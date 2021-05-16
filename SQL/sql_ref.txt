@@ -1,0 +1,158 @@
+#################################################
+#                 SQL                         #
+#################################################
+
+=================================================
+#              CMD | Bash                                       
+=================================================   
+show databases;
+use databaseName;
+show tables;
+describe tableName;
+select * from tableName;
+
+=================================================
+#              DOCKER                                          
+================================================= 
+
+#Docker Image for MySQL
+-------------------------------------------------
+=>docker run -d -p 3333:3306 --name=mysql-dkr-contr-db --env="MYSQL_ROOT_PASSWORD=root" --env="MYSQL_DATABASE=docker_spring_boot_mysql_db" -it mysql:5.7.18
+
+
+
+#Buid Application Image
+-------------------------------------------------
+=>docker build -t imranmadbar/docker-spring-boot-mysql .
+
+
+
+#Run Application with link of MySQL container
+-------------------------------------------------
+=>docker run --name docker-spring-boot-mysql -t --link mysql-dkr-contr-db:mysql-dkr-contr-db -d -p 8080:8181 imranmadbar/docker-spring-boot-mysql
+
+
+
+
+# Date between                                          
+-------------------------------------------------
+
+public static String transectionListStmt(String reqObj) {
+JSONObject json = new JSONObject(reqObj);
+StringBuilder sqlQuery = new StringBuilder();
+sqlQuery.append("SELECT A.PUR_REQ_NO AS PUR_REQ_NO, A.PUR_REQ_ID AS PUR_REQ_ID, ");
+sqlQuery.append("A.PUR_REQ_DATE AS PUR_REQ_DATE , S.SUPPLIER_NAME AS SUPPLIER_NAME, S.SUPPLIER_NO AS SUPPLIER_NO ");
+sqlQuery.append("FROM IN_PUR_REQ_PHR A,IN_SUPPLIER S ");
+sqlQuery.append("WHERE A.SUPPLIER_NO = S.SUPPLIER_NO ");
+sqlQuery.append("AND TRUNC(A.PUR_REQ_DATE) BETWEEN ");
+sqlQuery.append("TO_DATE('"+Def.getString(json, "fromDate")+"','MM/DD/YYYY') ");
+sqlQuery.append("AND TO_DATE('"+Def.getString(json, "fromDate")+"','MM/DD/YYYY') ");
+// sqlQuery.append("AND A.PUR_REQ_FROM = ");
+// sqlQuery.append("NVL('"+Def.getLong(json, "currBuNo")+"', A.PUR_REQ_FROM) ");
+// sqlQuery.append("AND A.PUR_REQ_ID LIKE '%'||'"+Def.getString(json, "purReqId")+"'||'%' ");
+// sqlQuery.append("AND UPPER(S.SUPPLIER_NAME) LIKE '%'||'"+Def.getString(json, "supplierName")+"'||'%' ");
+// sqlQuery.append("AND NVL(A.APPROVE_FLAG,0) = DECODE('"+null+"', 'A', NVL(A.APPROVE_FLAG,0), 'P', 1, 'U', 0) ");
+// sqlQuery.append("ORDER BY PUR_REQ_NO DESC ");
+return sqlQuery.toString();
+}
+-------------------------------------------------
+
+DROP VIEW MEDICARE_WEB.HL_FRESH_ITEM_STOCK_V;
+/* Formatted on 2020/01/19 10:54 (Formatter Plus v4.8.8) */
+CREATE OR REPLACE FORCE VIEW medicare_web.hl_fresh_item_stock_v (ID,
+store_no,
+store_name,
+itemtype_no,
+item_type_name,
+item_no,
+item_id,
+item_name,
+uom_no,
+uom_name,
+receive,
+issue,
+stock
+)
+AS
+SELECT ROWNUM ID, s.store_no, s.store_name, i.itemtype_no,
+t.item_type_name, i.item_no, i.item_id, i.item_name, u.uom_no,
+u.uom_name, receive, issue, NVL (receive, 0) - NVL (issue, 0) stock
+FROM in_store s,
+in_item i,
+in_itemtype t,
+in_uom u,
+(SELECT from_store_no, item_no,
+SUM (DECODE (trntype_no,
+1, item_qty,
+14, item_qty,
+3, item_qty,
+0
+)
+) receive,
+SUM (DECODE (trntype_no, 2, item_qty, 0)) issue
+FROM in_trnlgr_hl
+WHERE trntype_no IN (1, 2, 3)
+GROUP BY from_store_no, item_no) d
+WHERE s.store_no = d.from_store_no
+AND i.item_no = d.item_no
+AND i.itemtype_no = t.itemtype_no
+AND i.uom_no = u.uom_no(+);
+
+User Access Code:
+select u.SUBMENU_NO, u.SUBMENU_ID, u.SUBMENU_NAME, null user_no, 0 status
+from sa_submenu u
+where u.SUBMENU_TYPE = 'A'
+and not exists (select 1
+from sa_grantobject g
+where g.submenu_no = u.submenu_no
+and user_no = 1190000001917)
+union
+select u.SUBMENU_NO, u.SUBMENU_ID, u.SUBMENU_NAME, o.USER_NO, 1 status
+from sa_submenu u, sa_grantobject o
+where u.SUBMENU_NO = o.SUBMENU_NO
+and u.SUBMENU_TYPE = 'A'
+and o.USER_NO =1190000001917;
+
+
+=================================================
+# ORACLE | USER| SESSION
+=================================================
+
+Sessions can be killed from within WinSQL using the ALTER SYSTEM KILL SESSION syntax.
+First identify the offending session as follows:
+SELECT s.sid,
+s.serial#,
+s.osuser,
+s.program
+FROM v$session s;
+This query will result in a similar result.
+SID SERIAL# OSUSER PROGRAM
+1 1 SYSTEM ORACLE.EXE
+2 1 SYSTEM ORACLE.EXE
+3 1 SYSTEM ORACLE.EXE
+4 1 SYSTEM ORACLE.EXE
+32 45 SCOTT WINSQL.EXE
+37 501 SYSTEM WINSQL.EXE
+
+The SID and SERIAL# values of the relevant session can then be substituted into the following statement:
+ALTER SYSTEM KILL SESSION 'sid,serial#'
+
+In some situations the Oracle.exe is not able to kill the session immediately. In these cases the session will be "marked for kill". It will then be killed as soon as possible.
+Issuing the ALTER SYSTEM KILL SESSION command is the only safe way to kill an Oracle session. If the marked session persists for some time you may consider killing the process at the operating system level. However, this is not recommended as it is dangerous and can lead to instance failures.
+It is possible to force the kill by adding the IMMEDIATE keyword:
+
+ALTER SYSTEM KILL SESSION 'sid,serial#' IMMEDIATE
+-------------------------------------------------
+SELECT s.inst_id,
+s.sid,
+s.serial#,
+--s.sql_id,
+p.spid,
+s.username,
+s.program
+FROM gv$session s
+JOIN gv$process p ON p.addr = s.paddr AND p.inst_id = s.inst_id
+WHERE s.type != 'BACKGROUND';
+
+
+
