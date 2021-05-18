@@ -1,0 +1,32 @@
+version: '3'
+services:
+  web:
+    build: ./web-spring
+    ports:
+    - "8085:8085"
+    depends_on:
+    - "database"
+    volumes:
+    - /data/spring-boot-app
+  solver:
+    build: ./solver
+    ports:
+    - "8095:8095"
+    depends_on:
+    - "database"
+    - "web"    
+  database: 
+    image: "mysql:latest"
+    ports:
+    - "3306:3306"
+    environment:
+    - MYSQL_ROOT_PASSWORD=my-secret-pw
+    - MYSQL_DATABASE=mysqldatabase
+    volumes:
+      - /data/mysql
+    healthcheck:
+      test: ["CMD", "mysqldatabase" ,"ping", "-h", "database"]
+      timeout: 1s
+      retries: 100
+volumes:
+  logvolume01: {}
