@@ -35,7 +35,7 @@ Logging out from dockerhub
 
 
 #################################################
-#                 DOCKER_IMAGES                 #
+#                 Docker Image                 #
 #################################################
 
 
@@ -43,6 +43,29 @@ Logging out from dockerhub
 -------------------------------------------------
 =>docker Images
 List all the docker images pulled on the system with image details such as TAG/IMAGE ID/SIZE etc.
+
+
+
+# Build Images
+-------------------------------------------------
+=>docker image build -t imranmadbar/docker-spring-boot-restcall-producer .
+List all the docker images pulled on the system with image details such as TAG/IMAGE ID/SIZE etc.
+
+
+# Run Images as container
+-------------------------------------------------
+=>docker container run --name producer -p 8080:8080 -d employee-producer
+=>docker run --name docker-spring-boot-mysql -t --link mysql-dkr-contr-db:mysql-dkr-contr-db -d -p 8080:8181 imranmadbar/docker-spring-boot-mysql
+=>docker container run --network consumer-producer-net --name docker-spring-boot-restcall-producer -p 8080:8080 -d imranmadbar/docker-spring-boot-restcall-producer
+=>docker container run --network consumer-producer-net --name docker-spring-boot-restcall-consumer -p 8282:8282 -d imranmadbar/docker-spring-boot-restcall-consumer
+
+
+
+
+# Run Images as container
+-------------------------------------------------
+docker run --name docker-spring-boot-mysql -t --link mysql-dkr-contr-db:mysql-dkr-contr-db -d -p 8080:8181 imranmadbar/docker-spring-boot-mysql
+
 
 
 
@@ -155,7 +178,7 @@ To wipe Docker clean and start from scratch, enter the command:
 
  
 #################################################
-#                 DOCKER_NETWORK                #
+#                 Docker Network                #
 #################################################
 
 
@@ -166,14 +189,63 @@ The following command in docker lists the details of all the network in the clus
 
 
 
+#Create network
+-------------------------------------------------
+=>docker network create consumer-producer-net
+
+
+
 
 #################################################
-#                 DOCKER_DAEMONS                #
+#                 Docker Compose                #
 #################################################
 
 
+#Run Compose |  Up Compose
+-------------------------------------------------
+=>docker-compose up
+In this case, the application will be up and running until you hit Ctrl-C to cancel the foreground process.
+In this case, when you press Ctrl-C, it is equivalent to executing the “docker-compose stop”. So, it will stop all the containers gracefully.
 
-# Version
+=>docker-compose up -d 
+The -d options runs the docker application in the background as a daemon. 
+This will leave the application running until you decide to stop it.
+
+
+
+#Additional docker-compose Startup Options
+-------------------------------------------------
+When you use docker-compose up, if there are any changes in the docker-compose.yml file that affects the containers, they will stopped and recreated.
+But, you can force docker-compose not to stop and recreate the containers, you can use –no-recreate option as shown below during the docker-compose up. In other words, if the container already exits, this will not recreate it.
+
+=>docker-compose up -d --no-recreate
+You also can do the opposite. The following will forcefully recreate the containers even if nothing in the docker-compose.yml is changed.
+
+
+
+
+#You can also specify the timeout value
+-------------------------------------------------
+=>docker-compose up -d -t 30
+Default value is 10 seconds, but the following command will use the time-out value of 30 seconds.
+
+
+
+#The following are few additional options you can use along with “docker-compose up”
+-------------------------------------------------
+–no-deps This will not start any linked depended services.
+–no-build This will not build the image, even when the image is missing
+–abort-on-container-exit This will stop all the containers if any container was stopped. You cannot use this option with -d, you have to use this option by itself.
+–no-color In the output, this will not show any color. This will display the monochrome output on screen.
+
+
+
+#################################################
+#                Docker Daemons                 #
+#################################################
+
+
+#Version
 -------------------------------------------------
 =>docker --version
 One of the first things you want to know is how to find the installed docker version.

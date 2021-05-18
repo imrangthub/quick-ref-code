@@ -2,6 +2,32 @@
 #                 JAVA                          #
 #################################################
 
+
 =================================================
-#  Basic                                          
+#          List | Filter | Array                                          
 ================================================= 
+
+#Filter a list of object by its list field
+-------------------------------------------------
+
+public class Student {
+    List<Course> courses;
+    ...
+}
+public class Course {
+    String name;
+    ...
+}
+
+List<Student> studentList;
+List<Student> algorithmsCourseStudentList = 
+    studentList.stream()
+               .filter(a -> a.getCourses()
+                             .stream()
+                             .anyMatch(c -> c.getCourseName().equals("Algorithms")))
+               .collect(Collectors.toList());
+
+			   
+allMatch will only give you Students that all their Courses are named "Algorithms".
+
+anyMatch will give you all Students that have at least one Course named "Algorithms"
