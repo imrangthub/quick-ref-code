@@ -5,3 +5,307 @@
 =================================================
 #  Basic                                          
 ================================================= 
+
+#URL
+-------------------------------------------------
+
+
+#Consulatation to Prescription
+-------------------------------------------------
+http://localhost:4200/#/opd/global-registration/registration-global
+http://localhost:4200/#/opd/quick-consultation
+http://localhost:4200/#/opd/prescription/opd_prescription
+
+
+
+
+================================================= 
+#                   Phatology 
+================================================= 
+
+#ResultEntryTableAndView
+--------------------------------------
+
+in_item
+bill_invoice
+bill_invoicedtl
+path_invoicedtl
+paths_teststruct
+path_testresult
+path_testresultstamp
+sa_company_flag
+
+Invoice_with_pat_info_v_web
+V_IN_ITEM
+path_invoicedtl_v_web
+PATHS_USER_REPORT_PREPARED_V
+PATHS_USER_REPORTING_SIN_OFF_V
+PATHS_USER_REPORTING_DOCTOR_V
+PATHS_METHOD
+PATH_CONFIG
+PATHS_TESTTEMPLATE
+In_item
+Path_invoicedtl
+PATH_TESTRESULT
+PATHS_TESTSTRUCT
+PATHS_TESTSTRUCTVAL
+
+
+
+#Test Item attripute source
+-------------------------------------------------
+PATHS_TESTATTRGROUP_V VIEW BASED ON TABLE PATHS_TESTATTRGROUP
+SETUP ATTRIBUTE ON TABLE PATHS_TESTSTRUCT
+TRANSACTIONAL DATA PATH_TESTRESULT
+
+=================================================
+#                    Pharmacy
+=================================================
+
+
+#Get Medication List for Bill
+-------------------------------------------------
+SELECT s.screening_no, s.reg_no, s.appointment_no, s.opd_consultation_no,
+s.prescription_no, m.item_no, m.brand_name,
+null dosage, null duration,null duration_mu,
+q.stock_qty, q.purchase_price, q.supplier_no,
+m.form_name,m.route, SUM (d.item_qty) item_qty,
+NVL (v.sales_price, 0) item_rate,v.generic_name,v.item_type_name,v.disc_aplicable
+FROM pres_screening s,
+pres_screening_med m,
+pres_screening_med_dtl d,in_itmmed_v v,
+(SELECT s.store_no, s.item_no, SUM (NVL (s.stock_qty, 0)) stock_qty,
+s.purchase_price, s.supplier_no
+FROM phr_item_stock_data s
+WHERE s.store_no = 1000001
+GROUP BY s.store_no, s.item_no, s.purchase_price, s.supplier_no) q
+WHERE s.screening_no = m.screening_no
+AND m.pres_scr_med_no = d.pres_scr_med_no
+AND m.item_no = v.item_no
+AND s.opd_consultation_no = 1200000223543
+AND m.item_no = q.item_no(+)
+GROUP BY s.screening_no,
+s.reg_no,
+s.appointment_no,
+s.opd_consultation_no,
+s.prescription_no,
+m.generic_name,
+m.item_no,
+m.brand_name,
+m.form_name,
+m.strength,
+m.route,
+q.store_no,
+q.item_no,
+q.stock_qty,
+q.purchase_price,
+q.supplier_no,
+v.sales_price,
+v.generic_name,
+v.item_type_name,
+v.disc_aplicable
+
+==================================================
+ #                   For EMI
+=================================================
+SELECT DISTINCT TO_CHAR(B.INVOICE_NO) INVOICE_NO, B.REG_NO, TO_CHAR(B.INVOICE_DATETIME, 'DD/MM/YYYY hh:mm:ss') AS INVOICE_DATETIME,
+I.ITEM_NO,T.ITEM_ID, I.ITEM_NAME, T.BU_NO, H.BU_NAME, COUNT(I.ITEM_NO) TOTAL_TEST, 'Local' TEST_PERFORM
+FROM BILL_INVOICE B, BILL_INVOICEDTL I, PATH_INVOICEDTL P, IN_ITEM T, HR_BU H, OPD_REGISTRATION R
+WHERE B.INVOICE_NO = I.INVOICE_NO AND I.INVOICEDTL_NO = P.INVOICEDTL_NO AND I.ITEM_NO = T.ITEM_NO
+AND T.BU_NO = H.BU_NO AND NVL(I.CANCEL_FLAG, 0) = 0 AND P.LAB_RESULT_FINAL_KEY_FLAG = 1 AND R.REG_NO = B.REG_NO
+AND R.HOSPITAL_NUMBER = 'H11907005692'
+GROUP BY B.INVOICE_NO, B.REG_NO, B.INVOICE_DATETIME, I.ITEM_NO, T.ITEM_ID, I.ITEM_NAME, T.BU_NO, H.BU_NAME
+UNION ALL
+SELECT DISTINCT AFIP_VOUCHER_NO INVOICE_NO, O.REG_NO,
+TO_CHAR(C.DATA_UPLOAD_TIME, 'DD/MM/YYYY hh:mm:ss') AS INVOICE_DATETIME, C.CMH_ITEM_NO ITEM_NO,
+M.ITEM_ID, M.ITEM_NAME, M.BU_NO, H.BU_NAME, COUNT(DISTINCT C.CMH_ITEM_NO) TOTAL_TEST, 'AFIP' TEST_PERFORM
+FROM CMH_PAT_TEST_RESULT C, OPD_CONSULTATION O, IN_ITEM M, HR_BU H, OPD_REGISTRATION G
+WHERE C.CONSULTATION_NO = O.OPD_CONSULTATION_NO AND C.CMH_ITEM_NO = M.ITEM_NO AND M.BU_NO = H.BU_NO (+) AND O.REG_NO = G.REG_NO
+AND G.HOSPITAL_NUMBER = 'H11907005692'
+GROUP BY AFIP_VOUCHER_NO, O.REG_NO, C.DATA_UPLOAD_TIME, C.CMH_ITEM_NO, M.ITEM_ID, M.ITEM_NAME, M.BU_NO, H.BU_NAME
+ORDER BY ITEM_NO
+
+
+
+#Details
+--------------------------------------------------
+SELECT P.STAMP_ID, D.LAB_ID, TO_CHAR(D.LAB_RESULT_VERIFY_KEYED_TIME, 'DD/MM/YYYY') RESULT_DATE,
+R.ITEM_NO, R.SL_NO, R.ATTR, R.MACHINE_ATTRIB, R.ANALYZER_DESC, R.RESULT, R.RESULT1, R.RESULT2, R.RESULT3,
+R.COMMENTS, R.NOTE, R.INTERPRETATION, R.PLAIN_TEXT, R.UNIT, R.GROUP_TXT, R.REFERENCEVALUE, R.TEST_METHOD,
+R.SHOW_IN_REP, R.MACHINE_VAL_ARRIVED, R.ORIGINAL_RESULT, R.GROUP_SEQ, 'Local' TEST_PERFORM
+FROM BILL_INVOICE B, PATH_INVOICEDTL D, PATH_TESTRESULT R, PATH_TESTRESULTSTAMP P, HR_EMP H
+WHERE B.INVOICE_NO = D.INVOICE_NO AND D.PATHINVOICEDTL_NO = R.PATHINVOICEDTL_NO AND R.STAMP_NO = P.STAMP_NO
+AND NVL(P.RESULT_FINAL_KEYED_BY, 3) = H.DOCTOR_NO AND D.CANCEL_FLAG = 0
+AND B.REG_NO = 1190000391167
+AND R.ITEM_NO = 101319
+UNION ALL
+SELECT TO_CHAR(C.STAMP_NO) STAMP_ID, TO_CHAR(C.LAB_NO) LAB_ID, TO_CHAR(C.RES_VERIFY_DATE, 'DD/MM/YYYY') RESULT_DATE,
+C.CMH_ITEM_NO, C.SL_NO, C.ATTR, C.MACHINE_ATTR MACHINE_ATTRIB, C.ANALYZER_NAME ANALYZER_DESC,
+C.RESULT, C.RESULT1, C.RESULT2, C.RESULT3,
+C.REP_COMMENTS COMMENTS, C.REP_NOTE NOTE, C.REP_INTERPRETATION INTERPRETATION, C.REP_PLAIN_TEXT PLAIN_TEXT, C.UNIT, C.TEST_GROUP_NAME GROUP_TXT,
+C.REFERECNE_VALUE REFERENCEVALUE, C.REP_METHOD TEST_METHOD, C.SHOW_IN_REPORT SHOW_IN_REP, C.MACHINE_RES_FLAG MACHINE_VAL_ARRIVED,
+C.ORIGINAL_MAC_RESULT ORIGINAL_RESULT, C.TEST_GROUP_SEQ GROUP_SEQ, 'AFIP' TEST_PERFORM
+FROM CMH_PAT_TEST_RESULT C, OPD_CONSULTATION O
+WHERE C.CONSULTATION_NO = O.OPD_CONSULTATION_NO
+AND O.REG_NO = 1190000391167
+AND C.CMH_ITEM_NO = 101319
+ORDER BY ITEM_NO, SL_NO
+
+
+
+=================================================
+#    Typahead for HospitalNo(Serverside)
+=================================================
+Client
+-------------------------------------------------
+TS//
+mrnNumberList: Observable<any>
+typeaheadLoading: boolean;
+noResult = false;
+SelectedItemName: string = "";
+patientDetail: any = {};
+careOfDetail: any = {};
+searchObject: any = {};
+
+
+// onSelectMRN(result: any): void {
+// console.log('onSelectMRN Res', result.item);
+// if (result.item.hospitalNumber) {
+// this.searchHnPatient();
+// }
+
+// }
+
+changeTypeaheadLoading(e: boolean): void {
+if (this.selectedDoctor.length == 0) {
+this.selectedDoctor = null;
+}
+this.typeaheadLoading = e;
+}
+selectDoctor(result: any): void {
+}
+initiateMRNData(): any { // call this on init method
+return this.mrnNumberList = Observable.create((observer: any) => {
+observer.next(this.patientInfo.hospitalNo);
+
+}).pipe(mergeMap((token: string) => this.searchDoctor(token)));
+}
+searchDoctor(token: string): any {
+let searchObj = {
+"hospitalNumber": token
+}
+return this.paymentBillService.getTypeaheadPatientByMRN(searchObj);
+}
+
+onCLickRemoveMrn() {
+this.patientInfo = new PatientInfoModel();
+this.clearAll();
+}
+
+// call api
+
+getTypeaheadPatientByMRN(obj: any): Observable<any> {
+return this.http.post<any>(this.FIND_PATIENT_BY_MRN, obj).pipe(
+map((data: any) => data.items)
+)
+}
+
+HTML//
+<div *ngIf="showHnPat" class="col-auto col-md-5 paddingLeft0 margintopMinus8">
+<input
+#hnPatientField
+[(ngModel)]="patientInfo.hospitalNo"
+name="patientInfoHospitalNo"
+[typeaheadAsync]="true"
+[typeahead]="mrnNumberList"
+(typeaheadOnSelect)="onSelectMRN($event)"
+[typeaheadScrollable]="true"
+[typeaheadOptionsInScrollableView]="10"
+[typeaheadOptionsLimit]="10"
+[typeaheadWaitMs]="300"
+typeaheadOptionField="hospitalNumber"
+[typeaheadItemTemplate]="customTemplate"
+#patientName
+placeholder="Search by MRN"
+class="form-control"
+autocomplete="off"
+typeaheadMinLength="3">
+<button type="button" *ngIf ="patientInfo.hospitalNo" class="btn remove-doctor-icon" title="" (click)="onCLickRemoveMrn()"><i class="fas fa-times"></i></button>
+<ng-template #customTemplate let-model="item" let-index="index">
+<table>
+<tr>
+<th>ID:</th>
+<td>{{model.hospitalNumber}}</td>
+</tr>
+<tr>
+<th>Name</th>
+<td>{{model.patientName}}</td>
+</tr>
+</table>
+</ng-template>
+</div>
+
+
+Service Site (Java)
+-------------------------------------------------
+public Response typeaheadForMRN(String reqObj) {
+JSONObject json = new JSONObject(reqObj);
+String hospitalNumber = Def.getString(json, "hospitalNumber");
+
+CoreOpdRegistrationEntity opdRegistrationEntity = new CoreOpdRegistrationEntity();
+
+if (null == hospitalNumber) {
+return getErrorResponse("please enter hospitalNumber");
+}
+
+Map<String,Object> searchfields = new HashMap<String,Object>();
+searchfields.put("hospitalNumber", hospitalNumber);
+return baseList(typedQuery(opdRegistrationEntity, searchfields));
+}
+
+@SuppressWarnings({ "rawtypes" })
+private <T> TypedQuery typedQuery(CoreOpdRegistrationEntity filter, Map<String,Object> fields) {
+init();
+List<Predicate> pConjunction = criteriaCondition(filter, null, null);
+List<Predicate> pDisJunction = basePredicate(fields);
+
+return typedQuery(pConjunction,pDisJunction);
+}
+
+
+@SuppressWarnings({ "rawtypes" })
+public <T> TypedQuery typedQuery(List<Predicate> pConjunctionParam, List<Predicate> pDisJunctionParam) {
+List<Predicate> pArrayJoin = new ArrayList<Predicate>();
+List<Predicate> pConjunction = pConjunctionParam;
+List<Predicate> pDisJunction = pDisJunctionParam;
+Predicate predicateAND = null;
+Predicate predicateOR = null;
+if (!CollectionUtils.isEmpty(pConjunction)) {
+Predicate[] pArray = pConjunction.toArray(new Predicate[] {});
+predicateAND = builder.and(pArray);
+}
+if (!CollectionUtils.isEmpty(pDisJunction)) {
+Predicate[] pArray = pDisJunction.toArray(new Predicate[] {});
+predicateOR = builder.or(pArray);
+}
+if (predicateAND != null) {
+pArrayJoin.add(predicateAND);
+}
+if (predicateOR != null) {
+pArrayJoin.add(predicateOR);
+}
+criteria.where(pArrayJoin.toArray(new Predicate[0]));
+return baseTypedQuery(criteria);
+}
+
+@SuppressWarnings({ "rawtypes", "unchecked" })
+public <T> TypedQuery baseTypedQuery(CriteriaQuery criteria) {
+CriteriaQuery<T> select = criteria.select(root);
+TypedQuery<T> typedQuery = entityManager.createQuery(select);
+return typedQuery;
+}
+
+// ==============================================
+
+
+

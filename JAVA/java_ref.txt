@@ -2,6 +2,76 @@
 #                 JAVA                          #
 #################################################
 
+=================================================
+#         Convater | Param  | Json                                        
+================================================= 
+
+#From Json
+-------------------------------------------------
+
+JSONObject json = new JSONObject(reqObj);
+Date appointDate = Def.getDate(json, "appointDate", "dd/MM/yyyy");
+Long doctorNo = Def.getLong(json, "doctorNo");
+Long shiftNo = Def.getLong(json, "shiftNo");
+
+
+
+=================================================
+#         Query | sql call                                      
+================================================= 
+
+public static String getScheduleByDoctorNoDateShiftNo(Long doctorNo, Long shiftNo ) {
+	StringBuilder sqlQuery = new StringBuilder();
+	sqlQuery.append("select * from hpms_doc_schedule ");
+	sqlQuery.append("where doctor_no = 137 ");
+	sqlQuery.append("and shiftdtl_no = 2 ");
+	sqlQuery.append("wand trunc(empschedule_dt) between '31-may-2021' and '31-may-2021' ");
+	System.out.println("getScheduleByDoctorNoDateShiftNo: "+sqlQuery.toString());
+	return sqlQuery.toString();
+}
+
+
+public LabReportSaCompanyFlgDto getLabReportSaCompanyFlag(Long companyNo) {
+	boolean errorFlag = false;
+	LabReportSaCompanyFlgDto labReportSaCompanyFlg = new LabReportSaCompanyFlgDto();
+	Connection con = null;
+	ResultSet rs = null;
+	Statement stm = null;
+	List<LabReportSaCompanyFlgDto> labReportSaCompanyFlgList = new ArrayList<LabReportSaCompanyFlgDto>();
+	try {
+		con = getOraConnection();
+		stm = con.createStatement();
+		rs = stm.executeQuery(ReportStatement.getLabReportSaCompanyFlagQuery(companyNo, isEnbRpGnConLog()));
+		while (rs.next()) {
+			LabReportSaCompanyFlgDto obj = new LabReportSaCompanyFlgDto();
+
+			obj.setRepPreparedPrompt(rs.getString("REP_PREPARED_PROMPT"));
+			obj.setRepVerifyPrompt(rs.getString("REP_VERIFY_PROMPT"));
+			obj.setRepConsultantPrompt(rs.getString("REP_CONSULTANT_PROMPT"));
+			obj.setCollTimeFlg(rs.getLong("COLL_TIME_FLAG"));
+			obj.setReceiveTimeFlg(rs.getLong("RECEIVE_TIME_FLAG"));
+			obj.setResultEntryTimeFlg(rs.getLong("RESULT_ENTRY_TIME_FLAG"));
+			obj.setRepSlogan(rs.getString("REP_SLOGAN"));
+			obj.setRepEndText(rs.getString("REP_END_TEXT"));
+
+			labReportSaCompanyFlgList.add(obj);
+		}
+		if (!labReportSaCompanyFlgList.isEmpty()) {
+			labReportSaCompanyFlg = labReportSaCompanyFlgList.get(0);
+		}
+	} catch (SQLException e) {
+		e.printStackTrace();
+		errorFlag = true;
+	} finally {
+		finalyConStmRs(con, stm, rs);
+	}
+	if (errorFlag) {
+		return null;
+	}
+	return labReportSaCompanyFlg;
+}
+
+
 
 =================================================
 #          List | Filter | Array                                          

@@ -3,5 +3,1442 @@
 #################################################
 
 =================================================
-#  Basic                                          
+#                  Basic                                          
 ================================================= 
+
+autocomplete="off"
+#alterReportSerManMachBody
+@ViewChild('alterReportSerManMachBody') alterReportSerManMachBody: ElementRef;
+
+
+<tr *ngFor="let val of paymentHistoryList;let i = index">
+
+
+[ngClass]="{'match-metch-item':val.isCollectable === 1 && val.isCollectFlg === 1}"
+
+let selectableTag = document.getElementById(this.selectTestResultID );
+
+private toastr: ToastrService,
+this.toastr.warning("", "Please save this report first.");
+if (!this.currentItemTrnHl.currBu || this.currentItemTrnHl.currBu == 0) {
+this.toastr.warning('', "Please select a store !");
+return;
+}
+
+
+<input type="checkbox" [(ngModel)]="pathTestResult.showInRep"
+(ngModelChange)="pathTestResult.showInRep = $event ? 1 : 0"
+name="pathTestResult.showInRep" class="selectCheck">
+
+
+
+addLoader(): void {
+if (!this.alterReportSerManMachBody.nativeElement.classList.contains('loader')) {
+this.alterReportSerManMachBody.nativeElement.classList.add('loader');
+}
+}
+
+removeLoader(): void {
+if (this.alterReportSerManMachBody.nativeElement.classList.contains('loader')) {
+this.alterReportSerManMachBody.nativeElement.classList.remove('loader');
+}
+}
+
+
+#selectedOpetion
+-------------------------------------------------
+<select class="form-control br-0110"
+[(ngModel)]="selectedSalesPerson"
+(ngModelChange)="onCnageMarketingPerson()"
+>
+<option [ngValue]="null">-- Selecte Person --</option>
+<option *ngFor="let obj of marketingPersonList;" [ngValue]="obj">
+{{obj.salesrepName}}
+</option>
+</select>
+
+#bsDatepicker
+-------------------------------------------------
+// Filter fields
+fromDate: Date;
+toDate : Date;
+// max & min date for from date to date
+minDate: Date;
+maxDate: Date;
+private DATE_FMT = 'dd/MM/yyyy';
+sendFilterParam: any = {};
+
+initData(): void{
+this.toDate = new Date();
+this.fromDate = new Date();
+this.minDate = this.fromDate;
+this.maxDate = this.toDate;
+this.fromDate.setDate(this.toDate.getDate() - 0);
+this.sendFilterParam.toDate = this.util.getDateStringFromDateAndFormat(this.toDate,this.DATE_FMT);
+this.sendFilterParam.fromDate = this.util.getDateStringFromDateAndFormat(this.fromDate,this.DATE_FMT);
+}
+
+<input type="text"
+class="form-control datePicker"
+#fromDatedp="bsDatepicker"
+bsDatepicker
+[(ngModel)]="fromDate"
+(onHidden)="onChangeFromDate()"
+[bsConfig]="{ dateInputFormat: 'DD/MM/YYYY' }"
+[maxDate]="maxDate"
+placeholder="From Date">
+<input type="text"
+class="form-control datePicker"
+#toDatedp="bsDatepicker"
+bsDatepicker
+[(ngModel)]="toDate"
+(onHidden)="onChangeToDate()"
+[bsConfig]="{ dateInputFormat: 'DD/MM/YYYY' }"
+[minDate]="minDate"
+placeholder="To Date">
+
+
+#Calculation
+-------------------------------------------------
+decimalFormat( ,2);
+
+
+
+#Conditionally css class
+-------------------------------------------------
+type one
+[class.my-class]="step === 'step1'"
+type two
+[ngClass]="{'my-class': step === 'step1'}"
+and multiple option:
+[ngClass]="{'my-class': step === 'step1', 'my-class2':step === 'step2' }"
+type three
+[ngClass]="{1:'my-class1',2:'my-class2',3:'my-class4'}[step]"
+type four
+[ngClass]="(step=='step1')?'my-class1':'my-class2'"
+
+
+
+#Count down time
+-------------------------------------------------
+if(this.isStartOTDurationAutoCalculate){
+setInterval(() => {
+this.anaestheticNote.opEndDateTime = new Date();
+},500);
+}
+
+
+
+#Alert Modal
+-------------------------------------------------
+confirmAlertBsModalRef: BsModalRef;
+
+private modalService: BsModalService,
+
+
+stepCancelProcess(obj: PathInvoiceDtl, btnIdentity: any): void {
+const initialState = { title: "Are you sure to cancle this step ?" };
+this.resetAlertBsModalRef = this.modalService.show(ConfirmationDialogComponent, { initialState, class: 'modal-sm' });
+this.resetAlertBsModalRef.content.onClose.subscribe(
+result => {
+if (result == true) {
+this.pathStepReverseProc(obj, btnIdentity);
+}
+});
+}
+
+
+
+
+#General Modal
+-------------------------------------------------
+const initialState = {
+title: 'Add Store User Info',
+strUserDefModelObj: this.strUserDefModelObj,
+}
+this.addStoreUserDeModalRef = this.modalService.show(AddUserDefaultComponent, { class: 'modal-md', initialState, backdrop: 'static' });
+this.addStoreUserDeModalRef.content.onClose.subscribe(result => {
+if (result) {
+this.storeUserdefaultObj.draw();
+this.strUserDefModelObj = {}//new StoreUserModel();
+}
+});
+
+
+
+#API Call
+-------------------------------------------------
+Service
+-------
+getPosMedItemDtll(param: any): Observable<any> {
+return this.http.post<any>(this.POS_MED_ITEM_DTL, param).pipe(
+map((data: any) => data
+));
+}
+
+getTypeaheadPatientByMRN(obj: any): Observable<any> {
+return this.http.post<any>(this.FIND_PATIENT_BY_MRN, obj).pipe(
+map((data: any) => data.items)
+)
+}
+searchItemList(param: any): Observable<any> {
+return this.http.post<any>(this.ITEM_SEARCH_URL, param).pipe(
+map((data: any) => new SearchItemSerializer().toArray(data.model.itemList)
+));
+}
+
+
+
+#Client | Normal Call
+-------------------------------------------------
+onScreeningUpdate(): any {
+let reqObj = {
+'prescriptionNo': this.currentPresId
+}
+console.log("onScreeningUpdateReqObj:", reqObj);
+this.presMedScreeningService.screeningUpdate(reqObj).subscribe(
+res => {
+if (res.success) {
+console.log("screeningUpdate:", res);
+this.toastr.success('', 'Screening update done.');
+} else {
+console.log("screeningUpdate Failed:", res);
+this.toastr.warning('', 'Screening failed !');
+}
+},
+err => {
+console.log("screeningUpdate error: ", err);
+})
+}
+
+
+#API | PromiseCall
+-------------------------------------------------
+
+getRequiredData() {
+let that = this;
+this.getDataForScreening()
+.then(function (result) {
+return that.getPresMedicationByPresId();
+}).then(function (result) {
+console.log("Finished init API calling.");
+});
+}
+
+getDataForScreening(): any {
+return new Promise<any>((resolve, reject) => {
+this.sreeningWorkListService.dataForScreening(this.presScreenParam).subscribe(
+res => {
+if (res.success) {
+console.log("getDataForScreeningRes:", res);
+} else {
+console.log("getDataForScreening Failed:", res);
+}
+resolve(res);
+},
+err => {
+reject(null);
+console.log("getDataForScreening error: ", err);
+})
+});
+}
+
+getPresMedicationByPresId(): any {
+let reqObj = { 'prescriptionNo': this.currentPresId }
+return new Promise<any>((resolve, reject) => {
+this.presMedScreeningService.findByPrescriptionNo(reqObj).subscribe(
+res => {
+if (res.success) {
+console.log("getPresMedicationByPresId:", res);
+} else {
+console.log("getPresMedicationByPresId Failed:", res);
+}
+resolve(res);
+},
+err => {
+reject(null);
+console.log("getPresMedicationByPresId error: ", err);
+});
+});
+}
+
+
+=================================================
+#                  Component                                          
+================================================= 
+import { Component, OnInit } from '@angular/core';
+import { BsModalRef } from 'ngx-bootstrap';
+import { ToastrService } from 'ngx-toastr';
+import { Subject } from 'rxjs';
+import { CleaningReqReceivedDtl } from '../../_coreLinenLaundry/models/cleaning-req-received-dtl.model';
+import { CleaningProcessService } from '../../_coreLinenLaundry/services/cleaning-process.service';
+import { ClnProcReceivedDetails } from '../../_coreLinenLaundry/models/cln-proc-received-details.model';
+@Component({
+selector: 'app-received-detail-show-modal',
+templateUrl: './received-detail-show-modal.component.html',
+styleUrls: ['./received-detail-show-modal.component.css']
+})
+export class ReceivedDetailShowModalComponent implements OnInit {
+
+onClose: Subject<any>;
+hlTrnNo: any;
+clnProcReceivedDetails: ClnProcReceivedDetails[];
+
+constructor(
+private toastr: ToastrService,
+public showReceivedDtlBsModalRef: BsModalRef,
+private cleaningProcessService: CleaningProcessService
+) { }
+
+ngOnInit() {
+this.onClose = new Subject();
+console.log('hlTrnNo: ', this.hlTrnNo);
+this.getCleaningProcessReceivedDtlList();
+}
+
+
+getCleaningProcessReceivedDtlList(): void {
+let reqObj = { "hlTrnNo": this.hlTrnNo }
+console.log('getCleaningProcessReceivedDtlList obj:', reqObj);
+this.cleaningProcessService.cleaningProcessReceivedDtlList(reqObj).subscribe(
+res => {
+console.log('getCleaningProcessReceivedDtlList Items res: ', res);
+if (res.success) {
+this.clnProcReceivedDetails = res.items;
+console.log("Landry clean Item :", this.clnProcReceivedDetails);
+} else {
+this.clnProcReceivedDetails = [];
+this.toastr.warning('', res.message);
+}
+}, err => {
+console.error('Error Occur when getCleaningProcessReceivedDtlList item ', err);
+});
+}
+
+onClickCloseBtn(): void {
+console.log('onClickCloseBtn');
+this.onClose.next(true);
+this.showReceivedDtlBsModalRef.hide();
+}
+}
+
+
+
+#If else
+-------------------------------------------------
+
+<div *ngIf="condition; then thenBlock else elseBlock"></div>
+<ng-template #thenBlock>Content to render when condition is true.</ng-template>
+<ng-template #elseBlock>Content to render when condition is false.</ng-template>
+
+
+
+=================================================
+#          Angular Pipe | ngFor Group
+================================================= 
+<ng-template ngFor let-wardItemObj [ngForOf]="wardItemInfoList | groupBy: 'wardStoreName'">
+<span>{{wardItemObj.key}}</span>
+<ng-template ngFor let-object [ngForOf]="wardItemObj.value">
+<span>{{object.itemName}} - {{object.itemQty}}</span>
+</ng-template>
+</ng-template>
+---------------------------------------------------------
+<table class="table table-bordered table-striped customTable bg-white"
+*ngFor="let group of wardItemInfoList | groupBy: 'wardStoreName'"
+>
+<tr>
+<td colspan="3">
+<div class="word-dep-area">
+<p>
+<strong>Word/Department:</strong>
+<span>{{group.key}}</span>
+</p>
+<!-- <p>
+<strong>Date:</strong>
+<span>12-12-2019</span>
+</p> -->
+</div>
+</td>
+<td></td>
+</tr>
+<tr>
+<th class="text-center">SL</th>
+<th class="text-center">Item Name</th>
+<th class="text-center">Number of Item</th>
+<th class="text-center">Ward</th>
+</tr>
+<tr *ngFor="let wardItemInfoObj of group.value; let i = index;" (click)="onClickWordItem(wardItemInfoObj)">
+<td class="text-center">{{i+1}}</td>
+<td class="text-center">{{wardItemInfoObj.itemName}}</td>
+<td class="text-center">{{wardItemInfoObj.itemQty}}</td>
+<td class="text-center">{{wardItemInfoObj.wardStoreName}}</td>
+</tr>
+</table>
+
+
+
+=================================================
+#          DataTable 
+================================================= 
+
+#General
+-------------------------------------------------
+this.receivedGridObj.rows().deselect();
+
+// {
+// "visible": false,
+// data: 'ssModifiedON',
+// name: 'ssModifiedON'
+// },
+
+
+initOTStatusGrid() {
+let that = this;
+this.otRequisitionStatusGrid = $(this.otRequisitionStatusGridTbl.nativeElement);
+this.otRequisitionStatusGridObj = this.otRequisitionStatusGrid.DataTable({
+pagingType: 'full_numbers',
+pageLength: 10,
+serverSide: true,
+processing: true,
+ajax: {
+url: environment.baseUrl + environment.hospitalApiUrl + '/ot-requisition-status/gridList',
+type: "GET",
+data: function (sendData) {
+sendData.personalNumber = that.gridFilterParam.personalNumber;
+sendData.admissionId = that.gridFilterParam.admissionId;
+sendData.fromReqDate = that.gridFilterParam.fromReqDate;
+sendData.toReqDate = that.gridFilterParam.toReqDate;
+sendData.ipdWardNo = that.gridFilterParam.ipdWardNo;
+sendData.itemNo = that.gridFilterParam.itemNo
+if(that.ipdsStation)sendData.userStationNo = that.ipdsStation.nurseStationNo;
+if(that.userStationNoList)sendData.userStationNoList = that.userStationNoList.toString();
+
+},
+beforeSend: function (xhr) {
+xhr.setRequestHeader('Authorization', "bearer " + that.authService.getAccessToken());
+xhr.setRequestHeader('Content-Type', "application/json");
+},
+dataSrc: function (response) {
+if (response.obj) {
+response.draw = response.obj.draw;
+response.recordsTotal = response.obj.recordsTotal;
+response.recordsFiltered = response.obj.recordsFiltered;
+return response.obj.data;
+}
+},
+error: function (request) {
+console.log("request.responseText", request.responseText);
+}
+},
+"order": [[2, "desc"]],
+columns: [
+// {
+// "visible": false,
+// data: 'ssModifiedON',
+// name: 'ssModifiedON'
+// },
+{
+title: 'Patient Name',
+data: 'patientName',
+name: 'patientName',
+render: function (data, type, row) {
+let patientName;
+if (row.rankName){
+patientName = row.rankName + ' ' + row.patientName;
+} else {
+patientName = row.patientName;
+}
+if (row.photoUrl) {
+return '<div><img src="data:image/jpeg;base64,' + row.photoUrl + '" width="50px" height="50px" class="rounded-circle boder"><span class="pl-1">' + patientName + '</span></div>';
+} else {
+if (row.gender == 'F') {
+return '<div><img src="assets/images/profile-small-female.jpg" width="50px" height="50px" class="rounded-circle"><span class="pl-1">' + patientName + '</span></div>';
+} else {
+return '<div><img src="assets/images/profile-small.jpg" width="50px" height="50px" class="rounded-circle"><span class="pl-1">' + patientName + '</span></div>';
+}
+}
+}
+}, {
+title: 'Personal No.',
+data: 'personalNumber',
+name: 'personalNumber'
+},
+{
+title: 'Relation',
+data: 'relation',
+name: 'relation',
+render: function(data){
+if(data == ' '){
+return 'Self';
+}else{
+return data
+} ;
+}
+},
+{
+title: 'Admission No.',
+data: 'admissionId',
+name: 'admissionId'
+},
+{
+title: 'Age',
+data: 'age',
+},{
+title: 'Unit',
+data: 'unitName',
+},
+{
+orderable: false,
+title: 'Anes. Conf.',
+className: 'textCtd',
+render: (data, type, row) => {
+let resState: string;
+if (row.anaestChkupDoneFlg == 1) {
+resState = '<i class="far fa-check-square checkIcon"></i>'
+} else {
+resState = '<i class="fas fa-times pendingReportPrint"></i>'
+}
+return resState;
+},
+},
+{
+orderable: false,
+title: 'Doc. Conf.',
+className: 'textCtd',
+render: (data, type, row) => {
+let resState: string;
+if (row.otConfirmationFlag == 1) {
+resState = '<i class="far fa-check-square checkIcon"></i>'
+} else {
+resState = '<i class="fas fa-times pendingReportPrint"></i>'
+}
+return resState;
+},
+},
+{
+orderable: false,
+title: 'OT Execution',
+className: 'textCtd',
+render: (data, type, row) => {
+let resState: string;
+if (row.otInFlag == 1) {
+resState = '<i class="far fa-check-square checkIcon"></i>'
+} else {
+resState = '<i class="fas fa-times pendingReportPrint"></i>'
+}
+return resState;
+},
+},
+{
+orderable: false,
+title: 'OT Completed',
+className: 'textCtd',
+render: (data, type, row) => {
+let resState: string;
+if (row.otOutFlag == 1) {
+resState = '<i class="far fa-check-square checkIcon"></i>'
+} else {
+resState = '<i class="fas fa-times pendingReportPrint"></i>'
+}
+return resState;
+},
+},
+{
+orderable: false,
+title: 'Ret. Ward.',
+className: 'textCtd',
+render: (data, type, row) => {
+let resState: string;
+if (row.returnIpdFlag == 1) {
+resState = '<i class="far fa-check-square checkIcon"></i>'
+} else {
+resState = '<i class="fas fa-times pendingReportPrint"></i>'
+}
+return resState;
+},
+},
+{
+orderable: false,
+title: 'Ref. PACCU.',
+className: 'textCtd',
+render: (data, type, row) => {
+let resState: string;
+if (row.transferPacuFlg == 1) {
+resState = '<i class="far fa-check-square checkIcon"></i>'
+} else {
+resState = '<i class="fas fa-times pendingReportPrint"></i>'
+}
+return resState;
+},
+},
+{
+orderable: false,
+title: 'Ref. CCU.',
+className: 'textCtd',
+render: (data, type, row) => {
+let resState: string;
+if (row.transferCcuFlg == 1) {
+resState = '<i class="far fa-check-square checkIcon"></i>'
+} else {
+resState = '<i class="fas fa-times pendingReportPrint"></i>'
+}
+return resState;
+},
+},
+],
+select: true,
+responsive: true,
+autoWidth: true,
+rowCallback: (row: Node, data: any | Object) => {
+const self = this;
+$('td', row).off('click');
+$('td', row).on('click', () => {
+self.selectedAdmission = data;
+self.selectedAdmission.dob = new Date(self.selectedAdmission.dob)
+this.recivedPatient = self.selectedAdmission;
+this.onClickGridList(data);
+});
+return row;
+},
+})
+}
+
+#DataTable2
+-------------------------------------------------
+
+initSamplePendingGrid() {
+let that = this;
+this.samplePendingGrid = $(this.samplePendingTable.nativeElement);
+this.samplePendingGridObj = this.samplePendingGrid.DataTable({
+pagingType: 'full_numbers',
+pageLength: 10,
+serverSide: true,
+processing: true,
+ajax: {
+url: this.BASE_URL + "/path-simple-receive-atlab-pending-cc-v2/gridList",
+type: "GET",
+data: function (sendData) {
+sendData.fromDate = that.simplePendingfilterParams.fromDate;
+sendData.toDate = that.simplePendingfilterParams.toDate;
+sendData.selectedPendingPatientFrom = that.simplePendingfilterParams.selectedPendingPatientFrom;
+sendData.selectedDepartmentNo = that.simplePendingfilterParams.selectedDepartmentNo;
+sendData.selectedCompanyNo = that.simplePendingfilterParams.selectedCompanyNo;
+sendData.hospitalNumber = that.simplePendingfilterParams.hospitalNumber;
+sendData.personalNumber = that.simplePendingfilterParams.personalNumber;
+sendData.invoiceId = that.simplePendingfilterParams.invoiceId;
+sendData.admissionId = that.simplePendingfilterParams.admissionId;
+sendData.labId = that.simplePendingfilterParams.labId;
+sendData.deliveryStatusNo = that.simplePendingfilterParams.deliveryStatusNo;
+},
+beforeSend: function (xhr) {
+//TODO: Need to change bearer token from static to dynamic
+xhr.setRequestHeader('Authorization', "bearer " + that.authService.getAccessToken());
+xhr.setRequestHeader('Content-Type', "application/json");
+},
+dataSrc: function (response) {
+// console.log("path-simple-pending grid res:", response);
+response.draw = response.obj.draw;
+response.recordsTotal = response.obj.recordsTotal;
+response.recordsFiltered = response.obj.recordsFiltered;
+if (response.obj.data.length > 0) {
+that.currentInvoiceId = response.obj.data[0].invoiceId;
+that.getPatientDemographyInfo();
+}
+return response.obj.data;
+}
+},
+"order": [[0, "desc"]],
+columns: [
+{
+"visible": false,
+data: 'invoiceNo',
+name: 'invoiceNo'
+},
+{
+orderable: false,
+title: 'SRC',
+render: (data, type, row) => {
+let finalRwo: string;
+finalRwo = ''
+if (row.btobLabNo != null && row.btobLabNo>0) {
+finalRwo += 'B2B';
+}else if(row.billUnitNo != null && row.billUnitNo>0){
+finalRwo += 'BLU';
+}else {
+finalRwo += 'GNR';
+}
+return finalRwo;
+
+},
+},
+{
+title: 'Invoice ID',
+data: 'invoiceId',
+name: 'invoiceId'
+},
+{
+title: 'LAB ID',
+data: 'labId',
+name: 'labId'
+},
+{
+title: 'Delivery Date',
+data: 'deliveryDateTime',
+render: (data) => {
+return moment(new Date(data)).format("DD/MM/YYYY").toString()
+}
+},
+{
+title: 'Patient Name',
+data: 'patientName',
+name: 'patientName'
+},
+{
+title: 'Exam Name',
+data: 'itemName'
+},
+{
+title: 'Department',
+data: 'buName'
+},
+{
+title: 'Specimen',
+data: 'samName'
+},
+{
+title: 'Container',
+data: 'conName'
+}
+],
+responsive: true,
+select: true,
+rowCallback: (row: Node, data: any[] | Object) => {
+// console.log("*****",row, data);
+if (data['btobLabNo'] != null && data['btobLabNo']>0) {
+$(row).addClass('B2B')
+}else if(data['billUnitNo'] != null && data['billUnitNo']>0){
+$(row).addClass('BLU')
+}else {
+$(row).addClass('GNR')
+}
+
+$('td', row).bind('dblclick', () => {
+that.goToSampleReceiveClickHandler(data);
+});
+$(row).bind('click', () => {
+$(row).removeClass('selected')
+$(row).addClass('selected');
+that.onClickSampleReceive(data);
+});
+return row;
+}
+});
+}
+
+
+#DataTable3
+-------------------------------------------------
+
+initLandryItemGrid() {
+let that = this;
+this.receivedGrid = $(this.receivedGridTbl.nativeElement);
+this.receivedGridObj = this.receivedGrid.DataTable({
+pagingType: 'full_numbers',
+pageLength: 10,
+serverSide: true,
+processing: true,
+bLengthChange: false,
+//deferLoading:0,
+initComplete: function () {
+$('.dataTables_filter input').unbind()
+.bind('keyup change', function (e: any) {
+// console.log("Key Kore ##########:",e.keyCode);
+if (e.keyCode === 13) {
+if (e.target.value.length != undefined && e.target.value.length > 2) {
+that.receivedGridObj.search(e.target.value).draw();
+}
+}
+if (e.target.value == "") {
+that.receivedGridObj.search("").draw();
+}
+});
+},
+ajax: {
+url: environment.baseUrl + environment.linenLaundryAppUrl + "/cleaning-process/received/gridList",
+type: "GET",
+data: function (sendData) {
+sendData.fromDate = that.sendgridParam.fromDate;
+sendData.toDate = that.sendgridParam.toDate;
+},
+beforeSend: function (xhr) {
+xhr.setRequestHeader('Authorization', "bearer " + that.authService.getAccessToken());
+xhr.setRequestHeader('Content-Type', "application/json");
+},
+dataSrc: function (response) {
+// console.log("path-simple-pending grid res:", response);
+response.draw = response.obj.draw;
+response.recordsTotal = response.obj.recordsTotal;
+response.recordsFiltered = response.obj.recordsFiltered;
+return response.obj.data;
+}
+},
+"order": [[1, "desc"]],
+columns: [
+{
+"visible": false,
+data: 'hlTrnNo',
+name: 'hlTrnNo'
+},
+{
+title: 'Req No',
+data: 'refTrnId',
+name: 'refTrnId'
+},
+{
+title: 'Receive No',
+data: 'hlTrnId',
+name: 'hlTrnId'
+},
+{
+title: ' Date',
+data: 'trnDate',
+render: (data) => {
+return moment(data).format("DD/MM/YYYY")
+}
+},
+{
+title: 'Description',
+data: 'descr',
+},
+{
+title: 'Status',
+data: 'trnStatusDate'
+}
+],
+responsive: true,
+select: true,
+rowCallback: (row: Node, data: any[] | Object, index: number) => {
+$(row).unbind('click');
+$(row).bind('click', () => {
+$(row).removeClass('selected')
+$(row).addClass('selected');
+this.onClickGridItem(data);
+});
+$('td', row).unbind('dblclick');
+$('td', row).bind('dblclick', () => {
+that.onDblClickGridItem(data);
+});
+return row;
+}
+});
+}
+onClickGridItem(obj): void {
+console.log("onClickGridItem: ", obj);
+this.currentItemTrnHl = obj;
+}
+
+
+onDblClickGridItem(obj): void {
+console.log("onDblClickGridItem: ", obj);
+this.currentItemTrnHl = obj;
+this.showDetailsItem();
+}
+
+createdCell: (td, cellData, rowData, row, col) => {
+$(td).addClass('lightRed');
+}
+
+#DataTable4
+-------------------------------------------------
+itemStockGrid() {
+const that = this;
+this.itemStockList = $(this.itemStockTable.nativeElement);
+this.itemStockObj = this.itemStockList.DataTable({
+pagingType: 'full_numbers',
+pageLength: 10,
+serverSide: true,
+processing: true,
+ajax: {
+url: environment.baseUrl + environment.pharmacyApiUrl + '/item-stock/gridList',
+type: 'GET',
+data: function (sendData: any) {
+sendData.storeNo = that.storeNo;
+sendData.stockQty = that.stockQty;
+},
+beforeSend: function (xhr) {
+xhr.setRequestHeader('Authorization', 'bearer ' + that.authService.getAccessToken());
+xhr.setRequestHeader('Content-Type', 'application/json');
+},
+dataSrc: function (response) {
+response.draw = response.obj.draw;
+// console.log("Grid: ",response);
+response.recordsTotal = response.obj.recordsTotal;
+response.recordsFiltered = response.obj.recordsFiltered;
+return response.obj.data;
+},
+error: function (request) {
+console.log('request.responseText', request.responseText);
+}
+},
+'order': [[0, 'desc']],
+columns: [
+{
+'visible': false,
+data: 'itemId',
+name: 'itemId',
+},
+// {
+// 'visible': false,
+// data: 'itemNo',
+// name: 'itemNo'
+// },
+{
+title: 'Item Name',
+data: 'itemName',
+name: 'itemName',
+className: 'grid-name-item2-th',
+},
+{
+title: 'Type Name',
+data: 'itemTypeName',
+name: 'itemTypeName',
+},
+{
+title: 'UoM',
+data: 'uomName',
+name: 'uomName',
+},
+{
+title: 'Generic Name',
+data: 'genericName',
+name: 'genericName',
+className: 'grid-name-item-th',
+},
+{
+title: 'Therapeutic Name',
+name: 'therapeuticName',
+data: 'therapeuticName',
+},
+{
+title: 'Manufacturer Name',
+data: 'manufacturerName',
+name: 'manufacturerName',
+},
+{
+title: 'Sales Price',
+data: 'salesPrice',
+// name: 'salesPrice',
+},
+{
+title: 'Pur Price',
+data: 'purchasePrice',
+// name: 'purchasePrice',
+},
+{
+title: 'Stock Qty',
+data: 'stockQty',
+// name: 'stockQty',
+}
+],
+rowGroup: {
+startRender: function (rows, group) {
+var totalQty = rows
+.data()
+.pluck('stockQty')
+.reduce(function (a, b) {
+return a + b;
+}, 0);
+return '<div> Item No :: ' + group + '</div> <div> Item Total: ' + totalQty + '</div>'
+},
+// endRender: function (rows, group) {
+// var totalQty = rows
+// .data()
+// .pluck('stockQty')
+// .reduce(function (a, b) {
+// return a + b;
+// }, 0);
+// return 'Item total:' + totalQty;
+// },
+dataSrc: function (row) {
+return row.itemId;
+},
+},
+responsive: true,
+select: true,
+rowCallback: (row: Node, data: any[] | Object) => {
+$('td', row).bind('click', () => {
+that.getSelectedItem(data);
+});
+return row;
+}
+});
+}
+getSelectedItem(obj: any): void {
+console.log(obj)
+}
+
+
+
+=================================================
+#           Validation | Object check
+=================================================
+if (Object.keys(this.currentEmployee).length === 0 && this.currentEmployee.constructor === Object) {
+this.toast.warning('', "Please select a employee !");
+return;
+}
+
+=================================================
+#                  Array Operation
+=================================================
+
+let array = [
+    { id: 1, value: "itemname" },
+    { id: 2, value: "itemname" }
+];
+
+
+#Array Short
+-------------------------------------------------
+this.arr = this.arr.sort((a,b) => a.chapter > b.chapter ? 1 : -1);
+
+-------------------------------------------------
+if (this.fetalGrowthMeasureList != null) {
+this.fetalGrowthMeasureList.sort(function (a, b) {
+return a.growthDurationVal - b.growthDurationVal;
+});
+}
+
+
+#Get Obj from Array By Condition
+----------------------------------------------------
+let defObj = this.patientTypeList.find(obj => obj.phrDefaultFlg == 1);
+
+
+#Check doplicated item
+-------------------------------------------------
+let newArrForItemExistsCheck = this.itemTrnDtlHlList.filter((obj: InTrnDtlHl) => obj.itemNo === result.itemNo);
+if (newArrForItemExistsCheck && newArrForItemExistsCheck.length > 0) {
+this.toastr.warning('', `${result.itemName} already added !`);
+return;
+}
+this.itemTrnDtlHlList.unshift(result);
+
+
+#Filter Array
+------------------------------------------
+let newArr = this.pathSampleCollectionccList.filter((obj: PathSampleCollectionCCModel) => obj.isCollectable === 1);
+let newArrForQtyCheck = this.itemTrnDtlHlList.filter((obj: InTrnDtlHl) =>  obj.itemQty > obj.stockQty);
+    if(newArrForQtyCheck && newArrForQtyCheck.length > 0){
+      this.toastr.warning('', `Invlaid ${newArrForQtyCheck[0].itemName} quentity, Dirty item  more then Stock Item !`);
+      return;
+    }
+
+this.pathsMethodMthList = this.pathsMethodAllData.filter((obj:PathsMethod) => obj.textType === 'MTH');
+
+
+
+#Group By
+-------------------------------------------------
+
+groupBy(objectArray, property) {
+return objectArray.reduce(function (acc, obj) {
+  let key = obj[property]
+  if (!acc[key]) {
+	acc[key] = []
+  }
+  acc[key].push(obj)
+  return acc
+}, {})
+}
+
+
+#Ng for with data pipe
+-------------------------------------------------
+<tbody class="check_input">
+<tr *ngFor="let nonLabReport of nonLabReportList;let i = index;">
+<td>{{i+1}}</td>
+<td>{{nonLabReport.finalizeDate | date: 'dd/MM/yyyy h:mm a'}}</td>
+<td>{{nonLabReport.itemName}}</td>
+<td>{{nonLabReport.buName}}</td>
+<td>
+<button class="btn btn-primary btnLab" (click)="radiologyImage(nonLabReport.accessionId)">Image</button>
+</td>
+<td>
+<button class="btn btn-primary btnLab" (click)="loadRadiologyData(nonLabReport)">Report</button></td>
+</tr>
+</tbody>
+
+
+
+#API Calling
+-------------------------------------------------
+getDepartmentList():Observable<any>{
+return this.http.get<any>(this.DEPARTMENT_LIST).pipe(
+map((data: any) => data
+));
+}
+leaveApprovedOrReject(reqObj: any): Observable<any> {
+return this.http.post<any>(this.LEAV_APPROVED_OR_REJECT, reqObj).pipe(
+map((data: any) => data
+));
+}
+
+checkInvoiceId(invoiceId: string) {
+return this.http.get<any>(`${this.CHECK_INVOICE_ID}`, {
+params: new HttpParams().set('invoiceId', invoiceId)
+})
+}
+
+
+findBedListByWard(data:string){
+let params = new HttpParams().set("wardNo",data);
+return this.http.get(this.BED_BY_WARD, {params}).pipe(map((data:any) => data))
+}
+
+
+#Alert
+-------------------------------------------------
+if (this.selectedDoctor) {
+const initialState = { title: "Do you want to Delete?" };
+this.bsModalRef = this.modalService.show(ConfirmationDialogComponent, { initialState, class: 'modal-sm' });
+this.bsModalRef.content.onClose.subscribe(
+result => {
+if (result == true) {
+this.doctorService.deleteDoctor(this.selectedDoctor.doctorNo).subscribe(
+resp => {
+this.toastr.success('', "Delete Successfull");
+this.docTableObj.draw();
+this.selectedDoctor = "";
+},
+err => {
+this.toastr.warning('', "Error occured on Delete");
+}
+)
+}
+});
+} else {
+this.toastr.warning("Please select a Doctor");
+}
+
+
+
+
+#Html if else
+-------------------------------------------------
+
+<p *ngIf="currentLeaveApprovalObj.apprvlRemarks; else remarkPending">
+{{currentLeaveApprovalObj.apprvlRemarks}}
+</p>
+<ng-template #remarkPending>
+( Approval pending )
+</ng-template>
+
+
+#Typeahead
+-------------------------------------------------
+
+<input type="text" class="form-control borderradius"
+name="doctorSelect"
+[(ngModel)]="selectedOTItem"
+[typeahead]="otList"
+(typeaheadOnSelect)="onSelectOTItem($event)"
+(ngModelChange)="onOTItemChange()"
+[typeaheadOptionsLimit]="7"
+typeaheadMinLength="2"
+typeaheadOptionField="itemName"
+placeholder="Operation Name ..."
+autocomplete="off">
+
+
+onSelectOTItem(ev:any): void {
+console.log(ev)
+if(ev.item){
+this.gridFilterParam.itemNo = ev.item.itemNo
+this.reqComfirmationGridObj.draw();
+}
+}
+onOTItemChange(): void {
+console.log("onOTItemChange");
+if(this.selectedOTItem == undefined || this.selectedOTItem == ""){
+this.gridFilterParam.itemNo = undefined;
+this.reqComfirmationGridObj.draw();
+}
+}
+
+
+#Date picker
+-------------------------------------------------
+fromDate: Date;
+toDate: Date;
+maxDate: Date;
+
+ngOnInit() {
+this.toDate = new Date()
+this.fromDate = new Date();
+this.maxDate = new Date();
+this.fromDate.setDate(this.toDate.getDate() - 7);
+this.gridFilterParam.toDate = new DatePipe('en-US').transform(this.toDate, 'dd/MM/yyyy');
+}
+
+<input type="text"
+class="form-control datePicker"
+bsDatepicker
+[maxDate]="maxDate"
+[(ngModel)]="fromDate"
+(onHidden)="onChangeFormDate()"
+[bsConfig]="{ dateInputFormat: 'DD/MM/YYYY'}"
+>
+
+onChangeFormDate(): void {
+if (this.fromDate != undefined) {
+let modifyFormDate: string = new DatePipe('en-US').transform(this.fromDate, 'dd/MM/yyyy');
+this.gridFilterParam.fromDate = modifyFormDate;
+console.log("On change Form date:", modifyFormDate);
+}
+this.resultEntryPendingGridObj.draw();
+}
+
+
+#Style Tow
+-------------------------------------------------
+onChangeToDate(): void {
+console.log("On change selected to date ", this.toDate);
+if (this.toDate) {
+this.sendgridParam.toDate = this.util.getDateStringFromDateAndFormat(this.toDate, this.DATE_FMT);
+this.maxDate = this.toDate;
+}
+}
+
+
+
+#Confirmation Dialog Component
+-------------------------------------------------
+
+const initialState = { title: "Do you want to Delete?" };
+this.bsModalRef = this.modalService.show(ConfirmationDialogComponent, { initialState, class: 'modal-sm' });
+this.bsModalRef.content.onClose.subscribe(
+result => {
+if (result == true) {
+this.blacklistPatientService.delete(this.id.toString()).subscribe(
+() => {
+this.toastr.success('', "Delete Successfull")
+this.blockedListGridObj.draw();
+},
+() => {
+this.toastr.warning('', "Error occured in Unit Setup")
+}
+)
+}
+});
+
+
+
+
+#Modal
+-------------------------------------------------
+
+onClickAddLaveAppliction(): void {
+console.log('onClickAddLaveAppliction: ', this.currentEmployee)
+if (Object.keys(this.currentEmployee).length === 0 && this.currentEmployee.constructor === Object) {
+this.toast.warning('', "Please select a employee !");
+return;
+}
+const initialState = {
+currentEmployee: this.currentEmployee
+};
+this.applicationBsModalRef = this.modalService.show(LeaveApplicationFormComponent, { initialState, class: 'modal-lg',backdrop: 'static' });
+this.applicationBsModalRef.content.onClose.subscribe(
+result => {
+if (result == true) {
+this.leaveApplicationGridObj.draw();
+this.toast.success('', "Application successfully submit.")
+}
+});
+}
+
+
+
+#http call
+-------------------------------------------------
+
+getPriorityList(priority:Priority): Observable<any> {
+return this.http.post<any>(this.PRIORITY_LIST,priority).pipe(
+map((data: any) => data
+));
+}
+
+getDepartmentList(department:Department): Observable<any> {
+return this.http.post<any>(this.DEPARTMENT_LIST,department).pipe(
+map((data: any) => data
+));
+}
+getUserCompanyList(userCompany:UserCompany): Observable<any> {
+return this.http.post<any>(this.USER_COMPANY_LIST,userCompany).pipe(
+map((data: any) => data
+));
+}
+
+getInitialDataList(): Observable<any[]> {
+
+let priorityList = this.pathSampleCollectionCCService.getPriorityList(new Priority());
+let departmentList = this.pathSampleCollectionCCService.getDepartmentList(new Department());
+let userCompanyList = this.pathSampleCollectionCCService.getUserCompanyList(new UserCompany());
+return forkJoin([
+priorityList.pipe(take(1)),
+departmentList.pipe(take(1)),
+userCompanyList.pipe(take(1))
+]);
+}
+
+getInitialDataList(): void {
+this.pathSampleCollectionPendingCCService.getInitialDataList().subscribe(
+res => {
+console.log('getInitialDataList: ',res);
+let priorityObj = res[0];
+if(priorityObj.success){
+this.priorityList = priorityObj.items;
+}
+let departmentObj = res[1];
+if(departmentObj.success){
+this.departmentList = departmentObj.items;
+}
+let userCompanyObj = res[2];
+if(userCompanyObj.success){
+this.userCompanyList = userCompanyObj.items;
+}
+},
+err => {
+console.error("Error occured when get all Initial Data response ", err);
+}
+);
+}
+
+
+
+#Callback
+-------------------------------------------------
+onEnterSampleCollInputField(): void {
+let that = this;
+this.getPathLabIdChdByGenLabId(function (currentPathsLabIdChd: PathsLabIdChd) {
+console.log("getPathLabIdChdByGenLabId Call Back:", currentPathsLabIdChd.useFlag);
+});
+
+}
+
+getPathLabIdChdByGenLabId(callback: any): void {
+let genLabIdObj = { "genLabId": this.genLabIdForSampleColl }
+this.pathsLabIdChdService.getPathLabIdChdByGenLabId(genLabIdObj).subscribe(
+res => {
+if (res.success) {
+// console.log("getPathLabIdChdByGenLabId res:", res);
+this.currentPathsLabIdChd = res.obj;
+callback(this.currentPathsLabIdChd)
+} else {
+this.toastr.warning("", "Invlaid Label !");
+// console.log("getPatientDemographyInfo error:", res);
+}
+},
+err => {
+console.log("getPathLabIdChdByGenLabId list error: ", err);
+})
+}
+
+
+=================================================
+#                 Calculartion
+=================================================
+
+
+
+#Get Hour Minut from Date between
+-------------------------------------------------
+
+calcuteOPDuration(): void {
+    console.log("onChangeOpEndDateTime: ", this.anaestheticNote);
+    let diffRes = this.convertMS(this.anaestheticNote.opEndDateTime.getTime()-this.anaestheticNote.opStartDateTime.getTime());
+    if(diffRes){
+      this.anaestheticNote.opDuration = diffRes;
+    }
+    console.log("diffMilSec Hour: ",this.convertMS(diffRes));
+   }
+  convertMS(ms) {
+    var d, h, m, s;
+    s = Math.floor(ms / 1000);
+    m = Math.floor(s / 60);
+    s = s % 60;
+    h = Math.floor(m / 60);
+    m = m % 60;
+    d = Math.floor(h / 24);
+    h = h % 24;
+    h += d * 24;
+    return h + ':' + m + ':' + s;
+}
+
+
+#Reactive From
+-------------------------------------------------
+<form #preAnaesthCheckUpForm="ngForm">
+onSubmitPreAnaesthCheckUpForm(ngFrom : NgForm): void {
+console.log("ngFrom value:", ngFrom.valid);
+console.log("ngFrom touched:", ngFrom.touched);
+console.log("ngFrom untouched:", ngFrom.untouched);
+console.log("ngFrom dirty:", ngFrom.dirty);
+console.log("ngFrom valid:", ngFrom.valid);
+console.log("ngFrom Value:", ngFrom.value);
+if(ngFrom.dirty){
+if(ngFrom.valid){
+this.onClickAnestSaveBtn();
+}else{
+this.toastr.warning("", "Pleaser complete required field");
+}
+}else{
+this.bsModalRefAnaesthetic.hide();
+}
+}
+
+
+
+=================================================
+#            Production Building | build
+=================================================
+node --max_old_space_size=4096 node_modules/@angular/cli/bin/ng build --baseHref=/medicare-web-client-v2/ --prod=true
+
+
+
+================================================
+#          Install or uninstall
+================================================
+
+First:
+npm uninstall @angular-devkit/build-angular
+
+Next:
+npm install @angular-devkit/build-angular@0.12.4
+npm install ngx-toastr@9.1.2 --save
+
+
+=================================================
+#             Observable | obser
+=================================================
+
+
+  getReportListAsObservable() {
+    return of([
+      { orderSl: 1, label: 'Opd Appointment report', reportCod: 'OPD_4012_117_N' },
+      { orderSl: 2, label: 'Opd Appointment Summary report', reportCod: 'OPD_4013' },
+      { orderSl: 3, label: 'Opd Appointment Summary report(Type Wise)', reportCod: 'OPD_4014' },
+      { orderSl: 4, label: 'Opd Appointment Cancel report', reportCod: 'OPD_4015_117' },
+    ]).pipe(map((data) => data));
+  }
+
+  getReportList() {
+    this.getReportListAsObservable().subscribe(
+      response => {
+        this.reportList = response;
+        this.selectedReport = this.reportList.length > 0 ? this.reportList[0] : {};
+      }
+    );
+  }
+
+
+
