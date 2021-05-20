@@ -15,6 +15,49 @@ Long doctorNo = Def.getLong(json, "doctorNo");
 Long shiftNo = Def.getLong(json, "shiftNo");
 
 
+================================================
+#          List | Filter | Array  | Short                                       
+================================================= 
+
+#List From Response Obj
+-------------------------------------------------
+List<ViewDepartmentEntity> departmentList = new ArrayList<>();	
+	
+if (response.isSuccess() && !CollectionUtils.isEmpty(response.getItems())) {
+departmentList = getListFromObject(response.getItems(), ViewDepartmentEntity.class);
+
+
+#List Short by Name
+-------------------------------------------------
+departmentList = departmentList.stream().sorted((a1, a2) -> a1.getBuName().compareTo(a2.getBuName()))
+					.collect(Collectors.toList());	
+
+
+#Filter a list of object by its list field
+-------------------------------------------------
+
+public class Student {
+    List<Course> courses;
+    ...
+}
+public class Course {
+    String name;
+    ...
+}
+
+List<Student> studentList;
+List<Student> algorithmsCourseStudentList = 
+    studentList.stream()
+               .filter(a -> a.getCourses()
+                             .stream()
+                             .anyMatch(c -> c.getCourseName().equals("Algorithms")))
+               .collect(Collectors.toList());
+
+			   
+allMatch will only give you Students that all their Courses are named "Algorithms".
+
+anyMatch will give you all Students that have at least one Course named "Algorithms"
+
 
 =================================================
 #         Query | sql call                                      
@@ -73,31 +116,4 @@ public LabReportSaCompanyFlgDto getLabReportSaCompanyFlag(Long companyNo) {
 
 
 
-=================================================
-#          List | Filter | Array                                          
-================================================= 
-
-#Filter a list of object by its list field
--------------------------------------------------
-
-public class Student {
-    List<Course> courses;
-    ...
-}
-public class Course {
-    String name;
-    ...
-}
-
-List<Student> studentList;
-List<Student> algorithmsCourseStudentList = 
-    studentList.stream()
-               .filter(a -> a.getCourses()
-                             .stream()
-                             .anyMatch(c -> c.getCourseName().equals("Algorithms")))
-               .collect(Collectors.toList());
-
-			   
-allMatch will only give you Students that all their Courses are named "Algorithms".
-
-anyMatch will give you all Students that have at least one Course named "Algorithms"
+=
