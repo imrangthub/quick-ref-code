@@ -16,6 +16,12 @@ One of the first things you want to know is how to find the installed docker ver
 Get detailed information about docker installed on the system including the kernel version, number of containers and images, etc.
 
 
+#Strt docker
+-------------------------------------------------
+=>systemctl start docker
+Start docker in linux machine
+
+
 #Show docker logs
 -------------------------------------------------
 =>docker logs 96
@@ -194,9 +200,15 @@ The following command in docker lists the details of all the network in the clus
 
 
 
-#Create network
+#Create network (type Bridge)
 -------------------------------------------------
 =>docker network create consumer-producer-net
+
+
+
+#Create network (type Overlay)
+-------------------------------------------------
+=>docker network create --driver overlay producer-consumer-net
 
 
 
@@ -242,6 +254,32 @@ Default value is 10 seconds, but the following command will use the time-out val
 –no-build This will not build the image, even when the image is missing
 –abort-on-container-exit This will stop all the containers if any container was stopped. You cannot use this option with -d, you have to use this option by itself.
 –no-color In the output, this will not show any color. This will display the monochrome output on screen.
+
+
+
+
+#################################################
+#                Docker Swarm                   #
+#################################################
+
+
+
+#Initialized docker swarm
+-------------------------------------------------
+=>docker swarm init
+
+#Create a network of type overlay
+-------------------------------------------------
+=>docker network create --driver overlay producer-consumer-net
+
+When using services in a swarm,need a network so that multiple docker instances can interact with each other. 
+this time the network will be of type Overlay.
+
+
+#Create docker service
+-------------------------------------------------
+=>docker service create --network producer-consumer-net --name docker-swarm-spring-boot-consumer-api -p 8282:8282 imranmadbar/docker-swarm-spring-boot-consumer-api
+=>docker service create --network producer-consumer-net --name docker-swarm-spring-boot-producer-api -p 8181:8181 imranmadbar/docker-swarm-spring-boot-producer-api
 
 
 
