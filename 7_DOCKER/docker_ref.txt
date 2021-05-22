@@ -83,7 +83,7 @@ Remove the docker image with the docker image id mentioned in the command
 
 #Upload a docker Images 
 -------------------------------------------------
-=>docker push geekflare/httpd_image
+=>docker push imranmadbar/docker-swarm-spring-boot-consumer-api
 Upload a docker Images with the image name mentioned in the command on the dockerhub.
 
 
@@ -100,6 +100,11 @@ Just make change, re-build image and push !
 Search for a docker image on dockerhub with the name mentioned in the command.
 
 
+#delete all image:
+-------------------------------------------------
+=>docker system prune --all
+
+
 
 #################################################
 #                 Docker Container              #
@@ -108,14 +113,18 @@ Search for a docker image on dockerhub with the name mentioned in the command.
 
 # Lists of Containers
 -------------------------------------------------
+=>docker container ls
+
+=> docker container ls -aq
+List of container id
+
 =>docker ps
 Lists all the docker containers are running with container details.
 
 =>docker ps -a
 List all the docker containers running/exited/stopped with container details.
 
-=> docker container ls -aq
-List of container id
+
 
 
 
@@ -186,6 +195,25 @@ To remove all stopped containers
 -------------------------------------------------
 =>docker container stop $(docker container ls –aq) && docker system prune –af ––volumes
 To wipe Docker clean and start from scratch, enter the command:
+
+
+#Stop all docker containers at once on Windows
+-------------------------------------------------
+You could create a batch-file (.bat or .cmd) with these commands in it:
+
+@ECHO OFF
+FOR /f "tokens=*" %%i IN ('docker ps -q') DO docker stop %%i
+If you want to run this command directly in the console, replace %%i with %i, like:
+
+FOR /f "tokens=*" %i IN ('docker ps -q') DO docker stop %i
+In Git Bash or Bash for Windows you can use this Linux command:
+
+=>docker stop $(docker ps -q)
+Note: this will fail if there are no containers running
+
+For PowerShell, the command is very similar to the Linux one:
+
+=>docker ps -q | % { docker stop $_ }
 
  
 #################################################
@@ -268,6 +296,10 @@ Default value is 10 seconds, but the following command will use the time-out val
 -------------------------------------------------
 =>docker swarm init
 
+#Check Docker node-service
+-------------------------------------------------
+=>docker node ls
+
 #Create a network of type overlay
 -------------------------------------------------
 =>docker network create --driver overlay producer-consumer-net
@@ -281,6 +313,22 @@ this time the network will be of type Overlay.
 =>docker service create --network producer-consumer-net --name docker-swarm-spring-boot-consumer-api -p 8282:8282 imranmadbar/docker-swarm-spring-boot-consumer-api
 =>docker service create --network producer-consumer-net --name docker-swarm-spring-boot-producer-api -p 8181:8181 imranmadbar/docker-swarm-spring-boot-producer-api
 
+#Stop a docker service
+-------------------------------------------------
+=>docker service scale [serviceName]=0
+=>docker service scale docker-swarm-consumer-service=0
+Will remove all running instances but still keep the service object alive.
+
+
+#Remove service
+-------------------------------------------------
+=>docker service rm serviceName
+=>docker service rm docker-swarm-consumer-service
+To delete the service, which stops all deployed containers, you run:
+
+#Run docker service
+-------------------------------------------------
+docker service scale myservice=10
 
 
 #################################################
