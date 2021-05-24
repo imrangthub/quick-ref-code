@@ -50,9 +50,16 @@ List all the docker images pulled on the system with image details such as TAG/I
 =>docker image build -t imranmadbar/docker-spring-boot-restcall-producer .
 List all the docker images pulled on the system with image details such as TAG/IMAGE ID/SIZE etc.
 
+Retag the image with a version number:
+=>docker image build -t imranmadbar/docker-spring-security-mysql-mvc-prod:1.0.1.RELEASE .
+=>docker image build -t imranmadbar/docker-spring-security-mysql-mvc-prod:2.0.0.RELEASE .
 
 # Run Images as container
 -------------------------------------------------
+=>docker run --name containerName -p 8080:8080 -d imageName:tagName
+
+=>docker run --name docker-spring-security-mysql-mvc-prod -p 8181:8181  -d imranmadbar/docker-spring-security-mysql-mvc-prod:1.0.1.RELEASE
+
 =>docker container run --name producer -p 8080:8080 -d employee-producer
 =>docker run --name docker-spring-boot-mysql -t --link mysql-dkr-contr-db:mysql-dkr-contr-db -d -p 8080:8181 imranmadbar/docker-spring-boot-mysql
 =>docker container run --network consumer-producer-net --name docker-spring-boot-restcall-producer -p 8080:8080 -d imranmadbar/docker-spring-boot-restcall-producer
@@ -79,6 +86,11 @@ Remove the docker image with the docker image id mentioned in the command
 -------------------------------------------------
 =>docker push geekflare/httpd_image
 Upload a docker Images with the image name mentioned in the command on the dockerhub.
+
+With Version
+=>docker push abiodunjames/example-node-app:v1
+=>docker push imranmadbar/docker-spring-security-mysql-mvc-prod:1.0.1.RELEASE
+=>docker push imranmadbar/docker-spring-security-mysql-mvc-prod:2.0.0.RELEASE
 
 
 #Update a docker Images 
@@ -111,6 +123,9 @@ List all the docker containers running/exited/stopped with container details.
 => docker container ls -aq
 List of container id
 
+
+=>docker inspect <container-id>
+Inspect a container
 
 
 #Open Bash | CMD of Containers

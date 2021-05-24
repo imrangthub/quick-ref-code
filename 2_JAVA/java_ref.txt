@@ -6,6 +6,7 @@
 #         Convater | Param  | Json                                        
 ================================================= 
 
+
 #From Json
 -------------------------------------------------
 
@@ -13,6 +14,42 @@ JSONObject json = new JSONObject(reqObj);
 Date appointDate = Def.getDate(json, "appointDate", "dd/MM/yyyy");
 Long doctorNo = Def.getLong(json, "doctorNo");
 Long shiftNo = Def.getLong(json, "shiftNo");
+
+
+
+#From HttpParam | request.getParameter | Parameter
+-------------------------------------------------
+String companyNoStr = request.getParameter("companyNo");
+if (companyNoStr != null && !companyNoStr.isEmpty()) {
+	Long companyNo = Long.valueOf(companyNoStr);
+	if (companyNo > 0) {
+		viewPathSamplePendingCollectionEntity.setCompanyNo(companyNo);
+	}
+}
+
+String hospitalNumber = request.getParameter("hospitalNumber");
+if (hospitalNumber != null && !hospitalNumber.isEmpty()) {
+	isSearch = true;
+	int setHpNoRs = setKParamPdSetHospitalNo(hospitalNumber);
+	viewPathSamplePendingCollectionEntity.setHospitalNumber(hospitalNumber);
+}
+
+String fromDateStr = request.getParameter("fromDate");
+String toDateStr = request.getParameter("toDate");
+
+Date fromDate = deateParse(fromDateStr, "dd/MM/yyyy");
+Date toDate = deateParse(toDateStr, "dd/MM/yyyy");
+
+if (fromDate != null && toDate != null) {
+	isSearch = true;
+	viewPathSamplePendingCollectionEntity.setFromDate(fromDate);
+	viewPathSamplePendingCollectionEntity.setToDate(toDate);
+
+	int setInvoiceFrmDateRs = setKParamPdSetInvoiceDateFrom(
+			viewPathSamplePendingCollectionEntity.getFromDate());
+	int setInvoiceToDateRs = setKParamPdSetInvoiceDateTo(viewPathSamplePendingCollectionEntity.getToDate());
+
+}
 
 
 ================================================
