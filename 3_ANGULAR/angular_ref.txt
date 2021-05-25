@@ -57,6 +57,30 @@ this.alterReportSerManMachBody.nativeElement.classList.remove('loader');
 </option>
 </select>
 
+
+<select class="form-control" 
+[(ngModel)]="selectedPriorityDeliveryStatusNo" 
+(ngModelChange)="onChangePriority()"
+  name="selectedPriorityDeliveryStatusNo">
+  <option [ngValue]="0" selected>All</option>
+  <option [ngValue]="priority.deliveryStatusNo"
+   *ngFor="let priority of priorityList">
+	{{priority.deliveryStatusName}}
+  </option>
+</select>
+
+
+<select class="form-control" 
+        [(ngModel)]="selectedDepartmentNo" 
+        (ngModelChange)="onChangeDepartment()"
+          name="selectedDepartmentNo">
+          <option [ngValue]="0" selected>All</option>
+          <option [ngValue]="department.buNo" 
+          *ngFor="let department of departmentList">
+            {{department.buName}}
+          </option>
+        </select>
+
 #bsDatepicker
 -------------------------------------------------
 // Filter fields
@@ -978,6 +1002,300 @@ console.log(obj)
 }
 
 
+#DataTable5 | Color legend
+-------------------------------------------------
+ initAppointmentDetailsGrid() {
+    let that = this;
+    this.appointmentDetailsGrid = $(this.appointmetDetailsTable.nativeElement);
+    this.appointmentDetailsGridObjec = this.appointmentDetailsGrid.DataTable({
+      pagingType: 'full_numbers',
+      pageLength: 100,
+      serverSide: true,
+      processing: true,
+      deferLoading: 0,
+      sDom: '<"top"f >rt<"bottom"ip><"clear">',
+      searching: false,
+      ajax: {
+        url: environment.baseUrl + environment.diagnosticApiUrl + "/opd-appointments/opdAppointmentDetails",
+        type: "GET",
+
+        data: function (sendData) {
+          sendData.doctorNo = that.simplefilterParams.doctorNo
+          sendData.slotDate = that.simplefilterParams.slotDate
+          sendData.shiftdtlNo = that.simplefilterParams.shiftdtlNo
+        },
+
+        beforeSend: function (xhr) {
+          xhr.setRequestHeader('Authorization', "bearer " + that.authService.getAccessToken());
+          xhr.setRequestHeader('Content-Type', "application/json");
+        },
+
+        dataSrc: function (response) {
+          response.draw = response.obj.draw;
+          response.recordsTotal = response.obj.recordsTotal;
+          response.recordsFiltered = response.obj.recordsFiltered;
+          that.slotList = response.obj.data;
+
+          if(that.selectedDoctor && response.obj.data.length == 0){
+            if(that.scheduleStatus==0){
+              that.toastr.warning("No Schedule found !")
+            }else {
+              that.toastr.warning("No Sloat found, Please generate slot.")
+            }
+          }
+          return response.obj.data;
+        },
+   
+      },
+      order: [[1, "desc"]],
+      columns: [
+        {
+          orderable: false,
+          data: 'appointType',
+          render: (data) => {
+            if (data == 'Internet') {
+              return `<i class="fas fa-globe-asia" data-toggle="tooltip" title="Online appointment"></i>`;
+            } else if (data == 'Phone') {
+              return `<i class="fas fa-phone" data-toggle="tooltip" title="Phone appointment"></i>`;
+            } else if (data == 'Walking') {
+              return `<i class="fas fa-walking" data-toggle="tooltip" title="Walking appointment"></i>`;
+            } else {
+              return '';
+            }
+          }
+        }, {
+          title: 'SL.',
+          data: 'slotSl',
+          name: 'slotSl'
+        },
+        {
+          title: 'Start Time',
+          data: 'startTime',
+          name: 'startTime',
+          render: (data) => {
+            return moment(new Date(data)).format("hh:mm A").toString()
+          }
+        },
+        {
+          title: 'End Time',
+          data: 'endTime',
+          render: (data) => {
+            return moment(new Date(data)).format("hh:mm A").toString()
+          }
+        },
+        {
+          title: 'Patient Name',
+          data: 'patientName',
+        },
+        {
+          title: 'Reg.No.',
+          data: 'hospitalNumber',
+        },
+        {
+          title: 'Mobile No',
+          data: 'phoneMobile',
+        },
+        {
+          title: 'Booked By',
+          data: 'bookedBy',
+          render: (data, type, row) => {
+            if (row.appointStatus == 1) {
+              return data;
+            } else {
+              return '';
+            }
+          }
+        },
+        {
+          title: 'Modified By',
+          data: 'modifyByName',
+          render: (data, type, row) => {
+            if (row.modifyByName) {
+              return data;
+            } else {
+              return '';
+            }
+          }
+        },
+        {
+          title: 'Confirm By',
+          data: 'confirmByName',
+        },
+        {
+          "orderable": false,
+          class: 'text-center',
+          render: (data, type, row) => {
+            if (row && !row.appointNo || row.appointStatus == 0) {
+              return '<button type="button" class="btn btn-warning fontsize booked-slot">Booking</button>';
+            } else {
+              return '<button type="button" class="btn btn-warning fontsize disabled">Booked</button>';
+
+            }
+          }
+        },
+        {
+          "orderable": false,
+          class: 'text-center',
+          visible: that.consPriv,
+          render: (data, type, row) => {
+            if (row && row.appointNo) {
+              return '<button type="button" class="btn btn-success fontsize consultation">Consultation</button>';
+            } else {
+              return '<button type="button" class="btn btn-success fontsize disabled">Consultation</button>';
+            }
+          }
+        },
+        {
+          "orderable": false,
+          class: 'text-center',
+          render: (data, type, row) => {
+            if (row && row.appointNo && !row.consultationNo) {
+              return '<button type="button" class="btn btn-info fontsize update-slot">Update</button>';
+            } else {
+              return '<button type="button" class="btn btn-info fontsize disabled">Update</button>';
+            }
+          }
+        },
+        {
+          "orderable": false,
+          class: 'text-center',
+          render: (data, type, row) => {
+            if (row && row.appointNo && !row.consultationNo) {
+              return '<button type="button" class="btn btn-danger fontsize cencel-slot">Cancel</button>';
+            } else {
+              return '<button type="button" class="btn btn-danger fontsize disabled">Cancel</button>';
+            }
+          }
+        },
+        {
+          "orderable": false,
+          class: 'text-center',
+          render: (data, type, row) => {
+            if (row && row.appointNo) {
+              return '<button type="button" class="btn btn-warning fontsize disabled">Block</button>';
+            } else {
+              return '<button type="button" class="btn btn-warning fontsize appBlock">Block</button>';
+            }
+          }
+        },
+        {
+          "orderable": false,
+          class: 'text-center',
+          render: (data, type, row) => {
+            if (row && !row.appointNo) {
+              return '<button type="button" title="Re-Print" class="btn btn-primary fontsize disabled">R</button>';
+            } else {
+              return '<button type="button" title="Re-Print" class="btn btn-primary fontsize rePrintBtnRef">R</button>';
+            }
+          }
+        }
+      ],
+      rowGroup: {
+        startRender: function (rows, group) {
+          if (group === rows.data()[0].shiftdtlNo) {
+            if (group === 1) {
+              return '<div> Morning Shift</div>';
+            } else if (group === 2) {
+              return '<div> Evening Shift</div>';
+            }
+          }
+        },
+        dataSrc: ['shiftdtlNo']
+      },
+      select: true,
+      rowCallback: (row: Node, data: any[] | Object) => {
+        let rowObj: any = {};
+        rowObj = data;
+        $(row).find(".booked-slot").on("click", function () {
+          that.book(data);
+        });
+
+        $(row).find(".update-slot").click(function () {
+          that.book(data);
+        });
+        $(row).find(".rePrintBtnRef").click(function () {
+          that.onClickRePrintBtn(data);
+        });
+        $(row).find(".cencel-slot").click(function () {
+          that.opdCancel(data);
+        });
+
+        $(row).find(".consultation").on("click", function () {
+          that.retrieve(data);
+        });
+        $(row).find(".appBlock").on("click", function () {
+          that.onClickAppBlock(data);
+        });
+        $(row).bind('click', () => {
+          console.log(data);
+          if (!$(row).hasClass('selected')) {
+            that.selectedSlot = data;
+          } else {
+            that.selectedSlot = '';
+          }
+        });
+
+        // var endTime = new Date(rowObj.endTime);
+        var endTime = moment(new Date(rowObj.endTime));
+        var currentDate = moment(new Date());
+        if (endTime < currentDate) {
+          //console.log(rowObj.slotSl,endTime,currentDate);
+          $(row).find('td:eq(0)').css('background-color', '#ff0000');
+          $(row).find('td:eq(1)').css('background-color', '#ff0000');
+          $(row).find('td:eq(2)').css('background-color', '#ff0000');
+          $(row).find('td:eq(3)').css('background-color', '#ff0000');
+          that.setBgColor(row, rowObj);
+        } else {
+          $(row).find('td:eq(0)').css('background-color', 'transparent');
+          $(row).find('td:eq(1)').css('background-color', 'transparent');
+          $(row).find('td:eq(2)').css('background-color', 'transparent');
+          $(row).find('td:eq(3)').css('background-color', 'transparent');
+          that.setBgColor(row, rowObj);
+        }
+        return row;
+      }
+    }
+    );
+  }
+
+  setBgColor(row, rowObj) {
+    if (rowObj.slotStatus == 1) {
+      $(row).find('td:eq(0)').css('background-color', '#ffc000');
+      $(row).find('td:eq(1)').css('background-color', '#ffc000');
+      $(row).find('td:eq(2)').css('background-color', '#ffc000');
+      $(row).find('td:eq(3)').css('background-color', '#ffc000');
+    } if (rowObj.consultationNo) {
+      $(row).find('td:eq(0)').css('background-color', '#266a2e');
+      $(row).find('td:eq(1)').css('background-color', '#266a2e');
+      $(row).find('td:eq(2)').css('background-color', '#266a2e');
+      $(row).find('td:eq(3)').css('background-color', '#266a2e');
+    } else if (rowObj.slotStatus == 6) {
+      $(row).find('td:eq(0)').css('background-color', '#800000');
+      $(row).find('td:eq(1)').css('background-color', '#800000');
+      $(row).find('td:eq(2)').css('background-color', '#800000');
+      $(row).find('td:eq(3)').css('background-color', '#800000');
+    } if (rowObj.slotStatus == 8) {
+      $(row).find('td:eq(4)').css('background-color', '#708090');
+      $(row).find('td:eq(5)').css('background-color', '#708090');
+      $(row).find('td:eq(6)').css('background-color', '#708090');
+      $(row).find('td:eq(7)').css('background-color', '#708090');
+      $(row).find('td:eq(8)').css('background-color', '#708090');
+      $(row).find('td:eq(9)').css('background-color', '#708090');
+      $(row).find('td:eq(10)').css('background-color', '#708090');
+      $(row).find('td:eq(11)').css('background-color', '#708090');
+      $(row).find('td:eq(12)').css('background-color', '#708090');
+      $(row).find('td:eq(13)').css('background-color', '#708090');
+      $(row).find('td:eq(14)').css('background-color', '#708090');
+    } else if (rowObj.extraSlot == 1) {
+      $(row).find('td:eq(0)').css('background-color', '#008080');
+      $(row).find('td:eq(1)').css('background-color', '#008080');
+      $(row).find('td:eq(2)').css('background-color', '#008080');
+      $(row).find('td:eq(3)').css('background-color', '#008080');
+    }
+  }
+
+
+
 
 =================================================
 #           Validation | Object check
@@ -997,7 +1315,7 @@ let array = [
 ];
 
 
-#Array Short
+#Array Short | Order
 -------------------------------------------------
 this.arr = this.arr.sort((a,b) => a.chapter > b.chapter ? 1 : -1);
 
