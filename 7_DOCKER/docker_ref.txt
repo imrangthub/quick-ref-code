@@ -59,13 +59,25 @@ List all the docker images pulled on the system with image details such as TAG/I
 Retag the image with a version number:
 =>docker image build -t imranmadbar/docker-spring-security-mysql-mvc-prod:1.0.1.RELEASE .
 =>docker image build -t imranmadbar/docker-spring-security-mysql-mvc-prod:2.0.0.RELEASE .
+=>docker image build -t imranmadbar/docker-spring-security-mysql-mvc-prod:3.0.0.RELEASE .
+
+
+
+
+# Pull Images | download Images
+-------------------------------------------------
+=>docker pull imranmadbar/docker-spring-boot-mysql
+
+Pull image with a version number:
+=>docker pull imranmadbar/docker-spring-security-mysql-mvc-prod:1.0.1.RELEASE
+=>docker pull imranmadbar/docker-spring-security-mysql-mvc-prod:2.0.0.RELEASE
 
 
 # Run Images as container
 -------------------------------------------------
 =>docker run --name containerName -p 8080:8080 -d imageName:tagName
 
-=>docker run --name docker-spring-security-mysql-mvc-prod -p 8181:8181  -d imranmadbar/docker-spring-security-mysql-mvc-prod:1.0.1.RELEASE
+=>docker run --name docker-spring-security-mysql-mvc-prod -p 8181:8181 imranmadbar/docker-spring-security-mysql-mvc-prod:2.0.0.RELEASE
 
 =>docker container run --name producer -p 8080:8080 -d employee-producer
 =>docker run --name docker-spring-boot-mysql -t --link mysql-dkr-contr-db:mysql-dkr-contr-db -d -p 8080:8181 imranmadbar/docker-spring-boot-mysql
@@ -247,6 +259,17 @@ The following command in docker lists the details of all the network in the clus
 #Create network (type Bridge)
 -------------------------------------------------
 =>docker network create consumer-producer-net
+=>docker network create spring-security-mvc-net
+
+
+#Run Container in a Network
+--------------------------------------------------
+=>docker container run --network employee-mysql --name employee-jdbc-container -p 8080:8080 -d employee-jdbc
+
+#Run Container with a database
+--------------------------------------------------
+=>docker run --name docker-spring-security-mysql-mvc-prod3 -t --link mysql-dkr-contr-db:mysql-dkr-contr-db -d -p 8181:8181 imranmadbar/docker-spring-security-mysql-mvc-prod:3.0.0.RELEASE
+
 
 
 
