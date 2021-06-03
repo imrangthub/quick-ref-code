@@ -152,5 +152,2227 @@ public LabReportSaCompanyFlgDto getLabReportSaCompanyFlag(Long companyNo) {
 }
 
 
+-------------------------------------------------
 
-=
+public Response checkIsSplitableByLabNo(Long labNo) {
+		if (labNo == null) {
+			return getErrorResponse("labId Not Found!");
+		}
+		StringBuilder sqlString = new StringBuilder();
+		sqlString.append("select count(item_no) item from path_invoicedtl ");
+		sqlString.append(" where lab_no = '" + labNo + "' and nvl(cancel_flag,0) = 0");
+		System.out.println("sqlString:" + sqlString);
+
+		Query query = entityManager.createNativeQuery(sqlString.toString());
+		Response response = null;
+		try {
+			List<BigDecimal> resultList = query.getResultList();
+			BigDecimal result = resultList.get(0);
+			response = new Response();
+			if (result.longValue() > 1) {
+				response.setValid(true);
+			}
+			response.setObj(result.longValue());
+			response.setSuccess(true);
+
+		} catch (NoResultException e) {
+			response = new Response();
+			response.setSuccess(false);
+			response.setMessage("No entity's found!");
+		}
+		return response;
+	}
+-------------------------------------------------
+
+
+==================================================
+#Function | Procedure Call|OracleCallableStatement                        
+==================================================
+
+ST01
+====
+public Response collectionStepUpdateByLabId(String labId) {
+		Boolean executeFlag = null;
+		try {
+			StoredProcedureQuery query = entityManager.createStoredProcedureQuery("K_LAB.PD_STEP_UPDATE_WEB")
+
+					.registerStoredProcedureParameter(1, String.class, ParameterMode.IN)
+					.registerStoredProcedureParameter(2, Long.class, ParameterMode.IN)
+					.registerStoredProcedureParameter(3, Long.class, ParameterMode.IN)
+					.registerStoredProcedureParameter(4, String.class, ParameterMode.IN)
+					.setParameter(1, labId).setParameter(2, userDetails().getUserId())
+					.setParameter(3, userDetails().getSessionNo()).setParameter(4, "PSCC");
+
+			executeFlag = query.execute();
+
+		} catch (Exception e) {
+			System.out.println(e);
+			return getErrorResponse("Sample Collection fail !!");
+		}
+		return getSuccessResponse("Sample Collection Successfully");
+}
+
+STO2
+====
+public Response sampleCollectionProcessByInvoiceId(String invoiceId) {
+
+		StoredProcedureQuery query = entityManager.createStoredProcedureQuery("K_VARIFICATION.PD_INVOICE_SAM_PRO")
+
+				.registerStoredProcedureParameter(1, String.class, ParameterMode.IN)
+				.registerStoredProcedureParameter(2, Long.class, ParameterMode.IN)
+				.registerStoredProcedureParameter(3, Long.class, ParameterMode.IN)
+				.registerStoredProcedureParameter(4, Long.class, ParameterMode.OUT)
+				.registerStoredProcedureParameter(5, Long.class, ParameterMode.OUT)
+				.registerStoredProcedureParameter(6, String.class, ParameterMode.OUT)
+
+				.setParameter(1, invoiceId).setParameter(2, userDetails().getOrganizationNo())
+				.setParameter(3, userDetails().getCompanyNo());
+
+		query.execute();
+
+		Long invoiceNo = query.getOutputParameterValue(4) != null ? (Long) query.getOutputParameterValue(4) : null;
+		Long action = query.getOutputParameterValue(5) != null ? (Long) query.getOutputParameterValue(5) : null;
+		String message = query.getOutputParameterValue(6) != null ? (String) query.getOutputParameterValue(6) : "";
+
+		Response response = new Response();
+		Map<String, Object> resMap = new HashMap<String, Object>();
+		resMap.put("invoiceNo", invoiceNo);
+		resMap.put("action", action);
+		resMap.put("message", message);
+
+		response.setObj(resMap);
+
+		return response;
+}
+
+STO3
+====
+public Response sampleCollSplit(String reqStr) {
+
+		Map<String, Object> result = new HashMap<>();
+		Response response = new Response();
+		Connection dbConnection = null;
+		OracleCallableStatement orcs = null;
+		SampleCollectionSplitProcDto sampleCollectionSplitProcDto = new SampleCollectionSplitProcDto();
+
+		if (reqStr != null && !reqStr.equals("[]")) {
+			sampleCollectionSplitProcDto = objectMapperReadValue(reqStr, SampleCollectionSplitProcDto.class);
+		}
+
+		try {
+			int indexPosition = 0;
+			dbConnection = getOraConnection();
+			orcs = (OracleCallableStatement) dbConnection.prepareCall(procedureQuery("K_LAB.PD_NEW_LABNO", 7));
+
+			Def.setStringArray(++indexPosition, sampleCollectionSplitProcDto.getSplitableLabNoArr(), orcs);
+			orcs.setLong(++indexPosition, sampleCollectionSplitProcDto.getSplitableLabNoArr().length);
+			orcs.setLong(++indexPosition, sampleCollectionSplitProcDto.getDeliveryStatus());
+			orcs.setLong(++indexPosition, userDetails().getUserId());
+			orcs.setLong(++indexPosition, userDetails().getSessionNo());
+			orcs.setLong(++indexPosition, userDetails().getCompanyNo());
+
+			int errMessageIndex = ++indexPosition;
+			orcs.registerOutParameter(errMessageIndex, OracleTypes.VARCHAR);
+
+			orcs.execute();
+			result.put("errMessage", orcs.getString(errMessageIndex));
+
+		} catch (SQLException e) {
+			e.printStackTrace();
+			System.out.println("Error : " + e);
+		} finally {
+			Def.connectionClose(dbConnection, orcs);
+		}
+		if (result.get("errMessage") == null) {
+			response.setMessage("Split Successfully");
+			return response;
+		}
+		return getErrorResponse("Sample Collection Split fail !!");
+
+	}
+	
+MORE
+====
+	public String storedProcedureGenerateId(Long companyNo, String prefix) {
+		StoredProcedureQuery query = entityManager.createStoredProcedureQuery("K_GENERAL.PD_GENARATE_ID")
+
+				.registerStoredProcedureParameter(1, String.class, ParameterMode.IN)
+				.registerStoredProcedureParameter(2, String.class, ParameterMode.IN)
+				.registerStoredProcedureParameter(3, String.class, ParameterMode.IN)
+				.registerStoredProcedureParameter(4, Long.class, ParameterMode.IN)
+				.registerStoredProcedureParameter(5, String.class, ParameterMode.OUT)
+
+				.setParameter(1, prefix).setParameter(2, "OPD_REGISTRATION").setParameter(3, "HOSPITAL_NUMBER")
+				.setParameter(4, companyNo);
+
+		return (String) query.getOutputParameterValue(5);
+	}
+
+	public String storedProcedureGenerateId(Long companyNo, String prefix, String tableName, String columnName) {
+		StoredProcedureQuery query = entityManager.createStoredProcedureQuery("K_GENERAL.PD_GENARATE_ID")
+
+				.registerStoredProcedureParameter(1, String.class, ParameterMode.IN)
+				.registerStoredProcedureParameter(2, String.class, ParameterMode.IN)
+				.registerStoredProcedureParameter(3, String.class, ParameterMode.IN)
+				.registerStoredProcedureParameter(4, Long.class, ParameterMode.IN)
+				.registerStoredProcedureParameter(5, String.class, ParameterMode.OUT)
+
+				.setParameter(1, prefix).setParameter(2, tableName).setParameter(3, columnName)
+				.setParameter(4, companyNo);
+
+		return (String) query.getOutputParameterValue(5);
+	}
+
+	public Long storedProcedureGenerateNo(Long companyNo, String sequenceName) {
+
+		StoredProcedureQuery query = entityManager.createStoredProcedureQuery("K_GENERAL.PD_GENARATE_NO")
+
+				.registerStoredProcedureParameter(1, String.class, ParameterMode.IN)
+				.registerStoredProcedureParameter(2, Long.class, ParameterMode.IN)
+				.registerStoredProcedureParameter(3, Long.class, ParameterMode.OUT)
+				.registerStoredProcedureParameter(4, String.class, ParameterMode.IN)
+				.registerStoredProcedureParameter(5, Long.class, ParameterMode.IN)
+
+				.setParameter(1, sequenceName).setParameter(2, companyNo).setParameter(4, "YY").setParameter(5, 10l);
+		try {
+			query.execute();
+		} catch (Exception e) {
+			System.err.println("sequenceName: " + sequenceName);
+		}
+
+		return (Long) query.getOutputParameterValue(3);
+	}
+
+	public Long functionFdAutoNo(Long companyNo, String tableName, String columnName, Long dataLength) {
+		BigDecimal maxValue = null;
+		maxValue = (BigDecimal) entityManager
+				.createNativeQuery("SELECT FD_AUTO_NO(:pTable,:pColumn,:pCompanyNo,:pDataLength) FROM DUAL")
+				.setParameter("pTable", tableName).setParameter("pColumn", columnName)
+				.setParameter("pCompanyNo", companyNo).setParameter("pDataLength", dataLength).getSingleResult();
+
+		if (maxValue == null) {
+			return null;
+		}
+		return maxValue.longValue();
+
+	}
+
+	public String functionFdUserName(Long userno) {
+		String usrName = null;
+		usrName = (String) entityManager.createNativeQuery("SELECT FD_USER_NAME(:pUserNo) FROM DUAL")
+				.setParameter("pUserNo", userno).getSingleResult();
+		if (usrName == null) {
+			return null;
+		}
+		return usrName;
+	}
+
+	public Response storedProcedureCreateAnonymousUser(Long regNo, String HN, String gender, Long companyNo,
+			Long sessionNo, String encodPassword, String plainPassord, String defaultPageLink, String featureCoad,
+			String phoneNo, String patientName, Long userNo) throws AppRuntimeException {
+
+		StoredProcedureQuery query = entityManager.createStoredProcedureQuery("pd_anonymous_user")
+
+				.registerStoredProcedureParameter(1, Long.class, ParameterMode.IN)
+				.registerStoredProcedureParameter(2, String.class, ParameterMode.IN)
+				.registerStoredProcedureParameter(3, String.class, ParameterMode.IN)
+				.registerStoredProcedureParameter(4, String.class, ParameterMode.IN)
+				.registerStoredProcedureParameter(5, String.class, ParameterMode.IN)
+				.registerStoredProcedureParameter(6, Long.class, ParameterMode.IN)
+				.registerStoredProcedureParameter(7, Long.class, ParameterMode.IN)
+				.registerStoredProcedureParameter(8, Long.class, ParameterMode.IN)
+				.registerStoredProcedureParameter(9, String.class, ParameterMode.IN)
+				.registerStoredProcedureParameter(10, String.class, ParameterMode.IN)
+				.registerStoredProcedureParameter(11, String.class, ParameterMode.IN)
+				.registerStoredProcedureParameter(12, String.class, ParameterMode.IN)
+				.registerStoredProcedureParameter(13, Long.class, ParameterMode.OUT)
+				.registerStoredProcedureParameter(14, String.class, ParameterMode.OUT)
+
+				.setParameter(1, regNo).setParameter(2, HN).setParameter(3, gender).setParameter(4, phoneNo)
+				.setParameter(5, patientName).setParameter(6, userNo).setParameter(7, companyNo)
+				.setParameter(8, sessionNo).setParameter(9, encodPassword).setParameter(10, plainPassord)
+				.setParameter(11, defaultPageLink).setParameter(12, featureCoad);
+
+		query.execute();
+
+		Long action = query.getOutputParameterValue(13) != null ? (Long) query.getOutputParameterValue(13) : null;
+		String message = query.getOutputParameterValue(14) != null ? (String) query.getOutputParameterValue(14) : "";
+
+		Response response = new Response();
+		Map<String, Object> resMap = new HashMap<String, Object>();
+
+		resMap.put("action", action);
+		resMap.put("message", message);
+
+		response.setObj(resMap);
+
+		if (action.longValue() == 1L) {
+			throw new AppRuntimeException().anonymousUserCreationException("User Creation fail!! " + message);
+		}
+
+		return response;
+	}
+
+	public String functionPatientAge(Date fromDate, Date toDate) {
+		String from = null;
+		String to = null;
+		String age = null;
+
+		SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy");
+		if (null != fromDate) {
+			from = dateFormat.format(fromDate);
+		}
+		if (null != toDate) {
+			to = dateFormat.format(toDate);
+		}
+
+		age = (String) entityManager.createNativeQuery("SELECT fnc_cal_age_web(:from,:to) FROM DUAL")
+				.setParameter("from", from).setParameter("to", to).getSingleResult();
+
+		if (age == null) {
+			return null;
+		}
+		return age;
+	}
+	
+MORE
+====
+	public Response kLabPdStepUpdate(KLabPdStepUpdateProsdArgDto paramObj) {
+
+		Boolean executeFlag = null;
+		String genId = null;
+		try {
+			ProcedureCall procedureCall = entityManager.unwrap(Session.class)
+					.createStoredProcedureCall("K_LAB.PD_STEP_UPDATE");
+			procedureCall.registerParameter(1, Long.class, ParameterMode.IN);
+			procedureCall.registerParameter(2, Long.class, ParameterMode.IN);
+			procedureCall.registerParameter(3, Date.class, ParameterMode.IN);
+			procedureCall.registerParameter(4, Long.class, ParameterMode.IN);
+			procedureCall.registerParameter(5, Long.class, ParameterMode.IN);
+			procedureCall.registerParameter(6, Long.class, ParameterMode.IN);
+			procedureCall.registerParameter(7, String.class, ParameterMode.IN);
+			procedureCall.registerParameter(8, Long.class, ParameterMode.IN);
+			procedureCall.registerParameter(9, Long.class, ParameterMode.IN);
+			procedureCall.registerParameter(10, Long.class, ParameterMode.IN).enablePassingNulls(true);
+			procedureCall.registerParameter(11, Long.class, ParameterMode.IN);
+			procedureCall.registerParameter(12, Date.class, ParameterMode.IN);
+			procedureCall.registerParameter(13, Long.class, ParameterMode.IN).enablePassingNulls(true);
+			procedureCall.registerParameter(14, Date.class, ParameterMode.IN).enablePassingNulls(true);
+			procedureCall.registerParameter(15, Long.class, ParameterMode.IN).enablePassingNulls(true);
+			procedureCall.registerParameter(16, Date.class, ParameterMode.IN).enablePassingNulls(true);
+			procedureCall.registerParameter(17, Long.class, ParameterMode.IN).enablePassingNulls(true);
+			procedureCall.registerParameter(18, Date.class, ParameterMode.IN).enablePassingNulls(true);
+			procedureCall.registerParameter(19, String.class, ParameterMode.IN);
+
+			procedureCall.setParameter(1, paramObj.getStampNo());
+			procedureCall.setParameter(2, paramObj.getEntryBy());
+			procedureCall.setParameter(3, paramObj.getEntryDate());
+			procedureCall.setParameter(4, paramObj.getSessionNo());
+			procedureCall.setParameter(5, paramObj.getBuNo());
+			procedureCall.setParameter(6, paramObj.getTempNo());
+			procedureCall.setParameter(7, paramObj.getReportGroup());
+			procedureCall.setParameter(8, paramObj.getDeliveryStatusNo());
+			procedureCall.setParameter(9, paramObj.getInvoiceNo());
+			procedureCall.setParameter(10, paramObj.getPathVoucherDtlNoUck());
+			procedureCall.setParameter(11, paramObj.getPreparedBy());
+			procedureCall.setParameter(12, paramObj.getPreparedDate());
+			procedureCall.setParameter(13, paramObj.getVerifiedBy());
+			procedureCall.setParameter(14, paramObj.getVerifiedDate());
+			procedureCall.setParameter(15, paramObj.getFinalBy());
+			procedureCall.setParameter(16, paramObj.getFinalDate());
+			procedureCall.setParameter(17, paramObj.getPrintBy());
+			procedureCall.setParameter(18, paramObj.getPrintDate());
+			procedureCall.setParameter(19, paramObj.getTypeVal());
+
+			executeFlag = procedureCall.execute();
+
+		} catch (Exception e) {
+			LOGGER.error("Error Procedure execude K_LAB.PD_STEP_UPDATE" + e.getStackTrace());
+			System.out.println("Error Procedure execude K_LAB.PD_STEP_UPDATE" + e);
+			return getErrorResponse("Error Procedure execude K_LAB.PD_STEP_UPDATE ");
+		}
+		return getSuccessResponse("Successfully K_LAB.PD_STEP_UPDATE execute done");
+	}
+
+	// Post Insert Process : for table PATH_TESTRESULTSTAMP
+	public Response kLabPdUpdPathInvDtlStampNo(Long pInvoiceNo, String reportGroup, Long buNo, Long tempNo,
+			Long stampNo, Long deliveryStatusNo) {
+
+		Boolean executeFlag = null;
+		try {
+			StoredProcedureQuery query = entityManager.createStoredProcedureQuery("k_lab.PD_UPD_PATH_INV_DTL_STAMP_NO")
+
+					.registerStoredProcedureParameter(1, Long.class, ParameterMode.IN)
+					.registerStoredProcedureParameter(2, String.class, ParameterMode.IN)
+					.registerStoredProcedureParameter(3, Long.class, ParameterMode.IN)
+					.registerStoredProcedureParameter(4, Long.class, ParameterMode.IN)
+					.registerStoredProcedureParameter(5, Long.class, ParameterMode.IN)
+					.registerStoredProcedureParameter(6, Long.class, ParameterMode.IN)
+
+					.setParameter(1, pInvoiceNo).setParameter(2, reportGroup).setParameter(3, buNo)
+					.setParameter(4, tempNo).setParameter(5, stampNo).setParameter(6, deliveryStatusNo);
+
+			executeFlag = query.execute();
+
+		} catch (Exception e) {
+			LOGGER.error("Pathology Error Found for execute pros PD_UPD_PATH_INV_DTL_STAMP_NO: " + e.getStackTrace());
+			System.out.println("Pathology Error Found for execute pros PD_UPD_PATH_INV_DTL_STAMP_NO" + e);
+			return getErrorResponse("Pathology Error Found for execute pros PD_UPD_PATH_INV_DTL_STAMP_NO !!");
+		}
+		return getSuccessResponse("Successfully PD_UPD_PATH_INV_DTL_STAMP_NO pros execute done");
+	}
+
+	public List<Long> getItemNoListForResultEntry(Long invoiceNo, Long tempNo, Long buNo, String reportGroup,
+			Long deliveryStatusNo, Long stampNo) {
+
+		List<Long> itemNoList = new ArrayList<Long>();
+		StringBuilder sqlString = new StringBuilder();
+
+		sqlString.append("SELECT a.item_no FROM in_item a, path_invoicedtl b  ");
+		sqlString.append(" WHERE DECODE (NVL (a.report_group, 'I'),'I', TO_CHAR (a.item_no), a.report_group) = NVL ('"
+				+ reportGroup + "', 'I') ");
+		sqlString.append(" AND a.bu_no = " + buNo);
+		sqlString.append(" AND a.test_temp_no = " + tempNo);
+		sqlString.append(" AND a.item_no = b.item_no ");
+		sqlString.append(" AND b.delivery_status_no = NVL (" + deliveryStatusNo + ", 1) ");
+		sqlString.append(" AND NVL (b.stamp_no, -1) = NVL (" + stampNo + ", -1) ");
+		sqlString.append(" AND b.invoice_no = " + invoiceNo);
+		sqlString.append(" AND NVL (b.lab_rcv_from_sp_key_flag, 0) = 1 ");
+		System.out.println("PathResultEntryItemNoListQuery:" + sqlString);
+
+		Query query = entityManager.createNativeQuery(sqlString.toString());
+		Response response = null;
+		try {
+			List<BigDecimal> resultList = query.getResultList();
+			for (BigDecimal value : resultList) {
+				itemNoList.add(value.longValue());
+			}
+		} catch (Exception e) {
+			LOGGER.error("Pathology Error Found when getItemNoListForResultEntry : " + e.getStackTrace());
+			System.err.println("Pathology Error Found when getItemNoListForResultEntry " + e);
+			e.printStackTrace();
+			return null;
+		}
+		return itemNoList;
+	}
+
+	public String getGenaratedId(String tableName, String columnName) {
+
+		Boolean executeFlag = null;
+		String genId = null;
+		try {
+			ProcedureCall procedureCall = entityManager.unwrap(Session.class)
+					.createStoredProcedureCall("K_GENERAL.PD_GENARATE_ID");
+
+			procedureCall.registerParameter(1, StringType.class, ParameterMode.IN).enablePassingNulls(true);
+			procedureCall.registerParameter(2, String.class, ParameterMode.IN);
+			procedureCall.registerParameter(3, String.class, ParameterMode.IN);
+			procedureCall.registerParameter(4, Long.class, ParameterMode.IN);
+			procedureCall.registerParameter(5, String.class, ParameterMode.OUT);
+
+			procedureCall.setParameter(1, null);
+			procedureCall.setParameter(2, tableName);
+			procedureCall.setParameter(3, columnName);
+			procedureCall.setParameter(4, userDetails().getCompanyNo());
+
+			executeFlag = procedureCall.execute();
+
+			genId = procedureCall.getOutputParameterValue(5) != null ? (String) procedureCall.getOutputParameterValue(5)
+					: null;
+
+		} catch (Exception e) {
+			LOGGER.error("Pathology Error Found when getGenaratedId: " + e.getStackTrace());
+			System.err.println("Pathology Error Found when getGenaratedId " + e);
+			return null;
+		}
+		return genId;
+	}
+
+	public Long getGenIdForPathInvoiceDtl() {
+		return storedProcedureGenerateNo(userDetails().getCompanyNo(), "SEQ_PATHINVOICEDTL_NO");
+	}
+
+	public Long getGenIdForTestResult() {
+		return storedProcedureGenerateNo(userDetails().getCompanyNo(), "SEQ_TESTRESULT_NO");
+	}
+
+	public Long getGenIdForTestResultStamp() {
+		return storedProcedureGenerateNo(userDetails().getCompanyNo(), "SEQ_STAMP_NO");
+	}
+
+	// getStampNoByStampId
+	public Response getStampNoByStampId(String stampId) {
+		StoredProcedureQuery query = entityManager.createStoredProcedureQuery("PD_GET_STAMP_NO")
+				.registerStoredProcedureParameter(1, String.class, ParameterMode.IN)
+				.registerStoredProcedureParameter(2, String.class, ParameterMode.IN)
+				.registerStoredProcedureParameter(3, Long.class, ParameterMode.OUT).setParameter(1, stampId)
+				.setParameter(2, "P");
+
+		query.execute();
+
+		Long stampNo = query.getOutputParameterValue(3) != null ? (Long) query.getOutputParameterValue(3) : null;
+		Response response = new Response();
+		response.setObj(stampNo);
+		return response;
+	}
+
+	public MyUserDetails userDetails() {
+		MyUserDetails myUserDetails = userPrincipal();
+
+		Map<String, Object> details = resourceTokenStore.readAccessToken(accessToken()).getAdditionalInformation();
+		if (null != details.get("sessionNo")) {
+			myUserDetails.setSessionNo(((Long) details.get("sessionNo")).longValue());
+		}
+		return myUserDetails;
+	}
+
+	public Response pdReportViewLogWeb(Long testTempNo, Long invoiceNo, String reportType, Long buNo, String accessType,
+			Long stampNo) {
+
+		Boolean executeFlag = null;
+		Response response = new Response();
+		Map<String, Object> resMap = new HashMap<String, Object>();
+		try {
+			StoredProcedureQuery query = entityManager.createStoredProcedureQuery("pd_report_view_log_web");
+
+			query.registerStoredProcedureParameter(1, Long.class, ParameterMode.IN);
+			query.registerStoredProcedureParameter(2, Long.class, ParameterMode.IN);
+			query.registerStoredProcedureParameter(3, String.class, ParameterMode.IN);
+			query.registerStoredProcedureParameter(4, Long.class, ParameterMode.IN);
+			query.registerStoredProcedureParameter(5, String.class, ParameterMode.IN);
+			query.registerStoredProcedureParameter(6, Long.class, ParameterMode.IN);
+			query.registerStoredProcedureParameter(7, Long.class, ParameterMode.IN);
+			query.registerStoredProcedureParameter(8, Long.class, ParameterMode.IN);
+			query.registerStoredProcedureParameter(9, Long.class, ParameterMode.IN);
+			query.registerStoredProcedureParameter(10, Long.class, ParameterMode.OUT);
+			query.registerStoredProcedureParameter(11, String.class, ParameterMode.OUT);
+
+			query.setParameter(1, testTempNo);
+			query.setParameter(2, invoiceNo);
+			query.setParameter(3, reportType);
+			query.setParameter(4, buNo);
+			query.setParameter(5, accessType);
+			query.setParameter(6, stampNo);
+			query.setParameter(7, userDetails().getUserId());
+			query.setParameter(8, userDetails().getSessionNo());
+			query.setParameter(9, userDetails().getCompanyNo());
+
+			executeFlag = query.execute();
+			Long action = query.getOutputParameterValue(10) != null ? (Long) query.getOutputParameterValue(10) : null;
+			String message = query.getOutputParameterValue(11) != null ? (String) query.getOutputParameterValue(11)
+					: "";
+
+			resMap.put("action", action);
+			resMap.put("message", message);
+
+			if (action != 0) {
+				response.setSuccess(false);
+			}
+			response.setObj(resMap);
+
+		} catch (Exception e) {
+			e.printStackTrace();
+			LOGGER.error("Pathology Error Found when pdReportViewLogWeb Procesur Call: " + e.getStackTrace());
+			System.err.println("Pathology Error Found when pdReportViewLogWeb Procesur Call" + e);
+			return getErrorResponse("ReportViewLogWeb fail !!");
+		}
+		return response;
+	}
+
+	public List<LabReportResultDto> getLabReportResultList(Long stampNo) {
+		boolean errorFlag = false;
+		Connection con = null;
+		ResultSet rs = null;
+		Statement stm = null;
+		List<LabReportResultDto> labReportResultList = new ArrayList<LabReportResultDto>();
+		try {
+			con = getOraConnection();
+			stm = con.createStatement();
+			rs = stm.executeQuery(ReportStatement.getLabReportResultList(stampNo, isEnbRpGnConLog()));
+			while (rs.next()) {
+				LabReportResultDto obj = new LabReportResultDto();
+
+				obj.setStampId(rs.getString("stamp_id"));
+				// obj.setStampNo(rs.getLong("stamp_no"));
+				obj.setGroupSeq(rs.getLong("group_seq"));
+				obj.setBuNo(rs.getLong("bu_no"));
+				obj.setItemName(rs.getString("item_name"));
+				obj.setItemNo(rs.getLong("item_no"));
+				obj.setAttr(rs.getString("attr"));
+				obj.setResult(rs.getString("result"));
+				obj.setResultOne(rs.getString("result1"));
+				obj.setResultTwo(rs.getString("result2"));
+				obj.setResultThree(rs.getString("result3"));
+				obj.setInterpretationTest(rs.getString("INTERPRETATION_TEST"));
+				obj.setNormalValue(rs.getString("normal_value"));
+				obj.setAttribGroup(rs.getString("attribgroup"));
+				obj.setAttribGroupOne(rs.getString("attribgroup_1"));
+				// obj.setInterpretationTest(rs.getString("interpretation_test"));
+				// obj.setSlNo(rs.getLong("sl_no"));
+				obj.setGroupTxt(rs.getString("GROUP_TXT"));
+				obj.setTestGroupNo(rs.getLong("TEST_GROUP_NO"));
+				obj.setUnit(rs.getString("unit"));
+
+				labReportResultList.add(obj);
+			}
+
+		} catch (SQLException e) {
+			e.printStackTrace();
+			errorFlag = true;
+		} finally {
+			finalyConStmRs(con, stm, rs);
+		}
+
+		if (errorFlag) {
+			return null;
+		}
+
+		return labReportResultList;
+	}
+
+	public LabReportSaCompanyFlgDto getLabReportSaCompanyFlag(Long companyNo) {
+		boolean errorFlag = false;
+		LabReportSaCompanyFlgDto labReportSaCompanyFlg = new LabReportSaCompanyFlgDto();
+		Connection con = null;
+		ResultSet rs = null;
+		Statement stm = null;
+		List<LabReportSaCompanyFlgDto> labReportSaCompanyFlgList = new ArrayList<LabReportSaCompanyFlgDto>();
+		try {
+			con = getOraConnection();
+			stm = con.createStatement();
+			rs = stm.executeQuery(ReportStatement.getLabReportSaCompanyFlagQuery(companyNo, isEnbRpGnConLog()));
+			while (rs.next()) {
+				LabReportSaCompanyFlgDto obj = new LabReportSaCompanyFlgDto();
+
+				obj.setRepPreparedPrompt(rs.getString("REP_PREPARED_PROMPT"));
+				obj.setRepVerifyPrompt(rs.getString("REP_VERIFY_PROMPT"));
+				obj.setRepConsultantPrompt(rs.getString("REP_CONSULTANT_PROMPT"));
+				obj.setCollTimeFlg(rs.getLong("COLL_TIME_FLAG"));
+				obj.setReceiveTimeFlg(rs.getLong("RECEIVE_TIME_FLAG"));
+				obj.setResultEntryTimeFlg(rs.getLong("RESULT_ENTRY_TIME_FLAG"));
+				obj.setRepSlogan(rs.getString("REP_SLOGAN"));
+				obj.setRepEndText(rs.getString("REP_END_TEXT"));
+
+				labReportSaCompanyFlgList.add(obj);
+			}
+			if (!labReportSaCompanyFlgList.isEmpty()) {
+				labReportSaCompanyFlg = labReportSaCompanyFlgList.get(0);
+			}
+		} catch (SQLException e) {
+			e.printStackTrace();
+			errorFlag = true;
+		} finally {
+			finalyConStmRs(con, stm, rs);
+		}
+		if (errorFlag) {
+			return null;
+		}
+		return labReportSaCompanyFlg;
+	}
+
+	
+-------------------------------------------------
+
+
+================================================
+# Repository Example|                                     
+================================================= 
+
+
+@Repository
+@Transactional
+public class ViewPathSamplePendingCollectionRepository extends DiagnosticBaseRepository {
+
+	private static final Logger LOGGER = LoggerFactory.getLogger(ViewPathSamplePendingCollectionRepository.class);
+
+	public Response getPathSamplePendingCollectionList(String viewPathSamplePendingCollectionStr) {
+		ViewPathSamplePendingCollectionEntity viewPathSamplePendingCollection = objectMapperReadValue(
+				viewPathSamplePendingCollectionStr, ViewPathSamplePendingCollectionEntity.class);
+		return baseList(criteriaQuery(viewPathSamplePendingCollection));
+	}
+
+	@SuppressWarnings({ "rawtypes", "unchecked" })
+	public Response gridList(HttpServletRequest request) {
+
+		boolean isSearch = false; // If empty of those foure field then search will be false
+		DataTableResults<ViewPathSamplePendingCollectionEntity> dataTableResults = null;
+		Response response = new Response();
+		ViewPathSamplePendingCollectionEntity viewPathSamplePendingCollectionEntity = new ViewPathSamplePendingCollectionEntity();
+
+		String fromDateStr = request.getParameter("fromDate");
+		String toDateStr = request.getParameter("toDate");
+
+		Date fromDate = deateParse(fromDateStr, "dd/MM/yyyy");
+		Date toDate = deateParse(toDateStr, "dd/MM/yyyy");
+
+		if (fromDate != null && toDate != null) {
+			isSearch = true;
+			viewPathSamplePendingCollectionEntity.setFromDate(fromDate);
+			viewPathSamplePendingCollectionEntity.setToDate(toDate);
+
+			int setInvoiceFrmDateRs = setKParamPdSetInvoiceDateFrom(
+					viewPathSamplePendingCollectionEntity.getFromDate());
+			int setInvoiceToDateRs = setKParamPdSetInvoiceDateTo(viewPathSamplePendingCollectionEntity.getToDate());
+
+		}
+		String patientFrom = request.getParameter("patientFrom");
+		if (null != patientFrom && !patientFrom.isEmpty()) {
+			viewPathSamplePendingCollectionEntity.setPatientFrom(patientFrom);
+		}
+
+		String departmentNoStr = request.getParameter("departmentNumbrer");
+		if (null != departmentNoStr && !departmentNoStr.isEmpty()) {
+			Long departmentNo = Long.valueOf(departmentNoStr);
+			if (departmentNo > 0) {
+				viewPathSamplePendingCollectionEntity.setDepartmentNo(departmentNo);
+			}
+		}
+
+		String priorityNumberStr = request.getParameter("priorityNumber");
+		if (priorityNumberStr != null && !priorityNumberStr.isEmpty()) {
+			Long priorityNo = Long.valueOf(priorityNumberStr);
+			if (priorityNo > 0) {
+				viewPathSamplePendingCollectionEntity.setDeliveryStatusNo(priorityNo);
+			}
+		}
+
+		String companyNoStr = request.getParameter("companyNo");
+		if (companyNoStr != null && !companyNoStr.isEmpty()) {
+			Long companyNo = Long.valueOf(companyNoStr);
+			if (companyNo > 0) {
+				viewPathSamplePendingCollectionEntity.setCompanyNo(companyNo);
+			}
+		}
+
+		String hospitalNumber = request.getParameter("hospitalNumber");
+		if (hospitalNumber != null && !hospitalNumber.isEmpty()) {
+			isSearch = true;
+			int setHpNoRs = setKParamPdSetHospitalNo(hospitalNumber);
+			viewPathSamplePendingCollectionEntity.setHospitalNumber(hospitalNumber);
+		}
+
+		String admissionId = request.getParameter("admissionId");
+		if (admissionId != null && !admissionId.isEmpty()) {
+			isSearch = true;
+			int setAdmissionNoRs = setKParamPdSetAdmissionId(admissionId);
+			viewPathSamplePendingCollectionEntity.setAdmissionId(admissionId);
+		}
+
+		String invoiceId = request.getParameter("invoiceId");
+		if (invoiceId != null && !invoiceId.isEmpty()) {
+			isSearch = true;
+			int setInvoiceIdRs = setKParamPdSetInvoiceId(invoiceId);
+			viewPathSamplePendingCollectionEntity.setInvoiceId(invoiceId);
+		}
+		String labId = request.getParameter("labId");
+		if (labId != null && !labId.isEmpty()) {
+			isSearch = true;
+			int setLabIdRs = setKParamPdSetLabId(labId);
+			viewPathSamplePendingCollectionEntity.setLabId(labId);
+		}
+
+		DataTableRequest dataTableInRQ = new DataTableRequest(request);
+		Long totalRowCount = totalCount(viewPathSamplePendingCollectionEntity);
+
+		List gridList = new ArrayList<>();
+		if (isSearch) {
+			response = baseList(typedQuery(viewPathSamplePendingCollectionEntity, dataTableInRQ));
+		}
+		if (response.isSuccess()) {
+			if (response.getItems() != null) {
+				gridList = response.getItems();
+			}
+
+			dataTableResults = dataTableResults(dataTableInRQ, gridList, gridList, totalRowCount);
+
+		}
+		response.setItems(null);
+		response.setObj(dataTableResults);
+		return response;
+	}
+
+	public Response list(String reqObj) {
+		ViewPathSamplePendingCollectionEntity viewPathSamplePendingCollectionEntity = new ViewPathSamplePendingCollectionEntity();
+		if (reqObj != null) {
+			viewPathSamplePendingCollectionEntity = objectMapperReadValue(reqObj,
+					ViewPathSamplePendingCollectionEntity.class);
+		}
+		return baseList(criteriaQuery(viewPathSamplePendingCollectionEntity));
+	}
+
+	// Non API
+	@SuppressWarnings({ "rawtypes", "unchecked" })
+	private CriteriaQuery criteriaQuery(ViewPathSamplePendingCollectionEntity filter) {
+		init();
+		List<Predicate> p = new ArrayList<Predicate>();
+		p = criteriaCondition(filter, null, null);
+
+		if (!CollectionUtils.isEmpty(p)) {
+			Predicate[] pArray = p.toArray(new Predicate[] {});
+			Predicate predicate = builder.and(pArray);
+			criteria.where(predicate);
+		}
+		return criteria;
+	}
+
+	@SuppressWarnings({ "rawtypes" })
+	private <T> TypedQuery typedQuery(ViewPathSamplePendingCollectionEntity filter, DataTableRequest<T> dataTableInRQ) {
+		init();
+		List<Predicate> pArrayJoin = new ArrayList<Predicate>();
+		List<Predicate> pConjunction = criteriaCondition(filter, null, null);
+		List<Predicate> pDisJunction = dataTablefilter(dataTableInRQ);
+
+		Predicate predicateAND = null;
+		Predicate predicateOR = null;
+
+		if (!CollectionUtils.isEmpty(pConjunction)) {
+			Predicate[] pArray = pConjunction.toArray(new Predicate[] {});
+			predicateAND = builder.and(pArray);
+		}
+
+		if (!CollectionUtils.isEmpty(pDisJunction)) {
+			Predicate[] pArray = pDisJunction.toArray(new Predicate[] {});
+			predicateOR = builder.or(pArray);
+		}
+		if (predicateAND != null) {
+			pArrayJoin.add(predicateAND);
+		}
+
+		if (predicateOR != null) {
+			pArrayJoin.add(predicateOR);
+		}
+		if (dataTableInRQ.getOrder().getName() != null && !dataTableInRQ.getOrder().getName().isEmpty()) {
+			if (dataTableInRQ.getOrder().getSortDir().equals("ASC")) {
+				criteria.orderBy(builder.asc(root.get(dataTableInRQ.getOrder().getName())));
+			} else {
+				criteria.orderBy(builder.desc(root.get(dataTableInRQ.getOrder().getName())));
+			}
+		}
+
+		criteria.where(pArrayJoin.toArray(new Predicate[0]));
+
+		return baseTypedQuery(criteria, dataTableInRQ);
+	}
+
+	private Long totalCount(ViewPathSamplePendingCollectionEntity filter) {
+		CriteriaBuilder builder = criteriaBuilder();
+		CriteriaQuery<Long> criteriaQuery = longCriteriaQuery(builder);
+		Root<ViewPathSamplePendingCollectionEntity> root = from(ViewPathSamplePendingCollectionEntity.class,
+				criteriaQuery);
+		return totalCount(builder, criteriaQuery, root, criteriaCondition(filter, builder, root));
+
+	}
+
+	@SuppressWarnings({ "unchecked" })
+	private List<Predicate> criteriaCondition(ViewPathSamplePendingCollectionEntity filter, CriteriaBuilder builder,
+			Root<ViewPathSamplePendingCollectionEntity> root) {
+
+		if (builder == null) {
+			builder = super.builder;
+		}
+		if (root == null) {
+			root = super.root;
+		}
+
+		List<Predicate> p = new ArrayList<Predicate>();
+
+		if (filter != null) {
+
+			if (filter.getInvoiceId() != null && !filter.getInvoiceId().isEmpty()) {
+				Predicate condition = builder.equal(root.get("invoiceId"), filter.getInvoiceId());
+				p.add(condition);
+			}
+			if (filter.getAdmissionId() != null && !filter.getAdmissionId().isEmpty()) {
+				Predicate condition = builder.equal(root.get("admissionId"), filter.getAdmissionId());
+				p.add(condition);
+			}
+			if (filter.getLabId() != null && !filter.getLabId().isEmpty()) {
+				Predicate condition = builder.equal(root.get("labId"), filter.getLabId());
+				p.add(condition);
+			}
+
+			if (filter.getHospitalNumber() != null && !filter.getHospitalNumber().isEmpty()) {
+				Predicate condition = builder.equal(root.get("hospitalNumber"), filter.getHospitalNumber());
+				p.add(condition);
+			}
+
+			if (filter.getInvoiceNo() != null && filter.getInvoiceNo() > 0) {
+				Predicate condition = builder.equal(root.get("invoiceNo"), filter.getInvoiceNo());
+				p.add(condition);
+			}
+
+			if (filter.getAdmissionNo() != null && filter.getAdmissionNo() > 0) {
+				Predicate condition = builder.equal(root.get("admissionNo"), filter.getAdmissionNo());
+				p.add(condition);
+			}
+			if (filter.getLabNo() != null && filter.getLabNo() > 0) {
+				Predicate condition = builder.equal(root.get("labNo"), filter.getLabNo());
+				p.add(condition);
+			}
+			if (filter.getPatientFrom() != null) {
+				Predicate condition = builder.equal(root.get("patientFrom"), filter.getPatientFrom());
+				p.add(condition);
+			}
+			if (filter.getFromDate() != null && filter.getToDate() != null) {
+				Date fromDate = addHourMinutesSeconds(00, 00, 00, filter.getFromDate());
+				Date toDate = addHourMinutesSeconds(23, 59, 59, filter.getToDate());
+				Predicate condition = builder.between(root.get("invoiceDateTime"), fromDate, toDate);
+				p.add(condition);
+			}
+			if (filter.getDepartmentNo() != null && filter.getDepartmentNo() > 0) {
+				Predicate condition = builder.equal(root.get("departmentNo"), filter.getDepartmentNo());
+				p.add(condition);
+			}
+			if (filter.getDeliveryStatusNo() != null && filter.getDeliveryStatusNo() > 0) {
+				Predicate condition = builder.equal(root.get("deliveryStatusNo"), filter.getDeliveryStatusNo());
+				p.add(condition);
+			}
+			if (filter.getCompanyNo() != null && filter.getCompanyNo() > 0) {
+				Predicate condition = builder.equal(root.get("companyNo"), filter.getCompanyNo());
+				p.add(condition);
+			}
+			
+						
+			Predicate regTypecondition1 = builder.isNotNull(root.get("regType"));
+			p.add(regTypecondition1);
+			
+			Predicate regTypecondition2 = builder.notEqual(root.get("regType"), 11);
+			p.add(regTypecondition2);
+
+		}
+
+		return p;
+	}
+
+	@SuppressWarnings({ "unused", "rawtypes" })
+	private void init() {
+		initEntityManagerBuilderCriteriaQueryRoot(ViewPathSamplePendingCollectionEntity.class);
+		CriteriaBuilder builder = super.builder;
+		CriteriaQuery criteria = super.criteria;
+		Root root = super.root;
+	}
+
+}
+
+Repo2
+=====
+
+import java.sql.Connection;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.text.SimpleDateFormat;
+import java.time.LocalDate;
+import java.time.Month;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+import javax.persistence.EntityManager;
+import javax.persistence.ParameterMode;
+import javax.persistence.StoredProcedureQuery;
+import javax.persistence.TypedQuery;
+import javax.persistence.criteria.CriteriaBuilder;
+import javax.persistence.criteria.CriteriaQuery;
+import javax.persistence.criteria.Predicate;
+import javax.persistence.criteria.Root;
+import javax.servlet.http.HttpServletRequest;
+
+import org.apache.commons.lang.StringUtils;
+import org.json.JSONObject;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.MediaType;
+import org.springframework.stereotype.Repository;
+import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.CollectionUtils;
+import org.springframework.web.client.HttpClientErrorException;
+import org.springframework.web.client.RestTemplate;
+import org.springframework.web.multipart.MultipartFile;
+
+
+import oracle.jdbc.OracleCallableStatement;
+import oracle.jdbc.OracleTypes;
+
+@Repository
+@Transactional
+public class OpdRegistrationRepositoryGlobal extends BaseRepository {
+
+//	@Autowired
+//	OpdRegistrationOthersGlobalRepository opdOtherRepository;
+	@Autowired
+	private CoreOpdRegistrationPhotoService opdRegistrationPhotoService;
+
+	@Autowired
+	private OpdRegistrationOthersGlobalRepository opdRegistrationOthersGlobalRepository;
+
+//	@Autowired
+//	private CoreCompanyService coreCompanyService;
+
+	@Autowired
+	private EntityManager entityManager;
+
+	@SuppressWarnings({ "rawtypes", "unchecked" })
+	public Response gridList(HttpServletRequest request) {
+
+		List<OpdRegistrationEntityGlobal> opdRegistrationEntityList;
+		DataTableResults<OpdRegistrationEntityGlobal> dataTableResults = null;
+		OpdRegistrationEntityGlobal opdRegistrationEntityGlobal = new OpdRegistrationEntityGlobal();
+
+		String fromDateStr = request.getParameter("fromDate");
+		String toDateStr = request.getParameter("toDate");
+		String regPoint = request.getParameter("regPoint");
+		String mobileNo = request.getParameter("mobileNo");
+
+		String filterDob = request.getParameter("filterDob");
+
+		try {
+
+			if (regPoint != null && !regPoint.isEmpty()) {
+				opdRegistrationEntityGlobal.setRegPoint(Integer.parseInt(regPoint));
+			}
+
+			Date fromDate = null;
+			Date toDate = null;
+			if (fromDateStr != null && toDateStr != null) {
+				fromDate = clearTime(new SimpleDateFormat("dd/MM/yyyy").parse(fromDateStr));
+				toDate = clearTime(new SimpleDateFormat("dd/MM/yyyy").parse(toDateStr));
+			}
+			if (fromDate != null && toDate != null) {
+				opdRegistrationEntityGlobal.setFromDate(fromDate);
+				opdRegistrationEntityGlobal.setToDate(toDate);
+			}
+			if (mobileNo != null) {
+				opdRegistrationEntityGlobal.setPhoneMobile(mobileNo);
+			}
+			Date dob = null;
+			if (filterDob != null) {
+				dob = clearTime(new SimpleDateFormat("dd/MM/yyyy").parse(filterDob));
+			}
+			if (dob != null) {
+				opdRegistrationEntityGlobal.setDob(dob);
+			}
+		} catch (Exception e) {
+			System.err.println(e);
+		}
+
+		Response response = new Response();
+
+		DataTableRequest dataTableInRQ = new DataTableRequest(request);
+		Long totalRowCount = totalCount(opdRegistrationEntityGlobal);
+
+		List gridList = new ArrayList<>();
+
+		response = baseList(typedQuery(opdRegistrationEntityGlobal, dataTableInRQ));
+
+		if (response.isSuccess()) {
+
+			if (response.getItems() != null) {
+				opdRegistrationEntityList = getListFromObject(response.getItems(), OpdRegistrationEntityGlobal.class);
+				for (OpdRegistrationEntityGlobal opdReg : opdRegistrationEntityList) {
+
+					if (opdReg.getPatientPhoto() != null && !opdReg.getPatientPhoto().isEmpty()
+							&& !StringUtils.isBlank(opdReg.getPatientPhoto())) {
+						Response responsePhoto = opdRegistrationPhotoService.findByPhotoName(opdReg.getPatientPhoto());
+						if (responsePhoto.isSuccess() && responsePhoto.getObj() != null) {
+							opdReg.setPhoto((String) responsePhoto.getObj());
+						}
+					}
+					Response resRegOthers = opdRegistrationOthersGlobalRepository.findById(opdReg.getId());
+					if (resRegOthers.isSuccess() && resRegOthers.getObj() != null) {
+						OpdRegistrationOtherEntityGlobal regOthers = getValueFromObject(resRegOthers.getObj(),
+								OpdRegistrationOtherEntityGlobal.class);
+						opdReg.setBlackListPatient(regOthers.getBlackListPatient());
+						opdReg.setVipPatientFlag(regOthers.getVipPatient());
+						opdReg.setActiveStatus(regOthers.getActiveStatus());
+					}
+					// === added for card bill ======
+					if (opdReg != null) {
+						opdReg.setCardBilledStatus(findCardBillPaidStatus(opdReg.getId()));
+					}
+					// ==============================
+					gridList.add(opdReg);
+				}
+			}
+			dataTableResults = dataTableResults(dataTableInRQ,
+					countTypedQuery(opdRegistrationEntityGlobal, dataTableInRQ), gridList, totalRowCount);
+		}
+
+		response.setItems(null);
+		response.setObj(dataTableResults);
+		return response;
+	}
+
+	public Response list(String reqObj) {
+		OpdRegistrationEntityGlobal opdRegistrationEntity = new OpdRegistrationEntityGlobal();
+		if (null == reqObj) {
+			getErrorResponse("please enter  parameter");
+		}
+		opdRegistrationEntity = objectMapperReadValue(reqObj, OpdRegistrationEntityGlobal.class);
+		return baseList(criteriaQuery(opdRegistrationEntity));
+	}
+
+	public Response typeaheadPersonalNumber(String reqObj) {
+		JSONObject json = new JSONObject(reqObj);
+		String personalNumber = Def.getString(json, "personalNumber");
+
+		OpdRegistrationEntityGlobal opdRegistrationEntity = new OpdRegistrationEntityGlobal();
+
+		if (null == personalNumber) {
+			return getErrorResponse("please enter  personalnumber");
+		}
+
+		Map<String, Object> searchfields = new HashMap<String, Object>();
+		searchfields.put("personalNumber", personalNumber);
+		searchfields.put("coid", personalNumber);
+		searchfields.put("personalId", personalNumber);
+
+		return baseList(typedQuery(opdRegistrationEntity, searchfields));
+	}
+
+	public Response searchByHospitalNumber(String hospitalNumber) {
+
+		OpdRegistrationEntityGlobal opdRegistrationEntity = new OpdRegistrationEntityGlobal();
+
+		if (isNullOrEmptyOrBlank(hospitalNumber)) {
+			return getErrorResponse("please enter  hospital number");
+		}
+
+		opdRegistrationEntity.setLikeHospitalNumber(hospitalNumber);
+
+		Response response = baseList(criteriaQuery(opdRegistrationEntity));
+
+		if (response.isSuccess() && !CollectionUtils.isEmpty(response.getItems())) {
+			List<OpdRegistrationEntityGlobal> registrationList = getListFromObject(response.getItems(),
+					OpdRegistrationEntityGlobal.class);
+			registrationList.stream().forEach(u -> u.setAge(functionPatientAge(u.getDob(), new Date())));
+
+			Response filteredReponse = new Response();
+			filteredReponse.setItems(registrationList);
+
+			return filteredReponse;
+		}
+		return getSuccessResponse("Patient Not Found");
+	}
+
+	public Response patientInfoWithImageByMrn(String mrn) {
+
+		OpdRegistrationEntityGlobal opdRegistrationEntity = new OpdRegistrationEntityGlobal();
+
+		if (isNullOrEmptyOrBlank(mrn)) {
+			return getErrorResponse("please enter  hospital number");
+		}
+
+		opdRegistrationEntity.setHospitalNumber(mrn);
+
+		Response response = baseSingleObject(criteriaQuery(opdRegistrationEntity));
+
+		if (response.isSuccess() && response.getObj() != null) {
+			OpdRegistrationEntityGlobal registration = getValueFromObject(response.getObj(),
+					OpdRegistrationEntityGlobal.class);
+
+			registration.setAge(functionPatientAge(registration.getDob(), new Date()));
+
+			if (registration.getPatientPhoto() != null && !registration.getPatientPhoto().isEmpty()
+					&& !StringUtils.isBlank(registration.getPatientPhoto())) {
+				Response responsePhoto = opdRegistrationPhotoService.findByPhotoName(registration.getPatientPhoto());
+				if (responsePhoto.isSuccess() && responsePhoto.getObj() != null) {
+					registration.setPhoto((String) responsePhoto.getObj());
+				}
+			}
+
+			Response finalReponse = new Response();
+			finalReponse.setObj(registration);
+			return getSuccessResponse("Patient Information Found.", finalReponse);
+
+		}
+
+		return getSuccessResponse("Patient Not Found");
+	}
+
+	public Response findById(Long id) {
+
+		OpdRegistrationEntityGlobal opdRegistrationEntity = new OpdRegistrationEntityGlobal();
+		opdRegistrationEntity.setId(id);
+		Response response = baseFindById(criteriaQuery(opdRegistrationEntity));
+		if (response.isSuccess()) {
+			return response;
+		}
+		return getErrorResponse("Record not Found !!");
+	}
+
+	public Response findByCriteria(String searchCriteria) {
+		JSONObject searchCriteriaObj = new JSONObject(searchCriteria);
+
+		Long id = Def.getLong(searchCriteriaObj, "id");
+//		String personalNumber = Def.getString(searchCriteriaObj, "personalNumber");
+//		String personalId = Def.getString(searchCriteriaObj, "personalId");
+
+		OpdRegistrationEntityGlobal opdRegistrationEntity = new OpdRegistrationEntityGlobal();
+		opdRegistrationEntity.setId(id);
+
+		Response response = baseFindById(criteriaQuery(opdRegistrationEntity));
+
+		if (response.isSuccess() && response.getObj() != null) {
+			return response;
+		}
+		return getErrorResponse("Data Not Found.");
+	}
+
+	public Response isExistence(Long id) {
+
+		OpdRegistrationEntityGlobal opdRegistrationEntity = new OpdRegistrationEntityGlobal();
+		if (id != null) {
+			opdRegistrationEntity.setNotEqualId(id);
+		}
+		Response response = baseFindById(criteriaQuery(opdRegistrationEntity));
+
+		if (response.isSuccess() && response.getObj() != null) {
+			return response;
+		}
+		return getErrorResponse("Data Not Exist.");
+	}
+
+	public Response registraionValidation(String reqObj) {
+//
+//        JSONObject json = new JSONObject(reqObj);
+//
+//        String checkingId = Def.getString(json, "checkingId");
+//        String checkingType = Def.getString(json, "checkingType");
+//        Long lookupdtlNo = Def.getLong(json, "lookupdtlNo");
+//        Response reponse = storedProcedureRegitValidate(checkingId, checkingType, lookupdtlNo);
+//
+//        Map<String, Object> validationMap = (Map<String, Object>) reponse.getObj();
+//
+////        validationMap.put("serviceHolderDetails", findByPersonalNo(checkingId));
+//
+//        reponse.setObj(validationMap);
+//
+//        return reponse;
+		return null;
+	}
+
+	public Response save(String userCreate, String opdRegistrationStr, UserSignInContainter userDetails,
+			String hospitalId, Long regNo) {
+
+		JSONObject json = new JSONObject(opdRegistrationStr);
+		String opdReg = Def.getString(json, "opdReg");
+		String opdRegOthers = Def.getString(json, "opdRegOthers");
+
+		OpdRegistrationOtherEntityGlobal opdRegOther = new OpdRegistrationOtherEntityGlobal();
+		OpdRegistrationEntityGlobal opdRegistrationEntity = objectMapperReadValue(opdReg,
+				OpdRegistrationEntityGlobal.class);
+		opdRegOther = objectMapperReadValue(opdRegOthers, OpdRegistrationOtherEntityGlobal.class);
+
+		opdRegistrationEntity.setDob(clearTime(opdRegistrationEntity.getDob()));
+		opdRegistrationEntity.setSsCreator(userDetails.getUserId());
+		opdRegistrationEntity.setSsCreatedOn(new Date());
+		opdRegistrationEntity.setSsCreateSession(userDetails.getSessionNo());
+		// for sorting the worklist by latest edit
+		opdRegistrationEntity.setSsModifier(userDetails.getUserId());
+		opdRegistrationEntity.setSsModifiedOn(new Date());
+		opdRegistrationEntity.setSsModifiedSession(userDetails.getSessionNo());
+
+		opdRegistrationEntity.setHospitalNumber(hospitalId);
+		opdRegistrationEntity.setId(regNo);
+		opdRegistrationEntity.setRegDate(new Date());
+		opdRegistrationEntity.setCompanyNo(userDetails.getCompanyNo());
+
+		Response response = baseOnlySave(opdRegistrationEntity);
+
+		if (response.isSuccess()) {
+			OpdRegistrationEntityGlobal savedEntity = getValueFromObject(response.getObj(),
+					OpdRegistrationEntityGlobal.class);
+
+			opdRegOther.setSsCreatedOn(new Date());
+			opdRegOther.setSsCreateSession(userDetails.getSessionNo());
+			opdRegOther.setSsCreator(userDetails.getUserId());
+			opdRegOther.setCompanyNo(userDetails.getCompanyNo());
+			opdRegOther.setId(savedEntity.getId());
+
+			Response response2 = baseOnlySave(opdRegOther);
+
+			if (response2.isSuccess()) {
+				if (userCreate != null && userCreate.equals("true")) {
+					System.out.println("User create done when Registration !");
+					storedProcedureCreateAnonymousUser(regNo, hospitalId, opdRegistrationEntity.getGender(),
+							userDetails.getCompanyNo(), userDetails.getSessionNo(), userDetails.getEcodPass(),
+							userDetails.getPlainPass(), "external-service/patient-portal/patient-report", "ES01-PP",
+							opdRegistrationEntity.getPhoneMobile(), opdRegistrationEntity.getFname(),
+							userDetails.getUserId());
+				}
+			}
+		} else {
+			return getErrorResponse("Registration creation failed initially");
+		}
+		return response;
+	}
+
+	public Response saveWithImage(String isUserCreate, MultipartFile file, String opdRegistrationStr,
+			UserSignInContainter userDetails, String hospitalId, Long regNo) {
+
+		Response response = new Response();
+		JSONObject json = new JSONObject(opdRegistrationStr);
+		String opdReg = Def.getString(json, "opdReg");
+		String opdRegOthers = Def.getString(json, "opdRegOthers");
+
+		OpdRegistrationEntityGlobal opdRegistrationEntity = objectMapperReadValue(opdReg,
+				OpdRegistrationEntityGlobal.class);
+
+		// ==== for checking passport number exist or not ======================
+		if (isPassportTimeLimitCheck() && !StringUtils.isEmpty(opdRegistrationEntity.getPassportNo())
+				&& opdRegistrationEntity.getIsPassportNoApproved() == 0) {
+			OpdRegistrationEntityGlobal opdRegistrationObj = checkPassport(opdRegistrationEntity.getPassportNo());
+
+			if (opdRegistrationObj != null) {
+				Long hours = findDifferenceTwoDate(new Date(), opdRegistrationObj.getSsCreatedOn());
+
+				if (hours.longValue() < passportTimePeriodHR().longValue()) {
+					return getErrorResponse("Invalid");
+				}
+			}
+		}
+		// =======================================================================
+
+		OpdRegistrationOtherEntityGlobal opdRegOther = new OpdRegistrationOtherEntityGlobal();
+		opdRegOther = objectMapperReadValue(opdRegOthers, OpdRegistrationOtherEntityGlobal.class);
+
+		opdRegistrationEntity.setDob(clearTime(opdRegistrationEntity.getDob()));
+
+		opdRegistrationEntity.setSsCreator(userDetails.getUserId());
+		opdRegistrationEntity.setSsCreatedOn(new Date());
+		opdRegistrationEntity.setSsCreateSession(userDetails.getSessionNo());
+		// for sorting the worklist by latest edit
+		opdRegistrationEntity.setSsModifier(userDetails.getUserId());
+		opdRegistrationEntity.setSsModifiedOn(new Date());
+		opdRegistrationEntity.setSsModifiedSession(userDetails.getSessionNo());
+
+		opdRegistrationEntity.setHospitalNumber(hospitalId);
+		opdRegistrationEntity.setId(regNo);
+		opdRegistrationEntity.setRegDate(new Date());
+		opdRegistrationEntity.setCompanyNo(userDetails.getCompanyNo());
+
+		// Image file
+		if (file != null) {
+			opdRegistrationEntity.setPatientPhoto(Def.customFileName(file, opdRegistrationEntity.getHospitalNumber()));
+		}
+
+		response = baseOnlySave(opdRegistrationEntity);
+
+		if (response.isSuccess()) {
+			OpdRegistrationEntityGlobal savedEntity = getValueFromObject(response.getObj(),
+					OpdRegistrationEntityGlobal.class);
+
+			if (file != null) {
+				opdRegistrationPhotoService.storePhotoToFile(file, opdRegistrationEntity.getHospitalNumber());
+			}
+
+			opdRegOther.setSsCreatedOn(new Date());
+			opdRegOther.setSsCreateSession(userDetails.getSessionNo());
+			opdRegOther.setSsCreator(userDetails.getUserId());
+			opdRegOther.setCompanyNo(userDetails.getCompanyNo());
+			opdRegOther.setId(savedEntity.getId());
+
+			Response response2 = baseOnlySave(opdRegOther);
+
+			if (response2.isSuccess() && response2.getObj() != null) {
+
+				if (isUserCreate != null && isUserCreate.equals("true")) {
+
+					storedProcedureCreateAnonymousUser(regNo, hospitalId, opdRegistrationEntity.getGender(),
+							userDetails.getCompanyNo(), userDetails.getSessionNo(), userDetails.getEcodPass(),
+							userDetails.getPlainPass(), "external-service/patient-portal/patient-report", "ES01-PP",
+							opdRegistrationEntity.getPhoneMobile(), opdRegistrationEntity.getFname(),
+							userDetails.getUserId());
+				}
+			}
+		} else {
+			return getErrorResponse("Registration creation failed initially");
+		}
+		return response;
+	}
+
+	private OpdRegistrationEntityGlobal checkPassport(String passportNo) {
+
+		OpdRegistrationEntityGlobal opdRegistrationEntity = new OpdRegistrationEntityGlobal();
+		opdRegistrationEntity.setPassportNo(passportNo);
+		Response response = baseTop1(criteriaQuery(opdRegistrationEntity, "DESC", "ssCreatedOn"));
+
+		if (response.isSuccess() && response.getObj() != null) {
+			return getValueFromObject(response.getObj(), OpdRegistrationEntityGlobal.class);
+		}
+		return null;
+	}
+
+	public Response updateWithImage(MultipartFile file, String opdRegistrationStr, UserSignInContainter userDetails) {
+
+		JSONObject json = new JSONObject(opdRegistrationStr);
+		String opdReg = Def.getString(json, "opdReg");
+		String opdRegOthers = Def.getString(json, "opdRegOthers");
+
+		OpdRegistrationEntityGlobal opdRegistrationEntity = objectMapperReadValue(opdReg,
+				OpdRegistrationEntityGlobal.class);
+		OpdRegistrationOtherEntityGlobal opdRegOther = objectMapperReadValue(opdRegOthers,
+				OpdRegistrationOtherEntityGlobal.class);
+
+		Response response = findById(opdRegistrationEntity.getId());
+		OpdRegistrationEntityGlobal obj = getValueFromObject(response.getObj(), OpdRegistrationEntityGlobal.class);
+
+		if (obj != null) {
+			opdRegistrationEntity.setDob(clearTime(opdRegistrationEntity.getDob()));
+			opdRegistrationEntity.setSsModifier(userDetails.getUserId());
+			opdRegistrationEntity.setSsModifiedSession(userDetails.getSessionNo());
+			opdRegistrationEntity.setSsModifiedOn(new Date());
+
+			// Image file
+			if (file != null) {
+				opdRegistrationEntity
+						.setPatientPhoto(Def.customFileName(file, opdRegistrationEntity.getHospitalNumber()));
+			}
+
+			response = baseSaveOrUpdate(opdRegistrationEntity);
+
+			if (response.isSuccess() && file != null) {
+				opdRegistrationPhotoService.storePhotoToFile(file, opdRegistrationEntity.getHospitalNumber());
+			}
+
+			opdRegOther.setId(opdRegistrationEntity.getId());
+			opdRegOther.setSsModifiedOn(new Date());
+			opdRegOther.setSsModifiedSession(userDetails.getSessionNo());
+			opdRegOther.setSsModifier(userDetails.getUserId());
+
+			Response otherDataRes = baseUpdate(opdRegOther);
+			if (otherDataRes.isSuccess()) {
+				return response;
+			} else {
+				return getErrorResponse("Update Failed !!");
+			}
+		}
+		return getErrorResponse("Record not Found !!");
+	}
+
+	public Response update(String opdRegistrationStr, UserSignInContainter userDetails) {
+		JSONObject json = new JSONObject(opdRegistrationStr);
+		String opdReg = Def.getString(json, "opdReg");
+		String opdRegOthers = Def.getString(json, "opdRegOthers");
+
+		OpdRegistrationEntityGlobal opdRegistrationEntity = objectMapperReadValue(opdReg,
+				OpdRegistrationEntityGlobal.class);
+		OpdRegistrationOtherEntityGlobal opdRegOther = objectMapperReadValue(opdRegOthers,
+				OpdRegistrationOtherEntityGlobal.class);
+
+		Response response = findById(opdRegistrationEntity.getId());
+		OpdRegistrationEntityGlobal obj = getValueFromObject(response.getObj(), OpdRegistrationEntityGlobal.class);
+
+		if (obj != null) {
+			opdRegistrationEntity.setDob(clearTime(opdRegistrationEntity.getDob()));
+			opdRegistrationEntity.setSsModifier(userDetails.getUserId());
+			opdRegistrationEntity.setSsModifiedSession(userDetails.getSessionNo());
+			opdRegistrationEntity.setSsModifiedOn(new Date());
+
+			response = baseUpdate(opdRegistrationEntity);
+
+			opdRegOther.setId(opdRegistrationEntity.getId());
+			opdRegOther.setSsModifiedOn(new Date());
+			opdRegOther.setSsModifiedSession(userDetails.getSessionNo());
+			opdRegOther.setSsModifier(userDetails.getUserId());
+
+			return baseUpdate(opdRegOther);
+
+		}
+		return getErrorResponse("Record not Found !!");
+	}
+
+	public Response delete(Long id) {
+		Response response = new Response();
+		response = findById(id);
+		OpdRegistrationEntityGlobal opdMain = getValueFromObject(response.getObj(), OpdRegistrationEntityGlobal.class);
+		if (opdMain == null) {
+			return getErrorResponse("Record not found!");
+		}
+		response = findOpdOtherById(id);
+		OpdRegistrationOtherEntityGlobal opdOther = getValueFromObject(response.getObj(),
+				OpdRegistrationOtherEntityGlobal.class);
+		if (opdOther == null) {
+			return getErrorResponse("Record not found!");
+		}
+		response = baseDelete(opdOther);
+		if (response.isSuccess()) {
+			return baseDelete(opdMain);
+		}
+		return response;
+	}
+
+	public Response remove(Long id) {
+		Response response = new Response();
+		response = findById(id);
+		OpdRegistrationEntityGlobal opdRegistrationEntity = getValueFromObject(response.getObj(),
+				OpdRegistrationEntityGlobal.class);
+		if (opdRegistrationEntity == null) {
+			return getErrorResponse("Record not found!");
+		}
+		opdRegistrationEntity.setActiveStatus(3);
+		return baseRemove(opdRegistrationEntity);
+	}
+
+	public Response findOpdOtherById(Long id) {
+		return opdRegistrationOthersGlobalRepository.findById(id);
+	}
+
+	public Response findByHospitalNumber(String hospitalNumber) {
+
+		OpdRegistrationEntityGlobal opdRegistrationEntity = new OpdRegistrationEntityGlobal();
+
+		Response HNresponse = null;
+
+		System.err.println("Is Digit ==> " + strStartWithDigit(hospitalNumber));
+		if (strStartWithDigit(hospitalNumber)) {
+			System.err.println("hospitalNumber ==> " + hospitalNumber);
+			HNresponse = advanceSearchByHN(hospitalNumber);
+		}
+
+		if (null != HNresponse && HNresponse.isSuccess()) {
+
+			@SuppressWarnings("unchecked")
+			HashMap<String, Object> hnMap = (HashMap<String, Object>) HNresponse.getObj();
+			hospitalNumber = (String) hnMap.get("hospitalNumber");
+
+			System.err.println("Return HospitalNumber ==> " + hospitalNumber);
+		}
+		opdRegistrationEntity.setHospitalNumber(hospitalNumber);
+
+		// Response response = baseFindById(criteriaQuery(opdRegistrationEntity));
+		Response response = baseFindByIdReadOnly(criteriaQuery(opdRegistrationEntity));
+
+		if (response.isSuccess() && response.getObj() != null) {
+
+			OpdRegistrationEntityGlobal opdRegistrationEntityGlobal = getValueFromObject(response.getObj(),
+					OpdRegistrationEntityGlobal.class);
+			opdRegistrationEntityGlobal.setAge(functionPatientAge(opdRegistrationEntityGlobal.getDob(), new Date()));
+
+			response.setObj(opdRegistrationEntityGlobal);
+
+			return response;
+		}
+		return getErrorResponse("Record not Found !!");
+	}
+
+	public Response advanceSearchByHN(String hospitalNumber) {
+
+		return baseAdvanceSearchByHN(hospitalNumber);
+
+	}
+
+	public OpdRegistrationEntityGlobal findObjByHospitalNumber(String hospitalNumber) {
+
+		OpdRegistrationEntityGlobal opdRegistrationEntity = new OpdRegistrationEntityGlobal();
+		opdRegistrationEntity.setHospitalNumber(hospitalNumber);
+
+		// Response response = baseFindById(criteriaQuery(opdRegistrationEntity));
+		Response response = baseFindByIdReadOnly(criteriaQuery(opdRegistrationEntity));
+
+		if (response.isSuccess() && response.getObj() != null) {
+			OpdRegistrationEntityGlobal opdRegistrationEntityGlobal = getValueFromObject(response.getObj(),
+					OpdRegistrationEntityGlobal.class);
+			opdRegistrationEntityGlobal.setAge(functionPatientAge(opdRegistrationEntityGlobal.getDob(), new Date()));
+			return opdRegistrationEntityGlobal;
+		}
+		return null;
+	}
+
+	public Response findByPhoneNo(String phoneMobile) {
+		OpdRegistrationEntityGlobal opdRegistrationEntity = new OpdRegistrationEntityGlobal();
+		opdRegistrationEntity.setPhoneMobile(phoneMobile);
+		Response response = baseList(criteriaQuery(opdRegistrationEntity));
+
+		if (response.isSuccess() && response.getItems() != null) {
+//			List<OpdRegistrationEntityGlobal> opdRegistrationList = new ArrayList<OpdRegistrationEntityGlobal>();
+			List<OpdRegistrationEntityGlobal> opdRegistrationEntityList = getListFromObject(response.getItems(),
+					OpdRegistrationEntityGlobal.class);
+			for (OpdRegistrationEntityGlobal opdRegistrationEntityGlobal : opdRegistrationEntityList) {
+				opdRegistrationEntityGlobal.setAge(functionPatientAge(opdRegistrationEntity.getDob(), new Date()));
+//				opdRegistrationList.add(opdRegistrationEntityGlobal);
+			}
+			response.setItems(opdRegistrationEntityList);
+			return response;
+		}
+		return getErrorResponse("Record not Found !!");
+	}
+
+	public Response findByPhoneNoOrHNo(String phoneMobile) {
+		OpdRegistrationEntityGlobal opdRegistrationEntity = new OpdRegistrationEntityGlobal();
+		opdRegistrationEntity.setPhoneOrHNo(phoneMobile);
+		Response response = baseList(criteriaQuery(opdRegistrationEntity));
+
+		if (response.isSuccess() && response.getItems() != null) {
+//			List<OpdRegistrationEntityGlobal> opdRegistrationList = new ArrayList<OpdRegistrationEntityGlobal>();
+			List<OpdRegistrationEntityGlobal> opdRegistrationEntityList = getListFromObject(response.getItems(),
+					OpdRegistrationEntityGlobal.class);
+			for (OpdRegistrationEntityGlobal opdRegistrationEntityGlobal : opdRegistrationEntityList) {
+				opdRegistrationEntityGlobal.setAge(functionPatientAge(opdRegistrationEntity.getDob(), new Date()));
+//				opdRegistrationList.add(opdRegistrationEntityGlobal);
+			}
+			response.setItems(opdRegistrationEntityList);
+			return response;
+		}
+		return getErrorResponse("Record not Found !!");
+	}
+
+	public Response passportKioskTokenDetails(String reqObj) {
+		PassportKioskResDto passKioskRes = null;
+		JSONObject json = Def.getJSONObject(reqObj);
+		if (reqObj == null || reqObj.equals("{}")) {
+			return getErrorResponse("No Request Param found");
+		}
+		Response response = new Response();
+		String tokenNo = Def.getString(json, "tokenNo");
+		String passportNo = Def.getString(json, "passportNo");
+
+		String filePaht = loadPassportJson();
+		Map<String, Object> _mp = readPassportJsonFile(filePaht);
+
+		HttpHeaders headers = new HttpHeaders();
+		headers.setContentType(MediaType.APPLICATION_JSON);
+		JSONObject personJsonObject = new JSONObject();
+		personJsonObject.put("api_client_id", _mp.get("api_client_id").toString());
+		personJsonObject.put("secret_code", _mp.get("secret_code").toString());
+//		MultiValueMap<String, String> map = new LinkedMultiValueMap<String, String>();
+		HttpEntity<String> request = new HttpEntity<String>(personJsonObject.toString(), headers);
+		// HttpEntity<MultiValueMap<String, String>> entity = new
+		// HttpEntity<MultiValueMap<String, String>>(map, headers);
+		String responseStr = null;
+		responseStr = restTemplatePostCalling(_mp.get("token_url").toString(), request);
+		if (responseStr != null) {
+			JSONObject tokenResponse4 = Def.getJSONObject(responseStr);
+			String authToken = Def.getString(tokenResponse4, "token");
+
+			HttpHeaders headers1 = new HttpHeaders();
+			headers1.setContentType(MediaType.APPLICATION_JSON);
+			headers1.set("Client-Id", _mp.get("api_client_id").toString());
+			headers1.set("Token-Key", authToken);
+
+			JSONObject personJsonObject1 = new JSONObject();
+			personJsonObject1.put("tokenNo", JSONObject.NULL);
+			personJsonObject1.put("passportNo", JSONObject.NULL);
+			if (tokenNo != null) {
+				personJsonObject1.put("tokenNo", tokenNo);
+			}
+			if (passportNo != null) {
+				personJsonObject1.put("passportNo", passportNo);
+			}
+			// personJsonObject1.put("tokenDate", "2021-03-08");
+			HttpEntity<String> request1 = new HttpEntity<String>(personJsonObject1.toString(), headers1);
+			responseStr = restTemplatePostCalling(_mp.get("token_detail_url").toString(), request1);
+			if (responseStr != null) {
+				JSONObject tokenResponse5 = Def.getJSONObject(responseStr);
+				String dataStr = Def.getString(tokenResponse5, "data");
+				if (dataStr != null && !dataStr.equals("{}")) {
+					passKioskRes = new PassportKioskResDto();
+					passKioskRes = objectMapperReadValue(dataStr, PassportKioskResDto.class);
+				}
+				if (passKioskRes.getPassportInfo() != null) {
+					response.setSuccess(true);
+					response.setObj(passKioskRes);
+					return response;
+				}
+			}
+		}
+
+		return getErrorResponse("data not found");
+	}
+
+	private String restTemplatePostCalling(String url, HttpEntity<String> request) {
+
+		String response = null;
+
+		RestTemplate restTemplate = new RestTemplate();
+
+		try {
+			response = restTemplate.postForObject(url, request, String.class);
+
+		} catch (HttpClientErrorException e) {
+
+			System.out.println(e.getMessage());
+		}
+
+		return response;
+	}
+
+	public Response findByPhoneMobile(String reqObj) {
+		OpdRegistrationEntityGlobal opdRegistrationEntity = new OpdRegistrationEntityGlobal();
+		if (null == reqObj) {
+			return getErrorResponse("please enter parameter");
+		}
+		opdRegistrationEntity = objectMapperReadValue(reqObj, OpdRegistrationEntityGlobal.class);
+		return baseList(criteriaQuery(opdRegistrationEntity));
+	}
+
+	// ========= for OPD registration layout 2 =====================================
+	public Response saveOpdRegLayout2(String reqObj, UserSignInContainter userDetails, String hospitalId, Long regNo) {
+
+		OpdRegistrationEntityGlobal opdRegistrationEntity = objectMapperReadValue(reqObj,
+				OpdRegistrationEntityGlobal.class);
+
+		opdRegistrationEntity.setDob(clearTime(opdRegistrationEntity.getDob()));
+
+		opdRegistrationEntity.setSsCreator(userDetails.getUserId());
+		opdRegistrationEntity.setSsCreatedOn(new Date());
+		opdRegistrationEntity.setSsCreateSession(userDetails.getSessionNo());
+		opdRegistrationEntity.setSsModifier(userDetails.getUserId());
+		opdRegistrationEntity.setSsModifiedOn(new Date());
+		opdRegistrationEntity.setSsModifiedSession(userDetails.getSessionNo());
+		opdRegistrationEntity.setCompanyNo(userDetails.getCompanyNo());
+
+		opdRegistrationEntity.setHospitalNumber(hospitalId);
+		opdRegistrationEntity.setId(regNo);
+		opdRegistrationEntity.setRegDate(new Date());
+
+		Response response = baseOnlySave(opdRegistrationEntity);
+
+		if (response.isSuccess()) {
+			OpdRegistrationEntityGlobal opdRegistrationEntityGlobal = getValueFromObject(response.getObj(),
+					OpdRegistrationEntityGlobal.class);
+
+			OpdRegistrationOtherEntityGlobal opdRegistrationOtherEntityGlobal = objectMapperReadValue(reqObj,
+					OpdRegistrationOtherEntityGlobal.class);
+			opdRegistrationOtherEntityGlobal.setId(opdRegistrationEntityGlobal.getId());
+
+			Response finalResp = opdRegistrationOthersGlobalRepository.saveOrUpdate(opdRegistrationOtherEntityGlobal,
+					userDetails);
+			if (finalResp.isSuccess()) {
+				return getSuccessResponse("Registration Save Successfully.", response);
+			}
+			return getErrorResponse("Registration Other Data Save failed!!", response);
+		}
+		return getErrorResponse("Registration failed!!", response);
+
+	}
+
+	public Response updateOpdRegLayout2(String reqObj, UserSignInContainter userDetails) {
+
+		OpdRegistrationEntityGlobal opdRegistrationEntity = objectMapperReadValue(reqObj,
+				OpdRegistrationEntityGlobal.class);
+
+		Response response = findById(opdRegistrationEntity.getId());
+		OpdRegistrationEntityGlobal obj = getValueFromObject(response.getObj(), OpdRegistrationEntityGlobal.class);
+
+		if (obj != null) {
+			opdRegistrationEntity.setSsCreator(obj.getSsCreator());
+			opdRegistrationEntity.setSsCreatedOn(obj.getSsCreatedOn());
+			opdRegistrationEntity.setSsCreateSession(obj.getSsCreateSession());
+			opdRegistrationEntity.setCompanyNo(obj.getCompanyNo());
+
+			opdRegistrationEntity.setDob(clearTime(opdRegistrationEntity.getDob()));
+			opdRegistrationEntity.setSsModifier(userDetails.getUserId());
+			opdRegistrationEntity.setSsModifiedSession(userDetails.getSessionNo());
+			opdRegistrationEntity.setSsModifiedOn(new Date());
+
+			response = baseUpdate(opdRegistrationEntity);
+		}
+		if (response.isSuccess()) {
+			OpdRegistrationOtherEntityGlobal opdRegistrationOtherEntityGlobal = objectMapperReadValue(reqObj,
+					OpdRegistrationOtherEntityGlobal.class);
+
+			Response finalResp = opdRegistrationOthersGlobalRepository.saveOrUpdate(opdRegistrationOtherEntityGlobal,
+					userDetails);
+			if (finalResp.isSuccess()) {
+				return getSuccessResponse("Registration Updated Successfully.", response);
+			}
+			return getErrorResponse("Registration Other Data Updated Failed!!");
+		}
+		return getErrorResponse("Record not Found !!");
+	}
+
+	@SuppressWarnings({ "rawtypes", "unchecked" })
+	public Response gridListOpdRegLayout2(HttpServletRequest request, UserSignInContainter userDetails) {
+
+		DataTableResults<OpdRegistrationEntityGlobal> dataTableResults = null;
+		OpdRegistrationEntityGlobal opdRegistrationEntityGlobal = new OpdRegistrationEntityGlobal();
+
+		String fromDate = request.getParameter("fromDate");
+		String toDate = request.getParameter("toDate");
+		String filterDob = request.getParameter("filterDob");
+		Long userNo = userDetails.getUserId();
+
+		try {
+			if (fromDate != null && toDate != null) {
+				opdRegistrationEntityGlobal.setFromDate(clearTime(deateParse(fromDate, "dd/MM/yyyy")));
+				opdRegistrationEntityGlobal.setToDate(clearTime(deateParse(toDate, "dd/MM/yyyy")));
+			}
+			if (filterDob != null) {
+				opdRegistrationEntityGlobal.setDob(clearTime(deateParse(filterDob, "dd/MM/yyyy")));
+			}
+			if (userNo != null) {
+				opdRegistrationEntityGlobal.setSsCreator(userNo);
+			}
+
+		} catch (Exception e) {
+			System.err.println(e);
+		}
+
+		Response response = new Response();
+
+		DataTableRequest dataTableInRQ = new DataTableRequest(request);
+		Long totalRowCount = totalCount(opdRegistrationEntityGlobal);
+
+		List gridList = new ArrayList<>();
+
+		response = baseList(typedQuery(opdRegistrationEntityGlobal, dataTableInRQ));
+
+		if (response.isSuccess()) {
+			if (response.getItems() != null) {
+				gridList = response.getItems();
+			}
+			dataTableResults = dataTableResults(dataTableInRQ, gridList, gridList, totalRowCount);
+		}
+
+		response.setItems(null);
+		response.setObj(dataTableResults);
+		return response;
+	}
+	// ===================================
+
+	// ====== for save card bill =================================
+	public Response saveCardBill(String reqObj, UserSignInContainter userDetails) {
+
+		if (reqObj == null) {
+			return getErrorResponse("Request data not found!!");
+		}
+
+		Map<String, Object> result = new HashMap<>();
+		Response response = new Response();
+
+		CardBillDto cardBillDto = new CardBillDto();
+		cardBillDto = objectMapperReadValue(reqObj, CardBillDto.class);
+
+		Long paidStatus = findCardBillPaidStatus(cardBillDto.getRegNo());
+		if (paidStatus != null && paidStatus == 1) {
+			response.setSuccess(false);
+			result.put("actionFlag", 0);
+			result.put("error", "MRN Card Bill Already Paid !!");
+			response.setModel(result);
+			return response;
+		}
+
+		Connection dbConnection = null;
+		OracleCallableStatement orcs = null;
+
+		try {
+			int indexPosition = 0;
+			dbConnection = getOraConnection();
+			orcs = (OracleCallableStatement) dbConnection.prepareCall(procedureQuery("PD_OPD_REG_COLL_SAVE_WEB", 20));
+
+			orcs.setBigDecimal(++indexPosition, convertLongToBigDecimmal(cardBillDto.getRegNo()));
+
+			Def.setLongArray(++indexPosition, cardBillDto.getPayMode(), orcs);
+			Def.setDoubleArray(++indexPosition, cardBillDto.getPayAmt(), orcs);
+			Def.setDoubleArray(++indexPosition, cardBillDto.getGivenAmt(), orcs);
+			Def.setLongArray(++indexPosition, cardBillDto.getPayTypeNo(), orcs);
+			Def.setLongArray(++indexPosition, cardBillDto.getChequeNo(), orcs);
+			Def.setStringArray(++indexPosition, cardBillDto.getBankName(), orcs);
+
+			orcs.setBigDecimal(++indexPosition, convertLongToBigDecimmal(cardBillDto.getPayIndex()));
+			orcs.setBigDecimal(++indexPosition, convertDoubleToBigDecimmal(cardBillDto.getDiscAmount()));
+			orcs.setBigDecimal(++indexPosition, convertLongToBigDecimmal(cardBillDto.getDisctypeNo()));
+			orcs.setBigDecimal(++indexPosition, convertLongToBigDecimmal(cardBillDto.getDiscAuthBy()));
+			orcs.setString(++indexPosition, cardBillDto.getDiscRemarks());
+
+			orcs.setBigDecimal(++indexPosition, convertLongToBigDecimmal(userDetails.getUserId()));
+			orcs.setBigDecimal(++indexPosition, convertLongToBigDecimmal(userDetails.getSessionNo()));
+			orcs.setBigDecimal(++indexPosition, convertLongToBigDecimmal(userDetails.getOrganizationNo()));
+			orcs.setBigDecimal(++indexPosition, convertLongToBigDecimmal(userDetails.getCompanyNo()));
+
+			orcs.registerOutParameter(++indexPosition, OracleTypes.NUMBER);
+			orcs.registerOutParameter(++indexPosition, OracleTypes.VARCHAR);
+			orcs.registerOutParameter(++indexPosition, OracleTypes.NUMBER);
+			orcs.registerOutParameter(++indexPosition, OracleTypes.VARCHAR);
+
+			orcs.execute();
+
+			result.put("invoiceNo", orcs.getLong(17));
+			result.put("invoiceId", orcs.getString(18));
+			result.put("actionFlag", orcs.getLong(19));
+			result.put("error", orcs.getString(20));
+
+		} catch (SQLException e) {
+			e.printStackTrace();
+			System.out.println("Error : " + e);
+		} finally {
+			Def.connectionClose(dbConnection, orcs);
+		}
+		response.setModel(result);
+		return response;
+	}
+
+	private Long findCardBillPaidStatus(Long regNo) {
+
+		int index = 0;
+		StoredProcedureQuery query = entityManager.createStoredProcedureQuery("pd_opd_bill_inv_check_web")
+
+				.registerStoredProcedureParameter(++index, Long.class, ParameterMode.IN)
+
+				.registerStoredProcedureParameter(++index, Long.class, ParameterMode.OUT)
+				.registerStoredProcedureParameter(++index, String.class, ParameterMode.OUT)
+
+				.setParameter(1, regNo);
+
+		query.execute();
+
+		Long cardBillStatus = (Long) query.getOutputParameterValue(2);
+		String p_error = (String) query.getOutputParameterValue(3);
+
+		System.out.println("card bill status error ===>" + p_error);
+		if (cardBillStatus == null) {
+			return 2L;
+		}
+		return cardBillStatus;
+	}
+
+	public Response getHnCardInvoiceReportData(Long invoiceNo) {
+
+		Map<String, Object> result = new HashMap<String, Object>();
+
+		Response response = new Response();
+//		JSONObject json = new JSONObject(reqObj);
+//		Long invoiceNo = Def.getLong(json, "invoiceNo");
+
+		ResultSet rs = null;
+		ResultSet rs2 = null;
+
+		int index = 0;
+
+		StoredProcedureQuery query = entityManager.createStoredProcedureQuery("pd_hn_card_bill_rep_web")
+				.registerStoredProcedureParameter(++index, Long.class, ParameterMode.IN)
+				.registerStoredProcedureParameter(++index, Void.class, ParameterMode.REF_CURSOR)
+				.registerStoredProcedureParameter(++index, Void.class, ParameterMode.REF_CURSOR)
+				.setParameter(1, invoiceNo);
+		query.execute();
+
+		List<HnCardInvoiceReportDto> invoiceReportDtlList = new ArrayList<HnCardInvoiceReportDto>();
+		List<HnCardInvoiceSummeryDto> invoiceReportPaymentList = new ArrayList<HnCardInvoiceSummeryDto>();
+
+		try {
+
+			// ================ Report Item Data ====================================
+			rs = (ResultSet) query.getOutputParameterValue(2);
+
+			while (rs != null && rs.next()) {
+
+				HnCardInvoiceReportDto invoiceReportDtlObj = new HnCardInvoiceReportDto();
+				invoiceReportDtlObj.setInvoiceNo(rs.getLong("invoice_no"));
+				invoiceReportDtlObj.setInvoiceId(rs.getString("invoice_id"));
+				invoiceReportDtlObj.setBarcode(rs.getString("barcode"));
+				invoiceReportDtlObj.setInvoiceDateTime(rs.getTimestamp("invoice_datetime"));
+				invoiceReportDtlObj.setRegNo(rs.getLong("reg_no"));
+				invoiceReportDtlObj.setHospitalNumber(rs.getString("hospital_number"));
+				invoiceReportDtlObj.setHnBarcode(rs.getString("hn_barcode"));
+				invoiceReportDtlObj.setAdmissionNo(rs.getLong("admission_no"));
+				invoiceReportDtlObj.setAdmissionId(rs.getString("admission_id"));
+				invoiceReportDtlObj.setRefDocNo(rs.getLong("ref_doc_no"));
+				invoiceReportDtlObj.setRefDocName(rs.getString("ref_doc_name"));
+				invoiceReportDtlObj.setRemarks(rs.getString("remarks"));
+				invoiceReportDtlObj.setSsCreator(rs.getLong("ss_creator"));
+				invoiceReportDtlObj.setSsCreatorName(rs.getString("ss_creator_name"));
+				invoiceReportDtlObj.setCorClientNo(rs.getLong("cor_client_no"));
+				invoiceReportDtlObj.setCorClientCardNo(rs.getLong("cor_client_card_no"));
+				invoiceReportDtlObj.setCorClient(rs.getString("cor_client"));
+				invoiceReportDtlObj.setEmpNo(rs.getLong("emp_no"));
+				invoiceReportDtlObj.setRelationNo(rs.getLong("relation_no"));
+				invoiceReportDtlObj.setPatientname(rs.getString("patient_name"));
+				invoiceReportDtlObj.setAge(rs.getString("age"));
+				invoiceReportDtlObj.setGender(rs.getString("gender"));
+				invoiceReportDtlObj.setPhoneMobile(rs.getString("phone_mobile"));
+				invoiceReportDtlObj.setItemId(rs.getString("item_id"));
+				invoiceReportDtlObj.setItemNo(rs.getLong("item_no"));
+				invoiceReportDtlObj.setItemTypeNo(rs.getLong("itemtype_no"));
+				invoiceReportDtlObj.setItemName(rs.getString("item_name"));
+				invoiceReportDtlObj.setItemRate(rs.getDouble("item_rate"));
+				invoiceReportDtlObj.setItemVat(rs.getDouble("item_vat"));
+				invoiceReportDtlObj.setUrgentFee(rs.getDouble("urgent_fee"));
+				invoiceReportDtlObj.setServiceCharge(rs.getDouble("service_charge"));
+				invoiceReportDtlObj.setItemQty(rs.getLong("item_qty"));
+				invoiceReportDtlObj.setItemRateTotal(rs.getDouble("item_rate_total"));
+				invoiceReportDtlObj.setItemVatTotal(rs.getDouble("item_vat_total"));
+				invoiceReportDtlObj.setUrgentFeeTotal(rs.getDouble("urgent_fee_total"));
+				invoiceReportDtlObj.setServiceChargeTotal(rs.getDouble("service_charge_total"));
+				invoiceReportDtlObj.setAdvance(rs.getDouble("advance"));
+				invoiceReportDtlObj.setDiscAmt(rs.getDouble("disc_amt"));
+				invoiceReportDtlObj.setDue(rs.getDouble("due"));
+
+//				invoiceReportDtlObj.setDeliveryStatusNo(rs2.getLong("delivery_status_no"));
+//				invoiceReportDtlObj.setPackageItemFlag(rs2.getLong("package_item_flag"));
+//				invoiceReportDtlObj.setColectedByName(rs.getString("USER_NAME"));
+
+				invoiceReportDtlList.add(invoiceReportDtlObj);
+			}
+
+			// ================ Report Payment Data ====================================
+
+			rs2 = (ResultSet) query.getOutputParameterValue(3);
+
+			while (rs2 != null && rs2.next()) {
+				HnCardInvoiceSummeryDto invoiceReportPaymentObj = new HnCardInvoiceSummeryDto();
+
+				invoiceReportPaymentObj.setPayNo(rs2.getLong("pay_no"));
+				invoiceReportPaymentObj.setPayAmt(rs2.getDouble("pay_amt"));
+				invoiceReportPaymentObj.setPayModeName(rs2.getString("pay_mode_name"));
+				invoiceReportPaymentObj.setGivenAmt(rs2.getLong("given_amt"));
+				invoiceReportPaymentObj.setPayTypeName(rs2.getString("pay_type_name"));
+				invoiceReportPaymentObj.setColectedByName(rs2.getString("user_name"));
+
+				invoiceReportPaymentList.add(invoiceReportPaymentObj);
+			}
+
+		} catch (SQLException e) {
+			e.printStackTrace();
+			response.setSuccess(false);
+			response.setMessage("Data not found !");
+		} finally {
+			try {
+				if (rs != null) {
+					rs.close();
+				}
+				if (rs2 != null) {
+					rs2.close();
+				}
+			} catch (SQLException e) {
+				e.printStackTrace();
+			}
+		}
+
+		if (!response.isSuccess()) {
+			return getErrorResponse("Data not found!");
+		}
+
+		result.put("invoiceReportDtlList", invoiceReportDtlList);
+		result.put("invoiceReportPaymentList", invoiceReportPaymentList);
+
+		response.setModel(result);
+
+		return getSuccessResponse("Data found", response);
+
+	}
+
+	public Response findPatByHospitalNumber(String reqObj) {
+
+		JSONObject json = new JSONObject(reqObj);
+		String hospitalNumber = Def.getString(json, "HOSPITAL_NUMBER");
+
+		Response response = findByHospitalNumber(hospitalNumber);
+
+		if (response.isSuccess() && response.getObj() != null) {
+
+			OpdRegistrationEntityGlobal opdRegistrationEntityGlobal = getValueFromObject(response.getObj(),
+					OpdRegistrationEntityGlobal.class);
+
+			opdRegistrationEntityGlobal
+					.setCardBilledStatus(findCardBillPaidStatus(opdRegistrationEntityGlobal.getId()));
+
+			response.setObj(opdRegistrationEntityGlobal);
+
+			return response;
+		}
+
+		return getErrorResponse("No data found !!", response);
+	}
+
+	// ===========================================================
+
+	@SuppressWarnings({ "rawtypes", "unchecked" })
+	private CriteriaQuery criteriaQuery(OpdRegistrationEntityGlobal filter, String orderByDir, String orderByColumn) {
+		init();
+
+		List<Predicate> p = new ArrayList<Predicate>();
+		p = criteriaCondition(filter, null, null);
+
+		if (!CollectionUtils.isEmpty(p)) {
+			Predicate[] pArray = p.toArray(new Predicate[] {});
+			Predicate predicate = builder.and(pArray);
+			criteria.where(predicate);
+		}
+
+		if (!StringUtils.isEmpty(orderByColumn)) {
+
+			if (orderByDir.equalsIgnoreCase("ASC")) {
+				criteria.orderBy(builder.asc(root.get(orderByColumn)));
+			} else {
+				criteria.orderBy(builder.desc(root.get(orderByColumn)));
+			}
+
+		}
+
+		return criteria;
+	}
+
+	@SuppressWarnings({ "rawtypes", "unchecked" })
+	private CriteriaQuery criteriaQuery(OpdRegistrationEntityGlobal filter) {
+		init();
+
+		List<Predicate> p = new ArrayList<Predicate>();
+		p = criteriaCondition(filter, null, null);
+
+		if (!CollectionUtils.isEmpty(p)) {
+			Predicate[] pArray = p.toArray(new Predicate[] {});
+			Predicate predicate = builder.and(pArray);
+			criteria.where(predicate);
+		}
+		return criteria;
+	}
+
+	@SuppressWarnings({ "rawtypes", "unchecked" })
+	private <T> TypedQuery typedQuery(OpdRegistrationEntityGlobal filter, DataTableRequest<T> dataTableInRQ) {
+		init();
+		List<Predicate> pArrayJoin = new ArrayList<Predicate>();
+		List<Predicate> pConjunction = criteriaCondition(filter, null, null);
+		List<Predicate> pDisJunction = dataTablefilter(dataTableInRQ, OpdRegistrationEntityGlobal.class);
+		Predicate predicateAND = null;
+		Predicate predicateOR = null;
+
+		if (!CollectionUtils.isEmpty(pConjunction)) {
+			predicateAND = builder.and(pConjunction.toArray(new Predicate[] {}));
+		}
+		if (!CollectionUtils.isEmpty(pDisJunction)) {
+			predicateOR = builder.or(pDisJunction.toArray(new Predicate[] {}));
+		}
+		if (predicateAND != null) {
+			pArrayJoin.add(predicateAND);
+		}
+		if (predicateOR != null) {
+			pArrayJoin.add(predicateOR);
+		}
+
+//		if (dataTableInRQ.getOrder().getName() != null && !dataTableInRQ.getOrder().getName().isEmpty()) {
+//
+//			if (dataTableInRQ.getOrder().getSortDir().equals("ASC")) {
+//				criteria.orderBy(builder.asc(root.get(dataTableInRQ.getOrder().getName())));
+//			} else {
+//				criteria.orderBy(builder.desc(root.get(dataTableInRQ.getOrder().getName())));
+//			}
+//
+//		}
+//		
+		if (dataTableInRQ.getOrder().getName() != null && !dataTableInRQ.getOrder().getName().isEmpty()) {
+			if (dataTableInRQ.getOrder().getSortDir().equals("ASC")) {
+				criteria.orderBy(builder.asc(builder.coalesce(root.get(dataTableInRQ.getOrder().getName()),
+						LocalDate.of(2018, Month.JANUARY, 1))));
+			} else {
+				criteria.orderBy(builder.desc(builder.coalesce(root.get(dataTableInRQ.getOrder().getName()),
+						LocalDate.of(2018, Month.JANUARY, 1))));
+			}
+		}
+		criteria.where(pArrayJoin.toArray(new Predicate[0]));
+		return baseTypedQuery(criteria, dataTableInRQ);
+	}
+
+	private <T> Long countTypedQuery(OpdRegistrationEntityGlobal filter, DataTableRequest<T> dataTableInRQ) {
+
+		if (dataTableInRQ.getPaginationRequest().isFilterByEmpty()) {
+			return 0l;
+		}
+
+		CriteriaBuilder builder = criteriaBuilder();
+		CriteriaQuery<Long> criteriaQuery = longCriteriaQuery(builder);
+		Root<OpdRegistrationEntityGlobal> root = from(OpdRegistrationEntityGlobal.class, criteriaQuery);
+		return totalCount(builder, criteriaQuery, root, criteriaCondition(filter, builder, root),
+				dataTablefilter(dataTableInRQ, builder, root));
+
+	}
+
+	@SuppressWarnings({ "rawtypes" })
+	private <T> TypedQuery typedQuery(OpdRegistrationEntityGlobal filter, Map<String, Object> fields) {
+		init();
+		List<Predicate> pConjunction = criteriaCondition(filter, null, null);
+		List<Predicate> pDisJunction = basePredicate(fields);
+
+		return typedQuery(pConjunction, pDisJunction);
+	}
+
+	private Long totalCount(OpdRegistrationEntityGlobal filter) {
+		CriteriaBuilder builder = criteriaBuilder();
+		CriteriaQuery<Long> criteriaQuery = longCriteriaQuery(builder);
+		Root<OpdRegistrationEntityGlobal> root = from(OpdRegistrationEntityGlobal.class, criteriaQuery);
+		return totalCount(builder, criteriaQuery, root, criteriaCondition(filter, builder, root));
+	}
+
+	@SuppressWarnings({ "unchecked" })
+	private List<Predicate> criteriaCondition(OpdRegistrationEntityGlobal filter, CriteriaBuilder builder,
+			Root<OpdRegistrationEntityGlobal> root) {
+		if (builder == null) {
+			builder = super.builder;
+		}
+		if (root == null) {
+			root = super.root;
+		}
+		List<Predicate> p = new ArrayList<Predicate>();
+		if (filter != null) {
+			if (filter.getActiveStatus() != null && filter.getActiveStatus() > 0) {
+				p.add(builder.equal(root.get("activeStatus"), filter.getActiveStatus()));
+			}
+			if (filter.getId() != null && filter.getId() > 0) {
+				p.add(builder.equal(root.get("id"), filter.getId()));
+			}
+			if (filter.getFromDate() != null && filter.getToDate() != null) {
+				p.add(builder.between(root.get("regDate"), addMinTime(filter.getFromDate()),
+						addMaxTime(filter.getToDate())));
+			}
+			if (filter.getRegPoint() != null && filter.getRegPoint() != 0) {
+				p.add(builder.equal(root.get("regPoint"), filter.getRegPoint()));
+			}
+			if (!StringUtils.isBlank(filter.getLikeHospitalNumber())) {
+				Predicate condition = builder.like(builder.upper(root.get("hospitalNumber")),
+						CommonUtils.PERCENTAGE_SIGN + filter.getLikeHospitalNumber().toUpperCase()
+								+ CommonUtils.PERCENTAGE_SIGN);
+				p.add(condition);
+			}
+			if (filter.getHospitalNumber() != null) {
+				Predicate condition = builder.like(builder.upper(root.get("hospitalNumber")),
+						CommonUtils.PERCENTAGE_SIGN + filter.getHospitalNumber().toUpperCase()
+								+ CommonUtils.PERCENTAGE_SIGN);
+				p.add(condition);
+			}
+//			if (!StringUtils.isBlank(filter.getHospitalNumber())) {
+//				Predicate condition = builder.equal(root.get("hospitalNumber"), filter.getHospitalNumber());
+//				p.add(condition);
+//			}
+			if (filter.getPhoneMobile() != null && !filter.getPhoneMobile().isEmpty()) {
+				p.add(builder.equal(root.get("phoneMobile"), filter.getPhoneMobile()));
+			}
+			if (filter.getDob() != null) {
+				p.add(builder.between(root.get("dob"), addMinTime(filter.getDob()), addMaxTime(filter.getDob())));
+			}
+			if (filter.getSsCreator() != null) {
+				p.add(builder.equal(root.get("ssCreator"), filter.getSsCreator()));
+			}
+			if (filter.getPassportNo() != null) {
+				p.add(builder.equal(root.get("passportNo"), filter.getPassportNo()));
+			}
+//			Predicate conditionOne = builder.greaterThan(root.get("id"), 100L);
+			p.add(builder.greaterThan(root.get("id"), 100L));
+
+			// only bringing null type RegType
+//			Predicate conditionTwo = builder.isNull(root.get("regType"));
+			p.add(builder.isNull(root.get("regType")));
+
+			if (filter.getPersonalId() != null && !filter.getPersonalId().isEmpty()
+					&& !filter.getPersonalId().equalsIgnoreCase("null")) {
+				p.add(builder.equal(root.get("personalId"), filter.getPersonalId()));
+			}
+			if (filter.getPhoneOrHNo() != null) {
+				Predicate p1 = builder.equal(root.get("phoneMobile"), filter.getPhoneOrHNo());
+				Predicate p2 = builder.equal(root.get("hospitalNumber"), filter.getPhoneOrHNo());
+				p.add(builder.or(p1, p2));
+			}
+
+		}
+		return p;
+	}
+
+	private void init() {
+		initEntityManagerBuilderCriteriaQueryRoot(OpdRegistrationEntityGlobal.class);
+	}
+
+}
+
+-------------------------------------------------

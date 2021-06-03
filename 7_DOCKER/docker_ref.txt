@@ -59,7 +59,7 @@ List all the docker images pulled on the system with image details such as TAG/I
 Retag the image with a version number:
 =>docker image build -t imranmadbar/docker-spring-security-mysql-mvc-prod:1.0.1.RELEASE .
 =>docker image build -t imranmadbar/docker-spring-security-mysql-mvc-prod:2.0.0.RELEASE .
-=>docker image build -t imranmadbar/docker-spring-security-mysql-mvc-prod:3.0.0.RELEASE .
+
 
 
 
@@ -278,7 +278,13 @@ The following command in docker lists the details of all the network in the clus
 =>docker network create --driver overlay producer-consumer-net
 
 
+#Show IP add ress of Container
+-------------------------------------------------
+=>docker inspect -f '{{range.NetworkSettings.Networks}}{{.IPAddress}}{{end}}' container_name_or_id
 
+#Delete docker network
+-------------------------------------------------
+=>docker network rm networkId
 
 #################################################
 #                 Docker Compose                #
@@ -288,6 +294,7 @@ The following command in docker lists the details of all the network in the clus
 #Run Compose |  Up Compose
 -------------------------------------------------
 =>docker-compose up
+=>docker-compose down
 In this case, the application will be up and running until you hit Ctrl-C to cancel the foreground process.
 In this case, when you press Ctrl-C, it is equivalent to executing the “docker-compose stop”. So, it will stop all the containers gracefully.
 
@@ -323,6 +330,11 @@ Default value is 10 seconds, but the following command will use the time-out val
 –no-color In the output, this will not show any color. This will display the monochrome output on screen.
 
 
+#Set Container Name
+---------------------------------------------------
+mysql:
+    image: mysql
+    container_name: sf4_mysql
 
 
 #################################################

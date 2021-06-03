@@ -1760,3 +1760,2382 @@ npm install ngx-toastr@9.1.2 --save
 
 
 
+=================================================
+#Service | HttpCall | Rest Api Call
+=================================================
+
+Base
+=====
+import { Injectable } from '@angular/core';
+import { Resource } from '../models/resource.model';
+import { HttpClient, HttpParams, HttpHeaders } from '@angular/common/http';
+import { Serializer } from '../interfaces/serializer';
+import { Observable } from 'rxjs';
+import { map } from 'rxjs/operators';
+import { environment } from '../../../environments/environment';
+
+export class ResourceService<T extends Resource> {
+
+  private RESOURCE_LIST = `list`;
+  private RESOURCE_CREATE = `create`;
+  private RESOURCE_CREATE_WITH_IMAGE = `create-with-image`;
+  private RESOURCE_UPDATE_WITH_IMAGE = `update-with-image`;
+  private RESOURCE_UPDATE = `update`;
+  private RESOURCE_DELETE = `delete`;
+  private RESOURCE_REMOVE = `remove`;
+  private BASE_URL = environment.baseUrl;
+
+  constructor(
+    private httpClient: HttpClient,
+    private apiUrl: string,
+    private endpoint: string,
+    private serializer: Serializer) { }
+
+  public uploadImage(image_url: string, image: File): Observable<any> {
+    const formData = new FormData();
+    formData.append('file', image);
+
+    return this.httpClient
+      .post(`${this.BASE_URL}${this.apiUrl}/${this.endpoint}/${image_url}`, formData).pipe(
+        map(data => data)
+      );
+  }
+
+  public createWithImage(item: T, image: File): Observable<any> {
+    const formData = new FormData();
+    formData.append('reqobj', JSON.stringify(this.serializer.toJson(item)));
+    formData.append('file', image);
+
+    return this.httpClient
+      .post<any>(`${this.BASE_URL}${this.apiUrl}/${this.endpoint}/${this.RESOURCE_CREATE_WITH_IMAGE}`, formData).pipe(
+        map(data => data)
+      );
+  }
+
+  public create(item: T): Observable<T> {
+    return this.httpClient
+      .post<any>(`${this.BASE_URL}${this.apiUrl}/${this.endpoint}/${this.RESOURCE_CREATE}`,
+        this.serializer.toJson(item)).pipe(
+          map(data => data.obj && this.serializer.fromJson(data.obj) as T)
+        );
+  }
+
+  public createNew(item: T): Observable<T> {
+    return this.httpClient
+      .post<any>(`${this.BASE_URL}${this.apiUrl}/${this.endpoint}/${this.RESOURCE_CREATE}`, this.serializer.toJson(item)).pipe(
+        map(data => data)
+      );
+  }
+
+  public updateNew(item: T): Observable<T> {
+    return this.httpClient
+      .put<any>(`${this.BASE_URL}${this.apiUrl}/${this.endpoint}/${this.RESOURCE_UPDATE}`,
+        this.serializer.toJson(item)).pipe(
+          map((data: any) => data)
+        );
+  }
+  
+  public updateWithImage(item: T, image: File): Observable<any> {
+    const formData = new FormData();
+    // console.log("item >>>>>>>>>>> ", item)
+    formData.append('reqobj', JSON.stringify(this.serializer.toJson(item)));
+    formData.append('file', image);
+
+    return this.httpClient
+      .put<any>(`${this.BASE_URL}${this.apiUrl}/${this.endpoint}/${this.RESOURCE_UPDATE_WITH_IMAGE}`, formData).pipe(
+        map(data => data)
+      );
+  }
+
+  public update(item: T): Observable<T> {
+    return this.httpClient
+      .put<any>(`${this.BASE_URL}${this.apiUrl}/${this.endpoint}/${this.RESOURCE_UPDATE}`,
+        this.serializer.toJson(item)).pipe(
+          map(data => data)
+        );
+  }
+
+  public updatePrescription(item: T): Observable<T> {
+    return this.httpClient
+      .put<any>(`${this.BASE_URL}${this.apiUrl}/${this.endpoint}/${this.RESOURCE_UPDATE}`,
+        this.serializer.toJson(item)).pipe(
+          map((data: any) => data)
+        );
+  }
+
+  // read(id: number): Observable<T> {
+  //   return this.httpClient
+  //     .get(`${this.BASE_URL}:${this.apiUrl}/${this.endpoint}/${id}`).pipe(
+  //       map((data: any) => this.serializer.fromJson(data) as T)
+  //     )
+  // }
+
+  public getSearch(mappingUrl: string, reqItem: T): Observable<T[]> {
+    return this.httpClient
+      .get(`${this.BASE_URL}${this.apiUrl}/${this.endpoint}/${mappingUrl}`).pipe(
+        map((data: any) => data)
+      );
+  }
+
+  public search(mappingUrl: string, reqItem: T): Observable<T> {
+    return this.httpClient
+      .post<any>(`${this.BASE_URL}${this.apiUrl}/${this.endpoint}/${mappingUrl}`, reqItem).pipe(
+        map((data: any) => data)
+      );
+  }
+
+  public customeList(mappingUrl: string, item: T): Observable<T[]> {
+    return this.httpClient
+      .post<any>(`${this.BASE_URL}${this.apiUrl}/${this.endpoint}/${mappingUrl}`, this.serializer.toJson(item)).pipe(
+        map((data: any) => this.convertData(data.items))
+      );
+  }
+
+  public customeListGet(mappingUrl: string, item: T): Observable<T[]> {
+    return this.httpClient
+      .get(`${this.BASE_URL}${this.apiUrl}/${this.endpoint}/${mappingUrl}`, this.serializer.toJson(item)).pipe(
+        map((data: any) => this.convertData(data.items))
+      );
+  }
+
+  public getCustomObjects(optional: string, item: T): Observable<any> {
+    return this.httpClient
+      .get(`${this.BASE_URL}${this.apiUrl}/${this.endpoint}/${optional}`, this.serializer.toJson(item)).pipe(
+        map((data: any) => this.convertDataObject(data))
+      );
+  }
+
+  public customParamList(optional: string, item: any): Observable<any> {
+    return this.httpClient
+      .post(`${this.BASE_URL}${this.apiUrl}/${this.endpoint}/${optional}`, item).pipe(
+        map((data: any) => data.model.itemList)
+      );
+  }
+  public customParamObj(optional: string, item: any): Observable<any> {
+    return this.httpClient
+      .post(`${this.BASE_URL}${this.apiUrl}/${this.endpoint}/${optional}`, item).pipe(
+        map((data: any) => (this.isEmptyObject(data.model)) ? null : this.serializer.fromJson(data.model))
+      );
+  }
+
+  public list(item: T): Observable<T[]> {
+    return this.httpClient
+      .post(`${this.BASE_URL}${this.apiUrl}/${this.endpoint}/${this.RESOURCE_LIST}`, this.serializer.toJson(item)).pipe(
+        map((data: any) => this.convertData(data.items))
+      );
+  }
+
+
+  public delete(id: string) {
+    return this.httpClient
+      .delete<any>(`${this.BASE_URL}${this.apiUrl}/${this.endpoint}/${this.RESOURCE_DELETE}`, {
+        params: new HttpParams().set('id', id)
+      });
+  }
+
+  public remove(id: string) {
+    return this.httpClient
+      .delete<any>(`${this.BASE_URL}${this.apiUrl}/${this.endpoint}/${this.RESOURCE_REMOVE}`, {
+        params: new HttpParams().set('id', id)
+      });
+  }
+
+  convertToJson(data: any): T[] {
+    if (data) {
+      return this.serializer.toJson(data);
+    } else {
+      return [];
+    }
+  }
+
+  convertData(data: any): T[] {
+    if (data) {
+      return data.map(item => this.serializer.fromJson(item));
+    } else {
+      return [];
+    }
+  }
+
+  private convertDataObject(data: any) {
+    if (data) {
+      // return data.map(item => this.serializer.fromJson(item));
+      return this.serializer.fromJson(data);
+    } else {
+      return null;
+    }
+  }
+
+  isEmptyObject(obj) {
+    for (let prop in obj) {
+      if (obj.hasOwnProperty(prop)) {
+        return false;
+      }
+    }
+    return true;
+  }
+
+}
+
+Serivce
+========
+
+import { Injectable } from '@angular/core';
+import { environment } from 'src/environments/environment';
+import { HttpClient } from '@angular/common/http';
+import { Observable } from 'rxjs';
+import { map } from 'rxjs/operators';
+
+@Injectable({
+  providedIn: 'root'
+})
+export class PathReportLogService {
+
+
+  private END_POINT = `path-report-log`;
+
+  private REPORT_LOG_BY_INVOICE_ID = `${environment.baseUrl}${environment.pathologyApiUrl}/${this.END_POINT}/log-by-invoice-id`;
+  private GET_PATIENT_DEMOGRAPHY_DATE = `${environment.baseUrl}${environment.pathologyApiUrl}/${this.END_POINT}/patient-demography`;
+
+  constructor(private http:HttpClient) { }
+
+
+  reportLogByInvoiceId(itemInfoStr:any): Observable<any> {
+    return this.http.post<any>(this.REPORT_LOG_BY_INVOICE_ID, itemInfoStr).pipe(
+      map((data: any) => data
+    ));
+  }
+
+  patientDemographyDate(itemInfoStr:any): Observable<any> {
+    return this.http.post<any>(this.GET_PATIENT_DEMOGRAPHY_DATE, itemInfoStr).pipe(
+      map((data: any) => data
+    ));
+  }
+  
+  
+    getRsFormConfigByCompanyNo() {
+    const params = new HttpParams();
+    return this.http.get(this._RS_FORM_CONFIG_BY_COMPANY_NO, { params }).pipe(
+      map((data: any) => data
+      ));
+  }
+
+
+
+ 
+
+}
+
+Service2
+========
+
+import { Injectable } from '@angular/core';
+import { HttpClient, HttpParams } from '@angular/common/http';
+import { ConsultationSerializer } from '../serializers/consultation-serializer';
+import { ResourceService } from 'src/app/core/services/resource.service';
+import { environment } from 'src/environments/environment';
+import { Consultation } from '../models/consultation.model';
+import { Observable, forkJoin } from 'rxjs';
+import { take } from 'rxjs/operators';
+
+@Injectable({
+  providedIn: 'root'
+})
+export class ConsultationService extends ResourceService<Consultation> {
+
+  private GRAPH_END_POINT = `pathology-graph`;
+  private FIND_GRAPH_ATTRIBUTE_LIST = `${environment.baseUrl}${environment.prescriptionServiceApiUrl}/${this.GRAPH_END_POINT}/findGraphAttributeList`;
+  private FIND_GRAPHABLE_ATTRIBUTE_LIST = `${environment.baseUrl}${environment.prescriptionServiceApiUrl}/${this.GRAPH_END_POINT}/findGraphableAttributeList`;
+  private FIND_GRAPHABLE_ATTRIBUTE_LIST_WITH_DATE = `${environment.baseUrl}${environment.prescriptionServiceApiUrl}/${this.GRAPH_END_POINT}/findGraphableAttributeListWithDate`;
+  private FIND_GRAPHABLE_ATTRIBUTE_LIST_WITH_DATE_ARRAYLIST = `${environment.baseUrl}${environment.prescriptionServiceApiUrl}/${this.GRAPH_END_POINT}/findGraphableAttributeListArryListWithDate`;
+
+  // Lab non lab report request url
+  private LAB_NON_LAB_END_POINT = `lab-nonlab-report`;
+  private LAB_REPORT_LIST = `${environment.baseUrl}${environment.prescriptionServiceApiUrl}/${this.LAB_NON_LAB_END_POINT}/margeLabReportList`;
+  private NON_LAB_REPORT_LIST = `${environment.baseUrl}${environment.prescriptionServiceApiUrl}/${this.LAB_NON_LAB_END_POINT}/nonLabReportList`;
+  private LAB_INVESTIGATION_DETAIL_LIST = `${environment.baseUrl}${environment.prescriptionServiceApiUrl}/${this.LAB_NON_LAB_END_POINT}/margeLabInvestigationDetailList`;
+  private NON_LAB_INVESTIGATION_DETAIL_LIST = `${environment.baseUrl}${environment.prescriptionServiceApiUrl}/${this.LAB_NON_LAB_END_POINT}/nonLabInvestigationDetailList`;
+
+  constructor(httpClient: HttpClient, private http: HttpClient) {
+    super(httpClient, environment.prescriptionServiceApiUrl, 'consultation', new ConsultationSerializer());
+  }
+
+  
+
+  // OPD lab investigation detail list
+  labInvestigationDetailList(params: HttpParams): Observable<any> {
+    return this.http.get<any>(this.LAB_INVESTIGATION_DETAIL_LIST, { params });
+  }
+
+  // OPD non lab investigation detail list
+  nonLabInvestigationDetailList(params: HttpParams): Observable<any> {
+    return this.http.get<any>(this.NON_LAB_INVESTIGATION_DETAIL_LIST, { params });
+  }
+
+  // Graph Attribute List
+  labGraphAttributeList(params: any): Observable<any> {
+    return this.http.post<any>(this.FIND_GRAPH_ATTRIBUTE_LIST, params);
+  }
+
+  // Graphable Attribute List
+  labGraphableAttributeList(params: any): Observable<any> {
+    return this.http.post<any>(this.FIND_GRAPHABLE_ATTRIBUTE_LIST, params);
+  }
+
+  // Graphable Attribute List With Date
+  labGraphableAttributeListWithDate(params: any): Observable<any> {
+    return this.http.post<any>(this.FIND_GRAPHABLE_ATTRIBUTE_LIST_WITH_DATE, params);
+  }
+
+  // Graphable Attribute List With Date Arry List
+  loadGraphData(params: any): Observable<any> {
+    return this.http.post<any>(this.FIND_GRAPHABLE_ATTRIBUTE_LIST_WITH_DATE_ARRAYLIST, params);
+  }
+
+  getLabNonLabReportList(params: HttpParams): Observable<any[]> {
+
+    const labReportList = this.http.get<any>(this.LAB_REPORT_LIST, { params });
+    const nonLabReportList = this.http.get<any>(this.NON_LAB_REPORT_LIST, { params });
+
+    return forkJoin([
+      labReportList.pipe(take(1)),
+      nonLabReportList.pipe(take(1))
+    ]);
+
+  }
+
+}
+
+InCpmponent
+===========
+
+import { Component, ViewChild, OnInit, ElementRef, OnDestroy } from '@angular/core';
+import { ToastrService } from 'ngx-toastr';
+import { UtilsService } from 'src/app/core/services/utils.service';
+import { Priority } from 'src/app/diagnostic/_coreDiagnostic/models/priority.model';
+import { Department } from 'src/app/diagnostic/_coreDiagnostic/models/department.model';
+import { UserCompany } from 'src/app/diagnostic/_coreDiagnostic/models/user-company.model';
+import { PathologySharedService } from 'src/app/diagnostic/_coreDiagnostic/services/pathology-shared.service';
+import { PathInvoiceDtl } from '../../_coreDiagnostic/models/path-invoicedtl.model';
+import { BsModalRef, BsModalService } from 'ngx-bootstrap';
+import { ConfirmationDialogComponent } from 'src/app/shared/components/confirmation-dialog/confirmation-dialog.component';
+import { StepReverseService } from '../../_coreDiagnostic/services/step-reverse.service';
+import { StepCancellationFilterParams } from '../../_coreDiagnostic/models/step-cancellation-filter-params.model';
+import { DatePipe } from '@angular/common';
+import { Subscription } from 'rxjs';
+
+
+@Component({
+  selector: 'app-step-cancellation',
+  templateUrl: './step-cancellation.component.html',
+  styleUrls: ['./step-cancellation.component.css']
+})
+export class StepCancellationComponent implements OnInit, OnDestroy {
+
+  @ViewChild("invoiceNoInputFieldIdentity") invoiceNoInputFieldIdentity;
+  @ViewChild('stepReversePageBody') stepReversePageBody: ElementRef;
+
+  subscription: Subscription;
+
+
+  // Filter fields
+  fromDate: Date;
+  toDate: Date;
+
+  selectedPatientFrom: string;
+
+  resetAlertBsModalRef: BsModalRef;
+  cuttentInvoiceId: string;
+
+  labNo: string;
+  invoiceNo: string;
+  hospitalNumber: string;
+  admissionNo: string;
+  personalNumber: string;
+  currentInvoiceId: string;
+  currentPathItemInfo: any = {};
+
+  priority: Priority = new Priority();
+  priorityList: Priority[] = [];
+  selectedPriorityDeliveryStatusNo: number = 0;
+
+  department: Department = new Department();
+  departmentList: Department[] = [];
+  selectedDepartmentNo: number = 0;
+
+  userCompany: UserCompany = new UserCompany();
+  userCompanyList: UserCompany[] = [];
+  selectedCompanyNo: number = 0;
+
+  minDate: Date;
+  maxDate: Date;
+
+  private DATE_FMT = 'dd/MM/yyyy';
+
+  selectedPatientInfo: any;
+  pathInvoiceDtl: PathInvoiceDtl = new PathInvoiceDtl();
+  pathInvoiceDtlList: PathInvoiceDtl[] = [];
+  stepCancellationFilterParams: StepCancellationFilterParams = new StepCancellationFilterParams();
+
+
+  constructor(
+    private util: UtilsService,
+    private toastr: ToastrService,
+    private modalService: BsModalService,
+    private stepReverseService: StepReverseService,
+    private pathologySharedService: PathologySharedService,
+
+  ) { }
+
+  ngOnInit(): void {
+    this.subscription = this.pathologySharedService.obj$.subscribe((obj: any) => {
+      if(obj){
+        console.log("SharedServiceObj: ",obj);
+        this.currentPathItemInfo = obj;
+        this.invoiceNo = this.currentPathItemInfo.invoiceId;
+        this.onInitFindData();
+      }
+      setTimeout(() => { this.invoiceNoInputFieldIdentity.nativeElement.focus() }, 100 / 60);
+      console.log('invoiceId: ', this.currentPathItemInfo.invoiceId);
+    });
+
+    let that = this;
+    this.selectedCompanyNo = 0;
+    this.selectedDepartmentNo = 0;
+    this.selectedPatientFrom = "ALL";
+    this.selectedPriorityDeliveryStatusNo = 0;
+
+    this.toDate = new Date()
+    this.fromDate = new Date();
+    this.maxDate = new Date();
+    this.fromDate.setDate(this.toDate.getDate() - 7);
+
+    this.stepCancellationFilterParams.toDateStr = new DatePipe('en-US').transform(this.toDate, 'dd/MM/yyyy');
+    this.stepCancellationFilterParams.fromDateStr = new DatePipe('en-US').transform(this.fromDate, 'dd/MM/yyyy');
+
+    this.getInitialDataList();
+  }
+
+
+  onInitFindData(): void {
+    this.stepCancellationFilterParams.labId = "";
+    this.selectedPatientInfo = {};
+    if (this.invoiceNo != undefined) {
+      this.stepCancellationFilterParams.invoiceId = this.invoiceNo;
+      // this.stepCancellationFilterParams.buNo = this.currentPathItemInfo.buNo;
+      this.stepCancellationFilterParams.deliveryStatusNo = this.currentPathItemInfo.deliveryStatusNo;
+      console.log("onInitFindDataParam:", this.stepCancellationFilterParams);
+      this.getInvoiceDtlViewListForStepReverse();
+    }
+  }
+
+  onChangeFromDate(): void {
+    console.log("On change selected from date ", this.fromDate);
+    if (this.fromDate) {
+      this.minDate = this.fromDate;
+      this.stepCancellationFilterParams.fromDateStr = this.util.getDateStringFromDateAndFormat(this.fromDate, this.DATE_FMT);
+      this.getInvoiceDtlViewListForStepReverse();
+    }
+
+  }
+
+  onChangeToDate(): void {
+    console.log("On change selected to date ", this.toDate);
+    if (this.toDate) {
+      this.maxDate = this.toDate;
+      this.stepCancellationFilterParams.toDateStr = this.util.getDateStringFromDateAndFormat(this.toDate, this.DATE_FMT);
+      this.getInvoiceDtlViewListForStepReverse();
+    }
+  }
+
+  onChangePriority(): void {
+    console.log("selectedPriorityDeliveryStatusNo: ", this.selectedPriorityDeliveryStatusNo)
+    if (this.selectedPriorityDeliveryStatusNo == 0 || this.selectedPriorityDeliveryStatusNo > 0) {
+      this.stepCancellationFilterParams.priorityNumber = this.selectedPriorityDeliveryStatusNo;
+      this.getInvoiceDtlViewListForStepReverse();
+    }
+  }
+
+  onChangeDepartment(): void {
+    console.log("selectedDepartmentNo: ", this.selectedDepartmentNo)
+    if (this.selectedDepartmentNo == 0 || this.selectedDepartmentNo > 0) {
+      this.stepCancellationFilterParams.buNo = this.selectedDepartmentNo;
+      this.getInvoiceDtlViewListForStepReverse();
+    }
+
+  }
+
+  onChangeCompany(): void {
+    console.log("selectedCompanyNo: ", this.selectedCompanyNo)
+    if (this.selectedCompanyNo == 0 || this.selectedCompanyNo > 0) {
+      this.stepCancellationFilterParams.companyNo = this.selectedCompanyNo;
+      this.getInvoiceDtlViewListForStepReverse();
+    }
+  }
+
+  onChangeSelectedPatientFrom(): void {
+    console.log("selectedPatientFrom: ", this.selectedPatientFrom)
+    if (this.selectedPatientFrom != undefined) {
+      this.stepCancellationFilterParams.patientFrom = this.selectedPatientFrom;
+      this.getInvoiceDtlViewListForStepReverse();
+    }
+  }
+
+  onEnterSearchByInvoiceId(): void {
+    this.stepCancellationFilterParams.admissionId = "";
+    this.stepCancellationFilterParams.labId = "";
+    this.stepCancellationFilterParams.personalNumber = "";
+    this.selectedPatientInfo = {};
+    console.log("onEnterSearch:", this.invoiceNo);
+    if (this.invoiceNo != undefined) {
+      this.stepCancellationFilterParams.invoiceId = this.invoiceNo;
+      this.getInvoiceDtlViewListForStepReverse();
+    } else {
+      this.toastr.error('', 'Please enter valid number.');
+    }
+  }
+
+  onEnterLABNoInputField(): void {
+    this.stepCancellationFilterParams.admissionId = "";
+    this.stepCancellationFilterParams.personalNumber = "";
+    this.stepCancellationFilterParams.invoiceId = "";
+    this.selectedPatientInfo = {};
+    console.log("onEnterSearch:", this.labNo);
+    if (this.labNo != undefined) {
+      this.stepCancellationFilterParams.labId = this.labNo;
+      this.getInvoiceDtlViewListForStepReverse();
+    } else {
+      this.toastr.error('', 'Please enter valid number.');
+    }
+  }
+
+  onClickStepCalItem(obj: any): void {
+    console.log("Item: ", obj)
+  }
+
+  onClickCancelBtn(obj: PathInvoiceDtl, btnIdentity: any): void {
+    console.log('btnIdentity: ', btnIdentity);
+    console.log('CancelAbleObj: ', obj);
+    switch (btnIdentity) {
+      case "PSCC":
+        if (obj.spProSamKeyFlag != 1) {
+          this.stepCancelProcess(obj, btnIdentity);
+        } else {
+          this.toastr.warning('', 'Advance process exist. Please cancel advanced process first.');
+        }
+        break;
+      case "PSPP":
+        if (obj.labRcvFromSpKeyFlag != 1) {
+          this.stepCancelProcess(obj, btnIdentity);
+        } else {
+          this.toastr.warning('', 'Advance process exist. Please cancel advanced process first.');
+        }
+        break;
+      default:
+        this.toastr.warning("", "Item not found !");
+    }
+
+  }
+
+  stepCancelProcess(obj: PathInvoiceDtl, btnIdentity: any): void {
+    const initialState = { title: "Are you sure to cancle this step ?" };
+    this.resetAlertBsModalRef = this.modalService.show(ConfirmationDialogComponent, { initialState, class: 'modal-sm' });
+    this.resetAlertBsModalRef.content.onClose.subscribe(
+      result => {
+        if (result == true) {
+          this.pathStepReverseProc(obj, btnIdentity);
+        }
+      });
+  }
+
+  pathStepReverseProc(obj: PathInvoiceDtl, btnIdentity: any): void {
+
+    let setpReverseObj = {
+      "itemNo": obj.itemNo,
+      "labNo": obj.labNo,
+      "stampNo": obj.stampNo,
+      "pStepProc": btnIdentity,
+    }
+    console.log("setpReverseObj:", setpReverseObj);
+    this.addLoader();
+    this.stepReverseService.pathStepReverseProc(setpReverseObj).subscribe(
+      res => {
+        if (res.success) {
+          this.toastr.success("", res.message);
+          this.getInvoiceDtlViewListForStepReverse();
+        } else {
+          console.log("pathStepReverseProc error:", res);
+          this.toastr.error("", res.message);
+        }
+        // this.removeLoader();
+      },
+      err => {
+        this.removeLoader();
+        this.toastr.error("", err);
+        console.log("pathStepReverseProc error: ", err);
+      });
+  }
+
+  onClickResetBtn(obj: PathInvoiceDtl): void {
+    console.log("onClickResetBtn: ", obj);
+    if (obj.labResultPrintKeyFlag === 1) {
+      this.toastr.warning("", "Result already printed, so you can't restructure.\n Please step cancel first.");
+      return;
+    }
+    const initialState = { title: "Do you want to restructure ?" };
+    this.resetAlertBsModalRef = this.modalService.show(ConfirmationDialogComponent, { initialState, class: 'modal-sm' });
+    this.resetAlertBsModalRef.content.onClose.subscribe(
+      result => {
+        if (result == true) {
+          this.restructureProcess(obj);
+        }
+      });
+  }
+
+  restructureProcess(obj: PathInvoiceDtl): void {
+    let restructureProObj = {
+      "itemNo": obj.itemNo,
+      "labNo": obj.labNo
+    }
+    console.log("restructureProObj:", restructureProObj);
+    this.addLoader();
+    this.stepReverseService.pathStepResetProc(restructureProObj).subscribe(
+      res => {
+        if (res.success) {
+          this.toastr.success("", res.message);
+          this.getInvoiceDtlViewListForStepReverse();
+        } else {
+          console.log("restructureProObj error:", res);
+          this.toastr.error("", res.message);
+        }
+        // this.removeLoader();
+      },
+      err => {
+        this.removeLoader();
+        this.toastr.error("", err);
+        console.log("restructureProObjerror: ", err);
+      });
+  }
+
+  getInvoiceDtlViewListForStepReverse(): void {
+    this.addLoader();
+    this.stepReverseService.getInvoiceDtlViewListForStepReverse(this.stepCancellationFilterParams).subscribe(
+      res => {
+        if (res.success) {
+          console.log("getInvoiceDtlViewListForStepReverse:", res)
+          this.pathInvoiceDtlList = res.items;
+          if (this.pathInvoiceDtlList != null && this.pathInvoiceDtlList.length > 0) {
+            this.currentInvoiceId = this.pathInvoiceDtlList[0].invoiceId;
+            this.getPatientDemographyInfo();
+          }
+        } else {
+          console.log("getPatientDemographyInfo error:", res);
+        }
+        this.removeLoader();
+      },
+      err => {
+        this.removeLoader();
+        console.log("Priority list error: ", err);
+      }
+    )
+  }
+
+  getPatientDemographyInfo(): void {
+    this.selectedPatientInfo = {};
+    let invoiceIdObj = { "invoiceId": this.currentInvoiceId }
+    this.stepReverseService.getPatientDemographyInfo(invoiceIdObj).subscribe(
+      res => {
+        if (res.success) {
+          this.selectedPatientInfo = res.obj;
+        } else {
+          console.log("getPatientDemographyInfo error:", res);
+        }
+      },
+      err => {
+        console.log("Priority list error: ", err);
+      }
+    )
+  }
+
+  getInitialDataList(): void {
+    this.stepReverseService.getInitialDataList().subscribe(
+      res => {
+        let priorityObj = res[0];
+        if (priorityObj.success) {
+          this.priorityList = priorityObj.items;
+        }
+        let departmentObj = res[1];
+        if (departmentObj.success) {
+          this.departmentList = departmentObj.items;
+        }
+        let userCompanyObj = res[2];
+        if (userCompanyObj.success) {
+          this.userCompanyList = userCompanyObj.items;
+        }
+      },
+      err => {
+        console.error("Error occured when get all Initial Data response ", err);
+      }
+    );
+  }
+  
+   getReportLogByInvoiceId(): void {
+    let reqObj = {"invoiceId":this.currentInvoiceId}
+    this.pathReportLogService.reportLogByInvoiceId(reqObj).subscribe(
+      res => {
+        if (res.success) {
+          console.log("getReportLogByInvoiceId: ", res);
+          this.pathReportLogList = res.items;
+        } else {
+          console.log("getReportLogByInvoiceId error:", res);
+        }
+      },
+      err => {
+        console.log("getReportLogByInvoiceId error: ", err);
+      });
+  }
+
+
+  getPatientDemographyInfo(): void {
+    this.patientDemographyInfoForShow = {};
+    let invoiceIdObj = { "invoiceId": this.currentInvoiceId }
+    this.pathReportLogService.patientDemographyDate(invoiceIdObj).subscribe(
+      res => {
+        if (res.success) {
+          console.log("getPatientDemographyInfo: ", res);
+          this.patientDemographyInfoForShow = res.obj;
+        } else {
+          console.log("getPatientDemographyInfo error:", res);
+        }
+      },
+      err => {
+        console.log("getPatientDemographyInfo  error: ", err);
+      }
+    )
+  }
+
+
+
+  addLoader(): void {
+    if (!this.stepReversePageBody.nativeElement.classList.contains('loader')) {
+      this.stepReversePageBody.nativeElement.classList.add('loader');
+    }
+  }
+
+  removeLoader(): void {
+    if (this.stepReversePageBody.nativeElement.classList.contains('loader')) {
+      this.stepReversePageBody.nativeElement.classList.remove('loader');
+    }
+  }
+
+
+  ngOnDestroy(): void {
+    this.subscription.unsubscribe();
+    this.pathologySharedService.setObj(null);
+  }
+
+
+}
+
+InCpmponent2
+============
+import { Component, ViewChild, OnInit, Output, EventEmitter, OnDestroy } from '@angular/core';
+import { Subject } from 'rxjs';
+import * as moment from 'moment';
+import { PatientDemographyInfo } from '../../../_coreDiagnostic/models/patient-demography-info.model';
+import { environment } from '../../../../../environments/environment';
+import { AuthService } from 'src/app/core/auth/services/auth.service';
+import { PathSampleReceiveAtLabPending } from '../../../_coreDiagnostic/models/path-sample-receive-atlab-pending.model';
+import { PathSampleReceiveAtLabPendingService } from '../../../_coreDiagnostic/services/path-sample-receive-atlab-pending.service';
+import { Priority } from '../../../_coreDiagnostic/models/priority.model';
+import { Department } from '../../../_coreDiagnostic/models/department.model';
+import { UserCompany } from 'src/app/security/_coreSecurity/models/user-company.model';
+import { DatePipe } from '@angular/common';
+import { PathologySharedService } from 'src/app/diagnostic/_coreDiagnostic/services/pathology-shared.service';
+
+@Component({
+  selector: 'app-sample-pending',
+  templateUrl: './sample-pending.component.html',
+  styleUrls: ['./sample-pending.component.css']
+})
+export class SamplePendingComponent implements OnInit , OnDestroy{
+
+  @Output() tabId: EventEmitter<number> = new EventEmitter<number>();
+  @ViewChild('samplePendingGrid') samplePendingTable;
+  samplePendingGrid: any;
+  samplePendingGridObj: any;
+
+  onClose: Subject<boolean>;
+  fromDate: Date;
+  toDate: Date;
+  maxDate: Date;
+  selectedDepartmentNo: any;
+  selectedCompanyNo: any;
+  selectedPendingPatientFrom: any;
+  selectedPriorityDeliveryStatusNo: any;
+  pathSampleReceiveAtLabPending: PathSampleReceiveAtLabPending = new PathSampleReceiveAtLabPending();
+
+  constructor(
+    private authService: AuthService,
+    private pathSampleReceiveAtLabPendingService: PathSampleReceiveAtLabPendingService,
+    private pathologySharedService: PathologySharedService
+  ) { }
+  public BASE_URL = environment.baseUrl + environment.diagnosticApiUrl;
+
+  priorityList: Priority[] = []
+  priority: Priority = new Priority();
+  departmentList: Department[] = []
+  department: Department = new Department();
+  userCompanyList: UserCompany[] = []
+  userCompany: UserCompany = new UserCompany();
+  simplePendingfilterParams: any = {};
+  patientDemographyInfoForShow: any = {};
+  currentInvoiceId  : string;
+  patientDemographyInfo: PatientDemographyInfo = new PatientDemographyInfo();
+
+  ngOnInit() {
+    let that = this;
+    this.selectedCompanyNo = "ALL";
+    this.selectedDepartmentNo = "ALL";
+    this.selectedPriorityDeliveryStatusNo = "ALL";
+    this.toDate = new Date()
+    this.fromDate = new Date();
+    this.maxDate = new Date();
+    this.fromDate.setDate(this.toDate.getDate() - 7);
+
+    this.simplePendingfilterParams.toDate = new DatePipe('en-US').transform(this.toDate, 'dd/MM/yyyy');
+    this.simplePendingfilterParams.fromDate = new DatePipe('en-US').transform(this.fromDate, 'dd/MM/yyyy');
+
+    this.getPriorityList(function () {
+      that.getDepartmentList(function () {
+        that.getUserCompanyList(function () {
+          that.initSamplePendingGrid();
+        });
+      });
+    });
+    //console.log("SamplePendingComponent On Init");
+  }
+
+  samplePendingGridClickHandler(info: any): void {
+    console.log("Grid Data:", info);
+  }
+
+  onChangeToDate(): void {
+    if (this.toDate != undefined) {
+     // console.log(this.toDate);
+      let modiftToDate: string = new DatePipe('en-US').transform(this.toDate, 'dd/MM/yyyy');
+      this.simplePendingfilterParams.toDate = modiftToDate
+    }
+    this.samplePendingGridObj.draw();
+  }
+
+  onChangeFormDate(): void {
+    //console.log(this.fromDate, " Onchange")
+    if (this.fromDate != undefined) {
+      let modifyFormDate: string = new DatePipe('en-US').transform(this.fromDate, 'dd/MM/yyyy');
+      this.simplePendingfilterParams.fromDate = modifyFormDate;
+    }
+    this.samplePendingGridObj.draw();
+  }
+
+  onEnterSearchByHospitalNo() {
+    this.patientDemographyInfoForShow = {};
+    this.pathSampleReceiveAtLabPending.invoiceId = "";
+    this.pathSampleReceiveAtLabPending.admissionId = "";
+    this.pathSampleReceiveAtLabPending.labId = "";
+    if (this.pathSampleReceiveAtLabPending.hospitalNumber != undefined) {
+      this.simplePendingfilterParams.invoiceId=''; 
+      this.simplePendingfilterParams.admissionId=''; 
+      this.simplePendingfilterParams.labId=''; 
+      this.simplePendingfilterParams.hospitalNumber = this.pathSampleReceiveAtLabPending.hospitalNumber;
+    }
+    this.samplePendingGridObj.draw();
+  }
+
+  onEnterSearchByInvoiceNo() {
+    this.pathSampleReceiveAtLabPending.hospitalNumber = "";
+    this.pathSampleReceiveAtLabPending.admissionId = "";
+    this.pathSampleReceiveAtLabPending.labId = "";
+    this.patientDemographyInfoForShow = {};
+    if (this.pathSampleReceiveAtLabPending.invoiceId != undefined) {
+      this.simplePendingfilterParams.hospitalNumber=''; 
+      this.simplePendingfilterParams.admissionId=''; 
+      this.simplePendingfilterParams.labId=''; 
+      this.simplePendingfilterParams.invoiceId = this.pathSampleReceiveAtLabPending.invoiceId;
+    }
+    this.samplePendingGridObj.draw();
+  }
+
+
+  onEnterSearchByAdmissionNo() {
+    this.pathSampleReceiveAtLabPending.hospitalNumber = "";
+    this.pathSampleReceiveAtLabPending.invoiceId = "";
+    this.pathSampleReceiveAtLabPending.labId = "";
+    this.patientDemographyInfoForShow = {};
+    if (this.pathSampleReceiveAtLabPending.admissionId != undefined) {
+      this.simplePendingfilterParams.invoiceId=''; 
+      this.simplePendingfilterParams.hospitalNumber=''; 
+      this.simplePendingfilterParams.labId=''; 
+      this.simplePendingfilterParams.admissionId = this.pathSampleReceiveAtLabPending.admissionId;
+    }
+    this.samplePendingGridObj.draw();
+  }
+
+  onEnterSearchByLabNo() {
+    this.pathSampleReceiveAtLabPending.hospitalNumber = "";
+    this.pathSampleReceiveAtLabPending.invoiceId = "";
+    this.pathSampleReceiveAtLabPending.admissionId = "";
+    if (this.pathSampleReceiveAtLabPending.labId != undefined) {
+      this.simplePendingfilterParams.invoiceId=''; 
+      this.simplePendingfilterParams.hospitalNumber=''; 
+      this.simplePendingfilterParams.admissionId=''; 
+      this.simplePendingfilterParams.labId = this.pathSampleReceiveAtLabPending.labId;
+    }
+    this.samplePendingGridObj.draw();
+  }
+
+  changePendingPatientFrom(value: any) {
+    this.simplePendingfilterParams.selectedPendingPatientFrom = undefined;
+    this.selectedPendingPatientFrom = value;
+    if (this.selectedPendingPatientFrom != 'ALL') {
+      this.simplePendingfilterParams.selectedPendingPatientFrom = this.selectedPendingPatientFrom;
+    }
+    this.samplePendingGridObj.draw();
+  }
+
+  onChangeDeliveryStatus(): void {
+    this.simplePendingfilterParams.deliveryStatusNo = undefined;
+    if (this.selectedPriorityDeliveryStatusNo != 'ALL') {
+      this.simplePendingfilterParams.deliveryStatusNo = this.selectedPriorityDeliveryStatusNo;
+    }
+    this.samplePendingGridObj.draw();
+  }
+
+  onChangeDepartment(): void {
+    this.simplePendingfilterParams.selectedDepartmentNo = undefined;
+    if (this.selectedDepartmentNo != 'ALL') {
+      this.simplePendingfilterParams.selectedDepartmentNo = this.selectedDepartmentNo;
+    }
+    this.samplePendingGridObj.draw();
+  }
+
+  onChangeCompany(): void {
+    this.simplePendingfilterParams.selectedCompanyNo = undefined
+    if (this.selectedCompanyNo != 'ALL') {
+      this.simplePendingfilterParams.selectedCompanyNo = this.selectedCompanyNo;
+    }
+    this.samplePendingGridObj.draw();
+  }
+
+  
+
+  onClickSampleReceive(info: any){
+    console.log("onClickSampleReceive",info);
+    // this.currentInvoiceId = info.invoiceId;
+    // this.getPatientDemographyInfo();
+  }
+
+  goToSampleReceiveClickHandler(info: any){
+    this.pathologySharedService.setInvoiceNo(info.invoiceId);
+    this.tabId.emit(0);
+  }
+
+  initSamplePendingGrid() {
+    let that = this;
+    this.samplePendingGrid = $(this.samplePendingTable.nativeElement);
+    this.samplePendingGridObj = this.samplePendingGrid.DataTable({
+      pagingType: 'full_numbers',
+      pageLength: 10,
+      serverSide: true,
+      processing: true,
+      searching: false,
+      ajax: {
+        url: this.BASE_URL + "/path-simple-receive-atlab-pending/gridList",
+        type: "GET",
+        data: function (sendData) {
+          sendData.fromDate = that.simplePendingfilterParams.fromDate;
+          sendData.toDate = that.simplePendingfilterParams.toDate;
+          sendData.selectedPendingPatientFrom = that.simplePendingfilterParams.selectedPendingPatientFrom;
+          sendData.selectedDepartmentNo = that.simplePendingfilterParams.selectedDepartmentNo;
+          sendData.selectedCompanyNo = that.simplePendingfilterParams.selectedCompanyNo;
+          sendData.hospitalNumber = that.simplePendingfilterParams.hospitalNumber;
+          sendData.invoiceId = that.simplePendingfilterParams.invoiceId;
+          sendData.admissionId = that.simplePendingfilterParams.admissionId;
+          sendData.labId = that.simplePendingfilterParams.labId;
+          sendData.deliveryStatusNo = that.simplePendingfilterParams.deliveryStatusNo;
+        },
+        beforeSend: function (xhr) {
+          //TODO: Need to change bearer token from static to dynamic
+          xhr.setRequestHeader('Authorization', "bearer " + that.authService.getAccessToken());
+          xhr.setRequestHeader('Content-Type', "application/json");
+        },
+        dataSrc: function (response) {
+          // console.log("path-simple-pending grid res:", response);
+          response.draw = response.obj.draw;
+          response.recordsTotal = response.obj.recordsTotal;
+          response.recordsFiltered = response.obj.recordsFiltered;
+          if(response.obj.data.length > 0){
+            that.currentInvoiceId = response.obj.data[0].invoiceId;
+            that.getPatientDemographyInfo();
+          }
+          return response.obj.data;
+        }
+      },
+      "order": [[0, "desc"]],
+      columns: [
+        {
+          "visible": false ,
+          data: 'deliveryDateTime',
+          name: 'deliveryDateTime'
+        },
+        { 
+          title: 'MEN',
+          data: 'hospitalNumber'
+        },
+        {
+          title: 'Invoice ID',
+          data: 'invoiceId',
+          name: 'invoiceId'
+        },
+        {
+          title: 'LAB ID',
+          data: 'labId',
+          name: 'labId'
+        },
+        {
+          title: 'Delivery Date',
+          data: 'deliveryDateTime',
+          render: (data) => {
+            return moment(new Date(data)).format("DD/MM/YYYY").toString()
+          }
+        },
+        {
+          title: 'Patient Name',
+          data: 'patientName',
+          name: 'patientName'
+        },
+        {
+          title: 'Exam Name',
+          data: 'itemName'
+        },
+        {
+          title: 'Department',
+          data: 'buName'
+        },
+        {
+          title: 'Specimen',
+          data: 'samName'
+        },
+        {
+          title: 'Container',
+          data: 'conName'
+        }
+      ],
+      responsive: true,
+      select: true,
+      rowCallback: (row: Node, data: any[] | Object) => {
+        $('td', row).bind('dblclick', () => {
+          that.goToSampleReceiveClickHandler(data);
+        });
+        $(row).bind('click', () => {
+          $(row).removeClass('selected')
+          $(row).addClass('selected');
+         that.onClickSampleReceive(data);
+        });
+        return row;
+      }
+    });
+  }
+
+  getPriorityList(callback) {
+    if (typeof callback === 'function') {
+      let priority = new Priority();
+      this.pathSampleReceiveAtLabPendingService.getPriorityList(priority).subscribe(
+        res => {
+          if (res.success) {
+            this.priorityList = res.items;
+            callback(this, this.priorityList)
+          } else {
+            callback(this, "priorityList list error:", res)
+            console.log("priorityList list error:", res);
+          }
+        },
+        err => {
+          callback(this, "Priority list error: ", err)
+          console.log("Priority list error: ", err);
+        }
+      )
+    }
+  }
+
+  getDepartmentList(callback) {
+    if (typeof callback === 'function') {
+      let department = new Department();
+      this.pathSampleReceiveAtLabPendingService.getDepartmentList(department).subscribe(
+        res => {
+          if (res.success) {
+            this.departmentList = res.items;
+            callback(this, this.departmentList)
+          } else {
+            console.log("Department list error:", res);
+          }
+        },
+        err => {
+          console.log("Department list error: ", err);
+        }
+      )
+    }
+  }
+
+  getUserCompanyList(callback) {
+    if (typeof callback === 'function') {
+      let userCompany = new UserCompany();
+      this.pathSampleReceiveAtLabPendingService.getUserCompanyList(userCompany).subscribe(
+        res => {
+          if (res.success) {
+            this.userCompanyList = res.items;
+            callback(this, this.userCompanyList)
+          } else {
+            console.log("userCompanyList list error:", res);
+          }
+        },
+        err => {
+          console.log("User Company list error: ", err);
+        }
+      )
+    }
+  }
+
+  getPatientDemographyInfo(): void {
+    this.patientDemographyInfoForShow = {};
+    let invoiceIdObj = {"invoiceId":this.currentInvoiceId}
+    this.pathSampleReceiveAtLabPendingService.getPatientDemographyInfo(invoiceIdObj).subscribe(
+      res => {
+        if (res.success) {
+          this.patientDemographyInfoForShow = res.obj;
+         // console.log("getPatientDemographyInfo:", this.patientDemographyInfoForShow);
+        } else {
+          console.log("getPatientDemographyInfo Not found:", res);
+        }
+      },
+      err => {
+        console.log("Priority list error: ", err);
+      }
+    )
+  }
+
+  checkIsNumber(value: any | number): boolean {
+    return ((value != null) && !isNaN(Number(value.toString())));
+  }
+
+  gridRefresh(){
+    this.samplePendingGridObj.draw();
+  }
+
+  ngOnDestroy(): void {
+    this.pathologySharedService.setInvoiceNo(0);
+    this.pathSampleReceiveAtLabPending.hospitalNumber = "";
+    this.pathSampleReceiveAtLabPending.invoiceId = "";
+    this.pathSampleReceiveAtLabPending.labId = "";
+   // console.log("call OnDestory")
+  }
+
+
+
+}
+
+InCpmponent3
+==============
+import { Component, ViewChild, OnInit, OnDestroy, ElementRef, AfterViewInit } from '@angular/core';
+import { PathResultEntrySharedService } from 'src/app/diagnostic/pathology/_corePathology/services/path-result-entry-shared.service';
+import { ResultEntryItemInfo } from 'src/app/diagnostic/pathology/_corePathology/models/result-entry-item-info.model';
+import { Subscription } from 'rxjs';
+import { Router } from '@angular/router';
+import { HttpParams } from '@angular/common/http';
+import { BsModalRef, BsModalService } from 'ngx-bootstrap';
+import { ResultEntryTemplateFilterParams } from 'src/app/diagnostic/pathology/_corePathology/models/result-entry-template-filter-params.model';
+import { ToastrService } from 'ngx-toastr';
+import { BasicLabReportComponent } from '../../../basic-lab-report/basic-lab-report.component';
+import { ConsultationService } from 'src/app/diagnostic/pathology/_corePathology/services/consultation.service';
+import { PatientDemographyInfo } from 'src/app/diagnostic/_coreDiagnostic/models/patient-demography-info.model';
+import { PathTestResult } from 'src/app/diagnostic/pathology/_corePathology/models/path-test-result.model';
+import { PathsMethod } from 'src/app/diagnostic/pathology/_corePathology/models/paths-method.model';
+import { TestResultStamp } from 'src/app/diagnostic/pathology/_corePathology/models/path-test-result-stamp.model';
+import { PathInvoiceDtl } from 'src/app/diagnostic/_coreDiagnostic/models/path-invoicedtl.model';
+import { ResultEntryTemplateAuthorInfoService } from 'src/app/diagnostic/pathology/_corePathology/services/result-entry-template-author-info.service';
+import { PathTestResultService } from 'src/app/diagnostic/pathology/_corePathology/services/path-test-result.service';
+import { PathInvoiceDtlService } from 'src/app/diagnostic/_coreDiagnostic/services/path-invoicedtl.service';
+import { TestResultStampService } from 'src/app/diagnostic/pathology/_corePathology/services/path-test-result-stamp.service';
+import { TmplConfirmationDialogComponent } from '../../../../../shared/components/tmpl-confirmation-dialog/tmpl-confirmation-dialog.component';
+import { PathResultEntryReportService } from 'src/app/diagnostic/pathology/_corePathology/services/path-result-entry-report.service';
+import { PathGeneralResultEntryFormService } from 'src/app/diagnostic/pathology/_corePathology/services/path-general-result-entry-form.service';
+import { GeneralFormResultEntryData } from 'src/app/diagnostic/pathology/_corePathology/models/general-from-result-entry-data.model';
+import { UserFeatureService } from 'src/app/diagnostic/pathology/_corePathology/services/user-feature.service';
+import { PathUserFeaturAccess } from 'src/app/diagnostic/pathology/_corePathology/models/path-user-feature-acc.model';
+import { PathologySharedService } from 'src/app/diagnostic/_coreDiagnostic/services/pathology-shared.service';
+import { ItemValueListViewerComponent } from '../../../item-value-list-viewer/item-value-list-viewer.component';
+import { PathsMethodDataViewerComponent } from '../../../paths-method-data-viewer/paths-method-data-viewer.component';
+import { ItemHistoryViewerComponent } from '../../../item-history-viewer/item-history-viewer.component';
+import { PathTestStructValue } from '../../../_corePathology/models/path-test-struct-value.model';
+import { PathTestStructValueService } from '../../../_corePathology/services/path-test-struct-value.service';
+import { PathRsFrmFeatureMng } from '../../../_corePathology/models/path-rs-frm-feature-mng.model';
+import { ResultEntryFormResourceService } from '../../../_corePathology/services/result-entry-form-resource.service';
+import { PathItemPropEditorComponent } from '../../../path-item-prop-editor/path-item-prop-editor.component';
+import { LabReportInfo } from '../../../_corePathology/models/lab-report-info.model';
+import { PathResultEntryConfig } from '../../../_corePathology/models/path-result-entry-config.model';
+import { PreparedByAuthInfo } from '../../../_corePathology/models/prepared-by-auth-info.model';
+import { VerifyByAuthInfo } from '../../../_corePathology/models/verify-by-auth-info.model';
+import { FinalizedByAuthInfo } from '../../../_corePathology/models/finalized-by-auth-info.model';
+import { PathsTesttemplateService } from '../../../_corePathology/services/paths-testtemplate.service';
+import { PathsTesttemplate } from '../../../_corePathology/models/paths-testtemplate.model';
+import { isHasFileData } from 'src/app/core/services/utils.service';
+
+
+
+@Component({
+  selector: 'app-general-template',
+  templateUrl: './general-template.component.html',
+  styleUrls: ['./general-template.component.css']
+})
+export class GeneralTemplateComponent implements OnInit, OnDestroy {
+
+  @ViewChild('generalResultEntryFormBody') generalResultEntryFormBody: ElementRef;
+
+  @ViewChild("pathsMthInput_1") pathsMthInput_1: ElementRef;
+  @ViewChild("pathsMthInput_2") pathsMthInput_2: ElementRef;
+  @ViewChild("pathsMthInput_3") pathsMthInput_3: ElementRef;
+  @ViewChild("pathsMthInput_4") pathsMthInput_4: ElementRef;
+  @ViewChild("pathsMthInput_5") pathsMthInput_5: ElementRef;
+  @ViewChild("pathsMthInput_6") pathsMthInput_6: ElementRef;
+
+  @ViewChild("pathRsEntrySaveBtnRef") pathRsEntrySaveBtnRef: ElementRef;
+  @ViewChild("pathRsEntryVerifyBtnRef") pathRsEntryVerifyBtnRef: ElementRef;
+  @ViewChild("pathRsEntryFinalizeBtnRef") pathRsEntryFinalizeBtnRef: ElementRef;
+  @ViewChild("pathRsEntryPrintBtnRef") pathRsEntryPrintBtnRef: ElementRef;
+  @ViewChild("pathRsEntryExitBtnRef") pathRsEntryExitBtnRef: ElementRef;
+
+
+  constructor(
+    public router: Router,
+    private toastr: ToastrService,
+    public modalService: BsModalService,
+    private userFeatureService: UserFeatureService,
+    private consultationService: ConsultationService,
+    private pathTestResultService: PathTestResultService,
+    private pathInvoiceDtlService: PathInvoiceDtlService,
+    private pathologySharedService: PathologySharedService,
+    private testResultStampService: TestResultStampService,
+    public pathsTesttemplateService: PathsTesttemplateService,
+    public pathTestStructValueService: PathTestStructValueService,
+    private pathResultEntryReportService: PathResultEntryReportService,
+    private pathResultEntrySharedService: PathResultEntrySharedService,
+    private resultEntryFormResourceService: ResultEntryFormResourceService,
+    private pathGeneralResultEntryFormService: PathGeneralResultEntryFormService,
+    private resultEntryTemplateAuthorInfoService: ResultEntryTemplateAuthorInfoService
+
+  ) { }
+
+  bsModalRef: BsModalRef;
+  subscription: Subscription;
+  itemLogListBsModalRef: BsModalRef;
+  itemValueListBsModalRef: BsModalRef;
+  pathsMethodDataBsModalRef: BsModalRef;
+  pathItemPropEditorBsModalRef: BsModalRef;
+
+  // For EMI
+  // lab non lab report list
+  labReportList: any[] = [];
+  labReportFilterByItemNoList: any[] = [];
+  nonLabReportList: any[] = [];
+  //Lab non lab report modal
+  labNonLabReportModalConfig = {
+    keyboard: true,
+    ignoreBackdropClick: true
+  };
+  // -- For EMI  --
+
+  patientDemographyInfoForShow: any = {};
+  labReportInfo: LabReportInfo = new LabReportInfo();
+  currentPathsTestTemp: PathsTesttemplate = new PathsTesttemplate();
+  pathRsFrmFeatureMng: PathRsFrmFeatureMng = new PathRsFrmFeatureMng();
+  pathUserFeaturAccess: PathUserFeaturAccess = new PathUserFeaturAccess();
+  patientDemographyInfo: PatientDemographyInfo = new PatientDemographyInfo();
+  pathResultEntryConfig: PathResultEntryConfig = new PathResultEntryConfig();
+  generalFormResultEntryData: GeneralFormResultEntryData = new GeneralFormResultEntryData();
+  resultEntryTemplateFilterParams: ResultEntryTemplateFilterParams = new ResultEntryTemplateFilterParams();
+
+  currentPathItemInfoForShow: any = {};
+  currentPathItemInfo: any = {};
+
+  otherPrepEmp: any = {};
+  otherVerifyEmp: any = {};
+  otherFinalEmp: any = {};
+  preparedByInfoList: PreparedByAuthInfo[] = [];
+  currentkPreparedBy: PreparedByAuthInfo = new PreparedByAuthInfo();
+  verifyByInfoList: VerifyByAuthInfo[] = [];
+  currentVerifyBy: VerifyByAuthInfo = new VerifyByAuthInfo();
+  consultationInfoList: FinalizedByAuthInfo[] = [];
+  currentConsultation: FinalizedByAuthInfo = new FinalizedByAuthInfo();
+
+  pathTestResult: PathTestResult = new PathTestResult();
+  pathTestResultList: PathTestResult[] = [];
+
+
+  pathInvoiceDtlList: PathInvoiceDtl[] = [];
+  pathInvoiceDtl: PathInvoiceDtl = new PathInvoiceDtl();
+  currentSinglePathDtlObj: PathInvoiceDtl = new PathInvoiceDtl();
+
+
+  pathsMethod: PathsMethod = new PathsMethod();
+  pathsMethodAllData: PathsMethod[] = [];
+  pathsMethodMthList: PathsMethod[] = [];
+  pathsMethodAnaList: PathsMethod[] = [];
+  pathsMethodNotList: PathsMethod[] = [];
+  pathsMethodComList: PathsMethod[] = [];
+  currentPathsMethodList: PathsMethod[] = [];
+
+  selectedPathTestStructValObj: PathTestStructValue = new PathTestStructValue();
+  pathTestStructValueList = []
+  selectTestResultID: any;
+
+  currentRsSl: string;
+  testResultStamp: TestResultStamp = new TestResultStamp();
+
+  // for save flag
+  g_checkpendingtest: any = {};
+  l_save: any = {};
+  opdPatientInfoVProces: any = 1;
+  isBlankReportPrint: boolean = false;
+
+
+  ngOnInit() {
+    this.getAuthorizePrivileged();
+    this.receivedPathItemObjForResultEntry();
+  }
+
+  receivedPathItemObjForResultEntry() {
+    this.subscription = this.pathResultEntrySharedService.pathItem$.subscribe((pathItemObj: ResultEntryItemInfo) => {
+      if (pathItemObj == undefined) {
+        console.log("Obj Not found for result entry:", pathItemObj);
+        setTimeout(() => {
+          this.toastr.warning("", "Item not found for result entry.\nPlease add item from work list.");
+        }, 0);
+        this.resetInfo();
+        return;
+      }
+      console.log("Obj found for result entry:", pathItemObj);
+      this.currentRsSl = 'result';
+      this.currentPathItemInfoForShow = pathItemObj;
+      this.currentPathItemInfo = pathItemObj;
+      this.resultEntryTemplateFilterParams.invoiceId = pathItemObj.invoiceId;
+
+      this.getRequiredData();
+    });
+  }
+
+  getRequiredData() {
+    let that = this;
+    this.addLoader();
+    this.getRsFormInitData()
+      .then(function (result) {
+        return that.getPathTestResultList();
+      }).then(function (result) {
+        return that.getTestResultStampDataByStampNo();
+      }).then(function (result) {
+        that.removeLoader();
+        console.log("Finished init API calling.");
+      });
+  }
+
+  getRsFormInitData(): any {
+    this.addLoader();
+    console.log("############## API 1  (getRsFormInitData) CALL START..");
+    return new Promise<any>((resolve, reject) => {
+      this.pathGeneralResultEntryFormService.rsFormInitData(this.currentPathItemInfo).subscribe(
+        res => {
+          if (res.success) {
+            console.log("getRsFormInitData res:", res);
+            if (res.model.currentPathsTestTemp) {
+              this.currentPathsTestTemp = res.model.currentPathsTestTemp;
+              // console.log("currentPathsTestTempResData:", this.currentPathsTestTemp);
+            }
+            if (res.model.pathResultEntryConfig) {
+              this.pathResultEntryConfig = res.model.pathResultEntryConfig;
+              // console.log("pathResultEntryConfigResData: ", this.pathResultEntryConfig);
+            }
+            if (res.model.pathInvoiceDtlList) {
+              this.pathInvoiceDtlList = res.model.pathInvoiceDtlList;
+              // console.log("pathInvoiceDtlListResData: ", this.pathInvoiceDtlList);
+            }
+            if (res.model.patientDemographyInfoObj) {
+              this.patientDemographyInfoForShow = res.model.patientDemographyInfoObj;
+              this.patientDemographyInfo = res.model.patientDemographyInfoObj;
+              // console.log("patientDemographyInfoResData: ", this.patientDemographyInfo);
+            }
+            if (res.model.preparedByInfoList) {
+              this.preparedByInfoList = res.model.preparedByInfoList;
+              let defaultPrepObj = this.preparedByInfoList.find(obj => obj.defaultFlag === 1);
+              if (defaultPrepObj) {
+                this.testResultStamp.resultPreparedKeyedBy = defaultPrepObj.docId;
+                this.currentkPreparedBy = defaultPrepObj;
+              }
+              // console.log("preparedByInfoListResData: ", this.preparedByInfoList);
+            }
+            if (res.model.verifyByInfoList) {
+              this.verifyByInfoList = res.model.verifyByInfoList;
+              let defaultVerifyObj = this.verifyByInfoList.find(obj => obj.defaultFlag === 1);
+              if (defaultVerifyObj) {
+                this.testResultStamp.resultVerifyKeyedBy = defaultVerifyObj.docId;
+                this.currentVerifyBy = defaultVerifyObj;
+              }
+              // console.log("verifyByInfoListResData: ", this.verifyByInfoList);
+            }
+            if (res.model.consultationInfoList) {
+              this.consultationInfoList = res.model.consultationInfoList;
+              let defaultConstObj = this.consultationInfoList.find(obj => obj.defaultFlag === 1);
+              if (defaultConstObj) {
+                this.testResultStamp.resultFinalKeyedBy = defaultConstObj.docId;
+                this.currentConsultation = defaultConstObj;
+              }
+              // console.log("consultationInfoListResData: ", this.consultationInfoList);
+            }
+            if (res.model.pathsMethodAllData) {
+              this.pathsMethodAllData = res.model.pathsMethodAllData;
+              this.pathsMethodMthList = this.pathsMethodAllData.filter((obj: PathsMethod) => obj.textType === 'MTH');
+              this.pathsMethodAnaList = this.pathsMethodAllData.filter((obj: PathsMethod) => obj.textType === 'ANA');
+              this.pathsMethodNotList = this.pathsMethodAllData.filter((obj: PathsMethod) => obj.textType === 'NOT');
+              this.pathsMethodComList = this.pathsMethodAllData.filter((obj: PathsMethod) => obj.textType === 'COM');
+              // console.log("pathsMethodAllDataResData: ", this.pathsMethodAllData);
+            }
+          } else {
+            console.log("getRsFormInitData resFailed:", res);
+          }
+          console.log("############## API 1  (getRsFormInitData) CALL RESOLVE !:");
+          resolve(res);
+        },
+        err => {
+          this.removeLoader();
+          console.log("getRsFormInitData  error: ", err);
+          reject(null);
+        });
+    });
+  }
+
+
+  onClickSaveBtn(event: any): void {
+    console.log("onClickSaveBtn", this.currentPathItemInfo);
+    if (Object.keys(this.currentPathItemInfo).length == 0) {
+      console.log("Obj Not found for result entry:", this.currentPathItemInfo);
+      this.toastr.warning("", "Item not found for result entry. Please add item from work list.");
+      this.resetInfo();
+      return;
+    }
+    if (this.pathResultEntryConfig.preparedByReqFlag === 1 && this.testResultStamp.resultPreparedKeyedBy == null) {
+      this.toastr.warning("", "Please select prepared by.");
+      return;
+    }
+    this.addLoader();
+    this.pathGeneralResultEntryFormService.checkPendingTest(this.currentPathItemInfo).subscribe(
+      res => {
+        if (res.success) {
+          console.log("checkPendingTest: ", res);
+          if (res.obj === 'N') {
+            console.log("checkPendingTest re fond N:");
+            this.g_checkpendingtest = 'Y';     // l_save := 1;
+            this.onSaveGeneralTemplateData();      // :parameter.g_checkpendingtest := 'Y'
+          } else {
+            const initialState = { title: "Pending test exist, Confirm to SAVE ?" };
+            this.bsModalRef = this.modalService.show(TmplConfirmationDialogComponent, { initialState, class: 'modal-sm' });
+            this.bsModalRef.content.onClose.subscribe(
+              result => {
+                if (result === 'save_now') {
+                  console.log("Pres save_now");
+                  this.g_checkpendingtest = 'Y';
+                  this.onSaveGeneralTemplateData();
+                } else if (result === 'proceed') {
+                  console.log("Pres proceed")
+                  this.g_checkpendingtest = 'N';
+                  this.onSaveGeneralTemplateData();
+                } else {
+                  this.removeLoader();
+                  console.log("Pres Later")
+                  this.g_checkpendingtest = null;
+                }
+              });
+          }
+        } else {
+          this.removeLoader();
+          console.log("checkPendingTest error:", res);
+        }
+      },
+      err => {
+        this.removeLoader();
+        console.log("checkPendingTest  error: ", err);
+      });
+
+
+
+  }
+
+  onSaveGeneralTemplateData(): void {
+    this.opdPatientInfoVProces = 1;
+    this.generalFormResultEntryData.setGCheckPendingTest(this.g_checkpendingtest);
+    this.generalFormResultEntryData.setTestResultStampData(this.testResultStamp);
+    this.generalFormResultEntryData.setOpdPatientInfoVProces(this.opdPatientInfoVProces);
+    this.generalFormResultEntryData.setPathInvoiceDtlListData(this.pathInvoiceDtlList);
+    this.generalFormResultEntryData.setPathTestResultListData(this.pathTestResultList);
+    this.generalFormResultEntryData.setResultEntryItemInfoData(this.currentPathItemInfo);
+    this.generalFormResultEntryData.setPatientDemographyInfoData(this.patientDemographyInfoForShow);
+    this.pathRsFrmFeatureMng.isResultSaveBtnActive = false;
+    console.log("onSaveGeneralTemplateData: ", this.generalFormResultEntryData);
+    this.pathGeneralResultEntryFormService.onSaveData(this.generalFormResultEntryData).subscribe(
+      res => {
+        if (res.success) {
+          console.log("onSaveGeneralTemplateData: ", res);
+          this.toastr.success("", "Result Entry done.");
+          this.testResultStamp = res.obj;
+          this.currentPathItemInfo.stampNo = res.obj.id;
+          if (this.pathRsEntryVerifyBtnRef) this.pathRsEntryVerifyBtnRef.nativeElement.focus();
+        } else {
+          this.toastr.warning("", res.message);
+          console.log("onSaveGeneralTemplateData error:", res);
+        }
+        this.removeLoader();
+        this.pathRsFrmFeatureMng.isResultSaveBtnActive = true;
+      },
+      err => {
+        console.log("onSaveGeneralTemplateData  error: ", err);
+        this.removeLoader();
+      });
+
+  }
+
+  onClickVerifiedBtn(): void {
+    console.log("onClickVerifiedBtn", this.testResultStamp);
+    if (this.testResultStamp.id == null) {
+      console.log("No StampNo found");
+      this.toastr.warning("", "Please save this report first.");
+      return;
+    }
+    if (this.testResultStamp.resultPreparedKeyFlag == null) {
+      this.toastr.warning("", "Prepared not complete !");
+      return;
+    }
+    if (this.pathResultEntryConfig.scientificByReqFlag === 1 && this.testResultStamp.resultVerifyKeyedBy == null) {
+      console.log("No resultVerifyKeyedBy found");
+      this.toastr.warning("", "Scientific Officer not selected.");
+      return;
+    }
+    this.onVerified();
+  }
+
+  onVerified(): void {
+    this.opdPatientInfoVProces = 2;
+    this.generalFormResultEntryData.setTestResultStampData(this.testResultStamp);
+    this.generalFormResultEntryData.setOpdPatientInfoVProces(this.opdPatientInfoVProces);
+    this.generalFormResultEntryData.setResultEntryItemInfoData(this.currentPathItemInfo);
+    this.generalFormResultEntryData.setPatientDemographyInfoData(this.patientDemographyInfoForShow);
+    console.log("onVerified data: ", this.generalFormResultEntryData);
+    this.pathRsFrmFeatureMng.isResultVerifyBtnActive = false;
+    this.addLoader();
+    this.pathGeneralResultEntryFormService.onVerified(this.generalFormResultEntryData).subscribe(
+      res => {
+        if (res.success) {
+          console.log("onVerified res: ", res);
+          this.toastr.success("", "Verified done.");
+          this.getTestResultStampDataByStampNo();
+          if (this.pathRsEntryFinalizeBtnRef) this.pathRsEntryFinalizeBtnRef.nativeElement.focus();
+        } else {
+          this.toastr.warning("", res.message);
+          console.log("verifiedImmunology error:", res);
+        }
+        this.removeLoader();
+        this.pathRsFrmFeatureMng.isResultVerifyBtnActive = true;
+      },
+      err => {
+        console.log("verifiedImmunology  error: ", err);
+        this.removeLoader();
+      });
+  }
+
+  onClickFinalizeBtn(): void {
+    console.log("onClickFinalizeBtn", this.testResultStamp);
+
+    if (this.testResultStamp.id == null) {
+      console.log("No StampNo found");
+      this.toastr.warning("", "Please save this report first.");
+      return;
+    }
+    if (this.testResultStamp.resultVerifyKeyFlag == null) {
+      this.toastr.warning("", "Report not verified yet !");
+      return;
+    }
+    if (this.pathResultEntryConfig.consultentByReqFlag === 1 && this.testResultStamp.resultFinalKeyedBy == null) {
+      console.log("No resultFinalKeyedBy found");
+      this.toastr.warning("", "Consultant not selected.");
+      return;
+    }
+    let reqObj = {
+      "invoiceNo": this.currentPathItemInfo.invoiceNo,
+      "labNo": this.currentPathItemInfo.labNo,
+      "itemNo": this.currentPathItemInfo.itemNo,
+    }
+    console.log("findByInvoiceNoAndLabNo reqObj: ", reqObj);
+    this.pathInvoiceDtlService.findByInvoiceNoAndLabNo(reqObj).subscribe(
+      res => {
+        if (res.success) {
+          // console.log("findByInvoiceNoAndLabNo: ", res);
+          if (res.items) {
+            this.currentSinglePathDtlObj = res.items[0];
+            console.log("currentSinglePathDtlObj: ", this.currentSinglePathDtlObj);
+            if (this.currentSinglePathDtlObj.labResultVerifyKeyFlag === 0) {
+              this.toastr.warning("", "Result not verified yet, Please verify first.");
+            } else {
+              this.onFinalize();
+            }
+          }
+        } else {
+          this.toastr.warning("", res.message);
+          console.log("findByInvoiceNoAndLabNo error:", res);
+        }
+      },
+      err => {
+        console.log("findByInvoiceNoAndLabNo error: ", err);
+      });
+
+  }
+
+  onFinalize(): void {
+    this.opdPatientInfoVProces = 3;
+    this.generalFormResultEntryData.setTestResultStampData(this.testResultStamp);
+    this.generalFormResultEntryData.setOpdPatientInfoVProces(this.opdPatientInfoVProces);
+    this.generalFormResultEntryData.setResultEntryItemInfoData(this.currentPathItemInfo);
+    this.generalFormResultEntryData.setPatientDemographyInfoData(this.patientDemographyInfoForShow);
+    console.log("onFinalize date: ", this.generalFormResultEntryData);
+    this.pathRsFrmFeatureMng.isResultFinalizedBtnActive = false;
+    this.addLoader();
+    this.pathGeneralResultEntryFormService.onFinalize(this.generalFormResultEntryData).subscribe(
+      res => {
+        if (res.success) {
+          console.log("onFinalize Res: ", res);
+          this.getTestResultStampDataByStampNo();
+          this.toastr.success("", "Finalize done.");
+          if (this.pathRsEntryPrintBtnRef) this.pathRsEntryPrintBtnRef.nativeElement.focus();
+        } else {
+          this.toastr.warning("", res.message);
+        }
+        this.removeLoader();
+        this.pathRsFrmFeatureMng.isResultFinalizedBtnActive = true;
+      },
+      err => {
+        console.log("onFinalizeImmunology  error: ", err);
+        this.removeLoader();
+      });
+  }
+
+  onClickPrintPreviewBtn(isBlankReportPrint: boolean): void {
+    this.labReportInfo.isBlankReport = isBlankReportPrint;
+    console.log("onClickPrintPreviewBtn currentPathItemInfo:", this.currentPathItemInfo);
+    console.log("onClickPrintPreviewBtn testResultStamp:", this.testResultStamp);
+    if (Object.keys(this.currentPathItemInfo).length == 0) {
+      console.log("Obj Not found for Print:", this.currentPathItemInfo);
+      this.toastr.warning("", "Item not found for Print. Please add item from work list.");
+      this.resetInfo();
+      return;
+    }
+    if (this.currentPathItemInfo.reportUrl == null) {
+      console.log("No Report url Found", this.currentPathItemInfo);
+      this.toastr.warning("", "Report Template not found for this Item.");
+      return;
+    }
+    if (this.testResultStamp.id == null) {
+      console.log("No StampNo found");
+      this.toastr.warning("", "Please save this report first.");
+      return;
+    }
+    let reqObj = {
+      "invoiceNo": this.currentPathItemInfo.invoiceNo,
+      "labNo": this.currentPathItemInfo.labNo,
+      "itemNo": this.currentPathItemInfo.itemNo,
+    }
+    console.log("findByInvoiceNoAndLabNo reqObj: ", reqObj);
+    this.goToPathReportPreview();
+
+  }
+
+  goToPathReportPreview(): void {
+    this.generalFormResultEntryData.setLabReportInfo(this.labReportInfo);
+    this.generalFormResultEntryData.setStampNoStr(this.testResultStamp.id);
+    this.generalFormResultEntryData.setReportAccessPoint("pathology_result_entry");
+    this.generalFormResultEntryData.setReportUrl(this.currentPathItemInfo.reportUrl);
+    this.generalFormResultEntryData.setTestResultStampData(this.testResultStamp);
+    this.generalFormResultEntryData.setOpdPatientInfoVProces(this.opdPatientInfoVProces);
+    this.generalFormResultEntryData.setResultEntryItemInfoData(this.currentPathItemInfo);
+    this.generalFormResultEntryData.setPatientDemographyInfoData(this.patientDemographyInfoForShow);
+    console.log("goToPathReportPreview data: ", this.generalFormResultEntryData);
+    this.addLoader();
+    this.pathResultEntryReportService.pathReportPreview(this.generalFormResultEntryData).subscribe(
+      res => {
+        this.pathRsFrmFeatureMng.isResultPrintBtnActive = true;
+        if (this.pathRsEntryExitBtnRef) this.pathRsEntryExitBtnRef.nativeElement.focus();
+        this.removeLoader();
+        let file = new Blob([res], { type: 'application/pdf' });
+        if (!isHasFileData(file)) {
+          this.toastr.warning("", "Report not found !");
+          return;
+        }
+        var fileURL = URL.createObjectURL(file);
+        window.open(fileURL);
+      },
+      err => {
+        this.removeLoader();
+        this.toastr.warning("", "Report not fully complete yet !");
+        console.log(" Error occured in goToPathReportPreview.", err);
+      });
+  }
+
+  onClicakPrintBtn(isBlankReportPrint: boolean): void {
+    this.labReportInfo.isBlankReport = isBlankReportPrint;
+    console.log("onClicakPrintBtn currentPathItemInfo:", this.currentPathItemInfo);
+    console.log("onClicakPrintBtn testResultStamp:", this.testResultStamp);
+    if (Object.keys(this.currentPathItemInfo).length == 0) {
+      console.log("Obj Not found for Print:", this.currentPathItemInfo);
+      this.toastr.warning("", "Item not found for Print. Please add item from work list.");
+      this.resetInfo();
+      return;
+    }
+    if (this.currentPathItemInfo.reportUrl == null) {
+      console.log("No Report url Found", this.currentPathItemInfo);
+      this.toastr.warning("", "Report Template not found for this Item.");
+      return;
+    }
+    if (this.testResultStamp.id == null) {
+      console.log("No StampNo found");
+      this.toastr.warning("", "Please save this report first.");
+      return;
+    }
+    if (this.testResultStamp.resultFinalKeyFlag == null) {
+      this.toastr.warning("", "Result not Finalized !");
+      return;
+    }
+    if (this.pathResultEntryConfig.consultentByReqFlag === 1 && this.testResultStamp.resultFinalKeyedBy == null) {
+      console.log("No resultFinalKeyedBy found");
+      this.toastr.warning("", "Consultant not selected.");
+      return;
+    }
+    let reqObj = {
+      "invoiceNo": this.currentPathItemInfo.invoiceNo,
+      "labNo": this.currentPathItemInfo.labNo,
+      "itemNo": this.currentPathItemInfo.itemNo,
+    }
+    console.log("findByInvoiceNoAndLabNo reqObj: ", reqObj);
+    this.pathInvoiceDtlService.findByInvoiceNoAndLabNo(reqObj).subscribe(
+      res => {
+        if (res.success) {
+          // console.log("findByInvoiceNoAndLabNo: ", res);
+          if (res.items) {
+            this.currentSinglePathDtlObj = res.items[0];
+            console.log("currentSinglePathDtlObj: ", this.currentSinglePathDtlObj);
+            if (this.currentSinglePathDtlObj.labResultFinalKeyFlag === 0) {
+              this.toastr.warning("", "Result not finalized yet, Please finalize first.");
+            } else {
+              this.pathRsFrmFeatureMng.isResultPrintBtnActive = false;
+              this.goToPrintResult();
+            }
+          }
+        }
+      },
+      err => {
+        console.log("findByInvoiceNoAndLabNo error: ", err);
+      });
+  }
+
+  goToPrintResult(): void {
+    this.opdPatientInfoVProces = 4;
+    this.generalFormResultEntryData.setLabReportInfo(this.labReportInfo);
+    this.generalFormResultEntryData.setStampNoStr(this.testResultStamp.id);
+    this.generalFormResultEntryData.setTestResultStampData(this.testResultStamp);
+    this.generalFormResultEntryData.setReportAccessPoint("pathology_result_entry");
+    this.generalFormResultEntryData.setReportUrl(this.currentPathItemInfo.reportUrl);
+    this.generalFormResultEntryData.setOpdPatientInfoVProces(this.opdPatientInfoVProces);
+    this.generalFormResultEntryData.setResultEntryItemInfoData(this.currentPathItemInfo);
+    this.generalFormResultEntryData.setPatientDemographyInfoData(this.patientDemographyInfoForShow);
+    console.log("goToPrintResult data: ", this.generalFormResultEntryData);
+    this.addLoader();
+    this.pathResultEntryReportService.generateReport(this.generalFormResultEntryData).subscribe(
+      res => {
+        this.pathRsFrmFeatureMng.isResultPrintBtnActive = true;
+        if (this.pathRsEntryExitBtnRef) this.pathRsEntryExitBtnRef.nativeElement.focus();
+        this.removeLoader();
+        let file = new Blob([res], { type: 'application/pdf' });
+        if (!isHasFileData(file)) {
+          this.toastr.warning("", "Report not found !");
+          return;
+        }
+        var fileURL = URL.createObjectURL(file);
+        window.open(fileURL);
+      },
+      err => {
+        this.removeLoader();
+        this.toastr.warning("", "Report not fully complete yet !");
+        console.log(" Error occured in general report generating.", err);
+      });
+  }
+
+  onEditRsItemProp(obj: any, objIndex: number, propType: any) {
+    console.log('onDoubleClickRsItemProp:');
+    const initialState = {
+      currentItemObj: obj
+    };
+    this.pathItemPropEditorBsModalRef = this.modalService.show(PathItemPropEditorComponent, { initialState, class: 'modal-sm', backdrop: 'static' });
+    this.pathItemPropEditorBsModalRef.content.onClose.subscribe(modalRes => {
+      if (modalRes) {
+        obj[propType] = modalRes;
+        // console.log('onDoubleClickRsFrmItemProp obj:',obj);
+        this.resultEntryFormResourceService.onFocusInputFieldByIdRef('pathTestResultResult_' + objIndex);
+      }
+    });
+  }
+
+  // For moving mouse course Up, Down, Left and Right on result input field.
+  onKeyDownInRsInputField(event: any, obj: any, objIndex: number, refInputIdPrefix: any, rsSl: string) {
+    console.log("CurrentInputFieldRef:", refInputIdPrefix, "Index:", objIndex);
+    let nextIndex = 0
+    if (event.keyCode == 13) {       // Enter key Press
+      nextIndex = objIndex + 1;
+      this.resultEntryFormResourceService.onRsFormTravelForward(event, obj, objIndex, refInputIdPrefix, null, this.pathRsEntrySaveBtnRef, this.pathRsEntryExitBtnRef);
+    } else if (event.keyCode == 40) { // Down arrow key
+      this.resultEntryFormResourceService.onRsFormTravelForward(event, obj, objIndex, refInputIdPrefix, null, this.pathRsEntrySaveBtnRef, this.pathRsEntryExitBtnRef);
+      nextIndex = objIndex + 1;
+    } else if (event.keyCode == 38) { // Up arrow key
+      if (objIndex > 0) nextIndex = objIndex - 1;
+      this.resultEntryFormResourceService.onRsFormTravelBackwards(event, obj, objIndex, refInputIdPrefix, null, this.pathRsEntrySaveBtnRef, this.pathRsEntryExitBtnRef);
+    } else if (event.keyCode == 39) { // Right arrow key
+      nextIndex = objIndex;
+      this.resultEntryFormResourceService.onRsFormTravelRight(event, obj, objIndex, refInputIdPrefix, null, this.pathRsEntrySaveBtnRef, this.pathRsEntryExitBtnRef);
+    } else if (event.keyCode == 37) { // Left arrow key
+      nextIndex = objIndex;
+      this.resultEntryFormResourceService.onRsFormTravelLeft(event, obj, objIndex, refInputIdPrefix, null, this.pathRsEntrySaveBtnRef, this.pathRsEntryExitBtnRef);
+    }
+    this.currentRsSl = rsSl;
+    this.pathTestStructValueList = [];
+    let nextObj = this.pathTestResultList[nextIndex];
+    if (nextObj) {
+      console.log("NextObjFound: ", nextObj);
+      this.pathTestResult = nextObj;
+      if (nextObj.testStructNo) this.listByTestStructNo(nextObj.testStructNo);
+      this.onActiveRsSl(nextIndex, rsSl);
+    }
+  }
+
+  onDblClickItemValue(obj: any): void {
+    console.log('onDblClickItemValue', obj.testResult);
+    if (this.pathTestResult) this.pathTestResult[this.currentRsSl] = obj.testResult;
+    let selectableTag = document.getElementById(this.selectTestResultID);
+    if (selectableTag != null) {
+      document.getElementById(this.selectTestResultID).focus();
+    }
+  }
+
+  onClickTestResult(selectObj: PathTestResult, objIndex: any, rsSl: string): void {
+    console.log('onClickTestResult: ', selectObj);
+    // let resultId = 'pathTestResultResult_' + objIndex;
+    // this.selectTestResultID = resultId;
+    this.currentRsSl = rsSl;
+    this.pathTestResult = selectObj;
+    this.onActiveRsSl(objIndex, rsSl);
+    if (selectObj.testStructNo) this.listByTestStructNo(selectObj.testStructNo);
+  }
+
+  onActiveRsSl(objIndex: any, rsSl: string): any {
+    switch (rsSl) {
+      case "result": {
+        let resultId = 'pathTestResultResult_' + objIndex;
+        this.selectTestResultID = resultId;
+        break;
+      }
+      case "result1": {
+        let resultId = 'pathTestResultResultOne_' + objIndex;
+        this.selectTestResultID = resultId;
+        break;
+      }
+      case "result2": {
+        let resultId = 'pathTestResultResultTwo_' + objIndex;
+        this.selectTestResultID = resultId;
+        break;
+      }
+      case "result3": {
+        let resultId = 'pathTestResultResultThree_' + objIndex;
+        this.selectTestResultID = resultId;
+        break;
+      }
+      default: {
+        let resultId = 'pathTestResultResult_' + objIndex;
+        this.selectTestResultID = resultId;
+        break;
+      }
+    }
+  }
+
+
+  onClickItemValueBtn(obj: PathTestResult): void {
+    console.log('onClickItemValueBtn:', obj)
+    if (obj.testStructNo == null) return;
+    const initialState = {
+      testStructNo: obj.testStructNo
+    };
+    this.itemValueListBsModalRef = this.modalService.show(ItemValueListViewerComponent, { initialState, class: 'modal-sm', backdrop: 'static' });
+    this.itemValueListBsModalRef.content.onClose.subscribe(testResult => {
+      if (testResult) {
+        console.log('itemValueListBsModalRef:', testResult);
+        obj[this.currentRsSl] = testResult;
+      }
+    });
+
+  }
+
+  onClickHistoryShowBtn(selectObj: PathTestResult): void {
+    console.log('onClickHistoryShowBtn: ', selectObj);
+    if (selectObj.id == null) return;
+    const initialState = {
+      testresultNo: selectObj.id
+    };
+    this.itemLogListBsModalRef = this.modalService.show(ItemHistoryViewerComponent, { initialState, class: 'modal-lg', backdrop: 'static' });
+    this.itemLogListBsModalRef.content.onClose.subscribe(testResult => {
+      if (testResult) {
+        console.log('itemLogListBsModalRef:', testResult);
+        selectObj[this.currentRsSl] = testResult;
+      }
+    });
+  }
+  onPathMthInputKeydownEvent(event: any, refElement: any): void {
+    console.log("onPathMthInputKeydownEvent: ", event, refElement);
+
+    if (event.keyCode == 13 && event.ctrlKey) {
+
+      switch (refElement) {
+        case "pathsMthInput_1": {
+          if (this.pathsMthInput_2) {
+            this.pathsMthInput_2.nativeElement.focus()
+          } else {
+            this.pathRsEntrySaveBtnRef.nativeElement.focus()
+          }
+          break;
+        }
+        case "pathsMthInput_2": {
+          if (this.pathsMthInput_3) {
+            this.pathsMthInput_3.nativeElement.focus()
+          } else {
+            this.pathRsEntrySaveBtnRef.nativeElement.focus()
+          }
+          break;
+        }
+        case "pathsMthInput_3": {
+          if (this.pathsMthInput_4) {
+            this.pathsMthInput_4.nativeElement.focus();
+          } else {
+            this.pathRsEntrySaveBtnRef.nativeElement.focus();
+          }
+          break;
+        }
+        case "pathsMthInput_4": {
+          if (this.pathsMthInput_5) {
+            this.pathsMthInput_5.nativeElement.focus();
+          } else {
+            this.pathRsEntrySaveBtnRef.nativeElement.focus();
+          }
+          break;
+        }
+        case "pathsMthInput_5": {
+          if (this.pathsMthInput_6) {
+            this.pathsMthInput_6.nativeElement.focus()
+          } else {
+            this.pathRsEntrySaveBtnRef.nativeElement.focus();
+          }
+          break;
+        }
+        case "pathsMthInput_6": {
+          if (this.pathRsEntrySaveBtnRef) {
+            this.pathRsEntrySaveBtnRef.nativeElement.focus()
+          } else {
+            this.pathRsEntryExitBtnRef.nativeElement.focus();
+          }
+          break;
+        }
+        default: {
+          if (this.pathRsEntryExitBtnRef) this.pathRsEntryExitBtnRef.nativeElement.focus()
+          break;
+        }
+      }
+
+    }
+  }
+
+
+  listByTestStructNo(testStructNo: number): void {
+    this.pathTestStructValueList = [];
+    let testStructNoObj = { "testStructNo": testStructNo }
+    this.pathTestStructValueService.listByTestStructNo(testStructNoObj).subscribe(
+      res => {
+        if (res.success) {
+          console.log("Value listByTestStructNo: ", res);
+          this.pathTestStructValueList = res.items;
+        } else {
+          console.log("listByTestStructNo error:", res);
+        }
+      },
+      err => {
+        console.log("listByTestStructNo error: ", err);
+      });
+  }
+
+  onDoubleClickForPathsMethodData(obj, dataFor): void {
+    console.log("onDoubleClickForPathsMethodData: ", dataFor)
+    this.currentPathsMethodList = [];
+    if (dataFor === 'comments') this.currentPathsMethodList = this.pathsMethodComList;
+    if (dataFor === 'note') this.currentPathsMethodList = this.pathsMethodNotList;
+    if (dataFor === 'testMethod') this.currentPathsMethodList = this.pathsMethodMthList;
+    if (dataFor === 'analyzerDesc') this.currentPathsMethodList = this.pathsMethodAnaList;
+    if (this.currentPathsMethodList.length == 0) {
+      this.toastr.warning("", `No Setup value found for ${dataFor} !`);
+      return;
+    }
+    // console.log("currentPathsMethodList: ",this.currentPathsMethodList)
+    // return;
+    const initialState = {
+      currentPathsMethodList: this.currentPathsMethodList,
+      dataFor: dataFor
+    };
+    this.pathsMethodDataBsModalRef = this.modalService.show(PathsMethodDataViewerComponent, { initialState, class: 'modal-sm', backdrop: 'static' });
+    this.pathsMethodDataBsModalRef.content.onClose.subscribe(methodName => {
+      if (methodName) {
+        obj[dataFor] = methodName;
+        // console.log('pathsMethodData obj:',obj);
+      }
+    });
+  }
+
+  onClickStepCancelBtn(): void {
+    console.log("onClickStepCancelBtn:", this.currentPathItemInfo)
+    if (this.currentPathItemInfo.invoiceId == undefined || this.currentPathItemInfo.invoiceId == null) {
+      this.toastr.warning("", "No Invoice Id found !");
+    }
+    this.pathologySharedService.setObj(this.currentPathItemInfo);
+    this.router.navigateByUrl(`diagnostic/pathology/step-cancellation`);
+  }
+
+
+  onClickExitBtn(): void {
+    this.pathologySharedService.setInvoiceId(this.currentPathItemInfo.invoiceId);
+    this.router.navigateByUrl('diagnostic/pathology/result-entry');
+  }
+
+
+  getTestResultStampDataByStampNo(): any {
+    console.log('getTestResultStampDataByStampNo Data: ', this.testResultStamp)
+    this.addLoader();
+    console.log("############## API 3  (getTestResultStampDataByStampNo) CALL START...");
+    return new Promise<any>((resolve, reject) => {
+      this.testResultStampService.getTestResultStampByStampNo(this.currentPathItemInfo).subscribe(
+        res => {
+          if (res.success) {
+            console.log("getTestResultStampDataByStampNo rea: ", res);
+            this.testResultStamp = res.obj;
+            let that = this;
+            if (that.testResultStamp.resultPreparedKeyedBy > 0) {
+              let matchObj = that.preparedByInfoList.find(obj => obj.docId === that.testResultStamp.resultPreparedKeyedBy);
+              if (!matchObj) {
+                that.getOtherPrepEmpByEmpNo(that.testResultStamp.resultPreparedKeyedBy);
+              }
+            }
+            if (that.testResultStamp.resultVerifyKeyedBy > 0) {
+              let matchObj = that.verifyByInfoList.find(obj => obj.docId === that.testResultStamp.resultVerifyKeyedBy);
+              if (!matchObj) {
+                that.getOtherVerifyEmpByEmpNo(that.testResultStamp.resultVerifyKeyedBy);
+              }
+            }
+            if (that.testResultStamp.resultFinalKeyedBy > 0) {
+              let matchObj = that.consultationInfoList.find(obj => obj.docId === that.testResultStamp.resultFinalKeyedBy);
+              if (!matchObj) {
+                that.getOtherConsultDocDocNo(that.testResultStamp.resultFinalKeyedBy);
+              }
+            }
+            console.log("############## API 3  (getTestResultStampDataByStampNo) CALL RESOLVE 1");
+            resolve(res);
+          } else {
+            console.log("getTestResultStampDataByStampNo error:", res);
+            let allNote = "";
+            let allComments = "";
+            let allPlainText = "";
+            let allTestMethod = "";
+            let allAnalyzerDesc = "";
+            let allInterpretation = "";
+            this.pathTestResultList.forEach(function (obj) {
+              if (obj.note) allNote += obj.note + "\n"
+              if (obj.comments) allComments += obj.comments + "\n"
+              if (obj.plainText) allPlainText += obj.plainText + "\n"
+              if (obj.testMethod) allTestMethod += obj.testMethod + "\n"
+              if (obj.analyzerDesc) allAnalyzerDesc += obj.analyzerDesc + "\n"
+              if (obj.interpretation) allInterpretation += obj.interpretation + "\n"
+            });
+            this.currentPathsTestTemp.note? this.testResultStamp.note = allNote + this.currentPathsTestTemp.note:this.testResultStamp.note = allNote
+            this.currentPathsTestTemp.comments? this.testResultStamp.comments = allComments + this.currentPathsTestTemp.comments:this.testResultStamp.comments = allComments;
+            this.currentPathsTestTemp.plainText?this.testResultStamp.plainText = allPlainText + this.currentPathsTestTemp.plainText:this.testResultStamp.plainText = allPlainText;
+            this.currentPathsTestTemp.testMethod?this.testResultStamp.testMethod = allTestMethod + this.currentPathsTestTemp.testMethod:this.testResultStamp.testMethod = allTestMethod;
+            this.currentPathsTestTemp.analyzerDesc?this.testResultStamp.analyzerDesc = allAnalyzerDesc + this.currentPathsTestTemp.analyzerDesc:this.testResultStamp.analyzerDesc = allAnalyzerDesc;
+            this.currentPathsTestTemp.interpretation?this.testResultStamp.interpretation = allInterpretation + this.currentPathsTestTemp.interpretation:this.testResultStamp.interpretation = allInterpretation;
+          }
+          this.removeLoader();
+          console.log("############## API 3  (getTestResultStampDataByStampNo) CALL RESOLVE 2");
+          resolve(res);
+        },
+        err => {
+          this.removeLoader();
+          console.log("getTestResultStampDataByStampNo  error: ", err);
+          reject(null);
+        });
+    });
+  }
+
+
+  getPathTestResultList(): any {
+    if (this.currentPathItemInfo.invoiceNo == undefined && this.currentPathItemInfo.itemNo == undefined) {
+      console.log("Item not found");
+      return;
+    }
+    this.addLoader();
+    console.log("############## API 2  (getPathTestResultList) CALL START..");
+    return new Promise<any>((resolve, reject) => {
+      this.pathTestResultService.getPathTestResultList(this.currentPathItemInfo).subscribe(
+        res => {
+          if (res.success) {
+            console.log("getPathTestResultList: ", res);
+            this.pathTestResultList = res.items;
+            if (this.pathTestResultList) {
+              this.resultEntryFormResourceService.onLoadRsFormFocusInputFieldByIdRef('pathTestResultResult_0');
+              if (this.pathTestResultList[0]) {
+                this.selectTestResultID = 'pathTestResultResult_0';
+                this.pathTestResult = this.pathTestResultList[0];
+                this.listByTestStructNo(this.pathTestResultList[0].testStructNo);
+              }
+            }
+
+          } else {
+            console.log("getPathTestResultList error:", res);
+          }
+          console.log("############## API 2  (getPathTestResultList) CALL RESOLVE");
+          resolve(res);
+        },
+        err => {
+          this.removeLoader();
+          console.log("getPathTestResultList error: ", err);
+          reject(null);
+        });
+    });
+  }
+
+  getOtherPrepEmpByEmpNo(empNo: any): void {
+    let reqObj = { "empNo": empNo }
+    this.resultEntryTemplateAuthorInfoService.prepEmpByEmpNo(reqObj).subscribe(
+      res => {
+        if (res.success) {
+          console.log("getOtherPrepEmpByEmpNo: ", res);
+          if (res.obj) {
+            this.otherPrepEmp = res.obj;
+          }
+        } else {
+          console.log("getOtherPrepEmpByEmpNo error:", res);
+        }
+      },
+      err => {
+        console.log("getOtherPrepEmpByEmpNo error: ", err);
+      });
+  }
+
+  getOtherVerifyEmpByEmpNo(empNo: any): void {
+    let reqObj = { "empNo": empNo }
+    this.resultEntryTemplateAuthorInfoService.verifyEmpByEmpNo(reqObj).subscribe(
+      res => {
+        if (res.success) {
+          console.log("getOtherVerifyEmpByEmpNo: ", res);
+          if (res.obj) {
+            this.otherVerifyEmp = res.obj;
+          }
+        } else {
+          console.log("getOtherVerifyEmpByEmpNo error:", res);
+        }
+      },
+      err => {
+        console.log("getOtherVerifyEmpByEmpNo error: ", err);
+      });
+  }
+
+  getOtherConsultDocDocNo(docNo: any): void {
+    let reqObj = { "docNo": docNo }
+    this.resultEntryTemplateAuthorInfoService.finalDocByDocNo(reqObj).subscribe(
+      res => {
+        if (res.success) {
+          console.log("getOtherConsultDocDocNo: ", res);
+          if (res.obj) {
+            this.otherFinalEmp = res.obj;
+          }
+        } else {
+          console.log("getOtherConsultDocDocNo error:", res);
+        }
+      },
+      err => {
+        console.log("getOtherConsultDocDocNo error: ", err);
+      });
+  }
+
+
+  onClickPathDtlItem(invoiceDtlObj: any): void {
+    console.log("onClickPathDtlItem:", invoiceDtlObj);
+  }
+  clearPreparedBy(): void {
+    this.otherPrepEmp = "";
+    this.currentkPreparedBy = new PreparedByAuthInfo();
+    this.testResultStamp.resultPreparedKeyedBy = null;
+  }
+  clearScientificBy(): void {
+    this.otherVerifyEmp = "";
+    this.currentVerifyBy = new VerifyByAuthInfo();
+    this.testResultStamp.resultVerifyKeyedBy = null;
+  }
+  clearConsultantBy(): void {
+    this.otherFinalEmp = "";
+    this.currentConsultation = new FinalizedByAuthInfo();
+    this.testResultStamp.resultFinalKeyedBy = null;
+  }
+
+  resetInfo(): void {
+    this.patientDemographyInfoForShow = "";
+  }
+
+  ngOnDestroy(): void {
+    this.subscription.unsubscribe();
+    this.pathResultEntrySharedService.setPathItemObjForResultEntry(null);
+  }
+
+  addLoader(): void {
+    if (!this.generalResultEntryFormBody.nativeElement.classList.contains('loader')) {
+      this.generalResultEntryFormBody.nativeElement.classList.add('loader');
+    }
+  }
+
+  removeLoader(): void {
+    if (this.generalResultEntryFormBody.nativeElement.classList.contains('loader')) {
+      this.generalResultEntryFormBody.nativeElement.classList.remove('loader');
+    }
+  }
+
+  onChangeResultPrepBy(): void {
+    console.log('onChangeResultPrepBy', this.testResultStamp.resultPreparedKeyedBy);
+    this.otherPrepEmp = "";
+  }
+
+  onChangeResultVerifyBy(): void {
+    console.log('onChangeResultVerifyBy', this.testResultStamp.resultVerifyKeyedBy);
+    this.otherVerifyEmp = "";
+  }
+
+  onChangeResultFinalBy(): void {
+    console.log('onChangeResultFinalBy', this.testResultStamp.resultFinalKeyedBy);
+    this.otherFinalEmp = "";
+  }
+
+  // For EMR showing
+  onClickLoadlabNonLabReport(): void {
+    console.log("EMR currentPathItemInfo:", this.currentPathItemInfo);
+    console.log("EMR patientDemographyInfo:", this.patientDemographyInfo);
+    if (this.currentPathItemInfo.hospitalNumber == null) {
+      this.toastr.warning("", "Hospital number not found. ");
+      return;
+    }
+    const labNonLabReportHttpParams = new HttpParams().set('hnNumber', this.currentPathItemInfo.hospitalNumber);
+    this.consultationService.getLabNonLabReportList(labNonLabReportHttpParams).subscribe(
+      res => {
+        if (res[0].success) {
+          console.log("EMR Load res:", res)
+          this.labReportList = res[0].items;
+          // this.nonLabReportList = res[1].items;
+          this.labReportFilterByItemNoList = this.labReportList.filter((obj: any) => obj.itemNo === this.currentPathItemInfo.itemNo);
+          console.log("EMI Filter list:", this.labReportFilterByItemNoList);
+          const initialState = {
+            isActive: true,
+            isLoading: false,
+            labReports: this.labReportFilterByItemNoList,
+            nonLabReports: this.nonLabReportList,
+            isInvoiceBillPaid: true,
+            selectedConsultation: this.patientDemographyInfo
+          };
+          this.bsModalRef = this.modalService.show(BasicLabReportComponent, Object.assign({}, this.labNonLabReportModalConfig, { initialState }));
+
+        } else {
+          console.log('Error occurred while get all OPD lab non report list.');
+        }
+      },
+      err => {
+        console.log('Http error occurred while get all OPD lab non lab report list.');
+      })
+
+
+  }
+  // EMR
+
+  getAuthorizePrivileged(): void {
+    this.userFeatureService.getAuthorizePreviledge().subscribe(
+      res => {
+        if (res.success) {
+          console.log("getAuthorizePreviledge: ", res);
+
+          if (res.items != null) {
+            for (let i in res.items) {
+
+              if (res.items[i].featureCode === 'PATH-PRSA-1007' && res.items[i].isGranted) {
+                this.pathUserFeaturAccess.resultEntrySaveAcc = true;
+              }
+              if (res.items[i].featureCode === 'PATH-VRETA-1003' && res.items[i].isGranted) {
+                this.pathUserFeaturAccess.resultEntryVerifiedAcc = true;
+              }
+              if (res.items[i].featureCode === 'PATH-FRETA-1004' && res.items[i].isGranted) {
+                this.pathUserFeaturAccess.resultEntryFinalizeAcc = true;
+              }
+              if (res.items[i].featureCode === 'PATH-PRPA-1010' && res.items[i].isGranted) {
+                this.pathUserFeaturAccess.resultEntryPrintAcc = true;
+              }
+            }
+          }
+        } else {
+          console.log("getAuthorizePreviledge error:", res);
+        }
+      },
+      err => {
+        console.log("getAuthorizePreviledge  error: ", err);
+        this.removeLoader();
+      });
+  }
+
+  setUserInfoByAccess(): void {
+    if (!this.pathUserFeaturAccess.resultEntrySaveAcc) {
+      this.clearPreparedBy();
+    }
+    if (!this.pathUserFeaturAccess.resultEntryVerifiedAcc) {
+      this.clearScientificBy();
+    }
+    if (!this.pathUserFeaturAccess.resultEntryFinalizeAcc) {
+      this.clearConsultantBy();
+    }
+  }
+
+
+
+}
+
+-------------------------------------------------
+
+
+
+
+
+
+
