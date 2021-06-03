@@ -288,6 +288,139 @@ console.log("getPresMedicationByPresId error: ", err);
 
 
 =================================================
+#              Custom  | Directive                                          
+================================================= 
+
+
+import { Directive, ElementRef, HostListener } from '@angular/core';
+
+@Directive( {
+    selector: '[appTwoDigitDecimaNumber]'
+} )
+export class TwoDigitDecimaNumberDirective {
+
+    private regex: RegExp = new RegExp( /^\d*\.?\d{0,2}$/g );
+    private specialKeys: Array<string> = ['Backspace', 'Tab', 'End', 'Home', '-', 'ArrowLeft', 'ArrowRight', 'Del', 'Delete'];
+    constructor( private el: ElementRef ) {
+    }
+    @HostListener( 'keydown', ['$event'] )
+    onKeyDown( event: KeyboardEvent ) {
+        console.log( this.el.nativeElement.value );
+        // Allow Backspace, tab, end, and home keys
+        if ( this.specialKeys.indexOf( event.key ) !== -1 ) {
+            return;
+        }
+        let current: string = this.el.nativeElement.value;
+        let next: string = current.concat( event.key );
+        if ( next && !String( next ).match( this.regex ) ) {
+            event.preventDefault();
+        }
+    }
+
+}
+
+=================================================
+#              Custom  | Pipe                                          
+================================================= 
+PIPE
+====
+import { Pipe, PipeTransform } from '@angular/core';
+import { Injectable } from "@angular/core";
+
+@Pipe({
+  name: 'filter'
+})
+@Injectable({
+  providedIn: 'root'
+})
+
+export class FilterPipe implements PipeTransform {
+
+  transform(items: any[], field: string, value: string): any[] {
+    if (!items) {
+      return [];
+    }
+    if (!field || !value) {
+      return items;
+    }
+
+    return items.filter(singleItem => {
+      if (singleItem[field]) {
+        return singleItem[field].toString().toLowerCase().includes(value.toString().toLowerCase());
+      }
+    });
+  }
+
+}
+
+PIPE2
+=====
+import { Pipe, PipeTransform } from '@angular/core';
+
+@Pipe({
+  name: 'multiFilter'
+})
+export class MultiFilterPipe implements PipeTransform {
+
+  transform(items: any[], value: string, ...fields: string[]): any[] {
+    if (!items) {
+      return [];
+    }
+    if (!fields || !value) {
+      return items;
+    }
+
+    let itemResult = [];
+    items.forEach(item => {
+      fields.forEach(col => {
+        if (item[col] && item[col].toLowerCase().includes(value.toLowerCase())) {
+          let dupItem = itemResult.find(obj => { if(obj == item) return item});
+          if(!dupItem){
+            itemResult.push(item);
+          }
+        }
+      });
+    });
+    return itemResult;
+  }
+
+}
+
+PIPE3
+======
+
+import { Pipe, PipeTransform } from '@angular/core';
+
+@Pipe({
+  name: 'groupBy'
+})
+export class GroupByPipe implements PipeTransform {
+
+  transform(collection: any[], property: string): any[] {
+    // prevents the application from breaking if the array of objects doesn't exist yet
+    if (!collection) {
+      return null;
+    }
+
+    const groupedCollection = collection.reduce((previous, current) => {
+      if (!previous[current[property]]) {
+        previous[current[property]] = [current];
+      } else {
+        previous[current[property]].push(current);
+      }
+
+      return previous;
+    }, {});
+
+    // this will return an array of objects, each object containing a group of objects
+    return Object.keys(groupedCollection).map(key => ({ key, value: groupedCollection[key] }));
+  }
+
+}
+
+
+
+=================================================
 #                  Component                                          
 ================================================= 
 import { Component, OnInit } from '@angular/core';
@@ -4133,6 +4266,1203 @@ export class GeneralTemplateComponent implements OnInit, OnDestroy {
 
 -------------------------------------------------
 
+=================================================
+#Router
+=================================================
+import { NgModule } from '@angular/core';
+import { Routes, RouterModule } from '@angular/router';
+
+import { AuthComponent } from './auth/auth.component';
+import { DashboardComponent } from './dashboard/dashboard.component';
+import { NotFoundComponent } from './not-found/not-found.component';
+import { HashLocationStrategy, LocationStrategy } from '@angular/common';
+import { AuthGuard } from './auth/guards/auth.guard';
+
+// Layouts
+import { HomeLayoutComponent } from './layouts/home-layout/home-layout.component';
+import { LoginLayoutComponent } from './layouts/login-layout/login-layout.component';
+import { DashboardLayoutComponent } from './layouts/dashboard-layout/dashboard-layout.component';
+import { BrowserNavigationGuard } from './auth/guards/browser-navigation.guard';
+import { EmrComponent } from './emr/emr.component';
+import { FullLayoutComponent } from './layouts/full-layout/full-layout.component';
+
+const routes: Routes = [
+  {
+    path: '',
+    component: DashboardLayoutComponent,
+    canActivate: [AuthGuard],
+    children: [
+      {
+        path: '',
+        component: DashboardComponent,
+        /*
+        child routing added to handle /dashboarc url using left nav from sub module
+        */
+        children: [
+          {
+            path: 'dashboard',
+            component: DashboardComponent
+          }
+        ]
+      }
+    ]
+  },
+  {
+    path: '',
+    component: LoginLayoutComponent,
+    canActivate: [BrowserNavigationGuard],
+    children: [
+      {
+        path: 'login',
+        component: AuthComponent
+      }
+    ]
+  },
+  {
+    path: 'diagnostic',
+    component: HomeLayoutComponent,
+    canActivate: [AuthGuard],
+    loadChildren: '../diagnostic/diagnostic.module#DiagnosticModule'
+  },
+  {
+    path: 'pharmacy',
+    component: HomeLayoutComponent,
+    canActivate: [AuthGuard],
+    loadChildren: '../pharmacy/pharmacy.module#PharmacyModule'
+  },
+  {
+    path: 'opd',
+    component: HomeLayoutComponent,
+    canActivate: [AuthGuard],
+    loadChildren: '../opd/opd.module#OpdModule'
+  },
+  {
+    path: 'ipd',
+    component: HomeLayoutComponent,
+    canActivate: [AuthGuard],
+    loadChildren: '../ipd/ipd.module#IpdModule'
+  },
+  {
+    path: 'hrm',
+    component: HomeLayoutComponent,
+    canActivate: [AuthGuard],
+    loadChildren: '../hrm/hrm.module#HRMModule'
+  },
+  {
+    path: 'emergency-casualty',
+    component: HomeLayoutComponent,
+    canActivate: [AuthGuard],
+    loadChildren: '../emergency-casualty/emergency-casualty.module#EmergencyCasualtyModule'
+  },
+  {
+    path: 'security',
+    component: HomeLayoutComponent,
+    canActivate: [AuthGuard],
+    loadChildren: '../security/security.module#SecurityModule'
+  },
+  {
+    path: 'displayboard',
+    component: LoginLayoutComponent,
+    children: [
+      {
+        path: 'opd',
+        component: LoginLayoutComponent,
+        loadChildren: '../opd-queue-displayboard/opd-queue-displayboard.module#OpdQueueDisplayboardModule'
+      }
+    ]
+  },
+  {
+    path: 'display-board',
+    component: LoginLayoutComponent,
+    children: [
+      {
+        path: 'display',
+        component: LoginLayoutComponent,
+        loadChildren: '../displayboard/displayboard.module#DisplayboardModule'
+      }
+    ]
+  },
+  
+  {
+    path: 'reception',
+    component: HomeLayoutComponent,
+    canActivate: [AuthGuard],
+    loadChildren: '../reception/reception.module#ReceptionModule'
+  },
+  {
+    path: 'daycare',
+    component: HomeLayoutComponent,
+    canActivate: [AuthGuard],
+    loadChildren: '../daycare/daycare.module#DaycareModule'
+  },
+  {
+    path: 'daycare-services',
+    component: HomeLayoutComponent,
+    canActivate: [AuthGuard],
+    loadChildren: '../daycare-services/daycare-services.module#DaycareServicesModule'
+  },
+  {
+    path: 'dietary',
+    component: HomeLayoutComponent,
+    canActivate: [AuthGuard],
+    loadChildren: '../dietary/dietary.module#DietaryModule'
+  },
+  {
+    path: 'external-service',
+    component: HomeLayoutComponent,
+    canActivate: [AuthGuard],
+    loadChildren: '../external-service/external-service.module#ExternalServiceModule'
+  },
+  {
+    path: 'hr-payroll',
+    component: HomeLayoutComponent,
+    canActivate: [AuthGuard],
+    loadChildren: '../hr-payroll/hr-payroll.module#HrPayrollModule'
+  },
+  {
+    path: 'material-management',
+    component: HomeLayoutComponent,
+    canActivate: [AuthGuard],
+    loadChildren: '../material-management/material-management.module#MaterialManagementModule'
+  },
+  {
+    path: 'accounts', 
+    component: HomeLayoutComponent,
+    canActivate: [AuthGuard],  
+    loadChildren: '../accounts/accounts.module#AccountsModule'
+  },
+  {
+    path: 'queue-managment-system', 
+    component: HomeLayoutComponent,
+    canActivate: [AuthGuard],  
+    loadChildren: '../queue-managment-system/queue-managment-system.module#QueueManagmentSystemModule'
+  },
+  {
+    path: 'package',
+    component: HomeLayoutComponent,
+    canActivate: [AuthGuard],
+    loadChildren: '../package/package.module#PackageModule'
+  },
+  {
+    path: 'corporate-client',
+    component: HomeLayoutComponent,
+    canActivate: [AuthGuard],
+    loadChildren: '../corporate-client/corporate-client.module#CorporateClientModule'
+  },
+
+  {
+    path: 'fixed-asset',
+    component: HomeLayoutComponent,
+    canActivate: [AuthGuard],
+    loadChildren: '../fixed-asset/fixed-asset.module#FixedAssetModule'
+  },
+  {
+    path: 'house-keeping',
+    component: HomeLayoutComponent,
+    canActivate: [AuthGuard],
+    loadChildren: '../house-keeping/house-keeping.module#HouseKeepingModule'
+  },
+  {
+    path: 'vaccinenation',
+    component: HomeLayoutComponent,
+    canActivate: [AuthGuard],
+    loadChildren: '../vaccinenation/vaccinenation.module#VaccinenationModule'
+  },
+  {
+    path: 'health-checkup',
+    component: HomeLayoutComponent,
+    canActivate: [AuthGuard],
+    loadChildren: '../health-checkup/health-checkup.module#HealthCheckupModule'
+  },
+  {
+    path: 'emr-service',
+    component: HomeLayoutComponent,
+    loadChildren: '../emergency-service/emergency-service.module#EmergencyServiceModule'
+  },
+  {
+    path: 'reports',
+    component: HomeLayoutComponent,
+    canActivate: [AuthGuard],
+    loadChildren: '../reports/reports.module#ReportsModule'
+  },
+  
+  {
+    path: 'patient-info-post',
+    component: HomeLayoutComponent,
+    canActivate: [AuthGuard],
+    loadChildren: '../patient-info-post/patient-info-post.module#PatientInfoPostModule'
+  },
+
+  {
+    path: 'operation-theater',
+    component: HomeLayoutComponent,
+    canActivate: [AuthGuard],
+    loadChildren: '../operation-theater/operation-theater.module#OperationTheaterModule'
+  },
+
+  {
+    path: 'statistics-view',
+    component: HomeLayoutComponent,
+    canActivate: [AuthGuard],
+    loadChildren: '../statistics-view/statistics-view.module#StatisticsViewModule'
+  },
+
+  {
+    path: 'theme-setting',
+    component: HomeLayoutComponent,
+    canActivate: [AuthGuard],
+    loadChildren: '../theme-setting/theme-setting.module#ThemeSettingModule'
+  },
+
+  {
+    path: 'dynamic-theme-setting',
+    component: HomeLayoutComponent,
+    canActivate: [AuthGuard],
+    loadChildren: '../dynamic-theme-setting/dynamic-theme-setting.module#DynamicThemeSettingModule'
+  },
+
+  {
+    path: 'car-parking',
+    component: HomeLayoutComponent,
+    canActivate: [AuthGuard],
+    loadChildren: '../car-parking/car-parking.module#CarParkingModule'
+  },
+
+  {
+    path: 'customer-relation-manage',
+    component: HomeLayoutComponent,
+    canActivate: [AuthGuard],
+    loadChildren: '../customer-relation-manage/customer-relation-manage.module#CustomerRelationManageModule'
+  },
+
+
+  {
+    path: 'his',
+    component: HomeLayoutComponent,
+    children: [
+      {
+        path: 'emr',
+        component: EmrComponent,
+        canActivate: [AuthGuard],
+      }
+    ]
+  },
+  // {
+  //   path: 'opd-queue-displayboard',
+  //   component: HomeLayoutComponent,
+  //   loadChildren: '../opd-queue-displayboard/opd-queue-displayboard.module#OpdQueueDisplayboardModule'
+  // },
+  {
+    path: 'onlineappointment',
+    component: LoginLayoutComponent,
+    children: [
+      {
+        path: 'appointment',
+        component: LoginLayoutComponent,
+        loadChildren: '../online-appointment/online-appointment.module#OnlineAppointmentModule'
+      }
+    ]
+  },
+  {
+    path: 'online',
+    component: FullLayoutComponent,
+    children: [
+      {
+        path: '',
+        component: FullLayoutComponent,
+        loadChildren: '../full-layout/full-layout.module#FullLayoutModule'
+      }
+    ]
+  },
+  {
+    path: 'videoconference',
+    component: LoginLayoutComponent,
+    children: [
+      {
+        path: 'viconference',
+        component: LoginLayoutComponent,
+        loadChildren: '../video-conference/video-conference.module#VideoConferenceModule'
+      }
+    ]
+  },
+  {
+    path: '**',
+    component: NotFoundComponent
+  }
+];
+
+@NgModule({
+  imports: [RouterModule.forRoot(routes,{ scrollPositionRestoration: 'enabled', anchorScrolling: 'enabled', })],
+  exports: [RouterModule],
+  providers: [{ provide: LocationStrategy, useClass: HashLocationStrategy }]
+})
+export class CoreRoutingModule { }
+
+
+Route#
+======
+import { NgModule } from '@angular/core';
+import { Routes, RouterModule } from '@angular/router';
+
+import { DashboardComponent } from './dashboard/dashboard.component';
+import { AuthGuard } from '../core/auth/guards/auth.guard';
+import { InformationDeskComponent } from './information-desk/information-desk.component';
+import { DiagItemBookingWorklistComponent } from './diag-item-booking-worklist/diag-item-booking-worklist.component';
+import { DiagnosticItemBookingComponent } from './diagnostic-item-booking/diagnostic-item-booking.component';
+
+const routes: Routes = [
+  {
+    path: '',
+    redirectTo: 'dashboard',
+    pathMatch: 'full'
+  },
+  {
+    path: 'dashboard',
+    canActivate: [AuthGuard],
+    component: DashboardComponent
+  },
+  {
+    path: 'diagnostic-config',
+    canActivate: [AuthGuard],
+    loadChildren: './config-diagnostic/config-diagnostic.module#ConfigDiagnosticModule'
+  },
+  {
+    path: 'diagnostic-service',
+    canActivate: [AuthGuard],
+    loadChildren: './diagnostic-services/diagnostic-services.module#DiagnosticServicesModule'
+  },
+  {
+    path: 'billing',
+    canActivate: [AuthGuard],
+    loadChildren: './billing/billing.module#BillingModule'
+  },
+  {
+    path: 'pathology',
+    canActivate: [AuthGuard],
+    loadChildren: './pathology/pathology.module#PathologyModule'
+  },
+  {
+    path: 'radiology',
+    canActivate: [AuthGuard],
+    loadChildren: './radiology/radiology.module#RadiologyModule'
+  },
+  {
+    path: 'information-desk',
+    canActivate: [AuthGuard],
+    component: InformationDeskComponent
+  },
+  {
+    path: 'diag-item-booking-worklist',
+    canActivate: [AuthGuard],
+    component: DiagItemBookingWorklistComponent
+  },
+  {
+    path: 'diagnostic-item-booking',
+    canActivate: [AuthGuard],
+    component: DiagnosticItemBookingComponent
+  }
+];
+
+@NgModule({
+  imports: [RouterModule.forChild(routes)],
+  exports: [RouterModule]
+})
+export class DiagnosticRoutingModule { }
+
+Router2
+=======
+
+import { NgModule } from '@angular/core';
+import { Routes, RouterModule } from '@angular/router';
+import { EmailManagementComponent } from './email-management/email-management.component';
+import { MessageManagementComponent } from './message-management/message-management.component';
+
+const routes: Routes = [
+  {
+    path: '',
+    redirectTo: 'dashboard',
+    pathMatch: 'full'
+  },
+  {
+    path: 'email-management',
+    component: EmailManagementComponent
+  },
+  {
+    path: 'message-management',
+    component: MessageManagementComponent
+  },
+];
+
+@NgModule({
+  imports: [RouterModule.forChild(routes)],
+  exports: [RouterModule]
+})
+export class CustomerRelationManageRoutingModule { }
+
+
+
+Module
+=======
+import { NgModule } from '@angular/core';
+import { CommonModule } from '@angular/common';
+
+import { CustomerRelationManageRoutingModule } from './customer-relation-manage-routing.module';
+import { EmailManagementComponent } from './email-management/email-management.component';
+import { SharedModule } from '../shared/shared.module';
+import { EmailSentWorklisComponent } from './email-management/email-sent-worklis/email-sent-worklis.component';
+import { ComposeEmailComponent } from './email-management/compose-email/compose-email.component';
+import { MessageManagementComponent } from './message-management/message-management.component';
+import { MessageSentWorklistComponent } from './message-management/message-sent-worklist/message-sent-worklist.component';
+import { ComposeMessageComponent } from './message-management/compose-message/compose-message.component';
+import { UpdateSmsSentInfoModalComponent } from './crm-modal/update-sms-sent-info-modal/update-sms-sent-info-modal.component';
+import { UpdateEmailSentInfoModalComponent } from './crm-modal/update-email-sent-info-modal/update-email-sent-info-modal.component';
+
+@NgModule({
+  declarations: [
+    EmailManagementComponent,
+    EmailSentWorklisComponent,
+    ComposeEmailComponent,
+    MessageManagementComponent,
+    MessageSentWorklistComponent,
+    ComposeMessageComponent,
+    UpdateSmsSentInfoModalComponent,
+    UpdateEmailSentInfoModalComponent
+  ],
+  imports: [
+    CommonModule,
+    SharedModule,
+    CustomerRelationManageRoutingModule
+  ],
+  entryComponents: [
+    UpdateSmsSentInfoModalComponent,
+    UpdateEmailSentInfoModalComponent
+
+  ],
+})
+export class CustomerRelationManageModule { }
+
+
+Module2
+======
+
+import { NgModule } from '@angular/core';
+
+import { DiagnosticRoutingModule } from './diagnostic-routing.module';
+import { DashboardComponent } from './dashboard/dashboard.component';
+import { SharedModule } from '../shared/shared.module';
+import { BillingModule } from './billing/billing.module';
+import { InformationDeskComponent } from './information-desk/information-desk.component';
+import { InvoiceReportComponent } from './information-desk/invoice-report/invoice-report.component';
+import { ReprintHnCardComponent } from './information-desk/reprint-hn-card/reprint-hn-card.component';
+import { InvoicePricingComponent } from './information-desk/invoice-pricing/invoice-pricing.component';
+import { ResetPasswordComponent } from './information-desk/reset-password/reset-password.component';
+import { InvestigationStatusComponent } from './information-desk/investigation-status/investigation-status.component';
+import { PathologyInvStatusComponent } from './information-desk/investigation-status/pathology-inv-status/pathology-inv-status.component';
+import { RadiologyImagingStatusComponent } from './information-desk/investigation-status/radiology-imaging-status/radiology-imaging-status.component';
+import { DiagItemBookingWorklistComponent } from './diag-item-booking-worklist/diag-item-booking-worklist.component';
+import { DiagnosticItemBookingComponent } from './diagnostic-item-booking/diagnostic-item-booking.component';
+
+
+@NgModule({
+  declarations: [
+     DashboardComponent, 
+     InformationDeskComponent,
+     InvoiceReportComponent,
+     ReprintHnCardComponent, 
+     InvoicePricingComponent, 
+     ResetPasswordComponent, 
+     InvestigationStatusComponent, 
+     PathologyInvStatusComponent, 
+     RadiologyImagingStatusComponent, 
+     DiagItemBookingWorklistComponent, DiagnosticItemBookingComponent
+  ],
+  imports: [
+    DiagnosticRoutingModule,
+    SharedModule
+  ],
+  entryComponents: [
+  ]
+})
+export class DiagnosticModule { }
+
+Module2
+=========
+
+
+import { CommonModule } from '@angular/common';
+import { NgModule } from '@angular/core';
+import { FormsModule, ReactiveFormsModule } from '@angular/forms';
+import { HttpClientModule } from '@angular/common/http';
+import { RouterModule } from '@angular/router';
+import { CookieService } from 'ngx-cookie-service';
+import { FullCalendarModule } from '@fullcalendar/angular';
+// datatables
+import { DataTablesModule, DataTableDirective } from 'angular-datatables';
+
+// Date Picker
+import { BsDatepickerModule } from 'ngx-bootstrap/datepicker';
+import { ConfirmationDialogComponent } from './components/confirmation-dialog/confirmation-dialog.component';
+
+// Modal
+import { ModalModule, BsModalRef, TooltipModule, TabsModule, TypeaheadModule, CollapseModule } from 'ngx-bootstrap';
+
+// ngx-order-pipe
+import { OrderModule } from 'ngx-order-pipe';
+
+
+import { PopoverModule } from 'ngx-bootstrap/popover';
+// password Match
+import { MustMatchDirective } from '../core/header/security-profile-modal/_coreSecurityProfile/passwordMatch.directive';
+
+// TinyMCE
+import { EditorModule } from '@tinymce/tinymce-angular';
+
+// BsDropdown
+import { BsDropdownModule } from 'ngx-bootstrap/dropdown';
+import { TmplConfirmationDialogComponent } from './components/tmpl-confirmation-dialog/tmpl-confirmation-dialog.component';
+
+// Ngx-Mask
+import { NgxMaskModule } from 'ngx-mask'
+
+// Digit Only || Only numeric field
+import { DigitOnlyModule } from '@uiowa/digit-only';
+
+// NG-Select
+import { NgSelectModule } from '@ng-select/ng-select';
+import { FilterPipe } from './pipes/filter.pipe';
+
+// High charts
+import { ChartModule } from '@rijine/ngx-highcharts';
+import { HighchartsStatic } from "@rijine/ngx-highcharts/dist/services/highcharts.service";
+
+//TimepickerModule
+import { TimepickerModule } from 'ngx-bootstrap';
+
+import { ButtonsModule } from 'ngx-bootstrap/buttons';
+//Sliding scale
+import { Ng5SliderModule } from 'ng5-slider';
+
+// AccordionModule
+import { AccordionModule } from 'ngx-bootstrap';
+import { OpdPatientsListComponent } from 'src/app/shared/components/opd-patients-list/opd-patients-list.component';
+import { TwoDigitDecimaNumberDirective } from './directives/two-digit-decima-number.directive';
+import { PrescriptionConfirmationComponent } from './components/prescription-confirmation/prescription-confirmation.component';
+import { GroupByPipe } from './pipes/group-by.pipe';
+import { MultiFilterPipe } from './pipes/multi-filter.pipe';
+import { TemplateSetupQuesFormComponent } from './components/template-setup-ques-form/template-setup-ques-form.component';
+import { WebCamComponent } from './components/web-cam/web-cam.component';
+import { WebcamModule } from 'ngx-webcam';
+import { TemplateFullCalenderComponent } from './components/template-full-calender/template-full-calender.component';
+import { RegPassportConfirmationComponent } from './components/reg-passport-confirmation/reg-passport-confirmation.component';
+
+export function highchartsFactory() {
+  return require('highcharts');
+}
+
+@NgModule({
+  declarations: [
+    ConfirmationDialogComponent,
+    MustMatchDirective,
+    TmplConfirmationDialogComponent,
+    FilterPipe,
+    MultiFilterPipe,
+    OpdPatientsListComponent,
+    TwoDigitDecimaNumberDirective,
+    PrescriptionConfirmationComponent,
+    GroupByPipe,
+    WebCamComponent,
+    TemplateSetupQuesFormComponent,
+    TemplateFullCalenderComponent,
+    RegPassportConfirmationComponent
+  ],
+  entryComponents: [
+    ConfirmationDialogComponent,
+    TmplConfirmationDialogComponent,
+    PrescriptionConfirmationComponent,
+    WebCamComponent,
+    RegPassportConfirmationComponent
+  ],
+  imports: [
+    CommonModule,
+    FormsModule,
+    ReactiveFormsModule,
+    HttpClientModule,
+    RouterModule,
+    DataTablesModule,
+    // DataTableDirective,
+    BsDatepickerModule.forRoot(),
+    ModalModule.forRoot(),
+    TooltipModule.forRoot(),
+    TabsModule.forRoot(),
+    TypeaheadModule.forRoot(),
+    OrderModule,
+    PopoverModule.forRoot(),
+    EditorModule,
+    BsDropdownModule.forRoot(),
+    NgxMaskModule.forRoot(),
+    DigitOnlyModule,
+    NgSelectModule,
+    ChartModule,
+    // TimepickerModule
+    TimepickerModule.forRoot(),
+    ButtonsModule.forRoot(),
+    Ng5SliderModule,
+    AccordionModule.forRoot(),
+    CollapseModule.forRoot(),
+    FullCalendarModule, // import the FullCalendar module! will make the FullCalendar component available
+    WebcamModule,
+  ],
+  exports: [
+    CommonModule,
+    FormsModule,
+    ReactiveFormsModule,
+    HttpClientModule,
+    RouterModule,
+    DataTablesModule,
+    // DataTableDirective,
+    BsDatepickerModule,
+    ModalModule,
+    TooltipModule,
+    TabsModule,
+    TypeaheadModule,
+    OrderModule,
+    PopoverModule,
+    MustMatchDirective,
+    EditorModule,
+    BsDropdownModule,
+    NgxMaskModule,
+    DigitOnlyModule,
+    NgSelectModule,
+    FilterPipe,
+    MultiFilterPipe,
+    GroupByPipe,
+    ChartModule,
+    TimepickerModule,
+    ButtonsModule,
+    Ng5SliderModule,
+    AccordionModule,
+    CollapseModule,
+    OpdPatientsListComponent,
+    TwoDigitDecimaNumberDirective,
+    FullCalendarModule,
+    WebCamComponent,
+    TemplateSetupQuesFormComponent,
+    TemplateFullCalenderComponent,
+  ],
+  providers: [BsModalRef, CookieService, { provide: HighchartsStatic, useFactory: highchartsFactory }]
+})
+export class SharedModule { }
+
+
+-------------------------------------------------
+
+=================================================
+#Service | Token | Auth
+=================================================
+
+Serice1
+======
+import { Injectable } from '@angular/core';
+import { Router } from '@angular/router';
+import { BehaviorSubject, Observable, throwError, of } from 'rxjs';
+import { User } from '../models/user.model';
+import { HttpClient, HttpHeaders, HttpParams } from '@angular/common/http';
+import { environment } from 'src/environments/environment';
+import { map, catchError } from 'rxjs/operators';
+import { CookieService } from 'ngx-cookie-service';
+import { CustomizeCookieService } from './customize-cookie.service';
+import { ToastrService } from 'ngx-toastr';
+import { VideoconferenceService } from 'src/app/opd/quick-consultation/_coreConsultation/services/videoconference.service';
+
+@Injectable()
+export class AuthService {
+    private loggedIn: BehaviorSubject<boolean> = new BehaviorSubject<boolean>(false);
+    private BASE_URL = environment.baseUrl;
+    private API_URL = environment.authApiUrl;
+    private END_POINT = '/oauth/token';
+    private USER_DETAILS = this.BASE_URL + this.API_URL + '/api/coreUser/user-details';
+    private AUTH_URL = `${this.BASE_URL}${this.API_URL}${this.END_POINT}`;
+
+    private CLIENT_ID = 'medClientIdPassword';
+    private PASSWORD = 'secret';
+    private GRANT_TYPE = 'password';
+
+    public _isLoading = false;
+    private isLoading: BehaviorSubject<boolean> = new BehaviorSubject(false);
+    private errorMgs: BehaviorSubject<string> = new BehaviorSubject(null);
+
+    userDetils: any = {};
+    localStorageObj: any = {}
+
+    get isLoggedIn() {
+        this.checkCredentials();
+        return this.loggedIn.asObservable();
+    }
+
+    constructor(
+        private router: Router,
+        private httpClient: HttpClient,
+        private cookieService: CookieService,
+        private cookie: CustomizeCookieService,
+        private toastr: ToastrService,
+        private videoconferenceService:VideoconferenceService
+    ) { }
+
+    // obtainAccessToken(user: User) {
+
+    //     this._isLoading = true;
+    //     this.isLoading.next(this._isLoading);
+
+    //     const params = new HttpParams()
+    //         .set('username', user.userName)
+    //         .set('password', user.password)
+    //         .set('grant_type', this.GRANT_TYPE)
+    //         .set('client_id', this.CLIENT_ID);
+
+    //     const headers = {
+    //         'Authorization': 'Basic ' + btoa(`${this.CLIENT_ID}:${this.PASSWORD}`),
+    //         'Content-type': 'application/x-www-form-urlencoded; charset=utf-8'
+    //     }
+
+    //     this.httpClient.post<any>(this.AUTH_URL, params.toString(), { headers }).pipe(
+    //         map(res => res))
+    //         .subscribe(
+    //             data => {
+    //                 this.saveToken(data);
+    //                 this._isLoading = false;
+    //                 this.isLoading.next(this._isLoading);
+    //                 this.errorMgs.next('');
+    //             },
+    //             err => {
+    //                 this._isLoading = false;
+    //                 this.isLoading.next(this._isLoading);
+    //                 // console.error('Credentials error ', err);
+    //                 var errorMessage = navigator.onLine ? err.error.error_description : 'Please check your internet connection or try again later';
+
+    //                 if (errorMessage === undefined) {
+    //                     errorMessage = 'Service not available, please contact with Administrator';
+    //                 }
+    //                 this.errorMgs.next(errorMessage);
+    //             }
+    //         );
+
+    // }
+
+    obtainAccessToken(user: User) {
+
+        this._isLoading = true;
+        this.isLoading.next(this._isLoading);
+
+        const params = new HttpParams()
+            .set('username', user.userName)
+            .set('password', user.password)
+            .set('grant_type', this.GRANT_TYPE)
+            .set('client_id', this.CLIENT_ID);
+
+        const headers = {
+            'Authorization': 'Basic ' + btoa(`${this.CLIENT_ID}:${this.PASSWORD}`),
+            'Content-type': 'application/x-www-form-urlencoded; charset=utf-8'
+        }
+
+        this.httpClient.post<any>(this.AUTH_URL, params.toString(), { headers }).pipe(
+            map(res => res))
+            .subscribe(
+                data => {
+                    this.saveToken(data);
+                    this._isLoading = false;
+                    this.isLoading.next(this._isLoading);
+                    this.errorMgs.next('');
+                },
+                err => {
+                    this._isLoading = false;
+                    this.isLoading.next(this._isLoading);
+                    console.error('Credentials error ', err);
+                    var errorMessage = navigator.onLine ? err.error.error_description : 'Please check your internet connection or try again later';
+
+                    if (errorMessage === undefined) {
+                        errorMessage = 'Service not available, please contact with Administrator';
+                    }
+                    this.errorMgs.next(errorMessage);
+                }
+            );
+
+    }
+
+    loadingStatus(): Observable<boolean> {
+        return this.isLoading.asObservable();
+    }
+
+    messStatus(): Observable<string> {
+        return this.errorMgs.asObservable();
+    }
+
+    // saveToken(token) {
+    //   //  console.log('===========:', token);
+    //     // var expireDate = new Date().getTime() + (1000 * token.expires_in);
+    //     const expireDate = token.expires_in;
+    //     // this.cookieService.set("access_token", token.access_token, expireDate);
+    //     this.cookie.setWithExpiryInSeconds('access_token', token.access_token, expireDate);
+    //     // console.log('Obtained Access token');
+    //     this.setUserInformation();
+    //     //        this.router.navigate(['/']);
+    // }
+
+    saveToken(token) {
+        console.log('===========:', token);
+        //var expireDate = new Date().getTime() + (1000 * token.expires_in);
+        var expireDate = token.expires_in;
+        //this.cookieService.set("access_token", token.access_token, expireDate);
+        this.cookie.setWithExpiryInSeconds("access_token", token.access_token, expireDate);
+        //console.log('Obtained Access token');
+        this.setUserInformation();
+        //        this.router.navigate(['/']);
+    }
+
+    // setUserInformation(): void {
+    //     this.httpClient.get<any>(`${this.USER_DETAILS}`, <any>{}).subscribe(
+    //         res => {
+    //             this.userDetils = res;
+    //             // console.log(this.userDetils);
+    //             // const _userInfo = this.userDetils.obj;
+    //             // const companyList = _userInfo.companyList;
+    //             // Object.keys(companyList).forEach((key, value, array) => {
+    //             //     if (companyList[key].companyId == _userInfo.defaultCompanyId) {
+    //             //         _userInfo.companyAddress1 = companyList[key].compnayAddress1;
+    //             //         _userInfo.companyAddress2 = companyList[key].compnayAddress2;
+    //             //     }
+    //             // });
+    //             if (this.userDetils.obj != null) {
+    //                 localStorage.setItem('userInfo', JSON.stringify(this.userDetils.obj));
+    //                 if (this.userDetils.obj.userDefaultPageLink) {
+    //                     this.router.navigate([this.userDetils.obj.userDefaultPageLink]);
+    //                 } else {
+    //                     this.router.navigate(['/']);
+    //                 }
+    //             } else {
+    //                 localStorage.setItem('userInfo', JSON.stringify(null));
+    //                 this.router.navigate(['/']);
+    //             }
+    //         },
+    //         err => {
+    //             localStorage.setItem('userInfo', JSON.stringify(null));
+    //             this.router.navigate(['/']);
+    //             // console.log("Error : ", err)
+    //         });
+    // }
+
+    setUserInformation(): void {
+        this.httpClient.get<any>(`${this.USER_DETAILS}`, <any>{}).subscribe(
+            res => {
+                this.userDetils = res;
+                console.log(this.userDetils);
+                const _userInfo = this.userDetils.obj;
+                const companyList = _userInfo.companyList;
+                if (companyList) {
+                    Object.keys(companyList).forEach((key, value, array) => {
+                        if (companyList[key].companyId == _userInfo.defaultCompanyId) {
+                            _userInfo.companyAddress1 = companyList[key].compnayAddress1
+                            _userInfo.companyAddress2 = companyList[key].compnayAddress2
+                        }
+                    });
+                }
+                if (this.userDetils.obj != null) {
+
+                   
+                   
+                    localStorage.setItem('userInfo', JSON.stringify(this.userDetils.obj));
+                  
+                    if (this.userDetils.obj.userDefaultPageLink) {
+                        this.router.navigate([this.userDetils.obj.userDefaultPageLink]);
+                    } else {
+                        this.router.navigate(['/']);
+                    }
+                } else {
+                    localStorage.setItem('userInfo', JSON.stringify(null));
+                    this.router.navigate(['/']);
+                }
+            },
+            err => {
+                localStorage.setItem('userInfo', JSON.stringify(null));
+                this.router.navigate(['/']);
+                console.log('Error : ', err)
+            })
+    }
+
+    getResource(resourceUrl): Observable<any> {
+
+        const headers = {
+            'Authorization': 'Bearer ' + this.cookieService.get('access_token'),
+            'Content-type': 'application/x-www-form-urlencoded; charset=utf-8'
+        }
+
+        return this.httpClient.get<any>(resourceUrl, { headers }).pipe(
+            map((res: Response) => res),
+            catchError((error: any) => {
+                return throwError(error);
+            })
+        );
+    }
+
+    getAccessToken(): any {
+        return this.cookie.get('access_token');
+    }
+
+    refreshAccessToken(): Observable<any> {
+        // console.log("Need Check.");
+        const currentToken = this.obtainNewAccessToken();
+
+        return of(this.obtainNewAccessToken()).pipe();
+    }
+
+    checkCredentials() {
+        if (!this.cookie.get('access_token')) {
+            this.loggedIn.next(false);
+        } else {
+            this.loggedIn.next(true);
+        }
+    }
+
+    obtainNewAccessToken(): Observable<any> {
+        return new Observable;
+    }
+
+    // checkCredentials() {
+    //     console.log("Check Credentials",this.cookieService.check('access_token'))
+    //     if (!this.cookieService.check('access_token')) {
+    //         this.loggedIn.next(false);
+    //     } else {
+    //         console.log("Check Credentials", this.cookieService.get('access_token'));
+    //         this.loggedIn.next(true);
+    //     }
+    // }
+
+    deleteToken(): Observable<any> {
+        const headers = {
+            'Authorization': 'Bearer ' + this.cookieService.get('access_token'),
+            'Content-type': 'application/x-www-form-urlencoded; charset=utf-8'
+        };
+
+        const deleteAPIURL = `${this.BASE_URL}${this.API_URL}${this.END_POINT}/logout`;
+
+        return this.httpClient.delete<any>(deleteAPIURL, { headers }).pipe(
+            map((res: Response) => res),
+            catchError((error: any) => {
+                return throwError(error);
+            })
+        );
+    }
+
+    logout() {
+        this.deleteToken().subscribe(
+            res => {
+                console.log('Delete token response ', res);
+                if (res.success) {
+
+                    this.cookie.delete('access_token');
+                    localStorage.clear();
+                    //localStorage.removeItem('userInfo');
+                    this.router.navigate(['/login']);
+
+                    // console.log("Revoke Occurred In Delete token ", res);
+
+                } else {
+
+                    this.cookie.delete('access_token');
+                    localStorage.clear();
+                    // localStorage.removeItem('userInfo');
+                    this.router.navigate(['/login']);
+
+                    // console.log("Error Occurred In Delete token ", res);
+                }
+            },
+            err => {
+                console.log('Error Occurred In Delete token ', err);
+                this.cookie.delete('access_token');
+                localStorage.clear();
+                // localStorage.removeItem('userInfo');
+                this.router.navigate(['/login']);
+
+            }
+        );
+    }
+}
+
+Service2
+========
+
+import { Injectable } from '@angular/core';
+
+@Injectable({
+  providedIn: 'root'
+})
+export class CustomizeCookieService {
+
+  constructor() { }
+  set(key: string, value: string): void;
+  set(key: string, value: string, expires: Date): void;
+  set(key: string, value: string, expires?: Date): void {
+    let cookieValue = `${key}=${value}`;
+    if (expires) cookieValue += `;expires='${expires.toUTCString()}'`
+    document.cookie = cookieValue;
+  }
+
+  setWithExpiryInYears(key: string, value: string, expires: number) {
+    this.setWithExpiryInDays(key, value, expires * 365);
+  }
+
+  setWithExpiryInDays(key: string, value: string, expires: number) {
+    this.setWithExpiryInHours(key, value, expires * 24);
+  }
+
+  setWithExpiryInHours(key: string, value: string, expires: number) {
+    this.setWithExpiryInMinutes(key, value, expires * 60);
+  }
+
+  setWithExpiryInMinutes(key: string, value: string, expires: number) {
+    this.setWithExpiryInSeconds(key, value, expires * 60);
+  }
+
+  setWithExpiryInSeconds(key: string, value: string, expires: number) {
+    this.setWithExpiryInMiliseconds(key, value, expires * 1000);
+  }
+
+  setWithExpiryInMiliseconds(key: string, value: string, expires: number) {
+    var expireDate = new Date();
+    var time = expireDate.getTime() + expires;
+    expireDate.setTime(time);
+    
+    this.set(key, value, expireDate);
+  }
+
+  get(key: string): string {
+    const decodedCookie: string = decodeURIComponent(document.cookie);
+    const pairs: string[] = decodedCookie.split(/;\s*/);
+
+    const prefix = `${key}=`;
+    for (const pair of pairs) {
+      if (pair.indexOf(prefix) == 0) {
+        return pair.substring(prefix.length);
+      }
+    }
+    return "";
+  }
+  delete(key:string) {
+    if( this.get( key ) ) {
+      document.cookie = key + "=" +
+        ";expires=Thu, 01 Jan 1970 00:00:01 GMT";
+    }
+  }
+}  
+
+
+Service3
+========
+import { Injectable } from '@angular/core';
+import { HttpInterceptor, HttpRequest, HttpHandler, HttpEvent, HttpErrorResponse } from '@angular/common/http';
+import { Observable, BehaviorSubject, throwError } from 'rxjs';
+import { catchError, switchMap, filter, take } from 'rxjs/operators';
+import { AuthService } from './auth.service';
+
+@Injectable({
+  providedIn: 'root'
+})
+export class TokenInterceptorService implements HttpInterceptor {
+
+  private refreshTokenInProgress = false;
+  // Refresh Token Subject tracks the current token, or is null if no token is currently
+  // available (e.g. refresh pending).
+  private refreshTokenSubject: BehaviorSubject<any> = new BehaviorSubject<any>(null);
+  constructor(public authService: AuthService) { }
+
+  intercept(request: HttpRequest<any>,next: HttpHandler): Observable<HttpEvent<any>> {
+
+    return next.handle(this.addAuthenticationToken(request)).pipe(
+      catchError((error: HttpErrorResponse) => {
+        // We don't want to refresh token for some requests like login or refresh token itself
+        // So we verify url and we throw an error if it's the case
+        console.log("Login request error", error.status);
+        if (
+          request.url.includes("refreshtoken") ||
+          request.url.includes("oauth/token")
+        ) {
+          // We do another check to see if refresh token failed
+          // In this case we want to logout user and to redirect it to login page
+
+          if (request.url.includes("refreshtoken")) {
+            this.authService.logout();
+          }
+
+          // return Observable.throw(error);
+          return throwError(error);
+        }
+
+        // If error status is different than 401 we want to skip refresh token
+        // So we check that and throw the error if it's the case
+        if (error.status !== 401) {
+          // return Observable.throw(error);
+          return throwError(error);
+        }
+
+        if (this.refreshTokenInProgress) {
+          // If refreshTokenInProgress is true, we will wait until refreshTokenSubject has a non-null value
+          // – which means the new token is ready and we can retry the request again
+          return this.refreshTokenSubject.pipe(
+            filter(result => result !== null),
+            take(1),
+            switchMap(() => next.handle(this.addAuthenticationToken(request)))
+          );
+        } else {
+          this.refreshTokenInProgress = true;
+
+          // Set the refreshTokenSubject to null so that subsequent API calls will wait until the new token has been retrieved
+          this.refreshTokenSubject.next(null);
+
+          // Call auth.refreshAccessToken(this is an Observable that will be returned)
+          return this.authService
+            .refreshAccessToken().pipe(
+              switchMap((token: any) => {
+                //When the call to refreshToken completes we reset the refreshTokenInProgress to false
+                // for the next time the token needs to be refreshed
+                this.refreshTokenInProgress = false;
+                this.refreshTokenSubject.next(token);
+
+                return next.handle(this.addAuthenticationToken(request));
+              }),
+              catchError((err: any) => {
+                this.refreshTokenInProgress = false;
+
+                this.authService.logout();
+                return Observable.throw(error);
+              })
+            )
+        }
+      })
+    );
+  }
+
+  addAuthenticationToken(request) {
+    // Get access token from Local Storage
+    const accessToken = this.authService.getAccessToken();
+
+    // If access token is null this means that user is not logged in
+    // And we return the original request
+    if (!accessToken) {
+      return request;
+    }
+
+  
+    
+
+ 
+    // We clone the request, because the original request is immutable
+    return request.clone({
+      setHeaders: {
+        Authorization: `Bearer ${this.authService.getAccessToken()}`
+      }
+    });
+  }
+}
+---------------------------------------------------------------------
 
 
 
