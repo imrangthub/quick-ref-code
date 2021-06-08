@@ -38,6 +38,44 @@ select * from tableName;
 SHOW VARIABLES LIKE 'HOSTNAME';     -- Returns: MyHostName
 SHOW VARIABLES LIKE 'BIND_ADDRESS'; -- Returns: 127.0.0.1
 
+
+
+#Check Mysql
+-------------------------------------------------
+shell> mysqladmin version
+shell> mysqladmin variables
+shell> mysqladmin -h `hostname` version variables
+shell> mysqladmin -h `hostname` --port=3306 version
+shell> mysqladmin -h host_ip version
+shell> mysqladmin --protocol=SOCKET --socket=/tmp/mysql.sock version
+
+
+#MySQL Server Start
+--------------------------------------------------
+Run the command prompt as admin and cd to bin directory of MySQL
+
+Generally it is (C:\Program Files\MySQL\mysql-5.6.36-winx64\bin)
+Run command : mysqld --install. (This command will install MySQL services and if services already installed it will prompt.)
+
+Run below commands to start and stop server
+
+To start : net start mysql
+
+To stop : net stop mysql
+
+
+#Change Root Password
+--------------------------------------------------
+Create a File in C drive as with below line :C:\mysql-init.txt
+
+ALTER USER 'root'@'localhost' IDENTIFIED BY 'root';
+
+Then Do:
+
+C:\> cd "C:\Program Files\MySQL\MySQL Server 5.7\bin"
+C:\> mysqld --init-file=C:\\mysql-init.txt
+
+
 =================================================
 #              DOCKER                                          
 ================================================= 

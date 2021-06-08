@@ -59,6 +59,12 @@ List all the docker images pulled on the system with image details such as TAG/I
 Retag the image with a version number:
 =>docker image build -t imranmadbar/docker-spring-security-mysql-mvc-prod:1.0.1.RELEASE .
 =>docker image build -t imranmadbar/docker-spring-security-mysql-mvc-prod:2.0.0.RELEASE .
+=>docker image build -t imranmadbar/docker-spring-security-mysql-mvc-prod:3.0.0.RELEASE .
+
+
+=>docker image build -t imranmadbar/oauth2-resource-server-api:1.0.0.RELEASE .
+=>docker image build -t imranmadbar/oauth2-authorization-server-api:1.0.0.RELEASE .
+
 
 
 
@@ -77,10 +83,15 @@ Pull image with a version number:
 -------------------------------------------------
 =>docker run --name containerName -p 8080:8080 -d imageName:tagName
 
+=>docker run -d -p 3306:3306 --name=spring-boot-mysql-oauth2-db --env="MYSQL_ROOT_PASSWORD=root" --env="MYSQL_DATABASE=mysqloauth2db" -it mysql:5.7
+
+
+=>docker run --name oauth2-authorization-server-api -p 8081:8081 imranmadbar/oauth2-authorization-server-api:1.0.0.RELEASE
 =>docker run --name docker-spring-security-mysql-mvc-prod -p 8181:8181 imranmadbar/docker-spring-security-mysql-mvc-prod:2.0.0.RELEASE
 
 =>docker container run --name producer -p 8080:8080 -d employee-producer
 =>docker run --name docker-spring-boot-mysql -t --link mysql-dkr-contr-db:mysql-dkr-contr-db -d -p 8080:8181 imranmadbar/docker-spring-boot-mysql
+=>docker run --name docker-spring-security-mysql-mvc-prod -t --link mysql-dkr-contr-db:mysql-dkr-contr-db -d -p 8080:8181 imranmadbar/docker-spring-security-mysql-mvc-prod:3.0.0.RELEASE
 =>docker container run --network consumer-producer-net --name docker-spring-boot-restcall-producer -p 8080:8080 -d imranmadbar/docker-spring-boot-restcall-producer
 =>docker container run --network consumer-producer-net --name docker-spring-boot-restcall-consumer -p 8282:8282 -d imranmadbar/docker-spring-boot-restcall-consumer
 
