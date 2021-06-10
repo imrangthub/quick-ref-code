@@ -419,6 +419,145 @@ export class GroupByPipe implements PipeTransform {
 }
 
 
+=================================================
+#                  Typeahead                                       
+=================================================
+Typeahead1: 
+===========
+
+Java
+=====
+
+@PostMapping("/drListByIdName")
+public Response patientListByIdName(@RequestBody String reqObj) {
+return doctorScheduleService.drListByIdName(reqObj);
+}
+
+
+public Response drListByIdName(String reqObj) {		
+return consultingDocRepository.findDrListByNameOrId(reqObj);
+}
+
+
+public Response findDrListByNameOrId(String reqObj) {
+	
+	if (null == reqObj) {
+		return getErrorResponse("Please enter  Doctor Name Or ID");
+	}
+	JSONObject json = new JSONObject(reqObj);
+	String doctorId = Def.getString(json, "doctorId");
+	String doctorName = Def.getString(json, "doctorName");
+	
+	
+	ViewConsultingDocEntity consultingDocEntity = new ViewConsultingDocEntity();
+	consultingDocEntity.setCompanyNo(userDetails().getCompanyNo());
+	
+	if (null == doctorId && doctorName == null) {
+		return getErrorResponse("please enter  personalnumber");
+	}
+
+	Map<String, Object> searchfields = new HashMap<String, Object>();
+	searchfields.put("doctorName", doctorName);
+	searchfields.put("doctorId", doctorId);
+
+	return baseList(typedQuery(consultingDocEntity, searchfields));
+
+}
+
+Html::
+====
+<input [(ngModel)]="selectedDoctor" name="selectedDoctor" [typeaheadAsync]="true"
+[typeahead]="drDatasource" [typeaheadScrollable]="true" [typeaheadOptionsInScrollableView]="10"
+(typeaheadLoading)="changeTypeaheadLoading($event)" (typeaheadOnSelect)="selectDoctor($event)"
+(typeaheadNoResults)="typeaheadNoResults($event)" [typeaheadOptionsLimit]="10"
+[typeaheadWaitMs]="300" typeaheadOptionField="doctorName"
+[typeaheadItemTemplate]="customTemplate" #patientName placeholder="Search by ID or Name"
+class="form-control" autocomplete="off" typeaheadMinLength="3">
+<button type="button" *ngIf="selectedDoctor" class="btn remove-doctor-icon" title=""
+(click)="onCLickRemoveDr()"><i class="fas fa-times"></i></button>
+<ng-template #customTemplate let-model="item" let-index="index">
+<table>
+  <tr>
+	<th>ID:</th>
+	<td>{{model.doctorId}}</td>
+  </tr>
+  <tr>
+	<th>Name</th>
+	<td>{{model.doctorName}}</td>
+  </tr>
+</table>
+</ng-template>
+
+TS:
+=====
+  //for typeahead
+  drDatasource: Observable<any>
+  selectedDoctor: string;
+  typeaheadLoading: boolean;
+  noResult = false;
+  searchObject: any = {};
+  selectedDoctorNo: number;
+ 
+    
+// == method for typeahed
+ changeTypeaheadLoading(e: boolean): void {
+  if (this.selectedDoctor.length == 0) {
+    this.selectedDoctor = null;
+  }
+  this.typeaheadLoading = e;
+}
+selectDoctor(result: any): void {
+  console.log(result.item);
+  this.selectedDoctorNo = result.item.doctorNo;
+  this.searchObject.doctorId = result.item.doctorId;
+}
+typeaheadNoResults(e: boolean): void {
+  this.noResult = e;
+}
+initiateDoctorData(): any {
+  return this.drDatasource = Observable.create((observer: any) => {
+    observer.next(this.selectedDoctor);
+
+  }).pipe(mergeMap((token: string) => this.searchDoctor(token)));
+}
+searchDoctor(token: string): any {
+  let searchObj = { "doctorId": token, "doctorName": token };
+  return this.pacsIpPortService.getTypeaheadDoctorIDName(searchObj);
+}
+
+onCLickRemoveDr() {
+  let result = {
+    "item": {
+      "doctorNo": 0,
+      "doctorId": ""
+    }
+  }
+  this.selectedDoctor = "";
+  this.selectDoctor(result);
+}
+
+//== method for typeahed
+
+ 
+					  
+In Service:
+------------
+  getTypeaheadDoctorIDName(obj: any): Observable<any> {
+    return this.http.post<any>(this.TYPEAHEAD_DOCTOR_ID, obj).pipe(
+      map((data: any) => this.sortByregType(data.items))
+    )
+  }
+  
+  sortByregType(data){
+    if(data == null){
+      return data;
+    }else{
+      return data.sort(sortBy('regType'));
+    }
+  }  
+  
+  
+//===============================================
 
 =================================================
 #                  Component                                          

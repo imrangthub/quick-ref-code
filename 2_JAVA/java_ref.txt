@@ -290,6 +290,94 @@ public Response sampleCollSplit(String reqStr) {
 		return getErrorResponse("Sample Collection Split fail !!");
 
 	}
+STO4
+====
+public Response getPatientDetailsByRegNo(Long regNo) {
+
+		Response res = new Response();
+		ResultSet rs = null;
+
+		StoredProcedureQuery query = entityManager.createStoredProcedureQuery("pd_reg_pat_details_info_web");
+		query.registerStoredProcedureParameter(1, Long.class, ParameterMode.IN);
+		query.registerStoredProcedureParameter(2, Void.class, ParameterMode.REF_CURSOR);
+		query.setParameter(1, regNo);
+		query.execute();
+
+		try {
+			rs = (ResultSet) query.getOutputParameterValue(2);
+			while (rs.next()) {
+				PatientDetailsInfoDTO pathInfo = new PatientDetailsInfoDTO();
+
+				pathInfo.setRegNo(rs.getLong("reg_no"));
+				pathInfo.setHospitalNumber(rs.getString("hospital_number"));
+				pathInfo.setRegDate(rs.getDate("reg_date"));
+				pathInfo.setPatientName(rs.getString("patient_name"));
+				pathInfo.setGenderData(rs.getString("gender_data"));
+				pathInfo.setMaritalStatus(rs.getString("m_status_data"));
+				pathInfo.setDob(rs.getDate("dob"));
+				pathInfo.setAge(rs.getString("age"));
+
+				res.setObj(pathInfo);
+			}
+			res.setMessage("Data Found");
+		} catch (SQLException e) {
+			res.setSuccess(false);
+			res.setMessage("Data not Found!");
+			e.printStackTrace();
+		} finally {
+			finalyRs(rs);
+		}
+		return res;
+	}
+	
+	
+STO5
+====
+public Response getRegSummaryDataList(String reqObj) {
+		
+		JSONObject json = new JSONObject(reqObj);
+		Date startDate 	= Def.getDate(json, "startDate");
+		Date endDate 	= Def.getDate(json, "endDate");
+		
+		Response res = new Response();
+		ResultSet rs = null;
+		
+		StoredProcedureQuery query = entityManager.createStoredProcedureQuery("PD_REG_SW_SUM_REP_WEB");
+		query.registerStoredProcedureParameter(1, Date.class, ParameterMode.IN);	//	p_st_date         DATE,
+		query.registerStoredProcedureParameter(2, Date.class, ParameterMode.IN);	//  p_end_date        DATE,
+		query.registerStoredProcedureParameter(3, Void.class, ParameterMode.REF_CURSOR);
+		
+		query.setParameter(1, addMinTime(startDate));
+		query.setParameter(2, addMaxTime(endDate));
+		
+		query.execute();
+
+		try {
+			List<RegSummaryRptDTO> rptDataList = new ArrayList<RegSummaryRptDTO>();
+			
+			rs = (ResultSet) query.getOutputParameterValue(3);
+			while (rs.next()) {
+				RegSummaryRptDTO regSum = new RegSummaryRptDTO();
+				
+				regSum.setRegDate(rs.getDate("reg_date"));
+				regSum.setMorning(rs.getLong("morning"));
+				regSum.setEvening(rs.getLong("evening"));
+				regSum.setTotReg(rs.getLong("tot_reg"));
+
+				rptDataList.add(regSum);
+			}
+			res.setItems(rptDataList);
+			res.setMessage("Data Found");
+		} catch (SQLException e) {
+			res.setSuccess(false);
+			res.setMessage("Data not Found!");
+			e.printStackTrace();
+		} finally {
+			finalyRs(rs);
+		}
+		return res;
+	}
+		
 	
 MORE
 ====
@@ -437,6 +525,222 @@ MORE
 	
 MORE
 ====
+
+public Response getRegPatientReportDataList(String reqObj) {
+		
+		JSONObject json = new JSONObject(reqObj);
+		Date startDate 	= Def.getDate(json, "startDate");
+		Date endDate 	= Def.getDate(json, "endDate");
+		Long userNo 	= Def.getLong(json, "userNo");
+		Long patTypeNo 	= Def.getLong(json, "patTypeNo");
+		String phoneNo 	= Def.getString(json, "phoneNo");
+		Long corClintNo 	  = Def.getLong(json, "corClintNo");
+		Integer corporateFlag = Def.getInteger(json, "corporateFlag");
+		Integer emailFlag 	  = Def.getInteger(json, "emailFlag");
+		
+		Integer inActiveFlag    = Def.getInteger(json, "inActiveFlag");
+		Integer blacklistedFlag = Def.getInteger(json, "blacklistedFlag");
+		Integer chronicFlag     = Def.getInteger(json, "chronicFlag");
+		
+		Response res = new Response();
+		ResultSet rs = null;
+		
+		StoredProcedureQuery query = entityManager.createStoredProcedureQuery("pd_reg_pat_report_web");
+		query.registerStoredProcedureParameter(1, Date.class, ParameterMode.IN);	//	p_st_date         DATE,
+		query.registerStoredProcedureParameter(2, Date.class, ParameterMode.IN);	//  p_end_date        DATE,
+		query.registerStoredProcedureParameter(3, Long.class, ParameterMode.IN);	//  p_user_no         NUMBER,
+		query.registerStoredProcedureParameter(4, Long.class, ParameterMode.IN);	//  p_pat_type_no     NUMBER,
+		query.registerStoredProcedureParameter(5, Integer.class, ParameterMode.IN);	//  p_email_flag      NUMBER,
+		query.registerStoredProcedureParameter(6, String.class, ParameterMode.IN);	//  p_active_stat     NUMBER,
+		query.registerStoredProcedureParameter(7, Long.class, ParameterMode.IN);	//  p_cor_client_no   NUMBER,
+		query.registerStoredProcedureParameter(8, Integer.class, ParameterMode.IN);	//	p_cor_flag        NUMBER,
+		query.registerStoredProcedureParameter(9, Integer.class, ParameterMode.IN);	//	p_cor_flag        NUMBER,
+		query.registerStoredProcedureParameter(10, Integer.class, ParameterMode.IN);	//	p_cor_flag        NUMBER,
+		query.registerStoredProcedureParameter(11, Integer.class, ParameterMode.IN);	//	p_cor_flag        NUMBER,
+		query.registerStoredProcedureParameter(12, Void.class, ParameterMode.REF_CURSOR);
+		
+		query.setParameter(1, addMinTime(startDate));
+		query.setParameter(2, addMaxTime(endDate));
+		query.setParameter(3, userNo);
+		query.setParameter(4, patTypeNo);
+		query.setParameter(5, emailFlag);
+		query.setParameter(6, phoneNo);
+		query.setParameter(7, corClintNo);
+		query.setParameter(8, corporateFlag);
+		query.setParameter(9, inActiveFlag);
+		query.setParameter(10, blacklistedFlag);
+		query.setParameter(11, chronicFlag);
+		
+		query.execute();
+
+		try {
+			List<PatientDetailsInfoDTO> rptDataList = new ArrayList<PatientDetailsInfoDTO>();
+			rs = (ResultSet) query.getOutputParameterValue(12);
+			while (rs.next()) {
+				PatientDetailsInfoDTO pathInfo = new PatientDetailsInfoDTO();
+
+				pathInfo.setRegNo(rs.getLong("reg_no"));
+				pathInfo.setHospitalNumber(rs.getString("hospital_number"));
+				pathInfo.setSsModifiedOn(rs.getDate("ss_modified_on"));	
+				
+				if(inActiveFlag!=null && inActiveFlag.equals(1)) {
+					pathInfo.setFlagType("Inactive");
+				} else if(blacklistedFlag!=null && blacklistedFlag.equals(1)) {
+					pathInfo.setFlagType("Blacklist");
+				} else if(chronicFlag!=null && chronicFlag.equals(1)) {
+					pathInfo.setFlagType("Chronic");
+				}
+
+				rptDataList.add(pathInfo);
+			}
+			res.setItems(rptDataList);
+			res.setMessage("Data Found");
+		} catch (SQLException e) {
+			res.setSuccess(false);
+			res.setMessage("Data not Found!");
+			e.printStackTrace();
+		} finally {
+			finalyRs(rs);
+		}
+		return res;
+	}
+	
+	public Response getRegMedCampaignDataList(String reqObj) {
+		
+		JSONObject json = new JSONObject(reqObj);
+		Date startDate 	= Def.getDate(json, "startDate");
+		Date endDate 	= Def.getDate(json, "endDate");
+		Long userNo 	= Def.getLong(json, "userNo");
+		Long campaignNo = Def.getLong(json, "campaignNo");
+		
+		Response res = new Response();
+		ResultSet rs = null;
+		
+		StoredProcedureQuery query = entityManager.createStoredProcedureQuery("PD_REG_CAMPAIGN_RPT_WEB");
+		query.registerStoredProcedureParameter(1, Date.class, ParameterMode.IN);	//	p_st_date         DATE,
+		query.registerStoredProcedureParameter(2, Date.class, ParameterMode.IN);	//  p_end_date        DATE,
+		query.registerStoredProcedureParameter(3, Long.class, ParameterMode.IN);	//  p_user_no         NUMBER,
+		query.registerStoredProcedureParameter(4, Long.class, ParameterMode.IN);	//  p_campaign_no     NUMBER,
+		query.registerStoredProcedureParameter(5, Void.class, ParameterMode.REF_CURSOR);
+		
+		query.setParameter(1, addMinTime(startDate));
+		query.setParameter(2, addMaxTime(endDate));
+		query.setParameter(3, userNo);
+		query.setParameter(4, campaignNo);
+		
+		query.execute();
+
+		try {
+			List<PatientDetailsInfoDTO> rptDataList = new ArrayList<PatientDetailsInfoDTO>();
+			rs = (ResultSet) query.getOutputParameterValue(5);
+			while (rs.next()) {
+				PatientDetailsInfoDTO pathInfo = new PatientDetailsInfoDTO();
+
+				pathInfo.setRegNo(rs.getLong("reg_no"));
+				pathInfo.setHospitalNumber(rs.getString("hospital_number"));
+				pathInfo.setCampaignNo(rs.getLong("campaign_no"));
+				pathInfo.setCampaignName(rs.getString("campaign_name"));				
+
+				rptDataList.add(pathInfo);
+			}
+			res.setItems(rptDataList);
+			res.setMessage("Data Found");
+		} catch (SQLException e) {
+			res.setSuccess(false);
+			res.setMessage("Data not Found!");
+			e.printStackTrace();
+		} finally {
+			finalyRs(rs);
+		}
+		return res;
+	}
+	
+
+	
+	
+	public DoctorScheduleDto getScheduleByDocNoAndDateShiftNo(Long doctorNo, Long shiftNo, String schecduleDate) {
+		boolean errorFlag = false;
+		DoctorScheduleDto docScheduleObj = null;
+		Connection con = null;
+		ResultSet rs = null;
+		Statement stm = null;
+		List<DoctorScheduleDto> docScheduleObjList = new ArrayList<DoctorScheduleDto>();
+		try {
+			con = getOraConnection();
+			stm = con.createStatement();
+			rs = stm.executeQuery(DiagnosticStatement.getScheduleByDoctorNoDateShiftNo(doctorNo, shiftNo, schecduleDate));
+			while (rs.next()) {
+				DoctorScheduleDto obj = new DoctorScheduleDto();
+
+				obj.setDoctorNo(rs.getLong("DOCTOR_NO"));
+				obj.setBuNo(rs.getLong("BU_NO"));
+				obj.setEmpscheduleDt(rs.getString("EMPSCHEDULE_DT"));
+				obj.setEmpscheduleNo(rs.getLong("EMPSCHEDULE_NO"));
+				obj.setShiftdtlNo(rs.getLong("SHIFTDTL_NO"));
+
+
+				docScheduleObjList.add(obj);
+			}
+			if (!docScheduleObjList.isEmpty()) {
+				docScheduleObj = docScheduleObjList.get(0);
+			}
+		} catch (SQLException e) {
+			e.printStackTrace();
+			errorFlag = true;
+		} finally {
+			finalyConStmRs(con, stm, rs);
+		}
+		if (errorFlag) {
+			return null;
+		}
+		return docScheduleObj;
+	}
+
+	public Response regMRNCardFeeBillProcedure(Long regNo, Long billFor, MyUserDetails user) {
+		
+		StoredProcedureQuery query = entityManager.createStoredProcedureQuery("pd_reg_mrn_card_bill_save_web");
+
+		query.registerStoredProcedureParameter(1, Long.class, ParameterMode.IN);
+		query.registerStoredProcedureParameter(2, Long.class, ParameterMode.IN);
+		query.registerStoredProcedureParameter(3, Long.class, ParameterMode.IN);
+		query.registerStoredProcedureParameter(4, Long.class, ParameterMode.IN);
+		query.registerStoredProcedureParameter(5, Long.class, ParameterMode.IN);
+		query.registerStoredProcedureParameter(6, Long.class, ParameterMode.IN);
+		
+		query.registerStoredProcedureParameter(7, Long.class, ParameterMode.OUT);
+		query.registerStoredProcedureParameter(8, String.class, ParameterMode.OUT);
+		query.registerStoredProcedureParameter(9, Long.class, ParameterMode.OUT);
+		query.registerStoredProcedureParameter(10, String.class, ParameterMode.OUT);
+
+		query.setParameter(1, regNo);
+		query.setParameter(2, billFor); //1=Reg_FeeBill, 2=MRN_CardFeeBill
+		query.setParameter(3, user.getUserId());
+		query.setParameter(4, user.getSessionNo());
+		query.setParameter(5, user.getOrganizationNo());
+		query.setParameter(6, user.getCompanyNo());
+
+		query.execute();
+
+		Long invoiceNo = query.getOutputParameterValue(7) != null ? (Long) query.getOutputParameterValue(7) : null;
+		String invoiceId = query.getOutputParameterValue(8) != null ? (String) query.getOutputParameterValue(8) : "";
+		Long action = query.getOutputParameterValue(9) != null ? (Long) query.getOutputParameterValue(9) : null;
+		String message = query.getOutputParameterValue(10) != null ? (String) query.getOutputParameterValue(10) : "";
+
+		Response response = new Response();
+		Map<String, Object> resMap = new HashMap<String, Object>();
+		resMap.put("invoiceNo", invoiceNo);
+		resMap.put("invoiceId", invoiceId);
+		resMap.put("action", action);
+		resMap.put("message", message);
+
+		response.setSuccess(action.equals(1L)?true:false);
+		response.setMessage(action.equals(1L)?"Sucessfully Bill Saved.":"Failed to Save Bill!");
+		response.setModel(resMap);
+
+		return response;
+	}
+	
+	
 	public Response kLabPdStepUpdate(KLabPdStepUpdateProsdArgDto paramObj) {
 
 		Boolean executeFlag = null;
@@ -694,14 +998,6 @@ MORE
 
 				obj.setStampId(rs.getString("stamp_id"));
 				// obj.setStampNo(rs.getLong("stamp_no"));
-				obj.setGroupSeq(rs.getLong("group_seq"));
-				obj.setBuNo(rs.getLong("bu_no"));
-				obj.setItemName(rs.getString("item_name"));
-				obj.setItemNo(rs.getLong("item_no"));
-				obj.setAttr(rs.getString("attr"));
-				obj.setResult(rs.getString("result"));
-				obj.setResultOne(rs.getString("result1"));
-				obj.setResultTwo(rs.getString("result2"));
 				obj.setResultThree(rs.getString("result3"));
 				obj.setInterpretationTest(rs.getString("INTERPRETATION_TEST"));
 				obj.setNormalValue(rs.getString("normal_value"));
@@ -2376,3 +2672,252 @@ public class OpdRegistrationRepositoryGlobal extends BaseRepository {
 }
 
 -------------------------------------------------
+
+Typeahead | autocomplete | Serverside
+=================================================
+
+WithQuery:
+==========
+
+	public static String DietItemStatement(String itemIdOrName) {
+		StringBuffer sqlQuery = new StringBuffer();
+
+		sqlQuery.append("SELECT d.item_no, m.item_id, m.item_name, ");
+		sqlQuery.append("NVL (d.sales_price, m.sales_price) sales_price, d.item_qty ");
+		sqlQuery.append("FROM dk_ipd_menu_category_chd d, in_item m ");
+		sqlQuery.append("WHERE d.item_no = m.item_no ");
+		sqlQuery.append("AND NVL (d.active_stat, 0) = 1 ");
+		sqlQuery.append("AND (   m.item_id LIKE  ");
+		sqlQuery.append("('" + CommonUtils.PERCENTAGE_SIGN);
+		sqlQuery.append(itemIdOrName.toUpperCase());
+		sqlQuery.append(CommonUtils.PERCENTAGE_SIGN + "')");
+		sqlQuery.append("OR UPPER (item_name) LIKE ");
+		sqlQuery.append("('" + CommonUtils.PERCENTAGE_SIGN);
+		sqlQuery.append(itemIdOrName.toUpperCase());
+		sqlQuery.append(CommonUtils.PERCENTAGE_SIGN + "') )");
+		return sqlQuery.toString();
+	}
+------------
+	// ================== for food item list ===========================
+	public Response itemList(String reqObj) {
+
+		JSONObject json = new JSONObject(reqObj);
+		String itemNameOrId = Def.getString(json, "itemNameOrId");
+
+		Response response = new Response();
+		Connection con = null;
+		ResultSet rs = null;
+		Statement stm = null;
+		List<DietRequistionItemDto> itemList = new ArrayList<DietRequistionItemDto>();
+
+		try {
+			con = getOraConnection();
+			stm = con.createStatement();
+			rs = stm.executeQuery(DietRequistionStatement.DietItemStatement(itemNameOrId));
+
+			while (rs.next()) {
+				DietRequistionItemDto itemObj = new DietRequistionItemDto();
+
+				itemObj.setItemNo(rs.getLong("ITEM_NO"));
+				itemObj.setItemId(rs.getString("ITEM_ID"));
+				itemObj.setItemName(rs.getString("ITEM_NAME"));
+				itemObj.setSalesPrice(rs.getLong("sales_price"));
+				itemObj.setItemQty(rs.getLong("item_qty"));
+				itemList.add(itemObj);
+
+			}
+		} catch (SQLException e) {
+			e.printStackTrace();
+		} finally {
+			finalyConStmRs(con, stm, rs);
+		}
+		response.setItems(itemList);
+		return getSuccessResponse("Item List Found", response);
+	}
+	
+Angular:	
+--------------
+Html
+<input type="search" placeholder="Type Name Or ID..." class="form-control" id="itemId"
+[(ngModel)]="foodItemSearchText" [typeaheadAsync]="true" [typeahead]="foodItemDataSource"
+(typeaheadOnSelect)="onSelectFoodItem($event)" [typeaheadOptionsLimit]="10"
+typeaheadOptionField="itemName" (typeaheadLoading)="changeTypeaheadLoading($event)"
+(typeaheadNoResults)="noResultsFound($event)" [typeaheadItemTemplate]="customItemTemplate">
+<div class="searchLoading loading-icon-all" *ngIf="typeaheadLoading">
+<i class="fas fa-spinner loading-icon"></i>
+</div>
+
+Tx:
+===
+
+ //===== For Diet Item Typeahead =================
+  getFoodItemTypeHedData() {
+    this.foodItemDataSource = Observable.create((observer) => {
+      observer.next(this.foodItemSearchText);
+    }).pipe(mergeMap((token: string) => this.getFoodItemAsObservable(token)));
+  }
+
+  getFoodItemAsObservable(token: string): Observable<any> {
+    let reqObj = { itemNameOrId: token }
+    return this._dietRequistionService.findFoodItemList(reqObj);
+  }
+
+  changeTypeaheadLoading(e: boolean): void {
+    this.typeaheadLoading = e;
+  }
+
+  noResultsFound(event: boolean): void {
+    this.noResult = event;
+  }
+
+  onSelectFoodItem(event: TypeaheadMatch) {
+    if (this.foodItemList.length == 0) {
+      this.foodItemList.push(event.item);
+    } else {
+      let dupItem = this.foodItemList.find(item => item.itemNo == event.item.itemNo);
+      if (dupItem) {
+        this._toastrService.warning('Item Already Added!')
+      } else {
+        this.foodItemList.push(event.item);
+      }
+    }
+    this.foodItemSearchText = null;
+    document.getElementById('itemId').focus();
+    this.calTotalItem();
+  }
+  //==========================================================
+
+/-------------------------------------------------
+
+Typeahead2:
+===========
+@PostMapping("/drListByIdName")
+public Response patientListByIdName(@RequestBody String reqObj) {
+return doctorScheduleService.drListByIdName(reqObj);
+}
+
+
+public Response drListByIdName(String reqObj) {		
+return consultingDocRepository.findDrListByNameOrId(reqObj);
+}
+
+
+public Response findDrListByNameOrId(String reqObj) {
+	
+	if (null == reqObj) {
+		return getErrorResponse("Please enter  Doctor Name Or ID");
+	}
+	JSONObject json = new JSONObject(reqObj);
+	String doctorId = Def.getString(json, "doctorId");
+	String doctorName = Def.getString(json, "doctorName");
+	
+	
+	ViewConsultingDocEntity consultingDocEntity = new ViewConsultingDocEntity();
+	consultingDocEntity.setCompanyNo(userDetails().getCompanyNo());
+	
+	if (null == doctorId && doctorName == null) {
+		return getErrorResponse("please enter  personalnumber");
+	}
+
+	Map<String, Object> searchfields = new HashMap<String, Object>();
+	searchfields.put("doctorName", doctorName);
+	searchfields.put("doctorId", doctorId);
+
+	return baseList(typedQuery(consultingDocEntity, searchfields));
+
+}
+
+Html::
+====
+<input [(ngModel)]="selectedDoctor" name="selectedDoctor" [typeaheadAsync]="true"
+[typeahead]="drDatasource" [typeaheadScrollable]="true" [typeaheadOptionsInScrollableView]="10"
+(typeaheadLoading)="changeTypeaheadLoading($event)" (typeaheadOnSelect)="selectDoctor($event)"
+(typeaheadNoResults)="typeaheadNoResults($event)" [typeaheadOptionsLimit]="10"
+[typeaheadWaitMs]="300" typeaheadOptionField="doctorName"
+[typeaheadItemTemplate]="customTemplate" #patientName placeholder="Search by ID or Name"
+class="form-control" autocomplete="off" typeaheadMinLength="3">
+<button type="button" *ngIf="selectedDoctor" class="btn remove-doctor-icon" title=""
+(click)="onCLickRemoveDr()"><i class="fas fa-times"></i></button>
+<ng-template #customTemplate let-model="item" let-index="index">
+<table>
+  <tr>
+	<th>ID:</th>
+	<td>{{model.doctorId}}</td>
+  </tr>
+  <tr>
+	<th>Name</th>
+	<td>{{model.doctorName}}</td>
+  </tr>
+</table>
+</ng-template>
+
+TS:
+=====
+  //for typeahead
+  drDatasource: Observable<any>
+  selectedDoctor: string;
+  typeaheadLoading: boolean;
+  noResult = false;
+  searchObject: any = {};
+  selectedDoctorNo: number;
+ 
+    
+// == method for typeahed
+ changeTypeaheadLoading(e: boolean): void {
+  if (this.selectedDoctor.length == 0) {
+    this.selectedDoctor = null;
+  }
+  this.typeaheadLoading = e;
+}
+selectDoctor(result: any): void {
+  console.log(result.item);
+  this.selectedDoctorNo = result.item.doctorNo;
+  this.searchObject.doctorId = result.item.doctorId;
+}
+typeaheadNoResults(e: boolean): void {
+  this.noResult = e;
+}
+initiateDoctorData(): any {
+  return this.drDatasource = Observable.create((observer: any) => {
+    observer.next(this.selectedDoctor);
+
+  }).pipe(mergeMap((token: string) => this.searchDoctor(token)));
+}
+searchDoctor(token: string): any {
+  let searchObj = { "doctorId": token, "doctorName": token };
+  return this.pacsIpPortService.getTypeaheadDoctorIDName(searchObj);
+}
+
+onCLickRemoveDr() {
+  let result = {
+    "item": {
+      "doctorNo": 0,
+      "doctorId": ""
+    }
+  }
+  this.selectedDoctor = "";
+  this.selectDoctor(result);
+}
+
+//== method for typeahed
+
+ 
+					  
+In Service:
+------------
+  getTypeaheadDoctorIDName(obj: any): Observable<any> {
+    return this.http.post<any>(this.TYPEAHEAD_DOCTOR_ID, obj).pipe(
+      map((data: any) => this.sortByregType(data.items))
+    )
+  }
+  
+  sortByregType(data){
+    if(data == null){
+      return data;
+    }else{
+      return data.sort(sortBy('regType'));
+    }
+  }  
+  
+  
+  
