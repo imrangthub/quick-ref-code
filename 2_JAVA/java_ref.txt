@@ -2671,6 +2671,661 @@ public class OpdRegistrationRepositoryGlobal extends BaseRepository {
 
 }
 
+Repo3
+=====
+
+package com.mysoft.core.consultation.repository;
+
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
+
+import javax.persistence.TypedQuery;
+import javax.persistence.criteria.CriteriaBuilder;
+import javax.persistence.criteria.CriteriaQuery;
+import javax.persistence.criteria.Order;
+import javax.persistence.criteria.Predicate;
+import javax.persistence.criteria.Root;
+import javax.servlet.http.HttpServletRequest;
+import javax.transaction.Transactional;
+
+import org.json.JSONObject;
+import org.springframework.stereotype.Repository;
+import org.springframework.util.CollectionUtils;
+
+import com.mysoft.core.base.BaseRepository;
+import com.mysoft.core.consultation.ViewCoreConsultationEntityMedicareNew;
+import com.mysoft.core.pagination.DataTableRequest;
+import com.mysoft.core.pagination.DataTableResults;
+import com.mysoft.core.util.Def;
+import com.mysoft.core.util.Response;
+import com.mysoft.core.util.UserSignInContainter;
+
+@Repository
+@Transactional
+public class ViewCoreConsulationRepositoryMedicareNew extends BaseRepository {
+
+	@SuppressWarnings({ "rawtypes", "unchecked" })
+	public Response gridList(HttpServletRequest request, UserSignInContainter userDetails) {
+
+		DataTableResults<ViewCoreConsultationEntityMedicareNew> dataTableResults = null;
+		Response response = new Response();
+		ViewCoreConsultationEntityMedicareNew consultationEntity = new ViewCoreConsultationEntityMedicareNew();
+
+		Long doctorNo = userDetails.getDoctorNo();
+		// String consultTypeNoList = request.getParameter("consultTypeNoList");
+		String shiftdtlNo = request.getParameter("shiftdtlNo");
+		String fromDate = request.getParameter("fromDate");
+		String toDate = request.getParameter("toDate");
+		String consultTypeNo = request.getParameter("consultTypeNo");
+		String appointFilter = request.getParameter("appointFilter");
+		String waitingFilter = request.getParameter("waitingFilter");
+		String doneFilter = request.getParameter("doneFilter");
+
+//		if (consultTypeNoList != null && !consultTypeNoList.isEmpty()) {
+//			consultationEntity = objectMapperReadValue(consultTypeNoList, ViewCoreConsultationEntityMedicareNew.class);
+//		}
+
+		if (doctorNo != null) {
+			consultationEntity.setDoctorNo(doctorNo);
+		}
+
+//		if (consultTypeNoList != null && !consultTypeNoList.isEmpty()) {
+//			consultationEntity.setConsultTypeNoList(consultTypeNoList);
+//		}
+
+		if (shiftdtlNo != null && !shiftdtlNo.isEmpty()) {
+			consultationEntity.setShiftdtlNo(Long.parseLong(shiftdtlNo));
+		}
+
+		if (fromDate != null && !fromDate.isEmpty()) {
+			consultationEntity.setFromDate(Def.DateParse(fromDate, "dd-MMM-yyyy"));
+		}
+
+		if (toDate != null && !toDate.isEmpty()) {
+			consultationEntity.setToDate(Def.DateParse(toDate, "dd-MMM-yyyy"));
+		}
+
+		if (consultTypeNo != null && !consultTypeNo.isEmpty()) {
+			consultationEntity.setConsultTypeNo(Long.parseLong(consultTypeNo));
+		}
+
+		if (appointFilter != null && !appointFilter.isEmpty()) {
+			consultationEntity.setAppointFilter(Boolean.parseBoolean(appointFilter));
+		}
+
+		if (waitingFilter != null && !waitingFilter.isEmpty()) {
+			consultationEntity.setWaitingFilter(Boolean.parseBoolean(waitingFilter));
+		}
+
+		if (doneFilter != null && !doneFilter.isEmpty()) {
+			consultationEntity.setDoneFilter(Boolean.parseBoolean(doneFilter));
+		}
+
+		DataTableRequest dataTableInRQ = new DataTableRequest(request);
+		Long totalRowCount = countTypedQuery(consultationEntity, dataTableInRQ);
+
+		List gridList = new ArrayList<>();
+		response = baseList(typedQuery(consultationEntity, dataTableInRQ));
+
+		if (response.isSuccess()) {
+			if (response.getItems() != null) {
+
+				gridList = response.getItems();
+			}
+		}
+
+		dataTableResults = dataTableResults(dataTableInRQ, countTypedQuery(consultationEntity, dataTableInRQ), gridList,
+				totalRowCount);
+
+		response.setItems(null);
+		response.setObj(dataTableResults);
+		return response;
+	}
+
+	@SuppressWarnings({ "rawtypes", "unchecked" })
+	public Response patientPortalPrescriptionGrid(HttpServletRequest request, UserSignInContainter userDetails) {
+
+		DataTableResults<ViewCoreConsultationEntityMedicareNew> dataTableResults = null;
+		Response response = new Response();
+		ViewCoreConsultationEntityMedicareNew consultationEntity = new ViewCoreConsultationEntityMedicareNew();
+
+		String userName = userDetails.getUserName();
+
+		List gridList = new ArrayList<>();
+		Long totalRowCount = 0L;
+		DataTableRequest dataTableInRQ = new DataTableRequest(request);
+		if (userName != null) {
+			consultationEntity.setHospitalId(userName);
+			dataTableInRQ = new DataTableRequest(request);
+			totalRowCount = countTypedQuery(consultationEntity, dataTableInRQ);
+
+			response = baseList(typedQuery(consultationEntity, dataTableInRQ));
+
+			if (response.isSuccess()) {
+				if (response.getItems() != null) {
+
+					gridList = response.getItems();
+				}
+			}
+		}
+
+		dataTableResults = dataTableResults(dataTableInRQ, countTypedQuery(consultationEntity, dataTableInRQ), gridList,
+				totalRowCount);
+
+		response.setItems(null);
+		response.setObj(dataTableResults);
+		return response;
+	}
+
+	@SuppressWarnings({ "rawtypes", "unchecked" })
+	public Response nsGridList(HttpServletRequest request) {
+
+		DataTableResults<ViewCoreConsultationEntityMedicareNew> dataTableResults = null;
+		Response response = new Response();
+		ViewCoreConsultationEntityMedicareNew consultationEntity = new ViewCoreConsultationEntityMedicareNew();
+
+		String shiftdtlNo = request.getParameter("shiftdtlNo");
+		String doctorNo = request.getParameter("doctorNo");
+		String fromDate = request.getParameter("fromDate");
+		String toDate = request.getParameter("toDate");
+
+		if (doctorNo != null && !doctorNo.isEmpty()) {
+			consultationEntity.setDoctorNo(Long.parseLong(doctorNo));
+		}
+
+		if (fromDate != null && !fromDate.isEmpty()) {
+			consultationEntity.setFromDate(Def.DateParse(fromDate, "dd-MMM-yyyy"));
+		}
+
+		if (toDate != null && !toDate.isEmpty()) {
+			consultationEntity.setToDate(Def.DateParse(toDate, "dd-MMM-yyyy"));
+		}
+
+		if (shiftdtlNo != null && !shiftdtlNo.isEmpty()) {
+			consultationEntity.setShiftdtlNo(Long.parseLong(shiftdtlNo));
+		}
+
+		// for flag wise filter
+		String consultTypeNo = request.getParameter("consultTypeNo");
+		String appointFilter = request.getParameter("appointFilter");
+		String waitingFilter = request.getParameter("waitingFilter");
+		String doneFilter = request.getParameter("doneFilter");
+
+		if (consultTypeNo != null && !consultTypeNo.isEmpty()) {
+			consultationEntity.setConsultTypeNo(Long.parseLong(consultTypeNo));
+		}
+
+		if (appointFilter != null && !appointFilter.isEmpty()) {
+			consultationEntity.setAppointFilter(Boolean.parseBoolean(appointFilter));
+		}
+
+		if (waitingFilter != null && !waitingFilter.isEmpty()) {
+			consultationEntity.setWaitingFilter(Boolean.parseBoolean(waitingFilter));
+		}
+
+		if (doneFilter != null && !doneFilter.isEmpty()) {
+			consultationEntity.setDoneFilter(Boolean.parseBoolean(doneFilter));
+		}
+
+		DataTableRequest dataTableInRQ = new DataTableRequest(request);
+		Long totalRowCount = countTypedQuery(consultationEntity, dataTableInRQ);
+
+		List gridList = new ArrayList<>();
+		response = baseList(typedQuery(consultationEntity, dataTableInRQ));
+
+		if (response.isSuccess() && response.getItems() != null) {
+			gridList = response.getItems();
+		}
+		dataTableResults = dataTableResults(dataTableInRQ, countTypedQuery(consultationEntity, dataTableInRQ), gridList,
+				totalRowCount);
+		response.setItems(null);
+		response.setObj(dataTableResults);
+		return response;
+	}
+
+	public Response pharmacyGridList(HttpServletRequest request) {
+		DataTableResults<ViewCoreConsultationEntityMedicareNew> dataTableResults = null;
+		Response response = new Response();
+		ViewCoreConsultationEntityMedicareNew consultationEntity = new ViewCoreConsultationEntityMedicareNew();
+
+		String shiftdtlNo = request.getParameter("shiftdtlNo");
+		String doctorNo = request.getParameter("doctorNo");
+		String fromDate = request.getParameter("fromDate");
+		String toDate = request.getParameter("toDate");
+
+		if (doctorNo != null && !doctorNo.isEmpty()) {
+			consultationEntity.setDoctorNo(Long.parseLong(doctorNo));
+		}
+
+		if (fromDate != null && !fromDate.isEmpty()) {
+			consultationEntity.setFromDate(Def.DateParse(fromDate, "dd-MMM-yyyy"));
+		}
+
+		if (toDate != null && !toDate.isEmpty()) {
+			consultationEntity.setToDate(Def.DateParse(toDate, "dd-MMM-yyyy"));
+		}
+
+		if (shiftdtlNo != null && !shiftdtlNo.isEmpty()) {
+			consultationEntity.setShiftdtlNo(Long.parseLong(shiftdtlNo));
+		}
+
+		// for flag wise filter
+		String consultTypeNo = request.getParameter("consultTypeNo");
+		String appointFilter = request.getParameter("appointFilter");
+		String waitingFilter = request.getParameter("waitingFilter");
+		String doneFilter = request.getParameter("doneFilter");
+
+		if (consultTypeNo != null && !consultTypeNo.isEmpty()) {
+			consultationEntity.setConsultTypeNo(Long.parseLong(consultTypeNo));
+		}
+
+		if (appointFilter != null && !appointFilter.isEmpty()) {
+			consultationEntity.setAppointFilter(Boolean.parseBoolean(appointFilter));
+		}
+
+		if (waitingFilter != null && !waitingFilter.isEmpty()) {
+			consultationEntity.setWaitingFilter(Boolean.parseBoolean(waitingFilter));
+		}
+
+		if (doneFilter != null && !doneFilter.isEmpty()) {
+			consultationEntity.setDoneFilter(Boolean.parseBoolean(doneFilter));
+		}
+
+		DataTableRequest dataTableInRQ = new DataTableRequest(request);
+		Long totalRowCount = countTypedQuery(consultationEntity, dataTableInRQ);
+
+		List gridList = new ArrayList<>();
+		response = baseList(typedQuery(consultationEntity, dataTableInRQ));
+
+		if (response.isSuccess() && response.getItems() != null) {
+			gridList = response.getItems();
+		}
+		dataTableResults = dataTableResults(dataTableInRQ, countTypedQuery(consultationEntity, dataTableInRQ), gridList,
+				totalRowCount);
+		response.setItems(null);
+		response.setObj(dataTableResults);
+		return response;
+	}
+
+	public Response list() {
+		ViewCoreConsultationEntityMedicareNew viewConsultationEntity = null;
+		return baseList(criteriaQuery(viewConsultationEntity));
+	}
+
+	public Response findByOncoConsultationId(String consultationId) {
+		ViewCoreConsultationEntityMedicareNew viewConsultationEntity = new ViewCoreConsultationEntityMedicareNew();
+		viewConsultationEntity.setConsultationId(consultationId);
+		return baseList(criteriaQuery(viewConsultationEntity));
+	}
+
+	public Response listWithFilter(String reqStr) {
+		ViewCoreConsultationEntityMedicareNew viewConsultationEntity = null;
+		if (reqStr != null) {
+			viewConsultationEntity = objectMapperReadValue(reqStr, ViewCoreConsultationEntityMedicareNew.class);
+		}
+		return baseList(criteriaQuery(viewConsultationEntity));
+	}
+
+	public Response doctorWiseConsultationFilter(String reqStr, UserSignInContainter userDetails) {
+		ViewCoreConsultationEntityMedicareNew viewConsultationEntity = null;
+		if (reqStr != null) {
+			viewConsultationEntity = objectMapperReadValue(reqStr, ViewCoreConsultationEntityMedicareNew.class);
+		}
+		if (viewConsultationEntity == null) {
+			viewConsultationEntity = new ViewCoreConsultationEntityMedicareNew();
+		}
+		viewConsultationEntity.setAppointDate(clearTime(new Date()));
+		viewConsultationEntity.setDoctorNo(userDetails.getDoctorNo());
+		return baseList(criteriaQuery(viewConsultationEntity));
+	}
+
+	public Response findConsultationDataByConsultationId(String reqStr, UserSignInContainter userDetails) {
+		ViewCoreConsultationEntityMedicareNew viewConsultationEntity = null;
+		if (reqStr != null) {
+			viewConsultationEntity = objectMapperReadValue(reqStr, ViewCoreConsultationEntityMedicareNew.class);
+		}
+		if (viewConsultationEntity == null) {
+			viewConsultationEntity = new ViewCoreConsultationEntityMedicareNew();
+		}
+		viewConsultationEntity.setDoctorNo(userDetails.getDoctorNo());
+		return baseList(criteriaQuery(viewConsultationEntity));
+	}
+
+	public Response doctorWisePatientWorkList(String reqStr, UserSignInContainter userDetails) {
+		ViewCoreConsultationEntityMedicareNew viewConsultationEntity = null;
+		if (reqStr != null) {
+			viewConsultationEntity = objectMapperReadValue(reqStr, ViewCoreConsultationEntityMedicareNew.class);
+		}
+		if (viewConsultationEntity == null) {
+			viewConsultationEntity = new ViewCoreConsultationEntityMedicareNew();
+		}
+		viewConsultationEntity.setConsultationNoNotNull(true);
+		viewConsultationEntity.setDoctorNo(userDetails.getDoctorNo());
+		return baseList(criteriaQuery(viewConsultationEntity));
+	}
+
+	public Response findByAppointmentNo(Long appointmentNo) {
+
+		Response response = new Response();
+		ViewCoreConsultationEntityMedicareNew viewConsultationEntity = null;
+
+		viewConsultationEntity = findById(appointmentNo);
+		if (null == viewConsultationEntity) {
+			return getErrorResponse("data not found");
+		}
+
+		response.setObj(viewConsultationEntity);
+
+		return getSuccessResponse("data found", response);
+
+	}
+
+	public Response findByConsultationId(String consultationId) {
+
+		Response response = new Response();
+
+		ViewCoreConsultationEntityMedicareNew viewConsultationEntity = new ViewCoreConsultationEntityMedicareNew();
+		viewConsultationEntity.setConsultationId(consultationId);
+		response = baseSingleObject(criteriaQuery(viewConsultationEntity));
+		if (response.isSuccess() && response.getObj() != null) {
+			return getSuccessResponse("Consultation Data Found", response);
+		}
+		return getErrorResponse("Data Not Found");
+
+	}
+	
+	public Response getFutureAppointListFromToday(String hospitalIdStr) {
+		JSONObject json = new JSONObject(hospitalIdStr);
+		String hospitalId = Def.getString(json, "hospitalId");
+		if (hospitalId == null) {
+			return getErrorResponse("hospitalId Not Found!");
+		}
+		ViewCoreConsultationEntityMedicareNew viewConsultationEntity = new ViewCoreConsultationEntityMedicareNew();
+		viewConsultationEntity.setFrmAppDate(new Date());
+		viewConsultationEntity.setHospitalId(hospitalId);
+		return baseList(criteriaQuery(viewConsultationEntity));
+
+	}
+	
+	public Response getConsultationHistory(String hospitalIdStr) {
+		JSONObject json = new JSONObject(hospitalIdStr);
+		String hospitalId = Def.getString(json, "hospitalId");
+		if (hospitalId == null) {
+			return getErrorResponse("hospitalId Not Found!");
+		}
+		ViewCoreConsultationEntityMedicareNew viewConsultationEntity = new ViewCoreConsultationEntityMedicareNew();
+//		viewConsultationEntity.setConsultationOut(1L);
+		viewConsultationEntity.setConsultationNoNotNull(true);
+		viewConsultationEntity.setHospitalId(hospitalId);
+		return baseList(criteriaQuery(viewConsultationEntity));
+
+	}
+
+	public Response maxSlNoByRoomNoAndToday(Long roomNo) {
+
+		Response response = new Response();
+		return response;
+	}
+
+	private Long totalCount(ViewCoreConsultationEntityMedicareNew filter) {
+		CriteriaBuilder builder = criteriaBuilder();
+		CriteriaQuery<Long> criteriaQuery = longCriteriaQuery(builder);
+		Root<ViewCoreConsultationEntityMedicareNew> root = from(ViewCoreConsultationEntityMedicareNew.class,
+				criteriaQuery);
+		return totalCount(builder, criteriaQuery, root, criteriaCondition(filter, builder, root));
+	}
+
+	public ViewCoreConsultationEntityMedicareNew findById(Long id) {
+		ViewCoreConsultationEntityMedicareNew obj = new ViewCoreConsultationEntityMedicareNew();
+		obj.setId(id);
+		Response response = baseFindById(criteriaQuery(obj));
+		if (response.isSuccess()) {
+			return (ViewCoreConsultationEntityMedicareNew) response.getObj();
+		}
+		return null;
+	}
+
+	@SuppressWarnings({ "rawtypes", "unchecked" })
+	private <T> TypedQuery typedQuery(ViewCoreConsultationEntityMedicareNew filter, DataTableRequest<T> dataTableInRQ) {
+		init();
+		List<Predicate> pArrayJoin = new ArrayList<Predicate>();
+		List<Predicate> pConjunction = criteriaCondition(filter, null, null);
+		List<Predicate> pDisJunction = dataTablefilter(dataTableInRQ, ViewCoreConsultationEntityMedicareNew.class);
+		Predicate predicateAND = null;
+		Predicate predicateOR = null;
+
+		if (!CollectionUtils.isEmpty(pConjunction)) {
+			Predicate[] pArray = pConjunction.toArray(new Predicate[] {});
+			predicateAND = builder.and(pArray);
+		}
+		if (!CollectionUtils.isEmpty(pDisJunction)) {
+			Predicate[] pArray = pDisJunction.toArray(new Predicate[] {});
+			predicateOR = builder.or(pArray);
+		}
+		if (predicateAND != null) {
+			pArrayJoin.add(predicateAND);
+		}
+		if (predicateOR != null) {
+			pArrayJoin.add(predicateOR);
+		}
+
+		if (dataTableInRQ.getOrder().getName() != null && !dataTableInRQ.getOrder().getName().isEmpty()) {
+
+			if (dataTableInRQ.getOrder().getSortDir().equals("ASC")) {
+				criteria.orderBy(builder.asc(root.get(dataTableInRQ.getOrder().getName())));
+			} else {
+				criteria.orderBy(builder.desc(root.get(dataTableInRQ.getOrder().getName())));
+			}
+
+		} else {
+
+			List<Order> orderList = new ArrayList();
+
+			orderList.add(builder.asc(root.get("doctorName")));
+			orderList.add(builder.asc(root.get("shiftdtlNo")));
+			orderList.add(builder.asc(root.get("appointDate")));
+			orderList.add(builder.asc(root.get("slotSl")));
+
+			criteria.orderBy(orderList);
+		}
+
+//		Comparator<ViewCoreConsultationEntityMedicareNew> descShiftComp = (
+//		ViewCoreConsultationEntityMedicareNew b1,
+//		ViewCoreConsultationEntityMedicareNew b2) -> b1.getShiftdtlNo().compareTo(b2.getShiftdtlNo());
+//Collections.sort(gridList, descShiftComp);
+//
+//Comparator<ViewCoreConsultationEntityMedicareNew> descDateComp = (
+//		ViewCoreConsultationEntityMedicareNew b1,
+//		ViewCoreConsultationEntityMedicareNew b2) -> b1.getAppointDate().compareTo(b2.getAppointDate());
+//Collections.sort(gridList, descDateComp);
+
+		criteria.where(pArrayJoin.toArray(new Predicate[0]));
+		return baseTypedQuery(criteria, dataTableInRQ);
+	}
+
+	private <T> Long countTypedQuery(ViewCoreConsultationEntityMedicareNew filter, DataTableRequest<T> dataTableInRQ) {
+		CriteriaBuilder builder = criteriaBuilder();
+		CriteriaQuery<Long> criteriaQuery = longCriteriaQuery(builder);
+		Root<ViewCoreConsultationEntityMedicareNew> root = from(ViewCoreConsultationEntityMedicareNew.class,
+				criteriaQuery);
+		return totalCount(builder, criteriaQuery, root, criteriaCondition(filter, builder, root),
+				dataTablefilter(dataTableInRQ, builder, root, ViewCoreConsultationEntityMedicareNew.class));
+	}
+
+	// Non API
+	@SuppressWarnings({ "rawtypes", "unchecked" })
+	private CriteriaQuery criteriaQuery(ViewCoreConsultationEntityMedicareNew filter) {
+		init();
+
+		List<Predicate> p = new ArrayList<Predicate>();
+		p = criteriaCondition(filter, null, null);
+
+		if (!CollectionUtils.isEmpty(p)) {
+			Predicate[] pArray = p.toArray(new Predicate[] {});
+			Predicate predicate = builder.and(pArray);
+			criteria.where(predicate);
+		}
+
+		List<Order> orderList = new ArrayList();
+
+		orderList.add(builder.asc(root.get("appointDate")));
+		orderList.add(builder.asc(root.get("shiftdtlNo")));
+		orderList.add(builder.asc(root.get("slotSl")));
+
+		criteria.orderBy(orderList);
+
+		return criteria;
+	}
+
+	@SuppressWarnings({ "rawtypes", "unchecked", "unused" })
+	private CriteriaQuery maxQuery(ViewCoreConsultationEntityMedicareNew filter, String maxColumnName) {
+		init();
+
+		List<Predicate> p = new ArrayList<Predicate>();
+		p = criteriaCondition(filter, null, null);
+
+		if (!CollectionUtils.isEmpty(p)) {
+			Predicate[] pArray = p.toArray(new Predicate[] {});
+			Predicate predicate = builder.and(pArray);
+			criteria.where(predicate);
+		}
+		criteria.select(builder.max(root.get(maxColumnName)));
+		return criteria;
+	}
+
+	@SuppressWarnings({ "unchecked" })
+	private List<Predicate> criteriaCondition(ViewCoreConsultationEntityMedicareNew filter, CriteriaBuilder builder,
+			Root<ViewCoreConsultationEntityMedicareNew> root) {
+
+		if (builder == null) {
+			builder = super.builder;
+		}
+		if (root == null) {
+			root = super.root;
+		}
+
+		List<Predicate> p = new ArrayList<Predicate>();
+
+		if (filter != null) {
+
+			if (filter.getId() != null && filter.getId() > 0) {
+				Predicate condition = builder.equal(root.get("id"), filter.getId());
+				p.add(condition);
+			}
+
+			if (filter.getDoctorNo() != null && filter.getDoctorNo() > 0) {
+				Predicate condition = builder.equal(root.get("doctorNo"), filter.getDoctorNo());
+				p.add(condition);
+			}
+
+			if (filter.getHospitalId() != null) {
+				Predicate condition = builder.equal(root.get("hospitalId"), filter.getHospitalId());
+				p.add(condition);
+			}
+
+			if (filter.getPatientName() != null) {
+				Predicate condition = builder.equal(root.get("patientName"), filter.getPatientName());
+				p.add(condition);
+			}
+
+			if (filter.getGender() != null) {
+				Predicate condition = builder.equal(root.get("gender"), filter.getGender());
+				p.add(condition);
+			}
+
+			if (filter.getRegistrationNo() != null) {
+				Predicate condition = builder.equal(root.get("registrationNo"), filter.getRegistrationNo());
+				p.add(condition);
+			}
+
+			if (filter.getConsultationId() != null) {
+				Predicate condition = builder.like(builder.upper(root.get("consultationId")),
+						"%" + filter.getConsultationId().toUpperCase() + "%");
+				p.add(condition);
+			}
+			if (filter.getConsultationNoNotNull()) {
+				Predicate condition = builder.isNotNull(root.get("consultationNo"));
+				p.add(condition);
+			}
+//			if (filter.getConsultTypeNo() != null) {
+//				Predicate condition = builder.equal(root.get("consultTypeNo"), filter.getConsultTypeNo());
+//				p.add(condition);
+//			}
+			if (filter.getShiftdtlNo() != null) {
+				Predicate condition = builder.equal(root.get("shiftdtlNo"), filter.getShiftdtlNo());
+				p.add(condition);
+			}
+			if (filter.getAppointDate() != null) {
+				Predicate condition = builder.equal(builder.function("TRUNC", Date.class, root.get("appointDate")),
+						filter.getAppointDate());
+				p.add(condition);
+			}
+
+			if (filter.getFromDate() != null && filter.getToDate() != null) {
+				Date fromDate = addMinTime(filter.getFromDate());
+				Date toDate = addMaxTime(filter.getToDate());
+				Predicate condition = builder.between(root.get("appointDate"), fromDate, toDate);
+				p.add(condition);
+			}
+			if (filter.getConsultationOut() != null && filter.getConsultationOut() > 0) {
+				Predicate condition = builder.equal(root.get("consultationOut"), filter.getConsultationOut());
+				p.add(condition);
+			}
+			if (filter.getConsultTypeNo() != null && filter.getConsultTypeNo() > 0) {
+				Predicate condition = builder.equal(root.get("consultTypeNo"), filter.getConsultTypeNo());
+				p.add(condition);
+			}
+			if (filter.getAppointFilter()) {
+				Predicate condition = builder.isNull(root.get("consultationId"));
+				p.add(condition);
+			}
+			if (filter.getWaitingFilter()) {
+				Predicate condition = builder.and(builder.isNotNull(root.get("consultationId")),
+						builder.equal(root.get("consultationIn"), 1), builder.isNull(root.get("prescriptionNo")));
+				p.add(condition);
+			}
+			if (filter.getDoneFilter()) {
+				Predicate condition = builder.and(builder.isNotNull(root.get("prescriptionNo")),
+						builder.equal(root.get("isPatientOut"), 1));
+				p.add(condition);
+			}
+			if (filter.getConsultationOut() != null) {
+				Predicate condition = builder.equal(root.get("consultationOut"), filter.getConsultationOut());
+				p.add(condition);
+			}
+			if (filter.getFrmAppDate() != null) {
+				Date fromDate = addMinTime(filter.getFrmAppDate());
+//				Predicate condition = builder.between(root.get("appointDate"), fromDate, toDate);
+				Predicate condition = builder.greaterThanOrEqualTo(root.<Date>get("appointDate"), fromDate);
+				p.add(condition);
+			}
+
+			
+//			if (filter.getConsultTypeNoList() != null && filter.getConsultTypeNoList().size() > 0) {
+//				Expression<Long> exp = root.get("consultTypeNo");
+//				Predicate condition = exp.in(filter.getConsultTypeNoList());
+//				p.add(condition);
+//			}
+
+			// Predicate condition = builder.isNotNull(root.get("consultationId"));
+			// p.add(condition);
+		}
+
+		return p;
+	}
+
+	@SuppressWarnings({ "unused", "rawtypes" })
+	private void init() {
+		initEntityManagerBuilderCriteriaQueryRoot(ViewCoreConsultationEntityMedicareNew.class);
+		CriteriaBuilder builder = super.builder;
+		CriteriaQuery criteria = super.criteria;
+		Root root = super.root;
+	}
+
+}
+
+
 -------------------------------------------------
 
 Typeahead | autocomplete | Serverside
@@ -2919,5 +3574,7 @@ In Service:
     }
   }  
   
+  
+//===============================================  
   
   

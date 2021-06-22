@@ -102,6 +102,56 @@ C:\> mysqld --init-file=C:\\mysql-init.txt
 
 
 
+# Date Convater                                          
+-------------------------------------------------
+
+  
+Oracle:
+
+Date to String
+  -- Convert the current date to YYYY-MM-DD format
+  SELECT TO_CHAR(SYSDATE, 'YYYY-MM-DD') FROM dual;
+==  
+  Convert to string with the default format
+  SELECT TO_CHAR(SYSDATE) FROM dual;
+ 
+ String to Date
+ SELECT TO_DATE( '5 Jan 2017', 'DD MON YYYY' ) FROM dual; 
+ SELECT TO_DATE('2015/05/15 8:30:25', 'YYYY/MM/DD HH:MI:SS') FROM dual;
+  
+SQL Server:
+Date to Stirng
+  -- Convert the current date to YYYY-MM-DD format
+  SELECT CONVERT(VARCHAR(10), GETDATE(), 120);
+  
+String to Date
+ -- Specify a datetime string and style 102 (ANSI format), raises an error if conversion fails
+  SELECT CONVERT(DATETIME, '2012-06-05', 102);
+ 
+  -- TRY_CONVERT available since SQL Server 2012 (returns NULL if conversion fails)
+  SELECT TRY_CONVERT(DATETIME, '2012-06-05', 102);
+
+
+# Group By | having | duplicated value                                       
+-------------------------------------------------
+
+SELECT 
+    INVOICE_NO,
+    COUNT(*)
+FROM 
+    bill_invoicedtl
+    group by 
+     INVOICE_NO
+    having count(*)>40;
+
+
+# Date equal                                          
+-------------------------------------------------	
+select *
+from bill_invoicedtl
+where REPORT_DELIVERY_DATE = to_date('01/01/2016', 'dd/mm/yyyy')
+
+	
 # Date between                                          
 -------------------------------------------------
 
