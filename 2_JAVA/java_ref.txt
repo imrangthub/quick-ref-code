@@ -2,6 +2,10 @@
 #                 JAVA                          #
 #################################################
 
+
+	@Id
+	@GeneratedValue(strategy = GenerationType.AUTO)
+	
 =================================================
 #         Convater | Param  | Json                                        
 ================================================= 
@@ -53,7 +57,7 @@ if (fromDate != null && toDate != null) {
 
 
 ================================================
-#          List | Filter | Array  | Short                                       
+#  Object Mapping | List | Filter | Array  | Short                                       
 ================================================= 
 
 #List From Response Obj
@@ -64,10 +68,75 @@ if (response.isSuccess() && !CollectionUtils.isEmpty(response.getItems())) {
 departmentList = getListFromObject(response.getItems(), ViewDepartmentEntity.class);
 
 
+Response response = baseFindById(criteriaQuery(userFeatureEntity));
+ if (response.isSuccess() && response.getObj()!=null) {
+  return getValueFromObject(response.getObj(), ShareUserFeatureEntity.class);
+}
+
+if (dataStr != null && !dataStr.equals("{}")) {
+	passKioskRes = new PassportKioskResDto();
+	passKioskRes = objectMapperReadValue(dataStr, PassportKioskResDto.class);
+}
+
+String clinicalHistoryListStr = Def.getArrayString(json, "clinicalHistoryList");
+String daycareServiceListStr = Def.getArrayString(json, "daycareServiceList");
+
+Map<String, Object> prescriptionData = new HashMap<String, Object>();
+
+if (prescriptionStr != null && !prescriptionStr.equals("{}")) {
+	prescriptionEntity = objectMapperReadValue(prescriptionStr, PrescriptionEntityMedicareNew.class);
+	if (prescriptionEntity != null) {
+		prescriptionData.put("prescriptionEntity", prescriptionEntity);
+	}
+
+}
+if (vitalStr != null && !vitalStr.equals("[]")) {
+	vitalList = objectMapperReadArrayValue(vitalStr, PrescriptionDetailsEntityMedicareNew.class);
+	if (vitalList != null) {
+		prescriptionData.put("vitalList", vitalList);
+	}
+}
+
+
+
+String personalInfoStr = Def.getString(json, "personalInfo");
+if (personalInfoStr != null && !personalInfoStr.equals("{}")) {
+	StudentPersonalInfoEntity personalInfo = null;
+	personalInfo = objectMapperReadValue(personalInfoStr, StudentPersonalInfoEntity.class);
+	personalInfo.setStudentNo(studentObj.getId());
+	response = personalInfoService.saveObj(personalInfo);
+	if (!response.isSuccess()) {
+		porcContinueFlg = false;
+		response.setSuccess(false);
+		response.setObj(personalInfo);
+		response.setMessage("Personal Info save failed !");
+		return response;
+	}
+}
+
+String familyInfoListStr = Def.getString(json, "familyInfoList");
+if (familyInfoListStr != null && !familyInfoListStr.equals("[]")) {
+	List<StudentFamilyInfoEntity> familyInfoList = null;
+	familyInfoList = objectMapperReadArrayValue(familyInfoListStr, StudentFamilyInfoEntity.class);
+	if (familyInfoList != null) {
+		boolean isSave = familyInfoService.saveFamilyMember(familyInfoList, studentObj.getId());
+		if (!isSave) {
+			porcContinueFlg = false;
+			response.setSuccess(false);
+			response.setObj(familyInfoList);
+			response.setMessage("Family Info save failed !");
+			return response;
+		}
+	}
+}				
+				
 #List Short by Name
 -------------------------------------------------
 departmentList = departmentList.stream().sorted((a1, a2) -> a1.getBuName().compareTo(a2.getBuName()))
 					.collect(Collectors.toList());	
+
+
+
 
 
 #Filter a list of object by its list field
@@ -95,6 +164,10 @@ allMatch will only give you Students that all their Courses are named "Algorithm
 
 anyMatch will give you all Students that have at least one Course named "Algorithms"
 
+
+Person matchingObject = objects.stream().
+filter(p -> p.email().equals("testemail")).
+findAny().orElse(null);
 
 =================================================
 #         Query | sql call                                      

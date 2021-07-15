@@ -241,6 +241,292 @@ and o.USER_NO =1190000001917;
 #           ORACLE | USER| SESSION
 =================================================
 
+#Create SEQUENCE
+=================
+DROP SEQUENCE MEDICARE.SEQ_REG_NO;
+CREATE SEQUENCE MEDICARE.SEQ_REG_NO
+  START WITH 394320
+  MAXVALUE 9999999999
+  MINVALUE 1
+  CYCLE
+  NOCACHE
+  NOORDER;
+------------
+DROP SEQUENCE MEDICARE.SEQ_REG_ID;
+CREATE SEQUENCE MEDICARE.SEQ_REG_ID
+  START WITH 1
+  MAXVALUE 999999
+  MINVALUE 1
+  CYCLE
+  NOCACHE
+  NOORDER;  
+-------------
+DROP SEQUENCE MEDICARE.SEQ_IN_ITEM_NO;
+CREATE SEQUENCE MEDICARE.SEQ_IN_ITEM_NO
+  START WITH 2
+  MAXVALUE 999999
+  MINVALUE 1
+  CYCLE
+  NOCACHE
+  NOORDER;  
+-------------
+DROP SEQUENCE MEDICARE.SEQ_IN_ITEM_ID;
+CREATE SEQUENCE MEDICARE.SEQ_IN_ITEM_ID
+  START WITH 6
+  MAXVALUE 9999
+  MINVALUE 1
+  CYCLE
+  NOCACHE
+  NOORDER;
+--------------
+DROP SEQUENCE MEDICARE.SEQ_INVOICE_NO;
+CREATE SEQUENCE MEDICARE.SEQ_INVOICE_NO
+  START WITH 512708
+  MAXVALUE 9999999999
+  MINVALUE 1
+  CYCLE
+  NOCACHE
+  NOORDER;  
+ -------------
+DROP SEQUENCE MEDICARE.SEQ_INVOICE_ID;
+CREATE SEQUENCE MEDICARE.SEQ_INVOICE_ID
+  START WITH 1
+  MAXVALUE 999999
+  MINVALUE 1
+  CYCLE
+  NOCACHE
+  NOORDER;
+--------------
+DROP SEQUENCE MEDICARE.SEQ_IN_INVOICEDTL_NO;
+CREATE SEQUENCE MEDICARE.SEQ_IN_INVOICEDTL_NO
+  START WITH 1
+  MAXVALUE 9999999999
+  MINVALUE 1
+  CYCLE
+  NOCACHE
+  NOORDER;
+-----------
+DROP SEQUENCE MEDICARE.SEQ_IN_INVOICEDTL_ID;
+
+CREATE SEQUENCE MEDICARE.SEQ_IN_INVOICEDTL_ID
+  START WITH 1
+  MAXVALUE 999999
+  MINVALUE 1
+  CYCLE
+  NOCACHE
+  NOORDER;
+  
+#Create Function
+==================
+CREATE OR REPLACE function fd_dob (p_year number default 0, p_month number default 0, p_day number default 0)
+return date
+as  
+begin
+    return trunc(sysdate) - (nvl(p_day,0) + (nvl(p_month,0) * 30) + (nvl(p_year,0) * 365));
+exception when others then 
+    return sysdate;  
+end;
+/
+
+
+#Function2
+==========
+CREATE OR REPLACE function fd_session_no (p_og_no number, p_company_no number) 
+return number
+    is
+    v_val   number;  
+begin
+        
+    select seq_session.nextval into v_val from dual;
+
+    return to_number (p_og_no||p_company_no || to_char (sysdate, 'RRMMDD') || v_val);
+        
+exception
+    when others then return 1;
+end;
+/
+
+#Funcation3
+=============
+CREATE OR REPLACE function F_PASSWORD(p_username in varchar2, p_password in varchar2)
+return varchar2
+is
+begin
+  return dbms_obfuscation_toolkit.md5
+     (input =>
+         utl_raw.cast_to_raw(upper(p_username)||'/'||p_password)
+     );
+end f_Password;
+/
+
+#Funcation4
+==============
+CREATE OR REPLACE function fd_age_calculator (p_date_of_birth   date)
+return varchar2
+is
+    vYears   number :=  0;
+    vMonths  number :=  0;
+    vDays    number :=  0;
+    bd       number := 0;
+    cd       number := 0;
+    v_last_md   varchar2(30);
+    v_last_md_chk   date;
+    vReturn  varchar2(500) := null;
+begin
+
+    begin
+        vYears    :=  trunc (months_between(sysdate,p_date_of_birth)/12);
+        vMonths   :=  trunc (mod (months_between(sysdate,p_date_of_birth),12));
+        
+        bd        :=  to_number (to_char (p_date_of_birth,'dd'));
+        cd        :=  to_number (to_char (sysdate,'dd'));
+        
+        if bd < cd then
+            vDays := cd - bd;
+        elsif bd > cd then
+            begin
+                v_last_md := to_char (p_date_of_birth,'dd')||to_char (add_months (sysdate,-1),'mmrrrr');
+                v_last_md_chk := to_date (v_last_md,'ddmmrrrr');
+            exception
+                when others then
+                v_last_md := to_char (last_day(add_months (sysdate,-1)),'ddmmrrrr');
+            end;
+            vDays     := trunc (sysdate) - to_date (v_last_md,'ddmmrrrr');
+        end if;
+        
+        vReturn :=  (case when abs(vYears) >= 1 then abs(vYears) ||'Y ' end)||
+                    (case when abs(vMonths) >= 1 then abs(vMonths) ||'M ' end)||
+                    (case when vDays >= 1 then vDays ||'D ' end);
+    exception
+        when others then null;
+    end;
+    
+    return vReturn;
+
+end fd_age_calculator;
+/
+
+
+
+#Create Package
+===============
+
+CREATE OR REPLACE PACKAGE K_PARAMETER   // Declared Package
+IS
+V_OG_NO             NUMBER;
+V_COMPANY_NO        NUMBER;
+V_INVOICE_NO        NUMBER;
+V_INVOICE_ID        VARCHAR2(50);
+V_LAB_NO            NUMBER;
+V_LAB_ID            VARCHAR2(50);
+V_INVOICE_STDT      DATE;
+V_INVOICE_ENDT      DATE;
+V_STATUS            VARCHAR2(4000);
+V_COUNTRY           VARCHAR2(4000);
+V_BU_NO             NUMBER;
+V_STAMP_NO          NUMBER;
+V_ADMISSION_NO      NUMBER;
+V_ADMISSION_ID      VARCHAR2(50);
+V_CONSULTATION_NO   NUMBER;
+V_STORE_NO          NUMBER;
+V_PHR_REQ_NO        NUMBER;
+V_STORE_REQ_NO      NUMBER;
+V_DK_REQ_NO         NUMBER;
+V_NS_REQ_NO         NUMBER;
+V_NS_TRN_NO         NUMBER;
+V_PUR_ORD_NO        NUMBER;
+V_ITEM_NO           NUMBER;
+V_NS_NO             NUMBER;
+V_HL_TRN_NO         NUMBER;
+V_CSD_TRN_NO        NUMBER;
+
+FUNCTION FD_GET_OG_NO RETURN NUMBER;
+PROCEDURE PD_SET_OG_NO (P_OG_NO NUMBER);
+
+END K_PARAMETER;
+/
+-------------------------------
+
+CREATE OR REPLACE PACKAGE BODY educare.K_PARAMETER // Defined Package Body
+IS
+FUNCTION FD_GET_OG_NO
+RETURN NUMBER
+IS
+BEGIN
+    RETURN(V_OG_NO);
+END;
+PROCEDURE PD_SET_OG_NO (P_OG_NO NUMBER)
+IS
+BEGIN
+    V_OG_NO := P_OG_NO;
+END;
+
+END K_PARAMETER;
+/
+
+
+#Create VIEW
+=============
+CREATE OR REPLACE FORCE VIEW HPMS_PATIENT_TYPE_V
+AS
+    SELECT p.pat_type_no,
+           p.pat_type_name,
+           p.reg_no,
+           p.ss_creator,
+           p.ss_created_on,
+           p.ss_created_session,
+           p.ss_modifier,
+           p.ss_modified_on,
+           p.ss_modified_session,
+           p.og_no,
+           o.og_name,
+           p.company_no,
+           c.company_name,
+           p.active_stat,
+           p.TYPE
+      FROM hpms_patient_type p, sa_org o, sa_company c
+     WHERE p.og_no = o.og_no AND p.company_no = c.company_no;
+	 
+View2
+======
+CREATE OR REPLACE FORCE VIEW SA_LOOKUPDTL_V
+
+AS
+    SELECT l.lookup_no,
+           l.lookup_name,
+           d.lookupdtl_no,
+           d.lookdtl_name,
+           d.description,
+           d.active_stat,
+           d.sl_no,
+           d.ss_creator,
+           d.ss_created_on,
+           d.ss_created_session,
+           d.ss_modifier,
+           d.ss_modified_on,
+           d.ss_modified_session,
+           d.company_no,
+           c.company_name,
+           d.og_no,
+           o.og_name,
+           d.lookdtl_name_map
+      FROM sa_lookup     l,
+           sa_lookupdtl  d,
+           sa_org        o,
+           sa_company    c
+     WHERE     l.lookup_no = d.lookup_no
+           AND d.og_no = o.og_no
+           AND d.company_no = c.company_no
+           AND d.company_no =
+               NVL (k_parameter.fd_get_company_no, d.company_no);
+			   
+			   
+			   
+			   
+//--------------------------------------------
+
+
+  
 Sessions can be killed from within WinSQL using the ALTER SYSTEM KILL SESSION syntax.
 First identify the offending session as follows:
 SELECT s.sid,
