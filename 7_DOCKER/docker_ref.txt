@@ -70,6 +70,8 @@ Retag the image with a version number:
 
 
 
+
+
 # Pull Images | download Images
 -------------------------------------------------
 =>docker pull imranmadbar/docker-spring-boot-mysql
@@ -82,9 +84,6 @@ Pull image with a version number:
 # Run Images as container
 -------------------------------------------------
 =>docker run --name containerName -p 8080:8080 -d imageName:tagName
-
-=>docker run -d -p 3306:3306 --name=spring-boot-mysql-oauth2-db --env="MYSQL_ROOT_PASSWORD=root" --env="MYSQL_DATABASE=mysqloauth2db" -it mysql:5.7
-
 
 =>docker run --name oauth2-authorization-server-api -p 8081:8081 imranmadbar/oauth2-authorization-server-api:1.0.0.RELEASE
 =>docker run --name docker-spring-security-mysql-mvc-prod -p 8181:8181 imranmadbar/docker-spring-security-mysql-mvc-prod:2.0.0.RELEASE
@@ -100,7 +99,10 @@ Pull image with a version number:
 
 # Run Images as container
 -------------------------------------------------
-docker run --name docker-spring-boot-mysql -t --link mysql-dkr-contr-db:mysql-dkr-contr-db -d -p 8080:8181 imranmadbar/docker-spring-boot-mysql
+=>docker run -d -p 3306:3306 --name=spring-boot-mysql-oauth2-db --env="MYSQL_ROOT_PASSWORD=root" --env="MYSQL_DATABASE=mysqloauth2db" -it mysql:5.7
+
+=>docker run --name oauth2-authorization-server-api -t --link spring-boot-mysql-oauth2-db:spring-boot-mysql-oauth2-db -p 8181:8081 imranmadbar/oauth2-authorization-server-api:1.0.0.RELEASE
+=>docker run --name oauth2-resource-server-api -t --link spring-boot-mysql-oauth2-db:spring-boot-mysql-oauth2-db -p 8282:8082 imranmadbar/oauth2-resource-server-api:1.0.0.RELEASE
 
 
 

@@ -18,6 +18,21 @@ C:\Program Files\MySQL\MySQL Server 8.0\bin
 
 Check Version 
 =>mysql -h localhost -V
+=>mysql -V
+=SELECT VERSION();
+=>SHOW VARIABLES LIKE "%version%"
+
+what character set a MySQL database / table / column is?
+=>SHOW VARIABLES LIKE 'character_set%';
+=>SELECT SCHEMA_NAME 'database', default_character_set_name 'charset', DEFAULT_COLLATION_NAME 'collation' FROM information_schema.SCHEMATA;
+
+Alter Charecter SET
+=>ALTER DATABASE dbname CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+=>ALTER DATABASE databasename CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+=>ALTER TABLE tablename CONVERT TO CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+
+=>ALTER DATABASE databasename CHARACTER SET utf8 COLLATE utf8_unicode_ci;
+=>ALTER TABLE tablename CONVERT TO CHARACTER SET utf8 COLLATE utf8_unicode_ci;
 
 Check user
 =>SELECT host, user FROM mysql.user;
@@ -82,6 +97,15 @@ Then Do:
 
 C:\> cd "C:\Program Files\MySQL\MySQL Server 5.7\bin"
 C:\> mysqld --init-file=C:\\mysql-init.txt
+
+
+=================================================
+#              DELETE                                          
+================================================= 
+
+SET SQL_SAFE_UPDATES = 0;
+delete  FROM mcvmysqldb.sa_lookupdtl;
+SET SQL_SAFE_UPDATES = 1;
 
 
 =================================================
