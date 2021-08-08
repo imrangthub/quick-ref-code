@@ -75,6 +75,14 @@ if (fromDate != null && toDate != null) {
 
 #List From Response Obj
 -------------------------------------------------
+
+response = resultEntryTemplateAuthorInfo.getConsultantInfo();
+if (response.isSuccess() && response.getItems() != null) {
+	consultationInfoList = copyPropertiesEntityListToDtoList(response.getItems(),
+			ResultEntryTemplateAuthorInfoDto.class);
+	resMap.put("consultationInfoList", consultationInfoList);
+}
+			
 List<ViewDepartmentEntity> departmentList = new ArrayList<>();	
 	
 if (response.isSuccess() && !CollectionUtils.isEmpty(response.getItems())) {
