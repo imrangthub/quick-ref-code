@@ -9,50 +9,109 @@ Trello:imranbs23trl
 258369
 
 
-keycloak
-
-
-
-Spicess
-------------------------------------------------
-
-Bhai
-Bhaiya 
-LunchBreak
-ForASRSalah
-AssalamuAlaikum
-AssalamuAlaikumBhaiya
-WalaikumusSalam
-
-I will introduce you with the team members shortly
-
-Facing some issues when trying to run project, Need your assistance
-
-Sure, let's keep in touch! 
-
-
-Need a little discussion about this
-
-Please  give me some time for it
-
-
-For Banglalink Project
+Server Deployment
 ==========================================
+/app/apihub/octopus
+=>ps -fC java
+=>kill -9 34071
+=>nohup java -jar 
+=>nohup java -jar identity-register-1.0.0.jar &
+=>nohup java -jar discovery-eureka-1.0.0.jar --spring.profiles.active=pre-prod-neir &
+=>tail -f nohup.out
 
-1) Project Structure:-
-   The Project Domain, 
-   How many Services their role, 
-   Service Architecture, 
-   API Data flow,
-   Service communication,
 
-2) Security policy
-   
-3) Technology and code base
+java -jar -Dserver.port=8083 apihub-big-data-0.0.1-SNAPSHOT.jar
 
-4) Developing and Testing environment
+java -jar -Dspring.profiles.active=dev-bl apihub-big-data-0.0.1-SNAPSHOT.jar
 
-5) About Existing issues and requirement.  
+java -jar -Dspring.profiles.active=dev-bl apihub-big-data-0.0.1-SNAPSHOT.jar --server.port=8083
+
+
+find out which process is listing upon a port
+=>netstat -tulpn
+=>netstat -tulpn | grep :9940
+
+
+
+=================================================
+#              NEIR                                      
+=================================================   
+NEIR Server Information
+==============================
+veonapi
+172.16.254.122
+DMZ
+TEST
+
+GZVLAPIHDEV02
+172.16.7.90
+LAN
+TEST
+
+------------------- 
+
+GZVLAM01
+172.16.254.52
+DMZ
+PRE-PROD
+
+GZVLAPIHUB15
+172.16.11.16
+LAN
+PRE-PROD
+
+------------------
+
+GZVLDOPENAPI01
+172.16.254.25
+DMZ
+PROD
+
+GZVLDOPENAPI02
+172.16.254.26
+DMZ
+PROD
+
+GZVLLOPENAPI01
+172.16.11.34
+LAN
+PROD
+
+GZVLLOPENAPI02
+172.16.11.35
+LAN
+PROD
+------------------------------------
+
+scp -r /app/apihub/neir apihub@172.16.254.52:/app/apihub/neir
+scp -r /app/apihub/neir apihub@172.16.254.25:/app/apihub/neir
+scp -r /app/apihub/neir apihub@172.16.254.26:/app/apihub/neir
+
+scp -r /app/apihub/neir apihub@172.16.11.16:/app/apihub/neir
+scp -r /app/apihub/neir apihub@172.16.11.34:/app/apihub/neir
+
+cd /app/apihub/neir/app-management/discovery-server
+cd /app/apihub/neir/app-management/discovery-eureka
+
+nohup java -jar discovery-eureka-1.0.0.jar --spring.profiles.active=pre-prod-neir &
+
+cd /app/apihub/app-management/configuration-server
+cd /app/apihub/neir/api-gw/edge
+
+nohup java -jar edge-1.0.0.jar --spring.profiles.active=dev-bl-neir &
+
+cd /app/apihub/neir/microservice/identity-register
+
+nohup java -jar identity-register-1.0.0.jar &
+
+java -jar discovery-eureka-1.0.0.jar --spring.profiles.active=prod-neir
+
+
+http://172.16.254.52:7180/swagger-ui/index.html
+
+
+
+
 
 
 
