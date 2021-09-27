@@ -9,9 +9,7 @@ Kernel Version
 
 =>ps -fC java
 =>kill -9 34071
-=>nohup java -jar 
-=>nohup java -jar identity-register-1.0.0.jar &
-=>nohup java -jar discovery-eureka-1.0.0.jar --spring.profiles.active=pre-prod-neir &
+=>nohup java -jar simple-service.jar --spring.profiles.active=pre-prod &
 =>tail -f nohup.out
 
 
@@ -36,7 +34,7 @@ then
 
 
 =================================================
-#    Copy ~  File or Directory                                          
+#    File or Directory  | Operation                                        
 ================================================= 
 scp localmachine/path_to_the_file username@server_ip:/path_to_remote_directory
 
@@ -44,3 +42,20 @@ scp localmachine/path_to_the_file username@server_ip:/path_to_remote_directory
 
 =>cat tast.txt
 =>vim test.txt
+
+=>rm test.txt
+delete a file
+
+
+=================================================
+#    Jar Operation                                      
+================================================= 
+Run a Jar
+
+=>java -jar -Dserver.port=8083 simpleJar.jar
+=>java -jar -Dspring.profiles.active=dev-bl spring-service-with-profile.jar
+=>java -jar -Dspring.profiles.active=dev-bl service-with-port.jar --server.port=8083
+
+find out which process is listing upon a port
+=>netstat -tulpn
+=>netstat -tulpn | grep :9940
