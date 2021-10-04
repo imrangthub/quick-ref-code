@@ -125,3 +125,37 @@ install:install-file -Dfile=/home/imran/JAR_LIBRARY/ReportFont/Arial-Narrow-Ital
 install:install-file -Dfile=/home/imran/LIBRARY_AND_JAR/ReportFont/segoeui.jar -DgroupId=com.mysoft.report-font -DartifactId=segoeui -Dversion=1.0.1 -Dpackaging=jar -DgeneratePom=true
 install:install-file -Dfile=/home/imran/Desktop/odbcjar/ojdbc7.jar -DgroupId=com.oracle -DartifactId=ojdbc7 -Dversion=12.1.0 -Dpackaging=jar -DgeneratePom=true
 install:install-file -Dfile=/home/imran/JAR_LIBRARY/ReportFont/segoeui.jar   -DgroupId=com.mysoft.report-font -DartifactId=segoeui -Dversion=1.0.1 -Dpackaging=jar    -DgeneratePom=true
+
+
+=================================================
+#  keycloak                                          
+================================================= 
+
+https://www.tutorialsbuddy.com/keycloak-mysql-setup
+https://www.appsdeveloperblog.com/keycloak-configure-mysql-database/
+https://sunitkatkar.blogspot.com/2020/07/setting-up-keycloak-10-with-mysql-8-on.html
+
+
+#Mysql server with keycloak
+-------------------------------------------------
+
+=>CREATE DATABASE keycloakdb CHARACTER SET utf8 COLLATE utf8_unicode_ci;
+Create a database in MySQL with the utf8 character set
+
+
+=>CREATE USER 'keycloakadmin'@'%' IDENTIFIED WITH mysql_native_password BY 'keycloak123';
+Create a database user for Keycloak
+
+=>GRANT ALL PRIVILEGES ON keycloakdb.* TO 'keycloakadmin'@'%';
+--- Tell the server to reload the grant tables
+--- by performing a flush privileges operation
+=>FLUSH PRIVILEGES;
+
+Grant all privileges
+
+
+=>SHOW GLOBAL variables like "default_storage%"
+Should output: default_storage_engine InnoDB
+
+=>SET GLOBAL default_storage_engine = 'InnoDB';
+If storage engine is not InnoDB, use this to set it

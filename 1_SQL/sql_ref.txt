@@ -16,13 +16,16 @@ TO_DATE.*\),
 -------------------------------------------------
 C:\Program Files\MySQL\MySQL Server 8.0\bin
 
-Check Version 
+#Check Version
+-------------------- 
 =>mysql -h localhost -V
 =>mysql -V
 =SELECT VERSION();
 =>SHOW VARIABLES LIKE "%version%"
 
-what character set a MySQL database / table / column is?
+
+#what character set a MySQL database / table / column is?
+----------------------------------------------------------------
 =>SHOW VARIABLES LIKE 'character_set%';
 =>SELECT SCHEMA_NAME 'database', default_character_set_name 'charset', DEFAULT_COLLATION_NAME 'collation' FROM information_schema.SCHEMATA;
 
@@ -34,12 +37,22 @@ Alter Charecter SET
 =>ALTER DATABASE databasename CHARACTER SET utf8 COLLATE utf8_unicode_ci;
 =>ALTER TABLE tablename CONVERT TO CHARACTER SET utf8 COLLATE utf8_unicode_ci;
 
-Check user
-=>SELECT host, user FROM mysql.user;
+#Ensure that your databse engine is InnoDB
+-----------------------------------------------
+Should output: default_storage_engine InnoDB
+=>SHOW GLOBAL variables like "default_storage%"
 
-Current User
+If storage engine is not InnoDB, use this to set it
+=>SET GLOBAL default_storage_engine = 'InnoDB';
+
+
+
+#Current User
 ----------------
 select user();
+
+Check user
+=>SELECT host, user FROM mysql.user;
 
 UserLogin
 -----------
