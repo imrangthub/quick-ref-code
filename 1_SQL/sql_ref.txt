@@ -658,20 +658,12 @@ JOIN gv$process p ON p.addr = s.paddr AND p.inst_id = s.inst_id
 WHERE s.type != 'BACKGROUND';
 
 
-
 =================================================
-#                   No-SQL                                          
+#      No-SQL  | CASSANDRA                                          
 ================================================= 
 
+=>Set-ExecutionPolicy Unrestricted
 
-=================================================
-#                   CASSANDRA                                          
-================================================= 
-
-Docker:
--------------------
-=>docker pull cassandra:3.11
-=>docker run --name cassandradb -d -p 9042:9042 cassandra:3.11
 
 =>cassandra
 Runing DB server
@@ -679,11 +671,11 @@ Runing DB server
 =>cqlsh
 Runing cassandra tarminal
 
-
 =>describe keyspaces;
 check keyspaces
 
 =>CREATE KEYSPACE spring_boot_kespc WITH replication = {'class':'SimpleStrategy', 'replication_factor' : 1};
+=>CREATE KEYSPACE zipkin_server_kespc WITH replication = {'class':'SimpleStrategy', 'replication_factor' : 1};
 Create keyspaces
 
 =>use spring_boot_kespc;
@@ -699,5 +691,34 @@ Create keyspaces
 Check Table
 
 =>INSERT INTO user_tbl (id, name, address, age) VALUES(1001,'MD IMRAN HOSSAIN', 'Dhaka', 30);
-
 => select * from user_tbl;
+
+
+
+
+Docker:
+=================================================
+=>docker pull cassandra:3.11
+=>docker run --name cassandradb -d -p 9042:9042 cassandra:3.11
+
+
+
+
+Zipkin With MySQL
+=================================================
+
+=>ALTER USER 'root'@'localhost'   IDENTIFIED WITH mysql_native_password   BY 'root';
+=>java -jar zipkin-server-2.12.9-exec.jar --zipkin.storage.type=mysql --zipkin.storage.mysql.host=localhost --zipkin.storage.mysql.port=3306 --   zipkin.storage.mysql.username=root --zipkin.storage.mysql.password=root --zipkin.storage.mysql.db=zipkin_service_mysql
+
+
+
+
+Zipkin With CASSANDRA
+=================================================
+
+=>java -jar zipkin-server-2.12.9-exec.jar --zipkin.storage.type=cassandra3
+    
+=>cqlsh
+=>describe keyspaces;
+=>use zipkin2;
+=>describe tables;
