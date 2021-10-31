@@ -2,8 +2,6 @@
 #                 SQL                         #
 #################################################
 
-postgres
-postgres
 
 =================================================
 #    CMD |  Environment | Windows setup                                          
@@ -662,8 +660,17 @@ WHERE s.type != 'BACKGROUND';
 =================================================
 #      No-SQL  | CASSANDRA                                          
 ================================================= 
+https://www.gushiciku.cn/pl/gCkH/zh-tw
+
+ drop keyspace zipkin3_udts;
+
+=>show version
+=>SELECT cql_version FROM system.local;
 
 =>Set-ExecutionPolicy Unrestricted
+
+=>cqlsh -u cassandra -p cassandra
+=>CREATE ROLE zipkinUser with SUPERUSER = true AND LOGIN = true and PASSWORD = 'zipkin';
 
 
 =>cassandra
@@ -675,9 +682,11 @@ Runing cassandra tarminal
 =>describe keyspaces;
 check keyspaces
 
-=>CREATE KEYSPACE spring_boot_kespc WITH replication = {'class':'SimpleStrategy', 'replication_factor' : 1};
+=>CREATE KEYSPACE springbootcassandradb WITH replication = {'class':'SimpleStrategy', 'replication_factor' : 1};
 =>CREATE KEYSPACE zipkin_server_kespc WITH replication = {'class':'SimpleStrategy', 'replication_factor' : 1};
 Create keyspaces
+
+=>DROP KEYSPACE springbootcassandradb;
 
 =>use spring_boot_kespc;
  
