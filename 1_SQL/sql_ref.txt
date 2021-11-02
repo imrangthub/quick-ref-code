@@ -684,6 +684,12 @@ Runing DB server
 
 =>cqlsh
 Runing cassandra tarminal
+=>cqlsh localhost -u cassandra -p cassandra
+Login with user
+
+=>create user apihub with password '12345' superuser;
+Create User:
+
 
 =>describe keyspaces;
 check keyspaces
@@ -711,7 +717,29 @@ Check Table
 
 
 =>LIST ROLES;
+=>LIST USERS;
 
+
+
+Authentication
+---------------------------------------------
+
+=>ALTER ROLE apihub WITH PASSWORD='apihub1';
+=>LIST ROLES OF apihub;
+
+=>CREATE USER alice WITH PASSWORD 'password_a' SUPERUSER;
+=>CREATE ROLE alice WITH PASSWORD = 'password_a' AND LOGIN = true AND SUPERUSER = true;
+
+=>LIST ALL PERMISSIONS OF apihub;
+=>LIST SELECT PERMISSIONS OF apihub;
+
+=>GRANT apihub TO apihub4;
+
+=>UPDATE system.local SET cluster_name = 'dev-bs' where key='local';
+
+
+=>COPY user_tbl (id, address, age, name) TO 'userTbl.csv';
+=>COPY user_tbl (id, address, age, name) FROM 'userTbl.csv';
 
 Docker:
 =================================================
