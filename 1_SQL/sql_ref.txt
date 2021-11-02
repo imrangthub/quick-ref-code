@@ -661,13 +661,19 @@ WHERE s.type != 'BACKGROUND';
 #      No-SQL  | CASSANDRA                                          
 ================================================= 
 https://www.gushiciku.cn/pl/gCkH/zh-tw
+https://cassandra.apache.org/doc/3.11/cassandra/getting_started/configuring.html
+https://cassandra.apache.org/doc/3.11/cassandra/getting_started/querying.html
 
- drop keyspace zipkin3_udts;
+=>drop keyspace zipkin3_udts;
 
 =>show version
 =>SELECT cql_version FROM system.local;
+=>SELECT cluster_name, listen_address FROM system.local;
 
 =>Set-ExecutionPolicy Unrestricted
+
+LOGIN
+--------------------------------------------
 
 =>cqlsh -u cassandra -p cassandra
 =>CREATE ROLE zipkinUser with SUPERUSER = true AND LOGIN = true and PASSWORD = 'zipkin';
@@ -704,13 +710,14 @@ Check Table
 => select * from user_tbl;
 
 
+=>LIST ROLES;
 
 
 Docker:
 =================================================
 =>docker pull cassandra:3.11
 =>docker run --name cassandradb -d -p 9042:9042 cassandra:3.11
-
+=>docker run -v /path/to/config:/etc/cassandra
 
 
 
