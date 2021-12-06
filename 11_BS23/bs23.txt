@@ -2,7 +2,7 @@
 #                 BS23                         #
 #################################################
 
-BS09303
+BS0930
 Md.Imran Hossain
 Software Engineer
 md.imran@brainstation-23.com
@@ -15,6 +15,16 @@ vpn.brainstation23.com
 Skype:mdimran.bs23@gmail.com
 
 
+http://172.16.8.132:7085/discovery-eureka/default
+http://172.16.8.132:8080/auth/admin/master/console/#/realms/banglalink
+http://172.16.254.52:8080/auth/admin/master/console/#/realms/banglalink
+
+http://172.16.8.132:9915/swagger-ui.html
+
+http://172.16.254.122:7081/swagger-ui.html         // APIHUB-TEST
+http://172.16.254.122:7180/swagger-ui/index.html   // NIER-TEST
+http://172.16.254.122:7080/swagger-ui/index.html   // OPENAPI-TEST
+
 
 
 Server Deployment
@@ -24,8 +34,13 @@ Server Deployment
 =>nohup java -jar octopus-sms-0.0.1-SNAPSHOT.jar --spring.profiles.active=dev-bs &
 =>nohup java -jar discovery-eureka-1.0.0.jar --spring.profiles.active=pre-prod-neir &
 =>tail -f nohup.out
+=>java -jar identity-register-1.0.0.jar --eureka.client.serviceUrl.defaultZone=http://localhost:7082/eureka/
 
-
+--server.port=8888
+--spring.profiles.active=dev-bl
+--spring.cloud.config.uri=http://localhost:7085
+--spring.cloud.config.uri=http://172.16.8.132:7085
+--eureka.client.serviceUrl.defaultZone=http://localhost:7082/eureka/
 
 Server-backup
 ==========================================
@@ -149,3 +164,18 @@ imranbs23gtlab
 
 
 
+
+=================================================
+#    Nexus Repository                                        
+================================================= 
+
+=>./nexus start
+=>./nexus stop
+=>./nexus status
+
+\$ cd /etc/init.d
+$ chkconfig --add nexus
+$ chkconfig --levels 345 nexus on
+$ service nexus start
+Starting Nexus Repository Manager Pro...
+$ tail -f /usr/local/nexus/logs/wrapper.log
