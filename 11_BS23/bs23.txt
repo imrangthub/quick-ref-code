@@ -27,6 +27,16 @@ http://172.16.254.122:7080/swagger-ui/index.html   // OPENAPI-TEST
 
 
 
+java -jar identity-register-1.0.0.jar --spring.profiles.active=dev-bl --spring.zipkin.baseUrl=http://172.16.254.122:9410
+
+java -jar identity-register-1.0.0.jar --spring.profiles.active=dev-bl
+
+
+java -jar identity-register-1.0.0.jar --spring.config.import=optional:configserver:http://localhost:7185
+java -jar identity-register-1.0.0.jar --spring.config.import=optional:configserver:http://172.16.7.90:7185
+
+
+
 Server Deployment
 ==========================================
 =>ps -fC java
@@ -106,6 +116,13 @@ http://172.16.229.231:8084/moshiurpiash/ucbl_corporate_banking
 User:md.imran@brainstation-23.com||imranbsgtlab
 12345678
 
+=>git clone -b live-1.0.1.23 --single-branch http://172.16.229.231:8084/internet-banking/ucbl-ib.git
+
+Add Jar to Class Pom:
+-----------------------------------------------
+mvn install:install-file -Dfile=ojdbc6-11.2.0.4.jar -DgroupId=com.oracle -DartifactId=ojdbc6 -Dversion=11.2.0.4 -Dpackaging=jar
+mvn install:install-file -Dfile=ojdbc6-11.2.0.jar -DgroupId=com.oracle -DartifactId=ojdbc6 -Dversion=11.2.0 -Dpackaging=jar
+
 
 Service=8080
 
@@ -154,7 +171,6 @@ MITHUN KANTY DEY - 0953202000000673
 ================================================= 
 
 ProjectGit:http://172.16.8.232:8181/groups/api-hub
-User:imranbs23gtlab
 imranbs23gtlab
 
 
