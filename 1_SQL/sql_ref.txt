@@ -1,10 +1,47 @@
 #################################################
-#                 SQL                         #
+#                  SQL                         #
 #################################################
+
+=================================================
+#              POSTGRE_SQL                                          
+================================================= 
+
+=>create database databaseName
+Create new database
+
+=>\l
+Show db list
+=>\c newDB
+(Switch db)Connecti  to new db
+=>drop database databaseName;
+Delete Database
+
+=>\q
+Quite from db 
+
+=>\d
+Show table;
+
+=>\d show tableName
+Show table details
+
+
+Export/Import
+-----------------------
+=>pg_dump -U postgres -p 5432 -d arif_travel_agencydb -W -f c:\arif_travel_agencydb.sql
+=>psql -U postgres -d testdb < C:\arif_travel_agencydb.sql
+
+
+
+#ORDER BY 
+-------------------------------------------------
+SELECT * FROM unet_r_22.generated_one_time_password
+ORDER BY create_date desc 
+
 
 
 =================================================
-#    CMD |  Environment | Windows setup                                          
+#  CMD | MySQL |  Environment | Windows setup                                          
 ================================================= 
 
 TO_DATE.*\),
@@ -109,75 +146,19 @@ C:\> cd "C:\Program Files\MySQL\MySQL Server 5.7\bin"
 C:\> mysqld --init-file=C:\\mysql-init.txt
 
 
-=================================================
-#              DELETE                                          
-================================================= 
+Set max conn in Mysql
+=>SET GLOBAL max_connections = 750;
+=>show variables like 'max_connections';
 
-SET SQL_SAFE_UPDATES = 0;
-delete  FROM mcvmysqldb.sa_lookupdtl;
-SET SQL_SAFE_UPDATES = 1;
-
-
-
-=================================================
-#              POSTGRE_SQL                                          
-================================================= 
-
-=>create database databaseName
-Create new database
-
-=>\l
-Show db list
-=>\c newDB
-(Switch db)Connecti  to new db
-=>drop database databaseName;
-Delete Database
-
-=>\q
-Quite from db 
-
-=>\d
-Show table;
-
-=>\d show tableName
-Show table details
-
-
-
-
-=================================================
-#              POSTGRE_SQL                                          
-================================================= 
-
-=>create database databaseName
-Create new database
-
-=>\l
-Show db list
-=>\c newDB
-(Switch db)Connecti  to new db
-=>drop database databaseName;
-Delete Database
-
-=>\q
-Quite from db 
-
-=>\d
-Show table;
-
-=>\d show tableName
-Show table details
-
-
-Export/Import
------------------------
-=>pg_dump -U postgres -p 5432 -d arif_travel_agencydb -W -f c:\arif_travel_agencydb.sql
-=>psql -U postgres -d testdb < C:\arif_travel_agencydb.sql
 
 
 =================================================
 #              DOCKER                                          
 ================================================= 
+SET SQL_SAFE_UPDATES = 0;
+delete  FROM mcvmysqldb.sa_lookupdtl;
+SET SQL_SAFE_UPDATES = 1;
+
 
 #Docker Image for MySQL
 -------------------------------------------------
@@ -694,11 +675,11 @@ Create User:
 =>describe keyspaces;
 check keyspaces
 
-=>CREATE KEYSPACE springbootcassandradb WITH replication = {'class':'SimpleStrategy', 'replication_factor' : 1};
+=>CREATE KEYSPACE neir_zipkin_server_kespc WITH replication = {'class':'SimpleStrategy', 'replication_factor' : 1};
 =>CREATE KEYSPACE zipkin_server_kespc WITH replication = {'class':'SimpleStrategy', 'replication_factor' : 1};
 Create keyspaces
 
-=>DROP KEYSPACE springbootcassandradb;
+=>DROP KEYSPACE neir_zipkin_server_kespc;
 
 =>use spring_boot_kespc;
  
@@ -719,7 +700,7 @@ Check Table
 =>LIST ROLES;
 =>LIST USERS;
 
-
+=>DROP ROLE IF EXISTS apihub;
 
 Authentication
 ---------------------------------------------
@@ -728,7 +709,8 @@ Authentication
 =>LIST ROLES OF apihub;
 
 =>CREATE USER alice WITH PASSWORD 'password_a' SUPERUSER;
-=>CREATE ROLE alice WITH PASSWORD = 'password_a' AND LOGIN = true AND SUPERUSER = true;
+
+=>CREATE ROLE apihubdevbs WITH PASSWORD = '12345' AND LOGIN = true AND SUPERUSER = true;
 
 =>LIST ALL PERMISSIONS OF apihub;
 =>LIST SELECT PERMISSIONS OF apihub;
