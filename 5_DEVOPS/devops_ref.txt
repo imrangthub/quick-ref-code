@@ -135,35 +135,18 @@ git push origin "internDev"
 
 
 =================================================
-#  Maven                                          
-================================================= 
-mvn -v
-mvn clean
-mvn package
-mvn spring-boot:run
-
-=================================================
-#  Gradle                                          
-================================================= 
-
-=>gradle -version
-=>gradle task
-=>gradle task --all 
-
-
-=================================================
 #  Tomcat                                          
 ================================================= 
 
 #Killing Port:
 -------------------------------------------------
-netstat -ano | findstr 7085
+netstat -ano | findstr 9410
 netstat -ano | findstr 3306
 taskkill /F /PID 2368
 
 
 Url:
-http://192.168.0.149:9092/edu-web/home.html
+http://192.168.0.149:9092/edu-web/home.html.
 http://192.168.0.149:9092/medicare-web-client-v2/#/login
 
 
@@ -215,6 +198,161 @@ install:install-file -Dfile=/home/imran/Desktop/odbcjar/ojdbc7.jar -DgroupId=com
 install:install-file -Dfile=/home/imran/JAR_LIBRARY/ReportFont/segoeui.jar   -DgroupId=com.mysoft.report-font -DartifactId=segoeui -Dversion=1.0.1 -Dpackaging=jar    -DgeneratePom=true
 
 
+
+
+=================================================
+#  Maven                                          
+================================================= 
+mvn -v
+mvn clean
+mvn package
+mvn spring-boot:run
+
+
+
+=================================================
+#                  GRADLE                                          
+================================================= 
+
+=>gradle -version
+=>gradle task
+=>gradle task --all 
+
+
+
+=>gradlew dependencyInsight --dependency log4j-core
+=>gradlew dependencyInsight --dependency log4j
+=>./gradlew dependencyInsight --dependency log4j-core
+Check Gradle dependencies jar version
+
+
+plugins {
+    id "java"
+    id "maven-publish"
+    id "org.springframework.boot" version "2.1.7.RELEASE"
+    id "io.spring.dependency-management" version "1.0.8.RELEASE"
+    id "org.jetbrains.gradle.plugin.idea-ext" version "0.5"
+    id "com.diffplug.gradle.spotless" version "3.24.2"
+    id "org.sonarqube" version "2.7.1" apply false
+}
+
+group = PROJECT_GROUP
+version = PROJECT_VERSION
+description = PROJECT_DESCRIPTION
+
+compileJava {
+    sourceCompatibility = JavaVersion.VERSION_11
+    targetCompatibility = JavaVersion.VERSION_11
+    options.encoding = "UTF-8"
+}
+
+compileTestJava {
+    sourceCompatibility = JavaVersion.VERSION_11
+    targetCompatibility = JavaVersion.VERSION_11
+    options.encoding = "UTF-8"
+    options.compilerArgs += "-parameters"
+}
+
+ext {
+    googleJavaFormatVersion = '1.7'
+}
+
+repositories {
+    maven {
+        url REPOSITORY
+        credentials {
+            username = REPOSITORY_USERNAME
+            password = REPOSITORY_PASSWORD
+        }
+    }
+}
+
+
+
+dependencies {
+
+    compile('org.springframework.boot:spring-boot-starter-logging') {
+        exclude group: 'ch.qos.logback', module: 'logback-classic'
+    }
+    compile('org.springframework.boot:spring-boot-starter-web') {
+        exclude group: 'org.springframework.boot', module: 'spring-boot-starter-logging'
+        exclude group: 'ch.qos.logback', module: 'logback-classic'
+    }
+
+    implementation(
+            "org.springframework.cloud:spring-cloud-starter-config",
+            "org.springframework.boot:spring-boot-starter-data-jpa",
+            "org.springframework.cloud:spring-cloud-starter-openfeign",
+            "org.springframework.boot:spring-boot-starter-actuator",
+            "org.springframework.cloud:spring-cloud-starter-netflix-eureka-client",
+            "org.springframework.cloud:spring-cloud-starter-sleuth",
+            "org.springframework.cloud:spring-cloud-starter-zipkin",
+            "org.springframework.boot:spring-boot-starter-log4j2"
+    )
+
+    implementation(
+            "io.springfox:springfox-swagger2",
+            "io.springfox:springfox-swagger-ui",
+            "org.projectlombok:lombok",
+    )
+
+    implementation('io.github.openfeign:feign-httpclient')
+
+    runtimeOnly "mysql:mysql-connector-java"
+
+    annotationProcessor("org.projectlombok:lombok")
+
+    testImplementation("org.springframework.boot:spring-boot-starter-test")
+
+    testAnnotationProcessor("org.projectlombok:lombok")
+/*
+    // https://mvnrepository.com/artifact/org.apache.logging.log4j/log4j-api
+    compile group: 'org.apache.logging.log4j', name: 'log4j-api', version: '2.6.1'
+
+    // https://mvnrepository.com/artifact/org.apache.logging.log4j/log4j-core
+    compile group: 'org.apache.logging.log4j', name: 'log4j-core', version: '2.6.1'*/
+
+// https://mvnrepository.com/artifact/org.springframework.boot/spring-boot-starter-log4j2
+   /* compile group: 'org.springframework.boot', name: 'spring-boot-starter-log4j2', version: '1.2.0.RELEASE'*/
+
+   /* runtime('org.springframework.boot') { exclude module: 'slf4j-log4j12' }*/
+}
+
+spotless.java {
+    googleJavaFormat(googleJavaFormatVersion)
+}
+
+tasks.withType(JavaCompile).configureEach { javaCompile ->
+    dependsOn 'spotlessApply'
+}
+
+wrapper {
+    gradleVersion = GRADLE_VERSION
+    distributionUrl = WRAPPER_ROOT + "/${gradleVersion}/gradle-wrapper-${gradleVersion}-bin.zip"
+}
+
+idea.project.settings.delegateActions.delegateBuildRunToGradle = true
+
+springBoot {
+    buildInfo {
+        properties {
+            name = PROJECT_NAME
+            additional = [
+                    'x'      : 'xomidar',
+                    'swagger': true
+            ]
+        }
+    }
+}
+
+configurations.all {
+    resolutionStrategy.cacheChangingModulesFor 0, 'seconds'
+}
+
+configurations {
+    all*.exclude module : 'spring-boot-starter-logging'
+}
+
 =================================================
 #  keycloak                                          
 ================================================= 
@@ -254,3 +392,5 @@ If storage engine is not InnoDB, use this to set it
 #  PYTHON                                          
 ================================================= 
 =>python --version
+
+
