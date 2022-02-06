@@ -4003,7 +4003,7 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler
 
 
 ================================================
-#  Random                                      
+#  X-CODE                                    
 ================================================
 
 private String generatedRandomPin() {
@@ -4013,12 +4013,21 @@ private String generatedRandomPin() {
 }
 
 
+public String getHadoopConnectionString() {
+	String workingDir = System.getProperty("user.dir");
+	String conStr = "jdbc:phoenix:thin:url=%s://%s:%s/gateway/cdp-proxy-api/avatica;authentication=BASIC;ssl=true;avatica_user=%s;avatica_password=%s;truststore=%s;truststore_password=%s;serialization=PROTOBUF";
+	String connectionString = String.format(conStr,this.hadoopServerProtocol, this.hadoopServerIP,
+			this.hadoopServerPort,this.hadoopUserUserId, this.hadoopUserPassword,workingDir+File.separator+"cm-auto-global_truststore.jks",this.hadoopTruststorePassword);
+ //   System.out.println(connectionString);
+	return connectionString;
+}
+
 
 
 
 
 ================================================
-#  SPRING                                      
+#  SPRING |  BASIC                                      
 ================================================
 
  ApplicationContextHolder.getContext().getBean(WalletFTVerifierService.class);

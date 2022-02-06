@@ -1,0 +1,198 @@
+#################################################
+#         MICROSERVICE-TECHSTACK                #
+#################################################
+
+
+=================================================
+#                  Basic                                          
+================================================= 
+
+
+
+=================================================
+#    Message broker  | RabbitMQ                                        
+================================================= 
+
+
+=>rabbitmq-server start
+Start rabbitMQ Server, Open RabbitMQ command prompt
+
+=>localhost:15672
+guest/guest
+              
+FanoutExchange:
+http://localhost:8083/rabbitmq/fanout/producer?exchangeName=fanout-exchange&messageData=HelloWorldMsg
+http://localhost:8084/rabbitmq/producer?empName=emp1&empId=emp001&salary=500000
+
+DirectExchange:
+http://localhost:8083/rabbitmq/direct/producer?exchangeName=direct-exchange&routingKey=finance&messageData=HelloWorldMSG
+
+
+
+
+
+=================================================
+#     ELK Stack                                      
+=================================================
+
+=>elasticsearch.bat
+=>kibana.bat
+
+
+=>GET /_nodes
+
+List of Index
+=>GET /_cat/indices?v
+  
+Creae a index
+=>PUT employee_indx
+  
+Add data to Index
+=>POST employee_indx/_doc/1
+  {
+     "name":"MD IMRAN HOSSAIN", "gender":"Male",
+     "age":"30", "city":"Dhaka"
+  }
+
+PUT /student_indx
+{
+  "settings": {
+    "number_of_shards": 1
+  },
+  "mappings": {
+    "properties": {
+      "name": { "type": "text" },
+      "age": { "type": "integer" },
+      "gender": { "type": "text" }
+    }
+  }
+}
+
+ 
+Show Index date
+  =>GET employee_indx/_doc/1
+  =>POST /employee_indx/_search
+  =>POST /employee_indx/_search?filter_path=hits.hits
+  
+
+Update
+=>POST /employee_indx/_doc/1/_update
+{
+  "doc": {
+  "name": "MD IMRAN HOSSAIN UPDATE"
+  }
+}
+  
+DeleteDate
+  =>DELETE  employee_indx/_doc/11
+
+
+
+
+=>PUT school_indx
+
+=>POST school_indx/student/1
+  {
+     "name":"MD IMRAN HOSSAIN", 
+     "gender":"Male",
+     "age":"30"
+  }
+  
+=================================================
+#  keycloak                                          
+================================================= 
+
+https://www.tutorialsbuddy.com/keycloak-mysql-setup
+https://www.appsdeveloperblog.com/keycloak-configure-mysql-database/
+https://sunitkatkar.blogspot.com/2020/07/setting-up-keycloak-10-with-mysql-8-on.html
+
+
+#Mysql server with keycloak
+-------------------------------------------------
+
+=>CREATE DATABASE keycloakdb CHARACTER SET utf8 COLLATE utf8_unicode_ci;
+Create a database in MySQL with the utf8 character set
+
+
+=>CREATE USER 'keycloakadmin'@'%' IDENTIFIED WITH mysql_native_password BY 'keycloak123';
+Create a database user for Keycloak
+
+=>GRANT ALL PRIVILEGES ON keycloakdb.* TO 'keycloakadmin'@'%';
+--- Tell the server to reload the grant tables
+--- by performing a flush privileges operation
+=>FLUSH PRIVILEGES;
+
+Grant all privileges
+
+
+=>SHOW GLOBAL variables like "default_storage%"
+Should output: default_storage_engine InnoDB
+
+=>SET GLOBAL default_storage_engine = 'InnoDB';
+If storage engine is not InnoDB, use this to set it
+
+
+
+=================================================
+#  SPRING SOAP SERVICE                                          
+================================================= 
+
+http://localhost:8080/user-soap-service/user.wsdl
+http://localhost:8080/imranmadbar/ws/calculatorDemo.wsdl
+
+
+
+Simple Soap Request:
+--------------------------------------
+
+<soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" 
+xmlns:cal="http://imranmadbar.com/types/calculator">
+	<soapenv:Header/>
+	<soapenv:Body>
+		<cal:SubtractionInput>
+			<cal:number1>10</cal:number1>
+			<cal:number2>4</cal:number2>
+		</cal:SubtractionInput>
+	</soapenv:Body>
+</soapenv:Envelope>
+
+<soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" xmlns:inh="http://com.imranmadbr/">
+   <soapenv:Header/>
+   <soapenv:Body>
+      <inh:opManager>
+         <!--Optional:-->
+         <version>2.0</version>
+         <service>xxx</service>
+         <method>xxx</method>
+         <param>xxxxxx</param>
+         <numberofparam>1</numberofparam>
+         <userid>xxxxxxx</userid>
+         <password>xxxxx</password>
+         <failclause>xxxx</failclause>
+      </inh:opManager>
+   </soapenv:Body>
+</soapenv:Envelope>
+
+
+
+<soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/"
+                  xmlns:us="http://imranmadbar.com/spring-boot-soap-service">
+    <soapenv:Header/>
+    <soapenv:Body>
+        <us:getUserRequest>
+            <us:name>imran</us:name>
+        </us:getUserRequest>
+    </soapenv:Body>
+</soapenv:Envelope>
+		
+Simple Soap Response:
+-------------------------------------
+
+<SOAP-ENV:Envelope xmlns:SOAP-ENV="http://schemas.xmlsoap.org/soap/envelope/">
+  <SOAP-ENV:Header/>
+  <SOAP-ENV:Body>
+	  <ns2:output xmlns:ns2="http://imranmadbar.com/types/calculator">
+		  <ns2:result>6</ns2:result>
+	  </ns2:output>
+  </SOAP-ENV:Body>
+</SOAP-ENV:Envelope>

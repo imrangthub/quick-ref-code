@@ -21,7 +21,9 @@ imranyop5@yopmail.com
 
 =================================================
 #                  Window | batch | .bat                                          
-================================================= 
+=================================================
+
+=>services.msc 
 
 #CMD
 ================================================= 
@@ -49,12 +51,16 @@ Networking Information
 =>tasklist
 
 >echo %JAVA_HOME%
+=>echo %CATALINA_HOME%
 =>netstat
 =>tracert google.com
 
 =>wmic MEMORYCHIP get BankLabel, DeviceLocator, MemoryType, TypeDetail, Capacity, Speed
 =>wmic memorychip list full
 RAM details
+
+=>wmic cpu get loadpercentage
+
 
 
 #Batch
@@ -96,11 +102,21 @@ echo fullstamp: "%fullstamp%"
 mkdir "%fullstamp%"
 pause
 
+
+@echo off 
+cd target
+java -jar spring-boot-simple-web-0.0.1-SNAPSHOT.jar
+echo "Done,  application run successfully !"
+exit
+
 =================================================
 #  JAVA                                          
 ================================================= 
 
 echo %JAVA_HOME%
+
+Extract the Jar
+Jar -xvf webapp-1.0.0.SNAPSHOT.jar
 
 =================================================
 #  GIT                                          
@@ -139,6 +155,9 @@ Step 4. Push the result of the merge to GitLab
 git push origin "internDev"
 
 
+ =>git add pom.xml src
+
+
 =================================================
 #  Tomcat                                          
 ================================================= 
@@ -150,9 +169,21 @@ netstat -ano | findstr 3306
 taskkill /F /PID 2368
 
 
-Url:
-http://192.168.0.149:9092/edu-web/home.html.
-http://192.168.0.149:9092/medicare-web-client-v2/#/login
+
+
+
+#Config
+-------------------------------------------------
+
+In server.xml set server port
+<Connector port="8585" protocol="HTTP/1.1" connectionTimeout="20000" redirectPort="8443" />
+
+In tomcat-users.xml set user
+<role rolename="manager"/>
+<role rolename="manager-gui"/>        
+<role rolename="admin"/>
+<role rolename="manager-script"/>
+<user username="admin" password="admin" roles="admin,manager,manager-gui,manager-script" /> 
 
 
 #Restart Tomcate Server
@@ -213,6 +244,8 @@ mvn clean
 mvn package
 mvn spring-boot:run
 
+=>mvn dependency:tree
+
 
 
 =================================================
@@ -228,6 +261,7 @@ mvn spring-boot:run
 =>gradlew dependencyInsight --dependency log4j-core
 =>gradlew dependencyInsight --dependency log4j
 =>./gradlew dependencyInsight --dependency log4j-core
+
 Check Gradle dependencies jar version
 
 
@@ -358,39 +392,22 @@ configurations {
     all*.exclude module : 'spring-boot-starter-logging'
 }
 
+
+
+
 =================================================
-#  keycloak                                          
+#  JENKING                                          
 ================================================= 
+2fab04a40b4146beba38a3da5b9c9415
 
-https://www.tutorialsbuddy.com/keycloak-mysql-setup
-https://www.appsdeveloperblog.com/keycloak-configure-mysql-database/
-https://sunitkatkar.blogspot.com/2020/07/setting-up-keycloak-10-with-mysql-8-on.html
-
-
-#Mysql server with keycloak
--------------------------------------------------
-
-=>CREATE DATABASE keycloakdb CHARACTER SET utf8 COLLATE utf8_unicode_ci;
-Create a database in MySQL with the utf8 character set
+java -jar jenkins.war --httpPort=9999
 
 
-=>CREATE USER 'keycloakadmin'@'%' IDENTIFIED WITH mysql_native_password BY 'keycloak123';
-Create a database user for Keycloak
 
-=>GRANT ALL PRIVILEGES ON keycloakdb.* TO 'keycloakadmin'@'%';
---- Tell the server to reload the grant tables
---- by performing a flush privileges operation
-=>FLUSH PRIVILEGES;
-
-Grant all privileges
-
-
-=>SHOW GLOBAL variables like "default_storage%"
-Should output: default_storage_engine InnoDB
-
-=>SET GLOBAL default_storage_engine = 'InnoDB';
-If storage engine is not InnoDB, use this to set it
-
+@echo off
+cd target 
+java -jar spring-boot-simple-web-0.0.1-SNAPSHOT.jar
+exit
 
 
 =================================================

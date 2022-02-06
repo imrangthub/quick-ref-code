@@ -13,6 +13,7 @@ GitUcbl:imranbsgtlab
 vpn.brainstation23.com
 172.16.231.253
 Skype:mdimran.bs23@gmail.com
+https://bs23.talentlms.com
 
 
 http://172.16.8.132:7085/discovery-eureka/default
@@ -27,15 +28,13 @@ http://172.16.254.122:7080/swagger-ui/index.html   // OPENAPI-TEST
 
 
 
-java -jar identity-register-1.0.0.jar --spring.profiles.active=dev-bl --spring.zipkin.baseUrl=http://172.16.254.122:9410
+
 
 java -jar identity-register-1.0.0.jar --spring.profiles.active=dev-bl
-
-
-java -jar identity-register-1.0.0.jar --spring.config.import=optional:configserver:http://localhost:7185
-java -jar identity-register-1.0.0.jar --spring.config.import=optional:configserver:http://172.16.7.90:7185
-
-
+java -jar identity-register-1.0.0.jar --spring.config.import=optional:configserver:http://172.16.11.35:7185/
+=>java -jar identity-register-1.0.0.jar --eureka.client.serviceUrl.defaultZone=http://localhost:7082/eureka/
+java -jar identity-register-1.0.0.jar --spring.profiles.active=dev-bl --spring.zipkin.baseUrl=http://172.16.254.122:9410
+java -jar zipkin-server-2.23.15-exec.jar --server.port=9410 --zipkin.storage.type=cassandra3 --zipkin.storage.cassandra3.ensure-schema=true --zipkin.storage.cassandra3.contact-points=localhost:9042 --zipkin.storage.cassandra3.username=imran --zipkin.storage.cassandra3.password=123456 --zipkin.storage.cassandra3.keyspace=spring_boot_keyspc
 
 Server Deployment
 ==========================================
@@ -44,7 +43,6 @@ Server Deployment
 =>nohup java -jar octopus-sms-0.0.1-SNAPSHOT.jar --spring.profiles.active=dev-bs &
 =>nohup java -jar discovery-eureka-1.0.0.jar --spring.profiles.active=pre-prod-neir &
 =>tail -f nohup.out
-=>java -jar identity-register-1.0.0.jar --eureka.client.serviceUrl.defaultZone=http://localhost:7082/eureka/
 
 --server.port=8888
 --spring.profiles.active=dev-bl
@@ -111,7 +109,6 @@ uneteb@!23
 =================================================
 #    PROJECT |  BANK | UCBL                                          
 ================================================= 
-
 Artifact is deployed successfully
 
 =================================================
