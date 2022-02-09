@@ -7,24 +7,61 @@
 =>cat /etc/*-release
 Kernel Version
 
-=>ps -fC java
-=>kill -9 34071
-=>nohup java -jar simple-service.jar --spring.profiles.active=pre-prod &
-=>tail -f nohup.out
 =>tree -L 1 /
 
+=>Ctrl+Alt+T
+=>sudo apt-get dist-upgrade
 
+=>which skype
+
+
+https://help.ubuntu.com/community/Repositories/Ubuntu
+https://www.lifewire.com/beginners-guide-to-ubuntu-2205722
+https://www.lifewire.com/things-to-do-installing-ubuntu-2200611
+https://www.makeuseof.com/tag/ubuntu-an-absolute-beginners-guide/
+
+https://linuxconfig.org/how-to-create-desktop-shortcut-launcher-on-ubuntu-20-04-focal-fossa-linux
 
 =================================================
 #                  Basic                                          
 ================================================= 
 
+=>dpkg --list
+Currently installed programs
 
+=>sudo apt-get remove packagName
+=>sudo apt-get --purge remove packagName
+=>sudo aptitude remove packagName
+Uninstalling Programs with Terminal
+
+=>sudo apt-get autoremove
+
+
+
+
+=>sudo apt update
+Syncs your local copy of available packages and their versions against the current-state index with the repositories
+
+=>apt-get dist-upgrade
+=>sudo apt full-upgrade -y
+
+=>sudo apt show
+=>sudo apt search "web browser"
+=>sudo apt install chromium-browser
+Finding and Installing New Software
+
+=>sudo apt-get clean 
+Clear the folders /var/cache/apt/packages
+
+=>Alt+F2
+Run command window.
 
 =>sudo apt-get update
 =>sudo apt-get upgrade
 =>sudo apt-get install <package-name> 
 =>sudo apt-get remove <package-name>
+
+=>sudo apt update && sudo apt upgrade -y
 
 
 =>sudo apt-get autoremove
@@ -111,3 +148,53 @@ Run a Jar
 find out which process is listing upon a port
 =>netstat -tulpn
 =>netstat -tulpn | grep :9940
+
+
+
+
+
+=================================================
+#Linux | Info | Desc | documentation                            
+=================================================
+
+#Tidying Up Packages
+-------------------------------------------------
+apt reinstall: Reinstalls the package from the repository source, useful if you think you've broken a program that you like.
+apt remove: Removes a package, but leaves user-configured files in place.
+apt purge: Removes a package and also all associated files related to it, including user configuration files.
+apt autoremove: Deletes packages that had been installed as dependencies but, given that they're obsolete or the other package was removed, are now orphaned. Running this command occasionally can recover some disk space.
+
+
+
+#Software | repositories |   packages   
+-------------------------------------------------
+Linux software is available from repositories—servers that hold software that can be installed for a particular distribution. 
+A repository is stored on one or more servers known as mirrors. Each item of software within a repository is called a package. 
+There are many package formats, but Ubuntu uses the Debian package format. 
+You'll find most of the things you need in the default repositories, but you can add and enable some extra repositories to acquire additional software.
+
+
+Using graphical packages such as Ubuntu Software and Synaptic aren't the only ways to install software using Ubuntu.
+You also can install packages from the command line using apt-get. 
+While the command line may seem daunting, you will come to appreciate the power of apt-get after using it for a bit.
+
+
+Some packages require specific other packages as well as their own; others require that some packages be removed before they'll work. 
+
+The files for installing software is usually called a package and packages come in many different flavors. 
+Ubuntu packages end in .DEB.
+
+
+#APT
+--------------------------------------------------
+APT is the default package-management framework for Ubuntu and several other popular distributions.
+
+
+apt-get upgrade: 
+Updates the package but does not, by default, delete other packages or add new ones. 
+Instead, the upgrade will fail if it requires added or deleted dependencies.
+apt-get dist-upgrade: 
+Updates and deletes prior versions of the package, including dependencies.
+apt upgrade: 
+Functions like apt-get upgrade --with-new-packages, which is a fancy way of saying that it updates, 
+but does not delete prior versions, yet it does install new packages (but won't delete them) if doing so is required to satisfy dependencies.
