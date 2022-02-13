@@ -3,96 +3,37 @@
 #################################################
 
 =>uname -a
+=>compgen -u
+=>compgen -g
+=>cat /etc/os-release
 =>cat /proc/version
 =>cat /etc/*-release
 Kernel Version
 
 =>Ctrl+Alt+T
-=>sudo apt-get dist-upgrade
+=> ./startup.sh 
 
 =>which skype
 
+=>sudo chmod a+rwx /szDirectoryName
+=>sudo chmod -R 700 folder3
+=>sudo chmod -R 700 folder3
 
-https://help.ubuntu.com/community/Repositories/Ubuntu
-https://www.lifewire.com/beginners-guide-to-ubuntu-2205722
-https://www.lifewire.com/things-to-do-installing-ubuntu-2200611
-https://www.makeuseof.com/tag/ubuntu-an-absolute-beginners-guide/
+=>sudo chmod o+r folder3
+=>sudo chmod 744 folder3
 
-https://linuxconfig.org/how-to-create-desktop-shortcut-launcher-on-ubuntu-20-04-focal-fossa-linux
+=>sudo usermod -a -G groudName imran
 
 =================================================
 #                  Basic                                          
 ================================================= 
 
-=>dpkg --list
-Currently installed programs
 
-=>sudo apt-get remove packagName
-=>sudo apt-get --purge remove packagName
-=>sudo aptitude remove packagName
-Uninstalling Programs with Terminal
-
-=>sudo apt-get autoremove
+=>sudo tar xzvf unzipAbleFileNametar.gz
+=>sudo mv moveFolderName /opt/myFolder/
+=>sudo chown -R imran:imran /opt/myFolder
 
 
-
-
-=>sudo apt update
-Syncs your local copy of available packages and their versions against the current-state index with the repositories
-
-=>apt-get dist-upgrade
-=>sudo apt full-upgrade -y
-
-=>sudo apt show
-=>sudo apt search "web browser"
-=>sudo apt install chromium-browser
-Finding and Installing New Software
-
-=>sudo apt-get clean 
-Clear the folders /var/cache/apt/packages
-
-=>Alt+F2
-Run command window.
-
-=>sudo apt-get update
-=>sudo apt-get upgrade
-=>sudo apt-get install <package-name> 
-=>sudo apt-get remove <package-name>
-
-=>sudo apt update && sudo apt upgrade -y
-
-
-=>sudo apt-get autoremove
-remove any unnecessary packages
-
-=>sudo apt-get purge <package-name>
-remove a software completely from your system with its configuration or data files
-
-=>dpkg --list
-list all the packages installed on your system
-
-=>Pwd
-full pathname of the current working directory.
-
-=>cd /
-Takes you to the root directory.
-=>cd ..
-Takes you up one directory level.
-=>cd –
-Takes you to the previous directory.
-=>cd home 
-open home folder in current directory.
-
-=>groups
-How to See Which Groups Your Linux User Account Belongs To
-
-=>compgen -g
-=>getent group
-List all group names on Linux:
-
-
-=>java -version
-Check Java
 
 =>update-alternatives --config java
 =>sudo update-alternatives --config java
@@ -107,8 +48,72 @@ then
 =>/app/archive/artifactory-oss-6.12.0/tomcat/bin/version.sh
 systemctl status nginx
 
-standalone.xml
 
+
+=================================================
+# Sucurity | Permissions  | access                                
+================================================= 
+
+=>sudo su
+Log in as root
+
+=>sudo chown userName:groudName fileName
+Change Owner/Group of a File
+
+=>sudo chown -R userName:groudName /path/to/directory/*
+Change Owner/Group of All Files/Directories
+
+
+=>sudo chmod a+rwx /szDirectoryName
+=>sudo chmod -R 700 folder3
+
+=>whoami
+=>id -un
+
+=>id -gn
+
+=>id -Gn
+=>groups
+
+=>compgen -g
+=>getent group
+List all group names on Linux:
+
+
+=>id -g -n imran
+=>id -G -n imran
+To print the primary/secondary group membership for a user called
+
+
+chmod a-w file (removes all writing permissions)
+chmod o+x file (sets execute permissions for other (public permissions))
+chmod u=rx file        (Give the owner rx permissions, not w)
+chmod go-rwx file      (Deny rwx permission for group, others)
+chmod g+w file         (Give write permission to the group)
+chmod a+x file1 file2  (Give execute permission to everybody)
+chmod g+rx,o+x file    (OK to combine like this with a comma)
+
+u = user that owns the file
+g = group that owns the file
+o = other (everyone else)
+a = all (everybody)
+
+r = read aces to the file
+w = write access
+x = execute (run) access 
+
+=================================================
+# Software | repositories |   packages   | install      | Tools                  
+================================================= 
+
+=>sudo apt show
+=>sudo apt search "web browser"
+=>sudo apt install chromium-browser
+Finding and Installing New Software
+
+
+Install  Net tools
+=>sudo apt install net-tools
 
 
 =================================================
@@ -118,7 +123,6 @@ scp localmachine/path_to_the_file username@server_ip:/path_to_remote_directory
 
 =>scp -r /app/test/test.txt apihub@172.16.254.25:/app
 =>scp -r cassandra.yaml C:
-
 =>scp -r apihub@172.16.8.132:standalone.xml "C:"
 =>docker cp e029d15afdfc:/etc/cassandra/cassandra.yaml C:/Z_MY_COMPUTER
 =>docker cp C:/Z_MY_COMPUTER/cassandra.yaml a394ae84224c:/etc/cassandra
@@ -151,6 +155,7 @@ find out which process is listing upon a port
 
 
 
+
 =================================================
 #Linux | Info | Desc | documentation                            
 =================================================
@@ -164,8 +169,6 @@ apt autoremove: Deletes packages that had been installed as dependencies but, gi
 
 
 
-#Software | repositories |   packages   
--------------------------------------------------
 Linux software is available from repositories—servers that hold software that can be installed for a particular distribution. 
 A repository is stored on one or more servers known as mirrors. Each item of software within a repository is called a package. 
 There are many package formats, but Ubuntu uses the Debian package format. 
@@ -196,3 +199,41 @@ Updates and deletes prior versions of the package, including dependencies.
 apt upgrade: 
 Functions like apt-get upgrade --with-new-packages, which is a fancy way of saying that it updates, 
 but does not delete prior versions, yet it does install new packages (but won't delete them) if doing so is required to satisfy dependencies.
+
+
+
+#Common File Permissions
+--------------------------------------------------------------------------------------------------------------------------------------------
+
+Setting			Numerical			Owner						Group						Others
+-rw——-			600				Read/Write	 	 
+-rw-r—–				640				Read/Write				Read	 
+-rw-r–r–				44				Read/Write				Read						Read
+-rw-rw-r–			664				Read/Write				Read/Write				Read
+-rwx——			700				Read/Write/Execute	 	 
+-rwxr-xr-x			755				Read/Write/Execute	Read/Execute			Read/Execute
+-rwx–x–x			711				Read/Write/Execute	Execute					Execute
+-rw-rw-rw-			666				Read/Write				Read/Write				Read/Write
+-rwxrwxrwx		777				Read/Write/Execute	Read/Write/Execute	Read/Write/Execute
+
+=================================================
+# System  |  Update | Upgrade                        
+================================================= 
+
+=>dpkg --list
+Currently installed programs
+
+=>sudo apt-get remove packagName
+=>sudo apt-get --purge remove packagName
+=>sudo aptitude remove packagName
+Uninstalling Programs with Terminal
+
+=>sudo apt-get dist-upgrade
+
+=>sudo apt-get autoremove
+
+=>sudo systemctl daemon-reload 
+Reload the systemd daemon service to load newly create files.
+
+=>sudo apt update
+Syncs your local copy of available packages and their versions against the current-state index with the repositories
