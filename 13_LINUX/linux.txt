@@ -14,19 +14,21 @@ Kernel Version
 => ./startup.sh 
 
 =>which skype
+=>shutdown
+=>shutdown -h now
+=>shutdown +10
+=>shutdown -c
+=>su - root
 
-=>sudo chmod a+rwx /szDirectoryName
-=>sudo chmod -R 700 folder3
-=>sudo chmod -R 700 folder3
+=>uptime
 
-=>sudo chmod o+r folder3
-=>sudo chmod 744 folder3
-
-=>sudo usermod -a -G groudName imran
-
+username@hostname:~$
 =================================================
 #                  Basic                                          
 ================================================= 
+
+=>whoami
+=>hostname
 
 
 =>sudo tar xzvf unzipAbleFileNametar.gz
@@ -51,11 +53,152 @@ systemctl status nginx
 
 
 =================================================
+#    File or Directory  | Operation                                        
+================================================= 
+
+=>ls -a
+Show hiddne file 
+=>ls -R
+Show all file and folder inside of folder
+
+
+=>cp fileName /copyFolder/
+Copy file
+
+=>cp -rf targetFolder /folderPath/
+Copy folder
+
+=>cp -rf /etc/tomcat/* /otherFolder/
+Copy all contain
+
+=>mv oldFileName newFileName
+Rename file
+
+=>mv myFolder /locationFolder/
+Move file 
+
+=>rm -rf /mhFolder/*
+Delete every thing in mhFolder
+
+
+#TAR |  ZIP
+-------------------------------------------
+=>tar -cvf myTarFile targetFolder/
+Make Tar
+=>tar -tvf myTarFile
+=>tar -xvf myTarFile
+UnTar
+=>tar -rf myTarFile newFile
+=>tar -xvf myTarFile reqFile
+Add/emit a file to exists tar
+
+
+=>gzip myFolder
+=>gunzip myFolder
+Zip/Unzip file
+
+
+
+#Search
+-------------------------------------------
+=>ls *searchKeyword*
+=>find . -name myFileName
+Search file in the folder
+
+=>locate filName
+=>locate -i filName
+=>locate *myFile*Name*
+Search file in the system
+
+=>grep fWord myTextFile.txt
+=>grep 'Please find my sentence' myTextFile.txt
+Search word in text file
+
+
+
+
+=>scp localmachine/path_to_the_file username@server_ip:/path_to_remote_directory
+
+=>scp -r /app/test/test.txt apihub@172.16.254.25:/app
+=>scp -r cassandra.yaml C:
+=>scp -r apihub@172.16.8.132:standalone.xml "C:"
+=>docker cp e029d15afdfc:/etc/cassandra/cassandra.yaml C:/Z_MY_COMPUTER
+=>docker cp C:/Z_MY_COMPUTER/cassandra.yaml a394ae84224c:/etc/cassandra
+
+
+
+=>cd /etc/skel/
+=>touch sharedFile
+Sharing file for all user
+
+
+
+=================================================
+# User | Group                                      
+================================================= 
+
+=>adduser imran |  and other information
+=>sudo passwd imran
+Set new password
+=>userdel imran
+
+=>cat /etc/passwd
+Check user list
+
+=>su newUseraName
+Switch user
+
+#Group
+-----------------------------------------------
+=>groupadd empGroup
+=>cat /etc/group
+
+
+=>usermod -G empGroup imranUser
+=>usermod -G empGroup, otherGroup imranUser
+Add user in a group
+
+=>gpasswd -d imranUser empGroup
+Remove user from a group
+
+=>groupmod -n newGroupName oldGroupName
+Rename group
+
+=>groupdel empGroup
+Delete group
+
+
+=================================================
 # Sucurity | Permissions  | access                                
 ================================================= 
 
+=>chmod u/g/o +/- file/folder
+Permissions Syntax
+
+=>chmod u+w myFileName
+=>chmod u+w,g+r,o+r myFileName
+=>chmod 777 myFileName
+Add file permission
+
+
+=>chown imranUser myFolder
+=>chmod .empGroup myFolder
+=>chmod imranUser.empGroup myFolder
+Add Owner permission
+
+
 =>sudo su
 Log in as root
+
+=>sudo passwd root
+For Change password
+
+=>runlevel
+Show current runlevel id
+
+=>su - imran
+Change system user
+
 
 =>sudo chown userName:groudName fileName
 Change Owner/Group of a File
@@ -85,6 +228,9 @@ List all group names on Linux:
 To print the primary/secondary group membership for a user called
 
 
+Id From 0 to 499 System generated and Other user generated
+
+
 chmod a-w file (removes all writing permissions)
 chmod o+x file (sets execute permissions for other (public permissions))
 chmod u=rx file        (Give the owner rx permissions, not w)
@@ -102,9 +248,40 @@ r = read aces to the file
 w = write access
 x = execute (run) access 
 
+
 =================================================
-# Software | repositories |   packages   | install      | Tools                  
+#Networking | Net                                           
 ================================================= 
+
+=>ifconfig
+=>host google.combine
+
+=>netstat -tulpn
+
+=>sudo route
+=>suod route add default gw 192.168.1.1
+=>suod route del default gw 192.168.1.1
+
+=>sudo apt-get install traceroute
+=>traceroute google.com
+
+ 
+
+
+ 
+
+
+=>sudo apt install net-tools
+
+
+
+=================================================
+#Software|repositories|packages|install|Tools                  
+================================================= 
+
+
+=>sudo apt install synaptic 
+=>sudo apt-get install vlc
 
 =>sudo apt show
 =>sudo apt search "web browser"
@@ -114,28 +291,7 @@ Finding and Installing New Software
 
 Install  Net tools
 =>sudo apt install net-tools
-
-
-=================================================
-#    File or Directory  | Operation                                        
-================================================= 
-scp localmachine/path_to_the_file username@server_ip:/path_to_remote_directory
-
-=>scp -r /app/test/test.txt apihub@172.16.254.25:/app
-=>scp -r cassandra.yaml C:
-=>scp -r apihub@172.16.8.132:standalone.xml "C:"
-=>docker cp e029d15afdfc:/etc/cassandra/cassandra.yaml C:/Z_MY_COMPUTER
-=>docker cp C:/Z_MY_COMPUTER/cassandra.yaml a394ae84224c:/etc/cassandra
-
-
-=>cat tast.txt
-=>vim test.txt
-
-=>rm test.txt
-delete a file
-
-
-
+ 
 
 
 =================================================
@@ -152,9 +308,44 @@ find out which process is listing upon a port
 =>netstat -tulpn | grep :9940
 
 
+=================================================
+# System  |  Update | Upgrade                        
+================================================= 
+
+=>init 3 // Text mode
+=>startx 
+=>init 0 shatdown
+=>init 6 or =>reboot
+=>who 
+Current log in user
 
 
+=>history 
+Show uses caommand from start to at now
 
+=>history -c
+Clear command history
+
+
+=>dpkg --list
+Currently installed programs
+
+=>sudo apt-get remove packagName
+=>sudo apt-get --purge remove packagName
+=>sudo aptitude remove packagName
+Uninstalling Programs with Terminal
+
+=>sudo apt-get dist-upgrade
+
+=>sudo apt-get autoremove
+
+=>sudo systemctl daemon-reload 
+Reload the systemd daemon service to load newly create files.
+
+=>sudo apt update
+Syncs your local copy of available packages and their versions against the current-state index with the repositories
+
+=>sudo updatedb
 
 =================================================
 #Linux | Info | Desc | documentation                            
@@ -215,25 +406,3 @@ Setting			Numerical			Owner						Group						Others
 -rwx–x–x			711				Read/Write/Execute	Execute					Execute
 -rw-rw-rw-			666				Read/Write				Read/Write				Read/Write
 -rwxrwxrwx		777				Read/Write/Execute	Read/Write/Execute	Read/Write/Execute
-
-=================================================
-# System  |  Update | Upgrade                        
-================================================= 
-
-=>dpkg --list
-Currently installed programs
-
-=>sudo apt-get remove packagName
-=>sudo apt-get --purge remove packagName
-=>sudo aptitude remove packagName
-Uninstalling Programs with Terminal
-
-=>sudo apt-get dist-upgrade
-
-=>sudo apt-get autoremove
-
-=>sudo systemctl daemon-reload 
-Reload the systemd daemon service to load newly create files.
-
-=>sudo apt update
-Syncs your local copy of available packages and their versions against the current-state index with the repositories
