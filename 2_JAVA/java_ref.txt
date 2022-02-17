@@ -4031,4 +4031,17 @@ public String getHadoopConnectionString() {
 ================================================
 
  ApplicationContextHolder.getContext().getBean(WalletFTVerifierService.class);
+ 
+ 
+ 
+ ================================================
+#  ResponseEntity                                      
+================================================
+    ObjectMapper mapper = new ObjectMapper();
+	
+	
+ ResponseEntity<?> response =
+	dbssClient.dataVolumeTransfer(
+		volumeTransferRequest.getSenderSubscriptionId(), objRequest);
+objResponse.setData(mapper.convertValue(response.getBody(), VolumeTransferResponse.class));
 

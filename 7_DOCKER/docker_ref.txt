@@ -69,9 +69,6 @@ Retag the image with a version number:
 
 
 
-
-
-
 # Pull Images | download Images
 -------------------------------------------------
 =>docker pull imranmadbar/docker-spring-boot-mysql
@@ -83,8 +80,10 @@ Pull image with a version number:
 
 # Run Images as container
 -------------------------------------------------
+=>cqlsh localhost -u imran -p 123456
 =>docker run imranmadbar/hello-world-java
 =>docker run --name containerName -p 8080:8080 -d imageName:tagName
+=>docker run --name cassandradb -d -p 9042:9042 cassandra:3.11
 
 =>docker run --name oauth2-authorization-server-api -p 8081:8081 imranmadbar/oauth2-authorization-server-api:1.0.0.RELEASE
 =>docker run --name docker-spring-security-mysql-mvc-prod -p 8181:8181 imranmadbar/docker-spring-security-mysql-mvc-prod:2.0.0.RELEASE
@@ -100,6 +99,7 @@ Pull image with a version number:
 
 # Run Images as container
 -------------------------------------------------
+=>docker run -d -p 9042:9042 cassandra:3.11
 =>docker run -d -p 3306:3306 --name=spring-boot-mysql-oauth2-db --env="MYSQL_ROOT_PASSWORD=root" --env="MYSQL_DATABASE=mysqloauth2db" -it mysql:5.7
 
 =>docker run --name oauth2-authorization-server-api -t --link spring-boot-mysql-oauth2-db:spring-boot-mysql-oauth2-db -p 8181:8081 imranmadbar/oauth2-authorization-server-api:1.0.0.RELEASE
@@ -178,7 +178,7 @@ Copy File From/To Container/Desktop
 
 #Open Bash | CMD of Containers
 -------------------------------------------------
-=>docker exec -it e029d15afdfc bash
+=>docker exec -it a394ae84224c bash
 Access the docker container and run commands inside the container. I am accessing the apache server container in this example.
 Type exit and press enter to come out of the container.
 
@@ -437,6 +437,8 @@ Save a new docker image with container id mentioned in the command on the local 
 
 #Copying file
 -------------------------------------------------
+=>docker cp e029d15afdfc:/etc/cassandra/cassandra.yaml C:/Z_MY_COMPUTER
+
 =>sudo docker cp 09ca6feb6efc:/usr/local/apache2/logs/httpd.pid /home/geekflare/
 Copy a file from a docker container to the local system.
 In this example, I am copying httpd.pid file inside a docker container with id 09ca6feb6efc to /home/geekflare/
