@@ -22,6 +22,9 @@ Kernel Version
 
 =>uptime
 
+
+sudo apt autoremove
+sudo apt autoclean
 username@hostname:~$
 =================================================
 #                  Basic                                          
@@ -362,6 +365,8 @@ find out which process is listing upon a port
 =>netstat -tulpn | grep :9940
 
 
+
+
 =================================================
 # System  |  Update | Upgrade                        
 ================================================= 
@@ -400,6 +405,43 @@ Reload the systemd daemon service to load newly create files.
 Syncs your local copy of available packages and their versions against the current-state index with the repositories
 
 =>sudo updatedb
+
+
+
+=================================================
+# MySQL                  
+================================================= 
+=>sudo mysql -u root -p -e 'SHOW VARIABLES LIKE "%version%";'
+=>sudo mysqladmin -u root -p version
+=>SELECT version();
+
+
+=>service mysql start
+=>systemctl status mysql
+=>service mysql stop
+
+
+
+#InstallMySql
+--------------------------------------------------------------------------------------------------
+=>sudo apt install mysql-server
+=>sudo mysql_secure_installation
+Security configuration
+
+
+
+=>sudo apt install ./mysql-workbench-community_8.0.20-1ubuntu20.04_amd64.deb
+=>snap install mysql-workbench-community
+=>sudo snap connect mysql-workbench-community:password-manager-service :password-manager-service
+
+
+mysql>update mysql.user set plugin = 'mysql_native_password' where User='root';
+mysql>FLUSH PRIVILEGES;
+mysql>exit;
+Access denied for user 'root'@'localhost'
+
+
+
 
 =================================================
 #Linux | Info | Desc | documentation                            
