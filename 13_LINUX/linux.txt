@@ -26,6 +26,7 @@ Kernel Version
 sudo apt autoremove
 sudo apt autoclean
 username@hostname:~$
+play /home/imran/Music/FadedShadow.mp3
 =================================================
 #                  Basic                                          
 ================================================= 
@@ -37,7 +38,6 @@ username@hostname:~$
 =>sudo tar xzvf unzipAbleFileNametar.gz
 =>sudo mv moveFolderName /opt/myFolder/
 =>sudo chown -R imran:imran /opt/myFolder
-
 
 
 =>update-alternatives --config java
@@ -297,38 +297,31 @@ x = execute (run) access
 #Service | systemd | Systemd Services                                     
 =================================================
 
+=>nano /etc/systemd/system/my_simple_service.service
+
+=>sudo  systemctl daemon-reload
+=>sudo systemctl start my_simple_service.service
+=>sudo systemctl status my_simple_service.service
+=>sudo systemctl stop my_simple_service.service
+
+=>sudo systemctl enable my_simple_service.service
+=>sudo systemctl disable my_simple_service.service
+To enable/disable your service on every reboot
+
+
 
 SimpleSerEx1
 ============
 [Unit]
-Description=My new Service
+Description=My Simple Custome Service
 
 [Service]
 Type=simple
-ExecStart=/bin/sh -c  'echo "WHAAAAAT" >> /var/log/my_service.log 2>&1'
+ExecStart=/bin/sh -c  'echo "Lgo written By SimpleService" >> /var/log/my_simple_service.log 2>&1'
 
 [Install]
 WantedBy=multi-user.target
 
-
-
-
-SimpleSerEx2
-============
-
-[Unit]
-Description=ROT13 demo service
-After=network.target
-StartLimitIntervalSec=0
-[Service]
-Type=simple
-Restart=always
-RestartSec=1
-User=centos
-ExecStart=/usr/bin/env php /path/to/server.php
-
-[Install]
-WantedBy=multi-user.target
 
  
 
@@ -440,6 +433,14 @@ mysql>FLUSH PRIVILEGES;
 mysql>exit;
 Access denied for user 'root'@'localhost'
 
+
+
+=================================================
+# Media |  Audio                  
+================================================= 
+ =>suod apt install sox
+ => sudo apt-get install libsox-fmt-mp3
+ =>sudo apt-get install sox libsox-fmt-all
 
 
 
