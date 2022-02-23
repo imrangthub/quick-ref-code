@@ -5,7 +5,7 @@
 =>docker --version
 =>docker info
 =>docker logs 96
-=> docker login
+=>docker login
 =>docker logout
 
 =>systemctl start docker
@@ -16,14 +16,23 @@
 
 =>docker run imranmadbar/hello-world-java
 =>docker run --name containerName -p 8080:8080 -d imageName:tagName
+=>docker run --name SpringBootWebApp1 -dp 8080:8080 -v MyDataVol:/projectData containerId
 =>docker run --name SpringBootWebApp -p 8080:8080 -d imranmadbar/hello-world-java-maven-web-spring-boot
 =>docker stop containerId
+
+
+=>docker cp e029d15afdfc:/etc/cassandra/cassandra.yaml C:/Z_MY_COMPUTER
+=>docker cp C:/Z_MY_COMPUTER/1MD_IMRAN_HOSSAIN/JAVA/SimpleJavaApplicatio.java 7a35bd9a6eb4:/home
+
 
 =================================================
 #                  Basic                                          
 ================================================= 
 
-=>docker Images
+=>printenv
+=>cat /etc/os-release
+
+=>docker images
 =>docker container ls
 
 => docker container ls -aq
@@ -35,19 +44,22 @@ Lists all the docker containers are running with container details.
 =>docker ps -a
 List all the docker containers running/exited/stopped with container details.
 
-=>docker inspect <container-id>
-Inspect a container
 
-
-=> docker search hadoop
+=>docker search hadoop
 Search for a docker image on dockerhub with the name mentioned in the command.
 
 =>docker system prune --all
-Delete all image:
+Delete all image
 
-#################################################
-#                 Docker Image                 #
-#################################################
+
+=>docker inspect containerId
+
+
+
+
+=================================================
+#Docker Image 
+=================================================
 
 
 # Build Images
@@ -96,7 +108,6 @@ Pull image with a version number:
 
 
 
-
 # Run Images as container
 -------------------------------------------------
 =>docker run -d -p 9042:9042 cassandra:3.11
@@ -136,9 +147,14 @@ Just make change, re-build image and push !
 
 
 
-#################################################
-#                 Docker Container              #
-#################################################
+=================================================
+#Docker Container   
+=================================================
+
+=>docker start 09ca6feb6efc
+=>docker rm 9b6343d3b5a0
+=>docker restart 09ca6feb6efc
+=>docker stop 09ca6feb6efc
 
 
 =>docker cp e029d15afdfc:/etc/cassandra/cassandra.yaml C:/Z_MY_COMPUTER
@@ -149,36 +165,7 @@ Copy File From/To Container/Desktop
 
 #Open Bash | CMD of Containers
 -------------------------------------------------
-=>docker exec -it a394ae84224c bash
-Access the docker container and run commands inside the container. I am accessing the apache server container in this example.
-Type exit and press enter to come out of the container.
-
-
-
-#Removing Container
--------------------------------------------------
-=> docker rm 9b6343d3b5a0
-Remove the docker container with container id mentioned in the command.
-
-
-
-#Restart Docker Container
--------------------------------------------------
-=> docker restart 09ca6feb6efc
-Restart the docker container with container id mentioned in the command
-
-
-
-#Stopping  Container
--------------------------------------------------
-=>docker stop 09ca6feb6efc
-Stop a container with container id mentioned in the command.
-
-
-
-#Starting  Container
--------------------------------------------------
-=>docker start 09ca6feb6efc
+=>docker exec -it 583c72a9b5e5 sh
 
 
 
@@ -189,61 +176,46 @@ Stop the docker container immediately. Docker stop command stops the container g
 
 
 
-#Remove Docker container
--------------------------------------------------
-=>docker container rm containerIdHere
 
 
-
-#Remove a Stopped Container
--------------------------------------------------
-=>docker container rm [container_id]
-To remove a stopped container, use the command
-Like before, this removes a container with the ID you specify.
-
-
-
-#Remove All Stopped Containers
--------------------------------------------------
-=>docker container rm $(docker container ls –aq)
-To remove all stopped containers
-
-
-
-#Remove All Docker Containers
--------------------------------------------------
-=>docker container stop $(docker container ls –aq) && docker system prune –af ––volumes
-To wipe Docker clean and start from scratch, enter the command:
-
-
-#Stop all docker containers at once on Windows
--------------------------------------------------
-You could create a batch-file (.bat or .cmd) with these commands in it:
-
-@ECHO OFF
-FOR /f "tokens=*" %%i IN ('docker ps -q') DO docker stop %%i
-If you want to run this command directly in the console, replace %%i with %i, like:
-
-FOR /f "tokens=*" %i IN ('docker ps -q') DO docker stop %i
-In Git Bash or Bash for Windows you can use this Linux command:
-
-=>docker stop $(docker ps -q)
-Note: this will fail if there are no containers running
-
-For PowerShell, the command is very similar to the Linux one:
-
-=>docker ps -q | % { docker stop $_ }
 
  
-#################################################
-#                 Docker Network                #
-#################################################
+=================================================
+#Mounting  | Volumes |  Bind mounts                                       
+=================================================
+
+=>docker volume create MyDataVol
+=>docker volume ls
+=>docker volume ls -f name=data
+=>docker volume inspect MyDataVol
+
+=>docker volume rm MyDataVol
+=>docker volume prune
 
 
-#Docker network
--------------------------------------------------
+=>docker run --name SpringBootWebApp1 -dp 8080:8080 -v MyDataVol:/projectData containerId
+=>echo "Simple Msg Written on volume" > /projectData/simple-msg.txt
+Add data to volumn file inside from a container
+
+
+=>docker run -it --rm -v MyDataVol:/vol busybox ls -l /vol
+Check volume data with a temp container
+
+
+
+
+
+
+=================================================
+#Docker Network 
+=================================================
+
+
+=>docker exec 484bc9a71fea  ifconfig
+=>docker network inspect netName
+
 => docker network ls
-The following command in docker lists the details of all the network in the cluster.
+=>docker inspect bridge
 
 
 
@@ -277,9 +249,13 @@ The following command in docker lists the details of all the network in the clus
 -------------------------------------------------
 =>docker network rm networkId
 
-#################################################
-#                 Docker Compose                #
-#################################################
+
+
+
+
+=================================================
+#Docker Compose  
+=================================================
 
 
 #Run Compose |  Up Compose
@@ -328,9 +304,14 @@ mysql:
     container_name: sf4_mysql
 
 
-#################################################
-#                Docker Swarm                   #
-#################################################
+
+
+
+
+
+=================================================
+#Docker Swarm  
+=================================================
 
 
 
@@ -373,10 +354,14 @@ To delete the service, which stops all deployed containers, you run:
 docker service scale myservice=10
 
 
-#################################################
-#                Docker Daemons                 #
-#################################################
 
+
+
+
+
+=================================================
+#Docker Daemons 
+=================================================
 
 #Version
 -------------------------------------------------
@@ -464,6 +449,11 @@ Run the below command if the volume got created or not
 -------------------------------------------------
 => docker plugin install vieux/sshfs D
 Install a docker plugin vieux/sshfs with debug environment set to 1.
+
+
+
+
+$ docker container run -d ubuntu:16.04 /bin/sh -c "while true; do echo hello world; sleep 1; done"
 
 
 
