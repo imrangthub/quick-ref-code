@@ -16,7 +16,6 @@
 
 =>docker run imranmadbar/hello-world-java
 =>docker run --name containerName -p 8080:8080 -d imageName:tagName
-=>docker run --name SpringBootWebApp1 -dp 8080:8080 -v MyDataVol:/projectData containerId
 =>docker run --name SpringBootWebApp -p 8080:8080 -d imranmadbar/hello-world-java-maven-web-spring-boot
 =>docker stop containerId
 
@@ -177,8 +176,6 @@ Stop the docker container immediately. Docker stop command stops the container g
 
 
 
-
-
  
 =================================================
 #Mounting  | Volumes |  Bind mounts                                       
@@ -201,9 +198,20 @@ Add data to volumn file inside from a container
 =>docker run -it --rm -v MyDataVol:/vol busybox ls -l /vol
 Check volume data with a temp container
 
+=>docker run --name SpringBootWebApp1 -dp 8080:8080 -v C:\Z_MY_COMPUTER\1MD_IMRAN_HOSSAIN\DOCKER\MyBindMount:/MyBindMount d86b72bd0247
+=>docker run --name SpringBootWebApp1 -dp 8080:8080 --mount type=bind,source=C:\Z_MY_COMPUTER\1MD_IMRAN_HOSSAIN\DOCKER\MyBindMount,target=/MyBindMount d86b72bd0247
 
 
+To avoid losing data, Docker provides volumes and bind mounts, two mechanisms for persisting data in your Docker container.
 
+#DockerVolumes
+------------------------------------------------
+Volumes are a great mechanism for adding a data persisting layer in your Docker containers.Docker volumes are completely handled by Docker itself and therefore independent of both your directory structure and the OS of the host machine.
+
+
+#BindMounts
+------------------------------------------------
+Bind mounts will mount a file or directory on to your container from your host machine, which you can then reference via its absolute path.
 
 
 =================================================
