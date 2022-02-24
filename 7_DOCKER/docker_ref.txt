@@ -53,13 +53,14 @@ Delete all image
 
 =>docker inspect containerId
 
+=>docker logs 09ca6feb6efc
+
 
 
 
 =================================================
 #Docker Image 
 =================================================
-
 
 # Build Images
 -------------------------------------------------
@@ -75,8 +76,6 @@ Retag the image with a version number:
 
 =>docker image build -t imranmadbar/oauth2-resource-server-api:1.0.0.RELEASE .
 =>docker image build -t imranmadbar/oauth2-authorization-server-api:1.0.0.RELEASE .
-
-
 
 
 
@@ -161,18 +160,12 @@ Just make change, re-build image and push !
 Copy File From/To Container/Desktop
 
 
-
-#Open Bash | CMD of Containers
--------------------------------------------------
 =>docker exec -it 583c72a9b5e5 sh
+Open Bash | CMD of Containers
 
 
-
-#Kill Container
--------------------------------------------------
 => docker kill 09ca6feb6efc
 Stop the docker container immediately. Docker stop command stops the container gracefully, that’s the difference between a kill and stop commands.
-
 
 
 
@@ -371,13 +364,11 @@ docker service scale myservice=10
 #Docker Daemons 
 =================================================
 
-#Version
--------------------------------------------------
 =>docker --version
-One of the first things you want to know is how to find the installed docker version.
 
 
-The error is related to that part:
+#Windows issue
+-------------------------------------------------
 
 In the default daemon configuration on Windows, the docker client must be run elevated to connect
 
@@ -392,64 +383,6 @@ OR, with cmd:
 Open cmd as administrator
 Launch command: "C:\Program Files\Docker\Docker\DockerCli.exe" -SwitchDaemon
 
-#Commit
--------------------------------------------------
-=>docker commit 09ca6feb6efc geekflare/httpd_image
-Save a new docker image with container id mentioned in the command on the local system. In the example below, geekflare is the username, and httpd_image is the image name.
-
-
-
-#Copying file
--------------------------------------------------
-=>docker cp e029d15afdfc:/etc/cassandra/cassandra.yaml C:/Z_MY_COMPUTER
-
-=>sudo docker cp 09ca6feb6efc:/usr/local/apache2/logs/httpd.pid /home/geekflare/
-Copy a file from a docker container to the local system.
-In this example, I am copying httpd.pid file inside a docker container with id 09ca6feb6efc to /home/geekflare/
-
-=>ls
-Run the command below to check if the file got copied or not.
-
-
-
-#Checking history
--------------------------------------------------
-=> docker history httpd
-Shows the history of a docker image with the image name mentioned in the command.
-
-
-
-#Checking logs
--------------------------------------------------
-=>docker logs 09ca6feb6efc
-Show the logs of the docker container with contained id mentioned in the command.
-
-
-
-#Searching image
--------------------------------------------------
-=> docker search hadoop
-Search for a docker image on dockerhub with the name mentioned in the command.
-
-
-
-#Updating configuration
--------------------------------------------------
-=>docker update --help
-Usage:  docker update [OPTIONS] CONTAINER [CONTAINER...]
-
-Update container configurations. This shows all the update options.
-Run the below command to update the CPU configuration of docker container with container id mentioned in the command.
-=>docker update -c 1 2f6fb3381078
-
-
-
-#Creating volume
--------------------------------------------------
-=>docker volume create
-Create a volume which docker container will use to store data.
-Run the below command if the volume got created or not
-=>docker volume ls
 
 
 
@@ -461,25 +394,19 @@ Install a docker plugin vieux/sshfs with debug environment set to 1.
 
 
 
-$ docker container run -d ubuntu:16.04 /bin/sh -c "while true; do echo hello world; sleep 1; done"
-
-
-
-
-
 
 
 =================================================
 #MySQL | Sql 
 =================================================
 
-docker run -v <absolute/path/to/store/data/in/host>:/var/lib/mysql/ -p 3306:3306 mysql
+create table student_tbl(
+   id INT NOT NULL AUTO_INCREMENT,
+   name VARCHAR(100) NOT NULL,
+   gender VARCHAR(40) NOT NULL,
+   PRIMARY KEY ( id )
+);
 
-
-=>docker run --name SpringBootWebApp1 -dp 8080:8080 -v C:\Z_MY_COMPUTER\1MD_IMRAN_HOSSAIN\DOCKER\MyBindMount:/MyBindMount d86b72bd0247
-=>docker run --name SpringBootWebApp1 -dp 8080:8080 --mount type=bind,source=C:\Z_MY_COMPUTER\1MD_IMRAN_HOSSAIN\DOCKER\MyBindMount,target=/MyBindMount d86b72bd0247
-
-
-=>docker run --name arif-travel-agency-app -t --link arif_travel_agencydb:arif_travel_agencydb -p 8080:8080 imranmadbar/arif-travel-agency-app
-
-=>docker run -d -p 3333:3306 --name=arif_travel_agencydb --env="MYSQL_ROOT_PASSWORD=root" --env="MYSQL_DATABASE=arif_travel_agencydb" -it mysql:5.7.18
+=>docker run -d -p 3306:3306 --name=simpledbschema -v MySqlVol:/var/lib/mysql/ -it mysql:5.7.18
+=>docker run -d -p 3306:3306 --name=arif_travel_agencydb --env="MYSQL_ROOT_PASSWORD=root" --env="MYSQL_DATABASE=arif_travel_agencydb" -it mysql:5.7.18
+=>docker run -d -p 3306:3306 --name=arif_travel_agencydb -v C:\Z_MY_COMPUTER\1MD_IMRAN_HOSSAIN\DOCKER\MySqlMount:/var/lib/mysql/ --env="MYSQL_ROOT_PASSWORD=root" --env="MYSQL_DATABASE=arif_travel_agencydb" -it mysql:5.7.18
