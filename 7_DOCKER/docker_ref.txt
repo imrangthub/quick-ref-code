@@ -2,6 +2,8 @@
 #                 DOCKER                        #
 #################################################
 
+https://www.youtube.com/watch?v=wtKef83kmUA&list=PL0hSJrxggIQoKLETBSmgbbvE4FO_eEgoB
+
 =>docker --version
 =>docker info
 =>docker logs 96
@@ -17,16 +19,30 @@
 =>docker run imranmadbar/hello-world-java
 =>docker run --name containerName -p 8080:8080 -d imageName:tagName
 =>docker run --name SpringBootWebApp -p 8080:8080 -d imranmadbar/hello-world-java-maven-web-spring-boot
+
 =>docker stop containerId
 
 
 =>docker cp e029d15afdfc:/etc/cassandra/cassandra.yaml C:/Z_MY_COMPUTER
 =>docker cp C:/Z_MY_COMPUTER/1MD_IMRAN_HOSSAIN/JAVA/SimpleJavaApplicatio.java 7a35bd9a6eb4:/home
 
-
+=>ps -eaf | grep 8080
+=>ps -eaf | grep docker
+=>docker exec containerId ls
+=>docker stats
+=>docker top containerId
+=>docker events
+=>docker exec -it containerId sh
+=>docker container stats --all
 =================================================
 #                  Basic                                          
 ================================================= 
+=>docker stop $(docker ps -a -q)
+=>docker rm $(docker ps -a -q)
+
+=>docker service scale SpringBootWebApp=5
+
+
 
 =>printenv
 =>cat /etc/os-release
@@ -53,7 +69,11 @@ Delete all image
 
 =>docker inspect containerId
 
-=>docker logs 09ca6feb6efc
+=>docker -f logs 09ca6feb6efc
+
+
+=>docker diff containerId
+Check the different history in container
 
 
 
@@ -61,6 +81,8 @@ Delete all image
 =================================================
 #Docker Image 
 =================================================
+
+=>docker commit -m "commitMsg" -a "authorName" containerId newImageName
 
 # Build Images
 -------------------------------------------------
@@ -77,7 +99,9 @@ Retag the image with a version number:
 =>docker image build -t imranmadbar/oauth2-resource-server-api:1.0.0.RELEASE .
 =>docker image build -t imranmadbar/oauth2-authorization-server-api:1.0.0.RELEASE .
 
+=>docker image build -t imranmadbar/arif-travel-agency-app:1.0.0.RELEASE .
 
+=>docker image build -t imranmadbar/hello-world-java-maven-web-spring-boot
 
 # Pull Images | download Images
 -------------------------------------------------
@@ -115,6 +139,14 @@ Pull image with a version number:
 =>docker run --name oauth2-resource-server-api -t --link spring-boot-mysql-oauth2-db:spring-boot-mysql-oauth2-db -p 8282:8082 imranmadbar/oauth2-resource-server-api:1.0.0.RELEASE
 
 
+=>docker run --name arif-travel-agency-app --link mysqlschema:mysqlschema -t -p 8080:8080 imranmadbar/arif-travel-agency-app:1.0.0.RELEASE
+=>docker run --name arif-travel-agency-app --link mysqlschema:mysqlschema -e MYSQL_HOST=mysqlschema -t -p 8080:8080 imranmadbar/arif-travel-agency-app:1.0.0.RELEASE
+
+=>docker run --name SpringBootWebApp -m 250m -p 8080:8080 -d imranmadbar/hello-world-java-maven-web-spring-boot
+
+=>docker run --name SpringBootWebApp --cpus 3 -m 100m -p 8080:8080 -d imranmadbar/hello-world-java-maven-web-spring-boot
+=>docker run --name SpringBootWebApp --cpus 3 --cpuset-cpus 1 -m 100m -p 8080:8080 -d imranmadbar/hello-world-java-maven-web-spring-boot
+=>docker run --name SpringBootWebApp --cpus 0.2 --cpuset-cpus 1 -m 100m -p 8080:8080 -d imranmadbar/hello-world-java-maven-web-spring-boot
 
 
 #Removing Images
@@ -252,32 +284,36 @@ Bind mounts will mount a file or directory on to your container from your host m
 
 
 
+=>docker network create --driver bridge --subnet 182.18.0.1/24 --gateway 182.18.0.1 wp-mysql-network
+Create a new network named wp-mysql-network using the bridge driver. Allocate subnet 182.18.0.1/24. Configure Gateway 182.18.0.1
+
+
 
 
 =================================================
 #Docker Compose  
 =================================================
+=>docker-compose --version
+
+
 
 
 #Run Compose |  Up Compose
 -------------------------------------------------
 =>docker-compose up
 =>docker-compose down
-In this case, the application will be up and running until you hit Ctrl-C to cancel the foreground process.
-In this case, when you press Ctrl-C, it is equivalent to executing the “docker-compose stop”. So, it will stop all the containers gracefully.
-
 =>docker-compose up -d 
-The -d options runs the docker application in the background as a daemon. 
-This will leave the application running until you decide to stop it.
+
+=>docker-compose up -d --no-recreate
 
 
 
-#Additional docker-compose Startup Options
--------------------------------------------------
+=>docker-compose up -d --no-recreate
+
 When you use docker-compose up, if there are any changes in the docker-compose.yml file that affects the containers, they will stopped and recreated.
 But, you can force docker-compose not to stop and recreate the containers, you can use –no-recreate option as shown below during the docker-compose up. In other words, if the container already exits, this will not recreate it.
 
-=>docker-compose up -d --no-recreate
+
 You also can do the opposite. The following will forcefully recreate the containers even if nothing in the docker-compose.yml is changed.
 
 
@@ -407,6 +443,30 @@ create table student_tbl(
    PRIMARY KEY ( id )
 );
 
-=>docker run -d -p 3306:3306 --name=simpledbschema -v MySqlVol:/var/lib/mysql/ -it mysql:5.7.18
-=>docker run -d -p 3306:3306 --name=arif_travel_agencydb --env="MYSQL_ROOT_PASSWORD=root" --env="MYSQL_DATABASE=arif_travel_agencydb" -it mysql:5.7.18
-=>docker run -d -p 3306:3306 --name=arif_travel_agencydb -v C:\Z_MY_COMPUTER\1MD_IMRAN_HOSSAIN\DOCKER\MySqlMount:/var/lib/mysql/ --env="MYSQL_ROOT_PASSWORD=root" --env="MYSQL_DATABASE=arif_travel_agencydb" -it mysql:5.7.18
+=>docker run -d -p 3306:3306 --name=mysqlschema --env="MYSQL_ROOT_PASSWORD=root" --env="MYSQL_DATABASE=arif_travel_agencydb" -it mysql:5.7.18
+
+
+=>docker run --network=wp-mysql-network -e DB_Host=mysql-db -e DB_Password=db_pass123 -p 38080:8080 --name webapp --link mysql-db:mysql-db -d kodekloud/simple-webapp-mysql
+Deploy a web application named webapp using the kodekloud/simple-webapp-mysql image. Expose the port to 38080 on the host.
+
+The application makes use of two environment variable:
+1: DB_Host with the value mysql-db.
+2: DB_Password with the value db_pass123.
+Make sure to attach it to the newly created network called wp-mysql-network.
+
+
+
+Also make sure to link the MySQL and the webapp container.
+
+
+
+
+=================================================
+#FFI
+=================================================
+
+=>docker info
+=>docker help run
+=>docker composer
+
+ 
