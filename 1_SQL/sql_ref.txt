@@ -2,47 +2,8 @@
 #                  SQL                         #
 #################################################
 
-=================================================
-#              POSTGRE_SQL                                          
-================================================= 
 
-
-
-=>NET STOP MySQL80
-=>NET START MySQL80
-WIN+R and type services.msc find the mysql serice name
-
-=>create database databaseName
-Create new database
-
-=>\l
-Show db list
-=>\c newDB
-(Switch db)Connecti  to new db
-=>drop database databaseName;
-Delete Database
-
-=>\q
-Quite from db 
-
-=>\d
-Show table;
-
-=>\d show tableName
-Show table details
-
-
-Export/Import
------------------------
-=>pg_dump -U postgres -p 5432 -d arif_travel_agencydb -W -f c:\arif_travel_agencydb.sql
-=>psql -U postgres -d testdb < C:\arif_travel_agencydb.sql
-
-
-
-#ORDER BY 
--------------------------------------------------
-SELECT * FROM student
-ORDER BY create_date desc 
+=>mysql -uroot -p
 
 
 
@@ -156,6 +117,36 @@ Set max conn in Mysql
 =>SET GLOBAL max_connections = 750;
 =>show variables like 'max_connections';
 
+
+
+
+=================================================
+#  MySQL | Connection check | Info check                                         
+================================================= 
+
+
+
+=>show status where `variable_name` = 'Threads_connected';
+=>SHOW STATUS WHERE variable_name LIKE "Threads_%" OR variable_name = "Connections"
+Current Active Connection
+
+
+=>SELECT * FROM INFORMATION_SCHEMA.PROCESSLIST;
+Show User with activeconnection
+
+
+
+=>SHOW VARIABLES LIKE "max_connections";
+Max conn
+
+=>SET GLOBAL max_connections = 5;
+Set Max conn
+
+
+#ORDER BY 
+-------------------------------------------------
+SELECT * FROM student
+ORDER BY create_date desc 
 
 
 =================================================
@@ -768,3 +759,42 @@ CREATE TABLE `hibernate_sequence` (
   `next_val` bigint DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 SELECT * FROM apihub.hibernate_sequence;
+
+
+
+
+
+=================================================
+#              POSTGRE_SQL                                          
+================================================= 
+
+
+
+=>NET STOP MySQL80
+=>NET START MySQL80
+WIN+R and type services.msc find the mysql serice name
+
+=>create database databaseName
+Create new database
+
+=>\l
+Show db list
+=>\c newDB
+(Switch db)Connecti  to new db
+=>drop database databaseName;
+Delete Database
+
+=>\q
+Quite from db 
+
+=>\d
+Show table;
+
+=>\d show tableName
+Show table details
+
+
+Export/Import
+-----------------------
+=>pg_dump -U postgres -p 5432 -d arif_travel_agencydb -W -f c:\arif_travel_agencydb.sql
+=>psql -U postgres -d testdb < C:\arif_travel_agencydb.sql

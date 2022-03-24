@@ -29,7 +29,7 @@ http://172.16.254.122:7080/swagger-ui/index.html   // OPENAPI-TEST
 
 
 
-
+java -jar student-service-1.0.0.RELEASE.jar --server.port=8888 --CONFIG_SERVER=configserver:http://localhost:8080
 java -jar identity-register-1.0.0.jar --spring.profiles.active=dev-bl
 java -jar identity-register-1.0.0.jar --spring.config.import=optional:configserver:http://172.16.11.35:7185/
 =>java -jar identity-register-1.0.0.jar --eureka.client.serviceUrl.defaultZone=http://localhost:7082/eureka/
@@ -46,12 +46,17 @@ Server Deployment
 
 --server.port=8888
 --spring.profiles.active=dev-bl
---spring.cloud.config.uri=http://localhost:7085
+--spring.cloud.config.uri=192.168.1.2:9091 --eureka.client.serviceUrl.defaultZone=http://192.168.1.2:7082/eureka/
 --spring.cloud.config.uri=http://172.16.8.132:7085
 --eureka.client.serviceUrl.defaultZone=http://localhost:7082/eureka/
 
 
+--spring.config.import.optional.configserver=http://localhost:9099/
 
+--spring.cloud.config.uri=192.168.1.2:9099
+	
+	
+	
 =>scp veon_apps@172.16.8.132:/app/apihub/app-management/configuration-server/configuration-server-0.0.1-SNAPSHOT.jar /home/imran/blPROJECT/BS23_BANGLALINK/deploymentProcess
 
 
