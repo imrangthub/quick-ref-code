@@ -1,22 +1,13 @@
 #################################################
 #                 DEVOPS                        #
 #################################################
-Fake Mail:
-imranyop1@yopmail.com
-imranyop2@yopmail.com
-imranyop3@yopmail.com
-imranyop4@yopmail.com
-imranyop5@yopmail.com
+
+192.168.217.145
 
 =================================================
 #                  Basic                                          
 ================================================= 
 
-=>Set-ExecutionPolicy Unrestricted
-
-
--Dcom.sun.management.jmxremote.ssl=false
--Dcom.sun.management.jmxremote.authenticate=false
 
 
 
@@ -24,9 +15,10 @@ imranyop5@yopmail.com
 #Linux | DEPLOYMENT                                          
 =================================================
 
-=>ssh imran@192.168.1.514
+=>ssh imran@192.168.1.5
 =>mv pappjar pappjar_23032022
-=>scp papp.jar imran@192.168.1.514:/home/imran
+=>scp papp.jar imran@192.168.1.5:/home/imran/appService
+=>scp student-service-1.0.0.RELEASE.jar imran@192.168.1.2:/home/imran/appService
 
 
 =>scp -r /home/imran/blPROJECT/deploymentProcess  imran@192.168.1.514:/home/imran/mySimpleFolder
@@ -38,7 +30,10 @@ Copying directories from remote machine to local machine
 
 
 
+=>java -jar student-service-1.0.0.RELEASE.jar --CONFIG_SERVER=configserver:http://192.168.1.2:9091 --eureka.client.serviceUrl.defaultZone=http://192.168.1.2:9092/eureka/
+=>java -jar student-service-1.0.0.RELEASE.jar --server.port=8888 --CONFIG_SERVER=configserver:http://localhost:8080
 
+=>java -jar zipkin-server-2.23.15-exec.jar --server.port=9410 --zipkin.storage.type=cassandra3 --zipkin.storage.cassandra3.ensure-schema=true --zipkin.storage.cassandra3.contact-points=localhost:9042 --zipkin.storage.cassandra3.username=imran --zipkin.storage.cassandra3.password=123456 --zipkin.storage.cassandra3.keyspace=spring_boot_keyspc
 
 =================================================
 #CURL                                         
@@ -53,10 +48,18 @@ curl https://www.cyberciti.biz/files/sticker/sticker_book.pdf --output output.pd
 ================================================= 
 
 
-#SSH
-------------------------------------------------
+#
+=================================================
+# SSH | SHALL | cmd                            
+================================================= 
 
 =>ssh imran@192.168.1.5
+
+
+
+=>Set-ExecutionPolicy Unrestricted
+-Dcom.sun.management.jmxremote.ssl=false
+-Dcom.sun.management.jmxremote.authenticate=false
 
 =================================================
 #                  Window | batch | .bat                                          
@@ -303,142 +306,11 @@ mvn spring-boot:run
 =>gradle task --all 
 
 
-
 =>gradlew dependencyInsight --dependency log4j-core
 =>gradlew dependencyInsight --dependency log4j
 =>./gradlew dependencyInsight --dependency log4j-core
 
 Check Gradle dependencies jar version
-
-
-plugins {
-    id "java"
-    id "maven-publish"
-    id "org.springframework.boot" version "2.1.7.RELEASE"
-    id "io.spring.dependency-management" version "1.0.8.RELEASE"
-    id "org.jetbrains.gradle.plugin.idea-ext" version "0.5"
-    id "com.diffplug.gradle.spotless" version "3.24.2"
-    id "org.sonarqube" version "2.7.1" apply false
-}
-
-group = PROJECT_GROUP
-version = PROJECT_VERSION
-description = PROJECT_DESCRIPTION
-
-compileJava {
-    sourceCompatibility = JavaVersion.VERSION_11
-    targetCompatibility = JavaVersion.VERSION_11
-    options.encoding = "UTF-8"
-}
-
-compileTestJava {
-    sourceCompatibility = JavaVersion.VERSION_11
-    targetCompatibility = JavaVersion.VERSION_11
-    options.encoding = "UTF-8"
-    options.compilerArgs += "-parameters"
-}
-
-ext {
-    googleJavaFormatVersion = '1.7'
-}
-
-repositories {
-    maven {
-        url REPOSITORY
-        credentials {
-            username = REPOSITORY_USERNAME
-            password = REPOSITORY_PASSWORD
-        }
-    }
-}
-
-
-
-dependencies {
-
-    compile('org.springframework.boot:spring-boot-starter-logging') {
-        exclude group: 'ch.qos.logback', module: 'logback-classic'
-    }
-    compile('org.springframework.boot:spring-boot-starter-web') {
-        exclude group: 'org.springframework.boot', module: 'spring-boot-starter-logging'
-        exclude group: 'ch.qos.logback', module: 'logback-classic'
-    }
-
-    implementation(
-            "org.springframework.cloud:spring-cloud-starter-config",
-            "org.springframework.boot:spring-boot-starter-data-jpa",
-            "org.springframework.cloud:spring-cloud-starter-openfeign",
-            "org.springframework.boot:spring-boot-starter-actuator",
-            "org.springframework.cloud:spring-cloud-starter-netflix-eureka-client",
-            "org.springframework.cloud:spring-cloud-starter-sleuth",
-            "org.springframework.cloud:spring-cloud-starter-zipkin",
-            "org.springframework.boot:spring-boot-starter-log4j2"
-    )
-
-    implementation(
-            "io.springfox:springfox-swagger2",
-            "io.springfox:springfox-swagger-ui",
-            "org.projectlombok:lombok",
-    )
-
-    implementation('io.github.openfeign:feign-httpclient')
-
-    runtimeOnly "mysql:mysql-connector-java"
-
-    annotationProcessor("org.projectlombok:lombok")
-
-    testImplementation("org.springframework.boot:spring-boot-starter-test")
-
-    testAnnotationProcessor("org.projectlombok:lombok")
-/*
-    // https://mvnrepository.com/artifact/org.apache.logging.log4j/log4j-api
-    compile group: 'org.apache.logging.log4j', name: 'log4j-api', version: '2.6.1'
-
-    // https://mvnrepository.com/artifact/org.apache.logging.log4j/log4j-core
-    compile group: 'org.apache.logging.log4j', name: 'log4j-core', version: '2.6.1'*/
-
-// https://mvnrepository.com/artifact/org.springframework.boot/spring-boot-starter-log4j2
-   /* compile group: 'org.springframework.boot', name: 'spring-boot-starter-log4j2', version: '1.2.0.RELEASE'*/
-
-   /* runtime('org.springframework.boot') { exclude module: 'slf4j-log4j12' }*/
-}
-
-spotless.java {
-    googleJavaFormat(googleJavaFormatVersion)
-}
-
-tasks.withType(JavaCompile).configureEach { javaCompile ->
-    dependsOn 'spotlessApply'
-}
-
-wrapper {
-    gradleVersion = GRADLE_VERSION
-    distributionUrl = WRAPPER_ROOT + "/${gradleVersion}/gradle-wrapper-${gradleVersion}-bin.zip"
-}
-
-idea.project.settings.delegateActions.delegateBuildRunToGradle = true
-
-springBoot {
-    buildInfo {
-        properties {
-            name = PROJECT_NAME
-            additional = [
-                    'x'      : 'xomidar',
-                    'swagger': true
-            ]
-        }
-    }
-}
-
-configurations.all {
-    resolutionStrategy.cacheChangingModulesFor 0, 'seconds'
-}
-
-configurations {
-    all*.exclude module : 'spring-boot-starter-logging'
-}
-
-
 
 
 =================================================

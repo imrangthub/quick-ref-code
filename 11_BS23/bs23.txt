@@ -16,60 +16,20 @@ Skype:mdimran.bs23@gmail.com
 https://bs23.talentlms.com
 
 
-http://172.16.8.132:7085/discovery-eureka/default
-http://172.16.8.132:8080/auth/admin/master/console/#/realms/banglalink
-http://172.16.254.52:8080/auth/admin/master/console/#/realms/banglalink
 
-http://172.16.8.132:9915/swagger-ui.html
-
-http://172.16.254.122:7081/swagger-ui.html         // APIHUB-TEST
-http://172.16.254.122:7180/swagger-ui/index.html   // NIER-TEST
-http://172.16.254.122:7080/swagger-ui/index.html   // OPENAPI-TEST
-
-
-
-
-
-java -jar identity-register-1.0.0.jar --spring.profiles.active=dev-bl
-java -jar identity-register-1.0.0.jar --spring.config.import=optional:configserver:http://172.16.11.35:7185/
-=>java -jar identity-register-1.0.0.jar --eureka.client.serviceUrl.defaultZone=http://localhost:7082/eureka/
-java -jar identity-register-1.0.0.jar --spring.profiles.active=dev-bl --spring.zipkin.baseUrl=http://172.16.254.122:9410
-java -jar zipkin-server-2.23.15-exec.jar --server.port=9410 --zipkin.storage.type=cassandra3 --zipkin.storage.cassandra3.ensure-schema=true --zipkin.storage.cassandra3.contact-points=localhost:9042 --zipkin.storage.cassandra3.username=imran --zipkin.storage.cassandra3.password=123456 --zipkin.storage.cassandra3.keyspace=spring_boot_keyspc
 
 Server Deployment
 ==========================================
 =>ps -fC java
+=>netstat -tulpn
 =>kill -9 34071
-=>nohup java -jar octopus-sms-0.0.1-SNAPSHOT.jar --spring.profiles.active=dev-bs &
-=>nohup java -jar discovery-eureka-1.0.0.jar --spring.profiles.active=pre-prod-neir &
 =>tail -f nohup.out
 
 --server.port=8888
 --spring.profiles.active=dev-bl
---spring.cloud.config.uri=http://localhost:7085
---spring.cloud.config.uri=http://172.16.8.132:7085
---eureka.client.serviceUrl.defaultZone=http://localhost:7082/eureka/
-
-
-
-=>scp veon_apps@172.16.8.132:/app/apihub/app-management/configuration-server/configuration-server-0.0.1-SNAPSHOT.jar /home/imran/blPROJECT/BS23_BANGLALINK/deploymentProcess
-
-
-
-Server-backup
-==========================================
-=>date
-=>ll
-Get The data and JAR Info from app jar location with server IP, Take the screenshot save to future purpose.
-
-
-
-
-
-Cassandra
-==========================================
-=>cqlsh -u apihub -p api@321 172.16.11.16
-
+--spring.cloud.config.uri=192.168.1.2:9091 
+--CONFIG_SERVER=configserver:http://192.168.1.2:9091
+--eureka.client.serviceUrl.defaultZone=http://192.168.1.2:7082/eureka/
 
 
 
@@ -77,134 +37,18 @@ keycloak Server run
 ==========================================
 =>./standalone.sh
 Test from the keycloak app bin folder
-
 => nohup ./standalone.sh -b=0.0.0.0 &
-
-
-
-
-
-octopus-sms132CMD
-==========================================
-java -jar octopus-cms-0.0.1-SNAPSHOT.jar --spring.profiles.active=prod
-java -jar discovery-eureka-0.0.1-SNAPSHOT.jar --spring.profiles.active=dev-bl
-java -jar otp-0.0.1-SNAPSHOT.jar --spring.profiles.active=dev-bl
-java -jar product-offer-0.0.1-SNAPSHOT.jar --spring.profiles.active=dev-bl
-/app/apihub/jdk1.8.0_231/bin/java -jar octopus-cm-0.0.1-SNAPSHOT-test.jar --spring.profiles.active=dev-bl
-java -jar octopus-lms-0.0.1-SNAPSHOT.jar --spring.profiles.active=dev-bl
-java -jar loyalty-0.0.1-SNAPSHOT.jar --spring.profiles.active=dev-bl
-java -jar PhoenixConnection.jar
-java -jar configuration-server-0.0.1-SNAPSHOT.jar
-/app/apihub/jdk-11/bin/java -D[Standalone] -server -Xms64m -Xmx512m -XX:MetaspaceSize=96M -XX:MaxMetaspaceSize=256m -Djava.net.preferIPv4Stac
-java -jar apihub-big-data-0.0.1-SNAPSHOT.jar
-java -jar octopus-dbss-0.0.1-SNAPSHOT.jar --spring.profiles.active=dev-bl
-java -jar octopus-sms-0.0.1-SNAPSHOT.jar --spring.profiles.active=dev-bs
-java -jar customer-information-0.0.1-SNAPSHOT.jar --spring.profiles.active=dev-bl
-java -jar octopus-adm-0.0.1-SNAPSHOT.jar --spring.profiles.active=dev-bl
-java -jar octopus-iris-0.0.1-SNAPSHOT.jar --spring.profiles.active=dev-bl
-java -jar complaint-management-0.0.1-SNAPSHOT.jar --spring.profiles.active=dev-bl
-java -jar provisioning-0.0.1-SNAPSHOT.jar --spring.profiles.active=dev-bl
-java -jar usages-history-0.0.1-SNAPSHOT.jar
-
-
-uneteb@!23
-
 
 
 
 =================================================
 #    PROJECT |  BANK | UCBL                                          
 ================================================= 
-Artifact is deployed successfully
-
-=================================================
-#  RETAIL                                          
-================================================= 
-
-service-app
-8080
-
-
-admin-app
-7080
-superadmin1
-123456
-
-web-app
-9080
-faisal
-123456
-
-
-================================================= 
-# CORPORATE
-==================================================
-
-http://172.16.229.231:8084/moshiurpiash/ucbl_corporate_banking
-User:md.imran@brainstation-23.com||imranbsgtlab
-12345678
-
-=>git clone -b live-1.0.1.23 --single-branch http://172.16.229.231:8084/internet-banking/ucbl-ib.git
 
 Add Jar to Class Pom:
 -----------------------------------------------
 mvn install:install-file -Dfile=ojdbc6-11.2.0.4.jar -DgroupId=com.oracle -DartifactId=ojdbc6 -Dversion=11.2.0.4 -Dpackaging=jar
 mvn install:install-file -Dfile=ojdbc6-11.2.0.jar -DgroupId=com.oracle -DartifactId=ojdbc6 -Dversion=11.2.0 -Dpackaging=jar
-
-
-Service=8080
-
-AdminApp=7080
-superadmin1
-123456@Tt
-
-WebApp=9080
-
-ID: test3
-: faisal5
-: 123456@Ee
-
-
-bs23
-accountant23
-123456#Tt
-
-
-EntId:imOrgEntId
-mrjon
-22222@Qq
-CEO
-
-mrtom
-22222@Qq
-CEO,Director
-
-mrmanager
-22222@Qq
-Manager
-
-
-
-MITHUN KANTY DEY - 0953202000000676
-MITHUN KANTY DEY - 0953202000000677
-MITHUN KANTY DEY - 0953202000000675
-MITHUN KANTY DEY - 0953202000000674
-MITHUN KANTY DEY - 0953202000000673
-
-
-
-
-=================================================
-#    PROJECT |  Banglalink | BL                                          
-================================================= 
-
-ProjectGit:http://172.16.8.232:8181/groups/api-hub
-imranbs23gtlab
-
-
-172.16.7.90 restart
-
-172.16.254.26 
 
 
 
