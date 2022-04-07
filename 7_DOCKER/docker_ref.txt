@@ -350,18 +350,31 @@ mysql:
 
 
 
-
-
-
 =================================================
 #Docker Swarm  
 =================================================
 
-docker service create --name service1 --network swarm-net --replicas 5 redis
-
-#Initialized docker swarm
--------------------------------------------------
 =>docker swarm init
+=>docker swarm join-token worker
+=>docker swarm join-token manager
+=>docker swarm join --token SWMTKN-1-0ln17cgolp97zws2t81j8i0s9rcjppj2y7j3zfqgmybgr60r66-5qaw5gqn74i5b5nhtt3owlipr 192.168.65.3:2377
+
+=>docker node ls
+
+=>docker service create --replicas 2 --name mynginx -p 8080:80 nginx
+=>docker service create --replicas 2 --name SpringBootWebApp -p 8080:8080 -d imranmadbar/hello-world-java-maven-web-spring-boot
+
+=>docker service ls
+=>docker service inspect --pretty serviceId
+
+=>docker ps
+=>docker service ps serviceId
+see which nodes are running the service:
+
+
+=>docker service scale serviceId=5
+=>docker service rm serviceId
+
 
 #Check Docker node-service
 -------------------------------------------------
@@ -387,20 +400,9 @@ this time the network will be of type Overlay.
 Will remove all running instances but still keep the service object alive.
 
 
-#Remove service
--------------------------------------------------
-=>docker service rm serviceName
-=>docker service rm docker-swarm-consumer-service
-To delete the service, which stops all deployed containers, you run:
-
 #Run docker service
 -------------------------------------------------
 docker service scale myservice=10
-
-
-
-
-
 
 
 =================================================
@@ -478,18 +480,6 @@ Also make sure to link the MySQL and the webapp container.
 
 
 =================================================
-#WorkTemp
-=================================================
-
-FROM openjdk:8-jdk-alpine
-MAINTAINER imranmadbar@gmail.com
-COPY target/arif-travel-agency-0.0.1-SNAPSHOT.jar app.jar
-ENTRYPOINT ["java","-jar","/app.jar"]
-
-
-
-
-=================================================
 #Fix Docker Issue: (Permission denied)
 =================================================
 
@@ -504,4 +494,13 @@ If it does not work, run this command:
 sudo chmod 660 /var/run/docker.sock
 
 
- 
+
+=================================================
+#WorkTemp
+=================================================
+
+FROM openjdk:8-jdk-alpine
+MAINTAINER imranmadbar@gmail.com
+COPY target/arif-travel-agency-0.0.1-SNAPSHOT.jar app.jar
+ENTRYPOINT ["java","-jar","/app.jar"]
+
