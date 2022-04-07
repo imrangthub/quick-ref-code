@@ -84,8 +84,15 @@ Check the different history in container
 
 =>docker commit -m "commitMsg" -a "authorName" containerId newImageName
 
+
+
 # Build Images
 -------------------------------------------------
+
+
+=>docker image build -t imranmadbar/bas-config-server .
+
+
 =>docker image build -t imranmadbar/docker-spring-boot-restcall-consumer .
 =>docker image build -t imranmadbar/docker-spring-boot-restcall-producer .
 List all the docker images pulled on the system with image details such as TAG/IMAGE ID/SIZE etc.
@@ -350,7 +357,7 @@ mysql:
 #Docker Swarm  
 =================================================
 
-
+docker service create --name service1 --network swarm-net --replicas 5 redis
 
 #Initialized docker swarm
 -------------------------------------------------
@@ -468,5 +475,16 @@ Also make sure to link the MySQL and the webapp container.
 =>docker info
 =>docker help run
 =>docker composer
+
+
+=================================================
+#WorkTemp
+=================================================
+
+FROM openjdk:8-jdk-alpine
+MAINTAINER imranmadbar@gmail.com
+COPY target/arif-travel-agency-0.0.1-SNAPSHOT.jar app.jar
+ENTRYPOINT ["java","-jar","/app.jar"]
+
 
  
