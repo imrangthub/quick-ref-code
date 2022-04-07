@@ -487,4 +487,21 @@ COPY target/arif-travel-agency-0.0.1-SNAPSHOT.jar app.jar
 ENTRYPOINT ["java","-jar","/app.jar"]
 
 
+
+
+=================================================
+#Fix Docker Issue: (Permission denied)
+=================================================
+
+Create the docker group if it does not exist: sudo groupadd docker
+See number of super users in the available system: grep -Po '^sudo.+:\K.*$' /etc/group
+Export the user in linux command shell: export USER=demoUser
+Add user to the docker group: sudo usermod -aG docker $USER
+Run the following command/ Login or logout: newgrp docker
+Check if docker runs ok or not: docker run hello-world
+Reboot if you still get an error: reboot
+If it does not work, run this command:
+sudo chmod 660 /var/run/docker.sock
+
+
  
