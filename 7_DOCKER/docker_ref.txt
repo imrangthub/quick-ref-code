@@ -44,6 +44,7 @@ https://www.youtube.com/watch?v=wtKef83kmUA&list=PL0hSJrxggIQoKLETBSmgbbvE4FO_eE
 
 
 
+
 =>printenv
 =>cat /etc/os-release
 
@@ -76,6 +77,10 @@ Delete all image
 Check the different history in container
 
 
+=================================================
+#Debug
+=================================================
+=>curl http://localhost:5000/v2/
 
 
 =================================================
@@ -353,11 +358,20 @@ mysql:
 =================================================
 #Docker Swarm  
 =================================================
+CTRL + FN + E to copy
+CTRL + SHIFT + v to paste
+
+All dockerStack and dockerService commands must be run from a manager node.
+
+
 
 =>docker swarm init
 =>docker swarm join-token worker
 =>docker swarm join-token manager
-=>docker swarm join --token SWMTKN-1-0ln17cgolp97zws2t81j8i0s9rcjppj2y7j3zfqgmybgr60r66-5qaw5gqn74i5b5nhtt3owlipr 192.168.65.3:2377
+=>docker swarm join --token SWMTKN-1-48un2xyorli2xipwmgil6n5ymkphj4gw22sprvgnr45mc7jt66-bu3y0o2ppwljssvn8vjd6vi29 192.168.0.11:2377
+=>sdf
+
+
 
 =>docker node ls
 
@@ -365,6 +379,7 @@ mysql:
 =>docker service create --replicas 2 --name SpringBootWebApp -p 8080:8080 -d imranmadbar/hello-world-java-maven-web-spring-boot
 
 =>docker service ls
+=>docker service logs -f serviceId
 =>docker service inspect --pretty serviceId
 
 =>docker ps
@@ -403,6 +418,21 @@ Will remove all running instances but still keep the service object alive.
 #Run docker service
 -------------------------------------------------
 docker service scale myservice=10
+
+
+#Deploy the stack to the swarm
+-------------------------------------------------
+
+=>docker stack deploy --compose-file docker-compose-swarm.yml bahsSwarmStack
+=>docker stack deploy --compose-file docker-compose-swarm-net.yml bahsSwarmStack
+
+=>docker stack ps bahsSwarmStack
+
+
+=>docker stack rm bahsSwarmStack
+
+
+
 
 
 =================================================
