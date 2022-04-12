@@ -44,6 +44,7 @@ https://www.youtube.com/watch?v=wtKef83kmUA&list=PL0hSJrxggIQoKLETBSmgbbvE4FO_eE
 
 
 
+
 =>printenv
 =>cat /etc/os-release
 
@@ -76,6 +77,10 @@ Delete all image
 Check the different history in container
 
 
+=================================================
+#Debug
+=================================================
+=>curl http://localhost:5000/v2/
 
 
 =================================================
@@ -84,8 +89,15 @@ Check the different history in container
 
 =>docker commit -m "commitMsg" -a "authorName" containerId newImageName
 
+
+
 # Build Images
 -------------------------------------------------
+
+
+=>docker image build -t imranmadbar/bas-config-server .
+
+
 =>docker image build -t imranmadbar/docker-spring-boot-restcall-consumer .
 =>docker image build -t imranmadbar/docker-spring-boot-restcall-producer .
 List all the docker images pulled on the system with image details such as TAG/IMAGE ID/SIZE etc.
@@ -343,18 +355,37 @@ mysql:
 
 
 
-
-
-
 =================================================
 #Docker Swarm  
 =================================================
+CTRL + FN + E to copy
+CTRL + SHIFT + v to paste
+
+All dockerStack and dockerService commands must be run from a manager node.
 
 
 
-#Initialized docker swarm
--------------------------------------------------
-=>docker swarm init
+=>docker swarm init --advertise-addr 192.168.8.11
+=>docker swarm join-token worker
+=>docker swarm join-token manager
+
+=>docker node ls
+
+=>docker service create --replicas 2 --name mynginx -p 8080:80 nginx
+=>docker service create --replicas 2 --name SpringBootWebApp -p 8080:8080 -d imranmadbar/hello-world-java-maven-web-spring-boot
+
+=>docker service ls
+=>docker service logs -f serviceId
+=>docker service inspect --pretty serviceId
+
+=>docker ps
+=>docker service ps serviceId
+see which nodes are running the service:
+
+
+=>docker service scale serviceId=5
+=>docker service rm serviceId
+
 
 #Check Docker node-service
 -------------------------------------------------
@@ -380,17 +411,16 @@ this time the network will be of type Overlay.
 Will remove all running instances but still keep the service object alive.
 
 
-#Remove service
+#Deploy the stack to the swarm
 -------------------------------------------------
-=>docker service rm serviceName
-=>docker service rm docker-swarm-consumer-service
-To delete the service, which stops all deployed containers, you run:
 
-#Run docker service
--------------------------------------------------
-docker service scale myservice=10
+=>docker stack deploy --compose-file docker-stack-swarm.yml bahsSwarmStack
+=>docker stack deploy --compose-file docker-stack-swarm-net.yml bahsSwarmStack
+
+=>docker stack ps bahsSwarmStack
 
 
+=>docker stack rm bahsSwarmStack
 
 
 
@@ -470,8 +500,6 @@ Also make sure to link the MySQL and the webapp container.
 =>docker composer
 
 
-
-
 =================================================
 #Fix Docker Issue: (Permission denied)
 =================================================
@@ -486,4 +514,14 @@ Reboot if you still get an error: reboot
 If it does not work, run this command:
 sudo chmod 660 /var/run/docker.sock
 
- 
+
+
+=================================================
+#WorkTemp
+=================================================
+
+FROM openjdk:8-jdk-alpine
+MAINTAINER imranmadbar@gmail.com
+COPY target/arif-travel-agency-0.0.1-SNAPSHOT.jar app.jar
+ENTRYPOINT ["java","-jar","/app.jar"]
+
