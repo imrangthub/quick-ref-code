@@ -365,7 +365,7 @@ All dockerStack and dockerService commands must be run from a manager node.
 
 
 
-=>docker swarm init
+=>docker swarm init --advertise-addr 192.168.8.11
 =>docker swarm join-token worker
 =>docker swarm join-token manager
 =>docker swarm join --token SWMTKN-1-48un2xyorli2xipwmgil6n5ymkphj4gw22sprvgnr45mc7jt66-bu3y0o2ppwljssvn8vjd6vi29 192.168.0.11:2377
@@ -415,16 +415,11 @@ this time the network will be of type Overlay.
 Will remove all running instances but still keep the service object alive.
 
 
-#Run docker service
--------------------------------------------------
-docker service scale myservice=10
-
-
 #Deploy the stack to the swarm
 -------------------------------------------------
 
-=>docker stack deploy --compose-file docker-compose-swarm.yml bahsSwarmStack
-=>docker stack deploy --compose-file docker-compose-swarm-net.yml bahsSwarmStack
+=>docker stack deploy --compose-file docker-stack-swarm.yml bahsSwarmStack
+=>docker stack deploy --compose-file docker-stack-swarm-net.yml bahsSwarmStack
 
 =>docker stack ps bahsSwarmStack
 
