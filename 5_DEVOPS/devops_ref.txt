@@ -277,6 +277,34 @@ Reopening log files
 
 
 
+#Reverse Proxy
+-------------------------------------------------
+
+server {
+	listen       8181;
+	server_name  localhost;
+
+location / {
+		proxy_pass   http://localhost:8080;
+	}
+}
+
+#Load Balancer
+-------------------------------------------------
+upstream upstreamGroup1 {
+   server localhost:8080;
+   server localhost:8282;
+}
+server {
+	listen       70;
+	server_name  localhost;
+
+location / {
+		proxy_pass   http://upstreamGroup1;
+	}
+}
+
+
 =================================================
 #         Jar add on Class Path                                          
 ================================================= 
