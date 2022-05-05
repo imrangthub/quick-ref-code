@@ -9,7 +9,8 @@
 ================================================= 
 
 
-
+--module-path C:\Z_MY_COMPUTER\Software\javafx18\lib 
+--add-modules=javafx.controls,javafx.fxml
 
 =================================================
 #Linux | DEPLOYMENT                                          
@@ -353,10 +354,12 @@ Check class path dependencies
 
 
 
-
+=>gradlew dependencies
 =>gradlew dependencyInsight --dependency log4j-core
 =>gradlew dependencyInsight --dependency log4j
 =>./gradlew dependencyInsight --dependency log4j-core
+
+=>gradlew dependencyInsight --dependency jaxb-core
 
 Check Gradle dependencies jar version
 
@@ -369,6 +372,12 @@ Wapper
 =>gradlew.bat clean
 
 
+
+implementation("org.springframework.boot:spring-boot-starter-web"){
+	exclude group: 'com.fasterxml.jackson.core'
+	exclude group: 'com.fasterxml.jackson.datatype'
+	exclude group: 'com.fasterxml.jackson.module'
+}
 
 =================================================
 #  JENKING                                          
