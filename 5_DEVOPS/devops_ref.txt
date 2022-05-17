@@ -268,7 +268,7 @@ catalina.bat run
 =================================================
 #  NGINX | nginx                                          
 ================================================= 
-=>nginx start
+=>start nginx
 =>nginx -s stop	
 =>nginx -s quit	
 =>nginx -s reload	
@@ -306,6 +306,37 @@ location / {
 		proxy_pass   http://upstreamGroup1;
 	}
 }
+
+
+Windows CMD
+---------------------------------------------------
+=>wmic process where name='nginx.exe' delete
+=>nginx.exe -s quit
+
+
+
+MySql proxy
+-------------------------------------------
+stream {
+    include stream.conf;
+}
+
+
+In stream.conf file on the same folder of nginx.conf write down this 
+upstream galera_cluster {
+    server 127.0.0.1:3306; #node1
+    zone tcp_mem 64k;
+}
+
+server {
+    listen 3366; # MySQL default
+    proxy_pass galera_cluster;
+}
+
+
+
+
+
 
 
 =================================================
