@@ -9,7 +9,8 @@
 ================================================= 
 
 
-
+--module-path C:\Z_MY_COMPUTER\Software\javafx18\lib 
+--add-modules=javafx.controls,javafx.fxml
 
 =================================================
 #Linux | DEPLOYMENT                                          
@@ -272,9 +273,39 @@ catalina.bat run
 =>nginx -s quit	
 =>nginx -s reload	
 
+=>ps -ef|grep nginx
+
 =>nginx -s reopen	
 Reopening log files
 
+
+
+#Reverse Proxy
+-------------------------------------------------
+
+server {
+	listen       8181;
+	server_name  localhost;
+
+location / {
+		proxy_pass   http://localhost:8080;
+	}
+}
+
+#Load Balancer
+-------------------------------------------------
+upstream upstreamGroup1 {
+   server localhost:8080;
+   server localhost:8282;
+}
+server {
+	listen       70;
+	server_name  localhost;
+
+location / {
+		proxy_pass   http://upstreamGroup1;
+	}
+}
 
 
 =================================================
@@ -314,19 +345,27 @@ mvn spring-boot:run
 #                  GRADLE                                          
 ================================================= 
 
+=>gradlew dependencies --configuration runtimeClasspath -q
+Check class path dependencies 
+
 =>gradle -version
 =>gradle task
 =>gradle task --all 
 
 
+
+=>gradlew dependencies
 =>gradlew dependencyInsight --dependency log4j-core
 =>gradlew dependencyInsight --dependency log4j
 =>./gradlew dependencyInsight --dependency log4j-core
+
+=>gradlew dependencyInsight --dependency jaxb-core
 
 Check Gradle dependencies jar version
 
 
 
+<<<<<<< HEAD
 # /etc/profile.d/gradle.sh
 # export PATH=$PATH:/opt/gradle/gradle-7.4.2/bin
 
@@ -353,6 +392,21 @@ Now load the environment variables as follows:
 =>gradle -v
 
 
+=======
+Wapper
+--------------------------------------------------
+=>gradlew --version
+=>gradlew init
+=>gradlew.bat clean
+
+
+
+implementation("org.springframework.boot:spring-boot-starter-web"){
+	exclude group: 'com.fasterxml.jackson.core'
+	exclude group: 'com.fasterxml.jackson.datatype'
+	exclude group: 'com.fasterxml.jackson.module'
+}
+>>>>>>> 772383c1b636a083a7076735c8a615c7c9f73d05
 
 =================================================
 #  JENKING                                          
