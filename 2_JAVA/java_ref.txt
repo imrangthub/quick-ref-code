@@ -75,7 +75,7 @@ if (fromDate != null && toDate != null) {
 
 
 ================================================
-#  Object Mapping | List | Filter | Array  | Short                                       
+#  Object Mapping | List | Filter |Stream|Short                                       
 ================================================= 
 
 #List From Response Obj
@@ -168,6 +168,12 @@ departmentList = departmentList.stream().sorted((a1, a2) -> a1.getBuName().compa
 #Filter a list of object by its list field
 -------------------------------------------------
 
+List<Student> productsDataList =
+       dbssList.getData().stream()
+           .filter(t -> t.getAttributes().getProductCode() != null)
+           .collect(Collectors.toList());
+		   
+-------------------------------------------------
 public class Student {
     List<Course> courses;
     ...
@@ -194,6 +200,27 @@ anyMatch will give you all Students that have at least one Course named "Algorit
 Person matchingObject = objects.stream().
 filter(p -> p.email().equals("testemail")).
 findAny().orElse(null);
+
+#Concate List
+------------------------------------------------
+List<String> str1 = new ArrayList<String>();
+str1.add("A");
+str1.add("B");
+str1.add("C");
+str1.add("D");
+
+List<String> str2 = new ArrayList<String>();
+str2.add("D");
+str2.add("E");
+
+List<String> str3 = str1.stream()
+                        .filter(item -> !str2.contains(item))
+                        .collect(Collectors.toList());
+
+str1 // ["A", "B", "C", "D"]
+str2 // ["D", "E"]
+str3 // ["A", "B", "C"]
+
 
 =================================================
 #         Query | sql call                                      
