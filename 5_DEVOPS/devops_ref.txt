@@ -337,6 +337,41 @@ server {
 
 
 
+Some helpful commands:
+---------------------------------------------
+Reload NGINX: /app/nginx/sbin/nginx –s reload
+
+Test NGINX conf: /app/nginx/sbin/nginx –t
+
+Check log: tail –f access.log
+Filtering status code except 200 and 202 ok: 
+=>tail –f access.log | grep –v ‘ 200 ‘  | grep –v ‘ 202 ‘     (202 is the status code of otp success)
+Printing only destination IP: 
+=>cat access.log | awk ‘{print $(NF-2)}‘
+Print destination IP count: 
+=>cat access.log | awk ‘{print $(NF-2)} | sort | uniq --count‘
+ 
+You can mix between these commands to achieve your goal. For example, you want to see which destination server is failing:
+=>cat access.log | grep –v ‘ 200 ‘  | grep –v ‘ 202 ‘ | awk ‘{print $(NF-2)} | sort | uniq --count‘
+
+Debug:
+=> tail -f access.log | grep 53489776
+=>tail -f access.log | grep -v "200"
+
+
+
+nginx.conf for log
+-------------------------------------------------
+http {
+    include       mime.types;
+    default_type  application/octet-stream;
+    log_format  main  '$remote_addr - [$time_local] "$request" '
+                      '$status $body_bytes_sent "$http_referer" '
+                     '"$http_user_agent" $upstream_addr $upstream_response_time' " $request_time";
+    access_log  /app/NginxFolder/logs/access.log   main;
+}
+	
+
 
 
 =================================================
