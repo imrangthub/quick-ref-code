@@ -393,6 +393,45 @@ ExecStart=/bin/sh -c  'echo "Lgo written By SimpleService" >> /var/log/my_simple
 WantedBy=multi-user.target
 
 
+Example2
+=========
+
+BashScript:
+
+while true
+do
+        echo "System is runing !" >>/home/imran/imranMadbar/myPROJECT/linuxScript/service-log.txt
+        date >> /home/imran/imranMadbar/myPROJECT/linuxScript/service-log.txt
+        sleep 1
+done
+
+=>sudo chmod +x simple-system-monitor.sh
+
+
+Simple system monitor service:
+
+[Unit]
+Description=MySimpleShellScript
+
+[Service]
+ExecStart=/home/imran/imranMadbar/myPROJECT/linuxScript/simple-system-monitor.sh
+
+[Install]
+WantedBy=multi-user.target
+
+
+=>sudo nano /lib/systemd/system/simple-system-monitor-service.service 
+=>sudo systemctl daemon-reload 
+=>sudo systemctl start simple-system-monitor-service.service 
+=>sudo systemctl status simple-system-monitor-service.service 
+=>sudo systemctl start simple-system-monitor-service.service 
+
+=>sudo systemctl enable simple-system-monitor-service.service 
+=>cd /etc/systemd/system/multi-user.target.wants
+=>sudo systemctl disable simple-system-monitor-service.service 
+
+
+
 
 =================================================
 #Ufw Firewall                  
