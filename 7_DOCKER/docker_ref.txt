@@ -37,9 +37,10 @@ https://www.youtube.com/watch?v=wtKef83kmUA&list=PL0hSJrxggIQoKLETBSmgbbvE4FO_eE
 =================================================
 #                  Basic                                          
 ================================================= 
+=>cat /etc/hosts
 =>docker stop $(docker ps -a -q)
 =>docker rm $(docker ps -a -q)
-
+=>docker run --rm debian echo 'HelloMsImran'
 =>docker service scale SpringBootWebApp=5
 
 
@@ -93,6 +94,7 @@ Check the different history in container
 
 # Build Images
 -------------------------------------------------
+=>docker build -t myubunty:v1 .
 
 
 =>docker image build -t imranmadbar/bas-config-server .
@@ -197,6 +199,7 @@ Just make change, re-build image and push !
 =>docker rm 9b6343d3b5a0
 =>docker restart 09ca6feb6efc
 =>docker stop 09ca6feb6efc
+=>docker container prune
 
 
 =>docker cp e029d15afdfc:/etc/cassandra/cassandra.yaml C:/Z_MY_COMPUTER
@@ -540,12 +543,21 @@ Ubuntu Image
 
 =>docker run -it ubuntu:14.04 /bin/bash
 
+
+
 =================================================
 # DCA | dca
 =================================================
 
 =>docker info
 Shwo Basice information about docker
+
+
+
+Build Images
+-----------------------------------------------------------------------------------------
+ =>docker build -f dockerfiles/Dockerfile.debug -t myapp_debug .
+ =>docker build -f dockerfiles/Dockerfile.prod  -t myapp_prod .
 
 
 
