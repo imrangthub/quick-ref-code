@@ -204,6 +204,14 @@ Sharing file for all user
 # User | Group                                      
 ================================================= 
 
+=>usermod -aG sudo imran
+Add a user on sudo group
+
+=>useradd imran
+=>groupadd empGroup
+=>chown imran:empGroup fileName
+In Root mode, assign a file permission
+
 =>adduser imran |  and other information
 =>sudo passwd imran
 Set new password
@@ -260,6 +268,41 @@ List all group names on Linux:
 =>id -g -n imran
 =>id -G -n imran
 To print the primary/secondary group membership for a user called
+
+=================================================
+# cGroup                               
+================================================= 
+
+=>cd /sys/fs/cgroup
+
+
+Emmp1
+=====
+=>sudo cgcreate- -g memory:cg1
+Create a memory cgroup
+
+=>echo 100000 | dudo tee /sys/fs/cgroup/memory/cg1/memory.limit_in_bytes
+Assign memory to cGroup
+
+=>sudo cgexec -g memory:cg1 ./myProcess.sh
+Run process under cGroup
+
+
+Exmp2
+=====
+
+=>cgcreate -g cpuset:cpusetA
+
+=>cgset -f cpuset.cpus=0 cpusetA
+=>cgset -f cpuset.mems-0 cpusetA
+
+=>cgget -r cupset.cpus -r cpuset.mems cpusetA
+=>cgexec -g cpuset:cpusetA dd if=/dev/zero of=/dev/null &
+
+
+
+
+
 
 
 =================================================
@@ -381,6 +424,24 @@ x = execute (run) access
 =>sudo apt install openssh-server
 
 
+#Namespace
+-------------------------------------------------
+=>ip netns
+=>ls /var/run/netns
+List of namespace
+
+=>ip netns add nameOfNamespace
+
+
+=>ip netns add net1
+Add name space
+
+=>ip netns exec net1 ip link
+=>ip netns exec net1 ip addr
+
+=>ip netns exec net1 ip link set dev lo update
+
+
 
 =================================================
 #Service | systemd | Systemd Services                                     
@@ -457,6 +518,11 @@ WantedBy=multi-user.target
 =>sudo ufw status
 =>sudo ufw disable
 
+=>vim /etc/default/ufw 
+
+=>sudo ufw reset
+Reset current rule
+
 
 
 =>sudo apt install ufw
@@ -466,6 +532,9 @@ Check the allow app list
 
 =>sudo ufw delete allow ssh
 =>sudo ufw delete allow 22/tcp
+
+
+=>sudo ufw status numbered
  
 
 =================================================
