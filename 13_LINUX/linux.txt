@@ -1,9 +1,7 @@
 #################################################
 #                 LINUX-OS                      #
 #################################################
-
 =>uname -a
-=>cat /etc/os-release
 =>cat /proc/version
 =>cat /etc/*-release
 =>cat /etc/os-release | grep name -i
@@ -21,13 +19,18 @@ Kernel Version
 =>netstat -an | grep 80
 
 sudo apt autoremove
-
 sudo apt autoclean
-username@hostname:~$
-play /home/imran/Music/FadedShadow.mp3
 =================================================
 #                  Basic                                          
 ================================================= 
+
+=>who 
+=>tty
+=>uptime
+=>wathc uptime
+
+=>which ifconfig
+Where from run this ifconfig
 
 =>whoami
 =>hostname
@@ -41,7 +44,6 @@ Find all runing process
 =>ps -ef|grep nginx
 Find how many process runing
 
-
 =>cat RELEASE-NOTES | grep "Apache Tomcat Version"
 Tomcat version check
 
@@ -50,7 +52,6 @@ If you are not sure where is the version.sh file
 then
 =>/app/archive/artifactory-oss-6.12.0/tomcat/bin/version.sh
 systemctl status nginx
-
 
 
 =================================================
@@ -78,7 +79,6 @@ Copying Directories local machine to remote machine
 
 =>scp  -r remoateUser@remoteHost:/app/mySimpleFolder /home/imran/localhMachinePath
 Copying directories from remote machine to local machine
-
 
 
 =>ls -a
@@ -115,6 +115,22 @@ Copy all file to another folder
 
 
 
+=>scp localmachine/path_to_the_file username@server_ip:/path_to_remote_directory
+
+=>scp -r /app/test/test.txt apihub@172.16.254.25:/app
+=>scp -r cassandra.yaml C:
+=>scp -r apihub@172.16.8.132:standalone.xml "C:"
+=>docker cp e029d15afdfc:/etc/cassandra/cassandra.yaml C:/Z_MY_COMPUTER
+=>docker cp C:/Z_MY_COMPUTER/cassandra.yaml a394ae84224c:/etc/cassandra
+
+
+=>cd /etc/skel/
+=>touch sharedFile
+Sharing file for all user
+
+
+
+
 #TAR |  ZIP
 -------------------------------------------
 =>tar -cvf myTarFile.tar *
@@ -136,10 +152,14 @@ Zip/Unzip file
 
 
 =================================================
-#    Find | Search    |    look up      
+#    Find | search    |    look up      
 ================================================= 
-#
+
+
+#locate
 -------------------------------------------
+=>updatedb
+Before serching update ths system
 =>which skype
 =>ls *searchKeyword*
 =>find . -name myFileName
@@ -150,24 +170,16 @@ Search file in the folder
 =>locate *myFile*Name*
 Search file in the system
 
+=>locate *.conf*
+find all file with .conf
+
 =>grep fWord myTextFile.txt
 =>grep 'Please find my sentence' myTextFile.txt
 Search word in text file
 
 
-=>scp localmachine/path_to_the_file username@server_ip:/path_to_remote_directory
-
-=>scp -r /app/test/test.txt apihub@172.16.254.25:/app
-=>scp -r cassandra.yaml C:
-=>scp -r apihub@172.16.8.132:standalone.xml "C:"
-=>docker cp e029d15afdfc:/etc/cassandra/cassandra.yaml C:/Z_MY_COMPUTER
-=>docker cp C:/Z_MY_COMPUTER/cassandra.yaml a394ae84224c:/etc/cassandra
-
-
-=>cd /etc/skel/
-=>touch sharedFile
-Sharing file for all user
-
+#find
+-------------------------------------------
 
 
 =================================================
@@ -299,6 +311,11 @@ Exmp2
 =================================================
 # Monitoring | CUP  | memory | storage                               
 ================================================= 
+
+=>top
+
+#Memory
+-------------------------------------------------
 =>df
 =>grep MemTotal /proc/meminfo
 =>free -m
@@ -306,12 +323,15 @@ Exmp2
 =>ps -ef
 =>cat /proc/meminfo
 =>docker run --name test01 -d centos /bin/sh -c "while true; do echo Hello Imran; sleep8; done"
+
+#Cpu
+-------------------------------------------------
+=>lscpu
+
 =>lscpu
 =>lscpu | egrep 'Model name|Socket|Thread|NUMA|CPU\(s\)'
 =>cat /proc/cpuinfo
 => grep 'cpu cores' /proc/cpuinfo | uniq
-
-=>top
 
 
 
@@ -431,9 +451,13 @@ Set root password
 ================================================= 
 
 =>ip a
+=>ip addr show
 =>ifconfig
 
 =>hostname -i 
+
+=>nmcli con up id ethernet-eno1
+Reload network card
 
 
 =>host google.combine
@@ -451,12 +475,26 @@ Set root password
  
 =>sudo apt install net-tools
 
+=>ip route add default via 10.21.29.11
+Set default getway
+
+=>ip route show
+Show default getway 
 
 
+
+=>systemctl status NetworkManger
+Check net manager status
+
+=>cd /etc/NetworkManger/system-connections
+System net conn list
 
 
 #SSH
 ------------------------------------------------
+
+=>echo $SHELL 
+Show alll shele list
 =>sudo apt install openssh-server
 
 
@@ -494,11 +532,46 @@ Add name space
 =>ip netns exec net1 ip link set dev lo update
 
 
+=================================================
+#    Storage |   
+================================================= 
+=>df
+=>lsblk
+
+=>fdisk -l
+list of disk in system
+
+=>fdisk /dev/deviceNameDB
+create partition new volum drive
+
+=>mkfs -t xfs /dev/xvdbl/deviceName
+Formate disk device
+
+
+=>mount /dev/xvdbl/deviceName /data/myTargetDrive
+Formated storage mounting
 
 =================================================
-#Service | systemd | Systemd Services                                     
+#Service | systemd | Process                                    
 =================================================
 
+
+
+#Process
+-------------------------------------------------
+
+=>ps
+=>ps aux
+show all current proecess in the system
+
+=>ps -f -U username
+Show process run by user
+
+
+
+
+#service
+-------------------------------------------------
 =>nano /etc/systemd/system/my_simple_service.service
 
 =>sudo  systemctl daemon-reload
@@ -509,6 +582,10 @@ Add name space
 =>sudo systemctl enable my_simple_service.service
 =>sudo systemctl disable my_simple_service.service
 To enable/disable your service on every reboot
+
+=>sudo systemctl enable simple-system-monitor-service.service 
+=>cd /etc/systemd/system/multi-user.target.wants
+=>sudo systemctl disable simple-system-monitor-service.service 
 
 
 
@@ -551,16 +628,36 @@ WantedBy=multi-user.target
 
 
 
+#Signal
+-------------------------------------------------
 
-=>sudo nano /lib/systemd/system/simple-system-monitor-service.service 
-=>sudo systemctl daemon-reload 
-=>sudo systemctl start simple-system-monitor-service.service 
-=>sudo systemctl status simple-system-monitor-service.service 
-=>sudo systemctl start simple-system-monitor-service.service 
+=man 7 signal
 
-=>sudo systemctl enable simple-system-monitor-service.service 
-=>cd /etc/systemd/system/multi-user.target.wants
-=>sudo systemctl disable simple-system-monitor-service.service 
+=>dd if=/dev/zero of=/dev/null &
+Start a process
+
+=>top 
+then ->k
+To sent signal sent process
+
+
+Process signal
+9=kill, 15=terminated
+
+=>kill
+=>killall dd
+
+
+
+#crontab
+-------------------------------------------------
+=>less /etc/crontab
+Show all cron systex
+
+
+=>crontabl -l
+Show all cron job
+
 
 
 
