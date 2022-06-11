@@ -1,3 +1,92 @@
 #################################################
 #                 AWS                          #
 #################################################
+
+
+
+
+=================================================
+#Documentation | doc | exam            
+================================================= 
+
+
+AWS- 
+  -Region
+  -VPC
+    -Available Zone
+    -Router 
+    -Subnet  
+  -Gateway
+
+
+
+=================================================
+#Subnet | cidr             
+================================================= 
+Subnet create on availablity zone not on Region. Same subnet can not take more then one.
+
+
+Public Subnet
+ - If a subnet traffic is routed to on Internet Gateway it is public with a public IP.
+Private Subnet
+ - If a Subnet dosnot have a route to the internet Gateway then it is private.
+   When you create a VPC you must specify on IPv4 CIDR blica for the VPC, The allowed blick size is betwwn /16 to /28 netmask.
+   The first four and last IP address of Subnet cannot be assigned.
+    - Suppose a IP => 10.0.0.0/16
+	- 10.0.0.0 Network address
+	- 10.0.0.1 Reserved by AWS for VPC Route
+	- 10.0.0.2 Reserved By AWS for DNS server
+	- 10.0.0.3 Reserved By AWS for future use
+	- 10.0.0.255 Brodycast Address
+	AWS do not support brodcust in a VPC but reserve the address.
+	
+	
+
+
+=================================================
+#VPC | vpc | virtual private cloud                
+================================================= 
+
+Vpc is a Virtual Network or DataCenter inside AWS for one Client.
+
+- It is logical Isolated from Other virtual Network in the AWS.
+- Max 5 VPC can be created and 200 subnet in 1 VPC.
+- We Can allocate Max 5 Elastic IP.
+- Once a VPC created DHCP, NACL and Sucurity Group will be created automatically.
+- A VPC is confied to on AWS Region and dos not extend between Region.
+
+- Onece the VPC is created, Its CIDR block range cant change.
+  (You can create another CIDR make it primary and older one will be Secondary then you can delete fitst one)
+- If you need a diffenent CIDR size, create a new VPC.
+- The different subnets wihtin a VPC cannot overlap.
+- You can expend yor vpc CIDR by adding new/extra IP address.
+
+
+VPC create on Region not available zone. all property of VPC are Regional becaus its exists on Region. 
+One vpc cant extend more then one Region.
+
+
+VPC Two Type
+
+- Default Vpc
+- Custom Vpc
+
+Primary diffent of of both, default vpc has internet gatway custom vpc has not, you can added.
+
+Default VPC has default CIDR, Security Group, NACL and Route table setting.
+In Custom VPC has to be create considering its CIDR dos not have Internet Getwat be default.
+ 
+
+
+#Component of VPC
+-------------------------------------------------
+
+ - CIDR and IP address subnet
+ - Implied router and Routing Table
+ - Internet Gatway
+ - Security Group
+ - Network ACL
+ - Virtual Private gatway 
+ - Peering connections
+ - Elastic IP
+

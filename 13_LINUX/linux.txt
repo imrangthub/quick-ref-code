@@ -24,6 +24,14 @@ sudo apt autoclean
 #                  Basic                                          
 ================================================= 
 
+=>who 
+=>tty
+=>uptime
+=>wathc uptime
+
+=>which ifconfig
+Where from run this ifconfig
+
 =>whoami
 =>hostname
 =>printenv
@@ -146,8 +154,12 @@ Zip/Unzip file
 =================================================
 #    Find | search    |    look up      
 ================================================= 
-#
+
+
+#locate
 -------------------------------------------
+=>updatedb
+Before serching update ths system
 =>which skype
 =>ls *searchKeyword*
 =>find . -name myFileName
@@ -158,9 +170,16 @@ Search file in the folder
 =>locate *myFile*Name*
 Search file in the system
 
+=>locate *.conf*
+find all file with .conf
+
 =>grep fWord myTextFile.txt
 =>grep 'Please find my sentence' myTextFile.txt
 Search word in text file
+
+
+#find
+-------------------------------------------
 
 
 =================================================
@@ -290,21 +309,28 @@ Exmp2
 
 
 =================================================
-# Monitoring | CUP  | memory                                
+# Monitoring | CUP  | memory | cpu                               
 ================================================= 
 
+=>top
+
+#Memory
+-------------------------------------------------
 =>grep MemTotal /proc/meminfo
 =>free -m
 =>df -kh .
 =>ps -ef
 =>cat /proc/meminfo
 =>docker run --name test01 -d centos /bin/sh -c "while true; do echo Hello Imran; sleep8; done"
+
+#Cpu
+-------------------------------------------------
+=>lscpu
+
 =>lscpu
 =>lscpu | egrep 'Model name|Socket|Thread|NUMA|CPU\(s\)'
 =>cat /proc/cpuinfo
 => grep 'cpu cores' /proc/cpuinfo | uniq
-
-=>top
 
 
 
@@ -416,9 +442,13 @@ x = execute (run) access
 ================================================= 
 
 =>ip a
+=>ip addr show
 =>ifconfig
 
 =>hostname -i 
+
+=>nmcli con up id ethernet-eno1
+Reload network card
 
 
 =>host google.combine
@@ -436,12 +466,26 @@ x = execute (run) access
  
 =>sudo apt install net-tools
 
+=>ip route add default via 10.21.29.11
+Set default getway
+
+=>ip route show
+Show default getway 
 
 
+
+=>systemctl status NetworkManger
+Check net manager status
+
+=>cd /etc/NetworkManger/system-connections
+System net conn list
 
 
 #SSH
 ------------------------------------------------
+
+=>echo $SHELL 
+Show alll shele list
 =>sudo apt install openssh-server
 
 
@@ -479,11 +523,46 @@ Add name space
 =>ip netns exec net1 ip link set dev lo update
 
 
+=================================================
+#    Storage |   
+================================================= 
+=>df
+=>lsblk
+
+=>fdisk -l
+list of disk in system
+
+=>fdisk /dev/deviceNameDB
+create partition new volum drive
+
+=>mkfs -t xfs /dev/xvdbl/deviceName
+Formate disk device
+
+
+=>mount /dev/xvdbl/deviceName /data/myTargetDrive
+Formated storage mounting
 
 =================================================
-#Service | systemd | Systemd Services                                     
+#Service | systemd | Process                                    
 =================================================
 
+
+
+#Process
+-------------------------------------------------
+
+=>ps
+=>ps aux
+show all current proecess in the system
+
+=>ps -f -U username
+Show process run by user
+
+
+
+
+#service
+-------------------------------------------------
 =>nano /etc/systemd/system/my_simple_service.service
 
 =>sudo  systemctl daemon-reload
@@ -494,6 +573,10 @@ Add name space
 =>sudo systemctl enable my_simple_service.service
 =>sudo systemctl disable my_simple_service.service
 To enable/disable your service on every reboot
+
+=>sudo systemctl enable simple-system-monitor-service.service 
+=>cd /etc/systemd/system/multi-user.target.wants
+=>sudo systemctl disable simple-system-monitor-service.service 
 
 
 
@@ -536,16 +619,36 @@ WantedBy=multi-user.target
 
 
 
+#Signal
+-------------------------------------------------
 
-=>sudo nano /lib/systemd/system/simple-system-monitor-service.service 
-=>sudo systemctl daemon-reload 
-=>sudo systemctl start simple-system-monitor-service.service 
-=>sudo systemctl status simple-system-monitor-service.service 
-=>sudo systemctl start simple-system-monitor-service.service 
+=man 7 signal
 
-=>sudo systemctl enable simple-system-monitor-service.service 
-=>cd /etc/systemd/system/multi-user.target.wants
-=>sudo systemctl disable simple-system-monitor-service.service 
+=>dd if=/dev/zero of=/dev/null &
+Start a process
+
+=>top 
+then ->k
+To sent signal sent process
+
+
+Process signal
+9=kill, 15=terminated
+
+=>kill
+=>killall dd
+
+
+
+#crontab
+-------------------------------------------------
+=>less /etc/crontab
+Show all cron systex
+
+
+=>crontabl -l
+Show all cron job
+
 
 
 
