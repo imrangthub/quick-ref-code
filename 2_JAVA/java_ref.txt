@@ -4099,7 +4099,29 @@ public String getHadoopConnectionString() {
 
 
 
+================================================
+#  Regular expression |  regx | exp                                     
+================================================
 
+Pattern offerIdPattern = Pattern.compile("(?<=^)(\\d*?)(?=\\s)");
+Pattern namePattern = Pattern.compile("(?<=\\s)([a-zA-Z0-9-_/+]+\\s*?)");
+Pattern rechargeAmountPattern = Pattern.compile("(?<=\\s)(\\d*?)(?=tk)");
+Pattern validityInDayPattern = Pattern.compile("(?<=-)(\\d*?)(?=d)");
+Pattern minPattern = Pattern.compile("(?<=-)(\\d*?)(?=min)");
+Pattern ratePattern = Pattern.compile("(?<=-)(\\d*?p/min)(?=-)");
+Pattern smsPattern = Pattern.compile("(?<=-)(\\d*?)(?=sms)");
+Pattern dataGbPattern = Pattern.compile("(?<=-)(\\d*?)(?=gb)");
+Pattern dataProductPattern = Pattern.compile("(?<=-)([a-zA-Z0-9_+]+\\s*?)");
+Pattern dataMbPattern = Pattern.compile("(?<=-)(\\d*?)(?=mb)");
+Pattern otherInformationPattern = Pattern.compile("(?<=\\()(\\d*?)(?=\\))");
+Pattern dataGbPattern = Pattern.compile("(?<=-)(\\d.*?)(?=gb)");
+		
+Matcher minMatcher = minPattern.matcher(offerDetail);
+
+if (minMatcher.find()) {
+   testObj.setVoiceMin(Integer.parseInt(minMatcher.group(1)));
+}
+		
 
 ================================================
 #  SPRING |  BASIC                                      
