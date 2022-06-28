@@ -2,6 +2,50 @@
 #                 AWS                          #
 #################################################
 
+Dirct connection shared vapc all transictiv
+Do so
+ 
+ 
+=================================================
+#To Do           
+================================================= 
+
+
+
+- Read white paper what is recomand AWS
+- ELB undestanding
+- AWS S3  undestanding
+
+- cludFont
+- AWS Global Accelerator
+- Amazon FSx
+- SQS, SNS, MQ and Amazon Kinesis
+- DynamoDB
+- CloudWatch
+- AWS Event and EventBridge
+- STS
+- KMS/CloudHSM
+- Transit Gateway | ECMP
+- TrafficMirroring
+- EventProcessing | SQS, SNS
+- HPC ENA, EFA, 
+- CloudFormation
+- StepFunction | SWS
+- EMR
+- AppSync
+
+Whitepapers:4
+ - Architecting for the cloud : AWS best practices
+ - AWS Well-Architected Framework
+ - AWS Disaster Recovery
+
+-Inportant services FAQ
+-AWS Community
+-AWS Conference(Youtube)
+
+
+
+
 
 
 
@@ -22,7 +66,7 @@ AWS-
  -Gateway
 
 
-
+NFS - Network file system
 =================================================
 #Subnet | cidr             
 ================================================= 
@@ -97,8 +141,23 @@ In Custom VPC has to be create considering its CIDR dos not have Internet Getwat
 
 
 =================================================
-#Storage | s3 | elastic | efs               
+#Storage | s3 | elastic | efs | ebs              
 ================================================= 
+
+Amazon Simple Storage Service (Amazon S3) is an object storage service that offers 
+industry-leading scalability, data availability, security, and performance.
+
+Amazon S3 is an object storage service that stores data as objects within buckets. 
+An object is a file and any metadata that describes the file. A bucket is a container for objects.
+Each object has a key (or key name), which is the unique identifier for the object within the bucket.
+
+Access control lists (ACLs)
+You can use ACLs to grant read and write permissions to authorized users for individual buckets and objects. 
+Each bucket and object has an ACL attached to it as a subresource. 
+The ACL defines which AWS accounts or groups are granted access and the type of access.
+
+Amazon S3 cloud storage is an object-based storage service. You cannot install an operating system when you use 
+Amazon S3 storage because data cannot be accessed on the block level as it is required by an operating system.
 
 
 AWS Storage:
@@ -123,9 +182,93 @@ TypeOfS3:
  - One zone IA
  - Intelactual
  
+ 
+
+#Elastic Block Storage (EBS)
+-------------------------------------------------
+ - One EBS for one EC2
+ - EBS Volume locked at the AZ level, EC2 and EBS have to be same zone to attach.
+ - Make shapshots to sent data volum to AZ or region.
+ - Using EBS Multi-Attach, you can attach the same EBS volume to multiple EC2 instances in the same AZ (with Full rw).
 
  
+
+#Object Lifecycle Management
+------------------------------------------------
+A lifecycle configuration is a set of rules that define actions that AWS S3 applies to a group of objects. There are two types of actions:
+
+Transaction Actions
+This action defines objects’ transition from one storage class to another.
+
+Expiration Actions
+This action deletes objects in the Amazon S3 bucket.
+
+  
+=================================================
+#Elastic Load Blancer |  | elb | ELB          
+================================================= 
+
+The AWS ELB is an AWS service for automatic distribution of incoming application traffic across its components like Amazon EC2 instances, AWS Lambda, and containers..
+
+A load balancer accepts incoming traffic from clients and routes requests to its registered targets (such as EC2) in one or more AZ. 
+The load balancer also monitors the health of its registered targets and ensures that it routes traffic only to healthy targets.
+When the load balancer detects an unhealthy target, it stops routing traffic to that target. 
+It then resumes routing traffic to that target when it detects that the target is healthy again.
+
+TypeOfLoadBalancer:
+ - Application Load Balancers
+ - Network Load Balancers
+ - Gateway Load Balancers
+ - Classic Load Balancers
  
+ 
+With Application Load Balancers, Network Load Balancers, and Gateway Load Balancers, 
+you register targets in target groups, and route traffic to the target groups. 
+With Classic Load Balancers,you register instances with the load balancer.
+
+
+Cross-zone load balancing is enable then every target equal load, if disable the  every AZ are equal. 
+Application Load Balancers, cross-zone load balancing is always enabled.
+With Network Load Balancers and Gateway Load Balancers, cross-zone load balancing is disabled by default. 
+
+
+Elastic Load Balancing works with the following services:
+
+ - Amazon EC2 — Virtual servers that run your applications in the cloud. 
+ - Amazon EC2 Auto Scaling — Ensures that you are running your desired number of instances, even if an instance fails. 
+ - AWS Certificate Manager — When you create an HTTPS listener, you can specify certificates provided by ACM. The load balancer uses certificates to terminate connections and decrypt requests from clients.
+ - Amazon CloudWatch — Enables you to monitor your load balancer and to take action as needed. 
+ - Amazon ECS — Enables you to run, stop, and manage Docker containers on a cluster of EC2 instances. 
+ - AWS Global Accelerator — Improves the availability and performance of your application. Use an accelerator to distribute traffic across multiple load balancers in one or more AWS Regions.
+ - Route 53 — Provides a reliable and cost-effective way to route visitors to websites by translating domain names into the numeric IP addresses that computers use to connect to each other.
+ - AWS WAF — You can use AWS WAF (Web Application Firewall) with your Application Load Balancer to allow or block requests based on the rules in a web access control list (web ACL).
+
+ 
+#AWS Classic Load Balancer:
+------------------------------------------------- 
+This simple load balancer operates both at the request level and the connection level and was originally used for classic EC2 instances. 
+Classic Load balancer in AWS is used on EC2-classic instances. This is the previous generation’s load balancer and also it doesn’t allow host-based or path based routing.
+Mostly it is used to route traffic to one single URL.
+
+
+#NLB
+------------------------------------------------- 
+AWS recommends AWS Network Load Balancer (NLB) if the application needs to achieve static IP and extreme performance.
+AWS network load balancers also avoid DNS caching problems and work with existing firewall security policies of users thanks to its static and resilient IP addresses. 
+And AWS load balancer TLS termination is only possible with NLB.
+
+
+#Create a ELB
+------------------------------------------------- 
+Select which type of AWS load balancer to use
+Complete basic configuration
+Configure a security group
+Configure a target group
+Register targets
+Create a load balancer and test it
+Get more details on how to configure AWS load balancers
+
+
 =================================================
 #AutoScaling             
 ================================================= 
@@ -145,24 +288,22 @@ AutoScalingPolicies
  
  
  
- 
-=================================================
-#Load Blancer | Elastic              
-================================================= 
 
-TypeOfLoadBalancer:
- - Application load balancer
- - Network load balancer
- - Clasic load balancer
- 
- 
- 
- 
-=================================================
-#To Do           
-================================================= 
 
-- Read white paper what is recomand AWS
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
