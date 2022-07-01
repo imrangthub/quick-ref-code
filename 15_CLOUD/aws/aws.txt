@@ -5,34 +5,12 @@
 Dirct connection shared vapc all transictiv
 Do so
  
- 
+ https://cloud.in28minutes.com/aws-certification-sqs-vs-sns-vs-amazon-mq1
 =================================================
 #To Do           
 ================================================= 
 
 
-
-- Read white paper what is recomand AWS
-- ELB undestanding
-- AWS S3  undestanding
-
-- cludFont
-- AWS Global Accelerator
-- Amazon FSx
-- SQS, SNS, MQ and Amazon Kinesis
-- DynamoDB
-- CloudWatch
-- AWS Event and EventBridge
-- STS
-- KMS/CloudHSM
-- Transit Gateway | ECMP
-- TrafficMirroring
-- EventProcessing | SQS, SNS
-- HPC ENA, EFA, 
-- CloudFormation
-- StepFunction | SWS
-- EMR
-- AppSync
 
 Whitepapers:4
  - Architecting for the cloud : AWS best practices
@@ -42,7 +20,6 @@ Whitepapers:4
 -Inportant services FAQ
 -AWS Community
 -AWS Conference(Youtube)
-
 
 
 
@@ -67,6 +44,17 @@ AWS-
 
 
 NFS - Network file system
+
+
+=================================================
+#Cloud Computing?           
+================================================= 
+
+Cloud computing is a computing service made available over the internet.
+Cloud computing is a pay-as-you-go model for delivering IT resources.
+You pay only for what you use.
+
+
 =================================================
 #Subnet | cidr             
 ================================================= 
@@ -141,7 +129,7 @@ In Custom VPC has to be create considering its CIDR dos not have Internet Getwat
 
 
 =================================================
-#Storage | s3 | elastic | efs | ebs              
+#Storage | DB | db | s3 | efs | ebs           
 ================================================= 
 
 Amazon Simple Storage Service (Amazon S3) is an object storage service that offers 
@@ -202,6 +190,25 @@ This action defines objects’ transition from one storage class to another.
 
 Expiration Actions
 This action deletes objects in the Amazon S3 bucket.
+
+
+#Amazon DynamoDB
+------------------------------------------------
+
+Amazon DynamoDB is a Serverless key-value and document database that delivers single-digit millisecond performance at any scale. 
+It's a fully managed, multiregion, multimaster, durable database with built-in security, backup and restore, 
+and in-memory caching for internet-scale applications. DynamoDB can handle more than 10 trillion requests 
+per day and can support peaks of more than 20 million requests per second.
+
+Amazon DynamoDB is a fully managed, serverless, key-value NoSQL database designed to run high-performance applications at any scale. 
+DynamoDB offers built-in security, continuous backups, automated multi-Region replication, in-memory caching, and data export tools.
+
+
+DynamoDB is accessible via an HTTP API and performs authentication & authorization via IAM roles, 
+making it a perfect fit for building Serverless applications.
+
+
+
 
   
 =================================================
@@ -286,26 +293,614 @@ AutoScalingPolicies
  - Manual
  - Daynamic
  
+=================================================
+# Edge locations             
+================================================= 
+
+Edge locations are AWS data centers designed to deliver services with the lowest latency possible.
+
+
+UserCase:
+
+CloudFront, 
+which uses edge locations to cache copies of the content that it serves, so the content is closer to users and can be delivered to them faster.
+Route 53, 
+which serves DNS responses from edge locations, so that DNS queries that originate nearby can resolve faster (and, contrary to what you might think, is also Amazon’s premier database).
+Web Application Firewall and AWS Shield, 
+which filter traffic in edge locations to stop unwanted traffic as soon as possible.
+
+
+
+=================================================
+#CloudFront  | cludFont      
+================================================= 
+Global Accelerator and CloudFront both use the AWS global network and its edge locations around the world.
+
+CloudFront is Amazon’s content delivery network that is primarily used to speed up websites. 
+It’s particularly useful for large, static assets—like images and videos. CloudFront sits in front of an “origin” server 
+(which serves the original content), and caches it at the edge locations around the world.
+
+When a user visits a site, they’re routed to the nearest edge location using DNS. 
+CloudFront looks to see if the page they requested is cached. If it is, the page is served directly from the cache. 
+If it isn’t, CloudFront fetches the page from the origin, stores it in the cache, and serves it to the user. 
+The next user to hit the same edge location will get the page served from the cache.
+
+
+Performance
+CloudFront improves performance for both cacheable content (such as images and videos) and dynamic content (such as API acceleration and dynamic site delivery).
+Global Accelerator improves performance for a wide range of applications over TCP or UDP by proxying packets at the edge to applications running in one or more AWS Regions.
+
+Use Cases
+CloudFront is a good fit for HTTP use cases
+Global Accelerator is a good fit for non-HTTP use cases, such as gaming (UDP), IoT (MQTT), or VoIP, as well as for HTTP use cases that require static IP addresses or deterministic, fast regional failover.
+
+Caching
+Caching
+CloudFront supports Edge caching
+Global Accelerator does not support Edge Caching.
+
+
+
+=================================================
+#AWS Global Accelerator (AMS SSPS)          
+================================================= 
+
+Global Accelerator, your users' traffic is moved off the internet and onto Amazon’s private global network through 90+ global edge locations, then directed to your application origins. 
+
+AWS Global Accelerator is a networking service that 
+improves the performance of your users’ traffic by up to 60% using Amazon Web Services’ global network infrastructure.
+
+Global Accelerator, you are provided two global static public IPs that act as a fixed entry point to your application, 
+improving availability. On the back end, add or remove your AWS application endpoints, such as Application Load Balancers, 
+Network Load Balancers, EC2 Instances, and Elastic IPs without making user-facing changes.
+
+Global Accelerator automatically re-routes your traffic to your nearest healthy available endpoint to mitigate endpoint failure.
+
+
+It provides static IP addresses that act as a fixed entry point to application endpoints in a single or multiple AWS Regions, such as Application Load Balancers, Network Load Balancers or EC2 instances.
+
+
+
+=================================================
+#Amazon FSx       
+================================================= 
+Amazon FSx is a fully managed third-party file system solution. It uses SSD storage to provide fast performance with low latency.
+There are four available FSx solutions available in AWS:
+
+Amazon FSx makes it easy and cost effective to launch, run, and scale feature-rich, high-performance file systems in the cloud. 
+It supports a wide range of workloads with its reliability, security, scalability, and broad set of capabilities. 
+
+Four widely-used file systems: 
+ - NetApp ONTAP, 
+ - OpenZFS, 
+ - Windows File Server 
+ - Lustre.
  
  
+NetApp ONTAP
+In collaboration with NetApp, AWS has launched Amazon FSx for NetApp ONTAP, a new cloud-based managed shared file and block storage 
+service that brings the best of both worlds to their customers.
+FSx for ONTAP delivers NFS, SMB and iSCSI storage powered by NetApp’s advanced data management system
+ 
+Lustre
+Amazon FSx for Lustre offers fully-managed storage built especially to provide high-performance at scale for compute workloads. 
+It is ideal for machine learning, video rendering, high performance computing and financial simulations.
+
+
+
+Windows File Server:
+FSx for Windows File Server provides fully managed Microsoft Windows file servers, that are backed by a fully native Windows file system. 
+
+
+FSx has two key differentiators compared to other Amazon’s previous file service offerings such as Elastic File Service (EFS). 
+It comes with a complete file server built in, and it offers superior performance for demanding use cases.
+
+Amazon FSx offers file systems designed for a variety of workload types. 
+You can use AWS FSx as storage for Windows applications, machine learning (ML) and high-performance computing (HPC). 
+FSx can also help with electronic design automation.
+
+
+
+=================================================
+#SQS, SNS, MQ and Amazon Kinesis        
+================================================= 
+
+
+Anytime multiple services need to receive the same event, you should consider SNS rather than SQS.
+
+#AWS SQS
+--------------------------------------------------
+ The entire service is based on sending messages to the queue and allowing for applications (ex. ECS containers, Lambda functions)
+ to poll for messages and process them. 
+ The message stays in the queue until some application picks it up, processes it, and deletes the message when it’s done. 
+ 
+
+#AWS SNS(Simple Notification Service)
+--------------------------------------------------
+It provides much more functionality than just the ability to send push notifications (emails, SMS, and mobile push). 
+In fact, it’s a serverless publish-subscribe messaging system allowing to send events to multiple applications (subscribers) at the same time (fan-out), 
+including SQS queues, Lambda functions, Kinesis Data Streams, and generic HTTP endpoints. 
+
+
+In order to use the service, we only need to:
+create a topic,
+subscribe to a topic,
+confirm the subscription,
+start sending events to a topic to deliver them to all subscribers (potentially multiple applications and people).
+
+#Amazon Kinesis 
+--------------------------------------------------
+
+Amazon Kinesis Data Streams is a serverless streaming data service that makes it easy to capture, process, 
+and store data streams at any scale.
+Amazon Kinesis makes it easy to collect, process, and analyze real-time, streaming data so you can get timely 
+insights and react quickly to new information.
+
+Amazon Kinesis is a managed, scalable, cloud-based service that allows real-time processing of streaming large amount of data per second. 
+It is designed for real-time applications and allows developers to take in any amount of data from several sources, 
+scaling up and down that can be run on EC2 instances.
+
+It is used to capture, store, and process data from large, distributed streams such as event logs and social media feeds. 
+After processing the data, Kinesis distributes it to multiple consumers simultaneously.
+
+The producers continually push data to Kinesis Data Streams, and the consumers process the data in real time. 
+Consumers (such as a custom application running on Amazon EC2 or an Amazon Kinesis Data Firehose delivery stream) 
+can store their results using an AWS service such as Amazon DynamoDB, Amazon Redshift, or Amazon S3.
+
+#MQ
+--------------------------------------------------
+Amazon MQ is a managed message broker service for Apache ActiveMQ and RabbitMQ that makes 
+it easy to set up and operate message brokers in the cloud. 
+You get direct access to the ActiveMQ and RabbitMQ consoles and industry standard APIs and protocols for messaging, 
+including JMS, NMS, AMQP 1.0 and 0.9.1, STOMP, MQTT, and WebSocket. 
+You can easily move from any message broker that uses these standards to Amazon MQ because you 
+don’t have to rewrite any messaging code in your applications.
+
+
+
+How do I migrate if I'm using a different message broker instead of ActiveMQ or RabbitMQ?
+Amazon MQ provides compatibility with the most common messaging APIs, such as Java Message Service (JMS) and 
+.NET Message Service (NMS), and protocols, including AMQP, STOMP, MQTT, and WebSocket. 
+This makes it easy to switch from any standards-based message broker to Amazon MQ without rewriting the messaging code in your applications. 
+In most cases, you can simply update the endpoints of your Amazon MQ broker to connect to your existing applications, 
+and start sending messages.
 
 
 
 
+=================================================
+#CloudWatch  | cloudWatch      
+================================================= 
+
+Amazon CloudWatch is a monitoring and observability service built for DevOps engineers, developers, site reliability engineers (SREs), 
+IT managers, and product owners. 
+
+CloudWatch provides you with data and actionable insights to monitor your applications, respond to system-wide performance changes, 
+and optimize resource utilization. CloudWatch collects monitoring and operational data in the form of logs, metrics, and events. 
+
+You get a unified view of operational health and gain complete visibility of your AWS resources, applications, and services running on 
+AWS and on-premises. You can use CloudWatch to detect anomalous behavior in your environments, set alarms, 
+visualize logs and metrics side by side, take automated actions, troubleshoot issues, and discover insights to 
+keep your applications running smoothly.
+ 
+ - Use a single platform for observability
+ - Collect metrics on AWS and on premises
+ - Improve operational performance and resource optimization
+ - Get operational visibility and insight
+ - Derive actionable insights from logs
+ 
+ 
+ You can use metrics to calculate statistics and then present the data graphically in the CloudWatch console. 
+ You can configure alarm actions to stop, start, or terminate an Amazon EC2 instance when certain criteria are met.
+ 
+Use cases:
+-Monitor Amazon EC2
+-Monitor Other Amazon Web Services Resources
+-Monitor Custom Metrics
+-Monitor and Store Logs
+-Set Alarms
+-Monitor and React to Resource Changes
 
 
 
 
+=================================================
+#AWS Event and EventBridge
+================================================= 
+
+#Event
+--------------------------------------------------
+An event indicates a change in an environment such as an AWS environment, a SaaS partner service or application, 
+or one of your applications or services. The following are examples of events:
+
+Amazon EC2 generates an event when the state of an instance changes from pending to running.
+
+Amazon EC2 Auto Scaling generates events when it launches or terminates instances.
+
+AWS CloudTrail publishes events when you make API calls.
+
+You can also set up scheduled events that are generated on a periodic basis.
+
+Events are represented as JSON objects and they all have a similar structure, and the same top-level fields.
+
+
+#EventBridge
+--------------------------------------------------
+EventBridge is an event bus for messages that you want to propagate across your (micro)services. 
+Those events can come from state changes of AWS services, other AWS accounts, or external 
+applications like Auth0, Shopify, and others. You can, of course, also send your custom messages.
+
+EventBridge delivers a stream of real-time data from event sources such as Zendesk or Shopify to targets like 
+AWS Lambda and other SaaS applications. You can set up routing rules to determine 
+where to send your data to build application architectures that react in real-time to your data sources 
+with event publisher and consumer completely decoupled.
+
+EventBridge sends metrics to Amazon CloudWatch every minute for everything from the number of 
+matched events to the number of times a target is invoked by a rule.
+
+
+In event-driven architecture, services interact with each other through events. 
+An event is something that happened in your application (for example, an item was put into a cart, a new order was placed). 
+Events are JSON objects that tell you information about something that happened in your application. 
+In event-driven architecture, each component of the application raises an event whenever anything changes. 
+Other components listen and decide what to do with it and how they would like to react.
+
+
+
+#CloudTrail 
+--------------------------------------------------
+AWS CloudTrail is an AWS service that helps you enable governance, compliance, and operational and risk auditing of your AWS account. 
+Actions taken by a user, role, or an AWS service are recorded as events in CloudTrail. 
+Events include actions taken in the AWS Management Console, AWS Command Line Interface, and AWS SDKs and APIs.
+
+CloudTrail is enabled on your AWS account when you create it. 
+When activity occurs in your AWS account, that activity is recorded in a CloudTrail event. 
+You can easily view recent events in the CloudTrail console by going to Event history. 
+For an ongoing record of activity and events in your AWS account, create a trail.
+
+
+
+AWS CloudTrail is a service that automatically records events such as AWS API calls. 
+You can create EventBridge rules that use the information from CloudTrail. 
+For more information about CloudTrail, see What is AWS CloudTrail?.
+
+
+
+=================================================
+#Security | IAM |       
+================================================= 
+
+#STS(Security Token Service)
+-------------------------------------------------
+WS STS is an AWS service that allows you to request temporary security credentials for your AWS resources, 
+for IAM authenticated users and users that are authenticated in AWS such as federated users via OpenID or SAML2.0.
+
+You use STS to provide trusted users with temporary access to resources via API calls, your AWS console or 
+the AWS command line interface (CLI)
+
+
+AWS provides AWS Security Token Service (AWS STS) as a web service that enables you to request temporary, 
+limited-privilege credentials for AWS Identity and Access Management (IAM) users or for users you authenticate (federated users).
+
+Recording API requests:
+AWS STS supports AWS CloudTrail, a service that records AWS calls for your AWS account and delivers log files to an Amazon S3 bucket. 
+By using information collected by CloudTrail, you can determine the requests successfully sent to AWS STS, 
+as well as who sent the request, and when it was sent.
+
+The STS token lifecycle is determined by you and can be anywhere from 15 minutes to 36 hours.
+
+External web identities can be authenticated by a third party online identity manager like amazon, google, 
+facebook or any other open-id connect compatible service. This web identity federation also removes the need to 
+distribute long-term security credentials to 
+facilitate access to your AWS resources.
+
+
+Use-Case:
+-Identity Federation Use-Case
+-Cross-Account Access using AWS STS
+-EC2 Instance STS Credentials
+
+
+#KMS AWS Key Management Service 
+-------------------------------------------------
+KMS is a managed service that makes it easy for you to create and control the encryption keys used to encrypt your data. 
+AWS KMS uses Hardware Security Modules (HSMs) to protect the security of your keys. 
+You can use AWS KMS to protect your data in AWS services and in your applications
+
+AWS Key Management Service (AWS KMS) makes it easy for you to create and manage cryptographic keys and control their use across a 
+wide range of AWS services and in your applications.
+
+AWS KMS is integrated with AWS CloudTrail to provide you with logs of all key usage to help meet your regulatory and compliance needs.
+
+AWS KMS Key Management Service is a useful and very beneficial service while dealing with sensitive data and it 
+also makes it easy for you to create and manage cryptographic keys.
+
+
+
+Features of AWS KMS:
+----------------------------------------------------
+It is an easy way to control and access your data using managed encryption.
+
+With AWS Key Management Service, the process of key management is reduced to a few simple clicks.
+
+It is also integrated with other AWS services including Amazon EBS, Amazon S3, and Amazon RedShift to 
+simplify the encryption of your data within these services.
+
+AWS KMS enables you to create, rotate, disable, enable, and define usage policies for master keys and audit their usage.
+
+It is a centralized key management
+
+It is secure and compliant.
+
+
+
+CloudHSM
+----------------------------------------------------
+AWS CloudHSM is a cloud-based hardware security module (HSM) that enables you to easily 
+generate and use your own encryption keys on the AWS Cloud. 
+
+CloudHSM is standards-compliant and enables you to export all of your keys to most other
+commercially-available HSMs, subject to your configurations. 
+
+
+The AWS CloudHSM service helps you meet corporate, contractual, and regulatory compliance 
+requirements for data security by using dedicated 
+Hardware Security Module (HSM) instances within the AWS cloud. 
+
+AWS CloudHSM provides hardware security modules in the AWS Cloud. A hardware security module (HSM) is a computing device that 
+processes cryptographic operations and provides secure storage for cryptographic keys.
+
+
+
+When you use an HSM from AWS CloudHSM, you can perform a variety of cryptographic tasks:
+
+Generate, store, import, export, and manage cryptographic keys, including symmetric keys and asymmetric key pairs.
+
+Use symmetric and asymmetric algorithms to encrypt and decrypt data.
+
+Use cryptographic hash functions to compute message digests and hash-based message authentication codes (HMACs).
+
+Cryptographically sign data (including code signing) and verify signatures.
+
+Generate cryptographically secure random data.
+
+
+
+Q: What is a Hardware Security Module (HSM)?
+
+A Hardware Security Module (HSM) provides secure key storage and cryptographic operations within a 
+tamper-resistant hardware device. HSMs are designed to securely store cryptographic 
+key material and use the key material without exposing it outside the cryptographic boundary of the hardware.
+
+
+Q: What can I do with CloudHSM?
+
+You can use the CloudHSM service to support a variety of use cases and applications, 
+such as database encryption, Digital Rights Management (DRM), Public Key Infrastructure (PKI), 
+authentication and authorization, document signing, and transaction processing.
+
+There are no upfront costs to use AWS CloudHSM. With CloudHSM, you pay an hourly fee for each HSM you launch until you terminate the HSM.
+
+
+#Transit Gateway (TGW)
+-------------------------------------------------
+AWS Transit Gateway connects your Amazon Virtual Private Clouds (VPCs) and on-premises networks 
+through a central hub. This simplifies your network and puts an end to complex peering relationships. 
+It acts as a cloud router – each new connection is only made once.
+
+Transit Gateway is a Regional resource and can connect thousands of VPCs within the same AWS Region. 
+You can create multiple Transit Gateway instances per Region, and you can 
+connect to a maximum of three Transit Gateway instances over a single Direct Connect connection for hybrid connectivity.
+
+
+
+As your cloud infrastructure expands globally you need to find out a way to connect your resources which are in different VPCs. 
+A Transit Gateway is a network hub that you can use to interconnect your virtual private clouds (VPCs) and on-premises networks. 
+
+It is like a hub and spoke design or star topology design for connecting VPCs and on-premises networks. 
+Transit Gateway allows customers to connect thousands of VPCs together. It is a regional service. 
+It gives you simplified connectivity to the multiple VPC as compared to a complex VPC peering connection. 
+
+Traffic between VPC and Transit Gateway remains on the AWS global private network and is not exposed to the public internet. 
+Transit Gateways in different regions can peer with each other to enable VPC communications across regions. 
+Transit Gateway inter-Region peering encrypts all traffic, with no single point of 
+failure or bandwidth bottleneck which helps you to get improved security.
+
+
+#ECMP
+-------------------------------------------------
+Equal-cost multi-path routing (ECMP) is a routing strategy where packet forwarding to a single destination can occur over multiple best paths with equal routing priority. 
+Multi-path routing can be used in conjunction with most routing protocols because it is a per-hop local decision made independently at each router.
+
+
+AWS Transit Gateway VPN supports ECMP protocol that can load balance traffic across multiple VPN tunnels. 
+The question is, can Transit Gateway ECMP be used to deploy a transit DMZ as shown in the diagram below?
+
+
+#Traffic Mirroring
+-------------------------------------------------
+
+Traffic Mirroring copies inbound and outbound traffic from the network interfaces that are attached to your instances. 
+You can send the mirrored traffic to the network interface of another instance, a Network Load Balancer that has a UDP listener, 
+or a Gateway Load Balancer that has a UDP listener. The traffic mirror source and the traffic mirror target (monitoring appliance) 
+can be in the same VPC. Or they can be in a different VPCs that are connected 
+through intra-Region VPC peering, a transit gateway, or by a Gateway Load Balancer endpoint to connect to a 
+Gateway Load Balancer in a different VPC.
+
+
+Traffic Mirroring is an Amazon VPC feature that you can use to copy network traffic from an elastic network interface of type interface. 
+You can then send the traffic to out-of-band security and monitoring appliances for:
+
+-Content inspection
+-Threat monitoring
+-Troubleshooting
+
+
+=================================================
+#HPC ENA, EFA      
+=================================================
+
+ 
+#Elastic Fabric Adapter (EFA)
+-------------------------------------------------
+An Elastic Fabric Adapter (EFA) is a network device that you can attach to your Amazon EC2 instance to accelerate 
+High Performance Computing (HPC) and machine learning applications. EFA enables you to achieve the application performance of 
+an on-premises HPC cluster, with the scalability, flexibility, and elasticity provided by the AWS Cloud.
+
+Elastic Fabric Adapter (EFA) is a network interface for Amazon EC2 instances that enables customers to run applications 
+requiring high levels of inter-node communications at scale on AWS. 
+Its custom-built operating system (OS) bypass hardware interface enhances the performance of inter-instance communications, 
+which is critical to scaling these applications. 
+
+
+You can create, use, and manage an EFA much like any other elastic network interface in Amazon EC2. 
+However, unlike elastic network interfaces, EFAs cannot be attached to or detached from an instance in a running state.
+
+Elastic Fabric Adapter (EFA) is a network interface for Amazon EC2 instances that enables customers to run HPC applications 
+requiring high levels of inter-instance communications, like computational fluid dynamics, weather modeling, 
+and reservoir simulation, at scale on AWS. It uses a custom-built operating system bypass technique to enhance the 
+performance of inter-instance communications, which is critical to scaling HPC applications. With EFA, 
+HPC applications using popular HPC technologies like Message Passing Interface (MPI) can scale to thousands of CPU cores. 
+EFA supports industry-standard libfabric APIs, so applications that use a supported MPI library can be 
+migrated to AWS with little or no modification.
+
+ 
+#ENA (Elastic Network Adapter)
+-------------------------------------------------
+The Elastic Network Adapter (ENA) is designed to improve operating system health and reduce 
+the chances of long-term disruption because of unexpected hardware behavior and or failures. 
+The ENA architecture keeps device or driver failures as transparent to the system as possible. 
+This topic provides troubleshooting information for ENA.
+
+#With EC2
+The Elastic Network Adapter (ENA) driver publishes network performance metrics from the instances where they are enabled. 
+You can use these metrics to troubleshoot instance performance issues, choose the right instance size for a workload, 
+plan scaling activities proactively, and benchmark applications to determine whether they maximize the
+performance available on an instance.
+
+#HPC (High Performance Computing)
+-------------------------------------------------
+Run your large, complex simulations and deep learning workloads in the cloud with a complete suite of 
+high performance computing (HPC) products and services on AWS. Gain insights faster, and quickly
+move from idea to market with virtually unlimited compute capacity, a high-performance file system,
+and high-throughput networking.
+
+
+#ParallelCluster 
+-------------------------------------------------
+AWS ParallelCluster is an open source cluster management tool that makes it easy for you to deploy and manage High Performance 
+Computing (HPC) clusters on AWS. ParallelCluster uses a simple text file to model and provision all the 
+resources needed for your HPC applications in an automated and secure manner. It also supports multiple 
+instance types and job submission queues, and job schedulers like AWS Batch and Slurm.
+
+AWS ParallelCluster is built on the popular open source CfnCluster project and is released via the Python Package Index (PyPI). 
+ParallelCluster's source code is hosted on the Amazon Web Services repository on GitHub. 
+AWS ParallelCluster is available at no additional charge, and you pay only for the AWS resources needed to run your applications.
 
 
 
 
+=================================================
+#CloudFormation         
+=================================================
+
+AWS CloudFormation is an AWS service that uses template files to automate the setup of AWS resources.
+
+An AWS CloudFormation template is a formatted text file in JSON or YAML language that describes your AWS infrastructure. 
+To create, view and modify templates, you can use AWS CloudFormation Designer or any text editor tool. 
+An AWS CloudFormation template consists of nine main objects:
+
+Format version: Format version defines the capability of a template.
+Description: Any comments about your template can be specified in the description.
+Metadata: Metadata can be used in the template to provide further information using JSON or YAML objects. 
+
+CloudFormation is an infrastructure automation platform for AWS that deploys AWS resources in a repeatable, testable and auditable manner.
+AWS CloudFormation provides users with a simple way to create and manage a collection of Amazon Web Services (AWS)
+resources by provisioning and updating them in a predictable way. AWS CloudFormation enables you to manage your 
+complete infrastructure or AWS resources in a text file.
+
+
+
+You can use CloudFormation to automate the configuration of workloads that run on the most popular AWS services, 
+like the EC2 compute service, the S3 storage service, and the IAM service for configuring access control.
+
+You can also apply CloudFormation templates to AWS services that cater to niche use cases, like Ground Station, 
+the AWS satellite management solution.
+
+In general, if a service runs on AWS, it is a safe bet that you can use CloudFormation to automate its configuration and deployment.
+
+It is worth noting that CloudFormation is not the only way to configure and deploy services on AWS. 
+You can handle these processes manually using the AWS command-line interface, API, or Web console. 
+
+
+#StepFunction
+-------------------------------------------------
+
+AWS Step Functions is a serverless orchestration service that lets developers create and manage multi-step 
+application workflows in the cloud. By using the service’s drag-and-drop visual editor, 
+teams can easily assemble individual microservices into unified workflows. At each step of a given workflow, 
+Step Functions manages input, output, error handling, and retries, so that developers can focus on 
+higher-value business logic for their applications.
 
 
 
 
+#EMR
+-------------------------------------------------
+
+With it, organizations can process and analyze massive amounts of data.
+
+Amazon Elastic MapReduce (Amazon EMR) is a web service that makes it easy to quickly and cost-effectively process vast amounts of data.
+Amazon EMR is the industry-leading cloud big data platform for processing vast amounts of data using 
+open source tools such as Apache Spark, Apache Hive, Apache HBase, Apache Flink, Apache Hudi, and Presto. 
+Amazon EMR makes it easy to set up, operate, and scale your big data environments 
+by automating time-consuming tasks like provisioning capacity and tuning clusters and uses 
+Hadoop, an open source framework, to distribute your data and processing across a resizable cluster of Amazon EC2 instances. 
 
 
+
+
+3
+#GraphQL:
+------------------------------------------------
+GraphQL is a query language for APIs and a runtime for fulfilling those queries with your existing data. 
+GraphQL provides a complete and understandable description of the data in your API, gives clients the 
+power to ask for exactly what they need and nothing more, makes it easier to evolve APIs over time, 
+and enables powerful developer tools.
+
+Send a GraphQL query to your API and get exactly what you need, nothing more and nothing less. 
+GraphQL queries always return predictable results. Apps using GraphQL are fast and stable because they 
+control the data they get, not the server.
+
+
+#AppSync
+-------------------------------------------------
+
+
+The fundamental idea of a GraphQL API is that all API functionality is available via a unified query language 
+(the Graph Query Language) under a single endpoint. Rather than making requests to various endpoints to get 
+different parts of the data needed to build a webpage, developers can issue a single request to a 
+GraphQL API and immediately get back all the data they need. This model reduces the complexity of 
+web applications and improves the experience for website visitors with faster load times.
+
+AWS AppSync is a fully managed GraphQL API layer developed by Amazon Web Services. 
+AppSync allows developers to build GraphQL APIs without much of the usual work; it handles the parsing and resolution of 
+requests as well as connecting to other AWS services like AWS Lambda, NoSQL and SQL data stores, and HTTP APIs to gather 
+backend data for the API.
+
+AWS AppSync is a fully managed AWS serverless service for real-time data queries, synchronization, and communications. 
+In AppSync, AWS has a GraphQL-as-a-Service offering that makes it easy to build scalable and resilient GraphQL APIs in the cloud.
+
+With AppSync, you can build scalable applications, including those requiring real-time updates, on a range of data sources 
+such as NoSQL data stores, relational databases, HTTP APIs, and your custom data sources with Amazon Lambda. 
+For mobile and web apps, AppSync additionally provides local data access when devices go offline, 
+and data synchronization with customizable conflict resolution, when they are back online.
+
+AWS AppSync is a serverless GraphQL and Pub/Sub API service that simplifies building modern web and mobile applications.
+
+AWS AppSync GraphQL APIs simplify application development by providing a single endpoint to securely query or update data from multiple databases, microservices, and APIs.
+
+AWS AppSync Pub/Sub APIs make it easy to create engaging real-time experiences by automatically publishing data updates to subscribed API clients via serverless WebSockets connections. 
 
 
 =================================================
