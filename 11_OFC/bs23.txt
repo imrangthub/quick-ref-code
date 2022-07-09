@@ -68,3 +68,66 @@ $ chkconfig --levels 345 nexus on
 $ service nexus start
 Starting Nexus Repository Manager Pro...
 $ tail -f /usr/local/nexus/logs/wrapper.log
+
+
+
+
+apihub Debuging Server issue
+===========================
+
+
+=>http://172.16.254.193:7171/octopus-iris/actuator/info
+=>http://172.16.254.193:7171/octopus-iris/swagger-ui.html
+Nginx Loadbalancer
+
+
+DebugScript1:
+-----------------------------------
+
+=>tail -f access.log | grep -v '200'  | grep -v '202'
+Filtering status code except 200 and 202 
+
+=>cat access.log | awk '{print $(NF-2)}'
+Printing only destination IP: 
+
+=> cat access.log | awk '{print $(NF-2)}' | sort | uniq --count
+Print destination IP count: 
+
+
+=>cat access.log | grep –v '200'  | grep –v '202' | awk '{print $(NF-2)}' | sort | uniq --count
+You can mix between these commands to achieve your goal. For example, you want to see which destination server is failing:
+
+
+=>tail -f access.log | grep '254.194'
+
+
+DebugScript2:
+-----------------------------------
+
+=>tail -100000 ../logs/access.log | awk '{ print $8}'|sort |uniq --repeated --count
+Print load balanced IPs and their count
+
+=>tail -10000 access.log |awk '{print $12,$8}'|sort|uniq --repeated --count
+Print load balanced IPs and their status count
+
+
+=>tail -10000 /app/apihub/Nginx_LB/logs/access.log | grep prepaid|awk '{ total += $14; count++ } END { print total/count }'
+Average RTT
+
+=>for (( i = 5; i >=0; i-- )) ; do grep $(date +%d/%b/%Y:%R -d "-$i min") /app/apihub/Nginx_LB/logs/access.log; done| awk '{ print $8}'|sort |uniq --repeated --count
+Last 5 minute request satus
+
+
+=>grep prepaid access.log|tail -1000|awk '{ if ( $14 > .750 ) print $0 }'|wc -l
+If RTT greater than:
+
+
+=>for i in {1..20}; do curl -o /dev/null -s -w '%{http_code},%{time_namelookup},%{time_connect},%{time_pretransfer},%{time_starttransfer}, %{time_total}s\n' "http://10.74.10.10:443/api/v1/subscriptions/32286622/combined-usage-reports"  ; done
+20 continuous calls to check DBSS API performance 
+
+=>tail -1000 ../logs/access.log | grep prepaid|awk '{ if (max<$14){ max=$14 }}END {print max}'
+Max RTT
+
+
+
+
