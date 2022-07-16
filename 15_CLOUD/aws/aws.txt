@@ -10,7 +10,10 @@ Do so
 #To Do           
 ================================================= 
 
--Pladement Group
+https://www.youtube.com/watch?v=7sOSkgWR2As&list=PLzde74P_a04d1roElg9DPWm5Bmavhi_97&index=3
+
+-Placement Group
+
 -ENI
 -EC2 Capicity Reservistion
 -EFS
@@ -257,7 +260,58 @@ making it a perfect fit for building Serverless applications.
 
 
 
+=================================================
+#Placement Group        
+================================================= 
+Placing the things at one place or gathering the things together at one place is nothing but placement groups.
+
+When you launch multiple EC2 instances on AWS, the EC2 service makes sure that all of your EC2 instances 
+are spread across different physical machines to minimize the failure of the entire system. 
+But AWS EC2 also provides the customers the ability to put the EC2 instance according to their need. 
+Placement groups are used to determine how the EC2 instances are launched on the underlying hardware. 
+
+
+Why use Placement Group?
+
+Placement groups help us to launch a bunch of EC2 instances close to each other physically within the same AZ. 
+Being close physically and within the same AZ helps it take advantage of high-speed connectivity to 
+provide low latency, high throughput access.
+
+Placement groups strategies:
+
+Cluster placement group: It groups instances into low latency clusters in a single available zone(AZ).
+Spread placement group: It spread the instances across underlying hardware.
+Partition placement group: It spreads the instances across many different partitions within an AZ.
+
+
+Cluster Placement Group:
+In the cluster placement group, all the instances are in the same rack in a single availability zone. 
+Cluster placement groups are designed for high speed performance and low network latency applications as 
+EC2 instances are physically on the same rack and it causes low latency between the EC2 instances in the same cluster placement group. 
+It usually supports up to 10Gbps network. As the EC2 instances in the cluster placement group are in the same physical rack so the 
+problem with cluster placement groups is if the rack fails, all the instances will fail at the same time 
+compromising the high availability of the application.
   
+Spread Placement Group:
+In the spread placement group, all EC2 instances are located on different hardware racks in a single availability zone. 
+Each rack is isolated from others and has its own power and networks to reduce the failure of all the instances in the 
+spread placement group at a time. You can create up to 7 EC2 instances per availability zone per spread placement group. 
+Unlike Cluster placement groups, EC2 instances in the spread placement group exist on different hardware within 
+the single availability zone minimizing the failure of all the EC2 instances at a time while making sure of the low latency. 
+Spread placement groups are designed for applications that require maximum high availability and where 
+each instance must be isolated from failure from each other.
+
+
+
+Partition Placement Group:
+In the partition placement group, instances are launched into different partitions on different hardware racks to 
+make sure of high availability. It can span across multiple AZs in the same region. 
+The instances in a partition do not share racks with the instances in the other partitions. 
+A partition failure can affect many EC2 instances in the same partition but won’t affect the EC2 instances on the other partitions. 
+Partition placement groups are designed for applications that require maximum high availability. 
+Partition placement groups are used for big application deployment and are ideal 
+for large distributed and replicated workloads such as kafka, hadoop and cassandra etc.
+
 =================================================
 #Elastic Load Blancer |  | elb | ELB          
 ================================================= 
