@@ -13,7 +13,6 @@ Do so
 https://www.youtube.com/watch?v=7sOSkgWR2As&list=PLzde74P_a04d1roElg9DPWm5Bmavhi_97&index=3
 
 -Placement Group
-
 -ENI
 -EC2 Capicity Reservistion
 -EFS
@@ -25,6 +24,7 @@ https://www.youtube.com/watch?v=7sOSkgWR2As&list=PLzde74P_a04d1roElg9DPWm5Bmavhi
 -S3 Replication
 -CloudFont
 -GlobalAcclarator
+
 -Glue
 -RedShift
 CloudWatch
@@ -167,6 +167,54 @@ In Custom VPC has to be create considering its CIDR dos not have Internet Getwat
 
 
 
+=================================================
+#ENI |  Elastic network interfaces             
+================================================= 
+An elastic network interface is a logical networking component in a VPC that represents a virtual network card. 
+It can include the following attributes:
+
+A primary private IPv4 address from the IPv4 address range of your VPC
+One or more secondary private IPv4 addresses from the IPv4 address range of your VPC
+One Elastic IP address (IPv4) per private IPv4 address
+One public IPv4 address
+One or more IPv6 addresses
+One or more security groups
+A MAC address
+A source/destination check flag
+A description
+
+ENIs are virtual network cards you can attach to your EC2 instances. They are used to enable network connectivity for your instances, 
+and having more than one of them connected to your instance allows it to communicate on two different subnets.
+
+
+A common use case for ENIs is the creation of management networks. 
+This allows you to have public-facing applications like web servers in a public subnet but lock down SSH access 
+down to a private subnet on a secondary network interface. In this scenario, you would connect using a 
+VPN to the private management subnet, then administrate your servers as usual.
+
+
+
+=================================================
+#EC2    
+================================================= 
+
+
+#EC2 capacity reservation
+-------------------------------------------------
+
+Capacity Reservations enable you to reserve compute capacity for your Amazon EC2 instances in a specific 
+Availability Zone for any duration. This gives you the ability to create and manage Capacity Reservations 
+independently from the billing discounts offered by Savings Plans or Regional Reserved Instances.
+
+
+Capacity Reservations enable you to reserve capacity for your Amazon EC2 instances in a specific Availability Zone for any duration. 
+This gives you the flexibility to selectively add capacity reservations and still get the Regional RI discounts for that usage. 
+By creating Capacity Reservations, you ensure that you always have access to Amazon EC2 capacity when you need it, 
+for as long as you need it. 
+
+
+
+
 
 =================================================
 #Storage | DB | db | s3 | efs | ebs           
@@ -221,6 +269,37 @@ TypeOfS3:
  - Intelactual
  
  
+ 
+#Amazon S3 Replication
+--------------------------------------------------
+
+Replication is the automatic, asynchronous copying of objects across buckets in the same or different AWS Regions. 
+Replication copies newly created objects and object updates from a source bucket to a destination bucket or buckets. 
+
+When you configure replication, you add replication rules to the source bucket. 
+Replication rules define which source bucket objects to replicate and the destination bucket or buckets where 
+the replicated objects are stored. You can create a rule to replicate all the objects in a bucket or a subset of 
+objects with a specific key name prefix, one or more object tags, or both. A destination bucket can be in the 
+same AWS account as the source bucket, or it can be in a different account.
+
+If you specify an object version ID to delete, Amazon S3 deletes that object version in the source bucket. 
+But it doesn't replicate the deletion in the destination bucket. In other words, 
+it doesn't delete the same object version from the destination bucket. This protects data from malicious deletions.
+
+When you add a replication rule to a bucket, the rule is enabled by default, so it starts working as soon as you save it.
+
+Amazon Simple Storage Service (S3) Replication is an elastic, fully managed, low cost feature that replicates objects 
+between buckets. S3 Replication offers the most flexibility and functionality in cloud storage, giving you the controls you need to 
+meet your data sovereignty and other business needs.
+
+With Amazon S3 Replication, you can configure Amazon S3 to automatically replicate S3 objects across different 
+AWS Regions by using S3 Cross-Region Replication (CRR) or between buckets in the same AWS Region by using S3 
+Same-Region Replication (SRR). S3 Replication offers the flexibility of replicating to multiple destination buckets in the same, 
+or different AWS Regions. S3 Replication supports two-way replication between two or more buckets in the same or different AWS Regions. 
+
+
+ 
+ 
 
 #Elastic Block Storage (EBS)
 -------------------------------------------------
@@ -229,7 +308,19 @@ TypeOfS3:
  - Make shapshots to sent data volum to AZ or region.
  - Using EBS Multi-Attach, you can attach the same EBS volume to multiple EC2 instances in the same AZ (with Full rw).
 
- 
+
+#EFS - Elastic File System
+-------------------------------------------------
+Simple, serverless, set-and-forget, elastic file system
+
+Amazon Elastic File System (Amazon EFS) provides a simple, serverless, set-and-forget elastic file system for use with AWS Cloud services and on-premises resources. 
+
+Amazon EFS provides a simple, serverless, set-and-forget elastic file system.
+With Amazon EFS, you can create a file system, mount the file system on an Amazon EC2 instance,
+and then read and write data to and from your file system. 
+You can mount an Amazon EFS file system in your virtual private cloud (VPC), through the 
+Network File System versions 4.0 and 4.1 (NFSv4) protocol.
+
 
 #Object Lifecycle Management
 ------------------------------------------------
@@ -258,6 +349,27 @@ DynamoDB is accessible via an HTTP API and performs authentication & authorizati
 making it a perfect fit for building Serverless applications.
 
 
+#Amazon Aurora
+------------------------------------------------
+Amazon Aurora (Aurora) is a fully managed relational database engine that's compatible with MySQL and PostgreSQL.
+The underlying storage grows automatically as needed. An Aurora cluster volume can grow to a maximum size of 128 tebibytes (TiB). 
+
+
+Amazon Aurora is a relational database management system (RDBMS) built for the cloud with full MySQL and PostgreSQL compatibility. 
+Aurora gives you the performance and availability of commercial-grade databases at one-tenth the cost.
+
+Amazon Aurora provides built-in security, continuous backups, serverless compute, 
+up to 15 read replicas, automated multi-Region replication, and integrations with other AWS services.
+
+Amazon Aurora is a modern relational database service offering performance and high availability at scale, fully open source 
+MySQL- and PostgreSQL-compatible editions, and a range of developer tools for 
+building serverless and machine learning (ML)-driven applications.
+
+Aurora features a distributed, fault-tolerant, and self-healing storage system that is 
+decoupled from compute resources and auto-scales up to 128 TB per database instance. 
+It delivers high performance and availability with up to 15 low-latency read replicas, 
+point-in-time recovery, continuous backup to Amazon Simple Storage Service (Amazon S3), 
+and replication across three Availability Zones (AZs).
 
 
 =================================================
@@ -377,9 +489,26 @@ Create a load balancer and test it
 Get more details on how to configure AWS load balancers
 
 
+#GateWay Load Balancer
+-------------------------------------------------
+
+Gateway Load Balancer helps you easily deploy, scale, and manage your third-party virtual appliances. 
+It gives you one gateway for distributing traffic across multiple virtual appliances while scaling them up or down, 
+based on demand. This decreases potential points of failure in your network and increases availability.
+
+You can find, test, and buy virtual appliances from third-party vendors directly in AWS Marketplace.  
+
+Use cases:
+Centralize your third-party virtual appliances
+Consolidating your third-party virtual appliances with Gateway Load Balancer can reduce operational overhead and costs.
+
 =================================================
-#AutoScaling             
+#ASG Auto Scaling | Auto Scaling groups        
 ================================================= 
+
+An Auto Scaling group contains a collection of EC2 instances that are treated as a 
+logical grouping for the purposes of automatic scaling and management. 
+An Auto Scaling group also enables you to use Amazon EC2 Auto Scaling features such as health check replacements and scaling policies.
 
 AutoScaling happend in a available zone.
 
@@ -411,6 +540,27 @@ Web Application Firewall and AWS Shield,
 which filter traffic in edge locations to stop unwanted traffic as soon as possible.
 
 
+
+
+=================================================
+#ElastiCache  | Elasti Cache      
+================================================= 
+
+Amazon ElastiCache is a fully managed, in-memory caching service supporting flexible, real-time use cases. 
+You can use ElastiCache for caching, which accelerates application and database performance, 
+or as a primary data store for use cases that don't require durability like 
+session stores, gaming leaderboards, streaming, and analytics. ElastiCache is compatible with Redis and Memcached. 
+
+
+Use cases:
+Accelerate application performance
+Ease backend database load
+Build low-latency data stores
+
+
+Amazon ElastiCache is a web service that makes it easy to deploy and run Memcached or Redis 
+protocol-compliant server nodes in the cloud. Amazon ElastiCache improves the performance of web applications by 
+allowing you to retrieve information from a fast, managed, in-memory system, instead of relying entirely on slower disk-based databases. 
 
 =================================================
 #CloudFront  | cludFont      
@@ -667,6 +817,35 @@ For an ongoing record of activity and events in your AWS account, create a trail
 AWS CloudTrail is a service that automatically records events such as AWS API calls. 
 You can create EventBridge rules that use the information from CloudTrail. 
 For more information about CloudTrail, see What is AWS CloudTrail?.
+
+
+#CloudFront
+-------------------------------------------------
+
+Securely deliver content with low latency and high transfer speeds
+
+Amazon CloudFront speeds up distribution of your static and dynamic web content, such as .html, .css, .php, image, and media files. 
+When users request your content, CloudFront delivers it through a worldwide network of 
+edge locations that provide low latency and high performance.
+
+AWS CloudFront is a globally-distributed network offered by Amazon Web Services, 
+which securely transfers content such as software, SDKs, videos, etc., to the clients, with high transfer speed.
+
+
+Use cases:
+-Deliver fast, secure websites
+-Accelerate dynamic content delivery and APIs
+-Stream live and on-demand video
+-Distribute patches and updates
+
+
+Amazon Cloudfront is a content delivery network (AWS CDN) that retrieves data stored in the 
+Amazon S3 bucket and distributes it to numerous edge locations across the world. 
+Edge locations are the network of data centers distributed worldwide through which content is delivered.
+
+If the content is already cached in the edge location, CloudFront delivers it immediately with the lowest latency possible.
+If the content is not present in the edge location, CloudFront retrieves it from the origin 
+(like Amazon S3 bucket, a MediaPackage channel, or an HTTP server) that has been identified for your content.
 
 
 
@@ -1025,6 +1204,64 @@ AWS AppSync is a serverless GraphQL and Pub/Sub API service that simplifies buil
 AWS AppSync GraphQL APIs simplify application development by providing a single endpoint to securely query or update data from multiple databases, microservices, and APIs.
 
 AWS AppSync Pub/Sub APIs make it easy to create engaging real-time experiences by automatically publishing data updates to subscribed API clients via serverless WebSockets connections. 
+
+
+
+=================================================
+#Elastic Beanstalk        
+================================================= 
+
+AWS Elastic Beanstalk allows you to quickly deploy applications and services without having to worry about 
+configuring underlying resources, services, operating systems or web servers.
+
+Elastic Beanstalk takes care of the hosting infrastructure, coding language interpreter, operating system, 
+security, https service and application layer. All you need to worry about is writing your code.
+
+You can develop code in a number of languages which is then zipped up and the zip file is used 
+when instantiating a new elastic beanstalk instance.
+
+Elastic Beanstalk is a complete application management solution, and manages all infrastructure and platform tasks on your behalf.
+
+When using Elastic Beanstalk as your deployment solution, simply upload your source code and 
+Elastic Beanstalk will provision and operate all necessary infrastructure, including servers, databases, 
+load balancers, networks, and auto scaling groups. Although these resources are created on your behalf, 
+you retain full control of these resources, allowing developers to customize as needed.
+
+AWS Elastic Beanstalk, you can quickly deploy and manage applications in the AWS Cloud without worrying about the 
+infrastructure that runs those applications. AWS Elastic Beanstalk reduces management complexity 
+without restricting choice or control. You simply upload your application, and AWS Elastic Beanstalk 
+automatically handles the details of capacity provisioning, load balancing, scaling, and application health monitoring.
+
+
+Elastic Beanstalk is the fastest and simplest way to deploy your application on AWS. You simply use the AWS Management Console, 
+a Git repository, or an integrated development environment (IDE) such as Eclipse or Visual Studio to upload your application, 
+and Elastic Beanstalk automatically handles the deployment details of capacity 
+provisioning, load balancing, auto-scaling, and application health monitoring. 
+Within minutes, your application will be ready to use without any infrastructure or resource configuration work on your part.
+
+
+=================================================
+#Global Accelerator      
+================================================= 
+
+Global Accelerator is a network layer service in which you create accelerators to improve availability and performance for internet applications used by a global audience. 
+
+
+With Global Accelerator, you are provided two global static public IPs that act as a fixed entry point to your application, 
+improving availability. On the back end, add or remove your AWS application endpoints, such as Application Load Balancers, 
+Network Load Balancers, EC2 Instances, and Elastic IPs without making user-facing changes. 
+Global Accelerator automatically re-routes your traffic to your nearest healthy available endpoint to mitigate endpoint failure.
+
+
+It provides static IP addresses that act as a fixed entry point to application endpoints in a 
+single or multiple AWS Regions, such as Application Load Balancers, Network Load Balancers or EC2 instances.
+
+
+
+Uses the AWS global network to optimize the path from users to applications, improving the performance of TCP and UDP traffic.
+
+AWS Global Accelerator continually monitors the health of application endpoints and will detect an unhealthy endpoint and redirect 
+traffic to healthy endpoints in less than 1 minute.
 
 
 =================================================
