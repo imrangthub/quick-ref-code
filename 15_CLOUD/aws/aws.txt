@@ -13,6 +13,10 @@ Do so
 https://www.youtube.com/watch?v=7sOSkgWR2As&list=PLzde74P_a04d1roElg9DPWm5Bmavhi_97&index=3
 
 
+S3+ Encryption:
+
+
+
 
 Whitepapers:4
  - Architecting for the cloud : AWS best practices
@@ -55,6 +59,12 @@ NFS - Network file system
 Cloud computing is a computing service made available over the internet.
 Cloud computing is a pay-as-you-go model for delivering IT resources.
 You pay only for what you use.
+
+
+Cloud computing differs from a traditional, on-premises environment in many ways,
+including flexible, global, and scalable capacity, managed services, built-in security,
+options for cost optimization, and various operating models.
+
 
 
 =================================================
@@ -192,6 +202,39 @@ By creating Capacity Reservations, you ensure that you always have access to Ama
 for as long as you need it. 
 
 
+
+Creating copies of EC2 instances: Old instance -> Snapshot -> Image (AMI) -> New instance
+
+=================================================
+#Security Groups    
+================================================= 
+
+Security Groups are used to control access (SSH, HTTP, RDP, etc.) with EC2. 
+They act as a virtual firewall for your instances to control inbound and outbound traffic. 
+When you launch an instance in a VPC, you can assign up to five security groups to 
+the instance and security groups act at the instance level, not the subnet level.
+
+Security groups are specific to a single VPC, so you can't share a Security Group 
+between multiple VPCs. However, you can copy a Security Group to create a new Security Group with the same 
+rules in another VPC for the same AWS Account.
+
+
+Security Groups are regional and can span AZs, but can't be cross-regional.
+
+You can specify the source of your security group (basically who is allowed to bypass the virtual firewall) 
+to be a single /32 IP address, an IP range, or even a separate security group.
+
+You cannot block specific IP addresses with Security Groups (use NACLs instead)
+
+
+=================================================
+#WAF   | Web Application Firewall (WAF)
+================================================= 
+AWS WAF is a web application that lets you allow or block the HTTP(s) requests that are bound for CloudFront, 
+API Gateway, Application Load Balancers, EC2, and other Layer 7 entry points into your AWS environment. 
+AWS WAF gives you control over how traffic reaches your applications by enabling you to create security 
+rules that block common attack patterns, such as SQL injection or cross-site scripting, 
+and rules that filter out specific traffic patterns that you can define. 
 
 
 
@@ -351,6 +394,20 @@ point-in-time recovery, continuous backup to Amazon Simple Storage Service (Amaz
 and replication across three Availability Zones (AZs).
 
 
+#Data Warehouse
+-------------------------------------------------
+A data warehouse is a specialized type of relational database, which is optimized for
+analysis and reporting of large amounts of data. It can be used to combine
+transactional data from disparate sources (such as user behavior in a web application,
+data from your finance and billing system, or customer relationship management or
+CRM) to make them available for analysis and decision-making.
+
+Traditionally, setting up, running, and scaling a data warehouse has been complicated
+and expensive. On AWS, you can leverage Amazon Redshift, a managed data
+warehouse service that is designed to operate at less than a tenth the cost of
+traditional solutions.
+
+
 #Redshift
 -------------------------------------------------
 Fastest, easiest, and most widely used cloud data warehouse
@@ -375,6 +432,12 @@ from disparate source systems and provisions them for analytical use.
 =================================================
 #Placement Group        
 ================================================= 
+
+Placement groups balance the tradeoff between risk tolerance and network performance when it comes to your fleet of EC2 instances.
+The more you care about risk, the more isolated you want your instances to be from each other. 
+The more you care about performance, the more conjoined you want your instances to be with each other.
+
+
 Placing the things at one place or gathering the things together at one place is nothing but placement groups.
 
 When you launch multiple EC2 instances on AWS, the EC2 service makes sure that all of your EC2 instances 
@@ -577,6 +640,12 @@ If it isn’t, CloudFront fetches the page from the origin, stores it in the cac
 The next user to hit the same edge location will get the page served from the cache.
 
 
+The AWS CDN service is called CloudFront. It serves up cached content and assets for the increased global performance of your application. 
+The main components of CloudFront are the edge locations (cache endpoints), the origin (original source of truth to be cached 
+such as an EC2 instance, an S3 bucket, an Elastic Load Balancer or a Route 53 config), and the distribution (the arrangement 
+of edge locations from the origin or basically the network itself).
+
+
 Performance
 CloudFront improves performance for both cacheable content (such as images and videos) and dynamic content (such as API acceleration and dynamic site delivery).
 Global Accelerator improves performance for a wide range of applications over TCP or UDP by proxying packets at the edge to applications running in one or more AWS Regions.
@@ -585,7 +654,6 @@ Use Cases
 CloudFront is a good fit for HTTP use cases
 Global Accelerator is a good fit for non-HTTP use cases, such as gaming (UDP), IoT (MQTT), or VoIP, as well as for HTTP use cases that require static IP addresses or deterministic, fast regional failover.
 
-Caching
 Caching
 CloudFront supports Edge caching
 Global Accelerator does not support Edge Caching.
@@ -888,6 +956,21 @@ If the content is not present in the edge location, CloudFront retrieves it from
 =================================================
 #Security | IAM |       
 ================================================= 
+
+IAM is a global AWS services that is not limited by regions. Any user, group, role or policy is accessible globally.
+
+IAM Entities:
+Users - any individual end user such as an employee, system architect, CTO, etc.
+
+Groups - any collection of similar people with shared permissions such as system administrators, HR employees, finance teams, etc. 
+Each user within their specified group will inherit the permissions set for the group.
+
+Roles - any software service that needs to be granted permissions to do its job, 
+e.g- AWS Lambda needing write permissions to S3 or a fleet of EC2 instances needing read permissions from a RDS MySQL database.
+
+Policies - the documented rule sets that are applied to grant or limit access. 
+In order for users, groups, or roles to properly set permissions, they use policies. 
+Policies are written in JSON and you can either use custom policies for your specific needs or use the default policies set by AWS.
 
 
 #IAM
@@ -1346,6 +1429,20 @@ Uses the AWS global network to optimize the path from users to applications, imp
 
 AWS Global Accelerator continually monitors the health of application endpoints and will detect an unhealthy endpoint and redirect 
 traffic to healthy endpoints in less than 1 minute.
+
+
+
+=================================================
+#AWS Well-Architected  | Architected Framework      
+================================================= 
+
+The AWS Well-Architected Framework is based on five pillars:
+-operational excellence, 
+-security, 
+-reliability, 
+-performance efficiency
+-cost optimization
+
 
 
 =================================================
