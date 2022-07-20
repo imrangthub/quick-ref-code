@@ -14,6 +14,8 @@ https://www.youtube.com/watch?v=7sOSkgWR2As&list=PLzde74P_a04d1roElg9DPWm5Bmavhi
 
 
 S3+ Encryption:
+CIDR Permitted Accociation/RFC1918
+BGP
 
 
 
@@ -238,6 +240,65 @@ and rules that filter out specific traffic patterns that you can define.
 
 
 
+
+=================================================
+#Placement Group        
+================================================= 
+
+Placement groups balance the tradeoff between risk tolerance and network performance when it comes to your fleet of EC2 instances.
+The more you care about risk, the more isolated you want your instances to be from each other. 
+The more you care about performance, the more conjoined you want your instances to be with each other.
+
+
+Placing the things at one place or gathering the things together at one place is nothing but placement groups.
+
+When you launch multiple EC2 instances on AWS, the EC2 service makes sure that all of your EC2 instances 
+are spread across different physical machines to minimize the failure of the entire system. 
+But AWS EC2 also provides the customers the ability to put the EC2 instance according to their need. 
+Placement groups are used to determine how the EC2 instances are launched on the underlying hardware. 
+
+
+Why use Placement Group?
+
+Placement groups help us to launch a bunch of EC2 instances close to each other physically within the same AZ. 
+Being close physically and within the same AZ helps it take advantage of high-speed connectivity to 
+provide low latency, high throughput access.
+
+Placement groups strategies:
+
+Cluster placement group: It groups instances into low latency clusters in a single available zone(AZ).
+Spread placement group: It spread the instances across underlying hardware.
+Partition placement group: It spreads the instances across many different partitions within an AZ.
+
+
+Cluster Placement Group:
+In the cluster placement group, all the instances are in the same rack in a single availability zone. 
+Cluster placement groups are designed for high speed performance and low network latency applications as 
+EC2 instances are physically on the same rack and it causes low latency between the EC2 instances in the same cluster placement group. 
+It usually supports up to 10Gbps network. As the EC2 instances in the cluster placement group are in the same physical rack so the 
+problem with cluster placement groups is if the rack fails, all the instances will fail at the same time 
+compromising the high availability of the application.
+  
+Spread Placement Group:
+In the spread placement group, all EC2 instances are located on different hardware racks in a single availability zone. 
+Each rack is isolated from others and has its own power and networks to reduce the failure of all the instances in the 
+spread placement group at a time. You can create up to 7 EC2 instances per availability zone per spread placement group. 
+Unlike Cluster placement groups, EC2 instances in the spread placement group exist on different hardware within 
+the single availability zone minimizing the failure of all the EC2 instances at a time while making sure of the low latency. 
+Spread placement groups are designed for applications that require maximum high availability and where 
+each instance must be isolated from failure from each other.
+
+
+
+Partition Placement Group:
+In the partition placement group, instances are launched into different partitions on different hardware racks to 
+make sure of high availability. It can span across multiple AZs in the same region. 
+The instances in a partition do not share racks with the instances in the other partitions. 
+A partition failure can affect many EC2 instances in the same partition but won’t affect the EC2 instances on the other partitions. 
+Partition placement groups are designed for applications that require maximum high availability. 
+Partition placement groups are used for big application deployment and are ideal 
+for large distributed and replicated workloads such as kafka, hadoop and cassandra etc.
+
 =================================================
 #Storage | DB | db | s3 | efs | ebs           
 ================================================= 
@@ -357,6 +418,16 @@ This action deletes objects in the Amazon S3 bucket.
 
 #Amazon DynamoDB
 ------------------------------------------------
+Amazon DynamoDB is a key-value and document database that delivers single-digit millisecond performance at any scale. 
+It's a fully managed, multiregion, multimaster, durable non-SQL database. It comes with built-in security, backup and restore, 
+and in-memory caching for internet-scale applications.
+
+
+The main components of DynamoDB are:
+
+-a collection which serves as the foundational table
+-a document which is equivalent to a row in a SQL database
+-key-value pairs which are the fields within the document or row
 
 Amazon DynamoDB is a Serverless key-value and document database that delivers single-digit millisecond performance at any scale. 
 It's a fully managed, multiregion, multimaster, durable database with built-in security, backup and restore, 
@@ -421,6 +492,9 @@ Amazon Redshift is a fully managed, scalable cloud data warehouse that accelerat
 and secure analytics at scale. Thousands of customers rely on 
 Amazon Redshift to analyze data from terabytes to petabytes and run complex analytical queries.
 
+Redshift is not multi-AZ, if you want multi-AZ you will need to spin up a separate cluster ingesting the same input. 
+You can also manually restore snapshots to a new AZ in the event of an outage.
+
 
 What are the differences between a database and a data warehouse? 
 A database is any collection of data organized for storage, accessibility, and retrieval. 
@@ -430,62 +504,73 @@ from disparate source systems and provisions them for analytical use.
 
 
 =================================================
-#Placement Group        
+#RDS       
 ================================================= 
 
-Placement groups balance the tradeoff between risk tolerance and network performance when it comes to your fleet of EC2 instances.
-The more you care about risk, the more isolated you want your instances to be from each other. 
-The more you care about performance, the more conjoined you want your instances to be with each other.
+RDS is a managed service that makes it easy to set up, operate, and scale a relational database in AWS. 
+It provides cost-efficient and resizable capacity while automating or outsourcing time-consuming administration tasks such as 
+hardware provisioning, database setup, patching and backups.
+
+RDS comes in six different flavors:
+SQL Server
+Oracle
+MySQL Server
+PostgreSQL
+MariaDB
+Aurora
 
 
-Placing the things at one place or gathering the things together at one place is nothing but placement groups.
-
-When you launch multiple EC2 instances on AWS, the EC2 service makes sure that all of your EC2 instances 
-are spread across different physical machines to minimize the failure of the entire system. 
-But AWS EC2 also provides the customers the ability to put the EC2 instance according to their need. 
-Placement groups are used to determine how the EC2 instances are launched on the underlying hardware. 
+RDS has two key features when scaling out:
+-Read replication for improved performance
+-Multi-AZ for high availability
 
 
-Why use Placement Group?
+You cannot SSH into an RDS instance so therefore you cannot patch the OS. 
+This means that AWS is responsible for the security and maintenance of RDS. 
 
-Placement groups help us to launch a bunch of EC2 instances close to each other physically within the same AZ. 
-Being close physically and within the same AZ helps it take advantage of high-speed connectivity to 
-provide low latency, high throughput access.
+You can provision an EC2 instance as a database if you need or want to manage the underlying server yourself, 
+but not with an RDS engine.
 
-Placement groups strategies:
+Multi-AZ is supported for all DB flavors except aurora. This is because Aurora is completely fault-tolerant on its own.
+Multi-AZ feature allows for high availability across availability zones and not regions.
 
-Cluster placement group: It groups instances into low latency clusters in a single available zone(AZ).
-Spread placement group: It spread the instances across underlying hardware.
-Partition placement group: It spreads the instances across many different partitions within an AZ.
-
-
-Cluster Placement Group:
-In the cluster placement group, all the instances are in the same rack in a single availability zone. 
-Cluster placement groups are designed for high speed performance and low network latency applications as 
-EC2 instances are physically on the same rack and it causes low latency between the EC2 instances in the same cluster placement group. 
-It usually supports up to 10Gbps network. As the EC2 instances in the cluster placement group are in the same physical rack so the 
-problem with cluster placement groups is if the rack fails, all the instances will fail at the same time 
-compromising the high availability of the application.
-  
-Spread Placement Group:
-In the spread placement group, all EC2 instances are located on different hardware racks in a single availability zone. 
-Each rack is isolated from others and has its own power and networks to reduce the failure of all the instances in the 
-spread placement group at a time. You can create up to 7 EC2 instances per availability zone per spread placement group. 
-Unlike Cluster placement groups, EC2 instances in the spread placement group exist on different hardware within 
-the single availability zone minimizing the failure of all the EC2 instances at a time while making sure of the low latency. 
-Spread placement groups are designed for applications that require maximum high availability and where 
-each instance must be isolated from failure from each other.
+During a failover, the recovered former primary becomes the new secondary and the promoted secondary becomes primary. 
+Once the original DB is recovered, there will be a sync process kicked off where the two 
+DBs mirror each other once to sync up on the new data that the failed former primary might have missed out on.
 
 
 
-Partition Placement Group:
-In the partition placement group, instances are launched into different partitions on different hardware racks to 
-make sure of high availability. It can span across multiple AZs in the same region. 
-The instances in a partition do not share racks with the instances in the other partitions. 
-A partition failure can affect many EC2 instances in the same partition but won’t affect the EC2 instances on the other partitions. 
-Partition placement groups are designed for applications that require maximum high availability. 
-Partition placement groups are used for big application deployment and are ideal 
-for large distributed and replicated workloads such as kafka, hadoop and cassandra etc.
+Read Replication is exclusively used for performance enhancement.
+
+You can promote read replicas to be their very own production database if needed.
+Read replicas are supported for all six flavors of DB on top of RDS.
+Each Read Replica will have its own DNS endpoint.
+Automated backups must be enabled in order to use read replicas.
+
+
+
+RDS Backups:
+
+When it comes to RDS, there are two kinds of backups:
+-automated backups
+-database snapshots
+
+Automated backups allow you to recover your database to any point in time within a retention period (between one and 35 days). 
+Automated backups will take a full daily snapshot and will also store transaction logs throughout the day. 
+When you perform a DB recovery, RDS will first choose the most recent daily backup and apply the relevant transaction logs from that day. 
+
+
+DB snapshots are done manually by the administrator. A key different from automated backups is that they are retained even 
+after the original RDS instance is terminated. With automated backups, the backed up data in 
+S3 is wiped clean along with the RDS engine. 
+
+
+A relational database system does not scale well for the following reasons:
+It normalizes data and stores it on multiple tables that require multiple queries to write to disk.
+It generally incurs the performance costs of an ACID-compliant transaction system.
+It uses expensive joins to reassemble required views of query results.
+
+
 
 =================================================
 #Elastic Load Blancer |  | elb | ELB          
@@ -504,7 +589,10 @@ TypeOfLoadBalancer:
  - Gateway Load Balancers
  - Classic Load Balancers
  
- 
+Load balancers are a regional service. They do not balance load across different regions. 
+You must provision a new ELB in each region that you operate out of.
+
+
 With Application Load Balancers, Network Load Balancers, and Gateway Load Balancers, 
 you register targets in target groups, and route traffic to the target groups. 
 With Classic Load Balancers,you register instances with the load balancer.
@@ -585,6 +673,16 @@ Component of Authscaling
 AutoScalingPolicies
  - Manual
  - Daynamic
+ 
+ 
+You cannot modify a launch configuration after you've created it. If you want to change the launch 
+configuration for an Auto Scaling group, you must create a new launch configuration and update your Auto Scaling group to 
+inherit this new launch configuration.
+
+The default termination policy for an Auto Scaling Group is to automatically terminate a stopped instance, 
+so unless you've configured it to do otherwise, stopping an instance will result in termination regardless 
+if you wanted that to happen or not. 
+A new instance will be spun up in its place.
  
 =================================================
 # Edge locations             
@@ -683,6 +781,11 @@ It provides static IP addresses that act as a fixed entry point to application e
 =================================================
 #Amazon FSx       
 ================================================= 
+
+Amazon FSx for Windows File Server provides a fully managed native Microsoft File System.
+You can use Microsoft Active Directory to authenticate into the file system.
+
+
 Amazon FSx is a fully managed third-party file system solution. It uses SSD storage to provide fast performance with low latency.
 There are four available FSx solutions available in AWS:
 
@@ -717,6 +820,27 @@ It comes with a complete file server built in, and it offers superior performanc
 Amazon FSx offers file systems designed for a variety of workload types. 
 You can use AWS FSx as storage for Windows applications, machine learning (ML) and high-performance computing (HPC). 
 FSx can also help with electronic design automation.
+
+
+You can deploy your Amazon FSx for Windows in a single AZ or in a Multi-AZ configuration.
+By default, all data is encrypted at rest.
+
+
+=================================================
+#Amazon FSx for Lustre
+================================================= 
+Amazon FSx for Lustre makes it easy and cost effective to launch and run the open source Lustre file system for high-performance 
+computing applications. With FSx for Lustre, you can launch and run a file system that can process massive data sets at up to 
+hundreds of gigabytes per second of throughput, millions of IOPS, and sub-millisecond latencies.
+
+
+FSx for Lustre is compatible with the most popular Linux-based AMIs, including Amazon Linux, 
+Amazon Linux 2, Red Hat Enterprise Linux (RHEL), CentOS, SUSE Linux and Ubuntu.
+
+Since the Lustre file system is designed for high-performance computing workloads that typically run on compute clusters, 
+choose EFS for normal Linux file system if your requirements don't match this use case.
+
+FSx Lustre has the ability to store and retrieve data directly on S3 on its own.
 
 
 
@@ -800,6 +924,9 @@ and optimize resource utilization.
 
 CloudWatch collects monitoring and operational data in the form of logs, metrics, and events. 
 
+CloudWatch collects monitoring and operational data in the form of logs, metrics, and events.
+You can use CloudWatch to detect anomalous behavior in your environments, set alarms, visualize logs and metrics side by side, 
+take automated actions, troubleshoot issues, and discover insights to keep your applications running smoothly.
 
 You get a unified view of operational health and gain complete visibility of your AWS resources, applications, and services running on 
 AWS and on-premises. You can use CloudWatch to detect anomalous behavior in your environments, set alarms, 
@@ -825,6 +952,8 @@ Use cases:
 -Monitor and React to Resource Changes
 
 
+CloudWatch is NOT CloudTrail so it is important to know that only CloudTrail can monitor AWS access for security and auditing reasons. 
+CloudWatch is all about performance. CloudTrail is all about auditing.
 
 
 =================================================
@@ -923,8 +1052,37 @@ You can create EventBridge rules that use the information from CloudTrail.
 For more information about CloudTrail, see What is AWS CloudTrail?.
 
 
+There are two types of events that can be logged in CloudTrail: management events and data events.
+
+Management events provide information about management operations that are performed on resources in your AWS account.
+Think of Management events as things normally done by people when they are in AWS. 
+
+Examples:
+a user sign in
+a policy changed
+a newly created security configuration
+a logging rule deletion
+
+
+Data events provide information about the resource operations performed on or in a resource.
+Think of Data events as things normally done by software when hitting various AWS endpoints. 
+
+Examples:
+S3 object-level API activity
+Lambda function execution activity
+By default, CloudTrail logs management events, but not data events.
+
+
 #CloudFront
 -------------------------------------------------
+
+Amazon Cloudfront is a content delivery network (AWS CDN) that retrieves data stored in the 
+Amazon S3 bucket and distributes it to numerous edge locations across the world. 
+Edge locations are the network of data centers distributed worldwide through which content is delivered.
+
+If the content is already cached in the edge location, CloudFront delivers it immediately with the lowest latency possible.
+If the content is not present in the edge location, CloudFront retrieves it from the origin 
+(like Amazon S3 bucket, a MediaPackage channel, or an HTTP server) that has been identified for your content.
 
 Securely deliver content with low latency and high transfer speeds
 
@@ -943,15 +1101,43 @@ Use cases:
 -Distribute patches and updates
 
 
-Amazon Cloudfront is a content delivery network (AWS CDN) that retrieves data stored in the 
-Amazon S3 bucket and distributes it to numerous edge locations across the world. 
-Edge locations are the network of data centers distributed worldwide through which content is delivered.
-
-If the content is already cached in the edge location, CloudFront delivers it immediately with the lowest latency possible.
-If the content is not present in the edge location, CloudFront retrieves it from the origin 
-(like Amazon S3 bucket, a MediaPackage channel, or an HTTP server) that has been identified for your content.
 
 
+=================================================
+#Route 53 | Route53 
+================================================= 
+Amazon Route 53 is a highly available and scalable Domain Name System (DNS) service. 
+You can use Route 53 to perform three main functions in any combination: domain registration, DNS routing, and health checking.
+
+
+When you buy a domain name, every DNS address starts with an SOA (Start of Authority) record. 
+The SOA record stores information about the name of the server that kicked off the transfer of ownership, 
+the administrator who will now use the domain, the current metadata available, and the default number of seconds or TTL.
+
+NS records, or Name Server records, are used by the Top Level Domain hosts (.org, .com, .uk, etc.) 
+to direct traffic to the Content servers. The Content DNS servers contain the authoritative DNS records.
+
+Browsers talk to the Top Level Domains whenever they are queried and encounter domain name that they do not recognize.
+Browsers will ask for the authoritative DNS records associated with the domain.
+
+Because the Top Level Domain contains NS records, the TLD can in turn queries the Name Servers for their own SOA.
+Within the SOA, there will be the requested information.
+
+Once this information is collected, it will then be returned all the way back to the original browser asking for it.
+
+
+
+In summary: Browser -> TLD -> NS -> SOA -> DNS record. The pipeline reverses when the correct DNS record is found.
+
+
+The routing policies available are:
+-Simple Routing
+-Weighted Routing
+-Latency-based Routing
+-Failover Routing
+-Geolocation Routing
+-Geo-proximity Routing
+-Multivalue Answer Routing
 
 =================================================
 #Security | IAM |       
