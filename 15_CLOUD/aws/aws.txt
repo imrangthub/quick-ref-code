@@ -2,23 +2,16 @@
 #                 AWS                          #
 #################################################
 
-Dirct connection shared vapc all transictiv
-Do so
  
- https://cloud.in28minutes.com/aws-certification-sqs-vs-sns-vs-amazon-mq1
 =================================================
 #To Do           
 ================================================= 
 
-https://www.youtube.com/watch?v=7sOSkgWR2As&list=PLzde74P_a04d1roElg9DPWm5Bmavhi_97&index=3
+https://aws.amazon.com/vpc/faqs/
 
 
-S3+ Encryption:
-CIDR Permitted Accociation/RFC1918
-BGP
-ElasticBeanstalk
 
-
+RTO), Recovery Point Objectives (RPO), and compliance
 
 
 Whitepapers:4
@@ -29,8 +22,6 @@ Whitepapers:4
 -Inportant services FAQ
 -AWS Community
 -AWS Conference(Youtube)
-
-
 
 
 
@@ -97,7 +88,8 @@ Public Subnet
  - If a subnet traffic is routed to on Internet Gateway it is public with a public IP.
 Private Subnet
  - If a Subnet dosnot have a route to the internet Gateway then it is private.
-   When you create a VPC you must specify on IPv4 CIDR blica for the VPC, The allowed blick size is betwwn /16 to /28 netmask.
+   When you create a VPC you must specify on IPv4 CIDR blica for the 
+   , The allowed blick size is betwwn /16 to /28 netmask.
    The first four and last IP address of Subnet cannot be assigned.
     - Suppose a IP => 10.0.0.0/16
 	- 10.0.0.0 Network address
@@ -159,6 +151,26 @@ In Custom VPC has to be create considering its CIDR dos not have Internet Getwat
 
 
 
+
+-Each VPC has a main route table, by default
+-Main route table has a default route enabling communication between resources in all subnets in a VPC
+-Default route rule CANNOT be deleted/edited
+-HOWEVER you can add/edit/delete other routing rules to the main route table
+
+
+#Subnet 
+-------------------------------------------------
+-Each subnet can have its own route table OR share its route table with the VPC
+-If a subnet does not have a route table associated with it, it implicitly uses the route table of its VPC
+-Multiple subnets can share a route table
+-HOWEVER at any point in time, a subnet can be associated with one route table ONLY
+
+
+Public Subnet:
+-Communication is allowed from subnet to internet
+-Communication is allowed from internet to subnet
+
+
 =================================================
 #VPN | VPNs | vpn             
 ================================================= 
@@ -168,8 +180,11 @@ With a VPC Virtual Private Network (VPN), your VPC becomes an extension of your 
 
 
 =================================================
-#DirectConnect           
+#DirectConnect    | DX       | DC
 ================================================= 
+AWS Direct Connect Private dedicated network connection from on-premises to AWS
+
+
 Direct Connect is an AWS service that establishes a dedicated network connection between your premises and AWS. 
 You can create this private connectivity to reduce network costs, increase bandwidth, and provide more consistent network experience 
 compared to regular internet-based connections.
@@ -198,6 +213,11 @@ Summary: AWS PrivateLink connects your AWS services with other AWS services thro
 
 
 
+=================================================
+#BGP |   Border Gateway Protocol          
+================================================= 
+BGP is a means by which all junction points on the internet (routers) communicate with each other to dynamically establish the 
+correct (and correctly weighted) paths that network packets should follow to traverse the global networking
 
 =================================================
 #AWS Global Accelerator
@@ -213,36 +233,55 @@ By default, Global Accelerator provides you two static IP addresses that you can
 Global Accelerator also provides fast regional failover.
 
 
+
+
 =================================================
-#ENI |  Elastic network interfaces             
+#Internet Protocol (IP    
 ================================================= 
-An elastic network interface is a logical networking component in a VPC that represents a virtual network card. 
-It can include the following attributes:
+The Internet Protocol (IP) uses three types of addressing schemes: Unicast, Multicast, and Anycast.
 
-A primary private IPv4 address from the IPv4 address range of your VPC
-One or more secondary private IPv4 addresses from the IPv4 address range of your VPC
-One Elastic IP address (IPv4) per private IPv4 address
-One public IPv4 address
-One or more IPv6 addresses
-One or more security groups
-A MAC address
-A source/destination check flag
-A description
-
-ENIs are virtual network cards you can attach to your EC2 instances. They are used to enable network connectivity for your instances, 
-and having more than one of them connected to your instance allows it to communicate on two different subnets.
+Unicast:
+A Unicast address is used to identify a single unique host. It is used to send data to a single destination. 
+In computer networking, unicast communication is a one-to-one transmission from one point in the network to another. 
 
 
-A common use case for ENIs is the creation of management networks. 
-This allows you to have public-facing applications like web servers in a public subnet but lock down SSH access 
-down to a private subnet on a secondary network interface. In this scenario, you would connect using a 
-VPN to the private management subnet, then administrate your servers as usual.
+Multicast:
+A Multicast address is used to deliver data to a group of destinations (a one-to-many transmission). 
+IP multicast group addresses are represented by class-D IP addresses reserved specifically for multicast 
+communications, ranging from 224.0.0.0 through 239.255.255.255. Any IP packet sent to a multicast address is 
+delivered to only those hosts that have joined that particular IP Multicast group, resulting in less network traffic, 
+thereby reducing bandwidth and network overhead. If the host hasn’t joined the group, the receiver ignores the packets 
+at the hardware level, eliminating platform software resource consumption in that network element. 
+IPv6 multicast replaces broadcast addresses that were supported in IPv4. 
+
+Anycast:
+Anycast, also known as IP Anycast or Anycast routing, is an IP network addressing scheme that allows multiple servers to share the same 
+IP address, allowing for multiple physical destination servers to be logically identified by a single IP address. 
+Based on the location of the user request, the anycast routers send it to the server in the network based on a least-cost analysis 
+that includes assessing the number of hops, shortest distance, lowest transit cost, and minimum latency measurements to optimize the 
+selection of a destination server.
+
 
 
 
 =================================================
 #EC2    
 ================================================= 
+
+t2.micro:
+	t - Instance Family
+	2 - generation. Improvements with each generation.
+	micro - size. (nano < micro < small < medium < large < xlarge < …..)
+
+EC2 provides two important services to get details:
+-Instance Metadata Service
+-Dynamic Data Service
+
+URL: http://169.254.169.254/latest/meta-data/
+
+URL: http://169.254.169.254/latest/dynamic/
+Example: http://169.254.169.254/latest/dynamic/instance-identity/document
+
 
 
 #EC2 capacity reservation
@@ -262,37 +301,117 @@ for as long as you need it.
 
 Creating copies of EC2 instances: Old instance -> Snapshot -> Image (AMI) -> New instance
 
-=================================================
-#Security Groups    
-================================================= 
 
-Security Groups are used to control access (SSH, HTTP, RDP, etc.) with EC2. 
-They act as a virtual firewall for your instances to control inbound and outbound traffic. 
-When you launch an instance in a VPC, you can assign up to five security groups to 
-the instance and security groups act at the instance level, not the subnet level.
+Elastic IP Addresses:
+How do you get a constant public IP address for a EC2 instance? Quick and dirty way is to use an Elastic IP!
 
-Security groups are specific to a single VPC, so you can't share a Security Group 
-between multiple VPCs. However, you can copy a Security Group to create a new Security Group with the same 
-rules in another VPC for the same AWS Account.
+An Elastic IP can be switched to another EC2 instance within the same region. Elastic IP remains attached even if you stop the instance. 
+You have to manually detach it.
 
 
-Security Groups are regional and can span AZs, but can't be cross-regional.
 
-You can specify the source of your security group (basically who is allowed to bypass the virtual firewall) 
-to be a single /32 IP address, an IP range, or even a separate security group.
+Bootstrapping: 
+Install OS patches or software when an EC2 instance is launched.
 
-You cannot block specific IP addresses with Security Groups (use NACLs instead)
+Example:
+
+#!/bin/bash
+yum update -y
+yum install -y httpd
+systemctl start httpd
+systemctl enable httpd
+curl -s http://169.254.169.254/latest/dynamic/instance-identity/document > /var/www/html/index.html
 
 
-=================================================
-#WAF   | Web Application Firewall (WAF)
-================================================= 
-AWS WAF is a web application that lets you allow or block the HTTP(s) requests that are bound for CloudFront, 
-API Gateway, Application Load Balancers, EC2, and other Layer 7 entry points into your AWS environment. 
-AWS WAF gives you control over how traffic reaches your applications by enabling you to create security 
-rules that block common attack patterns, such as SQL injection or cross-site scripting, 
-and rules that filter out specific traffic patterns that you can define. 
+You can call http://169.254.169.254/latest/user-data/ from inside the EC2 instance to lookup user data configured for that instance.
 
+Termination Protection:
+
+Remember:EC2 Termination Protection is not effective for terminations from a) Auto Scaling Groups (ASG) b) Spot Instances c) OS Shutdown
+
+Launch Templates - Pre-configured templates (AMI ID, instance type, and network settings) simplifying the creation of EC2 instances.
+
+Key Pairs:
+-Public key cryptography (Key Pairs) used to protect your EC2 instances
+-You need private key with right permissions (chmod 400) to connect to your EC2 instance. 
+(Windows EC2 instances only) You need admin password also.
+-Security group should allow SSH(22) or RDP(3389)
+
+
+#AMI  | Amazon Machine Image
+-------------------------------------------------
+You need to choose the Amazon Machine Image or AMI based on what operating system and what software do you want on the EC2 instance.
+
+AMIs are stored in Amazon S3 (region specific).
+
+AMIs contain:
+-Root volume block storage (OS and applications)
+-Block device mappings for non-root volumes
+-You can configure launch permissions on an AMI
+
+Who can use the AMI?
+You can share your AMIs with other AWS accounts
+
+Best Practice: Backup upto date AMIs in multiple regions
+Critical for Disaster Recovery
+
+
+Three AMI sources:
+-Provided by AWS
+-AWS Market Place: Online store for customized AMIs. Per hour billing
+-Customized AMIs: Created by you.
+
+
+
+#Monitoring EC2 instances
+-------------------------------------------------
+Amazon CloudWatch is used to monitor EC2 instances.
+
+There are two types of monitoring:
+(FREE) Basic monitoring (“Every 5 minutes”) provided for all EC2 instance types
+(\(\)) EC2 Detailed Monitoring can be enabled for detailed metrics every 1 minute
+
+
+#EC2 Tenancy - Shared vs Dedicated
+--------------------------------------------------
+
+There are two Dedicated EC2 options:
+
+-EC2 Dedicated Instances
+-EC2 Dedicated Hosts
+
+
+EC2 Dedicated Instances are Virtualized instances on hardware dedicated to one customer:
+You do NOT have visibility into the hardware of underlying host
+
+EC2 Dedicated Hosts are Physical servers dedicated to one customer:
+You have visibility into the hardware of underlying host (sockets and physical cores)
+(Use cases) Regulatory needs or server-bound software licenses like Windows Server, SQL Server
+
+
+#EC2 Pricing Models:
+--------------------------------------------------
+
+-On Demand: Request when you want it	Flexible and Most Expensive
+-Spot: Quote the maximum price	Cheapest (upto 90% off) BUT NO Guarantees
+-Reserved: Reserve ahead of time	Upto 75% off. 1 or 3 years reservation.
+-Savings Plans: Commit spending $X per hour on (EC2 or AWS Fargate or Lambda)	Upto 66% off. No restrictions. 1 or 3 years reservation.
+
+
+INP:
+====
+-You want to update the EC2 instance to a new AMI updated with latest patches
+Relaunch a new instance with an updated AMI
+
+-Create EC2 instances based on on-premise Virtual Machine (VM) images	
+Use VM Import/Export. You are responsible for licenses.
+
+
+-You are installing a lot of software using user data slowing down instance launch. How to make it faster?	
+Create an AMI from the EC2 instance and use it for launching new instances
+
+-I’ve stopped my EC2 instance. Will I be billed for it?	
+ZERO charge for a stopped instance (If you have storage attached, you have to pay for storage)
 
 
 
@@ -354,10 +473,91 @@ Partition placement groups are designed for applications that require maximum hi
 Partition placement groups are used for big application deployment and are ideal 
 for large distributed and replicated workloads such as kafka, hadoop and cassandra etc.
 
+
+=================================================
+#ENI |  Elastic network interfaces             
+================================================= 
+An elastic network interface is a logical networking component in a VPC that represents a virtual network card. 
+It can include the following attributes:
+
+A primary private IPv4 address from the IPv4 address range of your VPC
+One or more secondary private IPv4 addresses from the IPv4 address range of your VPC
+One Elastic IP address (IPv4) per private IPv4 address
+One public IPv4 address
+One or more IPv6 addresses
+One or more security groups
+A MAC address
+A source/destination check flag
+A description
+
+ENIs are virtual network cards you can attach to your EC2 instances. They are used to enable network connectivity for your instances, 
+and having more than one of them connected to your instance allows it to communicate on two different subnets.
+
+
+A common use case for ENIs is the creation of management networks. 
+This allows you to have public-facing applications like web servers in a public subnet but lock down SSH access 
+down to a private subnet on a secondary network interface. In this scenario, you would connect using a 
+VPN to the private management subnet, then administrate your servers as usual.
+
+
+
+
+Each EC2 instance is connected to primary network interface (eth0). 
+You can create and attach a secondary network interface - eth1.
+
+This allows an instance to be dual homed - present in two subnets in a VPC. 
+It can be used to create a management network or a low budget high availability solution.
+
+
+Important terminology with ENI:
+Hot attach: Attaching ENI when EC2 instance is running
+Warm attach: Attaching ENI when EC2 instance is stopped
+Cold attach: Attaching ENI at launch time of EC2 instance
+
+
+=================================================
+#Security Groups    
+================================================= 
+
+Security Groups are used to control access (SSH, HTTP, RDP, etc.) with EC2. 
+They act as a virtual firewall for your instances to control inbound and outbound traffic. 
+When you launch an instance in a VPC, you can assign up to five security groups to 
+the instance and security groups act at the instance level, not the subnet level.
+
+Security groups are specific to a single VPC, so you can't share a Security Group 
+between multiple VPCs. However, you can copy a Security Group to create a new Security Group with the same 
+rules in another VPC for the same AWS Account.
+
+
+Security Groups are regional and can span AZs, but can't be cross-regional.
+
+You can specify the source of your security group (basically who is allowed to bypass the virtual firewall) 
+to be a single /32 IP address, an IP range, or even a separate security group.
+
+You cannot block specific IP addresses with Security Groups (use NACLs instead)
+
+
+Security Groups are stateful:
+-If an outgoing request is allowed, the incoming response for it is automatically allowed.
+-If an incoming request is allowed, an outgoing response for it is automatically allowed
+
+
+=================================================
+#WAF   | Web Application Firewall (WAF)
+================================================= 
+AWS WAF is a web application that lets you allow or block the HTTP(s) requests that are bound for CloudFront, 
+API Gateway, Application Load Balancers, EC2, and other Layer 7 entry points into your AWS environment. 
+AWS WAF gives you control over how traffic reaches your applications by enabling you to create security 
+rules that block common attack patterns, such as SQL injection or cross-site scripting, 
+and rules that filter out specific traffic patterns that you can define. 
+
+
+
 =================================================
 #Storage | DB | db | s3 | efs | ebs           
 ================================================= 
-
+There are several categories of databases:
+Relational (OLTP and OLAP), Document, Key Value, Graph, In Memory among others
 
 Buckets:
 -Buckets are a universal namespace, i.e., the bucket names must be unique.
@@ -437,7 +637,33 @@ or different AWS Regions. S3 Replication supports two-way replication between tw
 
 
  
- 
+#S3 security
+-------------------------------------------------
+
+Security responsibility includes the following areas:
+
+-Managing your data, including object ownership and encryption.
+-Classifying your assets.
+-Managing access to your data using IAM roles and other service configurations to apply the appropriate permissions.
+-Enabling detective controls such as AWS CloudTrail or Amazon GuardDuty for Amazon S3.
+
+
+Server-Side Encryption:
+Request Amazon S3 to encrypt your object before saving it on disks in its data centers and then decrypt it 
+when you download the objects. Server-side encryption can help reduce risk to your data by encrypting 
+the data with a key that is stored in a different mechanism than the mechanism that stores the data itself.
+
+Amazon S3 provides these server-side encryption options:
+-Server-side encryption with Amazon S3‐managed keys (SSE-S3).
+-Server-side encryption with KMS key stored in AWS Key Management Service (SSE-KMS).
+-Server-side encryption with customer-provided keys (SSE-C).
+
+
+Client-Side Encryption:
+
+Encrypt data client-side and upload the encrypted data to Amazon S3. In this case, you manage the encryption process, 
+the encryption keys, and related tools. As with server-side encryption, client-side encryption can help 
+reduce risk by encrypting the data with a key that is stored in a different mechanism than the mechanism that stores the data itself.
 
 #Elastic Block Storage (EBS)
 -------------------------------------------------
@@ -495,6 +721,13 @@ DynamoDB offers built-in security, continuous backups, automated multi-Region re
 
 DynamoDB is accessible via an HTTP API and performs authentication & authorization via IAM roles, 
 making it a perfect fit for building Serverless applications.
+
+
+DAX:
+===
+DynamoDB Accelerator (DAX) delivers fast response times for accessing eventually consistent data. Certain usecases requires microseconds response times
+
+
 
 
 #Amazon Aurora
@@ -556,6 +789,30 @@ A database is any collection of data organized for storage, accessibility, and r
 
 A data warehouse is a type of database the integrates copies of transaction data 
 from disparate source systems and provisions them for analytical use.
+
+
+#Storage Gateway 
+-------------------------------------------------
+
+
+
+AWS Storage Gateway - Summary:
+Key to look for : Hybrid storage (cloud + on premise)
+
+File share (NFS or SMB) + Looking for S3 features and integrations => AWS Storage File Gateway
+
+Tapes on cloud => AWS Storage Tape Gateway
+
+Volumes on cloud (Block Storage) => AWS Storage Volume Gateway
+
+High performance => Stored
+Otherwise => Cached
+
+Needs additional setup on-premises
+
+VM image with AWS Storage Gateway software deployed on-premises or on EC2 instance
+
+
 
 
 =================================================
@@ -626,10 +883,45 @@ It generally incurs the performance costs of an ACID-compliant transaction syste
 It uses expensive joins to reassemble required views of query results.
 
 
+Scenario:
+=========
+-You want full control of OS or need elevated permissions	Consider going for a custom installation (EC2 + EBS)
+-You want to migrate data from an on-premise database to cloud database of the same type	Consider using AWS Database Migration Service
+-You want to migrate data from one database engine to another (Example : Microsoft SQL Server to Amazon Aurora)	Consider using AWS Schema Conversion Tool
+-What are retained when you delete a RDS database instance?	All automatic backups are deleted
+-All manual snapshots are retained (until explicit deletion)
+(Optional) Take a final snapshot
+-How do you reduce global latency and improve disaster recovery?	Use multi region read replicas
+-How do you select the subnets a RDS instance is launched into?	Create DB Subnet groups
+-How can you add encryption to an unencrypted database instance?	Create a DB snapshot
+-Encrypt the database snapshot using keys from KMS
+-Create a database from the encrypted snapshot
+-Are you billed if you stop your DB instance?	You are billed for storage, IOPS, backups and snapshots. You are NOT billed for DB instance hours
+-I will need RDS for at least one year. How can I reduce costs?	Use Amazon RDS reserved instances.
+-Efficiently manage database connections	Use Amazon RDS Proxy
+-Sits between client applications (including lambdas) and RDS
+
+
+
+
+Let’s add a standby database in the second data center with replication.
+
+Let’s consider some challenges:
+
+Challenge 1 (SOLVED): Your database will go down if the data center crashes
+You can switch to the standby database
+Challenge 2 (SOLVED): You will lose data if the database crashes
+Challenge 3 (SOLVED): Database will be slow when you take snapshots
+Take snapshots from standby.
+Applications connecting to master will get good performance always
+
+
 
 =================================================
 #Elastic Load Blancer |  | elb | ELB          
-================================================= 
+=================================================
+
+Elastic Load Balancer are used to distribute traffic across EC2 instances in one or more AZs in a single region. 
 
 The AWS ELB is an AWS service for automatic distribution of incoming application traffic across its components like Amazon EC2 instances, AWS Lambda, and containers..
 
@@ -739,6 +1031,12 @@ so unless you've configured it to do otherwise, stopping an instance will result
 if you wanted that to happen or not. 
 A new instance will be spun up in its place.
  
+ 
+=================================================
+#NAT Gateway        
+================================================= 
+
+
 =================================================
 # Edge locations             
 ================================================= 
@@ -1084,6 +1382,14 @@ and loads it into Amazon S3 or Amazon Redshift. Glue then writes metadata from t
 
 AWS Glue DataBrew is a visual data preparation tool that enables users to clean and normalize data without writing any code. 
 
+Simplify data preparation (capturing metadata) for analytics:
+Connect AWS Glue to your data on AWS (Aurora, RDS, Redshift, S3 etc)
+AWS Glue creates a AWS Glue Data Catalog with metadata abstracted from your data
+Your data is ready for searching and querying
+
+
+
+
 
 
 #CloudTrail 
@@ -1128,6 +1434,14 @@ Lambda function execution activity
 By default, CloudTrail logs management events, but not data events.
 
 
+
+Track events, API calls, changes made to your AWS resources:
+-Who made the request?
+-What action was performed?
+-What are the parameters used?
+-What was the end result?
+
+
 #CloudFront
 -------------------------------------------------
 
@@ -1156,6 +1470,10 @@ Use cases:
 -Distribute patches and updates
 
 
+
+Scenario: Restrict content to users in certain countries
+	Enable CloudFront Geo restriction
+	Configure White list(countries to be allowed) and Blacklist(countries to be blocked)
 
 
 =================================================
@@ -1232,6 +1550,51 @@ IAM features are:
 IAM user represents an entity (person or an application) that interacts with AWS resources and services.
 
 
+================================================= 
+# Encryption  | Security
+================================================= 
+
+#Symmetric Key 
+-------------------------------------------------
+Symmetric encryption algorithms use the same key for encryption and decryption
+-Key Factor 1: Choose the right encryption algorithm
+-Key Factor 2: How do we secure the encryption key?
+-Key Factor 3: How do we share the encryption key?
+
+
+#Asymmetric Key Encryption
+-------------------------------------------------
+
+Two Keys : Public Key and Private Key Also called Public Key Cyptography.
+
+Encrypt data with Public Key and decrypt with Private Key
+Share Public Key with everybody and keep the Private Key with you(YEAH, ITS PRIVATE!)
+
+No crazy questions:
+Will somebody not figure out private key using the public key?
+
+How do you create Asymmetric Keys
+
+
+
+#Amazon Cognito
+-------------------------------------------------
+
+Amazon Cognito provides authentication, authorization, and user management for your web and mobile apps. 
+Your users can sign in directly with a user name and password, or through a third party such as Facebook, Amazon, Google or Apple.
+
+
+Amazon Cognito lets you add user sign-up, sign-in, and access control to your web and mobile apps quickly and easily. 
+Amazon Cognito scales to millions of users and supports sign-in with social identity providers, such as Apple, Facebook, Google, 
+and Amazon, and enterprise identity providers via SAML 2.0 and OpenID Connect.  
+
+
+Amazon Cognito is designed for developers who want to add user management and sync functionality to their mobile and web apps. 
+Developers can use Cognito Identity to add sign-up and sign-in to their apps and to enable their 
+users to securely access their app’s resources. 
+Cognito also enables developers to sync data across devices, platforms, and applications.
+
+
 
 #STS(Security Token Service)
 -------------------------------------------------
@@ -1266,6 +1629,10 @@ Use-Case:
 
 #KMS AWS Key Management Service 
 -------------------------------------------------
+
+Amazon S3 uses AWS KMS keys to encrypt your Amazon S3 objects. AWS KMS encrypts only the object data.
+ 
+ 
 KMS is a managed service that makes it easy for you to create and control the encryption keys used to encrypt your data. 
 AWS KMS uses Hardware Security Modules (HSMs) to protect the security of your keys. 
 You can use AWS KMS to protect your data in AWS services and in your applications
@@ -1277,6 +1644,12 @@ AWS KMS is integrated with AWS CloudTrail to provide you with logs of all key us
 
 AWS KMS Key Management Service is a useful and very beneficial service while dealing with sensitive data and it 
 also makes it easy for you to create and manage cryptographic keys.
+
+
+
+
+AWS KMS keys must be in the same Region as the bucket.
+
 
 
 
@@ -1446,6 +1819,26 @@ AWS Managed Microsoft AD makes it easy to migrate AD-dependent applications and 
 With AWS Managed Microsoft AD, you can use Group Policies to manage EC2 instances and run AD-dependent applications in the 
 AWS Cloud without the need to deploy your own AD infrastructure
 
+
+#AWS Workspaces
+-------------------------------------------------
+-Desktop-as-a-Service (DaaS)
+--Provision Windows or Linux desktops in minutes
+-Eliminate traditional desktop management - Virtual Desktop Infrastructure (VDI)
+
+
+
+#AWS Shield
+-------------------------------------------------
+
+Shields from Distributed Denial of Service (DDoS) attacks
+Disrupt normal traffic of a server by overwhelming it with a flood of Internet traffic
+Protect
+-Amazon Route 53
+-Amazon CloudFront
+-AWS Global Accelerator
+-Amazon Elastic Compute Cloud (EC2) instances
+-Elastic Load Balancers (ELB)
 
 =================================================
 #HPC ENA, EFA      
@@ -1672,7 +2065,84 @@ AWS Global Accelerator continually monitors the health of application endpoints 
 traffic to healthy endpoints in less than 1 minute.
 
 
+#RTO and RPO
+-------------------------------------------------
+Among the components of a DR plan are two key parameters that define how long your business can afford to be offline and how
+much data loss it can tolerate. These are the Recovery Time Objective (RTO) and Recovery Point Objective (RPO).
 
+
+RTO:
+RTO is the goal your organization sets for the maximum length of time it should take to restore normal 
+operations following an outage or data loss.
+
+RTO refers to how much time an application can be down without causing significant damage to the business. 
+Some applications can be down for days without significant consequences. 
+
+RTO is not simply the duration of time between loss and recovery. The objective also accounts for the steps 
+IT must take to restore the application and its data.
+
+
+
+RPO:
+RPO is your goal for the maximum amount of data the organization can tolerate losing. 
+This parameter is measured in time: from the moment a failure occurs to your last valid data backup. 
+For example, if you experience a failure now and your last full data backup was 24 hours ago, the RPO is 24 hours. 
+
+
+Recovery point objectives refer to your company’s loss tolerance: the amount of data that can be lost before significant 
+harm to the business occurs. 
+
+If you back up all or most of your data in regularly scheduled 24-hour increments, then in the worst-case scenario you 
+will lose 24 hours’ worth of data.
+
+For example, if you have a 4-hour RPO for an application then you will have a maximum 4-hour gap between backup and data loss.
+Having a 4-hour RPO does not necessarily mean you will lose 4 hours’ worth of data.
+
+
+=================================================
+#AWS Organizations  
+================================================= 
+Organizations typically have multiple AWS accounts
+Different business units
+Different environments
+
+How do you centralize your management (billing, access control, compliance and security) across multiple AWS accounts?
+Welcome AWS Organizations!
+Organize accounts into Organizational Units (OU)
+Provides API to automate creation of new accounts
+
+
+Features:
+-One consolidated bill for all AWS accounts
+-Centralized compliance management for AWS Config Rules
+-Send AWS CloudTrail data to one S3 bucket (across accounts)
+-AWS Firewall Manager to manage firewall rules (across accounts)
+-AWS WAF, AWS Shield Advanced protections and Security Groups
+-Use Service control policies (SCPs) to define restrictions for actions (across accounts):
+-Prevent users from disabling AWS Config or changing its rules
+-Require Amazon EC2 instances to use a specific type
+-Require MFA to stop an Amazon EC2 instance
+-Require a tag upon resource creation
+
+
+
+=================================================
+#AWS Trusted Advisor
+================================================= 
+Recommendations for cost optimization, performance, security and fault tolerance
+-Red - Action recommended Yellow - investigate and Green - Good to go
+-All AWS customers get 4 checks for free:
+-Service limits (usage > 80%)
+-Security groups having unrestricted access (0.0.0.0/0)
+-Proper use of IAM
+-MFA on Root Account
+-Business or Enterprise AWS support plan provides over 50 checks
+-Disable those you are not interested in
+-How much will you save by using Reserved Instances?
+-How does your resource utilization look like? Are you right sized?
+
+
+AWS Directory Service
 =================================================
 #AWS Well-Architected  | Architected Framework      
 ================================================= 
@@ -1683,6 +2153,195 @@ The AWS Well-Architected Framework is based on five pillars:
 -reliability, 
 -performance efficiency
 -cost optimization
+
+
+DevOps 
+
+
+
+=================================================
+#DevOps | CI  |CD | cicd | DevOps - CI, CD Tools       
+================================================= 
+
+Tools:
+-CodeCommit - Private source control (Git)
+-CodePipeline - Orchestrate CI/CD pipelines
+-CodeBuild - Build and Test Code (application packages and containers)
+-CodeDeploy - Automate Deployment (EC2, ECS, Elastic Beanstalk, EKS, Lambda etc)
+
+
+
+
+
+
+=================================================
+#Managed Services8 | IAAS| PAAS       
+================================================= 
+
+AWS Managed Service Offerings:
+
+-Elastic Load Balancing - Distribute incoming traffic across multiple targets
+-AWS Elastic Beanstalk - Run and Manage Web Apps
+-Amazon Elastic Container Service (ECS) - Containers orchestration on AWS
+-AWS Fargate - Serverless compute for containers
+-Amazon Elastic Kubernetes Service (EKS) - Run Kubernetes on AWS
+-Amazon RDS - Relational Databases - MySQL, Oracle, SQL Server etc
+
+
+
+IAAS:
+
+IAAS (Infrastructure as a Service):
+IAAS (Infrastructure as a Service) is all about using only infrastructure from cloud provider. It is also called “Lift and Shift”. Example: Using EC2 to deploy your applications or databases
+
+With IAAS, you are responsible for:
+
+Application Code and Runtime
+Configuring load balancing
+Auto scaling
+OS upgrades and patches
+Availability
+
+
+
+
+
+
+PAAS:
+
+PAAS (Platform as a Service)
+PAAS (Platform as a Service) is all about using a platform provided by cloud
+
+Cloud provider is responsible for:
+
+OS (incl. upgrades and patches)
+Application Runtime
+Auto scaling, Availability & Load balancing etc..
+You are responsible for:
+
+Application code
+Configuration
+
+Examples of PAAS
+CAAS (Container as a Service): Containers instead of Applications
+FAAS (Function as a Service) or Serverless: Functions instead of Applications
+
+
+
+=================================================
+#Shared Responsibility Model         
+================================================= 
+Security & Compliance is shared responsibility between AWS and customer
+
+
+
+Amazon EC2 instances is Infrastructure as a Service (IaaS).
+You are responsible for:
+Guest OS (incl. security patches)
+Application software installed
+Configuring Security Groups (or firewalls)
+
+
+AWS is responsible for infrastructure layer only.
+
+
+Amazon S3 & DynamoDB are managed services.
+
+AWS manages infrastructure layer, OS, and platform.
+
+You are responsible for
+-Managing your data
+-Managing security of data at rest(encryption)
+-Managing security of data in transit
+-Mandating SSL/HTTPS
+-Using the right network - AWS global network or dedicated private network when possible
+-Managing access to the service
+-Configure right permissions (IAM users/roles/user policies/resource policies)
+(FOR AWS RDS) Managing in database users
+-Configuring the right security groups (control inbound and outbound traffic)
+-Disabling external access (public vs private)
+
+
+=================================================
+# API Gateway       
+================================================= 
+How about a fully managed service with auto scaling that can act as a “front door” to your APIs? Welcome “Amazon API Gateway”
+
+Amazon API Gateway helps you to “publish, maintain, monitor, and secure APIs at any scale”
+
+You can authorize users by integrating with:
+
+AWS IAM (for AWS users using signature version 4)
+Amazon Cognito
+Lambda authorizer (custom authorization with JWT tokens or SAML)
+
+Features:
+-Integrates with AWS Lambda, Amazon EC2, Amazon ECS or any web application
+-Supports HTTP(S) and WebSockets (two way communication - chat apps and streaming dashboards)
+-Serverless. Pay for use (API calls and connection duration)
+-Provides API Lifecycle Management for RESTful APIs and WebSocket APIs
+-You can Run multiple versions of the same API
+-Supports Rate Limits(request quota limits), throttling and fine-grained access permissions using API Keys for Third-Party Developers
+-Lifecycle management for REST APIs
+-Versioning and multiple environments
+-API keys - Generate API keys to monitor usage
+-Implement plans and quota limits for external applications (or developer)
+-WARNING - Do NOT use API keys for Authorization
+-Enable caching for API calls with TTL
+-Protect backends by throttling requests
+-Integrates with
+-Amazon CloudWatch - Performance metrics, API calls, latency data and error rates
+-Amazon CloudWatch Logs - Debug logging
+-WS CloudTrail - Complete history of changes to your REST API
+
+
+
+
+=================================================
+#Amazon Elastic Container Service (ECS)      
+================================================= 
+
+Amazon Elastic Container Service (Amazon ECS) is a fully managed service for container orchestration.
+
+
+Amazon ECR is a Fully-managed Docker container registry provided by AWS. Its an alternative to Docker Hub.
+
+
+
+AWS Fargate is a serverless option.
+
+-Service: Allows you to run and maintain a specified number (the “desired count”) of tasks
+-ECS cluster: Grouping of one or more container instances (EC2 instances) where you run your tasks
+-Container Instance - EC2 instance in the cluster running a container agent (helps it communicate with the cluster)
+-AWS provides ECS ready AMIs with container agents pre-installed.
+
+
+Remember:
+-AWS Fargate does NOT give you visibility into the EC2 instances in the cluster.
+-You can use On-Demand instances or Spot instances to create your cluster.
+-You can load balance using Application Load Balancers
+-Two features of ALB are important for ECS:
+-Dynamic host port mapping: Multiple tasks from the same service are allowed per EC2 (container) instance
+-Path-based routing: Multiple services can use the same listener port on same ALB and be routed based on path (www.app.com/microservice-a and www.app.com/microservice-b)
+
+
+Elastic Beanstalk:
+Single container or multiple containers in same EC2 instance
+Recommended for simple web applications
+
+Amazon ECS:
+AWS specific solution for container orchestration
+Ideal for microservices
+
+
+Amazon Fargate:
+Serverless version of Amazon ECS
+You want to run microservices and you don’t want to manage the cluster
+
+
+Amazon EKS:
+AWS managed service for Kubernetes
+Recommended if you are already using Kubernetes and would want to move the workload to AWS
 
 
 
