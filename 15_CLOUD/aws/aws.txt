@@ -2,12 +2,24 @@
 #                 AWS                          #
 #################################################
 
- 
+
+Tags=>This helps to identify instances more quickly. 
+
+Stopping => Temporarily shutting down the system
+Terminating => Returning control to Amazon
+
+
+Private key: The user downloads the private key
+Public key: AWS uses the public key to confirm the identity of the user. 
+
+
+
 =================================================
 #To Do           
 ================================================= 
 
 https://aws.amazon.com/vpc/faqs/
+https://aws.amazon.com/faqs/
 
 
 
@@ -22,6 +34,7 @@ Whitepapers:4
 -Inportant services FAQ
 -AWS Community
 -AWS Conference(Youtube)
+
 
 
 
@@ -43,7 +56,20 @@ AWS-
  -Gateway
 
 
-NFS - Network file system
+
+
+Amazon web service is an online platform that provides scalable and cost-effective cloud computing solutions.
+AWS has 80 Availability Zones across 25 geographic regions global data centers. 
+
+AWS:
+-Security: AWS provides a secure and durable platform that provides end-to-end security and storage.
+-Experience: The skills and infrastructure management born from Amazon’s many years of experience can be very valuable.
+-Flexibility: It allows users to select the operating systems, language, database, and other services as per their requirements.
+-Easy to use: AWS lets you host your applications quickly and securely, regardless of whether it’s an existing or new application.
+-Scalable: The applications you use can be scaled up or down, depending on your requirements.
+-Cost savings: You only pay for the compute power, storage, and other resources that you use, without any long-term commitments.
+-Scheduling: This enables you to start and stop AWS services at predetermined times
+-Reliability: AWS takes multiple backups at servers at multiple physical locations
 
 
 =================================================
@@ -107,6 +133,8 @@ Private Subnet
 ================================================= 
 
 Vpc is a Virtual Network or DataCenter inside AWS for one Client.
+A VPC can span multiple availability zones in a region.
+The CIDR block for the default VPC is always a 16 subnet mask; in this example, it's 172.31.0.0/16. It means this VPC can provide up to 65,536 IP addresses.
 
 - It is logical Isolated from Other virtual Network in the AWS.
 - Max 5 VPC can be created and 200 subnet in 1 VPC.
@@ -136,6 +164,17 @@ Default VPC has default CIDR, Security Group, NACL and Route table setting.
 In Custom VPC has to be create considering its CIDR dos not have Internet Getwat be default.
  
 
+VPC Peering: 
+A peering connection can be made between your own VPCs or with a VPC in another AWS account, as long as it is in the same region.
+
+VPCs, but transitive peering is not supported. In other words, VPC A can connect to B and C in the above diagram, 
+but C cannot communicate with B unless directly paired.
+
+We can have up to 200 Subnets per Amazon Virtual Private Cloud (VPC).
+
+Monitor VPC by using:
+CloudWatch and CloudWatch logs
+VPC Flow Logs
 
 #Component of VPC
 -------------------------------------------------
@@ -160,6 +199,10 @@ In Custom VPC has to be create considering its CIDR dos not have Internet Getwat
 
 #Subnet 
 -------------------------------------------------
+Amazon defines a route table as a set of rules, called routes, which are used to determine where network traffic is directed.
+Each subnet has to be linked to a route table, and a subnet can only be linked to one route table. On the other hand, one route table can have associations with multiple subnets. 
+
+
 -Each subnet can have its own route table OR share its route table with the VPC
 -If a subnet does not have a route table associated with it, it implicitly uses the route table of its VPC
 -Multiple subnets can share a route table
@@ -169,6 +212,13 @@ In Custom VPC has to be create considering its CIDR dos not have Internet Getwat
 Public Subnet:
 -Communication is allowed from subnet to internet
 -Communication is allowed from internet to subnet
+
+
+Security products and features:
+-Security groups - This acts as a firewall for the EC2 instances, controlling inbound and outbound traffic at the instance level.
+-Network access control lists - It acts as a firewall for the subnets, controlling inbound and outbound traffic at the subnet level.
+-Flow logs - These capture the inbound and outbound traffic from the network interfaces in your VPC.
+
 
 
 =================================================
@@ -194,6 +244,36 @@ The use case for Direct Connect is high throughput workloads or if you need a st
 
 DirectConnect connects your on-prem with your VPC through a non-public tunnel.
 
+=================================================
+#NAT Gateway        
+================================================= 
+A Network Address Translation (NAT) device can be used to enable instances in a private subnet to connect to the internet 
+or the AWS services, but this prevents the internet from initiating connections with the instances in a private subnet.
+
+However, your private subnet database instance might still need internet access or the ability to connect to other AWS resources. 
+You can use a NAT device to do so. 
+
+The NAT device directs traffic from your private subnet to either the internet or other AWS services. 
+It then sends the response back to your instances. When traffic is directed to the internet, the source 
+IP address of your instance is replaced with the NAT device address, and when the internet traffic returns, 
+the NAT device translates the address to your instance’s private IP address.
+
+
+NAT device is added to the public subnet to get internet connectivity.
+
+
+
+AWS provides two kinds of NAT devices:
+NAT gateway 
+NAT instance 
+
+
+NAT Gateway
+A NAT gateway must be launched in a public subnet because it needs internet connectivity. 
+It also requires an elastic IP address, which you can select at the time of launch.
+
+Once created, you need to update the route table associated with your private subnet to point internet-bound traffic to the NAT gateway. 
+This way, the instances in your private subnet can communicate with the internet.
 
 =================================================
 #AWS PrivateLink
@@ -210,6 +290,36 @@ If you do not want that behavior and instead want AWS services to only communica
 
 
 Summary: AWS PrivateLink connects your AWS services with other AWS services through a non-public tunnel.
+
+
+
+Network ACL:
+-------------------------------------------------
+
+Every subnet in your VPC must be associated with an ACL, failing which the subnet gets automatically associated with your default ACL.
+
+One subnet can only be linked with one ACL. On the other hand, an ACL can be linked to multiple subnets.
+
+
+Amazon VPC can contain anywhere from 16 to 65,536 IP addresses. You can select your CIDR block according to the number of instances needed.
+
+VPC limits:
+
+Five VPCs per region
+200 subnets per VPC
+200 route tables per VPC
+500 security groups per VPC
+50 inbound and outbound rules per VPC
+
+
+Amazon VPC costs:
+If you opt to create a hardware VPN connection associated with your VPC using Virtual Private Gateway, you will have to pay for each 
+VPN connection hour that your VPN connection is provisioned and available. Each partial VPN connection hour consumed is 
+billed as a full hour. You'll also incur standard AWS data transfer charges for all data transferred via the VPN connection. 
+
+If you create a NAT gateway in your VPC, Charges are levied for each NAT gateway hour that your NAT gateway is 
+provisioned and available for. Data processing charges apply for each gigabyte processed through a NAT gateway. 
+Each partial NAT gateway hour consumed is billed as a full hour.
 
 
 
@@ -267,6 +377,10 @@ selection of a destination server.
 =================================================
 #EC2    
 ================================================= 
+
+EC2 is short for Elastic Compute Cloud, and it provides scalable computing capacity.
+EC2 provides virtual computing environments called “instances.”
+
 
 t2.micro:
 	t - Instance Family
@@ -1008,6 +1122,8 @@ An Auto Scaling group contains a collection of EC2 instances that are treated as
 logical grouping for the purposes of automatic scaling and management. 
 An Auto Scaling group also enables you to use Amazon EC2 Auto Scaling features such as health check replacements and scaling policies.
 
+When you create an EC2 Auto Scaling group, you must specify a launch configuration. You can specify your launch configuration with multiple EC2 Auto Scaling groups. 
+
 AutoScaling happend in a available zone.
 
 
@@ -1032,10 +1148,43 @@ if you wanted that to happen or not.
 A new instance will be spun up in its place.
  
  
-=================================================
-#NAT Gateway        
-================================================= 
 
+
+#Amazon EC2 Auto Scaling vs. AWS Auto Scaling           
+--------------------------------------------------
+
+AWS Auto Scaling:
+You should use AWS Auto Scaling to manage scaling for multiple resources across multiple services. 
+AWS Auto Scaling lets you define dynamic scaling policies for multiple EC2 Auto Scaling groups or other resources using predefined scaling strategies. Using AWS Auto Scaling to configure scaling policies for all of the scalable resources 
+in your application is faster than managing scaling policies for each resource via its individual service console
+
+Amazon EC2 Auto Scaling :
+You should use EC2 Auto Scaling if you only need to scale Amazon EC2 Auto Scaling groups, or if you are only interested 
+in maintaining the health of your EC2 fleet. You should also use EC2 Auto Scaling if you need 
+to create or configure Amazon EC2 Auto Scaling groups, or if you need to set up scheduled or step 
+scaling policies (as AWS Auto Scaling supports only target tracking scaling policies)
+
+
+
+Predictive Scaling of AWS Auto Scaling pla:
+Predictive Scaling Policy brings the similar prediction algorithm offered through AWS Auto Scaling 
+plan as a native scaling policy in EC2 Auto Scaling. 
+If you have predictable load changes, you can use Predictive Scaling policy to proactively increase capacity ahead of upcoming demand. 
+Amazon EC2 Auto Scaling enables you to run your Amazon EC2 fleet at optimal utilization.
+
+
+
+What is fleet management and how is it different from dynamic scaling:
+
+Fleet management refers to the functionality that automatically replaces unhealthy instances and maintains your fleet at the 
+desired capacity. Amazon EC2 Auto Scaling fleet management ensures that your application is able to receive traffic 
+and that the instances themselves are working properly. 
+When Auto Scaling detects a failed health check, it can replace the instance automatically.
+
+
+The dynamic scaling capabilities of Amazon EC2 Auto Scaling refers to the functionality that automatically increases 
+or decreases capacity based on load or other metrics. For example, if your CPU spikes above 80% (and you have an alarm setup)
+ Amazon EC2 Auto Scaling can add a new instance dynamically.
 
 =================================================
 # Edge locations             
@@ -1108,6 +1257,11 @@ Global Accelerator is a good fit for non-HTTP use cases, such as gaming (UDP), I
 Caching
 CloudFront supports Edge caching
 Global Accelerator does not support Edge Caching.
+
+Geo-Targeting:
+Geo-Targeting is a concept where businesses can show personalized content to their audience based on their geographic location 
+without changing the URL. This helps you create customized content for the audience of a specific 
+geographical area, keeping their needs in the forefront.
 
 
 
@@ -1440,6 +1594,15 @@ Track events, API calls, changes made to your AWS resources:
 -What action was performed?
 -What are the parameters used?
 -What was the end result?
+
+
+#AWS Config | AWSConfig 
+-------------------------------------------------
+This helps you understand the configuration changes that happen in your environment. 
+This service provides an AWS inventory that includes configuration history, configuration change notification, 
+and relationships between AWS resources. It can also be configured to send information via AWS SNS when new logs are delivered.
+
+
 
 
 #CloudFront
@@ -1936,6 +2099,18 @@ In general, if a service runs on AWS, it is a safe bet that you can use CloudFor
 It is worth noting that CloudFormation is not the only way to configure and deploy services on AWS. 
 You can handle these processes manually using the AWS command-line interface, API, or Web console. 
 
+AWS CloudFormation enables you to manage your complete infrastructure or AWS resources in a text file, or template. 
+A collection of AWS resources is called a stack. AWS resources can be created or updated by using a stack.
+
+
+HowToWork:
+-Create or use an existing CloudFormation template using JSON or YAML format.
+-Save the code in an S3 bucket, which serves as a repository for the code.
+-Use AWS CloudFormation to call the bucket and create a stack on your template. 
+-CloudFormation reads the file and understands the services that are called, their order, 
+the relationship between the services, and provisions the services one after the other.
+
+
 
 #StepFunction
 -------------------------------------------------
@@ -2039,6 +2214,11 @@ a Git repository, or an integrated development environment (IDE) such as Eclipse
 and Elastic Beanstalk automatically handles the deployment details of capacity 
 provisioning, load balancing, auto-scaling, and application health monitoring. 
 Within minutes, your application will be ready to use without any infrastructure or resource configuration work on your part.
+
+
+
+AWS Elastic Beanstalk provides an environment that makes it easy to deploy and run applications in the cloud.
+AWS Elastic Beanstalk is combined with the developer tools to help you manage the lifecycle of your applications.
 
 
 =================================================
@@ -2346,14 +2526,538 @@ Recommended if you are already using Kubernetes and would want to move the workl
 
 
 =================================================
+#ML | machine-learning
+================================================= 
+
+
+#SageMaker
+-------------------------------------------------
+Amazon SageMaker is a cloud-based machine-learning platform that helps users create, design, train, tune, and deploy machine-learning models in a production-ready hosted environment. The AWS SageMaker comes with a pool of advantages (know all about it in the next section)
+
+
+
+
+
+
+=================================================
 #Exam content         
 ================================================= 
+
+
+
+#Exam Content Outline
+-------------------------------------------------
+
+The exam contains five main sections, which are:
+
+-Design Resilient Architectures (34%)
+-Define Performant Architecture (24%)
+-Specify Secure Applications and Architectures (24%)
+-Design Cost-Optimized Architectures (10%)
+-Define Operationally Excellent Architectures (6%)Now
+
+
+Design Resilient Architecture:
+-How to choose reliable and resilient storage using services like AWS S3, AWS Glacier, and AWS EBS
+-How to design decoupling mechanisms using AWS services like AWS SNS
+-How to create a multi-tier architecture
+-How to architect for high availability and fault-tolerance
+
+
+Define Performant Architectures:
+How to choose performant storage and databases using AWS RDS, AWS Redshift, and AWS DynamoDB
+How to improve performance using AWS Elasticache
+How to design elastic and scalable solutions through AWS Lambda, AWS CloudWatch, and AWS Data Pipeline
+
+
+
+Specify Secure Applications and Architectures:
+How to secure applications using AWS Inspector, AWS CloudTrail, and AWS IAM
+How to secure data using AWS CloudHSM and AWS Macie
+How to define the network infrastructure with AWS CloudFront, AWS VPC, and Elastic Load Balancer
+
+
+Design Cost-Optimized Architectures:
+How to design cost-optimized compute solutions using AWS EC2, AWS Elastic Beanstalk, AWS Lambda, and Aws Lightsail
+Design cost-effective storage solutions using AWS S3, AWS Glacier, AWS EBS, and AWS Elastic File System
+
+
+Define Operationally Excellent Architectures:
+Perform operations as code
+Annotate documentation
+Make frequent, small, and reversible changes
+Anticipate and tackle failures
+
+
 
 
 #Question
 -------------------------------------------------
 
 1) How do you choose aws region ?
+
+2) How do you upgrade or downgrade a system with near-zero downtime?
+
+You can upgrade or downgrade a system with near-zero downtime using the following steps of migration:
+-Open EC2 console
+-Choose Operating System AMI
+-Launch an instance with the new instance type
+-Install all the updates
+-Install applications
+-Test the instance to see if it’s working
+-If working, deploy the new instance and replace the older instance
+-Once it’s deployed, you can upgrade or downgrade the system with near-zero downtime.
+
+
+3) Is there any other alternative tool to log into the cloud environment other than console?
+
+The that can help you log into the AWS resources are:
+Putty
+AWS CLI for Linux
+AWS CLI for Windows
+AWS CLI for Windows CMD
+AWS SDK
+Eclipse
+
+
+4) What services can be used to create a centralized logging solution?
+
+The essential services that you can use are Amazon CloudWatch Logs, store them in Amazon S3, and then use 
+Amazon Elastic Search to visualize them. You can use Amazon Kinesis Firehose to move the data from Amazon S3 to Amazon ElasticSearch.
+
+
+
+
+5) Name some of the AWS services that are not region-specific ?
+
+AWS services that are not region-specific are:
+IAM
+Route 53
+Web Application Firewall 
+CloudFront
+
+
+
+6) What is CloudWatch?
+The Amazon CloudWatch has the following features:
+
+Depending on multiple metrics, it participates in triggering alarms.
+Helps in monitoring the AWS environments like CPU utilization, EC2, Amazon RDS instances, Amazon SQS, S3, Load Balancer, SNS, etc.
+
+
+
+
+7) What is an Elastic Transcoder?
+
+To support multiple devices with various resolutions like laptops, tablets, and smartphones, we need to change the resolution and 
+format of the video. This can be done easily by an AWS Service tool called the Elastic Transcoder, 
+which is a media transcoding in the cloud that exactly lets us do the needful. It is easy to use, cost-effective, 
+and highly scalable for businesses and developers.
+
+
+8) How do you set up SSH agent forwarding so that you do not have to copy the key every time you log in?
+
+Here’s how you accomplish this:
+Go to your PuTTY Configuration
+Go to the category SSH -> Auth
+Enable SSH agent forwarding to your instance
+
+
+
+9) How do you configure CloudWatch to recover an EC2 instance?
+
+Here’s how you can configure them:
+Create an Alarm using Amazon CloudWatch
+In the Alarm, go to Define Alarm -> Actions tab
+Choose Recover this instance option
+
+
+
+10) What are the common types of AMI designs?
+
+There are many types of AMIs, but some of the common AMIs are:
+Fully Baked AMI
+Just Enough Baked AMI (JeOS AMI)
+Hybrid AMI
+
+
+
+
+11) What are Key-Pairs in AWS?
+
+The Key-Pairs are password-protected login credentials for the Virtual Machines that are used to prove our 
+identity while connecting the Amazon EC2 instances. The Key-Pairs are made up of a Private Key and a 
+Public Key which lets us connect to the instances.
+
+
+
+12) How can you recover/login to an EC2 instance for which you have lost the key?
+
+Follow the steps provided below to recover an EC2 instance if you have lost the key:
+
+Verify that the EC2Config service is running
+Detach the root volume for the instance
+Attach the volume to a temporary instance
+Modify the configuration file
+Restart the original instance
+
+
+
+
+
+
+13) How do you monitor Amazon VPC?
+
+You can monitor VPC by using:
+-CloudWatch and CloudWatch logs
+-VPC Flow Logs
+
+
+
+14) When Would You Prefer Provisioned IOPS over Standard Rds Storage?
+
+You would use Provisioned IOPS when you have batch-oriented workloads. 
+]Provisioned IOPS delivers high IO rates, but it is also expensive. 
+However, batch processing workloads do not require manual intervention. 
+
+
+
+15) How Do Amazon Rds, Dynamodb, and Redshift Differ from Each Other?
+
+Amazon RDS is a database management service for relational databases. It manages patching, upgrading, and data backups automatically. 
+It’s a database management service for structured data only. On the other hand, DynamoDB is a NoSQL 
+database service for dealing with unstructured data. Redshift is a data warehouse product used in data analysis.
+
+
+
+16) What are the factors to consider while migrating to Amazon Web Services?
+
+Here are the factors to consider during AWS migration:
+
+Operational Costs - These include the cost of infrastructure, ability to match demand and supply, transparency, and others.
+Workforce Productivity 
+Cost avoidance
+Operational resilience
+Business agility
+
+
+
+
+
+
+17) What is RTO and RPO in AWS?
+
+RTO or Recovery Time Objective is the maximum time your business or organization is willing to wait for a recovery to 
+complete in the wake of an outage. On the other hand, RPO or Recovery Point Objective is the 
+maximum amount of data loss your company is willing to accept as measured in time.
+
+
+
+
+
+18) What are the advantages of AWS IAM?
+
+AWS IAM allows an administrator to provide multiple users and groups with granular access. Various user groups and users may require 
+varying levels of access to the various resources that have been developed. 
+We may assign roles to users and create roles with defined access levels using IAM.
+
+It further gives us Federated Access, which allows us to grant applications and users access to 
+resources without having to create IAM Roles.
+
+
+19) Explain Connection Draining ?
+
+Connection Draining is an AWS service that allows us to serve current requests on the servers that are either being 
+decommissioned or updated.
+
+By enabling this Connection Draining, we let the Load Balancer make an outgoing instance finish its 
+existing requests for a set length of time before sending it any new requests. A departing instance will 
+immediately go off if Connection Draining is not enabled, and all pending requests will fail.
+
+
+20) What is Power User Access in AWS?
+
+The AWS Resources owner is identical to an Administrator User. ,
+The Administrator User can build, change, delete, and inspect resources, as well as grant permissions to other AWS users.
+
+Administrator Access without the ability to control users and permissions is provided to a Power User. 
+A Power User Access user cannot provide permissions to other users but has the ability to modify, remove, view, and create resources.
+
+
+
+Amazon EC2 Auto Scaling FAQs:
+==============================
+
+General:
+========
+
+21) How is AWS CloudFormation different from AWS Elastic Beanstalk?
+
+Here are some differences between AWS CloudFormation and AWS Elastic Beanstalk:
+
+AWS CloudFormation helps you provision and describe all of the infrastructure resources that are present in your cloud environment. 
+On the other hand, AWS Elastic Beanstalk provides an environment that makes it easy to deploy and run applications in the cloud.
+AWS CloudFormation supports the infrastructure needs of various types of applications, like legacy applications and 
+existing enterprise applications. On the other hand, AWS Elastic Beanstalk is combined with the developer tools to
+help you manage the lifecycle of your applications.
+
+
+
+22) What are the elements of an AWS CloudFormation template?
+
+AWS CloudFormation templates are YAML or JSON formatted text files that are comprised of five essential elements, they are:
+
+-Template parameters
+-Output values
+-Data tables
+-Resources
+-File format versi
+
+
+23) What happens when one of the resources in a stack cannot be created successfully?
+
+If the resource in the stack cannot be created, then the CloudFormation automatically rolls back and terminates all the 
+resources that were created in the CloudFormation template. This is a handy feature 
+when you accidentally exceed your limit of Elastic IP addresses or don’t have access to an EC2 AMI.
+
+
+
+23) What Is Identity and Access Management (IAM) and How Is It Used?
+
+Identity and Access Management (IAM) is a web service for securely controlling access to AWS services. 
+IAM lets you manage users, security credentials such as access keys, and permissions that control which 
+AWS resources users and applications can access.
+
+
+
+
+
+24) What are the policies that you can set for your users’ passwords?
+
+Here are some of the policies that you can set:
+
+You can set a minimum length of the password, or you can ask the users to add at least one number or special characters in it.
+You can assign requirements of particular character types, including uppercase letters, 
+lowercase letters, numbers, and non-alphanumeric characters.
+You can enforce automatic password expiration, prevent reuse of old passwords, and request for a password 
+reset upon their next AWS sign in.
+You can have the AWS users contact an account administrator when the user has allowed the password to expire. 
+
+
+
+25) Can AWS Config aggregate data across different AWS accounts?
+
+Yes, you can set up AWS Config to deliver configuration updates from different accounts to one S3 bucket, 
+once the appropriate IAM policies are applied to the S3 bucket.
+
+
+
+26) What happens to my Amazon EC2 instances if I delete my ASG?
+
+If you have an EC2 Auto Scaling group (ASG) with running instances and you choose to delete the ASG, the instances will be 
+terminated and the ASG will be deleted.
+
+
+27) How do I know when EC2 Auto Scaling is launching or terminating the EC2 instances in an EC2 Auto Scaling group?
+
+When you use Amazon EC2 Auto Scaling to scale your applications automatically, 
+it is useful to know when EC2 Auto Scaling is launching or terminating the EC2 instances in your EC2 Auto Scaling group. 
+Amazon SNS coordinates and manages the delivery or sending of notifications to subscribing clients or endpoints. 
+
+
+
+28) What is a launch configuration?
+
+A launch configuration is a template that an EC2 Auto Scaling group uses to launch EC2 instances.
+You can specify your launch configuration with multiple EC2 Auto Scaling groups. However, you can only specify one launch configuration 
+for an EC2 Auto Scaling group at a time, and you can't modify a launch configuration after you've created it. 
+Therefore, if you want to change the launch configuration for your EC2 Auto Scaling group, 
+you must create a launch configuration and then update your EC2 Auto Scaling group with the new launch configuration. 
+When you change the launch configuration for your EC2 Auto Scaling group, any new instances are launched using the new 
+configuration parameters, but existing instances are not affected. You can see the launch configurations section of the 
+EC2 Auto Scaling User Guide for more details.
+
+
+
+29) What happens if a scaling activity causes me to reach my Amazon EC2 limit of instances?
+
+Amazon EC2 Auto Scaling cannot scale past the Amazon EC2 limit of instances that you can run. If you need more Amazon EC2 instances, 
+complete the Amazon EC2 instance request form.
+
+
+30) Can EC2 Auto Scaling groups span multiple AWS regions?
+
+EC2 Auto Scaling groups are regional constructs. They can span Availability Zones, but not AWS regions.
+
+
+
+31) How can I implement changes across multiple instances in an EC2 Auto Scaling group?
+
+You can use AWS CodeDeploy or CloudFormation to orchestrate code changes to multiple instances in your EC2 Auto Scaling group.
+
+
+
+
+32) If I have data installed in an EC2 Auto Scaling group, and a new instance is dynamically created later, is the data copied over to the new instances?
+
+Data is not automatically copied from existing instances to new instances. You can use lifecycle hooks to copy the data, or an Amazon RDS database including replicas.
+
+
+
+
+33) When I create an EC2 Auto Scaling group from an existing instance, does it create a new AMI (Amazon Machine Image)?
+When you create an Auto Scaling group from an existing instance, it does not create a new AMI. 
+
+
+
+34) What are lifecycle hooks?
+Lifecycle hooks let you take action before an instance goes into service or before it gets terminated. 
+This can be especially useful if you are not baking your software environment into an Amazon Machine Image (AMI). 
+
+
+35) Which health check type should I select?
+If you are using Elastic Load Balancing (ELB) with your group, you should select an ELB health check. 
+If you’re not using ELB with your group, you should select the EC2 health check.
+
+
+36) How do I control which instances Amazon EC2 Auto Scaling terminates when scaling in, and how do I protect data on an instance?
+You can configure this through the use of a termination policy. You can also use instance protection to prevent 
+Amazon EC2 Auto Scaling from selecting specific instances for termination when scaling in. If you have data on an instance, 
+and you need that data to be persistent even if your instance is scaled in, then you can use a service like S3, RDS, or DynamoDB, 
+to make sure that it is stored off the instance.
+
+
+37) How long is the turn-around time for Amazon EC2 Auto Scaling to spin up a new instance at inService state after 
+detecting an unhealthy server?
+
+The turnaround time is within minutes. The majority of replacements happen within less than 5 minutes, and on average 
+it is significantly less than 5 minutes. It depends on a variety of factors, including how long it takes to boot up the AMI 
+of your instance.
+
+
+38) If Elastic Load Balancing (ELB) determines that an instance is unhealthy, and moved offline, 
+will the previous requests sent to the failed instance be queued and rerouted to other instances within the group?
+
+When ELB notices that the instance is unhealthy, it will stop routing requests to it. 
+However, prior to discovering that the instance is unhealthy, some requests to that instance will fail.
+
+
+39) If you don’t use Elastic Load Balancing (ELB) how would users be directed to the other servers in a group if there was a failure?
+You can integrate with Route53 (which Amazon EC2 Auto Scaling does not currently support out of the box, but many customers use).
+You can also use your own reverse proxy, or for internal microservices, can use service discovery solutions.
+
+
+
+Security:
+=========
+
+40) Are CloudWatch agents automatically installed on EC2 instances when you create an Amazon EC2 Auto Scaling group?
+If your AMI contains a CloudWatch agent, it’s automatically installed on EC2 instances when you create an EC2 Auto Scaling group. With the stock Amazon Linux AMI, you need to install it (recommended, via yum).
+
+
+Cost Optimization:
+=================
+
+41) Can I create a single ASG to scale instances across different purchase options?
+Yes. You can provision and automatically scale EC2 capacity across different EC2 instance types, Availability Zones, and On-Demand, RIs and Spot purchase options in a single Auto Scaling Group. 
+
+
+42)Can I use ASGs to launch and manage just Spot Instances or just On-Demand instances and RIs?
+Yes. You can configure your ASG specifying all capacity to be only Spot instances or all capacity to be only On-Demand instances and RIs.
+
+
+43) Can I specify instances of different sizes (CPU cores, memory) in my Auto Scaling group?
+Yes. You can specify any instance type available in a region. Additionally, you can specify an optional weight for each instance type, which defines the capacity units that each instance would contribute to your application’s performance.
+
+
+44) What are the costs for using Amazon EC2 Auto Scaling?
+Amazon EC2 Auto Scaling fleet managment for EC2 instances carries no additional fees. The dynamic scaling capabilities of 
+Amazon EC2 Auto Scaling are enabled by Amazon CloudWatch and also carry no additional fees. 
+Amazon EC2 and Amazon CloudWatch service fees apply and are billed separately.
+
+
+
+Amazon Elastic Container Registry FAQs:
+========================================
+
+1) What is Amazon Elastic Container Registry (Amazon ECR)?
+Amazon ECR is a fully managed container registry that makes it easy for developers to share and deploy container images and artifacts. Amazon ECR is integrated with Amazon Elastic Container Service (Amazon ECS),  Amazon Elastic Kubernetes Service (Amazon EKS), and AWS Lambda, simplifying your development to production workflow.
+
+
+2) Is Amazon ECR a global service?
+Amazon ECR is a Regional service and is designed to give you flexibility in how images are deployed. You have the ability to push/pull images to the same AWS Region where your Docker cluster runs for the best performance. 
+
+
+3) What is the difference between Amazon ECR public and private repositories?
+A private repository does not offer content search capabilities and requires Amazon IAM-based authentication using 
+AWS account credentials before allowing images to be pulled. A public repository has descriptive content and allows 
+anyone anywhere to pull images without needing an AWS account or using IAM credentials. Public repository 
+images are also available in the Amazon ECR public gallery.
+
+
+4) What compliance capabilities can I enable on Amazon ECR?
+You can use AWS CloudTrail on Amazon ECR to provide a history of all API actions such as who pulled an image and 
+when tags were moved between images. Administrators can also find which EC2 instances pulled which images.
+
+
+5) Can I access Amazon ECR inside a VPC?
+Yes. You can set up AWS PrivateLink endpoints to allow your instances to pull images from your private repositories without traversing through the public internet.
+
+
+6)Does Amazon ECR work with AWS Elastic Beanstalk?
+Yes. AWS Elastic Beanstalk supports Amazon ECR for both single and multi-container Docker environments, allowing you to easily 
+deploy container images stored in Amazon ECR with AWS Elastic Beanstalk. All you need to do is specify the 
+Amazon ECR repository in your Dockerrun.aws.json configuration and attach the 
+AmazonEC2ContainerRegistryReadOnly policy to your container instance role.
+
+
+7) Does Amazon ECR scan container images for vulnerabilities?
+You can enable Amazon ECR to automatically scan your container images for a broad range of operating system vulnerabilities. 
+You can also scan images using an API command, and Amazon ECR will notify you over API and in the console when a scan completes. 
+For enhanced image scanning, you can turn on Amazon Inspector.
+
+
+
+
+
+Amazon EC2 Container Service FAQ:
+================================
+
+1) What is Amazon Elastic Container Service?
+Amazon Elastic Container Service (ECS) is a highly scalable, high performance container management service that supports 
+Docker containers and allows you to easily run applications on a managed cluster of Amazon Elastic Compute Cloud (Amazon EC2) instances.
+
+Amazon ECS makes it easy to use containers as a building block for your applications by eliminating the need for you to install, 
+operate, and scale your own cluster management infrastructure. Amazon ECS lets you schedule long-running 
+applications, services, and batch processes using Docker containers.
+
+
+
+2) What is the pricing for Amazon ECS?
+There is no additional charge for Amazon ECS. You pay for AWS resources (e.g. Amazon EC2 instances or EBS volumes) 
+you create to store and run your application. You only pay for what you use, as you use it; there are no 
+minimum fees and no upfront commitments.
+
+
+3) How is Amazon ECS different from AWS Elastic Beanstalk?
+AWS Elastic Beanstalk is an application management platform that helps customers easily deploy and scale web applications and services. 
+It keeps the building block provisioning (e.g., EC2, Amazon RDS, Elastic Load Balancing, AWS Auto Scaling, and Amazon CloudWatch), 
+application deployment, and health monitoring abstracted from the user so they can focus on writing code. You simply specify which 
+container images to  deploy, the CPU and memory requirements, the port mappings, and the container links.
+
+Elastic Beanstalk will automatically handle all the details such as provisioning an Amazon ECS cluster, balancing load, auto-scaling, 
+monitoring, and container placement across your cluster. Elastic Beanstalk is ideal if you want to leverage the benefits of containers 
+withthe simplicity of deploying applications from development to production by uploading a container image. You can work with 
+Amazon ECS directly if you want more fine-grained control for custom application architectures.
+
+
+4) Does Amazon ECS support any other container types?
+No. Docker is the only container platform supported by Amazon ECS at this time.
+
+
+
+
+
 
 
 
