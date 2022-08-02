@@ -4045,12 +4045,350 @@ same MongoDB drivers, applications, and tools with Amazon DocumentDB with little
 
 
 
+Networking & Content Delivery:
+=============================
+
+
+
+Amazon VPC FAQs:
+===============
+
+1)Why should I use Amazon VPC?
+Amazon VPC enables you to build a virtual network in the AWS cloud - no VPNs, hardware, or physical datacenters required. 
+You can define your own network space, and control how your network and the Amazon EC2 resources inside 
+your network are exposed to the Internet. You can also leverage the enhanced security options in 
+Amazon VPC to provide more granular access to and from the Amazon EC2 instances in your virtual network.
+
+
+
+2)What are the components of Amazon VPC?
+-A Virtual Private Cloud: A logically isolated virtual network in the AWS cloud. 
+You define a VPC’s IP address space from ranges you select.
+
+-Subnet: A segment of a VPC’s IP address range where you can place groups of isolated resources.
+
+-Internet Gateway: The Amazon VPC side of a connection to the public Internet.
+
+-NAT Gateway: A highly available, managed Network Address Translation (NAT) service for your 
+resources in a private subnet to access the Internet.
+
+-Virtual private gateway: The Amazon VPC side of a VPN connection.
+
+-Peering Connection: A peering connection enables you to route traffic via private IP addresses between two peered VPCs.
+
+-VPC Endpoints: Enables private connectivity to services hosted in AWS, from within your 
+VPC without using an Internet Gateway, VPN, Network Address Translation (NAT) devices, or firewall proxies.
+
+-Egress-only Internet Gateway: A stateful gateway to provide egress only access for IPv6 traffic from the VPC to the Internet.
+
+
+3) How will I be charged and billed for my use of Amazon VPC?
+There are no additional charges for creating and using the VPC itself. 
+If you connect your VPC to your corporate datacenter using the optional hardware VPN connection, pricing is per VPN connection-hour 
+(the amount of time you have a VPN connection in the "available" state.) Partial hours are billed as full hours. 
+Data transferred over VPN connections will be charged at standard AWS Data Transfer rates.
+
+
+4)What are the connectivity options for my Amazon VPC?
+-The internet (via an internet gateway)
+-Your corporate data center using an AWS Site-to-Site VPN connection (via the virtual private gateway)
+-Both the internet and your corporate data center (utilizing both an internet gateway and a virtual private gateway)
+-Other AWS services (via internet gateway, NAT, virtual private gateway, or VPC endpoints)
+-Other Amazon VPCs (via VPC peering connections)
+
+
+5) When is an IP address considered a Public IP address?
+Any IP address that is assigned to an instance or a service hosted in a VPC that can be accessed over the internet is considered a 
+public IP address. Only public IPv4 addresses, including Elastic IP addresses (EIPs) and IPv6 GUA can be routable on the internet. 
+To do so, you would need to first connect the VPC to the internet and then update the route table to 
+make them reachable to/from the internet.
+
+
+6)How do instances without public IP addresses access the Internet?
+Instances without public IP addresses can access the Internet in one of two ways:
+Instances without public IP addresses can route their traffic through a NAT gateway or a NAT instance to access the Internet. 
+These instances use the public IP address of the NAT gateway or NAT instance to traverse the Internet. 
+The NAT gateway or NAT instance allows outbound communication but doesn’t allow machines on the Internet to initiate a 
+connection to the privately addressed instances.
+
+For VPCs with a hardware VPN connection or Direct Connect connection, instances can route their Internet traffic down the 
+virtual private gateway to your existing datacenter. From there, it can access the Internet via your existing egress points 
+and network security/monitoring devices.
+
+
+7)Can I connect to my VPC using a software VPN?
+Yes. You may use a third-party software VPN to create a site to site or remote access 
+VPN connection with your VPC via the Internet gateway.
+
+
+
+8)Does traffic go over the internet when two instances communicate using public IP addresses, or when instances 
+communicate with a public AWS service endpoint?
+No. When using public IP addresses, all communication between instances and services hosted in AWS use AWS's private network. 
+Packets that originate from the AWS network with a destination on the AWS network stay on the AWS global network, except 
+traffic to or from AWS China Regions.
+ 
+In addition, all data flowing across the AWS global network that interconnects our data centers and Regions is 
+automatically encrypted at the physical layer before it leaves our secured facilities. 
+Additional encryption layers exist as well; for example, all VPC cross-region peering traffic, 
+and customer or service-to-service Transport Layer Security (TLS) connections. 
+
+
+9)What IP address ranges are assigned to a default Amazon VPC?
+Default VPCs are assigned a CIDR range of 172.31.0.0/16. Default subnets within a default VPC are assigned /20 
+netblocks within the VPC CIDR range. 
+
+
+
+10)How large of a VPC can I create?
+Currently, Amazon VPC supports five (5) IP address ranges, one (1) primary and four (4) secondary for IPv4. 
+Each of these ranges can be between /28 (in CIDR notation) and /16 in size. 
+The IP address ranges of your VPC should not overlap with the IP address ranges of your existing network.
+For IPv6, the VPC is a fixed size of /56 (in CIDR notation). A VPC can have both IPv4 and IPv6 CIDR blocks associated to it.
+
+
+
+11)Is there a limit on how large or small a subnet can be?
+The minimum size of a subnet is a /28 (or 14 IP addresses.) for IPv4. Subnets cannot be larger than the VPC in which they are created.
+For IPv6, the subnet size is fixed to be a /64. Only one IPv6 CIDR block can be allocated to a subnet.
+
+
+12)Can I assign any IP address to an instance?
+You can assign any IP address to your instance as long as it is:
+Part of the associated subnet's IP address range
+Not reserved by Amazon for IP networking purposes
+Not currently assigned to another interfac
+Not currently assigned to another interfac
+
+
+
+
+13)Can I assign multiple IP addresses to an instance?
+Yes. You can assign one or more secondary private IP addresses to an Elastic Network Interface or an EC2 instance in Amazon VPC. 
+The number of secondary private IP addresses you can assign depends on the instance type. 
+
+
+14) Can I monitor the network traffic in my VPC?
+Yes. You can use Amazon VPC traffic mirroring and Amazon VPC flow logs features to monitor the network traffic in your Amazon VPC.
+
+VPC flow logs is a feature that enables you to capture information about the IP traffic going to and from network interfaces in your VPC. 
+Flow logs data can be published to either Amazon CloudWatch Logs or Amazon S3.
+
+
+15)What is Amazon VPC traffic mirroring?
+Amazon VPC traffic mirroring makes it easy for customers to replicate network traffic to and from an 
+Amazon EC2 instance and forward it to out-of-band security and monitoring appliances for use-cases such as content inspection, 
+threat monitoring, and troubleshooting. 
+
+
+
+16)Can a VPC span multiple Availability Zones?
+Yes. 
+
+
+17) Can a subnet span Availability Zones?
+No. A subnet must reside within a single Availability Zone.
+
+
+18)Am I charged for network bandwidth between instances in different subnets?
+If the instances reside in subnets in different Availability Zones, you will be charged $0.01 per GB for data transfer.
+
+
+
+19)What are instance hostnames?
+When you launch an instance, it is assigned a hostname. There are two options available, an IP based name or a Resource based name, 
+and this parameter is configurable at instance launch. 
+The IP based name uses a form of the Private IPv4 address while the Resource based name uses a form of the instance-id.
+
+ you can change the hostname of an instance form IP based to 
+ Resource based or vice versa by stopping the instance and then changing the resource based naming options.
+ the instance hostname can be used as DNS hostnames.
+
+
+
+20)What is AWS PrivateLink?
+AWS PrivateLink enables customers to access services hosted on AWS in a highly available and scalable manner, 
+while keeping all the network traffic within the AWS network.
+
+
+
+21)How many VPCs, subnets, Elastic IP addresses, and internet gateways can I create?
+
+Five Amazon VPCs per AWS account per region
+Two hundred subnets per Amazon VPC
+Five Amazon VPC Elastic IP addresses per AWS account per region
+One internet gateway per Amazon VPC
 
 
 
 
 
+Amazon CloudFront FAQs:
+=======================
 
+With CloudFront, your files are delivered to end-users using a global network of edge locations.
+Amazon CloudFront is a good choice for distribution of frequently accessed static content that benefits from edge 
+delivery—like popular website images, videos, media files or software downloads.
+
+1)How does Amazon CloudFront speed up my entire website?
+Amazon CloudFront uses standard cache control headers you set on your files to identify static and dynamic content. 
+Delivering all your content using a single Amazon CloudFront distribution helps you make sure that performance 
+optimizations are applied to your entire website or web application.
+
+
+2)What types of content does Amazon CloudFront support?
+Amazon CloudFront supports content that can be sent using the HTTP or WebSocket protocols. 
+This includes dynamic web pages and applications, such as HTML or PHP pages or WebSocket-based applications, 
+and any popular static files that are a part of your web application, such as website images, audio, video, 
+media files or software downloads. Amazon CloudFront also supports delivery of live or on-demand media streaming over HTTP.
+
+
+3)What types of HTTP requests are supported by Amazon CloudFront?
+Amazon CloudFront currently supports GET, HEAD, POST, PUT, PATCH, DELETE and OPTIONS reques
+
+4)What are WebSockets?
+WebSocket is a real-time communication protocol that provides bidirectional communication between a client and a server 
+over a long-held TCP connection.
+
+
+
+4) What is streaming? Why would I want to stream?
+Generally, streaming refers to delivering audio and video to end users over the Internet without having to download the 
+media file prior to playback. The protocols used for streaming include those that use HTTP for delivery such as Apple’s 
+HTTP Live Streaming (HLS), MPEG Dynamic Adaptive Streaming over HTTP (MPEG-DASH), 
+Adobe’s HTTP Dynamic Streaming (HDS) and Microsoft’s Smooth Streaming.
+
+
+
+5)What is Lambda@Edge?
+Lambda@Edge  is an extension of AWS Lambda allowing you to run code at global edge locations without provisioning or managing servers. 
+Lambda@Edge offers powerful and flexible serverless computing for complex functions and full application logic closer to your viewers. 
+
+
+
+
+
+Amazon Route 53 FAQs:
+====================
+
+1) What is Private DNS?
+Private DNS is a Route 53 feature that lets you have authoritative DNS within your VPCs without exposing your 
+DNS records (including the name of the resource and its IP address(es) to the Internet.
+
+
+
+
+
+Amazon API Gateway FAQs:
+=======================
+
+
+1)What is Amazon API Gateway?
+Amazon API Gateway is a fully managed service that makes it easy for developers to publish, maintain, monitor, 
+and secure APIs at any scale.
+
+
+2)How am I charged for using Amazon API Gateway?
+Amazon API Gateway bills per million API calls, plus the cost of data transfer out, in gigabytes. 
+If you choose to provision a cache for your API, hourly rates apply. For WebSocket APIs, API Gateway 
+bills based on messages sent and received and the number of minutes a client is connected to the API.
+
+
+AWS App Mesh FAQs:
+==================
+
+1)What is AWS App Mesh?
+
+AWS App Mesh makes it easy to monitor, control, and debug the communications between services.
+
+App Mesh makes it easier to get visibility, security, and control over the communications between your services 
+without writing new code or running additional AWS infrastructure. Using App Mesh, you can standardize 
+how services communicate, implement rules for communications between services, and capture metrics, logs, 
+and traces directly into AWS services and third-party tools of your choice.
+
+
+AWS Direct Connect FAQs:
+=========================
+
+What is AWS Direct Connect?
+AWS Direct Connect is a networking service that provides an alternative to using the internet to connect to AWS. 
+Using AWS Direct Connect, data that would have previously been transported over the internet is delivered through a 
+private network connection between your facilities and AWS. In many circumstances, private network connections can reduce costs, 
+increase bandwidth, and provide a more consistent network experience than internet-based connections. All AWS services, including 
+Amazon Elastic Compute Cloud (EC2), Amazon Virtual Private Cloud (VPC), Amazon Simple Storage Service (S3), and 
+Amazon DynamoDB can be used with AWS Direct Connect.
+
+
+
+2)What is an AWS Direct Connect gateway?
+An AWS Direct Connect gateway is a grouping of virtual private gateways (VGWs) and private virtual interfaces (VIFs). 
+An AWS Direct Connect gateway is a globally available resource. You can create the AWS Direct Connect gateway in any 
+Region and access it from all other Regions. 
+
+
+3)What is a virtual interface (VIF)?
+
+A virtual interface (VIF) is necessary to access AWS services, and is either public or private. 
+A public virtual interface enables access to public services, such as Amazon S3. A private virtual interface enables access to your VPC. 
+
+
+4) What is a virtual private gateway (VGW)?
+A virtual private gateway (VGW) is part of a VPC that provides edge routing for AWS managed VPN connections and AWS 
+Direct Connect connections. You associate an AWS Direct Connect gateway with the virtual private gateway for the VPC. 
+
+
+5)What is AWS Direct Connect SiteLink?
+When the AWS Direct Connect SiteLink feature is enabled at two or more AWS Direct Connect locations, 
+you can send data between those locations, bypassing AWS Regions. 
+AWS Direct Connect SiteLink works with both hosted and dedicated connections.
+
+
+6)How will I be charged and billed for my use of AWS Direct Connect?
+AWS Direct Connect has two separate charges: port hours and data transfer. Pricing is per port-hour consumed for each port type. 
+Partial port hours consumed are billed as full hours. The account that owns the port will be charged the port hour charges.
+Data transfer through AWS Direct Connect will be billed in the same month in which the usage occurred.
+
+
+
+7)How does AWS Direct Connect differ from an IPsec VPN Connection?
+VPN connections use IPsec to establish encrypted network connectivity between your intranet and an Amazon VPC over the public internet. 
+VPN Connections can be configured in minutes and are a good solution if you have an immediate need, have low to modest 
+bandwidth requirements, and can tolerate the inherent variability of internet-based connectivity. AWS Direct Connect bypasses 
+the internet; instead, it uses dedicated, private network connections between your network and AWS.
+
+
+
+8)Does MACsec replace other encryption technologies I currently use in my network?
+MACsec is not intended as a replacement for any specific encryption technology. For simplicity, and for defense in depth,
+you should continue to use any encryption technologies that you already use. We offer MACsec as an encryption option you can 
+integrate into your network in addition to other encryption technologies you currently use.
+
+
+
+
+Elastic Load Balancing FAQs:
+===========================
+
+1)How do I decide which load balancer to select for my application?
+Elastic Load Balancing (ELB) supports four types of load balancers. 
+You can select the appropriate load balancer based on your application needs. 
+If you need to load balance HTTP requests, we recommend you use the Application Load Balancer (ALB). 
+For network/transport protocols (layer4 – TCP, UDP) load balancing, and for extreme performance/low latency 
+applications we recommend using Network Load Balancer. If your application is built within the Amazon Elastic Compute Cloud (Amazon EC2) 
+Classic network, you should use Classic Load Balancer. If you need to deploy and run 
+third-party virtual appliances, you can use Gateway Load Balancer.
+
+
+2)Can Network Load Balancer process both TCP and UDP protocol traffic on the same port?
+Yes. To achieve this, you can use a TCP+UDP listener. For example, for a DNS service using both TCP and UDP, 
+you can create a TCP+UDP listener on port 53, and the load balancer will process traffic for both UDP and TCP requests on that port. 
+You must associate a TCP+UDP listener with a TCP+UDP target group.
+
+
+
+3) How does Gateway Load Balancer pricing work?
+You are charged for each hour or partial hour that a Gateway Load Balancer is running and the number of Load Balancer 
+Capacity Units (LCU) used by Gateway Load Balancer per hour.
 
 
 
