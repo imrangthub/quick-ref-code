@@ -17,6 +17,7 @@ Latency:বিলম্ব, দেরী,  বাধা,
 Availability:প্রাপ্যতা, লভ্যতা
 Provision:বন্দোবস্ত,ব্যবস্থা
 Consistent:সামঞ্জস্যপূর্ণ,সমান
+Retained:ধরে রাখা
 
 =>sudo chmod 777 -R destinationFolder/*
 Allow ec2 file permission
@@ -24,6 +25,10 @@ Allow ec2 file permission
 =================================================
 #To Do           
 ================================================= 
+
+
+Transition of S3 objects
+
 
 HandOnRemain:
 ============
@@ -49,6 +54,9 @@ Need to Review this section
 Route53
 -----------
 Need to review
+
+S3/IAM/SDK/AdvanceS3
+Need to handson
 
 
 
@@ -96,8 +104,10 @@ You pay only for the AWS resources needed to run your applications and Amazon Cl
 3)Application load balancer on available on free tirs NLB are not.
 4)ASG are free (you only pay for the underlying EC2 instances)
 
-
-
+CloudFont:
+===========
+1)Global excelarater not free.
+2)Global Excelaration pricing model of the region.
 
 
 ================================================= 
@@ -159,6 +169,53 @@ Make sure you fully master the concepts behind it!
 scale the ASG and you would like to define a Scaling Policy that will ensure the average number of connections to your 
 EC2 instances is around 1000. Which Scaling Policy should you use?
 Ans:Target Scaling Group.
+
+S3:
+=====
+1)Exam will asked which Encryption one are adapted to which situation base on scenario.
+2)Cross S3 will come with simple way.
+3)If a client does a cross-origin request on our S3 bucket, we need to enable the correct CORS headers.
+4)If you don’t specify or configure a default region, then us-east-1 will be chosen by default using SDK.
+5)You and your colleague are working on an application that's interacting with some AWS services through making API calls. 
+Your colleague can run the application on his machine without issues, while you get API Authorization Exceptions. 
+What should you do?
+Ans:Chack both IAM using AWS Policy Simulator.
+
+2)Filtering of server side data of S3 get List thing its S3 Select & Glacier Select
+
+3) Your application on EC2 creates images thumbnails after profile photos
+are uploaded to Amazon S3. These thumbnails can be easily recreated,
+and only need to be kept for 45 days. The source images should be able
+to be immediately retrieved for these 45 days, and afterwards, the user
+can wait up to 6 hours. How would you design this?
+S3 source images can be on STANDARD, with a lifecycle configuration
+to transition them to GLACIER after 45 days.
+S3 thumbnails can be on ONEZONE_IA, with a lifecycle configuration
+to expire them (delete them) after 45 days. 
+
+4)
+• A rule in your company states that you should be able to recover your
+deleted S3 objects immediately for 15 days, although this may happen rarely.
+After this time, and for up to 365 days, deleted objects should be recoverable
+within 48 hours.
+• You need to enable S3 versioning in order to have object versions, so that
+“deleted objects” are in fact hidden by a “delete marker” and can be
+recovered
+• You can transition these “noncurrent versions” of the object to S3_IA
+• You can transition afterwards these “noncurrent versions” to
+DEEP_ARCHIVE
+
+5)S3Request pay
+6)analyze data in S3 using serverless SQL, its Athena
+
+7)Create an application that will traverse the S3 bucket, issue a Byte Range 
+Fetch for the first 250 bytes, and store that information in RDS
+
+
+CloudFront:
+============
+1) Global excelaration come to exam.
+2) CloudFront pay model
 
 
 =================================================
@@ -345,6 +402,7 @@ The following EC2-related resources don't generate charges when used or provisio
 -Auto Scaling groups
 
 
+IAM Roles are the right way to provide credentials and permissions to an EC2 instance.
 
 #EC2    
 -------------------------------------------------
@@ -362,6 +420,19 @@ MetadataURL:
 http://169.254.169.254/latest/meta-data/
 http://169.254.169.254/latest/dynamic/
 http://169.254.169.254/latest/dynamic/instance-identity/document
+
+
+
+#AWS EC2 Instance Metadata
+-------------------------------------------------
+AWS EC2 Instance Metadata is powerful but one of the least known features to developers
+• It allows AWS EC2 instances to ”learn about themselves” without using an IAM Role for that purpose.
+• The URL is http://169.254.169.254/latest/meta-data
+• You can retrieve the IAM Role name from the metadata, but you CANNOT retrieve the IAM Policy.
+• Metadata = Info about the EC2 instance
+• Userdata = launch script of the EC2 instance
+• Let’s practice and see what we can do with it!
+
 
 
 #Bootstrapping: 
@@ -1629,7 +1700,199 @@ Public Hosted Zones are meant to be used for people requesting your website thro
 
 
 
+=================================================
+##Section 12: Amazon S3 Introduction
+=================================================
+Amazon S3 Overview – Objects (continued)
+• Object values are the content of the body:
+• Max Object Size is 5TB (5000GB)
+• If uploading more than 5GB, must use “multi-part upload”
+• Metadata (list of text key / value pairs – system or user metadata)
+• Tags (Unicode key / value pair – up to 10) – useful for security / lifecycle
+• Version ID (if versioning is enabled)
 
+S3 Encryption for Objects, There are 4 methods of encrypting objects in S3:
+• SSE-S3: encrypts S3 objects using keys handled & managed by AWS
+• SSE-KMS: leverage AWS Key Management Service to manage encryption keys
+• SSE-C: when you want to manage your own encryption keys
+• Client Side Encryption 
+
+Multi-Part Upload is recommended as soon as the file is over 100 MB.
+5GB is Max file size to upload.
+
+With SSE-C, the encryption happens in AWS and you have full control over the encryption keys.
+
+With SSE-KMS, the encryption happens in AWS, and the encryption keys are managed by AWS but you 
+have full control over the rotation policy of the encryption key. Encryption keys stored in AWS.
+
+With Client-Side Encryption, you have to do the encryption yourself and you have full control over the encryption keys. 
+You perform the encryption yourself and send the encrypted data to AWS. 
+AWS does not know your encryption keys and cannot decrypt your data.
+
+Explicit DENY in an IAM Policy will take precedence over an S3 bucket policy.
+
+
+S3 Select & Glacier Select:
+• Retrieve less data using SQL by performing server side filtering
+• Can filter by rows & columns (simple SQL statements)
+• Less network transfer, less CPU cost client-side
+
+
+S3 Event Notifications with Amazon EventBridge:
+• Advanced filtering options with JSON rules (metadata, object size, name...)
+• Multiple Destinations – ex Step Functions, Kinesis Streams / Firehose…
+• EventBridge Capabilities – Archive, Replay Events, Reliable delivery
+
+
+
+S3 – Requester Pays
+-------------------------------------------------
+• In general, bucket owners pay for all
+Amazon S3 storage and data transfer costs associated with their bucket
+
+• With Requester Pays buckets, the
+requester instead of the bucket owner pays the cost of the request and the data download from the bucket
+
+• Helpful when you want to share large datasets with other accounts
+• The requester must be authenticated in AWS (cannot be anonymous)
+
+
+
+
+MFA Delete forces users to use MFA codes before deleting S3 objects. 
+It's an extra level of security to prevent accidental deletions.
+
+S3 Access Logs log all the requests made to S3 buckets and Amazon Athena can then be used to run 
+cserverless analytics on top of the log files.
+
+S3 Replication allows you to replicate data from an S3 bucket to another in the same/different AWS Region.
+
+S3 Pre-Signed URLs are temporary URLs that you generate to grant time-limited access to some actions in your S3 bucket.
+
+
+S3 MFA-Delete:
+• MFA (multi factor authentication) forces user to generate a code on a device (usually a
+mobile phone or hardware) before doing important operations on S3
+• Only the bucket owner (root account) can enable/disable MFA-Delete
+• MFA-Delete currently can only be enabled using the CLI
+
+
+S3 Default Encryption vs Bucket Policies:
+• One way to “force encryption” is to use a bucket policy and refuse any
+API call to PUT an S3 object without encryption headers
+
+Another way is to use the “default encryption” option in S3
+• Note: Bucket Policies are evaluated before “default encryption”
+
+S3 Access Logs: Warning
+• Do not set your logging bucket to be the monitored bucket
+• It will create a logging loop, and your bucket will grow in size exponentially
+
+
+S3 Replication – Notes
+• After activating, only new objects are replicated
+• Optionally, you can replicate existing objects using S3 Batch Replication
+• Replicates existing objects and objects that failed replication
+• For DELETE operations:
+• Can replicate delete markers from source to target (optional setting)
+• Deletions with a version ID are not replicated (to avoid malicious deletes)
+• There is no “chaining” of replication
+• If bucket 1 has replication into bucket 2, which has replication into bucket 3
+• Then objects created in bucket 1 are not replicated to bucket 3
+
+
+S3 Pre-Signed URLs:
+• Can generate pre-signed URLs using SDK or CLI
+• For downloads (easy, can use the CLI)
+• For uploads (harder, must use the SDK)
+• Valid for a default of 3600 seconds, can change timeout with --expires-in [TIME_BY_SECONDS] argument
+• Users given a pre-signed URL inherit the permissions of the person who generated the URL for GET / PUT
+• Examples :
+• Allow only logged-in users to download a premium video on your S3 bucket
+• Allow an ever changing list of users to download files by generating URLs dynamically
+• Allow temporarily a user to upload a file to a precise location in our bucket
+
+=================================================
+##Section 15: CloudFront & AWS Global Accelerator
+=================================================
+CloudFront is a global service.
+
+CloudFront– Origins:
+-------------------------------------------------
+• S3 bucket 
+• For distributing files and caching them at the edge 
+• Enhanced security with CloudFront Origin Access Identity (OAI) 
+• CloudFront can be used as an ingress (to upload files to S3) 
+Custom Origin (HTTP) 
+• Application Load Balancer 
+• EC2 instance 
+• S3 website (must first enable the bucket as a static S3 website) 
+• Any HTTP backend you want
+
+
+CloudFront Geo Restriction:
+-------------------------------------------------
+• You can restrict who can access your distribution
+• Whitelist: Allow your users to access your content only if they're in one of the
+countries on a list of approved countries.
+• Blacklist: Prevent your users from accessing your content if they're in one of the
+
+countries on a blacklist of banned countries.
+• The “country” is determined using a 3rd party Geo-IP database
+• Use case: Copyright Laws to control access to content
+
+
+
+CloudFront vs S3 Cross Region Replication
+-------------------------------------------------
+CloudFront:
+• Global Edge network
+• Files are cached for a TTL (maybe a day)
+• Great for static content that must be available everywhere
+
+S3 Cross Region Replication:
+• Must be setup for each region you want replication to happen
+• Files are updated in near real-time
+• Read only
+• Great for dynamic content that needs to be available at low-latency in few regions
+
+
+
+CloudFront Signed URL / Signed Cookies
+-------------------------------------------------
+• You want to distribute paid shared content to premium users over the world
+• We can use CloudFront Signed URL / Cookie. We attach a policy with:
+• Includes URL expiration
+• Includes IP ranges to access the data from
+• Trusted signers (which AWS accounts can create signed URLs)
+• How long should the URL be valid for?
+• Shared content (movie, music): make it short (a few minutes)
+• Private content (private to the user): you can make it last for years
+• Signed URL = access to individual files (one signed URL per file)
+• Signed Cookies = access to multiple files (one signed cookie for many files)
+
+
+CloudFront Signed URL vs S3 Pre-Signed URL
+-------------------------------------------------
+CloudFront Signed URL:
+• Allow access to a path, no matter
+the origin
+• Account wide key-pair, only the root
+can manage it
+• Can filter by IP, path, date, expiration
+• Can leverage caching features
+
+S3 Pre-Signed URL:
+• Issue a request as the person who
+pre-signed the URL
+• Uses the IAM key of the signing
+IAM principal
+• Limited lifetime
+
+CloudFront – Origin Groups
+• To increase high-availability and do failover
+• Origin Group: one primary and one secondary origin
+• If the primary origin fails, the second one is used
 
 
 =================================================
