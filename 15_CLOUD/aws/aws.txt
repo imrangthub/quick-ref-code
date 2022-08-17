@@ -22,26 +22,32 @@ Retained:ধরে রাখা
 =>sudo chmod 777 -R destinationFolder/*
 Allow ec2 file permission
 
+
+=>/mnt/efs/fs1
+MetadataURL is http://169.254.169.254/latest/meta-data
+
 =================================================
 #To Do           
 ================================================= 
+https://portal.tutorialsdojo.com/courses/aws-certified-solutions-architect-associate-practice-exams/
+https://www.knowledgehut.com/practice-tests/aws-solutions-architect-associate
 
+https://digitalcloud.training/courses/aws-csaa-practice-exams/
+
+https://www.udemy.com/course/practice-exams-aws-certified-solutions-architect-associate/
+https://www.udemy.com/course/aws-certified-solutions-architect-associate-amazon-practice-exams-saa-c03/
 
 Transition of S3 objects
 
 
-HandOnRemain:
+HandsOnRemain:
 ============
-InstanceStorage
--------------------------------------------------
-1) EFS serive
+
 
 
 ELB
 ---------
 1)ALB Sticky Session
-2)NLB
-3)CrossZone
 4)ConnectionDraining
 5)AuthScalingPolicy
 
@@ -49,14 +55,33 @@ ELB
 RDS | Aurora| ElastiCache
 -------------------------
 Need to Review this section
-1)Complate cource hanson remain
+1)AurorHandOn (No free)
+2)ElastiCache (Limated free 2Month)
+
 
 Route53
 -----------
-Need to review
+Need to review this section
+
 
 S3/IAM/SDK/AdvanceS3
-Need to handson
+-------------------
+1)S3Encription
+2)Cross 
+
+Section 14: Advanced Amazon S3 & Athena
+Some of handsOn remaind done 
+
+Section 15: CloudFront & AWS Global Accelerator
+Global Accelerator not free.
+All remain
+
+
+
+
+CloudFont
+----------------
+Need to Review this section
 
 
 
@@ -104,10 +129,26 @@ You pay only for the AWS resources needed to run your applications and Amazon Cl
 3)Application load balancer on available on free tirs NLB are not.
 4)ASG are free (you only pay for the underlying EC2 instances)
 
+
+S3:
+===
+1)The AWS Free Tier includes 5 GB of Amazon S3 standard storage, which offers the highest Amazon S3 durability.
+2)Empty S3 buckets don't cost anything. 
+You are only charged by the size of the objects in the bucket, the storage class and the access.
+
 CloudFont:
 ===========
 1)Global excelarater not free.
 2)Global Excelaration pricing model of the region.
+
+
+Beanstalk:
+There is no additional charge for Elastic Beanstalk.
+
+
+SQS, Kinesis:
+============
+1)Kinesis is not free tiar.
 
 
 ================================================= 
@@ -216,6 +257,37 @@ CloudFront:
 ============
 1) Global excelaration come to exam.
 2) CloudFront pay model
+
+
+AWS Storage:
+============
+1)Snowball cannot import to Glacier directly.
+You must use Amazon S3 first, in combination with an S3 lifecycle policy
+2)FSx its thard party fully manage file system (Luster/Windows)
+3)Seamless integration with S3 Can “read/write S3” as a file system (through FSx)
+4)FSx where we use Scratch/Persistent file system
+5)You need to know the differences between all 3 storage gateway.
+Lot of scenario bas on it.
+6)Volume Gateway two type, Cached volume and Storage volume.
+
+
+SQS, Kinesis:
+=============
+1)If you see decoupling, think its SQS Que.
+2)What is needed to publish coess account SQS or event notification from S3.
+3)SQS Message visibility time concept with ChangeMessageVisible to take more time to process.
+4)API call wait for reduce the latency think it SQS long puling.
+5)Request-Response Systems Que how to work it.
+6)SNS and FiFo Queue.
+
+
+
+
+
+
+
+
+
 
 
 =================================================
@@ -1703,6 +1775,9 @@ Public Hosted Zones are meant to be used for people requesting your website thro
 =================================================
 ##Section 12: Amazon S3 Introduction
 =================================================
+S3 not a global service, need to region select for it.
+
+
 Amazon S3 Overview – Objects (continued)
 • Object values are the content of the body:
 • Max Object Size is 5TB (5000GB)
@@ -1893,6 +1968,268 @@ CloudFront – Origin Groups
 • To increase high-availability and do failover
 • Origin Group: one primary and one secondary origin
 • If the primary origin fails, the second one is used
+
+
+CloudFront Signed URLs are commonly used to distribute paid content through dynamically generated signed URLs.
+
+Signed Cookies are useful when you want to access multiple files.
+
+AWS Global Accelerator will provide us with the two static IP addresses and the ALB will provide us with the HTTP routing rules.
+
+
+=================================================
+##Section 16: AWS Storage Extras
+=================================================
+
+Highly-secure, portable devices to collect and process data at the edge,
+and migrate data into and out of AWS
+
+What is Edge Computing?
+-------------------------------------------------
+• Process data while it’s being created on an edge location
+• A truck on the road, a ship on the sea, a mining station underground
+
+These locations may have
+• Limited / no internet access
+• Limited / no easy access to computing power
+
+We setup a Snowball Edge / Snowcone device to do edge computing
+Use cases of Edge Computing:
+• Preprocess data
+• Machine learning at the edge
+• Transcoding media streams
+Eventually (if need be) we can ship back the device to AWS (for transferring data for example)
+
+
+Amazon FSx for Windows (File Server) 
+-------------------------------------------------
+• EFS is a shared POSIX system for Linux systems. 
+• FSx for Windows is a fully managed Windows file system share drive 
+• Supports SMB protocol & Windows NTFS 
+• Microsoft Active Directory integration, ACLs, user quotas 
+• Can be mounted on Linux EC2 instances 
+• Scale up to 10s of GB/s, millions of IOPS, 100s PB of data 
+
+Storage Options: 
+• SSD – latency sensitive workloads (databases, media processing, data analytics, …) 
+• HDD – broad spectrum of workloads (home directory, CMS, …) 
+
+• Can be accessed from your on-premises infrastructure (VPN or Direct Connect) 
+• Can be configured to be Multi-AZ (high availability) •
+• Data is backed-up daily to S3
+
+
+
+Amazon FSx for Lustre
+-------------------------------------------------
+• Lustre is a type of parallel distributed file system, for large-scale computing
+• The name Lustre is derived from “Linux” and “cluster
+• Machine Learning, High Performance Computing (HPC)
+• Video Processing, Financial Modeling, Electronic Design Automation
+• Scales up to 100s GB/s, millions of IOPS, sub-ms latencies
+
+Storage Options:
+• SSD – low-latency, IOPS intensive workloads, small & random file operations
+• HDD – throughput-intensive workloads, large & sequential file operations
+
+• Seamless integration with S3
+• Can “read S3” as a file system (through FSx)
+• Can write the output of the computations back to S3 (through FSx)
+• Can be used from on-premises servers (VPN or Direct Connect)
+
+
+FSx File System Deployment Options
+-------------------------------------------------
+Scratch File System
+• Temporary storage
+• Data is not replicated (doesn’t persist if file server fails)
+• High burst (6x faster, 200MBps per TiB)
+• Usage: short-term processing, optimize costs
+
+Persistent File System
+• Long-term storage
+• Data is replicated within same AZ
+• Replace failed files within minutes
+• Usage: long-term processing, sensitive data
+
+
+
+AWS Storage Gateway
+-------------------------------------------------
+Storage Gateway is a way of Hybrid cloud make possible
+
+3 types of Storage Gateway:
+• File Gateway
+• Volume Gateway
+• Tape Gateway
+
+
+File Gateway:
+• Configured S3 buckets are accessible using the NFS and SMB protocol
+• Supports S3 standard, S3 IA, S3 One Zone IA
+• Bucket access using IAM roles for each File Gateway
+• Most recently used data is cached in the file gateway
+• Can be mounted on many servers
+• Integrated with Active Directory (AD) for user authentication
+
+Volume Gateway:
+• Block storage using iSCSI protocol backed by S3
+• Backed by EBS snapshots which can help restore on-premises volumes!
+• Cached volumes: low latency access to most recent data
+• Stored volumes: entire dataset is on premise, scheduled backups to S3
+
+Tape Gateway:
+• Some companies have backup processes using physical tapes (!)
+• With Tape Gateway, companies use the same processes but, in the cloud
+• Virtual Tape Library (VTL) backed by Amazon S3 and Glacier
+• Back up data using existing tape-based processes (and iSCSI interface)
+• Works with leading backup software vendors 
+
+
+Amazon FSx File Gateway:
+• Native access to Amazon FSx for Windows File Server
+• Local cache for frequently accessed data
+• Windows native compatibility (SMB, NTFS, Active Directory...)
+• Useful for group file shares and home directories
+
+
+AWS Storage Gateway Summary:
+• Exam tip: Read the question well, it will hint at which gateway to use
+• On-premises data to the cloud => Storage Gateway
+• File access / NFS – user auth with Active Directory => File Gateway(backed by S3)
+• Volumes / Block Storage / iSCSI => Volume gateway (backed by S3 with EBS snapshots)
+• VTL Tape solution / Backup with iSCSI = > Tape Gateway (backed by S3 and Glacier)
+• No on-premises virtualization => Hardware Appliance
+
+
+AWS Transfer Family:
+-------------------------------------------------
+• A fully-managed service for file transfers into and out of Amazon S3 or Amazon EFS using the FTP protocol
+
+Supported Protocols
+• AWS Transfer for FTP (File Transfer Protocol (FTP))
+• AWS Transfer for FTPS (File Transfer Protocol over SSL (FTPS))
+• AWS Transfer for SFTP (Secure File Transfer Protocol (SFTP))
+
+• Managed infrastructure, Scalable, Reliable, Highly Available (multi-AZ)
+• Pay per provisioned endpoint per hour + data transfers in GB
+• Store and manage users’ credentials within the service
+• Integrate with existing authentication systems (Microsoft Active Directory,LDAP, Okta, Amazon Cognito, custom)
+• Usage: sharing files, public datasets, CRM, ERP.
+
+
+
+Storage Comparison:
+• S3: Object Storage
+• Glacier: Object Archival
+• EFS: Network File System for Linux instances, POSIX filesystem
+• FSx for Windows: Network File System for Windows servers
+• FSx for Lustre: High Performance Computing Linux file system
+• EBS volumes: Network storage for one EC2 instance at a time
+• Instance Storage: Physical storage for your EC2 instance (high IOPS)
+• Storage Gateway: File Gateway, Volume Gateway (cache & stored), Tape Gateway
+• Snowball / Snowmobile: to move large amount of data to the cloud, physically
+• Database: for specific workloads, usually with indexing and querying
+
+Snowball Edge is the right answer as it comes with computing capabilities and allows you to pre-process the data while it's being moved into Snowball.
+
+
+
+
+=================================================
+##Section 17: Decoupling applications: SQS, SNS, Kinesis, Active MQ
+=================================================
+
+
+Decouple your applications using:
+• using SQS: queue model
+• using SNS: pub/sub model
+• using Kinesis: real-time streaming model
+• These services can scale independently from our application!
+
+
+
+Amazon SQS – Standard Queue:
+-------------------------------------------------
+• Oldest offering (over 10 years old)
+• Fully managed service, used to decouple applications
+• Attributes:
+• Unlimited throughput, unlimited number of messages in queue
+• Default retention of messages: 4 days, maximum of 14 days
+• Low latency (<10 ms on publish and receive)
+• Limitation of 256KB per message sent
+• Can have duplicate messages (at least once delivery, occasionally)
+• Can have out of order messages (best effort ordering)
+
+
+Kinesis:
+-------------------------------------------------
+• Makes it easy to collect, process, and analyze streaming data in real-time
+• Ingest real-time data such as: Application logs, Metrics, Website clickstreams, IoT telemetry data
+• Kinesis Data Streams: capture, process, and store data streams
+• Kinesis Data Firehose: load data streams into AWS data stores
+• Kinesis Data Analytics: analyze data streams with SQL or Apache Flink
+• Kinesis Video Streams: capture, process, and store video streams
+
+
+Kinesis Data Streams vs Firehose:
+
+Kinesis Data Streams:
+• Streaming service for ingest at scale
+• Write custom code (producer / consumer)
+• Real-time (~200 ms)
+• Manage scaling (shard splitting / merging)
+• Data storage for 1 to 365 days
+• Supports replay capability
+
+Kinesis Data Firehose:
+• Load streaming data into S3 / Redshift / ES / 3rd party / custom HTTP
+• Fully managed
+• Near real-time (buffer time min. 60 sec)
+• Automatic scaling
+• No data storage
+• Doesn’t support replay capability
+
+Kinesis Data Analytics (SQL application):
+• Perform real-time analytics on Kinesis Streams using SQL
+• Fully managed, no servers to provision
+• Automatic scaling
+• Real-time analytics
+• Pay for actual consumption rate
+• Can create streams out of the real-time queries
+• Use cases:
+• Time-series analytics
+• Real-time dashboards
+• Real-time metrics
+
+
+Kinesis vs SQS ordering:
+• Let’s assume 100 trucks, 5 kinesis shards, 1 SQS FIFO
+
+Kinesis Data Streams:
+• On average you’ll have 20 trucks per shard
+• Trucks will have their data ordered within each shard
+• The maximum amount of consumers in parallel we can have is 5
+• Can receive up to 5 MB/s of data
+
+SQS FIFO
+• You only have one SQS FIFO queue
+• You will have 100 Group ID
+• You can have up to 100 Consumers (due to the 100 Group ID)
+• You have up to 300 messages per second (or 3000 if using batching)
+
+
+
+Amazon MQ:
+-------------------------------------------------
+• SQS, SNS are “cloud-native” services, and they’re using proprietary protocols from AWS.
+• Traditional applications running from on-premises may use open protocols such as: MQTT, AMQP, STOMP, Openwire, WSS
+• When migrating to the cloud, instead of re-engineering the application to use SQS and SNS, we can use Amazon MQ
+• Amazon MQ = managed Apache ActiveMQ
+• Amazon MQ doesn’t “scale” as much as SQS / SNS
+• Amazon MQ runs on a dedicated machine, can run in HA with failover
+• Amazon MQ has both queue feature (~SQS) and topic features (~SNS)
+
 
 
 =================================================
@@ -2475,12 +2812,13 @@ Amazon has dozens of these data centers spread across the world. They’re close
 often in major cities, so responses can be fast and snappy. 
 
 UserCase:
+A subset of services where latency matters, they use edge locations, they are:-
 
-CloudFront, 
+CloudFront:
 which uses edge locations to cache copies of the content that it serves, so the content is closer to users and can be delivered to them faster.
-Route 53, 
+Route 53: 
 which serves DNS responses from edge locations, so that DNS queries that originate nearby can resolve faster (and, contrary to what you might think, is also Amazon’s premier database).
-Web Application Firewall and AWS Shield, 
+Web Application Firewall and AWS Shield:
 which filter traffic in edge locations to stop unwanted traffic as soon as possible.
 
 
@@ -2492,8 +2830,9 @@ which filter traffic in edge locations to stop unwanted traffic as soon as possi
 
 Amazon ElastiCache is a fully managed, in-memory caching service supporting flexible, real-time use cases. 
 You can use ElastiCache for caching, which accelerates application and database performance, 
-or as a primary data store for use cases that don't require durability like 
-session stores, gaming leaderboards, streaming, and analytics. ElastiCache is compatible with Redis and Memcached. 
+or as a primary data store for use cases that don't require durability like session stores, gaming leaderboards, 
+streaming, and analytics. 
+ElastiCache is compatible with Redis and Memcached. 
 
 
 Use cases:
@@ -2505,6 +2844,7 @@ Build low-latency data stores
 Amazon ElastiCache is a web service that makes it easy to deploy and run Memcached or Redis 
 protocol-compliant server nodes in the cloud. Amazon ElastiCache improves the performance of web applications by 
 allowing you to retrieve information from a fast, managed, in-memory system, instead of relying entirely on slower disk-based databases. 
+
 
 =================================================
 #CloudFront  | cludFont      
@@ -2528,14 +2868,18 @@ of edge locations from the origin or basically the network itself).
 
 
 Performance
-CloudFront improves performance for both cacheable content (such as images and videos) and dynamic content (such as API acceleration and dynamic site delivery).
-Global Accelerator improves performance for a wide range of applications over TCP or UDP by proxying packets at the edge to applications running in one or more AWS Regions.
+CloudFront improves performance for both cacheable content (such as images and videos) and 
+dynamic content (such as API acceleration and dynamic site delivery).
 
-Use Cases
+Global Accelerator improves performance for a wide range of applications over TCP or UDP by proxying packets at the 
+edge to applications running in one or more AWS Regions.
+
+Use Cases:
 CloudFront is a good fit for HTTP use cases
-Global Accelerator is a good fit for non-HTTP use cases, such as gaming (UDP), IoT (MQTT), or VoIP, as well as for HTTP use cases that require static IP addresses or deterministic, fast regional failover.
+Global Accelerator is a good fit for non-HTTP use cases, such as gaming (UDP), IoT (MQTT), or VoIP, 
+as well as for HTTP use cases that require static IP addresses or deterministic, fast regional failover.
 
-Caching
+Caching:
 CloudFront supports Edge caching
 Global Accelerator does not support Edge Caching.
 
@@ -2550,7 +2894,8 @@ geographical area, keeping their needs in the forefront.
 #AWS Global Accelerator (AMS SSPS)          
 ================================================= 
 
-Global Accelerator, your users' traffic is moved off the internet and onto Amazon’s private global network through 90+ global edge locations, then directed to your application origins. 
+Global Accelerator, your users' traffic is moved off the internet and onto Amazon’s private global network 
+through 90+ global edge locations, then directed to your application origins. 
 
 AWS Global Accelerator is a networking service that 
 improves the performance of your users’ traffic by up to 60% using Amazon Web Services’ global network infrastructure.
@@ -2562,7 +2907,8 @@ Network Load Balancers, EC2 Instances, and Elastic IPs without making user-facin
 Global Accelerator automatically re-routes your traffic to your nearest healthy available endpoint to mitigate endpoint failure.
 
 
-It provides static IP addresses that act as a fixed entry point to application endpoints in a single or multiple AWS Regions, such as Application Load Balancers, Network Load Balancers or EC2 instances.
+It provides static IP addresses that act as a fixed entry point to application endpoints in a single or multiple AWS Regions, 
+such as Application Load Balancers, Network Load Balancers or EC2 instances.
 
 
 
@@ -6649,7 +6995,8 @@ Storage:
 	 
  
 
- 
+
+
 
  
  
