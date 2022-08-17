@@ -151,6 +151,14 @@ SQS, Kinesis:
 1)Kinesis is not free tiar.
 
 
+ECS:
+====
+1)Fargate lunch type ask about a lot.
+2)From ECS rolling update one question only.
+
+
+
+
 ================================================= 
 #EXMQ
 ================================================= 
@@ -2162,8 +2170,85 @@ Amazon SQS – Standard Queue:
 • Can have out of order messages (best effort ordering)
 
 
+SQS Delay Queues is a period of time during which Amazon SQS keeps new SQS messages invisible to consumers. 
+In SQS Delay Queues, a message is hidden when it is first added to the queue. (default: 0 mins, max.: 15 mins)
+
+
+When SQS Long Polling is enabled, Amazon SQS reducing the number of empty responses when there are no messages 
+available to return and eliminating false empty responses (when SQS messages are available but aren't included in a response).
+
+SQS Visibility Timeout is a period of time during which Amazon SQS prevents other consumers from receiving and processing 
+the message again. In Visibility Timeout, a message is hidden only after it is consumed from the queue. 
+Increasing the Visibility Timeout gives more time to the consumer to process the message and prevent 
+duplicate reading of the message. (default: 30 sec., min.: 0 sec., max.: 12 hours)
+
+SQS Dead Letter Queue is where other SQS queues (source queues) can send messages that can't be processed (consumed) 
+successfully. It's useful for debugging as it allows you to isolate problematic messages so 
+you can debug why their processing doesn't succeed.
+
+SQS FIFO (First-In-First-Out) Queues have all the capabilities of the SQS Standard Queue, plus the following two features. 
+First, The order in which messages are sent and received are strictly preserved and a message is 
+delivered once and remains available until a consumer process and deletes it. 
+Second, duplicated messages are not introduced into the queue.
+
+
+This is a common pattern where only one message is sent to the SNS topic and then "fan-out" to multiple SQS queues. 
+This approach has the following features: it's fully decoupled, no data loss, and you have the ability to add more
+SQS queues (more applications) over time.
+
+
+The capacity limits of a Kinesis data stream are defined by the number of shards within the data stream. 
+The limits can be exceeded by either data throughput or the number of reading data calls. Each shard allows for 
+1 MB/s incoming data and 2 MB/s outgoing data. You should increase the number of shards within 
+your data stream to provide enough capacity.
+
+
+Kinesis Data Stream uses the partition key associated with each data record to determine which shard a 
+given data record belongs to. When you use the identity of each user as the partition key, this ensures the 
+data for each user is ordered hence 
+sent to the same shard.
+
+
+Which AWS service is most appropriate when you want to perform real-time analytics on streams of data?
+Use Kinesis Data Analytics with Kinesis Data Streams as the underlying source of data.
+
+
+This is a perfect combo of technology for loading data near real-time data into S3 and Redshift. 
+Kinesis Data Firehose supports custom data transformations using AWS Lambda.
+
+
+Which of the following is NOT a supported subscriber for AWS SNS?
+Kinesis Data Firehose is now supported, but not Kinesis Data Streams.
+
+Amazon MQ supports industry-standard APIs such as JMS and NMS, and protocols for messaging, 
+including AMQP, STOMP, MQTT, and WebSocket.
+
+
 Kinesis:
 -------------------------------------------------
+
+What is a source in Kinesis Data Firehose?
+A source is where your streaming data is continuously generated and captured. For example, a source can be a logging server 
+running on Amazon EC2 instances, an application running on mobile devices, or a sensor on an IoT device. 
+You can connect your sources to Kinesis Data Firehose using 
+1) Amazon Kinesis Data Firehose API, which uses the AWS SDK for Java, .NET, Node.js, Python, or Ruby. 
+2) Kinesis Data Stream, where Kinesis Data Firehose reads data easily from an existing Kinesis data 
+stream and load it into Kinesis Data Firehose destinations. 
+3) AWS natively supported Service like AWS Cloudwatch, AWS EventBridge, AWS IOT, or AWS Pinpoint. 
+For complete list, see the Amazon Kinesis Data Firehose developer guide. 
+4) Kinesis Agents, which is a stand-alone Java software application that continuously monitors a set of files and 
+sends new data to your stream. 
+5) Fluentbit, which an open source Log Processor and Forwarder. 
+6) AWS Lambda, which is a serverless compute service that lets you run code without provisioning or managing servers. 
+You can use write your Lambda function to send traffic from S3 or DynamoDB to 
+Kinesis Data Firehose based on a triggered event.
+
+What is a destination in Kinesis Data Firehose?
+A destination is the data store where your data will be delivered. 
+Kinesis Data Firehose currently supports Amazon S3, Amazon Redshift, Amazon OpenSearch Service, Splunk, Datadog, 
+NewRelic, Dynatrace, Sumologic, LogicMonitor, MongoDB, and HTTP End Point as destinations.
+
+
 • Makes it easy to collect, process, and analyze streaming data in real-time
 • Ingest real-time data such as: Application logs, Metrics, Website clickstreams, IoT telemetry data
 • Kinesis Data Streams: capture, process, and store data streams
@@ -2229,6 +2314,128 @@ Amazon MQ:
 • Amazon MQ doesn’t “scale” as much as SQS / SNS
 • Amazon MQ runs on a dedicated machine, can run in HA with failover
 • Amazon MQ has both queue feature (~SQS) and topic features (~SNS)
+
+
+
+
+=================================================
+##Section 18: Containers on AWS: ECS, Fargate, ECR & EKS
+=================================================
+Docker Containers Management on AWS:
+
+Amazon Elastic Container Service (Amazon ECS)
+• Amazon’s own container platform
+
+Amazon Elastic Kubernetes Service (Amazon EKS)
+• Amazon’s managed Kubernetes (open source)
+
+AWS Fargate
+• Amazon’s own Serverless container platform
+• Works with ECS and with EKS
+
+Amazon ECR:
+• Store container images
+
+
+
+Note:
+• Amazon S3 cannot be mounted as a file system
+
+
+
+Amazon ECS - EC2 Launch Type
+• ECS = Elastic Container Service
+• Launch Docker containers on AWS =
+Launch ECS Tasks on ECS Clusters
+• EC2 Launch Type: you must provision
+& maintain the infrastructure (the EC2
+instances)
+• Each EC2 Instance must run the ECS
+Agent to register in the ECS Cluster
+• AWS takes care of starting / stopping
+containers
+
+
+
+Amazon ECS – Fargate Launch Type
+• Launch Docker containers on AWS
+• You do not provision the infrastructure
+(no EC2 instances to manage)
+• It’s all Serverless!
+• You just create task definitions
+• AWS just runs ECS Tasks for you based
+on the CPU / RAM you need
+• To scale, just increase the number of
+tasks. Simple - no more EC2 instances
+
+
+ECS Task Role:
+• Allows each task to have a specific role
+• Use different roles for the different ECS Services you run
+• Task Role is defined in the task definition
+
+
+
+Amazon EKS Overview:
+---------------------------------------------------
+• Amazon EKS = Amazon Elastic Kubernetes Service
+• It is a way to launch managed Kubernetes clusters on AWS
+• Kubernetes is an open-source system for automatic deployment, scaling and
+management of containerized (usually Docker) application
+• It’s an alternative to ECS, similar goal but different API
+• EKS supports EC2 if you want to deploy worker nodes or Fargate to deploy
+serverless containers
+• Use case: if your company is already using Kubernetes on-premises or in
+another cloud, and wants to migrate to AWS using Kubernetes
+• Kubernetes is cloud-agnostic (can be used in any cloud – Azure, GCP…)
+• For multiple regions, deploy one EKS cluster per region
+
+
+
+Amazon ECS – Load Balancer Integrations:
+
+• Application Load Balancer supported
+and works for most use cases
+
+• Network Load Balancer recommended
+only for high throughput / high
+performance use cases, or to pair it with
+AWS Private Link
+
+• Elastic Load Balancer supported but not
+recommended (no advanced features –
+no Fargate)
+
+
+
+EC2 Launch Type – Auto Scaling EC2 Instances:
+• Accommodate ECS Service Scaling by adding underlying EC2 Instances
+
+Auto Scaling Group Scaling
+• Scale your ASG based on CPU Utilization
+• Add EC2 instances over time
+
+ECS Cluster Capacity Provider
+• Used to automatically provision and scale the infrastructure for your ECS Tasks
+• Capacity Provider paired with an Auto Scaling Group
+• Add EC2 Instances when you’re missing capacity (CPU, RAM…)
+
+
+
+EC2 Instance Profile is the IAM Role used by the ECS Agent on the EC2 instance to execute ECS-specific 
+actions such as pulling Docker images from ECR and storing the container logs into CloudWatch Logs.
+
+ECS Task Role is the IAM Role used by the ECS task itself. Use when your container wants to call 
+other AWS services like S3, SQS, etc.
+
+EFS volume can be shared between different EC2 instances and different ECS Tasks. 
+It can be used as a persistent multi-AZ shared storage for your containers.
+
+Amazon ECR is a fully managed container registry that makes it easy to store, manage, share, and deploy your container images. 
+It won't help in running your Docker-based applications.
+
+
+
 
 
 
