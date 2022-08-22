@@ -22,7 +22,8 @@ Leverage:উদ্দেশ্যসাধনের উপায়
 sole:একমাত্র
 Reliable:নির্ভরযোগ্য
 Proprietary:মালিকানা
-
+Regardless:মনোযোগ বা পাত্তা না দিয়ে
+Potentially:সম্ভাব্য
 
 =>sudo chmod 777 -R destinationFolder/*
 Allow ec2 file permission
@@ -30,6 +31,14 @@ Allow ec2 file permission
 
 =>/mnt/efs/fs1
 MetadataURL is http://169.254.169.254/latest/meta-data
+
+
+#!/bin/bash
+yum update -y
+yum install -y httpd
+systemctl start httpd
+systemctl enable httpd
+echo "<h1>Hello World from $(hostname -f)</h1>" > /var/www/html/index.html
 
 =================================================
 #To Do           
@@ -41,6 +50,8 @@ https://digitalcloud.training/courses/aws-csaa-practice-exams/
 
 https://www.udemy.com/course/practice-exams-aws-certified-solutions-architect-associate/
 https://www.udemy.com/course/aws-certified-solutions-architect-associate-amazon-practice-exams-saa-c03/
+
+https://docs.aws.amazon.com/whitepapers/latest/disaster-recovery-workloads-on-aws/disaster-recovery-options-in-the-cloud.html
 
 
 Transition of S3 objects
@@ -374,9 +385,6 @@ Security:
 
 
 
-
-
-
 vpc:
 =====
 1)Conndct DX need more then 1 month
@@ -386,6 +394,36 @@ vpc:
 5)Transit Gateway: Site-to-Site VPN ECMP
 6)Transit Gateway: throughput with ECMP
 7)IPv6 Troubleshooting May Ipv4 are finish
+
+
+
+
+DisasterRecoveryMigrations:
+===========================
+1)Exam will provide scnereio and what is best for backup Pilot Light, Warm Standby ,Multi Site or All AWS Multi Region.
+
+
+
+
+
+
+
+FAQ:
+=================================================
+
+1)Q. Is there a limit on how large or small a subnet can be?\
+The minimum size of a subnet is a /28 (or 14 IP addresses.) for IPv4. Subnets cannot be larger than the VPC in which they are created.
+For IPv6, the subnet size is fixed to be a /64. Only one IPv6 CIDR block can be allocated to a subnet.
+
+2)Q. How large of a VPC can I create?
+Currently, Amazon VPC supports five (5) IP address ranges, one (1) primary and four (4) secondary for IPv4. 
+Each of these ranges can be between /28 (in CIDR notation) and /16 in size. The IP address ranges of your 
+VPC should not overlap with the IP address ranges of your existing network.
+For IPv6, the VPC is a fixed size of /56 (in CIDR notation). A VPC can have both IPv4 and IPv6 CIDR blocks associated to it.
+
+
+
+
 
 
 =================================================
@@ -608,15 +646,9 @@ AWS EC2 Instance Metadata is powerful but one of the least known features to dev
 #Bootstrapping: 
 -------------------------------------------------
 Install OS patches or software when an EC2 instance is launched.
+def-sub-south-1a
 
 Example:
-#!/bin/bash
-yum update -y
-yum install -y httpd
-systemctl start httpd
-systemctl enable httpd
-echo "<h1>Hello World from $(hostname -f)</h1>" > /var/www/html/index.html
-OR
 #!/bin/bash
 yum update -y
 yum install -y httpd
@@ -3915,6 +3947,282 @@ Use VPC Endpoint Services (AWS PrivateLink)
 
 AWS VPN CloudHub allows you to securely communicate with multiple sites using AWS VPN. 
 It operates on a simple hub-and-spoke model that you can use with or without a VPC.
+
+
+
+=================================================
+##Section 26: Disaster Recovery & Migrations
+=================================================
+
+
+Disaster Recovery Strategies:
+• Backup and Restore
+• Pilot Light 
+• Warm Standby 
+• Hot Site / Multi Site Approach
+
+
+
+Disaster Recovery Tips:
+Backup 
+	• EBS Snapshots, RDS automated backups / Snapshots, etc… 
+	• Regular pushes to S3 / S3 IA / Glacier, Lifecycle Policy, Cross Region Replication 
+	• From On-Premise: Snowball or Storage Gateway 
+High Availability 
+	• Use Route53 to migrate DNS over from Region to Region 
+	• RDS Multi-AZ, ElastiCache Multi-AZ, EFS, S3 
+	• Site to Site VPN as a recovery from Direct Connect 
+Replication 
+	• RDS Replication (Cross Region), AWS Aurora + Global Databases 
+	• Database replication from on-premises to RDS 
+	• Storage Gateway 
+Automation 
+	• CloudFormation / Elastic Beanstalk to re-create a whole new environment 
+	• Recover / Reboot EC2 instances with CloudWatch if alarms fail 
+	• AWS Lambda functions for customized automations 
+Chaos 
+	• Netflix has a “simian-army” randomly terminating EC2
+
+
+
+
+AWS Schema Conversion Tool (SCT):
+• Convert your Database’s Schema from one engine to another
+• Example OLTP: (SQL Server or Oracle) to MySQL, PostgreSQL, Aurora
+• Example OLAP: (Teradata or Oracle) to Amazon Redshift
+• Prefer compute-intensive instances to optimize data conversions
+• You do not need to use SCT if you are migrating the same DB engine
+	• Ex: On-Premise PostgreSQL => RDS PostgreSQL
+	• The DB engine is still PostgreSQL (RDS is the platform)
+
+
+
+On-Premise strategy with AWS:
+• Ability to download Amazon Linux 2 AMI as a VM (.iso format) 
+	• VMWare, KVM, VirtualBox (Oracle VM), Microsoft Hyper-V 
+• VM Import / Export 
+	• Migrate existing applications into EC2 
+	• Create a DR repository strategy for your on-premises VMs 
+	• Can export back the VMs from EC2 to on-premises 
+• AWS Application Discovery Service 
+	• Gather information about your on-premises servers to plan a migration 
+	• Server utilization and dependency mappings 
+	• Track with AWS Migration Hub 
+• AWS Database Migration Service (DMS) 
+	• replicate On-premise => AWS , AWS => AWS, AWS => On-premise 
+	• Works with various database technologies (Oracle, MySQL, DynamoDB, etc..) 
+• AWS Server Migration Service (SMS) 
+	• Incremental replication of on-premises live servers to AWS
+
+
+AWS DataSync
+• Move large amount of data from on-premises to AWS
+• Can synchronize to: Amazon S3 (any storage classes – including
+Glacier), Amazon EFS, Amazon FSx (Windows, Lustre...)
+• Move data from your NAS or file system via NFS or SMB
+• Replication tasks can be scheduled hourly, daily, weekly
+• Leverage the DataSync agent to connect to your systems
+• Can setup a bandwidth limit
+
+
+
+
+Transferring large amount of data into AWS:
+• Example: transfer 200 TB of data in the cloud. We have a 100 Mbps internet connection.
+• Over the internet / Site-to-Site VPN:
+	• Immediate to setup
+	• Will take 200(TB)*1000(GB)*1000(MB)*8(Mb)/100 Mbps = 16,000,000s = 185d
+• Over direct connect 1Gbps:
+	• Long for the one-time setup (over a month)
+	• Will take 200(TB)*1000(GB)*8(Gb)/1 Gbps = 1,600,000s = 18.5d
+• Over Snowball:
+	• Will take 2 to 3 snowballs in parallel
+	• Takes about 1 week for the end-to-end transfer
+	• Can be combined with DMS
+• For on-going replication / transfers: Site-to-Site VPN or DX with DMS or DataSync
+
+
+
+
+
+AWS DataSync is an online data transfer service that simplifies, automates, and accelerates moving data between 
+on-premises storage systems and AWS Storage services, as well as between AWS Storage services.
+
+
+AWS Backup enables you to centralize and automate data protection across AWS services. 
+It helps you support your regulatory compliance or business policies for data protection.
+
+
+
+
+=================================================
+##Section 27: Machine Learning
+=================================================
+
+Amazon Rekognition:
+• Find objects, people, text, scenes in images and videos using ML
+• Facial analysis and facial search to do user verification, people counting
+• Create a database of “familiar faces” or compare against celebrities
+• Use cases:
+	• Labeling
+	• Content Moderation
+	• Text Detection
+	• Face Detection and Analysis (gender, age range, emotions…)
+	• Face Search and Verification
+	• Celebrity Recognition
+	• Pathing (ex: for sports game analysis)
+
+
+
+Amazon Transcribe:
+• Automatically convert speech to text
+• Uses a deep learning process called automatic speech recognition
+(ASR) to convert speech to text quickly and accurately
+• Use cases:
+	• transcribe customer service calls
+	• automate closed captioning and subtitling
+	• generate metadata for media assets to create a fully searchable archive
+
+
+
+Amazon Polly:
+• Turn text into lifelike speech using deep learning 
+• Allowing you to create applications that talk
+
+
+Amazon Translate:
+• Natural and accurate language translation
+• Amazon Translate allows you to localize content - such as websites and
+applications - for international users, and to easily translate large
+volumes of text efficiently
+
+
+Amazon Lex & Connect:
+• Amazon Lex: (same technology that powers Alexa)
+	• Automatic Speech Recognition (ASR) to convert speech to text
+	• Natural Language Understanding to recognize the intent of text, callers
+	• Helps build chatbots, call center bots
+• Amazon Connect:
+	• Receive calls, create contact flows, cloud-based virtual contact center
+	• Can integrate with other CRM systems or AWS
+	• No upfront payments, 80% cheaper than traditional contact center solutions
+
+
+
+
+Amazon Comprehend:
+• For Natural Language Processing – NLP
+• Fully managed and serverless service
+• Uses machine learning to find insights and relationships in text
+	• Language of the text
+	• Extracts key phrases, places, people, brands, or events
+	• Understands how positive or negative the text is
+	• Analyzes text using tokenization and parts of speech
+	• Automatically organizes a collection of text files by topic
+• Sample use cases:
+	• analyze customer interactions (emails) to find what leads to a positive or negative experience
+	• Create and groups articles by topics that Comprehend will uncover
+
+
+
+Amazon SageMaker:
+• Fully managed service for developers / data scientists to build ML models
+• Typically, difficult to do all the processes in one place + provision servers
+• Machine learning process (simplified): predicting your exam score
+
+
+Amazon Forecast:
+• Fully managed service that uses ML to deliver highly accurate forecasts
+• Example: predict the future sales of a raincoat
+• 50% more accurate than looking at the data itself
+• Reduce forecasting time from months to hours
+• Use cases: Product Demand Planning, Financial Planning, Resource Planning
+
+
+Amazon Kendra:
+• Fully managed document search service powered by Machine Learning
+• Extract answers from within a document (text, pdf, HTML, PowerPoint, MS Word, FAQs…)
+• Natural language search capabilities
+• Learn from user interactions/feedback to promote preferred results (Incremental Learning)
+• Ability to manually fine-tune search results (importance of data, freshness, custom, …)
+
+
+Amazon Personalize:
+• Fully managed ML-service to build apps with real-time personalized recommendations
+• Example: personalized product recommendations/re-ranking, customized direct marketing
+• Example: User bought gardening tools, provide recommendations on the next one to buy
+• Integrates into existing websites, applications, SMS, email marketing systems, …
+• Implement in days, not months (you don’t need to build, train, and deploy ML solutions)
+• Use cases: retail stores, media and entertainment
+
+
+Amazon Textract:
+• Automatically extracts text, handwriting, and data from any scanned
+documents using AI and ML
+Extract data from forms and tables
+• Read and process any type of document (PDFs, images, …)
+• Use cases:
+	• Financial Services (e.g., invoices, financial reports)
+	• Healthcare (e.g., medical records, insurance claims)
+	• Public Sector (e.g., tax forms, ID documents, passports)
+
+
+AWS Machine Learning- Summary:
+• Rekognition
+: face detection, labeling, celebrity recognition
+• Transcribe: audio to text (ex: subtitles) 
+• Polly: text to audio 
+• Translate: translations 
+• Lex: build conversational bots – chatbots 
+• Connect: cloud contact center 
+• Comprehend: natural language processing 
+• SageMaker: machine learning for every developer and data scientist 
+• Forecast: build highly accurate forecasts 
+• Kendra: ML-powered search engine 
+• Personalize: real-time personalized recommendations 
+• Textract: detect text and data in documents
+
+
+Amazon Transcribe is an AWS service that makes it easy for customers to convert speech-to-text. 
+Amazon Polly is a service that turns text into lifelike speech.
+
+Amazon Transcribe is an AWS service that makes it easy for customers to convert speech-to-text. ]
+However, it does not have natural language understanding.
+
+Amazon Connect is a self-service, cloud-based contact center service that makes it easy for any business to 
+deliver better customer service at lower cost. It does not provide speech-to-text conversion or natural language understanding.
+
+
+Amazon Lex is a service for building conversational interfaces into any application using voice and text. 
+Lex provides the advanced deep learning functionalities of automatic speech recognition (ASR) 
+for converting speech to text, and natural language understanding (NLU) to recognize the intent of the text, 
+to enable you to build applications with highly engaging user experiences and lifelike conversational interactions.
+
+
+Amazon Personalize is a machine learning service that makes it easy for developers to create individualized recommendations 
+for customers using their applications.
+
+
+Amazon Comprehend is a natural language processing (NLP) service that uses machine learning to find meaning and insights in text.
+
+Amazon Translate is a neural machine translation service that delivers fast, high-quality, and affordable language translation.
+Amazon Transcribe is an AWS service that makes it easy for customers to convert speech-to-text.
+
+Amazon Kendra is a highly accurate and easy to use enterprise search service that’s powered by machine learning.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
