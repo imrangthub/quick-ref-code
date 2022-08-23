@@ -40,9 +40,16 @@ systemctl start httpd
 systemctl enable httpd
 echo "<h1>Hello World from $(hostname -f)</h1>" > /var/www/html/index.html
 
+
 =================================================
 #To Do           
 ================================================= 
+
+https://aws.amazon.com/solutions/
+https://aws.amazon.com/architecture/
+
+https://www.linkedin.com/pulse/aws-ip-ranges-your-amazon-vpc-neal-davis/
+
 https://portal.tutorialsdojo.com/courses/aws-certified-solutions-architect-associate-practice-exams/
 https://www.knowledgehut.com/practice-tests/aws-solutions-architect-associate
 
@@ -54,14 +61,10 @@ https://www.udemy.com/course/aws-certified-solutions-architect-associate-amazon-
 https://docs.aws.amazon.com/whitepapers/latest/disaster-recovery-workloads-on-aws/disaster-recovery-options-in-the-cloud.html
 https://www.youtube.com/playlist?list=PLo1fN4WDLQ_YTvJ00S4bYWLwSUw8YxEWl
 
-Transition of S3 objects
 
 
 HandsOnRemain:
 ============
-
-
-
 ELB
 ---------
 1)ALB Sticky Session
@@ -74,6 +77,25 @@ RDS | Aurora| ElastiCache
 Need to Review this section
 1)AurorHandOn (No free)
 2)ElastiCache (Limated free 2Month)
+
+
+ToDo/Review
+-------------------------------------------------
+Transit Gateway
+vpc advance
+How to Cahs APIGateway and CloudFron
+DisterRecoverWhitepaper
+Transition of S3 objects
+
+
+
+HandOnRemain
+----------------------------
+CloudWatch/CloudTrail/Config
+IAM advance 
+AWS Sceurity/KMS/SSM
+
+VPC
 
 
 Route53
@@ -111,7 +133,7 @@ HandsOnRemain
 
 
 =================================================
-#Billing | Const 
+#Billing | Pricing | Cost 
 =================================================
 
 EC2:
@@ -131,12 +153,10 @@ EC2 Instances Purchasing Options:
 3)There is no charge applicable to Security Groups in Amazon EC2 / Amazon VPC.
 
 
-
 Route53:
 ========
 1)Route53 Not free, 12dolar per year.
 2)You pay $0.50 per month per hosted zone.
-
 
 
 
@@ -207,11 +227,8 @@ vpc:
 =====
 1)VPC Rechability not free 
 2)3Q come from of Site-to-Site VPN Connections operation
-
-
-
-
-
+3)AWS VPC starts to cost money when you utilize Site-to-Site VPN connections, 
+PrivateLinks (VPC endpoints), NAT gateways, and traffic mirroring.
 
 
 
@@ -370,20 +387,17 @@ AWS Databases:
 
 
 CloudWatch/CloudTrail/Config:
-=====
+============================
 1)Cross Acccount access and Ausume role, Its STS
 2)Exam ask about high level of 3Type AD
 3)Any time you see multiple acc login with SAML, Its SSO
-
 
 
 (IAM) - Advanced:
-=============================
-
+================
 1)Cross Acccount access and Ausume role, Its STS
 2)Exam ask about high level of 3Type AD
 3)Any time you see multiple acc login with SAML, Its SSO
-
 
 
 Security:
@@ -414,21 +428,31 @@ DisasterRecoveryMigrations:
 
 
 
+MoreSolutionArch:
+================
+1)If you want to every envent from s3 then make sure of s3 object versioning.
+2)S3 enent only three reciver - SQS, SNS and Lamda, you can make many of Arcturacture from of this three.
 
-FAQ:
-=================================================
-
-1)Q. Is there a limit on how large or small a subnet can be?\
-The minimum size of a subnet is a /28 (or 14 IP addresses.) for IPv4. Subnets cannot be larger than the VPC in which they are created.
-For IPv6, the subnet size is fixed to be a /64. Only one IPv6 CIDR block can be allocated to a subnet.
-
-2)Q. How large of a VPC can I create?
-Currently, Amazon VPC supports five (5) IP address ranges, one (1) primary and four (4) secondary for IPv4. 
-Each of these ranges can be between /28 (in CIDR notation) and /16 in size. The IP address ranges of your 
-VPC should not overlap with the IP address ranges of your existing network.
-For IPv6, the VPC is a fixed size of /56 (in CIDR notation). A VPC can have both IPv4 and IPv6 CIDR blocks associated to it.
+User -> CloudFront->APIGateway->Application->Database->DBCaching(MemCach, Radis,DX)
+3)CloudFron is Cashinc in EdgeLocation, API Gateway cacheing on Regional location
+For Updated data in CloudFron add TTL time for updated data.
+Application not cash, Database not cash, S3 not Cash.
+4)High Performance Computing (HPC) come to exam.
+5)Elastic Network Adapter (ENA) up to 100 Gbps for high permormance
+6)Diffentent of enA, ENI, EFI, or any
 
 
+
+
+OtherService:
+=============
+1)Multi account region deployment its StackSets
+2)state machine,workflow(Job), orkstation, lamda if in exam its Step Functions.
+2)Hadoop clusters (Big Data) processing its EMR.
+3)In the exam: Chef & Puppet needed => AWS Opsworks
+4)VDI (Virtual Desktop Infrastructure) its WorkSpaces
+5)across mobile and web apps in real-time and GraphQL its AppSync.
+6)Full Trusted Advisor – Available for Business & Enterprise support plans
 
 
 
@@ -597,6 +621,7 @@ IAM Section – Summary:
 
 Golden AMI is an image that contains all your software, dependencies, and configurations, so that future 
 EC2 instances can boot up quickly from that AMI.
+
 
 
 =================================================
@@ -1140,7 +1165,6 @@ Simple Storage Service (S3) provides object storage, without the use of EC2 inst
 =================================================
 Section 8: High Availability and Scalability: ELB & ASG
 =================================================
-
 High Availability: 
 Run instances for the same application across multi AZ
 • Auto Scaling Group multi AZ
@@ -2793,7 +2817,6 @@ database event streams, financial transactions, social media feeds, IT logs, and
 =================================================
 ##Section 21: Databases in AWS
 =================================================
-
 Database Types:
 • RDBMS (= SQL / OLTP): RDS, Aurora – great for joins
 • NoSQL database: DynamoDB (~JSON), ElastiCache (key / value pairs),
@@ -3275,10 +3298,6 @@ Asymmetric (RSA & ECC key pairs)
 
 
 
-
-
-
-
 AWS KMS (Key Management Service) :
 • Able to fully manage the keys & policies: 
 	• Create 
@@ -3291,7 +3310,6 @@ AWS KMS (Key Management Service) :
 	• User Keys created in KMS: $1 / month 
 	• User Keys imported (must be 256-bit symmetric key): $1 / month 
 + pay for API call to KMS ($0.03 / 10000 calls)
-
 
 
 
@@ -3436,8 +3454,6 @@ Your responsibility:
 • Bucket policy / public setting 
 • IAM user and roles 
 • Enabling encryption
-
-
 
 
 
@@ -3628,9 +3644,13 @@ Interface Endpoints:
 • Provisions an ENI (private IP address) as an entry point (must attach a Security Group)
 • Supports most AWS services
 
-Gateway Endpoints
+Gateway Endpoints:
 • Provisions a gateway and must be used as a target in a route table
 • Supports both S3 and DynamoDB
+
+
+A gateway connects dissimilar networks. You can think of a gateway as a protocol converter. 
+AWS VPC uses an internet gateway to connect an AWS private network to the world wide web.
 
 
 VPC Flow Logs:
@@ -4167,18 +4187,402 @@ Amazon Kendra is a highly accurate and easy to use enterprise search service tha
 
 
 
+=================================================
+##Section 28: More Solution Architectures
+=================================================
+
+S3 Events:
+-------------------------------------------------
+S3:ObjectCreated, S3:ObjectRemoved,
+S3:ObjectRestore, S3:Replication…
+• Object name filtering possible (*.jpg)
+• Use case: generate thumbnails of images uploaded to S3
+• Can create as many “S3 events” as desired
+• S3 event notifications typically deliver events in
+seconds but can sometimes take a minute or
+longer
+• If two writes are made to a single non- versioned object at the same time, it is
+possible that only a single event notification
+will be sent
+• If you want to ensure that an event
+notification is sent for every successful write,
+you can enable versioning on your bucket.
+
+
+High Performance Computing (HPC)
+• The cloud is the perfect place to perform HPC
+• You can create a very high number of resources in no time
+• You can speed up time to results by adding more resources
+• You can pay only for the systems you have used
+• Perform genomics, computational chemistry, financial risk modeling,
+weather prediction, machine learning, deep learning, autonomous driving
+• Which services help perform HPC?
+
+
+
+Data Management & Transfer:
+• AWS Direct Connect:
+	• Move GB/s of data to the cloud, over a private secure network
+• Snowball & Snowmobile
+	• Move PB of data to the cloud
+• AWS DataSync
+	• Move large amount of data between on-premises and S3, EFS, FSx for Windows
+
+
+Compute and Networking:
+• EC2 Instances:
+• CPU optimized, GPU optimized
+• Spot Instances / Spot Fleets for cost savings + Auto Scaling
+• EC2 Placement Groups: Cluster for good network performance
+
+
+Compute and Networking:
+EC2 Enhanced Networking (SR-IOV)
+• Higher bandwidth, higher PPS (packet per second), lower latency
+• Option 1: Elastic Network Adapter (ENA) up to 100 Gbps
+• Option 2: Intel 82599 VF up to 10 Gbps – LEGACY
+
+Elastic Fabric Adapter (EFA)
+• Improved ENA for HPC, only works for Linux
+• Great for inter-node communications, tightly coupled workloads
+• Leverages Message Passing Interface (MPI) standard
+• Bypasses the underlying Linux OS to provide low-latency, reliable transport
+
+
+Storage:
+Instance-attached storage:
+• EBS: scale up to 256,000 IOPS with io2 Block Express
+• Instance Store: scale to millions of IOPS, linked to EC2 instance, low latency
+
+Network storage:
+• Amazon S3: large blob, not a file system
+• Amazon EFS: scale IOPS based on total size, or use provisioned IOPS
+• Amazon FSx for Lustre:
+	• HPC optimized distributed file system, millions of IOPS
+	• Backed by S3
+
+
+Automation and Orchestration:
+AWS Batch
+• AWS Batch supports multi-node parallel jobs, which enables you to run single
+jobs that span multiple EC2 instances.
+• Easily schedule jobs and launch EC2 instances accordingly
+
+AWS ParallelCluster
+• Open-source cluster management tool to deploy HPC on AWS
+• Configure with text files
+• Automate creation of VPC, Subnet, cluster type and instance types
+• Ability to enable EFA on the cluster (improves network performance)
+
+
+High Availability for a Bastion Host:
+
+HA options for the bastion host
+• Run 2 across 2 AZ
+• Run 1 across 2 AZ with 1 ASG 1:1:1
+
+Routing to the bastion host
+• If 1 bastion host, use an elastic IP with ec2 user-data script to access it
+• If 2 bastion hosts, use an Network Load Balancer (layer 4) deployed in multiple AZ
+• If NLB, the bastion hosts can live in the private subnet directly
+Note: Can’t use ALB as the ALB is layer 7 (HTTP protocol) ssH LAYER 4
 
 
 
 
+=================================================
+##Section 29: Other Services
+=================================================
+
+Technology Stack for CICD:
+-------------------------------------------------
+AWS CodeCommit->AWS CodeBuild->AWS Elastic Beanstalk
+GitHub
+Or 3rd party
+code repository
+
+Jenkins CI
+Or 3rd party CI servers
+
+AWS CodeDeploy
+User Managed
+EC2 Instances
+Fleet
+(CloudFormation)
+
+
+What is CloudFormation:
+• CloudFormation is a declarative way of outlining your AWS
+Infrastructure, for any resources (most of them are supported).
+• For example, within a CloudFormation template, you say:
+	• I want a security group
+	• I want two EC2 machines using this security group
+	• I want two Elastic IPs for these EC2 machines
+	• I want an S3 bucket
+	• I want a load balancer (ELB) in front of these machines
+• Then CloudFormation creates those for you, in the right order, with the
+exact configuration that you specify
+
+
+Benefits of AWS CloudFormation (1/2):
+
+nfrastructure as code
+• No resources are manually created, which is excellent for control
+• The code can be version controlled for example using git
+• Changes to the infrastructure are reviewed through code
+
+Cost
+• Each resources within the stack is tagged with an identifier so you can easily see how
+much a stack costs you
+• You can estimate the costs of your resources using the CloudFormation template
+• Savings strategy: In Dev, you could automation deletion of templates at 5 PM and
+recreated at 8 AM, safely
+
+Productivity
+• Ability to destroy and re-create an infrastructure on the cloud on the fly
+• Automated generation of Diagram for your templates!
+• Declarative programming (no need to figure out ordering and orchestration)
+
+Separation of concern: create many stacks for many apps, and many layers. Ex:
+• VPC stacks
+• Network stacks
+• App stacks
+
+Don’t re-invent the wheel
+• Leverage existing templates on the web!
+• Leverage the documentation
+
+
+How CloudFormation Works:
+• Templates have to be uploaded in S3 and then referenced in
+CloudFormation
+• To update a template, we can’t edit previous ones. We have to reupload a new version of the template to AWS
+• Stacks are identified by a name
+• Deleting a stack deletes every single artifact that was created by
+CloudFormation. 
+
+
+How CloudFormation Works:
+• Templates have to be uploaded in S3 and then referenced in
+CloudFormation
+• To update a template, we can’t edit previous ones. We have to reupload a new version of the template to AWS
+• Stacks are identified by a name
+• Deleting a stack deletes every single artifact that was created by
+CloudFormation.
+
+
+CloudFormation Building Blocks:
+Templates components
+1. Resources: your AWS resources declared in the template (MANDATORY)
+2. Parameters: the dynamic inputs for your template
+3. Mappings: the static variables for your template
+4. Outputs: References to what has been created
+5. Conditionals: List of conditions to perform resource creation
+6. Metadata
+
+Templates helpers:
+1. References
+2. Functions
 
 
 
+CloudFormation - StackSets:
+• Create, update, or delete stacks
+across multiple accounts and regions
+with a single operation
+• Administrator account to create
+StackSets
+• Trusted accounts to create, update,
+delete stack instances from StackSets
+• When you update a stack
+set, all associated stack instances are
+updated throughout all accounts and
+regions.
+
+
+AWS Step Functions:
+• Build serverless visual workflow to orchestrate your Lambda functions
+• Represent flow as a JSON state machine
+• Features: sequence, parallel, conditions, timeouts, error handling…
+• Can also integrate with EC2, ECS, On premise servers, API Gateway
+• Maximum execution time of 1 year
+• Possibility to implement human approval feature
+
+Use cases:
+• Order fulfillment
+• Data processing
+• Web applications
+• Any workflow
+
+
+AWS SWF – Simple Workflow Service:
+Step Functions is recommended to be used for new applications, except:
+• If you need external signals to intervene in the processes
+• If you need child processes that return values to parent processes
+
+
+Amazon EMR:
+• EMR stands for “Elastic MapReduce”
+• EMR helps creating Hadoop clusters (Big Data) to analyze and process
+vast amount of data
+• The clusters can be made of hundreds of EC2 instances
+• Also supports Apache Spark, HBase, Presto, Flink…
+• EMR takes care of all the provisioning and configuration
+• Auto-scaling and integrated with Spot instances
+• Use cases: data processing, machine learning, web indexing, big data
 
 
 
+Quick word on Chef / Puppet:
+• They help with managing configuration as code
+• Helps in having consistent deployments
+• Works with Linux / Windows
+• Can automate: user accounts, cron, ntp, packages, services…
+• They leverage “Recipes” or ”Manifests”
+• Chef / Puppet have similarities with SSM / Beanstalk / CloudFormation
+but they’re open-source tools that work cross-cloud
 
 
+
+AWS WorkSpaces:
+• Managed, Secure Cloud Desktop
+• Great to eliminate management of on-premises VDI (Virtual Desktop Infrastructure)
+• On Demand, pay per by usage
+• Secure, Encrypted, Network Isolation
+• Integrated with Microsoft Active Directory
+
+
+
+AWS AppSync:
+• Store and sync data across mobile and web apps in real-time
+• Makes use of GraphQL (mobile technology from Facebook)
+• Client Code can be generated automatically
+• Integrations with DynamoDB / Lambda
+• Real-time subscriptions
+• Offline data synchronization (replaces Cognito Sync)
+• Fine Grained Security
+
+
+Cost Explorer:
+• Visualize, understand, and manage your AWS costs and usage over time
+• Create custom reports that analyze cost and usage data.
+• Analyze your data at a high level: total costs and usage across all accounts
+• Or Monthly, hourly, resource level granularity
+• Choose an optimal Savings Plan (to lower prices on your bill)
+• Forecast usage up to 12 months based on previous usage
+
+
+Well Architected Framework:
+6 Pillars
+• 1) Operational Excellence
+• 2) Security
+• 3) Reliability
+• 4) Performance Efficiency
+• 5) Cost Optimization
+• 6) Sustainability
+
+
+Trusted Advisor:
+• No need to install anything – high level AWS account assessment
+• Analyze your AWS accounts and provides recommendation
+• Core Checks and recommendations – all customers
+• Can enable weekly email notification from the console
+• Full Trusted Advisor – Available for Business & Enterprise support plans
+• Ability to set CloudWatch alarms when reaching limits
+• Programmatic Access using AWS Support API
+
+
+Trusted Advisor Checks Examples:
+• Cost Optimization: 
+	• low utilization EC2 instances, idle load balancers, under-utilized EBS volumes… 
+	• Reserved instances & savings plans optimizations, 
+• Performance: 
+	• High utilization EC2 instances, CloudFront CDN optimizations 
+	• EC2 to EBS throughput optimizations, Alias records recommendations 
+• Security: 
+	• MFA enabled on Root Account, IAM key rotation, exposed Access Keys 
+	• S3 Bucket Permissions for public access, security groups with unrestricted ports 
+• Fault Tolerance: 
+	• EBS snapshots age, Availability Zone Balance 
+	• ASG Multi-AZ, RDS Multi-AZ, ELB configuration… 
+• Service Limit
+
+
+
+Other Services: Cheat Sheet:
+------------------------------------------------------
+Here's a quick cheat-sheet to remember all these services:
+CodeCommit: service where you can store your code. Similar service is GitHub
+CodeBuild: build and testing service in your CICD pipelines
+CodeDeploy: deploy the packaged code onto EC2 and AWS Lambda
+CodePipeline: orchestrate the actions of your CICD pipelines (build stages, manual approvals, many deploys, etc)
+CloudFormation: Infrastructure as Code for AWS. Declarative way to manage, create and update resources.
+ECS (Elastic Container Service): Docker container management system on AWS. Helps with creating micro-services.
+ECR (Elastic Container Registry): Docker images repository on AWS. Docker Images can be pushed and pulled from there
+Step Functions: Orchestrate / Coordinate Lambda functions and ECS containers into a workflow
+SWF (Simple Workflow Service): Old way of orchestrating a big workflow.
+EMR (Elastic Map Reduce): Big Data / Hadoop / Spark clusters on AWS, deployed on EC2 for you
+Glue: ETL (Extract Transform Load) service on AWS
+OpsWorks: managed Chef & Puppet on AWS
+ElasticTranscoder: managed media (video, music) converter service into various optimized formats
+Organizations: hierarchy and centralized management of multiple AWS accounts
+Workspaces: Virtual Desktop on Demand in the Cloud. Replaces traditional on-premise VDI infrastructure
+AppSync: GraphQL as a service on AWS
+SSO (Single Sign On): One login managed by AWS to log in to various business SAML 2.0-compatible applications (office 365 etc)
+
+
+
+AWS CodeCommit is a secure, highly scalable, managed source control service that hosts private Git repositories. 
+It is an alternative to GitLab and GitHub.
+
+AWS CodePipeline is a fully managed continuous delivery (CD) service that helps you automate your release 
+pipeline for fast and reliable application and infrastructure updates. It automates the build, test, 
+and deploy phases of your release process every time there is a code change.
+
+AWS CodePipeline is a fully managed continuous delivery (CD) service that helps you automate your release 
+pipeline for fast and reliable application and infrastructure updates. It automates the build, test, and deploy phases of your release process every time there is a code change.
+
+
+CloudFormation StackSets allows you to create, update, or delete CloudFormation stacks across multiple 
+AWS accounts and AWS regions with a single operation.
+
+
+AWS ECS service allows you to manage a fleet of Docker containers in AWS Cloud and on-premises.
+
+AWS CodePipeline is a fully managed continuous delivery (CD) service that helps you automate your release 
+pipeline for fast and reliable application and infrastructure updates. It automates the build, test, and deploy phases of 
+your release process every time there is a code change. It has direct integration with Elastic Beanstalk.
+
+AWS CodeDeploy is a fully managed deployment service that automates software deployments to a variety of computing 
+services such as EC2, Fargate, Lambda, and your on-premises servers. You can define the strategy you want to execute 
+such as in-place or blue/green deployments.
+
+AWS Step Functions is a low-code visual workflow service used to orchestrate AWS services, automate business processes, 
+and build Serverless applications. It manages failures, retries, parallelization, service integrations,
+
+Amazon EMR is managed service that makes it fast, easy, and cost-effective to run Apache Hadoop and Spark to process 
+vast amounts of data.
+
+AWS Glue is a Serverless data-preparation service for extract, transform, and load (ETL) operations.
+Move data all around your AWS databases using a managed ETL service that has a metadata catalog feature
+
+AWS OpsWorks is a configuration management service that provides managed instances of Chef and Puppet.
+
+
+Amazon WorkSpaces is a fully managed, persistent desktop virtualization service that enables your 
+users to access data, applications, and resources they need, anywhere, anytime, from any supported device. 
+It can be used to provision either Windows or Linux desktops.
+
+
+AWS AppSync is a fully managed service that makes it easy to develop GraphQL APIs by handling the heavy lifting of 
+securely connecting to data sources like DynamoDB, Lambda, and more
+
+AWS Cost Explorer enables you to view and analyze your costs and usage. You can view data for up to the last 12 months, 
+forecast how much you are likely to spend for the next 12 months, and get recommendations for what EC2 reserved instances to purchase.
+
+
+
+The Lambda function's invocation is "asynchronous", so the DLQ has to be set on the Lambda function side.
 
 
 
@@ -4209,7 +4613,6 @@ Private Subnet
 =================================================
 #VPC | vpc | virtual private cloud                
 ================================================= 
-
 Vpc is a Virtual Network or DataCenter inside AWS for one Client.
 A VPC can span multiple availability zones in a region.
 The CIDR block for the default VPC is always a 16 subnet mask; in this example, it's 172.31.0.0/16. It means this VPC can provide up to 65,536 IP addresses.
@@ -4756,7 +5159,6 @@ VM image with AWS Storage Gateway software deployed on-premises or on EC2 instan
 =================================================
 # Edge locations             
 ================================================= 
-
 Edge locations are AWS data centers designed to deliver services with the lowest latency possible.
 Amazon has dozens of these data centers spread across the world. They’re closer to users than Regions or Availability Zones, 
 often in major cities, so responses can be fast and snappy. 
@@ -4777,7 +5179,6 @@ which filter traffic in edge locations to stop unwanted traffic as soon as possi
 =================================================
 #ElastiCache  | Elasti Cache      
 ================================================= 
-
 Amazon ElastiCache is a fully managed, in-memory caching service supporting flexible, real-time use cases. 
 You can use ElastiCache for caching, which accelerates application and database performance, 
 or as a primary data store for use cases that don't require durability like session stores, gaming leaderboards, 
@@ -4843,7 +5244,6 @@ geographical area, keeping their needs in the forefront.
 =================================================
 #AWS Global Accelerator (AMS SSPS)          
 ================================================= 
-
 Global Accelerator, your users' traffic is moved off the internet and onto Amazon’s private global network 
 through 90+ global edge locations, then directed to your application origins. 
 
@@ -4865,7 +5265,6 @@ such as Application Load Balancers, Network Load Balancers or EC2 instances.
 =================================================
 #Amazon FSx       
 ================================================= 
-
 Amazon FSx for Windows File Server provides a fully managed native Microsoft File System.
 You can use Microsoft Active Directory to authenticate into the file system.
 
@@ -4930,9 +5329,7 @@ FSx Lustre has the ability to store and retrieve data directly on S3 on its own.
 
 =================================================
 #SQS, SNS, MQ and Amazon Kinesis        
-================================================= 
-
-
+=================================================
 Anytime multiple services need to receive the same event, you should consider SNS rather than SQS.
 
 #AWS SQS
@@ -4999,7 +5396,6 @@ and start sending messages.
 =================================================
 #CloudWatch  | cloudWatch      
 ================================================= 
-
 Amazon CloudWatch is a monitoring and observability service built for DevOps engineers, developers, site reliability engineers (SREs), 
 IT managers, and product owners. 
 
@@ -5120,9 +5516,6 @@ Your data is ready for searching and querying
 
 
 
-
-
-
 #CloudTrail 
 --------------------------------------------------
 CloudTrail logs actions inside your AWS environment.CloudTrail has a feature called CloudTrail Insights.
@@ -5178,7 +5571,6 @@ Track events, API calls, changes made to your AWS resources:
 This helps you understand the configuration changes that happen in your environment. 
 This service provides an AWS inventory that includes configuration history, configuration change notification, 
 and relationships between AWS resources. It can also be configured to send information via AWS SNS when new logs are delivered.
-
 
 
 
@@ -5611,7 +6003,6 @@ AWS ParallelCluster is available at no additional charge, and you pay only for t
 =================================================
 #CloudFormation         
 =================================================
-
 AWS CloudFormation is an AWS service that uses template files to automate the setup of AWS resources.
 
 An AWS CloudFormation template is a formatted text file in JSON or YAML language that describes your AWS infrastructure. 
@@ -5678,9 +6069,6 @@ by automating time-consuming tasks like provisioning capacity and tuning cluster
 Hadoop, an open source framework, to distribute your data and processing across a resizable cluster of Amazon EC2 instances. 
 
 
-
-
-3
 #GraphQL:
 ------------------------------------------------
 GraphQL is a query language for APIs and a runtime for fulfilling those queries with your existing data. 
@@ -5695,8 +6083,6 @@ control the data they get, not the server.
 
 #AppSync
 -------------------------------------------------
-
-
 The fundamental idea of a GraphQL API is that all API functionality is available via a unified query language 
 (the Graph Query Language) under a single endpoint. Rather than making requests to various endpoints to get 
 different parts of the data needed to build a webpage, developers can issue a single request to a 
@@ -5727,7 +6113,6 @@ AWS AppSync Pub/Sub APIs make it easy to create engaging real-time experiences b
 =================================================
 #Elastic Beanstalk        
 ================================================= 
-
 AWS Elastic Beanstalk allows you to quickly deploy applications and services without having to worry about 
 configuring underlying resources, services, operating systems or web servers.
 
@@ -5765,7 +6150,6 @@ AWS Elastic Beanstalk is combined with the developer tools to help you manage th
 =================================================
 #Global Accelerator      
 ================================================= 
-
 Global Accelerator is a network layer service in which you create accelerators to improve availability and performance for internet applications used by a global audience. 
 
 
@@ -5883,7 +6267,6 @@ DevOps
 =================================================
 #DevOps | CI  |CD | cicd | DevOps - CI, CD Tools       
 ================================================= 
-
 Tools:
 -CodeCommit - Private source control (Git)
 -CodePipeline - Orchestrate CI/CD pipelines
@@ -5926,10 +6309,7 @@ Availability
 
 
 
-
-
 PAAS:
-
 PAAS (Platform as a Service)
 PAAS (Platform as a Service) is all about using a platform provided by cloud
 
@@ -5953,7 +6333,6 @@ FAAS (Function as a Service) or Serverless: Functions instead of Applications
 #Shared Responsibility Model         
 ================================================= 
 Security & Compliance is shared responsibility between AWS and customer
-
 
 
 Amazon EC2 instances is Infrastructure as a Service (IaaS).
@@ -6021,12 +6400,9 @@ Features:
 =================================================
 #Amazon Elastic Container Service (ECS)      
 ================================================= 
-
 Amazon Elastic Container Service (Amazon ECS) is a fully managed service for container orchestration.
 
-
 Amazon ECR is a Fully-managed Docker container registry provided by AWS. Its an alternative to Docker Hub.
-
 
 
 AWS Fargate is a serverless option.
@@ -6070,7 +6446,6 @@ Recommended if you are already using Kubernetes and would want to move the workl
 #ML | machine-learning
 ================================================= 
 
-
 #SageMaker
 -------------------------------------------------
 Amazon SageMaker is a cloud-based machine-learning platform that helps users create, design, train, tune, and deploy machine-learning models in a production-ready hosted environment. The AWS SageMaker comes with a pool of advantages (know all about it in the next section)
@@ -6082,6 +6457,18 @@ Amazon SageMaker is a cloud-based machine-learning platform that helps users cre
 ================================================= 
 Amazon EC2 Auto Scaling FAQs:
 ================================================= 
+1)Q. Is there a limit on how large or small a subnet can be?\
+The minimum size of a subnet is a /28 (or 14 IP addresses.) for IPv4. Subnets cannot be larger than the VPC in which they are created.
+For IPv6, the subnet size is fixed to be a /64. Only one IPv6 CIDR block can be allocated to a subnet.
+
+2)Q. How large of a VPC can I create?
+Currently, Amazon VPC supports five (5) IP address ranges, one (1) primary and four (4) secondary for IPv4. 
+Each of these ranges can be between /28 (in CIDR notation) and /16 in size. The IP address ranges of your 
+VPC should not overlap with the IP address ranges of your existing network.
+For IPv6, the VPC is a fixed size of /56 (in CIDR notation). A VPC can have both IPv4 and IPv6 CIDR blocks associated to it.
+
+
+
 
 
 21) How is AWS CloudFormation different from AWS Elastic Beanstalk?
@@ -7324,6 +7711,12 @@ resources in a private subnet to access the Internet.
 
 -VPC Endpoints: Enables private connectivity to services hosted in AWS, from within your 
 VPC without using an Internet Gateway, VPN, Network Address Translation (NAT) devices, or firewall proxies.
+
+A VPC endpoint allows you to privately connect to other services in AWS. These endpoints include gateway endpoints, 
+interface endpoints, and load balancer endpoints.
+AWS VPC endpoints allow you to connect to S3 (for instance) from your network without the use of the 
+internet (internet gateway, NAT gateway).
+
 
 -Egress-only Internet Gateway: A stateful gateway to provide egress only access for IPv6 traffic from the VPC to the Internet.
 
