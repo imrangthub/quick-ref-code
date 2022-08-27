@@ -128,6 +128,7 @@ HandsOnRemain
 =>sudo chmod 777 -R destinationFolder/*
 Allow ec2 file permission
 
+01707445564
 
 =>/mnt/efs/fs1
 MetadataURL is http://169.254.169.254/latest/meta-data
@@ -194,6 +195,9 @@ Global Service.
 
 UseCase:
 ========
+You can grant other people permission to administer and use resources in your AWS account without having to share 
+your password or access key.
+
 BillCost:
 =========
 IAM is offered at no additional charge.
@@ -215,6 +219,10 @@ Global Service.
 
 UseCase:
 ========
+A user group is a way to attach policies to multiple users at one time. 
+When you attach an identity-based policy to a user group, all of the users in the user group receive the permissions from the user group.
+
+
 BillCost:
 =========
 IAM is offered at no additional charge.
@@ -244,6 +252,12 @@ Global Service.
 
 UseCase:
 ========
+You manage access in AWS by creating policies and attaching them to AWS Identity and Access Management 
+(IAM) principals (roles, users, or groups of users) or AWS resources. 
+AWS evaluates these policies when an IAM principal makes a request, such as uploading an object to an 
+Amazon Simple Storage Service (Amazon S3) bucket. Permissions in the policies determine whether the request is allowed or denied.
+
+
 
 BillCost:
 =========
@@ -266,6 +280,11 @@ Global Service.
 
 UseCase:
 ========
+1)Giving permissions to non-humans, such as services / applications.
+Ex. EC2 of  needs access to S3.
+
+2)Giving permissions to federated / outside users & groups.
+You can't assign role to user.
 
 BillCost:
 =========
@@ -276,11 +295,13 @@ Security:
 NonOffcial:Manage by AWS.
 
 
+
+
+
 ##IAM Security Tools
 -------------------------------------------------
 Area:
 =====
-
 UseCase:
 ========
 BillCost:
@@ -292,190 +313,472 @@ Security:
 
 ##MFA
 -------------------------------------------------
+MFA enabled, when a user signs in to an AWS Management Console, they will be prompted for their user 
+name and password (the first factor—what they know), as well as for an authentication code from their 
+AWS MFA device (the second factor—what they have).
+
 Area:
 =====
+Global Service.
+
 UseCase:
 ========
+Multi-Factor Authentication.
+
 BillCost:
 =========
+IAM is offered at no additional charge.
+
 Security:
 =========
+NonOffcial:Manage by AWS.
 
 
 
 ##AWS|AccessKeys|CLI|SDK
 -------------------------------------------------
+AccessKey:Access keys consist of an access key ID and secret access key, which are used to sign programmatic 
+requests that you make to AWS. 
+
+Programmatic access:
+You must provide your AWS access keys to make programmatic calls to AWS or to use the 
+AWS Command Line Interface or AWS Tools for PowerShell.
+
+AWS SDK (software development kit) helps simplify your coding by providing objects for AWS services. 
+It allows developers to access AWS from the code that runs, and it includes access to 
+AWS components like Amazon S3, Amazon SNS, Amazon SQS, DynamoDB, and more
+
+
 Area:
 =====
+IAM, Gloabl.
 
 UseCase:
 ========
+User/Object access.
+
 BillCost:
 =========
+No additional charge.
+
 Security:
 =========
+NonOffcial:Manage by AWS.
 
 
 
-##SloudShell
+
+##CloudShell
 -------------------------------------------------
+AWS CloudShell is a browser-based shell that makes it easy to securely manage, explore, and interact with your AWS resources. 
+CloudShell is pre-authenticated with your console credentials.
+Common development and operations tools are pre-installed, so no local installation or configuration is required.
+
 Area:
 =====
+Global Service.
+
 UseCase:
 ========
+CloudShell, you can quickly run scripts with the AWS Command Line Interface (AWS CLI).
+
 BillCost:
 =========
+No additional charge.
+
 Security:
 =========
+NonOffcial:Manage by AWS.
 
 
 
 
 ##EC2
 -------------------------------------------------
+Amazon Elastic Compute Cloud (Amazon EC2) provides scalable computing capacity in the Amazon Web Services (AWS) Cloud. 
+Virtual computing environments, known as instances.
+AWS has a limit of 20 instances per region. 
+
+TypeOfEC2:
+General purpose
+Compute optimized
+Memory-optimized
+Accelerated Computing
+Storage optimized
+
 Area:
 =====
+Amazon EC2 instance is a Regional resource.
+
 UseCase:
 ========
+Auto-scaling, Pay-as-you-go, Increased Reliability, Elasticity.
+Run cloud-native and enterprise applications.
+Scale for HPC applications, Access the on-demand infrastructure and capacity you need to run HPC applications.
+Develop for Apple platforms.
+Train and deploy ML applications
+
 BillCost:
 =========
+EC2 in FreeTier, 750 hours per month for 12 months with the AWS Free Tier.
+Stopped EC2 instances do not incur any charges. 
+
+Regular Purchasing options for instances:
+On-Demand Instances:
+Pay for the instances that you use by the second, with a minimum of 60 seconds, with no long-term commitments or upfront payments.
+
+Savings Plans:
+You can reduce your Amazon EC2 costs by making a commitment to a consistent amount of usage, in USD per hour, for a term of 1 or 3 years.
+
+Reserved Instances:
+You can reduce your Amazon EC2 costs by making a commitment to a specific instance configuration, including instance type and Region, for a term of 1 or 3 years.
+
+Spot Instances:
+Request unused EC2 instances, which can reduce your Amazon EC2 costs significantly.
+
+You can also pay for Dedicated Hosts.
+
 Security:
 =========
+Security is a shared responsibility between AWS and you:
+Security of the cloud – AWS is responsible for protecting the infrastructure that runs AWS services in the AWS Cloud. AWS also provides you with services that you can use securely. 
+
+Security in the cloud – Your responsibility includes the following areas:
+Controlling network access to your instances, for example, through configuring your VPC and security groups. 
+Managing the credentials used to connect to your instances.
+Managing the guest operating system and software deployed to the guest operating system, including updates and security patches.
+Configuring the IAM roles that are attached to the instance and the permissions associated with those roles. 
 
 
-##Security Group | Classic Ports
+
+
+##Security Group
 -------------------------------------------------
+Security groups are stateful,You can specify allow rules, but not deny rules.
+An AWS security group acts as a virtual firewall for your EC2 instances to control incoming and outgoing traffic.
+You can specify one or more security groups for each EC2 instance, with a maximum of five per network interface. 
+
 Area:
 =====
+AWS Security Groups are region specific and VPC specific. This means that if we create a security group in one region or VPC, 
+we can only use it in that same region or VPC.
+
 UseCase:
 ========
+In AWS VPCs, AWS Security Groups act as virtual firewalls,Control traffic to resources using security groups.
+
 BillCost:
 =========
+There is no charge applicable to Security Groups in Amazon EC2 / Amazon VPC. 
+
 Security:
 =========
+NonOffcial:Manage by AWS.
+
+
 
 
 ##EC2 Instance Role
 -------------------------------------------------
-Area:
-=====
-UseCase:
-========
-BillCost:
-=========
-Security:
-=========
+When you launch an Amazon EC2 instance, you specify an IAM role to associate with the instance to securely access aws Resources.
+
+
 
 
 ##Elastic IP | PublicVsPrivate
 -------------------------------------------------
+An Elastic IP address is a static (doesn't change) IPv4 address associated with your AWS account. 
+It is also public, meaning the IP address is uniquely reachable across the internet.
+
+WS accounts are limited to five (5) Elastic IP addresses per Region.
+
+PublicVsPrivate:
+A private IPv4 address is an IP address that's not reachable over the Internet. 
+You can use private IPv4 addresses for communication between instances in the same VPC.
+
+A public IP address is an IPv4 address that's reachable from the Internet. 
+You can use public addresses for communication between your instances and the Internet.
+
 Area:
 =====
+An Elastic IP address is for use in a specific Region only, and cannot be moved to a different Region.
+
 UseCase:
 ========
+You can mask the failure of an instance or software by rapidly remapping the address to another instance in your account. 
+Alternatively, you can specify the Elastic IP address in a DNS record for your domain, so that your domain points to your instance.
+ 
 BillCost:
 =========
+To ensure efficient use of Elastic IP addresses, we impose a small hourly charge if an Elastic IP address is 
+not associated with a running instance, or if it is associated with a stopped instance or an unattached network interface. 
+While your instance is running, you are not charged for one Elastic IP address associated with the instance, 
+but you are charged for any additional Elastic IP addresses associated with the instance.
+
 Security:
 =========
-
+NonOffcial:Manage by AWS.
 
 
 
 ##EC2 Placement Group
 -------------------------------------------------
+Placement Groups are logical groupings or clusters of instances in the selected AWS region. 
+Placement groups are specifically used for launching cluster compute instance types.
+
+Placement type:
+Cluster – packs instances close together inside an Availability Zone. This strategy enables workloads to achieve the low-latency 
+network performance necessary for tightly-coupled node-to-node communication that is typical of HPC applications.
+
+Partition – spreads your instances across logical partitions such that groups of instances in one 
+partition do not share the underlying hardware with groups of instances in different partitions. 
+It spreads the instances across many different partitions within an AZ.
+This strategy is typically used by large distributed and replicated workloads, such as Hadoop, Cassandra, and Kafka.
+
+Spread – strictly places a small group of instances across distinct underlying hardware to reduce correlated failures.
+It spread the instances across underlying hardware.
+
 Area:
 =====
 UseCase:
 ========
 BillCost:
 =========
+There is no charge for creating a placement group.
+
 Security:
 =========
+NonOffcial:Manage by AWS.
+
+
 
 
 ##ENI (Elastic Network Interfaces)
 -------------------------------------------------
+AWS Network Interface or Elastic Network Interfaces (ENIs) are virtual network cards attached to EC2 
+instances that help facilitate network connectivity for instances. 
+Having two or more of them connected to an instance permits it to communicate on two separate subnets.
+
+Attaching a secondary network interface allows you to connect your EC2 instance to two networks at once.
+
+Has the following attributes:
+Description
+Private IP Address
+Elastic IP Address
+MAC Address
+Security Group(s)
+Source/Destination Check Flag
+Delete on Termination Flag
+
 Area:
 =====
+Each ENI lives within a particular subnet of the VPC (and hence within a particular Availability Zone.
+
 UseCase:
 ========
+A common use case for ENIs is the creation of management networks. 
+This allows you to have public-facing applications like web servers in a public subnet but lock down 
+SSH access down to a private subnet on a secondary network interface.
+
 BillCost:
 =========
+ENIs are entirely free to use, though they are not exempt from the standard AWS data charges.
+
 Security:
 =========
+ENIs have security groups, just like EC2 instances, which act as a built in firewall.
+
 
 
 
 ##EC2 Hibernate
 -------------------------------------------------
+Hibernation gives you the ability to launch EC2 instances, set them up as desired, hibernate them, and then quickly 
+bring them back to life when you need them. Applications pick up exactly where they left off instead of rebuilding their memory footprint. 
+
+Hibernation saves the contents from the instance memory (RAM) to your Amazon Elastic Block Store (Amazon EBS) root volume.
+
 Area:
 =====
+Some of region not all.
+
 UseCase:
 ========
 BillCost:
 =========
+While the instance is in hibernation, you pay only for the EBS storage and any Elastic IP addresses attached to the instance.
+
 Security:
 =========
+NonOffcial:Manage by AWS.
+
 
 
 ##EBS
 -------------------------------------------------
+AWS Elastic Block Store (EBS) is Amazon’s block-level storage solution used with the EC2 cloud service to store persistent data. 
+This means that the data is kept on the AWS EBS servers even when the EC2 instances are shut down. 
+
+
 Area:
 =====
+EBS volume in a specific Availability Zone
+
 UseCase:
 ========
+Run relational or NoSQL databases
+Migrate mid-range, on-premises storage area network (SAN) workloads to the cloud.
+
+
 BillCost:
 =========
+30 GB of storage for 12 months with the AWS Free Tier
+With Amazon Elastic Block Store (EBS), you pay only for what you provision. 
+Volume storage for all EBS volume types is charged by the amount of GB you provision per month until you release the storage. 
+Costs increase for EBS volumes that support additional input/output operations per second (IOPS) and throughput beyond baseline performance.
+
 Security:
 =========
+Ensure EBS volumes are encrypted with KMS CMKs in order to have full control over data encryption and decryption.
+
+Use Amazon EBS encryption as a straight-forward encryption solution for your EBS resources associated with your EC2 instances. 
+With Amazon EBS encryption, you aren't required to build, maintain, and secure your own key management infrastructure. 
+Amazon EBS encryption uses AWS KMS keys when creating encrypted volumes and snapshots.
+
+Encrypted Volumes and snapshots  with CMK
+
+
+
 
 
 ##EFS
 -------------------------------------------------
+Amazon EFS provides a simple, serverless, set-and-forget elastic file system. With Amazon EFS, you can create a file system, 
+mount the file system on an Amazon EC2 instance, and then read and write data to and from your file system.
+
+Amazon EFS offers four storage classes: two standard storage classes, including Amazon EFS Standard and 
+Amazon EFS Standard-Infrequent Access (EFS Standard-IA), and two One Zone storage classes, including Amazon EFS 
+One Zone and Amazon EFS One Zone-Infrequent Access (EFS One Zone-IA).
+
+
 Area:
 =====
+Amazon EFS is a regional service storing data within and across multiple Availability Zones (AZs) for high availability and durability.
+ 
 UseCase:
 ========
+Share code and other files in a secure, organized way to increase DevOps agility and respond faster to customer feedback.
+Persist and share data from your AWS containers and serverless applications with zero
+management required.
+
+
 BillCost:
 =========
+5 GB of standard storage for 12 months with the AWS Free Tier
+EFS serverless, set-and-forget, elastic file system. There is no minimum fee or setup charge. 
+You pay only for the storage you use, for read and write access to data stored in Infrequent Access storage classes, 
+and for any provisioned throughput.
+
 Security:
 =========
-
+The AWS shared responsibility model applies to data protection in Amazon Elastic File System.
+When using Amazon EFS, you specify Amazon EC2 security groups for your EC2 instances and security groups for the 
+EFS mount targets associated with the file system.
 
 
 
 ##ELB (Elastic Load Balancer) 
 -------------------------------------------------
+Elastic Load Balancing automatically distributes your incoming traffic across multiple targets, such as 
+EC2 instances, containers, and IP addresses, in one or more Availability Zones. 
+It monitors the health of its registered targets, and routes traffic only to the healthy targets. 
+Elastic Load Balancing scales your load balancer capacity automatically in response to changes in incoming traffic.
+
+Elastic Load Balancing supports the following load balancers: 
+Application Load Balancers, 
+Network Load Balancers, 
+Gateway Load Balancers, and Classic Load Balancers.
+
 Area:
 =====
+ELB is one of many AWS services that have a regional scope, it does not allow you to distribute traffic to another region
+
 UseCase:
 ========
+A load balancer distributes workloads across multiple compute resources, such as virtual servers. 
+Using a load balancer increases the availability and fault tolerance of your applications.
+
 BillCost:
 =========
+Get started with Elastic Load Balancing for free with the AWS Free Tier. Upon sign-up, new 
+AWS customers receive 750 hours per month shared between Classic and Application load balancers; 
+15 GB of data processing for Classic load balancers; and 15 LCUs for Application Load Balancers.
+
+ELB pricing also follows an AWS rule: “You only pay for what you use with your setup.” 
+To properly bill you for your ELB usage, AWS has introduced a component called the Load Balancer Capacity Unit (LCU), 
+which is an integral part of your billing calculation, along with the region you host your infrastructure.
+
+
+
 Security:
 =========
+Ensure your ELBs do not use insecure or deprecated SSL ciphers.
+Ensure that your AWS ELBs listeners are using a secure protocol (HTTPS or SSL).
+Ensure there are valid security groups associated with your Elastic Load Balancer.
+Ensure that your AWS Elastic Load Balancers use access logging to analyze traffic patterns and identify and troubleshoot security issues.
+
+
+
+
+
 
 
 ##CLB (Classic Load Balancer)
 -------------------------------------------------
+The AWS Classic Load Balancer (CLB) operates at Layer 4 of the OSI model. 
+What this means is that the load balancer routes traffic between clients and backend servers based on IP address and TCP port. 
+For example, an ELB at a given IP address receives a request from a client on TCP port 80 (HTTP).
+
 Area:
 =====
 UseCase:
 ========
 BillCost:
 =========
+You are charged for each hour or partial hour that a 
+Classic Load Balancer is running and for each GB of data transferred through your load balancer.
 Security:
 =========
 
 
 ##ALB (Application Load Balancer)
 -------------------------------------------------
+An Application Load Balancer (ALB) only works at layer 7 (HTTP).
+An Application Load Balancer functions at the application layer, the seventh layer of the Open Systems Interconnection (OSI) model. 
+
+A listener checks for connection requests from clients, using the protocol and port that you configure. 
+The rules that you define for a listener determine how the load balancer routes requests to its registered targets. 
+Each rule consists of a priority, one or more actions, and one or more conditions. 
+When the conditions for a rule are met, then its actions are performed. 
+You must define a default rule for each listener, and you can optionally define additional rules.
+
+
 Area:
 =====
 UseCase:
 ========
+IP address registration as targets
+Path-based/host-based routing
+Calling Lambda functions to serve HTTP(S) requests
+AWS WAF load balancer
+SNI
+Enhanced containers via load balancing between multiple ports of a single instance
+
 BillCost:
 =========
+You are charged for each hour or partial hour that an Application Load Balancer is running, 
+and the number of Load Balancer Capacity Units (LCU) used per hour.
+
 Security:
 =========
 
@@ -483,24 +786,56 @@ Security:
 
 ##NLB (Network Load Balancer)
 -------------------------------------------------
+You can load balance both TCP and UDP traffic, routing connections to targets - Amazon EC2 instances, microservices, and containers.
+Network Load Balancer operates at the connection level (Layer 4), routing connections to 
+targets (Amazon EC2 instances, microservices, and containers) within Amazon VPC, based on IP protocol data. 
+
+
 Area:
 =====
 UseCase:
 ========
+This type of load balancer works at the transport layer(TCP/SSL) of the OSI model. 
+It’s capable of handling millions of requests per second.  It is mainly used for load balancing TCP traffic.
+
 BillCost:
 =========
+You are charged for each hour or partial hour that a Network Load Balancer is running, and the number of 
+Network Load Balancer Capacity Units (NLCU) used by Network Load Balancer per hour.
+
 Security:
 =========
+Network Load Balancers do not have security groups.
 
 
 ##GWLB (Gateway Load Balaner)
 -------------------------------------------------
+Gateway Load Balancer helps deploy, scale, and manage virtual appliances, such as firewalls, intrusion detection and 
+prevention systems (IDS/IPS), and deep packet inspection systems.
+
+operates at Layer 3 of the OSI model, the network layer.
+
 Area:
 =====
+Runs within one AZ and is recommended to be deployed in multiple AZs for greater availability.
+
 UseCase:
 ========
+Deploy third-party virtual appliances faster.
+Scale virtual appliances while managing costs.
+Improve virtual appliance availability.
+Centralize your third-party virtual appliances
+Add third-party security appliances to your network
+Integration with orchestration and deployment tools.
+Gateway Load Balancers provides you the facility to deploy, scale, and manage virtual appliances like firewall. Gateway Load Balancers combines a transparent network gateway and then distributes the traffic.
+
 BillCost:
 =========
+You are charged for each hour or partial hour that a Gateway Load Balancer is running, and the number of 
+Gateway Load Balancer Capacity Units (GLCU) used by Gateway Load Balancer per hour. 
+Gateway Load Balancer uses Gateway Load Balancer Endpoint (GWLBE),GWLBE is priced and billed separately.
+You pay charges for inter-AZ data transfer if enabled.
+
 Security:
 =========
 
@@ -509,28 +844,56 @@ Security:
 
 ##ASG (Auto Scaling Group)
 -------------------------------------------------
+AWS Auto Scaling monitors your applications and automatically adjusts capacity to maintain steady, 
+predictable performance at the lowest possible cost. Using AWS Auto Scaling, it’s easy to setup application scaling for 
+multiple resources across multiple services in minutes.
+
+Use predictive scaling:
+You can also combine predictive scaling and dynamic scaling (proactive and reactive approaches, respectively) to scale your EC2 capacity faster.
+
+
+
+Scaling Policy: 
+Manual scaling:
+At any time, you can change the size of an existing Auto Scaling group manually. 
+You can either update the desired capacity of the Auto Scaling group, or update the instances that are attached to the Auto Scaling group
+
+Dynamic scaling:
+Dynamic scaling scales the capacity of your Auto Scaling group as traffic changes occur.
+
+Target tracking scaling—Increase and decrease the current capacity of the group based on a Amazon CloudWatch metric and a target value. It works similar to the way that your thermostat 
+maintains the temperature of your home—you select a temperature and the thermostat does the rest.
+
+Step scaling—Increase and decrease the current capacity of the group based on a set of scaling adjustments, 
+known as step adjustments, that vary based on the size of the alarm breach.
+
+Simple scaling—Increase and decrease the current capacity of the group based on a single scaling adjustment, 
+with a cooldown period between each scaling activity.
+
+
+
 Area:
 =====
+An Auto Scaling group can contain EC2 instances in one or more Availability Zones within the same Region.
+
 UseCase:
 ========
+SETUP SCALING QUICKLY
+AUTOMATICALLY MAINTAIN PERFORMANCE
+PAY ONLY FOR WHAT YOU NEED
+IMPROVE FAULT TOLERANC
+
 BillCost:
 =========
+There are no additional fees with Amazon EC2 Auto Scaling.
+
 Security:
 =========
 
 
 
 
-##ASG Scaling Policy 
--------------------------------------------------
-Area:
-=====
-UseCase:
-========
-BillCost:
-=========
-Security:
-=========
+
 
 
 
@@ -538,14 +901,49 @@ Security:
 
 ##RDS
 -------------------------------------------------
+Amazon provides AWS RDS SQL Server as a managed relational database service. You can deploy databases instantly without 
+worrying about underlying hardware platform, license cost, managing data centers. AWS RDS database instances are highly available. 
+It provides a failover mechanism using the Mult-AZ deployments.
+
+Amazon Relational Database Service (Amazon RDS) is a collection of managed services that makes it simple to set up, operate, and scale 
+databases in the cloud. Choose from seven popular engines — Amazon Aurora with MySQL compatibility, 
+Amazon Aurora with PostgreSQL compatibility, MySQL, MariaDB, PostgreSQL, Oracle, and 
+SQL Server — and deploy on-premises with Amazon RDS on AWS Outposts.
+
+
 Area:
 =====
+Amazon RDS for SQL Server provides a Multi-AZ deployment, which replicates data synchronously across AZs.
+By default, the Multi-AZ feature is not enabled for the RDS instance.
+
 UseCase:
 ========
+Build web and mobile applications.
+Move to managed databases.
+
 BillCost:
 =========
+AWS Free Tier with Amazon RDS
+When you use Amazon RDS, you can choose to use on-demand DB instances or reserved DB instances.
+
+It is comprised of 3 parts:
+DB instance hours (per hour) . You can choose from different types of hosting depending on your need
+Storage (per GiB per month),I/O requests (per 1 million requests per month): Storage and Operations. 
+Storage is billed per gigabyte per month, and I/O is billed per million-request.
+Provisioned IOPS (per IOPS per month) 
+Backup storage (per GiB per month) –
+
+Data transfer (per GB) – Data transfer in and out of your DB instance from or to the internet and other Amazon Regions.
+
+
+
 Security:
 =========
+A security group controls the access to a DB instance. It does so by allowing access to IP address ranges or 
+Amazon EC2 instances that you specify.
+Use AWS Identity and Access Management (IAM) accounts to control access to Amazon RDS API operations, 
+especially operations that create, modify, or delete Amazon RDS resources.
+
 
 
 
@@ -553,46 +951,153 @@ Security:
 
 ##Amazon Aurora
 -------------------------------------------------
+Amazon Aurora Global Database is designed for globally distributed applications, allowing a single 
+Amazon Aurora database to span multiple AWS Regions.
+
+Amazon Aurora is a MySQL and PostgreSQL compatible relational database which is built for the cloud for providing 
+simplicity and cost-effectiveness of open-source databases with the availability and performance of traditional enterprise databases.
+
+5 times faster than standard MySQL
+3 times faster than standard PostgreSQL
+
 Area:
 =====
+Amazon Aurora Global Database is designed for globally distributed applications, allowing a single 
+Amazon Aurora database to span multiple AWS Regions. It replicates your data with no impact on database performance, 
+enables fast local reads with low latency in each Region, and provides disaster recovery from Region-wide outages.
+
+
 UseCase:
 ========
+
 BillCost:
 =========
+Prices vary according to the region.
+With Amazon Aurora Global Database, you pay for replicated write I/Os between the primary Region and each secondary Region.
+
 Security:
 =========
+Security is a shared responsibility between AWS and you.
 
 
-##ElasticCache
+
+##Elasticache
 -------------------------------------------------
+Amazon ElastiCache is a web service that makes it easy to deploy, operate, and scale an in-memory data store or cache in the cloud.
+Amazon ElastiCache is a fully managed in-memory data store and cache service by Amazon Web Services (AWS). 
+
+
+ElastiCache supports two open-source in-memory caching engines: Memcached and Redis.
+
+
 Area:
 =====
+Amazon ElastiCache is available in multiple AWS Regions. This means that you can launch ElastiCache clusters in 
+locations that meet your requirements.
+The new Global Datastore feature is available with Amazon ElastiCache for Redis 5.0. 6 or above, and is supported on M5 and R5 nodes
+
 UseCase:
 ========
+Accelerate application performance.
+Ease backend database load.
+Build low-latency data stores.
+Primary data store for use cases that don't require durability like session stores, gaming leaderboards, streaming, and analytics
+
+
 BillCost:
 =========
+750 hours free For 12 months with the AWS Free Tier.
+You are charged hourly based on the number of nodes, node type, and pricing model you select. 
+ElastiCache supports both on-demand nodes, which allow you to pay by hour with no long-term commitments, and reserved nodes, 
+which offer discounts for customers who commit to either one-year or three-year terms.
+
+
 Security:
 =========
+A security group controls the access to a cluster. It does so by allowing access to IP address ranges or 
+Amazon EC2 instances that you specify. 
+
 
 
 
 
 ##Route53
 -------------------------------------------------
+Amazon Route 53 is a highly available and scalable Domain Name System (DNS) web service. 
+Route 53 connects user requests to internet applications running on AWS or on-premises.
+
+Amazon Route 53 supports both forward (AAAA) and reverse (PTR) IPv6 records. 
+
+
+Routing Policies:
+Simple routing policy — Use for a single resource that performs a given function for your domain, for example, a web server that serves content for the example.com website.
+Weighted routing policy — Use to route traffic to multiple resources in proportions that you specify.
+Latency routing policy — Use when you have resources in multiple AWS Regions and you want to route traffic to the region that provides the best latency.
+Failover routing policy — Use when you want to configure active-passive failover.
+Geolocation routing policy — Use when you want to route traffic based on the location of your users.
+Geoproximity routing policy — Use when you want to route traffic based on the location of your resources and, optionally, shift traffic from resources in one location to resources in another.
+Multivalue answer routing policy — Use when you want Route 53 to respond to DNS queries with up to eight healthy records selected at random.
+
+Supported DNS record types:
+A
+AAAA
+CAA
+CNAME
+MX
+NAPTR
+NS
+PTR
+SOA
+SPF
+SRV
+TXT
+
+
+
+
 Area:
 =====
+Route 53 is primarily a global service, but the following features support AWS Regions:
+If you're using Route 53 Resolver to set up hybrid configurations, you create endpoints in AWS Regions that you choose, 
+and you specify IP addresses in multiple Availability Zones. For outbound endpoints, 
+you create rules in the same Region where you created the endpoint.
+
 UseCase:
 ========
+Create, visualize, and scale complex routing relationships between records and policies with easy-to-use global DNS features.
+Set routing policies to pre-determine and automate responses in case of failure, like redirecting traffic to alternative 
+Availability Zones or Regions.
+Assign and access custom domain names in your Amazon Virtual Private Cloud (VPC).
+
+
 BillCost:
 =========
+Managing hosted zones: You pay a monthly charge for each hosted zone managed with Route 53.
+Managing domain names: You pay an annual charge for each domain name registered via or transferred into Route 53.
+Serving DNS queries: You incur charges for every DNS query answered by the Amazon Route 53 service, except for queries to Alias A records.
+
+
 Security:
 =========
+AWS Shield Standard automatically protects your Amazon Route 53 Hosted Zones from infrastructure layer DDoS attacks at no additional cost.
+
+You can protect your domain from this type of attack, known as DNS spoofing or a man-in-the-middle attack, 
+by configuring Domain Name System Security Extensions (DNSSEC), a protocol for securing DNS traffic. 
+Amazon Route 53 supports DNSSEC signing as well as DNSSEC for domain registration.
+
 
 
 
 
 ##Route53-TTL
 -------------------------------------------------
+The amount of time, in seconds, that you want DNS recursive resolvers to cache information about this record.
+
+
+The time for which a DNS resolver caches a response is set by a value called the time to live (TTL) 
+associated with every record. Amazon Route 53 does not have a default TTL for any record type.
+
+
 Area:
 =====
 UseCase:
@@ -608,6 +1113,9 @@ Security:
 
 ##Route53 CNAME
 -------------------------------------------------
+A CNAME record maps DNS queries for the name of the current record, such as acme.example.com, 
+to another domain (example.com or example.net) or subdomain (acme.example.com or zenith.example.org).
+
 Area:
 =====
 UseCase:
@@ -618,18 +1126,6 @@ Security:
 =========
 
 
-
-
-##Route53 Route Policy
--------------------------------------------------
-Area:
-=====
-UseCase:
-========
-BillCost:
-=========
-Security:
-=========
 
 
 ##Route53 - Health Check
