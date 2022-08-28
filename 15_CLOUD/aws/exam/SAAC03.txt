@@ -1260,6 +1260,7 @@ BillCost:
 =========
 Security:
 =========
+Security is a shared responsibility.
 
 
 
@@ -1281,6 +1282,7 @@ BillCost:
 =========
 Security:
 =========
+Security is a shared responsibility.
 
 
 ##EC2 Instance Metadata
@@ -1296,6 +1298,7 @@ BillCost:
 =========
 Security:
 =========
+Security is a shared responsibility.
 
 
 
@@ -1320,6 +1323,7 @@ BillCost:
 =========
 Security:
 =========
+Security is a shared responsibility.
 
 
 
@@ -1346,6 +1350,7 @@ There is no extra charge for enabling server access logging on an Amazon S3 buck
 
 Security:
 =========
+Security is a shared responsibility.
 
 
 
@@ -1375,6 +1380,7 @@ BillCost:
 =========
 Security:
 =========
+Security is a shared responsibility.
 
 
 
@@ -1396,6 +1402,7 @@ BillCost:
 =========
 Security:
 =========
+Security is a shared responsibility.
 
 
 
@@ -1420,6 +1427,7 @@ BillCost:
 =========
 Security:
 =========
+Security is a shared responsibility.
 
 
 
@@ -1443,6 +1451,7 @@ BillCost:
 =========
 Security:
 =========
+Security is a shared responsibility.
 
 
 
@@ -1459,12 +1468,14 @@ Storage class analysis only provides recommendations for Standard to Standard IA
 
 Area:
 =====
+Global but Data is Regional.
 UseCase:
 ========
 BillCost:
 =========
 Security:
 =========
+Security is a shared responsibility.
 
 
 
@@ -1474,67 +1485,129 @@ Security:
 -------------------------------------------------
 Area:
 =====
+Global but Data is Regional.
 UseCase:
 ========
 BillCost:
 =========
 Security:
 =========
+Security is a shared responsibility.
 
 
 
 
 ##S3 Select & Glacier Select
 -------------------------------------------------
+Use S3 Select to retrieve specific data from object contents and Glacier Select to run queries on data stored in Amazon Glacier. 
+With Amazon S3 Select and Glacier S3, you can easily retrieve only a subset of data from an object by using simple SQL expressions.
+
+
+With Amazon S3 Select, you can use simple structured query language (SQL) statements to filter the contents of an 
+Amazon S3 object and retrieve just the subset of data that you need. 
+By using Amazon S3 Select to filter this data, you can reduce the amount of data that 
+Amazon S3 transfers, which reduces the cost and latency to retrieve this data.
+
+With S3 Glacier Select, you can perform filtering operations using simple 
+Structured Query Language (SQL) statements directly on your data in S3 Glacier.
+
+
+
 Area:
 =====
+Global but Data is Regional.
+
 UseCase:
 ========
 BillCost:
 =========
 Security:
 =========
+Security is a shared responsibility.
 
 
 
 ##S3 Event Nofifications
 -------------------------------------------------
+You can use the Amazon S3 Event Notifications feature to receive notifications when certain events happen in your S3 bucket. 
+To enable notifications, add a notification configuration that identifies the events that you want Amazon S3 to publish. 
+Make sure that it also identifies the destinations where you want Amazon S3 to send the notifications. 
+
+You store this configuration in the notification subresource that's associated with a bucket
+
+
 Area:
 =====
+Global but Data is Regional.
 UseCase:
 ========
+Amazon S3 supports For Event:Amazon SNS, Amazon SQS, Lambda.
+
+
+
 BillCost:
 =========
 Security:
 =========
+Security is a shared responsibility.
 
 
 
 
-##S3 Reqeust pays
+##S3 Requester pays
 -------------------------------------------------
+In general, bucket owners pay for all Amazon S3 storage and data transfer costs that are associated with their bucket. 
+However, you can configure a bucket to be a Requester Pays bucket. With Requester Pays buckets, 
+the requester instead of the bucket owner pays the cost of the request and the data download from the bucket. 
+The bucket owner always pays the cost of storing data.
+
+
+If you enable Requester Pays on a bucket, anonymous access to that bucket is not allowed.
+
+
 Area:
 =====
+Global but Data is Regional.
+
+
 UseCase:
 ========
+Typically, you configure buckets to be Requester Pays buckets when you want to share data but not incur 
+charges associated with others accessing the data. 
+
 BillCost:
 =========
 Security:
 =========
+Security is a shared responsibility.
 
 
 
 
 ##Athena
 -------------------------------------------------
+Amazon Athena is an interactive query service that makes it easy to analyze data in Amazon S3 using standard SQL. 
+Athena is serverless, so there is no infrastructure to manage, and you pay only for the queries that you run.
+
+
 Area:
 =====
+Global but Data is Regional.
+
 UseCase:
 ========
+Athena helps you analyze unstructured, semi-structured, and structured data stored in Amazon S3. 
+Examples include CSV, JSON, or columnar data formats such as Apache Parquet and Apache ORC. 
+You can use Athena to run ad-hoc queries using ANSI SQL, without the need to aggregate or load the data into Athena.
+
+
 BillCost:
 =========
+With Amazon Athena, you only pay for the queries that you run. You are charged based on the amount of data scanned by each query.
+
 Security:
 =========
+Security is a shared responsibility.
 
 
 
@@ -1542,69 +1615,169 @@ Security:
 
 ##S3 Lock | Vault Lock
 -------------------------------------------------
+S3 Glacier Vault Lock helps you to easily deploy and enforce compliance controls for individual S3 Glacier vaults with a 
+Vault Lock policy. You can specify controls such as "write once read many" (WORM) in a Vault Lock policy and lock the policy from 
+future edits.
+
+After a Vault Lock policy is locked, the policy can no longer be changed or deleted.
+
+
 Area:
 =====
+Global but Data is Regional.
 UseCase:
 ========
 BillCost:
 =========
 Security:
 =========
+Security is a shared responsibility.
 
 
 
 
 ##CloudFront
 -------------------------------------------------
+AWS CloudFront is a globally-distributed network offered by Amazon Web Services, which securely transfers content such as 
+software, SDKs, videos, etc., to the clients, with high transfer speed.
+
 Area:
 =====
+Global servicew.
+
 UseCase:
 ========
+Deliver fast, secure websites
+Stream live and on-demand video.
+
 BillCost:
 =========
+AWS CloudFront is in Free Usage Tier.
+Pricing varies by usage type, geographical region, and feature selection.
+
+
 Security:
 =========
+Security is a shared responsibility.
+Amazon CloudFront is a highly secure CDN that provides both network and application level protection. 
+All CloudFront customers benefit from the automatic protections of AWS Shield Standard, at no additional charge.
+
 
 
 
 ##CloudFront Signed URL/Coocks
 -------------------------------------------------
+CloudFront signed URLs and signed cookies provide the same basic functionality: they allow you to control who can access your content. 
+If you want to serve private content through CloudFront and you're trying to decide whether to use signed URLs or 
+signed cookies, consider the following.
+
+
+Signed URL is a url with a signature. The signature allows you to verify your credibility to access the 
+resource while url locates the resource. 
+Signed URLs are used to deliver private content securely.
+
+
+CloudFront signed cookies allow you to control who can access your content when you don't want to change your current 
+URLs or when you want to provide access to multiple restricted files, for example, all of the files in the subscribers' 
+area of a website.
+
+
 Area:
 =====
+
 UseCase:
 ========
+For accessing private contain Use a signed URL a user gets access only to a single file whereas with a signed cookie a user can access multiple files.
+
 BillCost:
 =========
 Security:
 =========
-
+Support for Encryption at Rest and Transit.
+onfigure HTTPS connections.
+Use signed URLs or cookies to restrict access for selected users.
 
 
 
 ##AWS Global Accelerator
 -------------------------------------------------
+AWS Global Accelerator is a service in which you create accelerators to improve the performance of your applications 
+for local and global users.
+
+
+With Global Accelerator, you are provided two global static public IPs that act as a fixed entry point to your application, 
+improving availability. On the back end, add or remove your AWS application endpoints, 
+such as Application Load Balancers, Network Load Balancers, 
+EC2 Instances, and Elastic IPs without making user-facing changes. Global Accelerator automatically re-routes 
+your traffic to your nearest healthy available endpoint to mitigate endpoint failure.
+
+
 Area:
 =====
+Global Accelerator is a global service.
+
 UseCase:
 ========
+Accelerator is a service that improves the availability and performance of applications with local or global users.
+
 BillCost:
 =========
+In AWS Global Accelerator, you are charged for each accelerator that is provisioned and the amount of traffic in the dominant 
+direction that flows through the accelerator.
+
 Security:
 =========
+By default, AWS Global Accelerator is protected by AWS Shield Standard, which minimizes application downtime and latency 
+from denial-of-service attacks by using always-on network flow monitoring and automated in-line mitigation.
+
+
 
 
 
 
 ##SHow Family
 -------------------------------------------------
+AWS Snow family comes under the migration and transfer services which move petabytes of data to and from AWS or process data at the edge locations. It is a cost-effective way to transfer data offline. 
+
+The AWS Snow Family is a collection of physical devices that help migrate large amounts of data into and out of the cloud without depending on networks. 
+
+
+AWS snow family service model is of three types: 
+AWS snow cone: AWS Snow cone is the most compact and portable device weighing in at 4.5 pounds (2.1kg). 
+It is available in HDD and SDD options. Snowcone is ruggedized, secure, and purpose-built for use outside of a traditional data centre. 
+
+AWS snowball: AWS snowball is available as compute optimized device and storage optimized device. 
+These devices are suited for extreme conditions, tamper-proof, and highly secure. 
+
+AWS snowmobile: AWS snowmobile is an Exabyte-scale data migration device which is used to move extremely large data. 
+It migrates up to 100PB in a 45-foot-long ruggedized shipping container, pulled by a semi-trailer truck. 
+
+
+
 Area:
 =====
 UseCase:
 ========
+The AWS Snow Family helps customers that need to run operations in austere, non-data center environments, and in locations where there's lack of consistent network connectivity. 
+
+Migrate data at petabyte-scale: In particular, when network circumstances are constrained, it moves databases, backups, archives, healthcare records, analytics datasets, IoT sensor data, and media assets to the cloud.
+Process and analyze data locally: Run Amazon Machine Images (AMIs) on Amazon EC2 and distribute AWS Lambda code using machine learning (ML) or other applications on Snowball Edge devices.
+Optimize manufacturing data: It gathers and examines data from the factory itself to hone procedures and boost production, efficiency, and safety.
+
+
 BillCost:
 =========
+Snowmobile pricing is based on the amount of data stored on the truck per month.
+
+With AWS Snowball, you pay only for your use of the device and for data transfer out of AWS. 
+There are two ways to pay for AWS Snowball: on-demand and committed upfront pricing.
+
+
 Security:
 =========
+All data moved to AWS Snow Family devices is automatically encrypted with 256-bit encryption keys that are 
+managed by the AWS Key Management Service (KMS). Encryption keys are never stored on the device so your data stays secure during transit.
+
 
 
 
@@ -1612,34 +1785,85 @@ Security:
 
 ##FSx
 -------------------------------------------------
+Amazon FSx for Windows File Server provides fully managed Microsoft Windows file servers, backed by a fully native Windows file system. 
+FSx for Windows File Server has the features, performance, 
+and compatibility to easily lift and shift enterprise applications to the AWS Cloud.
+
+Amazon FSx offer two types of file systems:Amazon FSx for Windows File Server—designed for business applications.
+Amazon FSx for Lustre—designed for compute-intensive workloads.
+Amazon FSx for ONTAP—multiprotocol file and block storage access, with NetApp’s advanced data management system features and benefits.
+
+
+
 Area:
 =====
+
 UseCase:
 ========
+Migrate Windows file servers to AWS
+Accelerate hybrid workloads
+Simplify virtual desktops and streaming
+
 BillCost:
 =========
+With Amazon FSx for Windows File Server, you pay only for the resources you use and there are no minimum fees or setup charges. While pricing is quoted on a monthly basis, your usage is prorated by the hour, and you are billed for your average usage over a month.
+
+
 Security:
 =========
+You can configure security group rules and control network access to your Amazon FSx file systems.
+Amazon FSx is integrated with AWS Identity and Access Management (IAM).
+You can also tag your Amazon FSx resources and control the actions that your IAM users and groups can take based on those tags.
+
+Amazon FSx offer two types of file systems:Amazon FSx for Windows File Server—designed for business applications.
+Amazon FSx for Lustre—designed for compute-intensive workloads.Amazon FSx for ONTAP—multiprotocol file and block storage access, 
+with NetApp’s advanced data management system features and benefits.
+
+AWS FSx was designed to meet high security standards. The service has ISO, PCI-DSS, and SOC certifications, and is also HIPAA eligible.
 
 
 
 
 ##Storage Gateway 
 -------------------------------------------------
+AWS Storage Gateway is a set of hybrid cloud storage services that provide on-premises access to virtually unlimited cloud storage.
+
+Storage Gateway provides a standard set of storage protocols such as 
+iSCSI, SMB, and NFS, which allow you to use AWS storage without rewriting your existing applications. 
+
+
+Gateway Types:
+Amazon S3 File Gateway
+Amazon FSx File Gateway
+Tape Gateway
+Volume Gateway
+
+
 Area:
 =====
 UseCase:
 ========
+Store data coming from specialized on-premises instruments in Amazon Simple Storage Service (Amazon S3) and use AWS services for data analysis.
+Provide cloud-based backup for on-premises files and database applications for low-cost, virtually unlimited scale.
+Transform your on-premises user and group file shares to a hybrid cloud architecture for simplified management and cost reduction.
+
 BillCost:
 =========
+This pricing is based on data transferred "in" to and "out" of the AWS Storage Gateway Service by your gateway, and it varies by region and gateway host. 
+
 Security:
 =========
+All data transferred between the gateway and AWS storage is encrypted using SSL.
 
 
 
 
 ##FSx File Gateway
 -------------------------------------------------
+Amazon FSx File Gateway optimizes on-premises access to fully managed, highly reliable file shares in Amazon FSx for Windows File Server. 
+Amazon FSx File Gateway helps accelerate your file-based storage migration to the cloud to enable faster performance, improved data protection, and reduced cost.
+
+
 Area:
 =====
 UseCase:
@@ -1654,28 +1878,78 @@ Security:
 
 ##Transfer Famamily 
 -------------------------------------------------
+AWS Transfer Family securely scales your recurring business-to-business file transfers to 
+AWS Transfer Family supports transferring data over the following protocols:
+Secure Shell (SSH) File Transfer Protocol (SFTP)
+File Transfer Protocol Secure (FTPS)
+File Transfer Protocol (FTP)
+Applicability Statement 2 (AS2)
+
+
+Seamlessly migrate, automate, and monitor your file transfer workflows into and out of 
+Amazon S3 and Amazon EFS using the SFTP, FTPS, and FTP protocols.
+
+
+AWS Transfer Family supports the following clients:
+OpenSSH (macOS and Linux)
+WinSCP (Microsoft Windows only)
+Cyberduck (Windows, macOS, and Linux)
+FileZilla (Windows, macOS, and Linux)
+
 Area:
 =====
 UseCase:
 ========
 BillCost:
 =========
+You pay only for access-enabled protocols, the amount of data (gigabytes) uploaded and downloaded over SFTP/FTPS/FTP, 
+or the number of messages sent or received over AS2. You select the protocols, identity providers, and choose endpoint configuration.
+
+Additional charges:
+You are charged standard storage request and data transfer rates to store, read, and write to and from Amazon S3. 
+You are also charged standard rates for domain name lookups using Amazon Route53, Amazon CloudTrail, and Amazon CloudWatch Logs and Events.
+
+
 Security:
 =========
+Security is a shared responsibility.
 
 
 
 
 ##SQS Queues
 -------------------------------------------------
+Amazon Simple Queue Service (SQS) is a fully managed message queuing service that enables you to decouple and scale microservices, distributed systems, and serverless applications.
+
+SQS offers two types of message queues: 
+Standard queues offer maximum throughput, best-effort ordering, and at-least-once delivery. 
+SQS FIFO queues are designed to guarantee that messages are processed exactly once, in the exact order that they are sent.
+
 Area:
 =====
+SQS is a regional service, that is highly available within a single region. There is no cross-region replication capability.
+
 UseCase:
 ========
+Eliminate administrative overhead
+Reliably deliver messages
+Keep sensitive data secure
+Scale elastically and cost-effectively
+
 BillCost:
 =========
+Amazon SQS Free Tier
+Amazon SQS has no upfront costs. The first million monthly requests are free. 
+After that, you pay based on the number and content of requests, and the interactions with Amazon S3 and the AWS Key Management Service.
+
 Security:
 =========
+As a managed service, Amazon SQS is protected by the AWS global network security.
+
+Amazon SQS server-side encryption uses the 256-bit Advanced Encryption Standard (AES-256 GCM algorithm) to 
+encrypt each message body. The integration with AWS Key Management Service (KMS) allows you to centrally 
+manage the keys that protect SQS messages along with keys that protect your other AWS resources.
+
 
 
 
@@ -1683,6 +1957,12 @@ Security:
 
 ##SQS Delay Queues
 -------------------------------------------------
+Delay queues let you postpone the delivery of new messages to consumers for a number of seconds, for example, 
+when your consumer application needs additional time to process messages. If you create a delay queue, any messages 
+that you send to the queue remain invisible to consumers for the duration of the delay period. 
+The default (minimum) delay for a queue is 0 seconds. The maximum is 15 minutes.
+
+
 Area:
 =====
 UseCase:
@@ -1697,6 +1977,16 @@ Security:
 
 ##SQS Long Polling
 -------------------------------------------------
+
+With short polling, the ReceiveMessage request queries only a subset of the servers (based on a weighted random distribution) 
+to find messages that are available to include in the response. Amazon SQS sends the response right away, 
+even if the query found no messages.
+
+With long polling, the ReceiveMessage request queries all of the servers for messages.
+Amazon SQS sends a response after it collects at least one available message, up to the maximum number of 
+messages specified in the request. Amazon SQS sends an empty response only if the polling wait time expires
+
+
 Area:
 =====
 UseCase:
@@ -1721,6 +2011,15 @@ Security:
 
 ##SQS FIFO Queues
 -------------------------------------------------
+FIFO (First-In-First-Out) queues are used to improve messaging between applications when the order of processes and 
+events is crucial, or duplicates cannot be permitted. 
+
+The following are some scenarios in which FIFO queues could be useful:
+To ensure that user-entered commands are executed in the correct sequence.
+By transmitting price updates in the correct order, the correct product price will be displayed.
+To stop a student from enrolling in a course without first creating an account.
+
+
 Area:
 =====
 UseCase:
@@ -1735,14 +2034,42 @@ Security:
 
 ##SNS and SQS | FanOut Pattern
 -------------------------------------------------
+Amazon Simple Notification Service (Amazon SNS) is a fully managed messaging service for both application-to-application (A2A) and application-to-person (A2P) communication.
+
+The A2A pub/sub functionality provides topics for high-throughput, push-based, many-to-many messaging between distributed systems, 
+microservices, and event-driven serverless applications. Using Amazon SNS topics, your publisher systems can fanout messages to a 
+large number of subscriber systems, including Amazon SQS queues, AWS Lambda functions, HTTPS endpoints, and Amazon Kinesis Data Firehose, 
+for parallel processing. The A2P functionality enables you to send messages to users at scale via SMS, mobile push, and email.
+
+
 Area:
 =====
 UseCase:
 ========
+Application integration
+Application alerts
+User notifications:Amazon SNS can send push email messages and text messages (SMS messages) to individuals or groups.
+Mobile push notifications
+
+Simplify and reduce costs with message filtering and batching
+Amazon SNS FIFO topics work with Amazon SQS FIFO queues to ensure messages are delivered in a strictly-ordered manner and are only processed once.
+Increase security with message encryption and privacy
+
 BillCost:
 =========
+The Free Tier includes 1 Million Publishes, 100K HTTP/S Deliveries and 1,000 Email Deliveries.
+
+SNS topics are defined as Standard topics or FIFO topics. You will be charged at the end of the month for your usage.
+Amazon SNS has no upfront costs. You pay based on the number of messages that you publish, the number of notifications that you 
+deliver, and any additional API calls for managing topics and subscriptions. Delivery pricing varies by endpoint type.
+
 Security:
 =========
+Amazon SNS provides encrypted topics to protect your messages from unauthorized access. 
+The encryption uses a 256-bit AES-GCM algorithm and a customer master key (CMK) issued with AWS Key Management Service (KMS). 
+Amazon SNS also supports VPC endpoints via AWS PrivateLink, so you can privately publish messages to Amazon SNS topics, from an 
+Amazon Virtual Private Cloud (VPC) subnet, without traversing the Internet. To learn more, see Message Encryption and Traffic Privacy.
+
 
 
 
@@ -1750,12 +2077,25 @@ Security:
 
 ##Amazon Kinesis
 -------------------------------------------------
+You can use Amazon Kinesis Data Streams to collect and process large streams of data records in real time. 
+
+Amazon Kinesis makes it easy to collect, process, and analyze real-time, streaming data so you can get timely insights and react quickly to new information.
+
+Amazon Kinesis Data Firehose is an extract, transform, and load (ETL) service that reliably captures, transforms, and delivers streaming data to data lakes, data stores, and analytics services.
+
 Area:
 =====
 UseCase:
 ========
+Kinesis Video Streams
+Kinesis Data Streams
+Fully managed
+Real-time: Amazon Kinesis enables you to ingest, buffer, and process streaming data in real-time, so you can derive insights in seconds or minutes instead of hours or days.
+
 BillCost:
 =========
+You pay only for the volume of data you ingest, store, and consume in your video streams.
+
 Security:
 =========
 
@@ -1764,14 +2104,26 @@ Security:
 
 ##Amazon MQ
 -------------------------------------------------
+Amazon MQ is a managed message broker service for Apache ActiveMQ and RabbitMQ that makes it easy to set up and operate 
+message brokers on AWS.
+
 Area:
 =====
 UseCase:
 ========
 BillCost:
 =========
+Amazon MQ is free to try.
+You pay for the time your message broker instance runs, the storage you use monthly, and standard data transfer fees**
+
+Broker Pricing Hourly instance usage
+Broker Storage Pricing Monthly storage usag
+
+
 Security:
 =========
+
+
 
 
 ##Amazon ECS
