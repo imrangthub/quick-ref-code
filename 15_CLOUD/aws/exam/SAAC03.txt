@@ -1130,6 +1130,16 @@ Security:
 
 ##Route53 - Health Check
 -------------------------------------------------
+Amazon Route 53 health checks monitor the health and performance of your web applications, web servers, and other resources. Each health check that you create can monitor one of the following:
+You can optionally configure Amazon CloudWatch alarms for your health checks, so that you receive notification 
+when a resource becomes unavailable.
+
+The health of a specified resource, such as a web server.
+The status of other health checks.
+The status of an Amazon CloudWatch alarm.
+Additionally, with Amazon Route 53 Application Recovery Controller, you can set up routing control health checks with 
+DNS failover records to manage traffic failover for your application.
+
 Area:
 =====
 UseCase:
@@ -1142,30 +1152,95 @@ Security:
 
 
 
-##Beanstalk 
+##AWS Elastic Beanstalk 
 -------------------------------------------------
+AWS Elastic Beanstalk is an orchestration service offered by Amazon Web Services for deploying applications which orchestrates 
+various AWS services, including EC2, S3, Simple Notification Service, CloudWatch, autoscaling, and Elastic Load Balancers.
+
+Elastic Beanstalk isn't great if you need a lot of environment variables. The simple reason is that Elastic Beanstalk has a hard limit of 4KB to store all key-value pairs.
+
+Beanstalk is PaaS (platform as a service) while CloudFormation is IaC (infrastructure as code).
+
 Area:
 =====
 UseCase:
 ========
+Developer productivity
+Fast and simple to begin: Elastic Beanstalk is the fastest and simplest way to deploy your application on AWS. 
+Complete resource control: You have the freedom to select the AWS resources, such as Amazon EC2 instance type and processor 
+type to run the workload on, that are optimal for your application. 
+
+
 BillCost:
 =========
+There is no additional charge for AWS Elastic Beanstalk.
+
 Security:
 =========
+Security is a shared responsibility.
+By default, Elastic Beanstalk creates a security group for your environment, but you can also add your own security group to your environment.
+
 
 
 
 
 ##AmazonS3 | S3
 -------------------------------------------------
+An Amazon S3 bucket is a public cloud storage.
+Amazon Simple Storage Service (Amazon S3) is an object storage service that offers industry-leading scalability, 
+data availability, security, and performance. 
+You can use Amazon S3 to store and retrieve any amount of data at any time, from anywhere.
+
+Amazon S3 Storage Classes:
+Amazon S3 Standard
+Amazon S3 Intelligent-Tiering
+Amazon S3 Standard-Infrequent Access
+Amazon S3 One Zone-Infrequent Access
+Amazon S3 Glacier Instant Retrieval
+Amazon S3 Glacier Flexible Retrieval
+Amazon S3 Glacier Deep Archive
+
+S3 in Amazon has two entities called buckets and objects. Objects are stored inside buckets.
+By default, the maximum number of buckets that can be created per account is 100.
+
 Area:
 =====
+The user interface shows all your buckets, in all regions. 
+But buckets exist in a specific region and you need to specify that region when you create a bucket.
+
+Amazon S3 creates bucket in a region you specify. 
+You can choose any AWS region that is geographically close to you to optimize latency, minimize costs, or address regulatory requirements.
+
+
 UseCase:
 ========
+Build a data lake:Run big data analytics, artificial intelligence (AI), machine learning (ML), 
+and high performance computing (HPC) applications to unlock data insights.
+Back up and restore critical data: Meet Recovery Time Objectives (RTO), Recovery Point Objectives (RPO).
+Archive data at the lowest cost.
+Run cloud-native applications.
+ 
 BillCost:
 =========
+AWS Free Tier, you can get started with Amazon S3 for free.
+Amazon S3 charges you only for what you actually use, with no hidden fees and no overage charges. \
+Bucket pricing varies by region.
+
 Security:
 =========
+To protect your data in Amazon S3, by default, users only have access to the S3 resources they create. 
+You can grant access to other users by using one or a combination of the following access management features: 
+
+AWS Identity and Access Management (IAM) to create users and manage their respective access; 
+
+Access Control Lists (ACLs) to make individual objects accessible to authorized users; bucket policies to configure permissions 
+for all objects within a single S3 bucket;
+
+Query String Authentication to grant time-limited access to others with temporary URLs. 
+Amazon S3 also supports Audit Logs that list the requests made against your S3 resources for complete 
+visibility into who is accessing what data.
+
+
 
 
 
@@ -1173,6 +1248,10 @@ Security:
 
 ##S3 Cors | CORS
 -------------------------------------------------
+Cross-origin resource sharing (CORS) defines a way for client web applications that are loaded in one domain to interact 
+with resources in a different domain. With CORS support, you can build rich client-side web applications with 
+Amazon S3 and selectively allow cross-origin access to your Amazon S3 resources.
+
 Area:
 =====
 UseCase:
@@ -1187,6 +1266,13 @@ Security:
 
 ##AWS Policy Simulator | IAM
 -------------------------------------------------
+The AWS IAM Simulator is a tool that helps you to test the effects of IAM access control policies. 
+This tool helps when you find yourself manually performing actions to test a policy. 
+The IAM simulator can simulate actions for any IAM principal, resource, and policy conditions.
+
+The simulator does not make an actual AWS service request, so you can safely test 
+requests that might make unwanted changes to your live AWS environment.
+
 Area:
 =====
 UseCase:
@@ -1199,6 +1285,9 @@ Security:
 
 ##EC2 Instance Metadata
 -------------------------------------------------
+Instance metadata is data about your instance that you can use to configure or manage the running instance. 
+Instance metadata is divided into categories, for example, host name, events, and security groups.
+
 Area:
 =====
 UseCase:
@@ -1211,8 +1300,18 @@ Security:
 
 
 
-##S3 MFa
+##S3 MFA
 -------------------------------------------------
+MFA-protected API access is used to enforce another authentication factor (MFA code) when accessing sensitive Amazon S3 resources. 
+
+Only bucket owner /root account(No admin allowed) can enable/disable MFA Delete
+You can’t enable MFA Delete using AWS Console and You must use AWS CLI
+
+MFA Delete is an additional layer of security on top of versioning that you can configure for your bucket.
+Permanently delete an object version
+Suspend Bucket Versioning
+
+
 Area:
 =====
 UseCase:
@@ -1227,12 +1326,24 @@ Security:
 
 ##S3 Access Logs
 -------------------------------------------------
+Server access logging provides detailed records for the requests that are made to an Amazon S3 bucket. 
+Server access logs are useful for many applications. For example, access log information can be useful in security and access audits.
+
+Provide the name of the target bucket. This bucket is where you want Amazon S3 to save the access logs as objects. 
+Both the source and target buckets must be in the same AWS Region and owned by the same account.
+
+You can enable or disable server access logging by using the Amazon S3 console, Amazon S3 API, the AWS Command Line Interface (AWS CLI), or AWS SDKs.
+
+
 Area:
 =====
+Global but Data is Regional.
 UseCase:
 ========
 BillCost:
 =========
+There is no extra charge for enabling server access logging on an Amazon S3 bucket.
+
 Security:
 =========
 
@@ -1242,10 +1353,24 @@ Security:
 
 ##S3 Replication 
 -------------------------------------------------
+Replication enables automatic, asynchronous copying of objects across Amazon S3 buckets. 
+Buckets that are configured for object replication can be owned by the same AWS account or by different accounts. 
+You can replicate objects to a single destination bucket or to multiple destination buckets. 
+
+The destination buckets can be in different AWS Regions or within the same Region as the source bucket.
+
+
+
 Area:
 =====
+Global but Data is Regional.
+
 UseCase:
 ========
+Data redundancy – If you need to maintain multiple copies of your data in the same, or different AWS Regions, with different encryption types, or across different accounts.
+Replicate objects to more cost-effective storage classes.
+Maintain object copies under a different account.
+
 BillCost:
 =========
 Security:
@@ -1256,8 +1381,15 @@ Security:
 
 ##S3 Pre-signed URLs
 -------------------------------------------------
+S3 objects are private. Only the object owner has permission to access them. 
+However, the object owner can optionally share objects with others by creating a presigned URL, 
+using their own security credentials, to grant time-limited permission to download the objects.
+
+
 Area:
 =====
+Global but Data is Regional.
+
 UseCase:
 ========
 BillCost:
@@ -1269,8 +1401,19 @@ Security:
 
 ##S3 Storage Class
 -------------------------------------------------
+Amazon S3 Storage Classes:
+Amazon S3 Standard
+Amazon S3 Intelligent-Tiering
+Amazon S3 Standard-Infrequent Access
+Amazon S3 One Zone-Infrequent Access
+Amazon S3 Glacier Instant Retrieval
+Amazon S3 Glacier Flexible Retrieval
+Amazon S3 Glacier Deep Archive
+
 Area:
 =====
+Global but Data is Regional.
+
 UseCase:
 ========
 BillCost:
@@ -1283,8 +1426,17 @@ Security:
 
 ##S3 Lifecycle | Rule
 -------------------------------------------------
+An S3 Lifecycle configuration is a set of rules that define actions that Amazon S3 applies to a group of objects. 
+
+There are two types of actions:
+Transition actions – These actions define when objects transition to another storage class.
+Expiration actions – These actions define when objects expire. Amazon S3 deletes expired objects on your behalf.
+
+
 Area:
 =====
+Global but Data is Regional.
+
 UseCase:
 ========
 BillCost:
@@ -1297,6 +1449,14 @@ Security:
 
 ##S3 Analytics
 -------------------------------------------------
+By using Amazon S3 analytics Storage Class Analysis you can analyze storage access patterns to help you decide when to transition 
+the right data to the right storage class. This new Amazon S3 analytics feature observes data access patterns to help you 
+determine when to transition less frequently accessed STANDARD storage to the STANDARD_IA (IA, for infrequent access) storage class.
+
+
+Storage class analysis only provides recommendations for Standard to Standard IA classes.
+
+
 Area:
 =====
 UseCase:
