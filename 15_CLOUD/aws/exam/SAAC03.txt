@@ -2128,38 +2128,120 @@ Security:
 
 ##Amazon ECS
 -------------------------------------------------
+Amazon ECS is a fully managed container orchestration service that makes it easy for you to deploy, manage, and 
+scale containerized applications.
+
+
+There are two models that you can use to run your containers:
+
+Fargate launch type - This is a serverless pay-as-you-go option. 
+You can run containers without needing to manage your infrastructure.
+
+EC2 launch type - Configure and deploy EC2 instances in your cluster to run your containers.
+
+
+The Fargate launch type is suitable for the following workloads:
+Large workloads that need to be optimized for low overhead
+Small workloads that have occasional burst
+Tiny workloads
+Batch workloads
+
+
+The EC2 launch type is suitable for the following workloads:
+Workloads that require consistently high CPU core and memory usage
+Large workloads that need to be optimized for price
+Your applications need to access persistent storage
+You must directly manage your infrastructure
+
+
 Area:
 =====
 UseCase:
 ========
+Support batch processing
+Scale web applications
+Deploy in a hybrid environment: Build container-based applications on-premises or in the cloud with Amazon ECS Anywhere and enjoy consistent tooling, management, workload scheduling, and monitoring across environments.
+
 BillCost:
 =========
+Amazon ECS pricing is dependent on whether you use AWS Fargate or Amazon EC2 infrastructure to host your containerized workloads.
+
 Security:
 =========
-
+Your EC2 instances use an IAM role to access the ECS service.
+Your ECS tasks use an IAM role to access services and resources.
+Security Groups and networks ACLs allow you to control inbound and outbound network access to and from your instances.
 
 
 
 ##Amazon ECR
 -------------------------------------------------
+Amazon ECR is a fully managed container registry offering high-performance hosting, so you can reliably deploy application images and artifacts anywhere.
+
 Area:
 =====
+Amazon ECR is a Regional service
+
 UseCase:
 ========
+Manage software vulnerabilities
+Manage image lifecycle policies
+
 BillCost:
 =========
+AWS Free Tier *
+As a new Amazon ECR customer, you get 500 MB per month of storage for your private repositories for one year as part of the AWS Free Tier.
+
+With Amazon ECR, there are no upfront fees or commitments. You pay only for the amount of data you store in your public or private repositories and for data transferred to the internet.
+
+
 Security:
 =========
+Amazon ECR automatically encrypts images at rest using Amazon S3 server-side encryption or AWS KMS encryption and transfers your container images over HTTPS.
+You can configure policies to manage permissions and control access to your images using AWS Identity and Access Management (IAM).
 
 
 
 
-##AWS Aerverless
+
+
+##AWS Serverless
 -------------------------------------------------
+Serverless on AWS Build and run applications without thinking about servers.
+
 Area:
 =====
 UseCase:
 ========
+Compute:
+AWS Lambda:AWS Lambda is an event-driven, pay-as-you-go compute service that lets you run code without provisioning or managing servers.
+AWS Fargate:AWS Fargate is a serverless compute engine that works with Amazon Elastic Container Service (ECS) and Amazon Elastic Kubernetes Service (EKS).
+
+Application integration:
+Amazon EventBridge
+Amazon EventBridge is a serverless event bus that lets you build event-driven applications at scale across AWS and existing systems.
+AWS Step Functions
+AWS Step Functions is a visual workflow orchestrator that makes it easy to sequence multiple AWS services into business-critical applications.
+Amazon SQS
+Amazon Simple Queue Service (SQS) is a message queuing service enabling you to decouple and scale microservices, distributed systems, and serverless applications.
+Amazon SNS
+Amazon Simple Notification Service (SNS) is a fully managed messaging service for both application-to-application (A2A) and application-to-person (A2P) communication.
+Amazon API Gateway
+Amazon API Gateway is a fully managed service that makes it easy to create and publish APIs at any scale.
+AWS AppSync
+AWS AppSync is a fully managed service that accelerates application development with scalable GraphQL APIs.
+
+
+Data store:
+Amazon S3
+Amazon Simple Storage Service (Amazon S3) is an object storage service designed to store and protect any amount of data.
+Amazon DynamoDB
+Amazon DynamoDB is a key-value and document database service, delivering single-digit millisecond performance at any scale.
+Amazon RDS Proxy
+Amazon RDS Proxy is a managed database proxy for Amazon Relational Database Service (RDS) that makes applications more scalable and secure.
+Amazon Aurora Serverless
+Amazon Aurora Serverless is a MySQL and PostgreSQL-compatible relational database that automatically scales capacity based on your application's needs.
+
 BillCost:
 =========
 Security:
@@ -2171,22 +2253,49 @@ Security:
 
 ##Lambda
 -------------------------------------------------
+AWS Lambda is a serverless, event-driven compute service that lets you run code for virtually any type of 
+application or backend service without provisioning or managing servers. 
+You can trigger Lambda from over 200 AWS services and software as a service (SaaS) applications, and only pay for what you use.
+
+
 Area:
 =====
+AWS Lambda is a regional service.
+
 UseCase:
 ========
+Process data at scale
+Run interactive web and mobile backends
+Enable powerful ML insights
+Create event-driven applications
+
 BillCost:
 =========
+The AWS Lambda free tier includes 
+Only pay for what you use. 
+You are charged based on the number of requests for your functions and the duration it takes for your code to execute.
+
 Security:
 =========
+Security and Compliance is a shared responsibility.
+
 
 
 
 
 ##Labmbda@Edge
 -------------------------------------------------
+
+Lambda@Edge is a feature of Amazon CloudFront that lets you run code closer to users of your application, 
+which improves performance and reduces latency. With Lambda@Edge, you don't have to provision or manage 
+infrastructure in multiple locations around the world. You pay only for the compute time you consume - 
+there is no charge when your code is not running.
+
+
 Area:
 =====
+Lambda@Edge is a global service.
+
 UseCase:
 ========
 BillCost:
@@ -2197,42 +2306,112 @@ Security:
 
 ##DynamoDB
 -------------------------------------------------
+Amazon DynamoDB Fast, flexible NoSQL database service for single-digit millisecond performance at any scale
+
+Amazon DynamoDB is a fully managed, serverless, key-value NoSQL database designed to run high-performance applications at any scale. 
+DynamoDB offers built-in security, continuous backups, automated multi-Region replication, in-memory caching, and data import and 
+export tools.
+
 Area:
 =====
+It is a global service.
+
 UseCase:
 ========
+Develop software applications
+Develop software applications
+Scale gaming platforms
+
 BillCost:
 =========
+DynamoDB charges for reading, writing, and storing data in your DynamoDB tables, along with any optional features you choose to enable.
+
+DynamoDB has two capacity modes,:
+Pricing for on-demand capacity mode
+
+On-demand capacity mode might be best if you:
+Create new tables with unknown workloads
+Have unpredictable application traffic
+Prefer the ease of paying for only what you use
+
+Provisioned capacity mode might be best if you:
+Have predictable application traffic
+Run applications whose traffic is consistent or ramps gradually
+Can forecast capacity requirements to control costs
+
+
 Security:
 =========
+Security is a shared responsibility.
+DynamoDB encrypts data at rest by default and also in transit using the keys stored in AWS Key Management Service (or customer-provided keys).
+DynamoDB also provides access control via AWS IAM roles.
 
 
 
 
 ##API Gateway
 -------------------------------------------------
+Amazon API Gateway is a fully managed service that makes it easy for developers to create, publish, maintain, monitor, and secure APIs at any scale.
+You can create RESTful APIs and WebSocket APIs that enable real-time two-way communication applications.
+
+API Types;
+RESTful: Build RESTful APIs optimized for serverless workloads and HTTP backends using HTTP APIs.
+WebSocket: Build real-time two-way communication applications, such as chat apps and streaming dashboards, with WebSocket APIs.
+
+
 Area:
 =====
 UseCase:
 ========
+Efficient API development
+Performance at any scale
+Flexible security controls
+Cost savings at scale
+
 BillCost:
 =========
+The API Gateway free tier includes.
+You pay only for the API calls you receive and the amount of data transferred out.
+
+
 Security:
 =========
+Authorize access to your APIs with AWS Identity and Access Management (IAM) and Amazon Cognito. 
+If you use OAuth tokens, API Gateway offers native OIDC and OAuth2 support. To support custom authorization requirements, 
+you can execute a Lambda authorizer from AWS Lambda.
+
 
 
 
 
 ##AWS Cognito
 -------------------------------------------------
+Amazon Cognito lets you add user sign-up, sign-in, and access control to your web and mobile apps quickly and easily. 
+Amazon Cognito scales to millions of users and supports sign-in with social identity providers, such as Apple, Facebook, Google, and 
+Amazon, and enterprise identity providers via SAML 2.0 and OpenID Connect.  
+
+
 Area:
 =====
 UseCase:
 ========
+Secure and scalable identity store
+Social and enterprise identity federation
+Standards-based authentication
+Access control for AWS resources
+Amazon Cognito provides solutions to control access to AWS resources from your app.
+Easy integration with your app
+
 BillCost:
 =========
+Free Tier
+If you are using Cognito Identity to create a User Pool, you pay based on your monthly active users (MAUs) only. 
+
 Security:
 =========
+Amazon Cognito supports multi-factor authentication and encryption of data-at-rest and in-transit. 
+Amazon Cognito is HIPAA eligible and PCI DSS, SOC, ISO/IEC 27001, ISO/IEC 27017, ISO/IEC 27018, and ISO 9001 compliant.
+
 
 
 
@@ -2240,12 +2419,23 @@ Security:
 
 ##SAM (Serverless Appliction Model)
 -------------------------------------------------
+The AWS Serverless Application Model (AWS SAM) is an open-source framework that you can use to build serverless applications on AWS.
+A serverless application is a combination of Lambda functions, event sources, and other resources that work together to perform tasks.
+
+
 Area:
 =====
 UseCase:
 ========
+Single-deployment configuration.
+Extension of AWS CloudFormation.
+
+
 BillCost:
 =========
+There is no additional charge to use AWS SAM. 
+
+
 Security:
 =========
 
@@ -2254,6 +2444,8 @@ Security:
 
 ##AWS MicroServices Architecture 
 -------------------------------------------------
+Microservices are an architectural and organizational approach to software development created to speed up deployment cycles, foster innovation and ownership, improve maintainability and scalability of software applications,
+
 Area:
 =====
 UseCase:
@@ -2266,10 +2458,20 @@ Security:
 
 ##AWS Distributing Paid Content
 -------------------------------------------------
+You can configure CloudFront to require that users access your files using either signed URLs or signed cookies. 
+
+
 Area:
 =====
 UseCase:
 ========
+An ending date and time, after which the URL is no longer valid.
+
+(Optional) The date and time that the URL becomes valid.
+
+(Optional) The IP address or range of addresses of the computers that can be used to access your content.
+
+
 BillCost:
 =========
 Security:
@@ -2280,6 +2482,9 @@ Security:
 
 ##Software Updates distribution
 -------------------------------------------------
+AWS Systems Manager Distributor provides simplified package creation, enabling you to deploy your software packages across instances quickly.
+With Distributor, you can securely store and manage software packages, such as software agents, from a centralized, version-controlled repository.
+
 Area:
 =====
 UseCase:
@@ -2288,18 +2493,32 @@ BillCost:
 =========
 Security:
 =========
+Distributor is priced on a pay-per-use model. 
+
 
 
 
 
 ##Big Data Ingestion Pipeline
 -------------------------------------------------
+AWS Data Pipeline is a web service that helps you reliably process and move data between different AWS compute and storage services, 
+as well as on-premises data sources, at specified intervals. With AWS Data Pipeline, you can regularly access 
+your data where it’s stored, transform and process it at scale, and efficiently transfer the results to 
+AWS services such as Amazon S3, Amazon RDS, Amazon DynamoDB, and Amazon EMR.
+
+
+AWS Data Pipeline helps you easily create complex data processing workloads that are fault tolerant, repeatable, and highly available. 
+AWS Data Pipeline also allows you to move and process data that was previously locked up in on-premises data silos.
+ 
+ 
 Area:
 =====
 UseCase:
 ========
 BillCost:
 =========
+AWS Data Pipeline is billed based on how often your activities and preconditions are scheduled to run and where they run (AWS or on-premises). 
+
 Security:
 =========
 
@@ -2309,64 +2528,118 @@ Security:
 
 ##Redshift
 -------------------------------------------------
+Amazon Redshift uses SQL to analyze structured and semi-structured data across data warehouses, operational databases, 
+and data lakes, using AWS-designed hardware and machine learning to deliver the best price performance at any scale.
+
 Area:
 =====
 UseCase:
 ========
+Improve financial and demand forecasts
+Collaborate and share data
+Increase developer productivity
+
 BillCost:
 =========
+AWS Free Tier
+Customers can use the Redshift for just $0.25 per hour with no commitments or upfront costs and scale to a petabyte or more for $1,000 per terabyte per year.
+
 Security:
 =========
+With a couple of parameter settings, you can set the Redshift to use SSL to secure your data. 
+You can also enable encryption, all the data written to disk will be encrypted.
 
 
 
 
 ##Glue
 -------------------------------------------------
+AWS Glue is a serverless data integration service that makes it easy to discover, prepare, and combine data for analytics, 
+machine learning, and application development. AWS Glue provides all the capabilities needed for data integration so that 
+you can start analyzing your data and putting it to use in minutes instead of months.
+
 Area:
 =====
 UseCase:
 ========
 BillCost:
 =========
+With AWS Glue, you pay an hourly rate, billed by the second, for crawlers (discovering data) and ETL jobs 
+processing and loading data). For the AWS Glue Data Catalog, you pay a simple monthly fee for storing and accessing the metadata.
+
 Security:
 =========
+We provide server-side encryption for data at rest and SSL for data in motion.
+
 
 
 ##Neptune
 -------------------------------------------------
+Amazon Neptune is a fast, reliable, fully managed graph database service that makes it easy to build and run applications.
+
 Area:
 =====
 UseCase:
 ========
+Build connections between identities
+Build knowledge graph applications
+
+
 BillCost:
 =========
+As part of the AWS Free Tier, you can get started with Amazon Neptune for free.
+You pay for your database by the hour, using On-Demand instances
+
 Security:
 =========
+Amazon Neptune supports HTTPS encrypted client connections and also allows you to encrypt your databases using keys you 
+manage through AWS Key Management Service (KMS). 
 
 
 
 
 ##OpenSearch
 -------------------------------------------------
+Amazon OpenSearch Service makes it easy for you to perform interactive log analytics, real-time application monitoring, 
+website search, and more. OpenSearch is an open source, distributed search and analytics suite derived from Elasticsearch.
+
+
 Area:
 =====
 UseCase:
 ========
+Monitor and debug applications and infrastructure
+Manage security and event information (SIEM)
+
 BillCost:
 =========
+Amazon OpenSearch Service with AWS Free Tier.
+
+You are charged based on three dimensions: instance hours, which are the number of hours an instance is available to you for use; 
+the amount of storage you need; and data transferred in and out of Amazon OpenSearch Service. Storage pricing depends on the 
+storage tier and type of instance you choose.
+
+
 Security:
 =========
+Amazon OpenSearch Service supports encryption at rest through AWS Key Management Service (KMS), 
+node-to-node encryption over TLS, and the ability to require clients to communicate of HTTPS.
 
 
 
-
-##SWS Monitoring 
+##AWS Monitoring 
 -------------------------------------------------
+Amazon Web Services (AWS) monitoring is a set of practices you can use to verify the security and performance of your 
+AWS resources and data.
+
+
 Area:
 =====
 UseCase:
 ========
+Use a single platform for observability
+Collect metrics on AWS and on premises
+
 BillCost:
 =========
 Security:
@@ -2378,6 +2651,35 @@ Security:
 
 ##CloudWatch 
 -------------------------------------------------
+CloudWatch is a service you can use to aggregate, visualize, and respond to service metrics. 
+CloudWatch has two main components: alarms, which create alerts according to thresholds for single metrics, and events, 
+which can automate responses to metric values or system changes.
+
+
+Area:
+=====
+UseCase:
+========
+BillCost:
+=========
+You simply pay for what you use and will be charged at the end of the month for your usage.
+
+
+Security:
+=========
+
+
+
+
+##AWS CloudWatch Metrics
+-------------------------------------------------
+Metrics are data about the performance of your systems. By default, many services provide free metrics for resources 
+such as Amazon EC2 instances, Amazon EBS volumes, and Amazon RDS DB instances). You can also enable detailed monitoring 
+for some resources, such as your Amazon EC2 instances, or publish your own application metrics. 
+Amazon CloudWatch can load all the metrics in your account (both AWS resource metrics and application metrics that you provide) 
+for search, graphing, and alarms.
+
+
 Area:
 =====
 UseCase:
@@ -2390,34 +2692,34 @@ Security:
 
 
 
-##CloudWatch Metrices
+##CloudWatch Custom Metrics
 -------------------------------------------------
+A custom metric enables you to monitor a specific application binary or runtime. 
+CloudWatch helps you monitor the infrastructure portion of an EC2 instance, such as CPU, hard disk and network.
+
+
 Area:
 =====
 UseCase:
 ========
+When CloudWatch doesn't have a metric for your specific use case, you'll want to implement a custom metric.
+
+
 BillCost:
 =========
 Security:
 =========
 
 
-##CloudWatch Custom Metrices
+
+
+##CloudWatch Dashboards
 -------------------------------------------------
-Area:
-=====
-UseCase:
-========
-BillCost:
-=========
-Security:
-=========
+Amazon CloudWatch dashboards are customizable home pages in the CloudWatch console that you can use to 
+monitor your resources in a single view, even those resources that are spread across different Regions. 
+You can use CloudWatch dashboards to create customized views of the metrics and alarms for your AWS resources.
 
 
-
-
-##CloudWatch Dashborads
--------------------------------------------------
 Area:
 =====
 UseCase:
@@ -2432,10 +2734,19 @@ Security:
 
 ##CloudWatch Logs
 -------------------------------------------------
+You can use Amazon CloudWatch Logs to monitor, store, and access your log files from Amazon Elastic Compute Cloud (Amazon EC2) instances, AWS CloudTrail, Route 53, and other sources.
+
+CloudWatch Logs enables you to centralize the logs from all of your systems, applications, and AWS services that you use, in a single, highly scalable service. 
+
 Area:
 =====
 UseCase:
 ========
+Query your log data
+Monitor logs from Amazon EC2 instances 
+Monitor AWS CloudTrail logged events 
+Log retention
+
 BillCost:
 =========
 Security:
@@ -2447,6 +2758,13 @@ Security:
 
 ##CloudWatch Agent | Logs Agent
 -------------------------------------------------
+The CloudWatch Logs agent provides an automated way to send log data to CloudWatch Logs from Amazon EC2 instances. The agent includes the following components:
+
+A plug-in to the AWS CLI that pushes log data to CloudWatch Logs.
+A script (daemon) that initiates the process to push data to CloudWatch Logs.
+A cron job that ensures that the daemon is always running.
+
+
 Area:
 =====
 UseCase:
@@ -2461,6 +2779,15 @@ Security:
 
 ##CloudWatch Alarms
 -------------------------------------------------
+CloudWatch alarms perform an action when a CloudWatch metric exceeds a specified value for some amount of time.
+
+An alarm watches a single metric over a specified time period, and performs one or more specified actions,
+ based on the value of the metric relative to a threshold over time. The action is a notification sent to an 
+ Amazon SNS topic or an Auto Scaling policy. You can also add alarms to dashboards.
+
+ You can attach multiple Alarms to each metric and each one can have multiple actions.
+ A CloudWatch Alarm is always in one of three states: OK, ALARM, or INSUFFICIENT_DATA
+ 
 Area:
 =====
 UseCase:
@@ -2473,12 +2800,26 @@ Security:
 
 ##Eventbridge
 -------------------------------------------------
+EventBridge connects applications using events.
+Amazon EventBridge is a serverless event bus that makes it easier to build event-driven applications at scale using 
+events generated from your applications, integrated Software-as-a-Service (SaaS) applications, and AWS services.
+
+
+
 Area:
 =====
 UseCase:
 ========
+Build event-driven architectures
+Write less custom code
+
 BillCost:
 =========
+Free tier: All state change events published by AWS services by default are free.
+Amazon EventBridge, you pay for events published to your event bus, events ingested for Schema Discovery, and Event Replay. 
+There are no additional charges for rules or event delivery. 
+
+
 Security:
 =========
 
@@ -2487,26 +2828,62 @@ Security:
 
 ##CloudTrail
 -------------------------------------------------
+AWS CloudTrail monitors and records account activity across your AWS infrastructure, giving you control over storage, 
+analysis, and remediation actions.
+
+
 Area:
 =====
 UseCase:
 ========
+Audit activity: Monitor, store, and validate activity events for authenticity. 
+Identify security incidents: Detect unauthorized access using the Who, What, and When information in CloudTrail Events.
+Troubleshoot operational issues.
+
+
 BillCost:
 =========
+For CloudTrail Insights, choose which event to analyze and pay as you go.
+For AWS CloudTrail Lake, you pay for ingestion and storage together. You can store your data for up to seven years. Choose which data to analyze, and pay as you go.
+
+
 Security:
 =========
+By default, CloudTrail log files are encrypted using Amazon S3 Server Side Encryption (SSE) and placed into your S3 bucket. 
+You can control access to log files by applying IAM or S3 bucket policies. You can add an additional layer of security by 
+enabling S3 Multi Factor Authentication (MFA) Delete on your S3 bucket.
+
 
 
 
 
 ##AWS Config
 -------------------------------------------------
+AWS Config is a service that enables you to assess, audit, and evaluate the configurations of your AWS resources. 
+Config continuously monitors and records your AWS resource configurations and allows you to automate the evaluation 
+of recorded configurations against desired configurations.
+
+
 Area:
 =====
 UseCase:
 ========
+Discovery: AWS Config will discover resources that exist in your account, record their current configuration, and capture any 
+changes to these configurations. 
+
+Config will also retain configuration details for resources that have been deleted. 
+
+Change management
+Continuous audit and compliance
+
+
 BillCost:
 =========
+You pay $0.003 per configuration item recorded in your AWS account per AWS Region. 
+With AWS Config, you are charged based on the number of configuration items recorded, 
+the number of active AWS Config rule evaluations and the number of conformance 
+pack evaluations in your account. 
+
 Security:
 =========
 
@@ -2516,12 +2893,22 @@ Security:
 
 ##STS (Security Token Services)
 -------------------------------------------------
+AWS provides AWS Security Token Service (AWS STS) as a web service that enables you to request temporary, 
+limited-privilege credentials for AWS Identity and Access Management (IAM) users or for users you authenticate (federated users). 
+
+
 Area:
 =====
+STS is a global service
+
 UseCase:
 ========
 BillCost:
 =========
+AWS Identity and Access Management (IAM) and AWS Security Token Service (AWS STS) are features of your 
+AWS account offered at no additional charge.
+
+
 Security:
 =========
 
@@ -2530,24 +2917,60 @@ Security:
 
 ##Identity Federation & Cognito
 -------------------------------------------------
+Amazon Cognito identity pools (federated identities) enable you to create unique identities for your users and federate them 
+with identity providers. With an identity pool, you can obtain temporary, limited-privilege AWS credentials to access other AWS services. 
+
+Amazon Cognito identity pools support the following identity providers:
+Public providers: Login with Amazon (identity pools), Facebook (identity pools), Google (identity pools), 
+Sign in with Apple (identity pools).
+Amazon Cognito user pools
+Open ID Connect providers (identity pools)
+SAML identity providers (identity pools)
+Developer authenticated identities (identity pools)
+
+
 Area:
 =====
+
 UseCase:
 ========
+
 BillCost:
 =========
+AWS Free Tier
+Amazon Cognito Identity to create a User Pool, you pay based on your monthly active users (MAUs) only. 
+
+
 Security:
 =========
 
 
+
+
 ##Directory Services 
 -------------------------------------------------
+AWS Directory Service for Microsoft Active Directory, also known as AWS Managed Microsoft Active Directory (AD), 
+enables your directory-aware workloads and AWS resources to use managed Active Directory (AD) in AWS.
+
+AWS Directory Service for Microsoft Active Directory allows you to use a directory in one account and share it with multiple accounts and VPCs.
+
+
 Area:
 =====
 UseCase:
 ========
+Provide your on-premises AD users quick access to AWS
+Leverage integrations with Amazon RDS and Amazon FSx
+Enable single sign-on experience for AWS End User Computing services
+Give your on-premises AD users federated access to the AWS Management Console and AWS CLI quickly
+
+
+
 BillCost:
 =========
+With AWS Directory Service, you pay only for the type and size of the managed directory that you use.
+
+
 Security:
 =========
 
@@ -2556,12 +2979,26 @@ Security:
 
 ##AWS Organizations
 -------------------------------------------------
+An organization is an entity that you create to consolidate a collection of accounts so that you can administer them as a single unit.
+
+An organizational unit (OU) provides a means to group accounts within a root. 
+An OU can also contain other OUs. When you attach a policy to one of the nodes in the hierarchy, it flows down and affects 
+all the branches (OUs) and leaves (accounts) beneath it. An OU can have exactly one parent, and each account can be a 
+member of exactly one OU.
+
+
 Area:
 =====
 UseCase:
 ========
+Automate the creation of AWS accounts and categorize workloads using groups
+Implement and enforce audit and compliance policies
+
 BillCost:
 =========
+AWS Organizations is offered at no additional charge.
+
+
 Security:
 =========
 
@@ -2570,6 +3007,13 @@ Security:
 
 ##RAM (Resource Access Manager)
 -------------------------------------------------
+AWS Resource Access Manager (RAM) helps you securely share your resources across AWS accounts, within your organization or 
+organizational units (OUs) in AWS Organizations, and with IAM roles and IAM users for supported resource types. 
+You can use AWS RAM to share resources with other AWS accounts. This eliminates the need to provision and 
+manage resources in every account. When you share a resource with another account, that account is granted 
+access to the resource and any 
+policies and permissions in that account apply to the shared resource.
+
 Area:
 =====
 UseCase:
@@ -2578,6 +3022,8 @@ BillCost:
 =========
 Security:
 =========
+Security is a shared responsibility 
+
 
 
 
@@ -2585,36 +3031,68 @@ Security:
 
 ##AWS IAM Identity Center
 -------------------------------------------------
+AWS Identity and Access Management (IAM), you can specify who or what can access services and resources in AWS, centrally manage fine-grained permissions, and analyze access to refine permissions across AWS.
+
 Area:
 =====
 UseCase:
 ========
+Apply fine-grained permissions and scale with attribute-based access control
+Manage per-account access or scale access across AWS accounts and applications
+
 BillCost:
 =========
+IAM is offered at no additional charge.
+
+
 Security:
 =========
-
+Security is a shared responsibility 
 
 
 
 ##SSO
--------------------------------------------------
+-------------------------------------------------\
+AWS Single Sign-On (AWS SSO) is a cloud service that allows you to grant your users access to AWS resources, 
+such as Amazon EC2 instances, across multiple AWS accounts. By default, AWS SSO now provides a directory that 
+you can use to create users, 
+organize them in groups, and set permissions across those groups.
+
 Area:
 =====
+
 UseCase:
 ========
+Enable multi-account access to your AWS accounts: Your users can use their directory credentials for single sign-on access to multiple AWS accounts.
+Enable single sign-on access to your AWS applications
+Enable single sign-on access to Amazon EC2 Windows instances
+Enable single sign-on access to cloud-based applications
+
 BillCost:
 =========
+AWS SSO and its directory are available at no additional cost to you.
+
+
 Security:
 =========
 
 
-##AWS Cecurity 
+
+##AWS Security 
 -------------------------------------------------
+AWS is designed to help you build secure, high-performing, resilient, and efficient infrastructure for your applications. 
+
 Area:
 =====
+
 UseCase:
 ========
+AWS provides services that help you protect your data, accounts, and workloads from unauthorized access.
+Identity & access management
+Network & application protection
+Threat detection & continuous monitoring
+Compliance & data privacy
+
 BillCost:
 =========
 Security:
@@ -2625,6 +3103,13 @@ Security:
 
 ##Encryption 101
 -------------------------------------------------
+AES-256 is the technology we use to encrypt data in AWS, including Amazon Simple Storage Service (S3) server-side encryption. It would take at least a trillion years to break using current computing technology.
+
+Each message is encrypted under a unique data key. Then the data key is encrypted by the wrapping keys you specify. 
+To decrypt the encrypted message, the AWS Encryption SDK uses the wrapping keys you specify to decrypt at least one 
+encrypted data key. Then it can decrypt the ciphertext and return a plaintext message.
+
+
 Area:
 =====
 UseCase:
@@ -2639,14 +3124,36 @@ Security:
 
 ##KMS
 -------------------------------------------------
+AWS Key Management Service (AWS KMS) makes it easy for you to create and manage cryptographic keys and 
+control their use across a wide range of AWS services and in your applications. 
+
 Area:
 =====
+AWS KMS has been strictly isolated to a single AWS Region for each implementation, with no sharing of keys, 
+policies, or audit information across Regions. Region isolation can help you comply 
+with security standards and data residency requirements.
+
 UseCase:
 ========
+Encrypt data in your applications
+Digitally sign data
+Built-in auditing
+
 BillCost:
 =========
+Has Free tier.
+Each AWS KMS key that you create in KMS costs $1/month (prorated hourly). 
+Cost for request.
+The standard AWS CloudHSM charges apply
+
+
+
 Security:
 =========
+AWS KMS is designed so that no one, including AWS employees, can retrieve your plaintext keys from the service. 
+The service uses hardware security modules (HSMs) that have been validated under FIPS 140-2, or are in the process 
+of being validated, to protect the confidentiality and integrity of your keys.
+
 
 
 
@@ -2654,6 +3161,11 @@ Security:
 
 ##KMS Key Rotation
 -------------------------------------------------
+AWS KMS supports automatic key rotation only for symmetric encryption KMS keys with key material that AWS KMS creates. 
+Automatic rotation is optional for customer managed KMS keys. AWS KMS always rotates the key material for AWS managed 
+KMS keys every year.
+
+
 Area:
 =====
 UseCase:
@@ -2668,52 +3180,104 @@ Security:
 
 ##SSM Parameter Store
 -------------------------------------------------
+Parameter Store, a capability of AWS Systems Manager, provides secure, hierarchical storage for configuration data 
+management and secrets management. You can store data such as passwords, database strings, Amazon Machine Image (AMI) IDs, 
+and license codes as parameter values. You can store values as plain text or encrypted data. You can reference 
+Systems Manager parameters in your scripts, commands, SSM documents, and configuration and automation workflows 
+by using the unique name that you specified when you created the parameter.
+
 Area:
 =====
+
 UseCase:
 ========
+Use a secure, scalable, hosted secrets management service with no servers to manage.
+Improve your security posture by separating your data from your code.
+Store configuration data and encrypted strings in hierarchies and track versions.
+Control and audit access at granular levels.
+Store parameters reliably because Parameter Store is hosted in multiple Availability Zones in an AWS Region.
+
+
 BillCost:
 =========
+Standard parameters are available at no additional charge. When you create advanced parameters, 
+you are charged based on the number of advanced parameters stored each month and per API interaction. 
+
 Security:
 =========
+Parameter Store, a capability of AWS Systems Manager, provides secure, hierarchical storage for configuration data 
+management and secrets management. You can store data such as passwords, database strings, 
+Amazon Machine Image (AMI) IDs, and license codes as parameter values.
+
 
 
 ##AWS Secrets Manager
 -------------------------------------------------
+AWS Secrets Manager is a secrets management service that helps you protect access to your applications, services, and IT resources. 
+This service enables you to easily rotate, manage, and retrieve database credentials, 
+API keys, and other secrets throughout their lifecycle. 
+Using Secrets Manager, you can secure and manage secrets used to access resources in the AWS Cloud, on 
+third-party services, and on-premises.
+
+
 Area:
 =====
 UseCase:
 ========
+
 BillCost:
 =========
+AWS Secrets Manager encrypts at rest using encryption keys that you own and store in AWS Key Management Service (KMS). You can control access to the secret using AWS Identity and Access Management (IAM) policies.
+
 Security:
 =========
+AWS Secrets Manager encrypts at rest using encryption keys that you own and store in AWS Key Management Service (KMS). 
+You can control access to the secret using AWS Identity and Access Management (IAM) policies.
 
 
 
 
-##CooudHSM
+##CloudHSM
 -------------------------------------------------
+AWS CloudHSM is a cryptographic service for creating and maintaining hardware security modules (HSMs) in your AWS environment.
+
+
 Area:
 =====
 UseCase:
 ========
+Offload the SSL/TLS processing for web servers
+Protect the private keys for an issuing certificate authority (CA)
+Enable transparent data encryption (TDE) for Oracle databases
+
 BillCost:
 =========
+With AWS CloudHSM, you pay by the hour with no long-term commitments or upfront payments
+
 Security:
 =========
+Security is a shared responsibility.
 
 
 
 
 ##Shield | DDoS Protection
 -------------------------------------------------
+AWS Shield is a managed service that provides protection against Distributed Denial of Service (DDoS) 
+attacks for applications running on AWS. AWS Shield Standard is automatically enabled to all 
+AWS customers at no additional cost. AWS Shield Advanced is an optional paid service. 
+AWS Shield Advanced provides additional protections against more sophisticated and larger attacks for your 
+applications running on Amazon Elastic Compute Cloud (EC2), Elastic Load Balancing (ELB), Amazon CloudFront, 
+AWS Global Accelerator, and Route 53.
+
 Area:
 =====
 UseCase:
 ========
 BillCost:
 =========
+AWS Shield Standard provides protection for all AWS customers from common.
+AWS Shield Advanced is a paid service that provides additional protections
 Security:
 =========
 
@@ -2723,6 +3287,10 @@ Security:
 
 ##WAF (Web Application Firewall)
 -------------------------------------------------
+AWS WAF is a web application firewall that helps protect web applications from attacks by allowing you to configure rules that allow, 
+block, or monitor (count) web requests based on conditions that you define. These conditions include 
+IP addresses, HTTP headers, HTTP body, URI strings, SQL injection and cross-site scripting.
+
 Area:
 =====
 UseCase:
@@ -2737,6 +3305,12 @@ Security:
 
 ##WAF & Shield
 -------------------------------------------------
+AWS WAF is a firewall that can protect you from multiple types of attacks and provide various options for whitelisting, 
+AWS Shield is a single-purpose service. AWS Shield is a managed Distributed Denial of Service (DDoS) 
+protection tool for your AWS-based applications.
+
+AWS Shield provides protection against a wide range of known DDoS attack vectors and zero-day attack vectors
+
 Area:
 =====
 UseCase:
@@ -2747,14 +3321,27 @@ Security:
 =========
 
 
+
 ##GuardDutu
 -------------------------------------------------
+Amazon GuardDuty is a threat detection service that continuously monitors your AWS accounts and workloads for
+malicious activity and delivers detailed security findings for visibility and remediation.
+Identify files containing malware
+Route insightful information on security findings
+
 Area:
 =====
 UseCase:
 ========
+Improve security operations visibility
+Assist security analysts in investigations
+
 BillCost:
 =========
+Start your 30-day free trial
+GuardDuty prices are based on the volume of both analyzed service logs and data scanned for malware. 
+ 
+
 Security:
 =========
 
@@ -2763,12 +3350,21 @@ Security:
 
 ##Amazon Inspector
 -------------------------------------------------
+Amazon Inspector is an automated vulnerability management service that continually scans Amazon 
+Elastic Compute Cloud (EC2) and container workloads for software vulnerabilities and unintended network exposure.
+
+
+
 Area:
 =====
 UseCase:
 ========
 BillCost:
 =========
+Monthly costs are determined by a combination of two dimensions: Amazon EC2 instances being scanned, and the total number of 
+container images initially scanned when pushed to Amazon Elastic Container Registry (ECR) and rescanned during a month
+Free 15-day trial for accounts new to Amazon Inspector
+
 Security:
 =========
 
@@ -2777,12 +3373,25 @@ Security:
 
 ##Macie
 -------------------------------------------------
+Amazon Macie is a fully managed data security and data privacy service that uses machine learning and pattern matching to
+discover and protect your sensitive data in AWS.
+
 Area:
 =====
 UseCase:
 ========
+Discover your sensitive data at scale
+Assessing your data privacy and security
+Maintaining regulatory compliance
+Identifying sensitive data in data migrations
+
+
 BillCost:
 =========
+Yes, there is a 30-day free trial. 
+Charged based on two dimensions, the number of Amazon S3 buckets in your account per month and the amount of data processed
+ for sensitive data discovery in a given month.
+
 Security:
 =========
 
@@ -2792,38 +3401,75 @@ Security:
 
 ##VPC 
 -------------------------------------------------
+Amazon Virtual Private Cloud (Amazon VPC) enables you to launch AWS resources into a virtual network that you've defined
+
+
 Area:
 =====
 UseCase:
 ========
 BillCost:
 =========
+There are no additional charges for creating and using the VPC itself. 
+
 Security:
 =========
+Security groups in a VPC specify which traffic is allowed to or from an Amazon EC2 instance. 
+Network ACLs operate at the subnet level and evaluate traffic entering and exiting a subnet. 
+Network ACLs can be used to set both Allow and Deny rules. Network ACLs do not filter traffic 
+between instances in the same subnet. In addition, network ACLs perform stateless filtering while 
+security groups perform stateful filteri
+
 
 
 
 
 ##CIDR
 -------------------------------------------------
+The allowed block size is between a /28 netmask and /16 netmask.
+The CIDR block must not overlap with any existing CIDR block that's associated with the VPC.
+The CIDR block must not be the same or larger than a destination CIDR range in a route in any of the VPC route tables. 
+
+
+CIDR blocks from the RFC 1918* range:
+10.0.0.0/8
+172.16.0.0/12
+192.168.0.0/16
+198.19.0.0/16
+
+192.168.0.0/16
+
 Area:
 =====
 UseCase:
 ========
 BillCost:
 =========
+There are no additional charges
+
 Security:
 =========
 
 
 ##Default VPC
 -------------------------------------------------
+When you start using Amazon VPC, you have a default VPC in each AWS Region. 
+A default VPC comes with a public subnet in each Availability Zone, an internet gateway, and settings to enable DNS resolution. 
+Therefore, you can immediately start launching Amazon EC2 instances into a default VPC.
+
+172.31.0.0/16	local
+0.0.0.0/0	internet_gateway_id
+
+
+
 Area:
 =====
 UseCase:
 ========
 BillCost:
 =========
+There are no additional charges
+
 Security:
 =========
 
@@ -2832,49 +3478,87 @@ Security:
 
 ##Subnet
 -------------------------------------------------
+A subnet is a range of IP addresses in your VPC. You can attach AWS resources, such as EC2 instances and RDS DB instances, to subnets.
+
+A subnet is a range of IP addresses in your VPC. A subnet must reside in a single Availability Zone. 
+After you add subnets, you can deploy AWS resources in your VPC.
+
+Public and private subnets
+
+If a subnet is associated with a route table that has a route to an internet gateway, it's known as a public subnet. 
+If a subnet is associated with a route table that does not have a route to an internet gateway, it's known as a private subnet.
+
 Area:
 =====
 UseCase:
 ========
 BillCost:
 =========
+There are no additional charges
+
 Security:
 =========
+AWS provides two features that you can use to increase security in your VPC: security groups and network ACLs. 
+
 
 
 
 
 ##Internet Gateway
 -------------------------------------------------
+An internet gateway is a horizontally scaled, redundant, and highly available VPC component that allows communication between your 
+VPC and the internet. It supports IPv4 and IPv6 traffic. 
+It does not cause availability risks or bandwidth constraints on your network traffic.
+
 Area:
 =====
+
 UseCase:
 ========
+An internet gateway enables resources in your public subnets (such as EC2 instances) to connect to the internet if the resource has a public IPv4 address or an IPv6 address.
+
 BillCost:
 =========
+There's no additional charge for creating an internet gateway.
+
+
 Security:
 =========
+Security is a shared responsibility
 
 
 
 
 
 ##Route Table 
--------------------------------------------------
+-------------------------------------------------\
+A route table contains a set of rules, called routes, that determine where network traffic from your subnet or gateway is directed.
+
+Main route table—The route table that automatically comes with your VPC. It controls the routing for all 
+subnets that are not explicitly associated with any other route table.
+Custom route table—A route table that you create for your VPC.
+Destination—The range of IP addresses where you want traffic to go (destination CIDR). For example, an external corporate network with the CIDR 172.16.0.0/12.
+Target—The gateway, network interface, or connection through which to send the destination traffic; for example, an internet gateway.
+
 Area:
 =====
 UseCase:
 ========
 BillCost:
 =========
+There are no additional charges
+
 Security:
 =========
+Security is a shared responsibility
 
 
 
 
 ##Bastion Host
 -------------------------------------------------
+A bastion host is a server whose purpose is to provide access to a private network from an external network, such as the Internet.
+
 Area:
 =====
 UseCase:
@@ -2887,29 +3571,46 @@ Security:
 
 ##NAT Instances
 -------------------------------------------------
+launch a NAT instance in a public subnet to enable instances in the private subnet to initiate outbound 
+IPv4 traffic to the internet or other AWS services, but prevent the instances from receiving inbound traffic initiated on the internet.
+
 Area:
 =====
 UseCase:
 ========
 BillCost:
 =========
+NAT Gateway Hourly Charge: NAT Gateway is charged on an hourly basis.
+
 Security:
 =========
-
+Security is a shared responsibility
 
 
 
 ##NAT Gateways
 -------------------------------------------------
+NAT Gateway is a highly available AWS managed service that makes it easy to connect to the 
+Internet from instances within a private subnet in an Amazon Virtual Private Cloud (Amazon VPC). 
+
+
 Area:
 =====
+Each NAT gateway is created in a specific Availability Zone
+
 UseCase:
 ========
+A NAT gateway supports the following protocols: TCP, UDP, and ICMP.
+NAT gateways are supported for IPv4 or IPv6 traffic. 
+
 BillCost:
 =========
+When you provision a NAT gateway, you are charged for each hour that your 
+NAT gateway is available and each Gigabyte of data that it processes. 
+
 Security:
 =========
-
+Security is a shared responsibility
 
 
 
@@ -2930,12 +3631,19 @@ Security:
 
 ##Route53 Private Zones
 -------------------------------------------------
+A private hosted zone is a container that holds information about how you want Amazon Route 53 to respond to
+ DNS queries for a domain and its subdomains within one or more VPCs that you create with the Amazon VPC service.
+
+ou create a private hosted zone, such as example.com, and specify the VPCs that you want to associate with the hosted zone.
+
 Area:
 =====
 UseCase:
 ========
 BillCost:
 =========
+Managing hosted zones: You pay a monthly charge for each hosted zone managed with Route 53.
+
 Security:
 =========
 
@@ -2944,24 +3652,34 @@ Security:
 
 ##NACL | Security Groups
 -------------------------------------------------
+Security Groups supports only allow rules, and by default, all the rules are denied. You cannot deny the rule for establishing a connection.
+
+NACL also adds an additional layer of security associated with subnets that control both inbound and outbound traffic at the subnet level.
+
 Area:
 =====
 UseCase:
 ========
 BillCost:
 =========
+There are no additional charges
+
 Security:
 =========
 
 
 ##VPC Reachability Analyzer
 -------------------------------------------------
+VPC Reachability Analyzer to determine whether a destination resource in your virtual private cloud (VPC) is reachable from a source resource. 
+
 Area:
 =====
 UseCase:
 ========
 BillCost:
 =========
+You are charged per analysis run between a source and destination.
+
 Security:
 =========
 
@@ -2970,12 +3688,17 @@ Security:
 
 ##VPC Peering
 -------------------------------------------------
+A VPC peering connection is a networking connection between two VPCs that enables you to route traffic between them using private 
+IPv4 addresses or IPv6 addresses. Instances in either VPC can communicate with each other as if they are within the same network.
+
 Area:
 =====
 UseCase:
 ========
 BillCost:
 =========
+There is no charge to create a VPC peering connection. There is a charge for data transfer across peering connections.
+
 Security:
 =========
 
@@ -2984,6 +3707,10 @@ Security:
 
 ##VPC Endpoints
 -------------------------------------------------
+A VPC endpoint enables you to privately connect your VPC to supported AWS services and VPC endpoint services 
+powered by PrivateLink without requiring an internet gateway, NAT device, VPN connection, or AWS Direct Connect connection.
+
+
 Area:
 =====
 UseCase:
@@ -2999,6 +3726,10 @@ Security:
 
 ##VPC Flow Logs
 -------------------------------------------------
+VPC Flow Logs is a feature that enables you to capture information about the IP traffic going to and from network 
+interfaces in your VPC. Flow log data can be published to Amazon CloudWatch Logs or Amazon S3. 
+After you create a flow log, you can retrieve and view its data in the chosen destination.
+
 Area:
 =====
 UseCase:
@@ -3013,18 +3744,31 @@ Security:
 
 ##Site to Site VPN
 -------------------------------------------------
+You can enable access to your remote network from your VPC by creating an AWS Site-to-Site VPN (Site-to-Site VPN) connection, and configuring routing to pass traffic through the connection.
+
 Area:
 =====
 UseCase:
 ========
+Application Migration: Moving applications to the cloud is easier with a Site-to-site VPN connection between your network and the AWS cloud. You can host Amazon VPCs behind your corporate firewall and seamlessly move your IT resources, without changing the way your users access these applications.
+You can use AWS Site-to-Site VPN connections to securely communicate between remote sites.
 BillCost:
 =========
+You are charged for each VPN connection hour that your VPN connection is provisioned and available. 
+
 Security:
 =========
+Site-to-Site VPN supports Internet Protocol security (IPsec) VPN connections.
+Security is a shared responsibility
+
 
 
 ##Virtual Private Gateway
 -------------------------------------------------
+A virtual private gateway is a logical, fully redundant distributed edge routing function that sits at the edge of your VPC. 
+As it is capable of terminating VPN connections from your on-prem or customer environments, the VPG is the VPN concentrator on the 
+Amazon side of the Site-to-Site VPN connection
+
 Area:
 =====
 UseCase:
@@ -3039,6 +3783,12 @@ Security:
 
 ##Customer Gateway
 -------------------------------------------------
+
+A customer gateway is a resource that you create in AWS that represents the customer gateway device in your on-premises network. 
+When you create a customer gateway, you provide information about your device to AWS. For more information, 
+see Customer gateway options for your Site-to-Site VPN connection.
+
+
 Area:
 =====
 UseCase:
@@ -3053,12 +3803,20 @@ Security:
 
 ##Direct Connect
 -------------------------------------------------
+AWS Direct Connect is a networking service that provides an alternative to using the internet to connect to AWS. 
+Using AWS Direct Connect, data that would have previously been transported over the internet is delivered through a 
+private network connection between your facilities and AWS.
+
 Area:
 =====
 UseCase:
 ========
 BillCost:
 =========
+AWS Direct Connect has two separate charges: port hours and data transfer. 
+Pricing is per port-hour consumed for each port type. Partial port hours consumed are billed as full hours. 
+The account that owns the port will be charged the port hour charges.
+
 Security:
 =========
 
@@ -3068,8 +3826,19 @@ Security:
 
 ##Direct Connect Gateway
 -------------------------------------------------
+AWS Direct Connect (DX) has been a popular method for businesses to connect to AWS services, giving users a secure and reliable connection to an AWS Region. There are more than 100 DX locations available globally across major cities.
+
+A Direct Connect gateway does not allow gateway associations that are on the same Direct Connect gateway to send traffic to each other (for example, a virtual private gateway to another virtual private gateway). 
+
+Using Direct Connect gateway, by attaching a private virtual interface (VIF) from your DX location and associate with designated 
+Region virtual private gateway (VGW), your DX traffic is route to your the Region using shortest path, 
+without reaching the home-associated Region
+
+
 Area:
 =====
+globally available resource.
+
 UseCase:
 ========
 BillCost:
@@ -3082,10 +3851,23 @@ Security:
 
 ##AWS PrivateLink
 -------------------------------------------------
+AWS PrivateLink provides private connectivity between VPCs, AWS services, and your on-premises networks, without exposing your 
+traffic to the public internet. AWS PrivateLink makes it easy to connect services across different accounts and VPCs to significantly 
+simplify your network architecture.
+
+Interface VPC endpoints, powered by AWS PrivateLink, connect you to services hosted by 
+AWS Partners and supported solutions available in AWS Marketplace. By powering Gateway Load Balancer endpoints, 
+AWS PrivateLink brings the same level of security and performance to your virtual network appliances or custom traffic inspection logic.
+
+
 Area:
 =====
 UseCase:
 ========
+SECURELY ACCESS SAAS APPLICATIONS
+MAINTAIN REGULATORY COMPLIANCE
+MIGRATE TO HYBRID CLOUD
+
 BillCost:
 =========
 Security:
@@ -3094,6 +3876,12 @@ Security:
 
 ##VPC End Point Service
 -------------------------------------------------
+A VPC endpoint enables you to privately connect your VPC to supported AWS services and VPC endpoint services powered by 
+PrivateLink without requiring an internet gateway, NAT device, VPN connection, or AWS Direct Connect connection. 
+Instances in your VPC do not require public IP addresses to communicate with resources in the service. 
+Traffic between your VPC and the other service does not leave the Amazon network.
+
+
 Area:
 =====
 UseCase:
@@ -3108,6 +3896,10 @@ Security:
 
 ##VPC Classic Link 
 -------------------------------------------------
+ClassicLink allows you to link EC2-Classic instances to a VPC in your account, within the same Region. 
+If you associate the VPC security groups with a EC2-Classic instance, this enables communication between your 
+EC2-Classic instance and instances in your VPC using private IPv4 addresses.
+
 Area:
 =====
 UseCase:
@@ -3116,20 +3908,34 @@ BillCost:
 =========
 Security:
 =========
+Linking your EC2-Classic instance to a VPC does not affect your EC2-Classic security groups. 
+They continue to control all traffic to and from the instance. 
 
 
 
 
-##Gransit Gateway 
+##Transit  Gateway 
 -------------------------------------------------
+AWS Transit Gateway connects your Amazon Virtual Private Clouds (VPCs) and on-premises networks through a central hub. 
+
 Area:
 =====
 UseCase:
 ========
+Deliver applications around the world
+Rapidly move to global scale
+Smoothly respond to spikes in demanding
+Host multicast applications in the cloud
+
 BillCost:
 =========
+In AWS Transit Gateway you are charged for the number of connections that you make to the Transit Gateway per hour and the amount of traffic that flows through AWS Transit Gateway.
+
 Security:
 =========
+AWS Transit Gateway inherits compliance from Amazon VPC and meets the standards for PCI DSS Level 1, 
+ISO 9001, ISO 27001, ISO 27017, ISO 27018, SOC 1, SOC 2, SOC 3, FedRAMP Moderate, 
+FedRAMP High and HIPAA eligibility.
 
 
 
@@ -3137,6 +3943,13 @@ Security:
 
 ##VPC Traffic Mirroring
 -------------------------------------------------
+Traffic Mirroring is an Amazon VPC feature that you can use to copy network traffic from an elastic network interface of type interface. 
+You can then send the traffic to out-of-band security and monitoring appliances for:
+
+Content inspection
+Threat monitoring
+Troubleshooting
+
 Area:
 =====
 UseCase:
@@ -3151,6 +3964,10 @@ Security:
 
 ##IPv6 VPC
 -------------------------------------------------
+Your VPC can operate in dual-stack mode — your resources can communicate over IPv4, or IPv6, or both. 
+IPv4 and IPv6 communication are independent of each other. You cannot disable IPv4 support for your VPC and subnets; 
+this is the default IP addressing system for Amazon VPC and Amazon EC2.
+
 Area:
 =====
 UseCase:
@@ -3163,6 +3980,9 @@ Security:
 
 ##Egress Only Internet Gateway
 -------------------------------------------------
+An egress-only internet gateway is used to enable outbound communication over IPv6 from instances in your VPC to the internet, 
+and prevents hosts outside of your VPC from initiating an IPv6 connection with your instance.
+
 Area:
 =====
 UseCase:
@@ -3175,7 +3995,7 @@ Security:
 
 
 
-##networking Cost
+##Networking Cost
 -------------------------------------------------
 Area:
 =====
@@ -3189,14 +4009,25 @@ Security:
 
 
 
-##DMS (Database4 Migration Service)
+##DMS (Database Migration Service)
 -------------------------------------------------
+AWS Database Migration Service (AWS DMS) helps you migrate databases to AWS quickly and securely. The source database remains fully operational during the migration, minimizing downtime to applications that rely on the database. The AWS Database Migration Service can migrate your data to and from the most widely used commercial and open-source databases.
+AWS Database Migration Service supports homogeneous migrations such as Oracle to Oracle, as well as heterogeneous migrations between different database platforms, such as Oracle or Microsoft SQL Server to Amazon Aurora.
+
+
 Area:
 =====
 UseCase:
 ========
+Homogeneous Database Migrations
+Heterogeneous Database Migrations
+
 BillCost:
 =========
+You only pay for your replication instances and any additional log storage. 
+Each database migration instance includes storage sufficient for swap space, replication logs, 
+and data cache for most replications and inbound data transfer is free.
+
 Security:
 =========
 
@@ -3206,12 +4037,23 @@ Security:
 
 ##DataSync
 -------------------------------------------------
+AWS DataSync is a secure, online service that automates and accelerates moving data between on premises and AWS Storage services. DataSync can copy data between Network File System (NFS) shares, Server Message Block (SMB) shares, Hadoop Distributed File Systems (HDFS), self-managed object storage, AWS Snowcone, Amazon Simple Storage Service (Amazon S3) buckets, Amazon Elastic File System (Amazon EFS) file systems, Amazon FSx for Windows File Server file systems, Amazon FSx for Lustre file systems, Amazon FSz for OpenZFS file systems, and Amazon FSx for NetApp ONTAP file systems.
+
 Area:
 =====
 UseCase:
 ========
+Migrate your data
+Quickly move file and object data to AWS. Your data is secure with in-flight encryption and end-to-end data validation.
+Protect your data
+Securely replicate your data into cost-efficient AWS storage services, including any Amazon S3 storage class.
+Manage your hybrid data workflows
+Seamlessly move data between on-premises systems and AWS to accelerate your critical hybrid workflows.
+
 BillCost:
 =========
+\ Pay only for the amount of data that you migrate based on a flat, per-gigabyte fee according to your region.
+
 Security:
 =========
 
@@ -3220,14 +4062,26 @@ Security:
 
 ##AWS Backup
 -------------------------------------------------
+AWS Backup is a fully managed service that enables you to centralize and automate data protection across on-premises and AWS services. 
+Together with AWS Organizations, AWS Backup allows you to centrally deploy data protection (backup) policies to configure, manage, 
+and govern your backup activity across your organization’s AWS accounts and resources. 
+AWS Backup also enables you to audit and report on the compliance of your data protection policies with AWS Backup Audit Manager.
+
+AWS Backup allows you to define a central data protection policy (called a backup plan) that works across AWS services for compute,
+ storage, and databases. 
+
 Area:
 =====
 UseCase:
 ========
 BillCost:
 =========
+With AWS Backup, you pay only for the amount of backup storage you use,
+
 Security:
 =========
+
+
 
 
 ##Rekognition
