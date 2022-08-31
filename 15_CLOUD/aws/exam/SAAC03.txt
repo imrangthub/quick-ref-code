@@ -135,27 +135,17 @@ MetadataURL is http://169.254.169.254/latest/meta-data
 
 
 
+Classic Ports to know:
+• 22 = SSH (Secure Shell) - log into a Linux instance
+• 21 = FTP (File Transfer Protocol) – upload files into a file share
+• 22 = SFTP (Secure File Transfer Protocol) – upload files using SSH
+• 80 = HTTP – access unsecured websites
+• 443 = HTTPS – access secured websites
+• 3389 = RDP (Remote Desktop Protocol) – log into a Windows instance
 
 =================================================
 #Contain | Element | Object | Keyworkd     
 ================================================= 
-KeyWord and Element Wise Description.
-
-#AWS BasicInfo
--------------------------------------------------
-
-Amazon web service is an online platform that provides scalable and cost-effective cloud computing solutions.
-AWS has 80 Availability Zones across 25 geographic regions global data centers. 
-
-AWS:
--Security: AWS provides a secure and durable platform that provides end-to-end security and storage.
--Experience: The skills and infrastructure management born from Amazon’s many years of experience can be very valuable.
--Flexibility: It allows users to select the operating systems, language, database, and other services as per their requirements.
--Easy to use: AWS lets you host your applications quickly and securely, regardless of whether it’s an existing or new application.
--Scalable: The applications you use can be scaled up or down, depending on your requirements.
--Cost savings: You only pay for the compute power, storage, and other resources that you use, without any long-term commitments.
--Scheduling: This enables you to start and stop AWS services at predetermined times
--Reliability: AWS takes multiple backups at servers at multiple physical locations
 
 
 #Cloud Computing?           
@@ -164,30 +154,86 @@ Cloud computing is a computing service made available over the internet.
 Cloud computing is a pay-as-you-go model for delivering IT resources.
 You pay only for what you use.
 
-
 Cloud computing differs from a traditional, on-premises environment in many ways,
 including flexible, global, and scalable capacity, managed services, built-in security,
 options for cost optimization, and various operating models.
 
 
+
+#AWS BasicInfo
+-------------------------------------------------
+Amazon web service is an online platform that provides scalable and cost-effective cloud computing solutions.
+AWS has Regions all around the world.
+
+AWS:
+-Security: AWS provides a secure and durable platform that provides end-to-end security and storage.
+-Flexibility: It allows users to select the operating systems, language, database, and other services as per their requirements.
+-Easy to use: AWS lets you host your applications quickly and securely, regardless of whether 
+ it’s an existing or new application.
+-Scalable: The applications you use can be scaled up or down, depending on your requirements.
+-Cost savings: You only pay for the compute power, storage, and other resources that you use, without any long-term commitments.
+-Scheduling: This enables you to start and stop AWS services at predetermined times
+-Reliability: AWS takes multiple backups at servers at multiple physical locations.
+
+Use cases:
+• Enterprise IT, Backup & Storage, Big Data analytics
+• Website hosting, Mobile & Social Apps
+• Gaming
+
+
 #Region        
 -------------------------------------------------
+A region is a cluster of data centers, Most AWS services are region-scoped.
+
 How to choose  and AWS Region?
- - Compliance
- - Proximity
- - Available Service
- - Pricing
+• Compliance with data governance and legal requirements: data never leaves a region without your explicit permission.
+• Proximity to customers: reduced latency
+• Available services within a Region: new services and new features aren’t available in every Region
+• Pricing: pricing varies region to region and is transparent in the service pricing page.
  
  
 #Availabiulity Zones |  AZ | az      
 -------------------------------------------------
 Each region hase many availabuility zone.
 Usually 3, Min 2 and Max 6;
+They’re separate from each other, so that they’re isolated from disasters.
+
+
+##AWS Points of Presence (Edge Locations)
+-------------------------------------------------
+Content is delivered to end users with lower latency.
+
+
+AWS has Global Services:
+• Identity and Access Management (IAM)
+• Route 53 (DNS service)
+• CloudFront (Content Delivery Network)
+• WAF (Web Application Firewall)
+
+Most AWS services are Region-scoped:
+• Amazon EC2 (Infrastructure as a Service)
+• Elastic Beanstalk (Platform as a Service)
+• Lambda (Function as a Service)
+• Rekognition (Software as a Service)
+
+
 
 
 
 ##IAM
 -------------------------------------------------
+IAM Policies Structure:
+• Version: policy language version, always include “2012-10-17”
+• Id: an identifier for the policy (optional) 
+• Statement: one or more individual statements (required)
+• Statements consists of 
+• Sid: an identifier for the statement (optional) 
+• Effect: whether the statement allows or denies access(Allow, Deny)
+• Principal: account/user/role to which this policy applied to 
+• Action: list of actions this policy allows or denies 
+• Resource: list of resources to which the actions applied to 
+• Condition: conditions for when this policy is in effect (optional)
+
 AWS Identity and Access Management (IAM) is a web service that helps you securely control access to AWS resources. 
 You use IAM to control who is authenticated (signed in) and authorized (has permissions) to use resources.
 
@@ -195,9 +241,19 @@ Three types of Principals — root users, IAM users and Instance Principals
 IAM deals with four principle entities: users, groups, roles and policies.
 
 
+IAM Security Tools:
+IAM Credentials Report (account-level)
+• a report that lists all your account's users and the status of their various credentials
+
+IAM Access Advisor (user-level)
+• Access advisor shows the service permissions granted to a user and when those services were last accessed.
+• You can use this information to revise your policies.
+
+
 Area:
 =====
 IAM are a Global service.
+
 
 UseCase:
 ========
@@ -210,15 +266,19 @@ UseCase:
 -PCI DSS Compliance
 -Integrated with many AWS services
 
+
 BillCost:
 =========
 AWS Identity and Access Management (IAM) and AWS Security Token Service (AWS STS) are features of your 
-AWS account offered at no additional charge. You are charged only when you access other AWS services using 
-your IAM users or AWS STS temporary security credentials. 
+AWS account offered at no additional charge. 
+You are charged only when you access other AWS services using your IAM users or AWS STS temporary security credentials. 
+
 
 Security:
 =========
+MFA + Password Policy.
 NonOffcial:Identity and access management (IAM) is a framework and AWS manage service, so Its secure.
+
 
 
 
@@ -226,9 +286,8 @@ NonOffcial:Identity and access management (IAM) is a framework and AWS manage se
 
 ##User
 -------------------------------------------------
-An IAM user is an entity that you create in AWS. The IAM user represents the person or service who uses the IAM user to interact with AWS. 
-A primary use for IAM users is to give people the ability to sign in to the AWS Management Console for interactive tasks and to make 
-programmatic requests to AWS services using the API or CLI. 
+An IAM user is an entity that you create in AWS. 
+The IAM user represents the person or service who uses the IAM user to interact with AWS. 
 
 A user in AWS consists of a name, a password to sign into the AWS 
 Management Console, and up to two access keys that can be used with the API or CLI. 
@@ -238,39 +297,52 @@ Area:
 =====
 Global Service.
 
+
+
 UseCase:
 ========
 You can grant other people permission to administer and use resources in your AWS account without having to share 
 your password or access key.
 
+
+
 BillCost:
 =========
-IAM is offered at no additional charge.
+IAM User is offered at no additional charge.
+
+
 
 Security:
 =========
 NonOffcial:Manage by AWS.
 
 
+
+
+
 ##Group
 -------------------------------------------------
-An IAM user group is a collection of IAM users. You can use user groups to specify permissions for a collection of users, which can 
-make those permissions easier to manage for those users. 
+An IAM user group is a collection of IAM users. 
+You can use user groups to specify permissions for a collection of users, which can make those permissions 
+easier to manage for those users. 
 
 
 Area:
 =====
 Global Service.
 
+
 UseCase:
 ========
 A user group is a way to attach policies to multiple users at one time. 
-When you attach an identity-based policy to a user group, all of the users in the user group receive the permissions from the user group.
+When you attach an identity-based policy to a user group, all of the users in the user group receive the 
+permissions from the user group.
 
 
 BillCost:
 =========
 IAM is offered at no additional charge.
+
 
 Security:
 =========
@@ -282,11 +354,19 @@ NonOffcial:Manage by AWS.
 -------------------------------------------------
 A policy is an object in AWS that, when associated with an identity or resource, defines their permissions.
 
-Identity-based policies – Attach managed and inline policies to IAM identities (users, groups to which users belong, or roles). Identity-based policies grant permissions to an identity.
+Identity-based policies – Attach managed and inline policies to IAM identities (users, groups to which users belong, or roles). 
+Identity-based policies grant permissions to an identity.
+
 Resource-based policies – Attach inline policies to resources. 
+
 Permissions boundaries – Use a managed policy as the permissions boundary for an IAM entity (user or role). 
-Organizations SCPs – Use an AWS Organizations service control policy (SCP) to define the maximum permissions for account members of an organization or organizational unit (OU). 
-Access control lists (ACLs) – Use ACLs to control which principals in other accounts can access the resource to which the ACL is attached.
+
+Organizations SCPs – Use an AWS Organizations service control policy (SCP) to define the maximum permissions 
+for account members of an organization or organizational unit (OU). 
+
+Access control lists (ACLs) – Use ACLs to control which principals in other accounts can access the resource to 
+which the ACL is attached.
+
 Session policies – Pass advanced session policies when you use the AWS CLI or AWS API to assume a role or a federated user.
 
 
@@ -300,7 +380,9 @@ UseCase:
 You manage access in AWS by creating policies and attaching them to AWS Identity and Access Management 
 (IAM) principals (roles, users, or groups of users) or AWS resources. 
 AWS evaluates these policies when an IAM principal makes a request, such as uploading an object to an 
-Amazon Simple Storage Service (Amazon S3) bucket. Permissions in the policies determine whether the request is allowed or denied.
+
+Amazon Simple Storage Service (Amazon S3) bucket. 
+Permissions in the policies determine whether the request is allowed or denied.
 
 
 
@@ -308,51 +390,52 @@ BillCost:
 =========
 IAM is offered at no additional charge.
 
+
+
 Security:
 =========
 NonOffcial:Manage by AWS.
 
 
+
+
+
 ##IAM Role
 -------------------------------------------------
-An IAM role is very similar to a user, in that it is an identity with permission policies that determine what the 
-identity can and cannot do in AWS.
+IAM roles allow you to delegate access to users or services that normally don't have access to your organization's AWS resources. 
+
+Some AWS service will need to perform actions on your behalf. 
+To do so, we will assign permissions to AWS services with IAM Roles.
+
 
 
 Area:
 =====
 Global Service.
 
+
+
 UseCase:
 ========
-1)Giving permissions to non-humans, such as services / applications.
+1)Giving permissions to non-humans, such as services/applications.
 Ex. EC2 of  needs access to S3.
 
-2)Giving permissions to federated / outside users & groups.
+2)Giving permissions to federated/outside users & groups.
 You can't assign role to user.
+
+
 
 BillCost:
 =========
 IAM is offered at no additional charge.
+
+
 
 Security:
 =========
 NonOffcial:Manage by AWS.
 
 
-
-
-
-##IAM Security Tools
--------------------------------------------------
-Area:
-=====
-UseCase:
-========
-BillCost:
-=========
-Security:
-=========
 
 
 
@@ -362,17 +445,25 @@ MFA enabled, when a user signs in to an AWS Management Console, they will be pro
 name and password (the first factor—what they know), as well as for an authentication code from their 
 AWS MFA device (the second factor—what they have).
 
+
+
 Area:
 =====
 Global Service.
+
+
 
 UseCase:
 ========
 Multi-Factor Authentication.
 
+
+
 BillCost:
 =========
 IAM is offered at no additional charge.
+
+
 
 Security:
 =========
@@ -380,8 +471,24 @@ NonOffcial:Manage by AWS.
 
 
 
-##AWS|AccessKeys|CLI|SDK
+
+
+
+##AWS CLI | SDK | AccessKeys | CloudShell
 -------------------------------------------------
+CLI: A tool that enables you to interact with AWS services using commands in your command-line shell.
+Direct access to the public APIs of AWS services.
+
+AWS SDK: Language-specific APIs (set of libraries), Enables you to access and manage AWS services programmatically.
+Embedded within your application.
+
+
+AWS CloudShell:
+AWS CloudShell is a browser-based shell that makes it easy to securely manage, explore, and interact with your AWS resources. 
+CloudShell is pre-authenticated with your console credentials.
+Common development and operations tools are pre-installed, so no local installation or configuration is required.
+
+
 AccessKey:Access keys consist of an access key ID and secret access key, which are used to sign programmatic 
 requests that you make to AWS. 
 
@@ -389,48 +496,22 @@ Programmatic access:
 You must provide your AWS access keys to make programmatic calls to AWS or to use the 
 AWS Command Line Interface or AWS Tools for PowerShell.
 
-AWS SDK (software development kit) helps simplify your coding by providing objects for AWS services. 
-It allows developers to access AWS from the code that runs, and it includes access to 
-AWS components like Amazon S3, Amazon SNS, Amazon SQS, DynamoDB, and more
-
 
 Area:
 =====
 IAM, Gloabl.
 
+
 UseCase:
 ========
 User/Object access.
-
-BillCost:
-=========
-No additional charge.
-
-Security:
-=========
-NonOffcial:Manage by AWS.
-
-
-
-
-##CloudShell
--------------------------------------------------
-AWS CloudShell is a browser-based shell that makes it easy to securely manage, explore, and interact with your AWS resources. 
-CloudShell is pre-authenticated with your console credentials.
-Common development and operations tools are pre-installed, so no local installation or configuration is required.
-
-Area:
-=====
-Global Service.
-
-UseCase:
-========
 CloudShell, you can quickly run scripts with the AWS Command Line Interface (AWS CLI).
 
 BillCost:
 =========
 No additional charge.
 
+
 Security:
 =========
 NonOffcial:Manage by AWS.
@@ -438,11 +519,30 @@ NonOffcial:Manage by AWS.
 
 
 
+
+
 ##EC2
 -------------------------------------------------
+EC2 = Elastic Compute Cloud = Infrastructure as a Service
 Amazon Elastic Compute Cloud (Amazon EC2) provides scalable computing capacity in the Amazon Web Services (AWS) Cloud. 
-Virtual computing environments, known as instances.
+
+EC2 sizing & configuration options: 
+• Operating System (OS): Linux, Windows or Mac OS 
+• How much compute power & cores (CPU) 
+• How much random-access memory (RAM) 
+• How much storage space: 
+	• Network-attached (EBS & EFS) 
+	• hardware (EC2 Instance Store) 
+• Network card: speed of the card, Public IP address 
+• Firewall rules: security group 
+• Bootstrap script (configure at first launch): EC2 User Data
+
 AWS has a limit of 20 instances per region. 
+
+m5.2xlarge-
+m: instance class
+5: generation (AWS improves them over time)
+2xlarge: size within the instance class
 
 TypeOfEC2:
 General purpose
@@ -451,48 +551,60 @@ Memory-optimized
 Accelerated Computing
 Storage optimized
 
+
+
 Area:
 =====
 Amazon EC2 instance is a Regional resource.
 
+
+
 UseCase:
 ========
+Renting virtual machines (EC2)
 Auto-scaling, Pay-as-you-go, Increased Reliability, Elasticity.
 Run cloud-native and enterprise applications.
 Scale for HPC applications, Access the on-demand infrastructure and capacity you need to run HPC applications.
 Develop for Apple platforms.
 Train and deploy ML applications
 
+
+
 BillCost:
 =========
 EC2 in FreeTier, 750 hours per month for 12 months with the AWS Free Tier.
 Stopped EC2 instances do not incur any charges. 
 
-Regular Purchasing options for instances:
-On-Demand Instances:
-Pay for the instances that you use by the second, with a minimum of 60 seconds, with no long-term commitments or upfront payments.
 
-Savings Plans:
-You can reduce your Amazon EC2 costs by making a commitment to a consistent amount of usage, in USD per hour, for a term of 1 or 3 years.
+EC2 Instances Purchasing Options:
+• On-Demand Instances – short workload, predictable pricing, pay by second
+• Reserved (1 & 3 years)
+	• Reserved Instances – long workloads
+	• Convertible Reserved Instances – long workloads with flexible instances
+• Savings Plans (1 & 3 years) –commitment to an amount of usage, long workload
+• Spot Instances – short workloads, cheap, can lose instances (less reliable)
+• Dedicated Hosts – book an entire physical server, control instance placement
+• Dedicated Instances – no other customers will share your hardware
+• Capacity Reservations – reserve capacity in a specific AZ for any duration
+  No need for 1 or 3-year commitment, The Availability Zone in which to reserve the capacity (only one).
 
-Reserved Instances:
-You can reduce your Amazon EC2 costs by making a commitment to a specific instance configuration, including instance type and Region, for a term of 1 or 3 years.
 
-Spot Instances:
-Request unused EC2 instances, which can reduce your Amazon EC2 costs significantly.
-
-You can also pay for Dedicated Hosts.
 
 Security:
 =========
 Security is a shared responsibility between AWS and you:
-Security of the cloud – AWS is responsible for protecting the infrastructure that runs AWS services in the AWS Cloud. AWS also provides you with services that you can use securely. 
+
+Security of the cloud – AWS is responsible for protecting the infrastructure that runs AWS services in the AWS Cloud. 
+AWS also provides you with services that you can use securely. 
 
 Security in the cloud – Your responsibility includes the following areas:
 Controlling network access to your instances, for example, through configuring your VPC and security groups. 
+
 Managing the credentials used to connect to your instances.
 Managing the guest operating system and software deployed to the guest operating system, including updates and security patches.
 Configuring the IAM roles that are attached to the instance and the permissions associated with those roles. 
+
+
 
 
 
@@ -503,22 +615,36 @@ Security groups are stateful,You can specify allow rules, but not deny rules.
 An AWS security group acts as a virtual firewall for your EC2 instances to control incoming and outgoing traffic.
 You can specify one or more security groups for each EC2 instance, with a maximum of five per network interface. 
 
+All inbound traffic is blocked by default.
+All outbound traffic is authorised by default.
+
+
+
 Area:
 =====
 AWS Security Groups are region specific and VPC specific. This means that if we create a security group in one region or VPC, 
 we can only use it in that same region or VPC.
 
+
+
 UseCase:
 ========
 In AWS VPCs, AWS Security Groups act as virtual firewalls,Control traffic to resources using security groups.
+
+
 
 BillCost:
 =========
 There is no charge applicable to Security Groups in Amazon EC2 / Amazon VPC. 
 
+
+
 Security:
 =========
 NonOffcial:Manage by AWS.
+
+
+
 
 
 
@@ -530,11 +656,11 @@ When you launch an Amazon EC2 instance, you specify an IAM role to associate wit
 
 
 
+
+
 ##Elastic IP | PublicVsPrivate
 -------------------------------------------------
-An Elastic IP address is a static (doesn't change) IPv4 address associated with your AWS account. 
-It is also public, meaning the IP address is uniquely reachable across the internet.
-
+An Elastic IP address is a static (doesn't change) public IPv4 address associated with your AWS account. 
 WS accounts are limited to five (5) Elastic IP addresses per Region.
 
 PublicVsPrivate:
@@ -544,14 +670,22 @@ You can use private IPv4 addresses for communication between instances in the sa
 A public IP address is an IPv4 address that's reachable from the Internet. 
 You can use public addresses for communication between your instances and the Internet.
 
+
+
 Area:
 =====
 An Elastic IP address is for use in a specific Region only, and cannot be moved to a different Region.
 
+
+
 UseCase:
 ========
-You can mask the failure of an instance or software by rapidly remapping the address to another instance in your account. 
-Alternatively, you can specify the Elastic IP address in a DNS record for your domain, so that your domain points to your instance.
+You can mask the failure of an instance or software by rapidly remapping the address to another instance in your account.
+ 
+Alternatively, you can specify the Elastic IP address in a DNS record for your domain, 
+so that your domain points to your instance.
+ 
+ 
  
 BillCost:
 =========
@@ -560,9 +694,14 @@ not associated with a running instance, or if it is associated with a stopped in
 While your instance is running, you are not charged for one Elastic IP address associated with the instance, 
 but you are charged for any additional Elastic IP addresses associated with the instance.
 
+
+
 Security:
 =========
 NonOffcial:Manage by AWS.
+
+
+
 
 
 
@@ -572,28 +711,48 @@ Placement Groups are logical groupings or clusters of instances in the selected 
 Placement groups are specifically used for launching cluster compute instance types.
 
 Placement type:
-Cluster – packs instances close together inside an Availability Zone. This strategy enables workloads to achieve the low-latency 
-network performance necessary for tightly-coupled node-to-node communication that is typical of HPC applications.
+Cluster – (Same Rack Same AZ )clusters instances into a low-latency group in a single Availability Zone.
+This strategy enables workloads to achieve the low-latency network performance.
 
-Partition – spreads your instances across logical partitions such that groups of instances in one 
-partition do not share the underlying hardware with groups of instances in different partitions. 
-It spreads the instances across many different partitions within an AZ.
-This strategy is typically used by large distributed and replicated workloads, such as Hadoop, Cassandra, and Kafka.
+Use case:
+• Big Data job that needs to complete fast
+• Application that needs extremely low latency and high network throughput
+
+Partition—spreads instances across many different partitions (which rely on
+different sets of racks) within an AZ. Scales to 100s of EC2 instances per group (Hadoop, Cassandra, Kafka)
+Can span across multiple AZs in the same region.
+The instances in a partition do not share racks with the instances in the other partitions.
 
 Spread – strictly places a small group of instances across distinct underlying hardware to reduce correlated failures.
 It spread the instances across underlying hardware.
+Use case:
+• Application that needs to maximize high availability.
+• Critical Applications where each instance must be isolated from failure from each other.
+
+
 
 Area:
 =====
+Regional Operation.
+
+
+
 UseCase:
 ========
+Different latency and high network throughput cases.
+
+
+
 BillCost:
 =========
 There is no charge for creating a placement group.
 
+
+
 Security:
 =========
 NonOffcial:Manage by AWS.
+
 
 
 
@@ -615,9 +774,14 @@ Security Group(s)
 Source/Destination Check Flag
 Delete on Termination Flag
 
+
+
 Area:
 =====
-Each ENI lives within a particular subnet of the VPC (and hence within a particular Availability Zone.
+Bound to a specific availability zone (AZ)
+Each ENI lives within a particular subnet of the VPC.
+
+
 
 UseCase:
 ========
@@ -625,9 +789,13 @@ A common use case for ENIs is the creation of management networks.
 This allows you to have public-facing applications like web servers in a public subnet but lock down 
 SSH access down to a private subnet on a secondary network interface.
 
+
+
 BillCost:
 =========
 ENIs are entirely free to use, though they are not exempt from the standard AWS data charges.
+
+
 
 Security:
 =========
@@ -636,22 +804,39 @@ ENIs have security groups, just like EC2 instances, which act as a built in fire
 
 
 
+
+
 ##EC2 Hibernate
 -------------------------------------------------
 Hibernation gives you the ability to launch EC2 instances, set them up as desired, hibernate them, and then quickly 
-bring them back to life when you need them. Applications pick up exactly where they left off instead of rebuilding their memory footprint. 
+bring them back to life when you need them. 
+Applications pick up exactly where they left off instead of rebuilding their memory footprint. 
 
 Hibernation saves the contents from the instance memory (RAM) to your Amazon Elastic Block Store (Amazon EBS) root volume.
+Root Volume – must be EBS, encrypted, not instance store, and large
+An instance can NOT be hibernated more than 60 day
+
+
 
 Area:
 =====
 Some of region not all.
 
+
+
 UseCase:
 ========
+Long-running processing
+Saving the RAM state
+Services that take time to initialize
+
+
+
 BillCost:
 =========
 While the instance is in hibernation, you pay only for the EBS storage and any Elastic IP addresses attached to the instance.
+
+
 
 Security:
 =========
@@ -659,10 +844,41 @@ NonOffcial:Manage by AWS.
 
 
 
+
+
+
+##EC2 Nitro
+-------------------------------------------------
+Underlying Platform for the next generation of EC2 instances
+• New virtualization technology
+• Allows for better performance:
+	• Better networking options (enhanced networking, HPC, IPv6)
+	• Higher Speed EBS (Nitro is necessary for 64,000 EBS IOPS – max 32,000 on non-Nitro)
+• Better underlying security
+
+
+
+
+
 #Storage | DB | db | s3 | efs | ebs           
 -------------------------------------------------
 There are several categories of databases:
 Relational (OLTP and OLAP), Document, Key Value, Graph, In Memory among others
+
+AWS Storage:
+  - Simple Storage service (S3)
+  - Elastic file system (EFS)
+  - Elastic Block Storage (EBS)
+  - Glacier
+  - Snowball
+  
+  
+Amazon S3 is an object storage service that stores data as objects within buckets. that offers 
+industry-leading scalability, data availability, security, and performance.
+
+
+An object is a file and any metadata that describes the file. A bucket is a container for objects.
+Each object has a key (or key name), which is the unique identifier for the object within the bucket.
 
 Buckets:
 -Buckets are a universal namespace, i.e., the bucket names must be unique.
@@ -673,12 +889,6 @@ Buckets:
 -By default buckets are private and all the objects stored in a bucket are also private.
 
 
-Amazon Simple Storage Service (Amazon S3) is an object storage service that offers 
-industry-leading scalability, data availability, security, and performance.
-
-Amazon S3 is an object storage service that stores data as objects within buckets. 
-An object is a file and any metadata that describes the file. A bucket is a container for objects.
-Each object has a key (or key name), which is the unique identifier for the object within the bucket.
 
 Access control lists (ACLs)
 You can use ACLs to grant read and write permissions to authorized users for individual buckets and objects. 
@@ -689,12 +899,7 @@ Amazon S3 cloud storage is an object-based storage service. You cannot install a
 Amazon S3 storage because data cannot be accessed on the block level as it is required by an operating system.
 
 
-AWS Storage:
-  - Simple Storage service (S3)
-  - Elastic file system (EFS)
-  - Elastic Block Storage (EBS)
-  - Glacier
-  - Snowball
+
   
 
 
@@ -712,20 +917,29 @@ warehouse service that is designed to operate at less than a tenth the cost of
 traditional solutions.
 
 
+
+
+
+
 ##EBS
 -------------------------------------------------
 AWS Elastic Block Store (EBS) is Amazon’s block-level storage solution used with the EC2 cloud service to store persistent data. 
 This means that the data is kept on the AWS EBS servers even when the EC2 instances are shut down. 
 
 
+
 Area:
 =====
 EBS volume in a specific Availability Zone
 
+
+
 UseCase:
 ========
+Preserve root volume when instance is terminated
 Run relational or NoSQL databases
 Migrate mid-range, on-premises storage area network (SAN) workloads to the cloud.
+
 
 
 BillCost:
@@ -733,7 +947,10 @@ BillCost:
 30 GB of storage for 12 months with the AWS Free Tier
 With Amazon Elastic Block Store (EBS), you pay only for what you provision. 
 Volume storage for all EBS volume types is charged by the amount of GB you provision per month until you release the storage. 
-Costs increase for EBS volumes that support additional input/output operations per second (IOPS) and throughput beyond baseline performance.
+Costs increase for EBS volumes that support additional input/output operations per second (IOPS) and throughput 
+beyond baseline performance.
+
+
 
 Security:
 =========
@@ -749,22 +966,136 @@ Encrypted Volumes and snapshots  with CMK
 
 
 
+
+##AMI
+-------------------------------------------------
+• AMI = Amazon Machine Image
+• AMI are a customization of an EC2 instance
+	• You add your own software, configuration, operating system, monitoring…
+	• Faster boot / configuration time because all your software is pre-packaged
+• AMI are built for a specific region (and can be copied across regions)
+• You can launch EC2 instances from:
+	• A Public AMI: AWS provided
+	• Your own AMI: you make and maintain them yourself
+	• An AWS Marketplace AMI: an AMI someone else made (and potentially sells)
+
+
+
+AMI to EC2 Instance:
+• Start an EC2 instance and customize it
+• Stop the instance (for data integrity)
+• Build an AMI – this will also create EBS snapshots
+• Launch instances from other AMIs
+
+
+ 
+ 
+ 
+ 
+ 
+##EC2 Instance Store
+-------------------------------------------------
+• EBS volumes are network drives with good but “limited” performance
+• If you need a high-performance hardware disk, use EC2 Instance Store
+• Better I/O performance
+• EC2 Instance Store lose their storage if they’re stopped (ephemeral)
+• Good for buffer / cache / scratch data / temporary content
+• Risk of data loss if hardware fails
+• Backups and Replication are your responsibility
+
+
+
+
+
+
+##EBS Volume Types Use cases
+-------------------------------------------------
+EBS Volumes come in 6 types
+EBS Volumes are characterized in Size | Throughput | IOPS (I/O Ops Per Sec)
+
+General Purpose SSD:
+• Cost effective storage, low-latency
+• System boot volumes, Virtual desktops, Development and test environments
+
+
+Provisioned IOPS (PIOPS) SSD:
+• Critical business applications with sustained IOPS performance
+• Or applications that need more than 16,000 IOPS
+• Great for databases workloads (sensitive to storage perf and consistency)
+  Supports EBS Multi-attach 
+
+Hard Disk Drives (HDD):
+• Cannot be a boot volume 
+• 125 GiB to 16 TiB
+
+
+
+EBS Multi-Attach – io1/io2 family:
+• Attach the same EBS volume to multiple EC2 instances in the same AZ
+• Each instance has full read & write permissions to the volume
+
+Use case:
+• Achieve higher application availability in clustered Linux applications (ex: Teradata)
+• Applications must manage concurrent write operations
+• Must use a file system that’s cluster-aware (not XFS, EX4, etc…)
+
+
+
+EBS Encryption:
+• When you create an encrypted EBS volume, you get the following:
+• Data at rest is encrypted inside the volume
+• All the data in flight moving between the instance and the volume is encrypted
+• All snapshots are encrypted
+• All volumes created from the snapshot
+• Encryption and decryption are handled transparently (you have nothing to do)
+• Encryption has a minimal impact on latency
+• EBS Encryption leverages keys from KMS (AES-256)
+• Copying an unencrypted snapshot allows encryption
+• Snapshots of encrypted volumes are encrypted
+
+
+Encrypt an unencrypted EBS volume:
+• Create an EBS snapshot of the volume
+• Encrypt the EBS snapshot ( using copy )
+• Create new ebs volume from the snapshot ( the volume will also be encrypted )
+• Now you can attach the encrypted volume to the original instance
+
+
+
+
+
+
 ##EFS
 -------------------------------------------------
-Amazon EFS provides a simple, serverless, set-and-forget elastic file system. With Amazon EFS, you can create a file system, 
+Compatible with Linux based AMI (not Windows)
+
+Amazon EFS provides a simple, serverless, set-and-forget elastic file system. 
+With Amazon EFS, you can create a file system, 
 mount the file system on an Amazon EC2 instance, and then read and write data to and from your file system.
 
-Amazon EFS offers four storage classes: two standard storage classes, including Amazon EFS Standard and 
-Amazon EFS Standard-Infrequent Access (EFS Standard-IA), and two One Zone storage classes, including Amazon EFS 
+Amazon EFS offers four storage classes: 
+
+Two standard storage classes, including Amazon EFS Standard and 
+Amazon EFS Standard-Infrequent Access (EFS Standard-IA). 
+
+Two One Zone storage classes, including Amazon EFS 
 One Zone and Amazon EFS One Zone-Infrequent Access (EFS One Zone-IA).
+
+Can copy snapshots across AZ or Region.
+
 
 
 Area:
 =====
-Amazon EFS is a regional service storing data within and across multiple Availability Zones (AZs) for high availability and durability.
+Amazon EFS is a regional service storing data within and across multiple Availability Zones (AZs) 
+for high availability and durability.
+ 
+ 
  
 UseCase:
 ========
+Content management, web serving, data sharing, Wordpress
+
 Share code and other files in a secure, organized way to increase DevOps agility and respond faster to customer feedback.
 Persist and share data from your AWS containers and serverless applications with zero
 management required.
@@ -777,8 +1108,13 @@ EFS serverless, set-and-forget, elastic file system. There is no minimum fee or 
 You pay only for the storage you use, for read and write access to data stored in Infrequent Access storage classes, 
 and for any provisioned throughput.
 
+
+
 Security:
 =========
+Uses security group to control access to EFS
+Encryption at rest using KMS
+
 The AWS shared responsibility model applies to data protection in Amazon Elastic File System.
 When using Amazon EFS, you specify Amazon EC2 security groups for your EC2 instances and security groups for the 
 EFS mount targets associated with the file system.
@@ -787,22 +1123,7 @@ EFS mount targets associated with the file system.
 
 
 
-#ECMP
--------------------------------------------------
-Equal-cost multi-path routing (ECMP) is a routing strategy where packet forwarding to a single destination can occur over multiple best paths with equal routing priority. 
-Multi-path routing can be used in conjunction with most routing protocols because it is a per-hop local decision made independently at each router.
 
-
-AWS Transit Gateway VPN supports ECMP protocol that can load balance traffic across multiple VPN tunnels. 
-The question is, can Transit Gateway ECMP be used to deploy a transit DMZ as shown in the diagram below?
-
-
-
-
-
-
-
- 
 #Elastic Fabric Adapter (EFA)
 -------------------------------------------------
 An Elastic Fabric Adapter (EFA) is a network device that you can attach to your Amazon EC2 instance to accelerate 
@@ -827,6 +1148,10 @@ EFA supports industry-standard libfabric APIs, so applications that use a suppor
 migrated to AWS with little or no modification.
 
  
+ 
+ 
+ 
+ 
 #ENA (Elastic Network Adapter)
 -------------------------------------------------
 The Elastic Network Adapter (ENA) is designed to improve operating system health and reduce 
@@ -848,6 +1173,10 @@ move from idea to market with virtually unlimited compute capacity, a high-perfo
 and high-throughput networking.
 
 
+
+
+
+
 #ParallelCluster 
 -------------------------------------------------
 AWS ParallelCluster is an open source cluster management tool that makes it easy for you to deploy and manage High Performance 
@@ -858,6 +1187,8 @@ instance types and job submission queues, and job schedulers like AWS Batch and 
 AWS ParallelCluster is built on the popular open source CfnCluster project and is released via the Python Package Index (PyPI). 
 ParallelCluster's source code is hosted on the Amazon Web Services repository on GitHub. 
 AWS ParallelCluster is available at no additional charge, and you pay only for the AWS resources needed to run your applications.
+
+
 
 
 
@@ -893,6 +1224,8 @@ will lose 24 hours’ worth of data.
 
 For example, if you have a 4-hour RPO for an application then you will have a maximum 4-hour gap between backup and data loss.
 Having a 4-hour RPO does not necessarily mean you will lose 4 hours’ worth of data.
+
+
 
 
 
