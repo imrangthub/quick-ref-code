@@ -1124,106 +1124,43 @@ EFS mount targets associated with the file system.
 
 
 
-#Elastic Fabric Adapter (EFA)
+##Scalability & High Availability
 -------------------------------------------------
-An Elastic Fabric Adapter (EFA) is a network device that you can attach to your Amazon EC2 instance to accelerate 
-High Performance Computing (HPC) and machine learning applications. EFA enables you to achieve the application performance of 
-an on-premises HPC cluster, with the scalability, flexibility, and elasticity provided by the AWS Cloud.
-
-Elastic Fabric Adapter (EFA) is a network interface for Amazon EC2 instances that enables customers to run applications 
-requiring high levels of inter-node communications at scale on AWS. 
-Its custom-built operating system (OS) bypass hardware interface enhances the performance of inter-instance communications, 
-which is critical to scaling these applications. 
+• Scalability means that an application / system can handle greater loads by adapting.
+• There are two kinds of scalability:
+• Vertical Scalability
+• Horizontal Scalability (= elasticity)
+• Scalability is linked but different to High Availability
 
 
-You can create, use, and manage an EFA much like any other elastic network interface in Amazon EC2. 
-However, unlike elastic network interfaces, EFAs cannot be attached to or detached from an instance in a running state.
+Vertical Scaling: Increase instance size (= scale up / down)
+• From: t2.nano - 0.5G of RAM, 1 vCPU
+• To: u-12tb1.metal – 12.3 TB of RAM, 448 vCPUs
 
-Elastic Fabric Adapter (EFA) is a network interface for Amazon EC2 instances that enables customers to run HPC applications 
-requiring high levels of inter-instance communications, like computational fluid dynamics, weather modeling, 
-and reservoir simulation, at scale on AWS. It uses a custom-built operating system bypass technique to enhance the 
-performance of inter-instance communications, which is critical to scaling HPC applications. With EFA, 
-HPC applications using popular HPC technologies like Message Passing Interface (MPI) can scale to thousands of CPU cores. 
-EFA supports industry-standard libfabric APIs, so applications that use a supported MPI library can be 
-migrated to AWS with little or no modification.
+Horizontal Scaling: Increase number of instances (= scale out / in)
+• Auto Scaling Group
+• Load Balancer
 
- 
- 
- 
- 
- 
-#ENA (Elastic Network Adapter)
--------------------------------------------------
-The Elastic Network Adapter (ENA) is designed to improve operating system health and reduce 
-the chances of long-term disruption because of unexpected hardware behavior and or failures. 
-The ENA architecture keeps device or driver failures as transparent to the system as possible. 
-This topic provides troubleshooting information for ENA.
-
-#With EC2
-The Elastic Network Adapter (ENA) driver publishes network performance metrics from the instances where they are enabled. 
-You can use these metrics to troubleshoot instance performance issues, choose the right instance size for a workload, 
-plan scaling activities proactively, and benchmark applications to determine whether they maximize the
-performance available on an instance.
-
-#HPC (High Performance Computing)
--------------------------------------------------
-Run your large, complex simulations and deep learning workloads in the cloud with a complete suite of 
-high performance computing (HPC) products and services on AWS. Gain insights faster, and quickly
-move from idea to market with virtually unlimited compute capacity, a high-performance file system,
-and high-throughput networking.
+High Availability: Run instances for the same application across multi AZ
+• Auto Scaling Group multi AZ
+• Load Balancer multi AZ
 
 
 
+Load Balancing:
+Load Balances are servers that forward traffic to multiple servers (e.g., EC2 instances) downstream.
 
 
+Why use a load balancer? 
+• Spread load across multiple downstream instances 
+• Expose a single point of access (DNS) to your application 
+• Seamlessly handle failures of downstream instances 
+• Do regular health checks to your instances 
+• Provide SSL termination (HTTPS) for your websites 
+• Enforce stickiness with cookies 
+• High availability across zones 
+• Separate public traffic from private traffic
 
-#ParallelCluster 
--------------------------------------------------
-AWS ParallelCluster is an open source cluster management tool that makes it easy for you to deploy and manage High Performance 
-Computing (HPC) clusters on AWS. ParallelCluster uses a simple text file to model and provision all the 
-resources needed for your HPC applications in an automated and secure manner. It also supports multiple 
-instance types and job submission queues, and job schedulers like AWS Batch and Slurm.
-
-AWS ParallelCluster is built on the popular open source CfnCluster project and is released via the Python Package Index (PyPI). 
-ParallelCluster's source code is hosted on the Amazon Web Services repository on GitHub. 
-AWS ParallelCluster is available at no additional charge, and you pay only for the AWS resources needed to run your applications.
-
-
-
-
-
-RTO and RPO
--------------------------------------------------
-Among the components of a DR plan are two key parameters that define how long your business can afford to be offline and how
-much data loss it can tolerate. These are the Recovery Time Objective (RTO) and Recovery Point Objective (RPO).
-
-
-RTO:
-RTO is the goal your organization sets for the maximum length of time it should take to restore normal 
-operations following an outage or data loss.
-
-RTO refers to how much time an application can be down without causing significant damage to the business. 
-Some applications can be down for days without significant consequences. 
-
-RTO is not simply the duration of time between loss and recovery. The objective also accounts for the steps 
-IT must take to restore the application and its data.
-
-
-
-RPO:
-RPO is your goal for the maximum amount of data the organization can tolerate losing. 
-This parameter is measured in time: from the moment a failure occurs to your last valid data backup. 
-For example, if you experience a failure now and your last full data backup was 24 hours ago, the RPO is 24 hours. 
-
-
-Recovery point objectives refer to your company’s loss tolerance: the amount of data that can be lost before significant 
-harm to the business occurs. 
-
-If you back up all or most of your data in regularly scheduled 24-hour increments, then in the worst-case scenario you 
-will lose 24 hours’ worth of data.
-
-For example, if you have a 4-hour RPO for an application then you will have a maximum 4-hour gap between backup and data loss.
-Having a 4-hour RPO does not necessarily mean you will lose 4 hours’ worth of data.
 
 
 
@@ -1232,23 +1169,41 @@ Having a 4-hour RPO does not necessarily mean you will lose 4 hours’ worth of 
 ##ELB (Elastic Load Balancer) 
 -------------------------------------------------
 Elastic Load Balancing automatically distributes your incoming traffic across multiple targets, such as 
-EC2 instances, containers, and IP addresses, in one or more Availability Zones. 
+EC2 instances, containers, and IP addresses, in one or more Availability Zones.
+ 
 It monitors the health of its registered targets, and routes traffic only to the healthy targets. 
 Elastic Load Balancing scales your load balancer capacity automatically in response to changes in incoming traffic.
 
 Elastic Load Balancing supports the following load balancers: 
 Application Load Balancers, 
 Network Load Balancers, 
-Gateway Load Balancers, and Classic Load Balancers.
+Gateway Load Balancers,
+Classic Load Balancers.
+
+
+
+It is integrated with many AWS offerings / services:
+• EC2, EC2 Auto Scaling Groups, Amazon ECS
+• AWS Certificate Manager (ACM), CloudWatch
+• Route 53, AWS WAF, AWS Global Accelerator
+
+Some load balancers can be setup as internal (private) or external (public) ELBs
+
+
+
 
 Area:
 =====
 ELB is one of many AWS services that have a regional scope, it does not allow you to distribute traffic to another region
 
+
+
 UseCase:
 ========
 A load balancer distributes workloads across multiple compute resources, such as virtual servers. 
 Using a load balancer increases the availability and fault tolerance of your applications.
+
+
 
 BillCost:
 =========
@@ -1264,10 +1219,13 @@ which is an integral part of your billing calculation, along with the region you
 
 Security:
 =========
+Security Group in Load Balancer => Application Security Group: Allow traffic only from Load Balancer.
+
 Ensure your ELBs do not use insecure or deprecated SSL ciphers.
 Ensure that your AWS ELBs listeners are using a secure protocol (HTTPS or SSL).
 Ensure there are valid security groups associated with your Elastic Load Balancer.
-Ensure that your AWS Elastic Load Balancers use access logging to analyze traffic patterns and identify and troubleshoot security issues.
+Ensure that your AWS Elastic Load Balancers use access logging to analyze traffic patterns and 
+identify and troubleshoot security issues.
 
 
 
@@ -1281,32 +1239,78 @@ The AWS Classic Load Balancer (CLB) operates at Layer 4 of the OSI model.
 What this means is that the load balancer routes traffic between clients and backend servers based on IP address and TCP port. 
 For example, an ELB at a given IP address receives a request from a client on TCP port 80 (HTTP).
 
+• Supports TCP (Layer 4), HTTP & HTTPS (Layer 7)
+• Health checks are TCP or HTTP based
+• Fixed hostname XXX.region.elb.amazonaws.com
+
+
 Area:
 =====
+Regional scope.
+
+
+
 UseCase:
 ========
+Support for EC2-Classic
+Support for TCP and SSL listeners
+Support for sticky sessions using application-generated cookies
+
+
+
 BillCost:
 =========
 You are charged for each hour or partial hour that a 
 Classic Load Balancer is running and for each GB of data transferred through your load balancer.
+
+
+
 Security:
 =========
+Security is a shared responsibility.
+Elastic Load Balancing provides a security group.
+
 
 
 ##ALB (Application Load Balancer)
 -------------------------------------------------
 An Application Load Balancer (ALB) only works at layer 7 (HTTP).
-An Application Load Balancer functions at the application layer, the seventh layer of the Open Systems Interconnection (OSI) model. 
-
 A listener checks for connection requests from clients, using the protocol and port that you configure. 
-The rules that you define for a listener determine how the load balancer routes requests to its registered targets. 
-Each rule consists of a priority, one or more actions, and one or more conditions. 
-When the conditions for a rule are met, then its actions are performed. 
-You must define a default rule for each listener, and you can optionally define additional rules.
+
+
+• Load balancing to multiple HTTP applications across machines(target groups)
+• Load balancing to multiple applications on the same machine(ex: containers)
+• Support for HTTP/2 and WebSocket
+• Support redirects (from HTTP to HTTPS for example)
+
+Routing tables to different target groups:
+• Routing based on path in URL (example.com/users & example.com/posts)
+• Routing based on hostname in URL (one.example.com & other.example.com)
+• Routing based on Query String, Headers (example.com/users?id=123&order=false)
+
+
+
+Target Groups:
+• EC2 instances (can be managed by an Auto Scaling Group) – HTTP
+• ECS tasks (managed by ECS itself) – HTTP
+• Lambda functions – HTTP request is translated into a JSON event
+• IP Addresses – must be private IPs
+• ALB can route to multiple target groups
+• Health checks are at the target group leve
+
+
+• Fixed hostname (XXX.region.elb.amazonaws.com)
+• The application servers don’t see the IP of the client directly
+	• The true IP of the client is inserted in the header X-Forwarded-For
+	• We can also get Port (X-Forwarded-Port) and proto (X-Forwarded-Proto)
 
 
 Area:
 =====
+Regional scope.
+
+
+
 UseCase:
 ========
 IP address registration as targets
@@ -1316,38 +1320,73 @@ AWS WAF load balancer
 SNI
 Enhanced containers via load balancing between multiple ports of a single instance
 
+
+
 BillCost:
 =========
 You are charged for each hour or partial hour that an Application Load Balancer is running, 
 and the number of Load Balancer Capacity Units (LCU) used per hour.
 
+
+
 Security:
 =========
+Security is a shared responsibility.
+Elastic Load Balancing provides a security group.
+
+
+
 
 
 
 ##NLB (Network Load Balancer)
 -------------------------------------------------
-You can load balance both TCP and UDP traffic, routing connections to targets - Amazon EC2 instances, microservices, and containers.
-Network Load Balancer operates at the connection level (Layer 4), routing connections to 
-targets (Amazon EC2 instances, microservices, and containers) within Amazon VPC, based on IP protocol data. 
+Network load balancers (Layer 4) allow to:
+	• Forward TCP & UDP traffic to your instances
+	• Handle millions of request per seconds
+	• Less latency ~100 ms (vs 400 ms for ALB)
+	
+• NLB has one static IP per AZ, and supports assigning Elastic IP(helpful for whitelisting specific IP)
+
+
+
+Network Load Balancer –Target Groups:
+• EC2 instances
+• IP Addresses – must be private IPs
+• Application Load Balancer
 
 
 Area:
 =====
+Regional scope.
+
+
+
 UseCase:
 ========
+NLB are used for extreme performance, TCP or UDP traffic
 This type of load balancer works at the transport layer(TCP/SSL) of the OSI model. 
-It’s capable of handling millions of requests per second.  It is mainly used for load balancing TCP traffic.
+It’s capable of handling millions of requests per second.  
+It is mainly used for load balancing TCP traffic.
+
+
 
 BillCost:
 =========
+Not included in the AWS free tier
 You are charged for each hour or partial hour that a Network Load Balancer is running, and the number of 
 Network Load Balancer Capacity Units (NLCU) used by Network Load Balancer per hour.
 
+
+
 Security:
 =========
+Security is a shared responsibility.
 Network Load Balancers do not have security groups.
+
+
+
+
 
 
 ##GWLB (Gateway Load Balaner)
@@ -1355,21 +1394,34 @@ Network Load Balancers do not have security groups.
 Gateway Load Balancer helps deploy, scale, and manage virtual appliances, such as firewalls, intrusion detection and 
 prevention systems (IDS/IPS), and deep packet inspection systems.
 
-operates at Layer 3 of the OSI model, the network layer.
+Operates at Layer 3 of the OSI model, the network layer.
+Uses the GENEVE protocol on port 6081
+
+
+Gateway Load Balancer –Target Groups:
+• EC2 instances
+• IP Addresses – must be private IPs
+
+
 
 Area:
 =====
 Runs within one AZ and is recommended to be deployed in multiple AZs for greater availability.
 
+
+
 UseCase:
 ========
 Deploy third-party virtual appliances faster.
-Scale virtual appliances while managing costs.
+Centralize your third-party virtual appliances
 Improve virtual appliance availability.
 Centralize your third-party virtual appliances
 Add third-party security appliances to your network
 Integration with orchestration and deployment tools.
-Gateway Load Balancers provides you the facility to deploy, scale, and manage virtual appliances like firewall. Gateway Load Balancers combines a transparent network gateway and then distributes the traffic.
+Gateway Load Balancers provides you the facility to deploy, scale, and manage virtual appliances like firewall. 
+Gateway Load Balancers combines a transparent network gateway and then distributes the traffic.
+
+
 
 BillCost:
 =========
@@ -1378,45 +1430,213 @@ Gateway Load Balancer Capacity Units (GLCU) used by Gateway Load Balancer per ho
 Gateway Load Balancer uses Gateway Load Balancer Endpoint (GWLBE),GWLBE is priced and billed separately.
 You pay charges for inter-AZ data transfer if enabled.
 
+Gateway Load Balancer + Gateway Load Balancer endpoints + virtual appliances + data processing charges.
+
+
+
 Security:
 =========
+Security is a shared responsibility.
+Gateway Load Balancers do not have associated security groups. Therefore, the security groups for your
+targets must use IP addresses to allow traffic from the load balancer
+
+
+
+
+
+
+
+##Sticky Sessions (Session Affinity)
+-------------------------------------------------
+It is possible to implement stickiness so that the same client is always redirected to the 
+same instance behind a load balancer
+• This works for Classic Load Balancers & Application Load Balancers
+• The “cookie” used for stickiness has an expiration date you control
+• Enabling stickiness may bring imbalance to the load over the backend EC2 instances 
+
+Use case: 
+Make sure the user doesn’t lose his session data.
+
+
+Sticky Sessions – Cookie Names:
+• Application-based Cookies
+
+Custom cookie
+	• Generated by the target
+	• Can include any custom attributes required by the application
+	• Cookie name must be specified individually for each target group
+	• Don’t use AWSALB, AWSALBAPP, or AWSALBTG (reserved for use by the ELB)
+
+Application cookie
+	• Generated by the load balancer
+	• Cookie name is AWSALBAPP
+
+• Duration-based Cookies
+	• Cookie generated by the load balancer
+	• Cookie name is AWSALB for ALB, AWSELB for CLB
+
+
+
+Cross-Zone Load Balancing:
+With Cross Zone Load Balancing  each load balancer instance distributes evenly
+across all registered instances in all AZ.(All Host==Host)
+
+Without Cross Zone Load Balancing: Requests are distributed in the instances of the
+node of the Elastic Load Balancer (All AZ == AZ)
+
+
+
+Cross-Zone Load Balancing:
+• Application Load Balancer 
+	• Always on (can’t be disabled) 
+	• No charges for inter AZ data 
+• Network Load Balancer 
+	• Disabled by default 
+	• You pay charges ($) for inter AZ data if enabled 
+• Classic Load Balancer 
+	• Disabled by default 
+	• No charges for inter AZ data if enabled
+
+
+SSL/TLS - Basics:
+• An SSL Certificate allows traffic between your clients and your load balancer
+to be encrypted in transit (in-flight encryption)
+• SSL refers to Secure Sockets Layer, used to encrypt connections
+• TLS refers to Transport Layer Security, which is a newer version
+• Nowadays, TLS certificates are mainly used, but people still refer as SSL
+• Public SSL certificates are issued by Certificate Authorities (CA)
+• Comodo, Symantec, GoDaddy, GlobalSign, Digicert, Letsencrypt, etc…
+• SSL certificates have an expiration date (you set) and must be renewed
+
+You can manage certificates using ACM (AWS Certificate Manager)
+You can create upload your own certificates alternatively
+
+HTTPS listener:
+• You must specify a default certificate
+• You can add an optional list of certs to support multiple domains
+• Clients can use SNI (Server Name Indication) to specify the hostname they reach
+• Ability to specify a security policy to support older versions of SSL / TLS (legacy clients)
+
+
+
+SSL – Server Name Indication (SNI):
+• SNI solves the problem of loading multiple SSL certificates onto one web server (to serve multiple websites)
+• The server will then find the correct certificate, or return the default one
+Note:
+• Only works for ALB & NLB (newer generation), CloudFront
+• Does not work for CLB (older gen)
+
+
+
+Classic Load Balancer (v1)
+• Support only one SSL certificate
+• Must use multiple CLB for multiple hostname with multiple SSL certificates
+
+Application Load Balancer (v2)
+• Supports multiple listeners with multiple SSL certificates
+• Uses Server Name Indication (SNI) to make it work
+
+Network Load Balancer (v2)
+• Supports multiple listeners with multiple SSL certificates
+• Uses Server Name Indication (SNI) to make it work
+
+
+
+Connection Draining:
+AWS ELB connection draining prevents breaking open network connections while taking an instance out of service, 
+updating its software, or replacing it with a fresh instance that contains updated software.
+
+Stops sending new requests to the EC2 instance which is willing to de-registering.
+
+Feature naming:
+• Connection Draining – for CLB
+• Deregistration Delay – for ALB & NLB
+
 
 
 
 
 ##ASG (Auto Scaling Group)
 -------------------------------------------------
-AWS Auto Scaling monitors your applications and automatically adjusts capacity to maintain steady, 
-predictable performance at the lowest possible cost. Using AWS Auto Scaling, it’s easy to setup application scaling for 
-multiple resources across multiple services in minutes.
+AWS Auto Scaling monitors your applications and automatically adjusts capacity.
+
+The goal of an Auto Scaling Group (ASG) is to:
+• Scale out (add EC2 instances) to match an increased load
+• Scale in (remove EC2 instances) to match a decreased load
+• Ensure we have a minimum and a maximum number of EC2 instances running
+• Automatically register new instances to a load balancer
+• Re-create an EC2 instance in case a previous one is terminated (ex: if unhealthy)
 
 Use predictive scaling:
-You can also combine predictive scaling and dynamic scaling (proactive and reactive approaches, respectively) to scale your EC2 capacity faster.
+You can also combine predictive scaling and dynamic scaling (proactive and reactive approaches, respectively) 
+to scale your EC2 capacity faster.
 
 
+Auto Scaling Group Attributes:
+• A Launch Template (older “Launch Configurations” are deprecated)
+• AMI + Instance Type
+• EC2 User Data
+• EBS Volumes
+• Security Groups
+• SSH Key Pair
+• IAM Roles for your EC2 Instances
+• Network + Subnets Information
+• Load Balancer Information
+• Min Size / Max Size / Initial Capacity
+• Scaling Policies
 
-Scaling Policy: 
+
+It is possible to scale an ASG based on CloudWatch alarms
+An alarm monitors a metric (such as Average CPU, or a custom metric)
+
+Auto Scaling Groups – Dynamic Scaling Policies:
+Target Tracking Scaling
+• Most simple and easy to set-up
+• Example: I want the average ASG CPU to stay at around 40%
+
+Simple / Step Scaling
+• When a CloudWatch alarm is triggered (example CPU > 70%), then add 2 units
+• When a CloudWatch alarm is triggered (example CPU < 30%), then remove 1
+
+Scheduled Actions
+• Anticipate a scaling based on known usage patterns
+• Example: increase the min capacity to 10 at 5 pm on Fridays
+
+
 Manual scaling:
-At any time, you can change the size of an existing Auto Scaling group manually. 
-You can either update the desired capacity of the Auto Scaling group, or update the instances that are attached to the Auto Scaling group
+At any time, you can change the size of an existing Auto Scaling group manually.
 
-Dynamic scaling:
-Dynamic scaling scales the capacity of your Auto Scaling group as traffic changes occur.
+Predictive scaling: 
+Continuously forecast load and schedule scaling ahead.
 
-Target tracking scaling—Increase and decrease the current capacity of the group based on a Amazon CloudWatch metric and a target value. It works similar to the way that your thermostat 
-maintains the temperature of your home—you select a temperature and the thermostat does the rest.
+Cooldown period:
+After a scaling activity happens, you are in the cooldown period (default 300 seconds).
+During the cooldown period, the ASG will not launch or terminate additional instances (to allow for metrics to stabilize)
 
-Step scaling—Increase and decrease the current capacity of the group based on a set of scaling adjustments, 
-known as step adjustments, that vary based on the size of the alarm breach.
+Advice: Use a ready-to-use AMI to reduce configuration time in order to be serving request fasters and reduce the cooldown
+period.
 
-Simple scaling—Increase and decrease the current capacity of the group based on a single scaling adjustment, 
-with a cooldown period between each scaling activity.
+ASG tries the balance the number of instances across AZ by default.
+
+
+ASG Lifecycle Hooks:
+• You have the ability to perform extra steps before the instance goes in service (Pending state)
+• You have the ability to perform some actions before the instance is terminated (Terminating state)
+
+
+Launch Configuration (legacy):
+• Must be re-created every time
+Launch Template (newer):
+• Can have multiple versions
+• Create parameters subsets (partial configuration for re-use and inheritance)
 
 
 
 Area:
 =====
 An Auto Scaling group can contain EC2 instances in one or more Availability Zones within the same Region.
+
+
 
 UseCase:
 ========
@@ -1425,15 +1645,17 @@ AUTOMATICALLY MAINTAIN PERFORMANCE
 PAY ONLY FOR WHAT YOU NEED
 IMPROVE FAULT TOLERANC
 
+
+
 BillCost:
 =========
-There are no additional fees with Amazon EC2 Auto Scaling.
+ASG are free (you only pay for the underlying EC2 instances),.
+
+
 
 Security:
 =========
-
-
-
+Security is a shared responsibility.
 
 
 
@@ -1443,14 +1665,27 @@ Security:
 
 ##RDS
 -------------------------------------------------
-Amazon provides AWS RDS SQL Server as a managed relational database service. You can deploy databases instantly without 
-worrying about underlying hardware platform, license cost, managing data centers. AWS RDS database instances are highly available. 
-It provides a failover mechanism using the Mult-AZ deployments.
+RDS stands for Relational Database Service
+• It’s a managed DB service for DB use SQL as a query language.
+• It allows you to create databases in the cloud that are managed by AWS
+• Postgres
+• MySQL
+• MariaDB
+• Oracle
+• Microsoft SQL Server
+• Aurora (AWS Proprietary database)
 
-Amazon Relational Database Service (Amazon RDS) is a collection of managed services that makes it simple to set up, operate, and scale 
-databases in the cloud. Choose from seven popular engines — Amazon Aurora with MySQL compatibility, 
-Amazon Aurora with PostgreSQL compatibility, MySQL, MariaDB, PostgreSQL, Oracle, and 
-SQL Server — and deploy on-premises with Amazon RDS on AWS Outposts.
+
+RDS is a managed service:
+• Automated provisioning, OS patching
+• Continuous backups and restore to specific timestamp (Point in Time Restore)!
+• Monitoring dashboards
+• Read replicas for improved read performance
+• Multi AZ setup for DR (Disaster Recovery)
+• Maintenance windows for upgrades
+• Scaling capability (vertical and horizontal)
+• Storage backed by EBS (gp2 or io1)
+• Backups are automatically enabled in RDS
 
 
 Area:
