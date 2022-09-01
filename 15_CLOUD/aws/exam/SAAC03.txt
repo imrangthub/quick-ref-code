@@ -2368,13 +2368,17 @@ charges associated with others accessing the data.
 
 ##Athena
 -------------------------------------------------
-Amazon Athena is an interactive query service that makes it easy to analyze data in Amazon S3 using standard SQL. 
-Athena is serverless, so there is no infrastructure to manage, and you pay only for the queries that you run.
+Serverless query service to perform analytics against S3 objects
+• Uses standard SQL language to query the files
+• Supports CSV, JSON, ORC, Avro, and Parquet (built on Presto)
+
 
 
 Area:
 =====
 Global but Data is Regional.
+
+
 
 UseCase:
 ========
@@ -2385,7 +2389,11 @@ You can use Athena to run ad-hoc queries using ANSI SQL, without the need to agg
 
 BillCost:
 =========
-With Amazon Athena, you only pay for the queries that you run. You are charged based on the amount of data scanned by each query.
+You are charged based on the amount of data scanned by each query.
+Pricing: $5.00 per TB of data scanned
+
+
+
 
 Security:
 =========
@@ -2395,25 +2403,51 @@ Security is a shared responsibility.
 
 
 
-##S3 Lock | Vault Lock
+
+
+##S3 Lock | Vault Lock | Glacier Vault Lock
 -------------------------------------------------
 S3 Glacier Vault Lock helps you to easily deploy and enforce compliance controls for individual S3 Glacier vaults with a 
-Vault Lock policy. You can specify controls such as "write once read many" (WORM) in a Vault Lock policy and lock the policy from 
-future edits.
+Vault Lock policy. You can specify controls such as "write once read many" (WORM) in a Vault Lock policy 
+and lock the policy from future edits.
 
 After a Vault Lock policy is locked, the policy can no longer be changed or deleted.
+
+Object retention:
+	• Retention Period: specifies a fixed period
+	• Legal Hold: same protection, no expiry date
+• Modes:
+	• Governance mode: users can't overwrite or delete an object version or alter its lock
+	settings unless they have special permissions
+	• Compliance mode: a protected object version can't be overwritten or deleted by
+	any user, including the root user in your AWS account. When an object is locked in
+	compliance mode, its retention mode can't be changed, and its retention period
+	can't be shortened.
 
 
 Area:
 =====
 Global but Data is Regional.
+
+
 UseCase:
 ========
+S3 Glacier Vault Lock helps you to easily deploy and enforce compliance controls for individual 
+S3 Glacier vaults with a Vault Lock policy.
+
+
 BillCost:
 =========
+
+
 Security:
 =========
 Security is a shared responsibility.
+
+
+
+
+
 
 
 
@@ -2422,17 +2456,17 @@ Security is a shared responsibility.
 -------------------------------------------------
 CloudFront is Amazon’s content delivery network that is primarily used to speed up websites. 
 It’s particularly useful for large, static assets—like images and videos. 
-CloudFront sits in front of an “origin” server (which serves the original content), and caches it at the edge locations around the world.
-
 
 AWS CloudFront is a globally-distributed network offered by Amazon Web Services, which securely transfers content such as 
 software, SDKs, videos, etc., to the clients, with high transfer speed.
 
 
-When a user visits a site, they’re routed to the nearest edge location using DNS. 
-CloudFront looks to see if the page they requested is cached. If it is, the page is served directly from the cache. 
-If it isn’t, CloudFront fetches the page from the origin, stores it in the cache, and serves it to the user. 
-The next user to hit the same edge location will get the page served from the cache.
+• Content Delivery Network (CDN)
+• Improves read performance, content is cached at the edge
+• 216 Point of Presence globally (edge locations)
+• DDoS protection, integration with Shield, AWS Web Application Firewall
+• Can expose external HTTPS and can talk to internal HTTPS backends
+
 
 Performance
 CloudFront improves performance for both cacheable content (such as images and videos) and 
@@ -2441,10 +2475,75 @@ dynamic content (such as API acceleration and dynamic site delivery).
 Global Accelerator improves performance for a wide range of applications over TCP or UDP by proxying packets at the 
 edge to applications running in one or more AWS Regions.
 
+
+CloudFront– Origins:
+S3 bucket 
+	• For distributing files and caching them at the edge 
+	• Enhanced security with CloudFront Origin Access Identity (OAI) 
+	• CloudFront can be used as an ingress (to upload files to S3) 
+Custom Origin (HTTP) 
+	• Application Load Balancer 
+	• EC2 instance 
+	• S3 website (must first enable the bucket as a static S3 website) 
+	• Any HTTP backend you want
+
+
+
+CloudFront Geo Restriction:
+• You can restrict who can access your distribution
+• Whitelist: Allow your users to access your content only if they're in one of the countries on a list of approved countries.
+• Blacklist: Prevent your users from accessing your content if they're in one of the countries on a 
+  blacklist of banned countries.
+• The “country” is determined using a 3rd party Geo-IP database
+• Use case: Copyright Laws to control access to content
+
+
+CloudFront vs S3 Cross Region Replication:
+CloudFront:
+	• Global Edge network
+	• Files are cached for a TTL (maybe a day)
+	• Great for static content that must be available everywhere
+S3 Cross Region Replication:
+	• Must be setup for each region you want replication to happen
+	• Files are updated in near real-time
+	• Read only
+	• Great for dynamic content that needs to be available at low-latency in few regions
+
+
+CloudFront Signed URL / Signed Cookies:
+• You want to distribute paid shared content to premium users over the world
+• We can use CloudFront Signed URL / Cookie. We attach a policy with:
+	• Includes URL expiration
+	• Includes IP ranges to access the data from
+	• Trusted signers (which AWS accounts can create signed URLs)
+• How long should the URL be valid for?
+	• Shared content (movie, music): make it short (a few minutes)
+	• Private content (private to the user): you can make it last for years
+	
+• Signed URL = access to individual files (one signed URL per file)
+• Signed Cookies = access to multiple files (one signed cookie for many files)
+
+
+CloudFront Signed URL vs S3 Pre-Signed URL:
+
+only S3 refers to them as Pre-signed URLs; 
+CloudFront refers to them as Signed URLs and Signed Cookies.
+
+-Pre-signed URLs use the owner’s security credentials to grant.
+
+-Restrict access to files in CloudFront edge caches
+-Restrict access to files in your Amazon S3 bucket (unless you’ve configured it as a website endpoint)
+-You can configure CloudFront to require that users access your files using either signed URLs or signed cookies.
+-OAI prevents users from viewing your S3 files by simply using the direct URL for the file. 
+ Instead, they would need to access it through a CloudFront URL.
+
+
+
 Area:
 =====
 Global servicew.
 Global Accelerator and CloudFront both use the AWS global network and its edge locations around the world.
+
 
 UseCase:
 ========
@@ -2485,9 +2584,17 @@ All CloudFront customers benefit from the automatic protections of AWS Shield St
 
 
 
+
 ##CloudFront Signed URL/Coocks
 -------------------------------------------------
-CloudFront signed URLs and signed cookies provide the same basic functionality: they allow you to control who can access your content. 
+You can control user access to your private content in two ways:
+-Restrict access to files in CloudFront edge caches
+-Restrict access to files in your Amazon S3 bucket (unless you’ve configured it as a website endpoint)
+You can configure CloudFront to require that users access your files using either signed URLs or signed cookies.
+
+
+CloudFront signed URLs and signed cookies provide the same basic functionality: they allow you to control 
+who can access your content. 
 If you want to serve private content through CloudFront and you're trying to decide whether to use signed URLs or 
 signed cookies, consider the following.
 
@@ -2502,15 +2609,26 @@ URLs or when you want to provide access to multiple restricted files, for exampl
 area of a website.
 
 
+
+
 Area:
 =====
+Global servicew.
+
 
 UseCase:
 ========
-For accessing private contain Use a signed URL a user gets access only to a single file whereas with a signed cookie a user can access multiple files.
+For accessing private contain Use a signed URL a user gets access only to a single file whereas with a 
+signed cookie a user can access multiple files.
+
+
 
 BillCost:
 =========
+Pricing varies by usage type, geographical region, and feature selection.
+
+
+
 Security:
 =========
 Support for Encryption at Rest and Transit.
@@ -2519,8 +2637,16 @@ Use signed URLs or cookies to restrict access for selected users.
 
 
 
+
+
+
 ##AWS Global Accelerator
 -------------------------------------------------
+• Leverage the AWS internal network to route to your application
+• 2 Anycast IP are created for your application
+• The Anycast IP send traffic directly to Edge Locations
+• The Edge locations send the traffic to your application
+
 AWS Global Accelerator is a service in which you create accelerators to improve the performance of your applications 
 for local and global users.
 
@@ -2534,10 +2660,33 @@ your traffic to your nearest healthy available endpoint to mitigate endpoint fai
 
 Global Accelerator automatically re-routes your traffic to your nearest healthy available endpoint to mitigate endpoint failure.
 
+Consistent Performance:
+• Intelligent routing to lowest latency and fast regional failover
+• No issue with client cache (because the IP doesn’t change)
+• Internal AWS network
+
+
+AWS Global Accelerator vs CloudFront:
+	• They both use the AWS global network and its edge locations around the world
+	• Both services integrate with AWS Shield for DDoS protection.
+• CloudFront
+	• Improves performance for both cacheable content (such as images and videos)
+	• Dynamic content (such as API acceleration and dynamic site delivery)
+	• Content is served at the edge
+• Global Accelerator
+	• Improves performance for a wide range of applications over TCP or UDP
+	• Proxying packets at the edge to applications running in one or more AWS Regions.
+	• Good fit for non-HTTP use cases, such as gaming (UDP), IoT (MQTT), or Voice over IP
+	• Good for HTTP use cases that require static IP addresses
+	• Good for HTTP use cases that required deterministic, fast regional failover
+
+
 
 Area:
 =====
 Global Accelerator is a global service.
+
+
 
 UseCase:
 ========
@@ -2545,13 +2694,20 @@ Global Accelerator also provides fast regional failover.
 In summary, Global Accelerator is a fast/reliable pipeline between user and application.
 Accelerator is a service that improves the availability and performance of applications with local or global users.
 
+
+
 BillCost:
 =========
 In AWS Global Accelerator, you are charged for each accelerator that is provisioned and the amount of traffic in the dominant 
 direction that flows through the accelerator.
 
+
+
 Security:
 =========
+only 2 external IP need to be whitelisted
+DDoS protection thanks to AWS Shield
+
 By default, AWS Global Accelerator is protected by AWS Shield Standard, which minimizes application downtime and latency 
 from denial-of-service attacks by using always-on network flow monitoring and automated in-line mitigation.
 
@@ -2560,16 +2716,21 @@ from denial-of-service attacks by using always-on network flow monitoring and au
 
 
 
-##SHow Family
+##Snow Family
 -------------------------------------------------
-AWS Snow family comes under the migration and transfer services which move petabytes of data to and from AWS or process data at the edge locations. It is a cost-effective way to transfer data offline. 
+Highly-secure, portable devices to collect and process data at the edge, and migrate data into and out of AWS. 
+It is a cost-effective way to transfer data offline. 
 
-The AWS Snow Family is a collection of physical devices that help migrate large amounts of data into and out of the cloud without depending on networks. 
+The AWS Snow Family is a collection of physical devices that help migrate large amounts of data into and out of the 
+cloud without depending on networks. 
+
 
 
 AWS snow family service model is of three types: 
+
 AWS snow cone: AWS Snow cone is the most compact and portable device weighing in at 4.5 pounds (2.1kg). 
-It is available in HDD and SDD options. Snowcone is ruggedized, secure, and purpose-built for use outside of a traditional data centre. 
+It is available in HDD and SDD options. Snowcone is ruggedized, secure, and purpose-built for use outside of a 
+traditional data centre. 
 
 AWS snowball: AWS snowball is available as compute optimized device and storage optimized device. 
 These devices are suited for extreme conditions, tamper-proof, and highly secure. 
@@ -2577,17 +2738,48 @@ These devices are suited for extreme conditions, tamper-proof, and highly secure
 AWS snowmobile: AWS snowmobile is an Exabyte-scale data migration device which is used to move extremely large data. 
 It migrates up to 100PB in a 45-foot-long ruggedized shipping container, pulled by a semi-trailer truck. 
 
+We setup a Snowball Edge/Snowcone device to do edge computing.
+AWS Snow Family: offline devices to perform data migrations
+If it takes more than a week to transfer over the network, use Snowball devices
+
+
+Snow Family – Edge Computing:
+• Snowcone (smaller)
+	• 2 CPUs, 4 GB of memory, wired or wireless access
+	• USB-C power using a cord or the optional battery
+• Snowball Edge – Compute Optimized
+	• 52 vCPUs, 208 GiB of RAM
+	• Optional GPU (useful for video processing or machine learning)
+	• 42 TB usable storage
+• Snowball Edge – Storage Optimized
+	• Up to 40 vCPUs, 80 GiB of RAM
+	• Object storage clustering available
+• All: Can run EC2 Instances & AWS Lambda functions (using AWS IoT Greengrass)
+• Long-term deployment options: 1 and 3 years discounted pricing
+
+
+AWS OpsHub (a software you install on your computer / laptop) to manage your Snow Family Device.
+Snowball cannot import to Glacier directly.
+You must use Amazon S3 first, in combination with an S3 lifecycle policy.
 
 
 Area:
 =====
+Global.
+
+
 UseCase:
 ========
-The AWS Snow Family helps customers that need to run operations in austere, non-data center environments, and in locations where there's lack of consistent network connectivity. 
+The AWS Snow Family helps customers that need to run operations in austere, non-data center environments, 
+and in locations where there's lack of consistent network connectivity. 
 
-Migrate data at petabyte-scale: In particular, when network circumstances are constrained, it moves databases, backups, archives, healthcare records, analytics datasets, IoT sensor data, and media assets to the cloud.
-Process and analyze data locally: Run Amazon Machine Images (AMIs) on Amazon EC2 and distribute AWS Lambda code using machine learning (ML) or other applications on Snowball Edge devices.
-Optimize manufacturing data: It gathers and examines data from the factory itself to hone procedures and boost production, efficiency, and safety.
+Migrate data at petabyte-scale: In particular, when network circumstances are constrained, 
+it moves databases, backups, archives, healthcare records, analytics datasets, IoT sensor data, and media assets to the cloud.
+
+Process and analyze data locally: Run Amazon Machine Images (AMIs) on Amazon EC2 and distribute 
+AWS Lambda code using machine learning (ML) or other applications on Snowball Edge devices.
+
+
 
 
 BillCost:
@@ -2601,7 +2793,8 @@ There are two ways to pay for AWS Snowball: on-demand and committed upfront pric
 Security:
 =========
 All data moved to AWS Snow Family devices is automatically encrypted with 256-bit encryption keys that are 
-managed by the AWS Key Management Service (KMS). Encryption keys are never stored on the device so your data stays secure during transit.
+managed by the AWS Key Management Service (KMS). 
+Encryption keys are never stored on the device so your data stays secure during transit.
 
 
 
@@ -2610,25 +2803,66 @@ managed by the AWS Key Management Service (KMS). Encryption keys are never store
 
 ##FSx
 -------------------------------------------------
-Amazon FSx for Windows File Server provides fully managed Microsoft Windows file servers, backed by a fully native Windows file system. 
-FSx for Windows File Server has the features, performance, 
-and compatibility to easily lift and shift enterprise applications to the AWS Cloud.
-
-
+Launch 3rd party high-performance file systems on AWS
 Four widely-used file systems: 
  - NetApp ONTAP, 
  - OpenZFS, 
  - Windows File Server 
  - Lustre.
  
-Amazon FSx offer two types of file systems:Amazon FSx for Windows File Server—designed for business applications.
-Amazon FSx for Lustre—designed for compute-intensive workloads.
-Amazon FSx for ONTAP—multiprotocol file and block storage access, with NetApp’s advanced data management system features and benefits.
+
+FSx for Windows:
+Amazon FSx is accessible from Windows, Linux, and MacOS compute instances and devices. 
+Thousands of compute instances and devices can access a file system concurrently. 
+Amazon FSx File Gateway provides low-latency, on-premises access to fully managed file shares in the cloud.
+
+• FSx for Windows is a fully managed Windows file system share drive.
+• Supports SMB protocol & Windows NTFS 
+• Microsoft Active Directory integration, ACLs, user quotas 
+• Can be mounted on Linux EC2 instance
+
+• Can be accessed from your on-premises infrastructure (VPN or Direct Connect) 
+• Can be configured to be Multi-AZ (high availability) 
+• Data is backed-up daily to S3
 
 
- 
+Amazon FSx for Lustre:
+FSx for Lustre can only be used by Linux-based instances.
+• Lustre is a type of parallel distributed file system, for large-scale computing
+• The name Lustre is derived from “Linux” and “cluster
+• Machine Learning, High Performance Computing (HPC)
+• Video Processing, Financial Modeling, Electronic Design Automation
+
+Seamless integration with S3:
+	• Can “read S3” as a file system (through FSx)
+	• Can write the output of the computations back to S3 (through FSx)
+• Can be used from on-premises servers (VPN or Direct Connect)
+
+
+
+Hybrid Cloud for Storage:
+• S3 is a proprietary storage technology (unlike EFS / NFS), so how do you expose the S3 data on-premises?
+  AWS Storage Gateway.
+
+
+AWS Storage Cloud Native Options:
+
+Block  
+Amazon EBS EC2 Instance Store
+
+File
+Amazon EFS Amazon FSx 
+
+Object
+Amazon S3 Amazon Glacier
+
+
+
 Area:
 =====
+Regional Service.
+
+
 
 UseCase:
 ========
@@ -2636,9 +2870,15 @@ Migrate Windows file servers to AWS
 Accelerate hybrid workloads
 Simplify virtual desktops and streaming
 
+
+
 BillCost:
 =========
-With Amazon FSx for Windows File Server, you pay only for the resources you use and there are no minimum fees or setup charges. While pricing is quoted on a monthly basis, your usage is prorated by the hour, and you are billed for your average usage over a month.
+With Amazon FSx for Windows File Server, you pay only for the resources you use and there are no minimum 
+fees or setup charges. 
+While pricing is quoted on a monthly basis, your usage is prorated by the hour, and you are billed for 
+your average usage over a month.
+
 
 
 Security:
@@ -2647,21 +2887,67 @@ You can configure security group rules and control network access to your Amazon
 Amazon FSx is integrated with AWS Identity and Access Management (IAM).
 You can also tag your Amazon FSx resources and control the actions that your IAM users and groups can take based on those tags.
 
-Amazon FSx offer two types of file systems:Amazon FSx for Windows File Server—designed for business applications.
-Amazon FSx for Lustre—designed for compute-intensive workloads.Amazon FSx for ONTAP—multiprotocol file and block storage access, 
-with NetApp’s advanced data management system features and benefits.
+AWS FSx was designed to meet high security standards. 
+The service has ISO, PCI-DSS, and SOC certifications, and is also HIPAA eligible.
 
-AWS FSx was designed to meet high security standards. The service has ISO, PCI-DSS, and SOC certifications, and is also HIPAA eligible.
+
 
 
 
 
 ##Storage Gateway 
 -------------------------------------------------
-AWS Storage Gateway is a set of hybrid cloud storage services that provide on-premises access to virtually unlimited cloud storage.
+AWS Storage Gateway is a set of hybrid cloud storage services that provide on-premises access to virtually 
+unlimited cloud storage.
 
 Storage Gateway provides a standard set of storage protocols such as 
 iSCSI, SMB, and NFS, which allow you to use AWS storage without rewriting your existing applications. 
+
+AWS Storage Gateway: Bridge between on-premises data and cloud data in S3
+Use cases: disaster recovery, backup & restore, tiered storage
+
+3 types of Storage Gateway:
+• File Gateway
+• Volume Gateway
+• Tape Gateway
+Exam Tip: You need to know the differences between all 3!
+
+
+
+File Gateway:
+• Configured S3 buckets are accessible using the NFS and SMB protocol
+• Supports S3 standard, S3 IA, S3 One Zone IA
+• Bucket access using IAM roles for each File Gateway
+• Most recently used data is cached in the file gateway
+• Can be mounted on many servers
+• Integrated with Active Directory (AD) for user authentication
+
+
+Volume Gateway:
+• Block storage using iSCSI protocol backed by S3
+• Backed by EBS snapshots which can help restore on-premises volumes!
+• Cached volumes: low latency access to most recent data
+• Stored volumes: entire dataset is on premise, scheduled backups to S3
+
+
+Tape Gateway:
+• Some companies have backup processes using physical tapes (!)
+• With Tape Gateway, companies use the same processes but, in the cloud
+• Virtual Tape Library (VTL) backed by Amazon S3 and Glacier
+
+
+Storage Gateway – Hardware appliance:
+• Using Storage Gateway means you need on-premises virtualization
+• Otherwise, you can use a Storage Gateway Hardware Appliance
+• You can buy it on amazon.com
+
+
+Amazon FSx File Gateway:
+• Native access to Amazon FSx for Windows File Server
+• Local cache for frequently accessed data
+• Windows native compatibility (SMB, NTFS, Active Directory...)
+• Useful for group file shares and home directories
+
 
 
 Gateway Types:
@@ -2669,20 +2955,30 @@ Amazon S3 File Gateway
 Amazon FSx File Gateway
 Tape Gateway
 Volume Gateway
-
 Needs additional setup on-premises
+
+
 
 Area:
 =====
+Regional.
+
+
+
 UseCase:
 ========
 Store data coming from specialized on-premises instruments in Amazon Simple Storage Service (Amazon S3) and use AWS services for data analysis.
 Provide cloud-based backup for on-premises files and database applications for low-cost, virtually unlimited scale.
 Transform your on-premises user and group file shares to a hybrid cloud architecture for simplified management and cost reduction.
 
+
+
 BillCost:
 =========
-This pricing is based on data transferred "in" to and "out" of the AWS Storage Gateway Service by your gateway, and it varies by region and gateway host. 
+This pricing is based on data transferred "in" to and "out" of the AWS Storage Gateway Service by your gateway, 
+and it varies by region and gateway host. 
+
+
 
 Security:
 =========
@@ -2691,32 +2987,21 @@ All data transferred between the gateway and AWS storage is encrypted using SSL.
 
 
 
-##FSx File Gateway
--------------------------------------------------
-Amazon FSx File Gateway optimizes on-premises access to fully managed, highly reliable file shares in Amazon FSx for Windows File Server. 
-Amazon FSx File Gateway helps accelerate your file-based storage migration to the cloud to enable faster performance, improved data protection, and reduced cost.
-
-
-Area:
-=====
-UseCase:
-========
-BillCost:
-=========
-Security:
-=========
-
-
 
 
 ##Transfer Famamily 
 -------------------------------------------------
-AWS Transfer Family securely scales your recurring business-to-business file transfers to 
-AWS Transfer Family supports transferring data over the following protocols:
-Secure Shell (SSH) File Transfer Protocol (SFTP)
-File Transfer Protocol Secure (FTPS)
-File Transfer Protocol (FTP)
-Applicability Statement 2 (AS2)
+A fully-managed service for file transfers into and out of Amazon S3 or Amazon EFS using the FTP protocol
+
+
+• Supported Protocols
+	• AWS Transfer for FTP (File Transfer Protocol (FTP))
+	• AWS Transfer for FTPS (File Transfer Protocol over SSL (FTPS))
+	• AWS Transfer for SFTP (Secure File Transfer Protocol (SFTP))
+• Managed infrastructure, Scalable, Reliable, Highly Available (multi-AZ)
+• Pay per provisioned endpoint per hour + data transfers in GB
+• Store and manage users’ credentials within the service
+• Integrate with existing authentication systems (Microsoft Active Directory, LDAP, Okta, Amazon Cognito, custom)
 
 
 Seamlessly migrate, automate, and monitor your file transfer workflows into and out of 
@@ -2729,23 +3014,59 @@ WinSCP (Microsoft Windows only)
 Cyberduck (Windows, macOS, and Linux)
 FileZilla (Windows, macOS, and Linux)
 
+
+Storage Comparison:
+• S3: Object Storage
+• Glacier: Object Archival
+• EFS: Network File System for Linux instances, POSIX filesystem
+• FSx for Windows: Network File System for Windows servers
+• FSx for Lustre: High Performance Computing Linux file system
+• EBS volumes: Network storage for one EC2 instance at a time
+• Instance Storage: Physical storage for your EC2 instance (high IOPS)
+• Storage Gateway: File Gateway, Volume Gateway (cache & stored), Tape Gateway
+• Snowball / Snowmobile: to move large amount of data to the cloud, physically
+• Database: for specific workloads, usually with indexing and querying
+
+
+
 Area:
 =====
+Regional.
+
+
 UseCase:
 ========
+sharing files, public datasets, CRM, ERP,
+
+
 BillCost:
 =========
 You pay only for access-enabled protocols, the amount of data (gigabytes) uploaded and downloaded over SFTP/FTPS/FTP, 
-or the number of messages sent or received over AS2. You select the protocols, identity providers, and choose endpoint configuration.
+or the number of messages sent or received over AS2. 
 
 Additional charges:
 You are charged standard storage request and data transfer rates to store, read, and write to and from Amazon S3. 
-You are also charged standard rates for domain name lookups using Amazon Route53, Amazon CloudTrail, and Amazon CloudWatch Logs and Events.
+You are also charged standard rates for domain name lookups using Amazon Route53, Amazon CloudTrail, and 
+Amazon CloudWatch Logs and Events.
+
 
 
 Security:
 =========
 Security is a shared responsibility.
+
+
+
+
+
+
+##Decouple your applications:
+-------------------------------------------------
+• using SQS: queue model
+• using SNS: pub/sub model
+• using Kinesis: real-time streaming model
+• These services can scale independently from our application!
+
 
 
 
