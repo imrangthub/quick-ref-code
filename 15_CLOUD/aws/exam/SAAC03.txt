@@ -1688,15 +1688,45 @@ RDS is a managed service:
 • Backups are automatically enabled in RDS
 
 
+Supports all RDS database engines (MariaDB, MySQL,PostgreSQL, SQL Server, Oracle)
+
+RDS Read Replicas for read scalability: 
+• Up to 5 Read Replicas
+• Within AZ, Cross AZ or Cross Region
+• Replication is ASYNC, so reads are eventually consistent
+Read replicas are used for SELECT =read) only kind of statements(not INSERT, UPDATE, DELETE)
+
+RDS – From Single-AZ to Multi-AZ, Zero downtime operation (no need to stop the DB)
+
+RDS Security – Summary:
+• Encryption at rest:
+	• Is done only when you first create the DB instance
+	• or: unencrypted DB => snapshot => copy snapshot as encrypted => create DB from snapshot
+• Your responsibility:
+	• Check the ports / IP / security group inbound rules in DB’s SG
+	• In-database user creation and permissions or manage through IAM
+	• Creating a database with or without public access
+	• Ensure parameter groups or DB is configured to only allow SSL connections
+• AWS responsibility:
+	• No SSH access
+	• No manual DB patching
+	• No manual OS patching
+	• No way to audit the underlying instance
+
+
 Area:
 =====
 Amazon RDS for SQL Server provides a Multi-AZ deployment, which replicates data synchronously across AZs.
 By default, the Multi-AZ feature is not enabled for the RDS instance.
 
+
+
 UseCase:
 ========
 Build web and mobile applications.
 Move to managed databases.
+
+
 
 BillCost:
 =========
@@ -1712,14 +1742,21 @@ Backup storage (per GiB per month) –
 
 Data transfer (per GB) – Data transfer in and out of your DB instance from or to the internet and other Amazon Regions.
 
+For RDS Read Replicas within the same region, you don’t pay that fee but cross - region must pay.
+
 
 
 Security:
 =========
-A security group controls the access to a DB instance. It does so by allowing access to IP address ranges or 
-Amazon EC2 instances that you specify.
-Use AWS Identity and Access Management (IAM) accounts to control access to Amazon RDS API operations, 
-especially operations that create, modify, or delete Amazon RDS resources.
+Possibility to encrypt the master & read replicas with AWS KMS - AES-256 encryption
+Transparent Data Encryption (TDE) available for Oracle and SQL Server
+Provide SSL options with trust certificate when connecting to database
+Security group and IAM controls the access to a DB instance.
+
+RDS databases are usually deployed within a private subnet, not in a public one
+IAM policies help control who can manage AWS RDS (through the RDS API)
+Traditional Username and Password can be used to login into the database
+IAM-based authentication can be used to login into RDS MySQL & PostgreSQL
 
 
 
@@ -1740,15 +1777,34 @@ The underlying storage grows automatically as needed. An Aurora cluster volume c
 Amazon Aurora provides built-in security, continuous backups, serverless compute, 
 up to 15 read replicas, automated multi-Region replication, and integrations with other AWS services.
 
+
+Custom Endpoints:
+• Define a subset of Aurora Instances as a Custom Endpoint
+• The Reader Endpoint is generally not used after defining Custom Endpoints
+
+
+Amazon Aurora and Aurora Serverless are two distinct products from AWS.
+Amazon Aurora Serverless is an on-demand, autoscaling configuration for Amazon Aurora.
+
+Aurora Multi-Master.
+
+
+
+
 Area:
 =====
 Amazon Aurora Global Database is designed for globally distributed applications, allowing a single 
-Amazon Aurora database to span multiple AWS Regions. It replicates your data with no impact on database performance, 
+Amazon Aurora database to span multiple AWS Regions. 
+It replicates your data with no impact on database performance, 
 enables fast local reads with low latency in each Region, and provides disaster recovery from Region-wide outages.
 
 
 UseCase:
 ========
+Automatic fail-over
+Aurora Cross Region Read Replicas, Useful for disaster recovery.
+
+
 
 BillCost:
 =========
@@ -1759,15 +1815,28 @@ Security:
 =========
 Security is a shared responsibility between AWS and you.
 
+• Encryption at rest using KMS
+• Automated backups, snapshots and replicas are also encrypted
+• Encryption in flight using SSL (same process as MySQL or Postgres)
+• Possibility to authenticate using IAM token (same method as RDS)
+• You are responsible for protecting the instance with security groups
+• You can’t SSH
+
 
 
 ##Elasticache
 -------------------------------------------------
-Amazon ElastiCache is a web service that makes it easy to deploy, operate, and scale an in-memory data store or cache in the cloud.
+Amazon ElastiCache is a web service that makes it easy to deploy, operate, and scale an in-memory data store or 
+cache in the cloud.
 Amazon ElastiCache is a fully managed in-memory data store and cache service by Amazon Web Services (AWS). 
 
 
 ElastiCache supports two open-source in-memory caching engines: Memcached and Redis.
+
+
+Amazon ElastiCache:
+ElastiCache is to get managed Redis or Memcached
+
 
 
 Area:
@@ -1776,12 +1845,15 @@ Amazon ElastiCache is available in multiple AWS Regions. This means that you can
 locations that meet your requirements.
 The new Global Datastore feature is available with Amazon ElastiCache for Redis 5.0. 6 or above, and is supported on M5 and R5 nodes
 
+
+
 UseCase:
 ========
 Accelerate application performance.
 Ease backend database load.
 Build low-latency data stores.
-Primary data store for use cases that don't require durability like session stores, gaming leaderboards, streaming, and analytics
+Primary data store for use cases that don't require durability like 
+session stores, gaming leaderboards, streaming, and analytics
 
 
 BillCost:
@@ -1794,23 +1866,23 @@ which offer discounts for customers who commit to either one-year or three-year 
 
 Security:
 =========
+ElastiCache Securiry:
+• Do not support IAM authentication
+• IAM policies on ElastiCache are only used for AWS API-level security
+
+Redis AUTH
+• You can set a “password/token” when you create a Redis cluster
+• This is an extra level of security for your cache (on top of security groups)
+• Support SSL in flight encryption
+
+Memcached
+• Supports SASL-based authentication (advanced)
+
 A security group controls the access to a cluster. It does so by allowing access to IP address ranges or 
 Amazon EC2 instances that you specify. 
 
 
 
-
-
-#GraphQL:
-------------------------------------------------
-GraphQL is a query language for APIs and a runtime for fulfilling those queries with your existing data. 
-GraphQL provides a complete and understandable description of the data in your API, gives clients the 
-power to ask for exactly what they need and nothing more, makes it easier to evolve APIs over time, 
-and enables powerful developer tools.
-
-Send a GraphQL query to your API and get exactly what you need, nothing more and nothing less. 
-GraphQL queries always return predictable results. Apps using GraphQL are fast and stable because they 
-control the data they get, not the server.
 
 
 
@@ -1834,30 +1906,69 @@ Geolocation routing policy — Use when you want to route traffic based on the l
 Geoproximity routing policy — Use when you want to route traffic based on the location of your resources and, optionally, shift traffic from resources in one location to resources in another.
 Multivalue answer routing policy — Use when you want Route 53 to respond to DNS queries with up to eight healthy records selected at random.
 
-Supported DNS record types:
-A
-AAAA
-CAA
-CNAME
-MX
-NAPTR
-NS
-PTR
-SOA
-SPF
-SRV
-TXT
+
+• Route 53 supports the following DNS record types:
+• (must know) A / AAAA / CNAME / NS
+• (advanced) CAA / DS / MX / NAPTR / PTR / SOA / TXT / SPF / SRV
 
 
 
 In summary: Browser -> TLD -> NS -> SOA -> DNS record. The pipeline reverses when the correct DNS record is found.
 
+
+Route 53 – Record Types:
+• A – maps a hostname to IPv4
+• AAAA – maps a hostname to IPv6
+• CNAME – maps a hostname to another hostname
+• The target is a domain name which must have an A or AAAA record
+• Can’t create a CNAME record for the top node of a DNS namespace (Zone Apex)
+• Example: you can’t create for example.com, but you can create for www.example.com
+• NS – Name Servers for the Hosted Zone
+• Control how traffic is routed for a domain
+
+Route53-TTL:
+The amount of time, in seconds, that you want DNS recursive resolvers to cache information about this record.
+Amazon Route 53 does not have a default TTL for any record type.
+
+Route53 - Health Check:
+Amazon Route 53 health checks monitor the health and performance of your web applications, web servers, and other resources. 
+You can optionally configure Amazon CloudWatch alarms for your health checks, so that you receive notification 
+when a resource becomes unavailable.
+
+CNAME vs Alias:
+	• AWS Resources (Load Balancer, CloudFront...) expose an AWS hostname:
+	• lb1-1234.us-east-2.elb.amazonaws.com and you want myapp.mydomain.com
+CNAME:
+	• Points a hostname to any other hostname. (app.mydomain.com => blabla.anything.com)
+	• ONLY FOR NON ROOT DOMAIN (aka. something.mydomain.com)
+Alias:
+	• Points a hostname to an AWS Resource (app.mydomain.com => blabla.amazonaws.com)
+	• Works for ROOT DOMAIN and NON ROOT DOMAIN (aka mydomain.com)
+	• Free of charge
+	• Native health check
+
+
+Alias Records Targets:
+• Elastic Load Balancers
+• CloudFront Distributions
+• API Gateway
+• Elastic Beanstalk environments
+• S3 Websites
+• VPC Interface Endpoints
+• Global Accelerator accelerator
+• Route 53 record in the same hosted zone
+You cannot set an ALIAS record for an EC2 DNS name
+
+
+
 Area:
 =====
 Route 53 is primarily a global service, but the following features support AWS Regions:
 If you're using Route 53 Resolver to set up hybrid configurations, you create endpoints in AWS Regions that you choose, 
-and you specify IP addresses in multiple Availability Zones. For outbound endpoints, 
-you create rules in the same Region where you created the endpoint.
+and you specify IP addresses in multiple Availability Zones. 
+For outbound endpoints, you create rules in the same Region where you created the endpoint.
+
+
 
 UseCase:
 ========
@@ -1876,7 +1987,8 @@ Serving DNS queries: You incur charges for every DNS query answered by the Amazo
 
 Security:
 =========
-AWS Shield Standard automatically protects your Amazon Route 53 Hosted Zones from infrastructure layer DDoS attacks at no additional cost.
+AWS Shield Standard automatically protects your Amazon Route 53 Hosted Zones from infrastructure 
+layer DDoS attacks at no additional cost.
 
 You can protect your domain from this type of attack, known as DNS spoofing or a man-in-the-middle attack, 
 by configuring Domain Name System Security Extensions (DNSSEC), a protocol for securing DNS traffic. 
@@ -1886,65 +1998,6 @@ Amazon Route 53 supports DNSSEC signing as well as DNSSEC for domain registratio
 
 
 
-##Route53-TTL
--------------------------------------------------
-The amount of time, in seconds, that you want DNS recursive resolvers to cache information about this record.
-
-
-The time for which a DNS resolver caches a response is set by a value called the time to live (TTL) 
-associated with every record. Amazon Route 53 does not have a default TTL for any record type.
-
-
-Area:
-=====
-UseCase:
-========
-BillCost:
-=========
-Security:
-=========
-
-
-
-
-
-##Route53 CNAME
--------------------------------------------------
-A CNAME record maps DNS queries for the name of the current record, such as acme.example.com, 
-to another domain (example.com or example.net) or subdomain (acme.example.com or zenith.example.org).
-
-Area:
-=====
-UseCase:
-========
-BillCost:
-=========
-Security:
-=========
-
-
-
-
-##Route53 - Health Check
--------------------------------------------------
-Amazon Route 53 health checks monitor the health and performance of your web applications, web servers, and other resources. Each health check that you create can monitor one of the following:
-You can optionally configure Amazon CloudWatch alarms for your health checks, so that you receive notification 
-when a resource becomes unavailable.
-
-The health of a specified resource, such as a web server.
-The status of other health checks.
-The status of an Amazon CloudWatch alarm.
-Additionally, with Amazon Route 53 Application Recovery Controller, you can set up routing control health checks with 
-DNS failover records to manage traffic failover for your application.
-
-Area:
-=====
-UseCase:
-========
-BillCost:
-=========
-Security:
-=========
 
 
 
@@ -1967,26 +2020,35 @@ security, https service and application layer. All you need to worry about is wr
 You can develop code in a number of languages which is then zipped up and the zip file is used 
 when instantiating a new elastic beanstalk instance.
 
+
+
 Area:
 =====
+Regional.
+
+
+
 UseCase:
-========
-Developer productivity
-Fast and simple to begin: Elastic Beanstalk is the fastest and simplest way to deploy your application on AWS. 
+======== 
+AWS Elastic Beanstalk provides an environment that makes it easy to deploy and run applications in the cloud.
 Complete resource control: You have the freedom to select the AWS resources, such as Amazon EC2 instance type and processor 
 type to run the workload on, that are optimal for your application. 
 
-AWS Elastic Beanstalk provides an environment that makes it easy to deploy and run applications in the cloud.
 AWS Elastic Beanstalk is combined with the developer tools to help you manage the lifecycle of your applications.
+
+
 
 BillCost:
 =========
-There is no additional charge for AWS Elastic Beanstalk.
+Beanstalk is free but you pay for the underlying instances.
+
+
 
 Security:
 =========
 Security is a shared responsibility.
-By default, Elastic Beanstalk creates a security group for your environment, but you can also add your own security group to your environment.
+By default, Elastic Beanstalk creates a security group for your environment, but you can also add your own 
+security group to your environment.
 
 
 
@@ -1994,10 +2056,14 @@ By default, Elastic Beanstalk creates a security group for your environment, but
 
 ##AmazonS3 | S3
 -------------------------------------------------
-An Amazon S3 bucket is a public cloud storage.
-Amazon Simple Storage Service (Amazon S3) is an object storage service that offers industry-leading scalability, 
-data availability, security, and performance. 
+An Amazon S3 bucket is a public cloud storage. Amazon Simple Storage Service (Amazon S3) is an object storage service. 
 You can use Amazon S3 to store and retrieve any amount of data at any time, from anywhere.
+
+Object values are the content of the body:
+• Max Object Size is 5TB (5000GB)
+• If uploading more than 5GB, must use “multi-part upload”
+
+You can version your files in Amazon S3, It is enabled at the bucket level.
 
 Amazon S3 Storage Classes:
 Amazon S3 Standard
@@ -2024,6 +2090,11 @@ Expiration Actions
 This action deletes objects in the Amazon S3 bucket.
 
 
+CORS:
+Cross-origin resource sharing (CORS) defines a way for client web applications that are loaded in one domain to interact 
+with resources in a different domain. 
+
+
 
 Area:
 =====
@@ -2036,11 +2107,14 @@ You can choose any AWS region that is geographically close to you to optimize la
 
 UseCase:
 ========
+S3 can host static websites and have them accessible on the www.
 Build a data lake:Run big data analytics, artificial intelligence (AI), machine learning (ML), 
 and high performance computing (HPC) applications to unlock data insights.
 Back up and restore critical data: Meet Recovery Time Objectives (RTO), Recovery Point Objectives (RPO).
 Archive data at the lowest cost.
 Run cloud-native applications.
+ 
+ 
  
 BillCost:
 =========
@@ -2048,98 +2122,73 @@ AWS Free Tier, you can get started with Amazon S3 for free.
 Amazon S3 charges you only for what you actually use, with no hidden fees and no overage charges. \
 Bucket pricing varies by region.
 
+
+
 Security:
 =========
 To protect your data in Amazon S3, by default, users only have access to the S3 resources they create. 
-You can grant access to other users by using one or a combination of the following access management features: 
-AWS Identity and Access Management (IAM) to create users and manage their respective access; 
 
+You can grant access to other users by using one or a combination of the following access management features: 
+
+AWS Identity and Access Management (IAM) to create users and manage their respective access; 
 Access Control Lists (ACLs) to make individual objects accessible to authorized users; bucket policies to configure permissions 
 for all objects within a single S3 bucket;
+
 
 Query String Authentication to grant time-limited access to others with temporary URLs. 
 Amazon S3 also supports Audit Logs that list the requests made against your S3 resources for complete 
 visibility into who is accessing what data.
 
 
-Security responsibility includes the following areas:
--Managing your data, including object ownership and encryption.
--Classifying your assets.
--Managing access to your data using IAM roles and other service configurations to apply the appropriate permissions.
 -Enabling detective controls such as AWS CloudTrail or Amazon GuardDuty for Amazon S3.
+-Server-Side Encryption.
 
 
-Server-Side Encryption:
-Request Amazon S3 to encrypt your object before saving it on disks in its data centers and then decrypt it 
-when you download the objects. Server-side encryption can help reduce risk to your data by encrypting 
-the data with a key that is stored in a different mechanism than the mechanism that stores the data itself.
-
-Amazon S3 provides these server-side encryption options:
--Server-side encryption with Amazon S3‐managed keys (SSE-S3).
--Server-side encryption with KMS key stored in AWS Key Management Service (SSE-KMS).
--Server-side encryption with customer-provided keys (SSE-C).
-
-
-Client-Side Encryption:
-Encrypt data client-side and upload the encrypted data to Amazon S3. In this case, you manage the encryption process, 
-the encryption keys, and related tools. As with server-side encryption, client-side encryption can help 
-reduce risk by encrypting the data with a key that is stored in a different mechanism than the mechanism that stores the data itself.
+There are 4 methods of encrypting objects in S3:
+• SSE-S3: encrypts S3 objects using keys handled & managed by AWS
+• SSE-KMS: leverage AWS Key Management Service to manage encryption keys
+• SSE-C: when you want to manage your own encryption keys
+• Client Side Encryption
 
 
 
-##S3 Cors | CORS
--------------------------------------------------
-Cross-origin resource sharing (CORS) defines a way for client web applications that are loaded in one domain to interact 
-with resources in a different domain. With CORS support, you can build rich client-side web applications with 
-Amazon S3 and selectively allow cross-origin access to your Amazon S3 resources.
+S3 Security:
+User based
+	• IAM policies - which API calls should be allowed for a specific user from IAM console
 
-Area:
-=====
-UseCase:
-========
-BillCost:
-=========
-Security:
-=========
-Security is a shared responsibility.
+Resource Based
+	• Bucket Policies(JSON based policies) - bucket wide rules from the S3 console - allows cross account
+	• Object Access Control List (ACL) – finer grain
+	• Bucket Access Control List (ACL) – less common
+
+S3 Security - Other:
+Networking:
+	• Supports VPC Endpoints (for instances in VPC without www internet)
+Logging and Audit:
+	• S3 Access Logs can be stored in other S3 bucket
+	• API calls can be logged in AWS CloudTrail
+User Security:
+	• MFA Delete: MFA (multi factor authentication) can be required in versioned buckets to delete objects
+	• Pre-Signed URLs: URLs that are valid only for a limited time (ex: premium video service for logged in users)
 
 
 
 
-##AWS Policy Simulator | IAM
--------------------------------------------------
-The AWS IAM Simulator is a tool that helps you to test the effects of IAM access control policies. 
-This tool helps when you find yourself manually performing actions to test a policy. 
-The IAM simulator can simulate actions for any IAM principal, resource, and policy conditions.
-
-The simulator does not make an actual AWS service request, so you can safely test 
-requests that might make unwanted changes to your live AWS environment.
-
-Area:
-=====
-UseCase:
-========
-BillCost:
-=========
-Security:
-=========
-Security is a shared responsibility.
 
 
 ##EC2 Instance Metadata
 -------------------------------------------------
 Instance metadata is data about your instance that you can use to configure or manage the running instance. 
-Instance metadata is divided into categories, for example, host name, events, and security groups.
+AWS EC2 Instance Metadata is powerful but one of the least known features to developers.
+• It allows AWS EC2 instances to ”learn about themselves” without using an IAM Role for that purpose.
+• The URL is http://169.254.169.254/latest/meta-data
+• You can retrieve the IAM Role name from the metadata, but you CANNOT retrieve the IAM Policy.
+• Metadata = Info about the EC2 instance
+• Userdata = launch script of the EC2 instance
 
-Area:
-=====
-UseCase:
-========
-BillCost:
-=========
-Security:
-=========
-Security is a shared responsibility.
+
+
+
 
 
 
