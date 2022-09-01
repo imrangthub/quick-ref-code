@@ -3065,7 +3065,7 @@ Security is a shared responsibility.
 • using SQS: queue model
 • using SNS: pub/sub model
 • using Kinesis: real-time streaming model
-• These services can scale independently from our application!
+These services can scale independently from our application!
 
 
 
@@ -3073,18 +3073,76 @@ Security is a shared responsibility.
 
 ##SQS Queues
 -------------------------------------------------
-Amazon Simple Queue Service (SQS) is a fully managed message queuing service that enables you to decouple and scale microservices, distributed systems, and serverless applications.
+Amazon Simple Queue Service (SQS) is a fully managed message queuing service that enables you to decouple and 
+scale microservices, distributed systems, and serverless applications.
 
-SQS offers two types of message queues: 
-Standard queues offer maximum throughput, best-effort ordering, and at-least-once delivery. 
-SQS FIFO queues are designed to guarantee that messages are processed exactly once, in the exact order that they are sent.
+Attributes:
+	• Unlimited throughput, unlimited number of messages in queue
+	• Default retention of messages: 4 days, maximum of 14 days
+	• Low latency (<10 ms on publish and receive)
+	• Limitation of 256KB per message sent
+• Can have duplicate messages (at least once delivery, occasionally)
+• Can have out of order messages (best effort ordering)
+
+Produced:
+• Produced to SQS using the SDK (SendMessage API)
+• The message is persisted in SQS until a consumer deletes it
+• Message retention: default 4 days, up to 14 days
+
+Consuming:
+• Consumers (running on EC2 instances, servers, or AWS Lambda)…
+• Poll SQS for messages (receive up to 10 messages at a time)
+• Process the messages (example: insert the message into an RDS database)
+• Delete the messages using the DeleteMessage API
+
+
+Message Visibility Timeout:
+• After a message is polled by a consumer, it becomes invisible to other consumers
+• By default, the “message visibility timeout” is 30 seconds
+• That means the message has 30 seconds to be processed
+• After the message visibility timeout is over, the message is “visible” in SQS
+
+
+Dead Letter Queue:
+• We can set a threshold of how many times a message
+can go back to the queue
+• After the MaximumReceives threshold is exceeded, the
+message goes into a dead letter queue (DLQ)
+• Useful for debugging! 
+Good to set a retention of 14 days in the DLQ
+
+Delay Queue:
+• Delay a message (consumers don’t see it immediately) up to 15 minutes
+• Default is 0 seconds (message is available right away)
+• Can set a default at queue level
+• Can override the default on send using the DelaySeconds parameter
+
+Long Polling:
+• When a consumer requests messages from the queue, it can optionally “wait” for messages to
+   arrive if there are none in the queue
+• This is called Long Polling
+• LongPolling decreases the number of API calls made to SQS while increasing the efficiency and
+  reducing latency of your application
+• The wait time can be between 1 sec to 20 sec (20 sec preferable)
+
+
+FIFO Queue:
+• FIFO = First In First Out (ordering of messages in the queue)
+• Limited throughput: 300 msg/s without batching, 3000 msg/s with
+• Exactly-once send capability (by removing duplicates)
+• Messages are processed in order by the consumer
+
+
+
 
 Area:
 =====
-SQS is a regional service, that is highly available within a single region. There is no cross-region replication capability.
+SQS is a regional service, that is highly available within a single region. 
+There is no cross-region replication capability.
 
 UseCase:
 ========
+Decouple and scale
 Eliminate administrative overhead
 Reliably deliver messages
 Keep sensitive data secure
@@ -3094,120 +3152,83 @@ BillCost:
 =========
 Amazon SQS Free Tier
 Amazon SQS has no upfront costs. The first million monthly requests are free. 
-After that, you pay based on the number and content of requests, and the interactions with Amazon S3 and the AWS Key Management Service.
+After that, you pay based on the number and content of requests, and the interactions with 
+Amazon S3 and the AWS Key Management Service.
+
+
 
 Security:
 =========
+•Encryption:
+	• In-flight encryption using HTTPS API
+	• At-rest encryption using KMS keys
+	• Client-side encryption if the client wants to perform encryption/decryption itself
+• Access Controls: IAM policies to regulate access to the SQS API
+• SQS Access Policies (similar to S3 bucket policies)
+	• Useful for cross-account access to SQS queues
+	• Useful for allowing other services (SNS, S3…) to write to an SQS queue
 As a managed service, Amazon SQS is protected by the AWS global network security.
 
-Amazon SQS server-side encryption uses the 256-bit Advanced Encryption Standard (AES-256 GCM algorithm) to 
-encrypt each message body. The integration with AWS Key Management Service (KMS) allows you to centrally 
-manage the keys that protect SQS messages along with keys that protect your other AWS resources.
 
 
 
-
-
-
-##SQS Delay Queues
--------------------------------------------------
-Delay queues let you postpone the delivery of new messages to consumers for a number of seconds, for example, 
-when your consumer application needs additional time to process messages. If you create a delay queue, any messages 
-that you send to the queue remain invisible to consumers for the duration of the delay period. 
-The default (minimum) delay for a queue is 0 seconds. The maximum is 15 minutes.
-
-
-Area:
-=====
-UseCase:
-========
-BillCost:
-=========
-Security:
-=========
-
-
-
-
-##SQS Long Polling
--------------------------------------------------
-
-With short polling, the ReceiveMessage request queries only a subset of the servers (based on a weighted random distribution) 
-to find messages that are available to include in the response. Amazon SQS sends the response right away, 
-even if the query found no messages.
-
-With long polling, the ReceiveMessage request queries all of the servers for messages.
-Amazon SQS sends a response after it collects at least one available message, up to the maximum number of 
-messages specified in the request. Amazon SQS sends an empty response only if the polling wait time expires
-
-
-Area:
-=====
-UseCase:
-========
-BillCost:
-=========
-Security:
-=========
-
-
-##SQS Request Response 
--------------------------------------------------
-Area:
-=====
-BillCost:
-=========
-Security:
-=========
-
-
-
-
-##SQS FIFO Queues
--------------------------------------------------
-FIFO (First-In-First-Out) queues are used to improve messaging between applications when the order of processes and 
-events is crucial, or duplicates cannot be permitted. 
-
-The following are some scenarios in which FIFO queues could be useful:
-To ensure that user-entered commands are executed in the correct sequence.
-By transmitting price updates in the correct order, the correct product price will be displayed.
-To stop a student from enrolling in a course without first creating an account.
-
-
-Area:
-=====
-UseCase:
-========
-BillCost:
-=========
-Security:
-=========
 
 
 
 
 ##SNS and SQS | FanOut Pattern
 -------------------------------------------------
-Amazon Simple Notification Service (Amazon SNS) is a fully managed messaging service for both application-to-application (A2A) and application-to-person (A2P) communication.
+Amazon Simple Notification Service (Amazon SNS) is a fully managed messaging service for both 
+application-to-application (A2A) and application-to-person (A2P) communication.
 
-The A2A pub/sub functionality provides topics for high-throughput, push-based, many-to-many messaging between distributed systems, 
-microservices, and event-driven serverless applications. Using Amazon SNS topics, your publisher systems can fanout messages to a 
-large number of subscriber systems, including Amazon SQS queues, AWS Lambda functions, HTTPS endpoints, and Amazon Kinesis Data Firehose, 
-for parallel processing. The A2P functionality enables you to send messages to users at scale via SMS, mobile push, and email.
+The A2A pub/sub functionality provides topics for high-throughput, push-based, many-to-many messaging between 
+distributed systems, 
+microservices, and event-driven serverless applications. 
+
+Using Amazon SNS topics, your publisher systems can fanout messages to a 
+large number of subscriber systems, including Amazon SQS queues, AWS Lambda functions, HTTPS endpoints, and 
+Amazon Kinesis Data Firehose,  for parallel processing. 
+The A2P functionality enables you to send messages to users at scale via SMS, mobile push, and email.
+
+Fan Out:
+• Push once in SNS, receive in all SQS queues that are subscribers
+• Fully decoupled, no data loss
+• Make sure your SQS queue access policy allows for SNS to write
+
+
+Amazon SNS – FIFO Topic:
+• FIFO = First In First Out (ordering of messages in the topic)
+• Ordering by Message Group ID (all messages in the same group are ordered)
+• Deduplication using a Deduplication ID or Content Based Deduplication
+• Can only have SQS FIFO queues as subscribers
+• Limited throughput (same throughput as SQS FIFO)
+
+
+Message Filtering:
+• JSON policy used to filter messages sent to SNS topic’s subscriptions
+• If a subscription doesn’t have a filter policy, it receives every message
+
+
 
 
 Area:
 =====
+Regioinal.
+
+
 UseCase:
 ========
 Application integration
 Application alerts
 User notifications:Amazon SNS can send push email messages and text messages (SMS messages) to individuals or groups.
-Mobile push notifications
+Mobile push notifications.
 
 Simplify and reduce costs with message filtering and batching
-Amazon SNS FIFO topics work with Amazon SQS FIFO queues to ensure messages are delivered in a strictly-ordered manner and are only processed once.
-Increase security with message encryption and privacy
+Amazon SNS FIFO topics work with Amazon SQS FIFO queues to ensure messages are delivered in a strictly-ordered 
+manner and are only processed once.
+Increase security with message encryption and privacy.
+
+
 
 BillCost:
 =========
@@ -3217,8 +3238,19 @@ SNS topics are defined as Standard topics or FIFO topics. You will be charged at
 Amazon SNS has no upfront costs. You pay based on the number of messages that you publish, the number of notifications that you 
 deliver, and any additional API calls for managing topics and subscriptions. Delivery pricing varies by endpoint type.
 
+
+
 Security:
 =========
+• Encryption:
+	• In-flight encryption using HTTPS API
+	• At-rest encryption using KMS keys
+	• Client-side encryption if the client wants to perform encryption/decryption itself
+• Access Controls: IAM policies to regulate access to the SNS API
+• SNS Access Policies (similar to S3 bucket policies)
+	• Useful for cross-account access to SNS topics
+	• Useful for allowing other services ( S3…) to write to an SNS topic
+
 Amazon SNS provides encrypted topics to protect your messages from unauthorized access. 
 The encryption uses a 256-bit AES-GCM algorithm and a customer master key (CMK) issued with AWS Key Management Service (KMS). 
 Amazon SNS also supports VPC endpoints via AWS PrivateLink, so you can privately publish messages to Amazon SNS topics, from an 
@@ -3229,20 +3261,20 @@ Amazon Virtual Private Cloud (VPC) subnet, without traversing the Internet. To l
 
 ##AWS SNS(Simple Notification Service)
 --------------------------------------------------
-
 Anytime multiple services need to receive the same event, you should consider SNS rather than SQS.
 
-
 It provides much more functionality than just the ability to send push notifications (emails, SMS, and mobile push). 
-In fact, it’s a serverless publish-subscribe messaging system allowing to send events to multiple applications (subscribers) at the same time (fan-out), 
+In fact, it’s a serverless publish-subscribe messaging system allowing to send events to multiple 
+applications (subscribers) at the same time (fan-out), 
 including SQS queues, Lambda functions, Kinesis Data Streams, and generic HTTP endpoints. 
-
 
 In order to use the service, we only need to:
 create a topic,
 subscribe to a topic,
 confirm the subscription,
 start sending events to a topic to deliver them to all subscribers (potentially multiple applications and people).
+
+
 
 
 
