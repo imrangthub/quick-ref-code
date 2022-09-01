@@ -2195,52 +2195,32 @@ AWS EC2 Instance Metadata is powerful but one of the least known features to dev
 
 ##S3 MFA
 -------------------------------------------------
-MFA-protected API access is used to enforce another authentication factor (MFA code) when accessing sensitive Amazon S3 resources. 
+MFA (multi factor authentication) forces user to generate a code on a device 
+(usually a mobile phone or hardware) before doing important operations on S3.
 
-Only bucket owner /root account(No admin allowed) can enable/disable MFA Delete
-You can’t enable MFA Delete using AWS Console and You must use AWS CLI
-
-MFA Delete is an additional layer of security on top of versioning that you can configure for your bucket.
-Permanently delete an object version
-Suspend Bucket Versioning
-
-
-Area:
-=====
-UseCase:
-========
-BillCost:
-=========
-Security:
-=========
-Security is a shared responsibility.
-
+• To use MFA-Delete, enable Versioning on the S3 bucket
+• You will need MFA to
+	• permanently delete an object version
+	• suspend versioning on the bucket
+• You won’t need MFA for
+	• enabling versioning
+	• listing deleted versions
+• Only the bucket owner (root account) can enable/disable MFA-Delete
+• MFA-Delete currently can only be enabled using the CLI
 
 
 
 ##S3 Access Logs
 -------------------------------------------------
 Server access logging provides detailed records for the requests that are made to an Amazon S3 bucket. 
-Server access logs are useful for many applications. For example, access log information can be useful in security and access audits.
-
 Provide the name of the target bucket. This bucket is where you want Amazon S3 to save the access logs as objects. 
 Both the source and target buckets must be in the same AWS Region and owned by the same account.
 
-You can enable or disable server access logging by using the Amazon S3 console, Amazon S3 API, the AWS Command Line Interface (AWS CLI), or AWS SDKs.
+S3 Access Logs: Warning
+• Do not set your logging bucket to be the monitored bucket
+• It will create a logging loop, and your bucket will grow in size exponentially
 
-
-Area:
-=====
-Global but Data is Regional.
-UseCase:
-========
-BillCost:
-=========
 There is no extra charge for enabling server access logging on an Amazon S3 bucket.
-
-Security:
-=========
-Security is a shared responsibility.
 
 
 
@@ -2248,11 +2228,9 @@ Security is a shared responsibility.
 
 ##S3 Replication 
 -------------------------------------------------
-Replication enables automatic, asynchronous copying of objects across Amazon S3 buckets. 
-Buckets that are configured for object replication can be owned by the same AWS account or by different accounts. 
+Replication enables automatic, asynchronous copying of objects across  
+Amazon S3 buckets same AWS account or by different accounts. 
 You can replicate objects to a single destination bucket or to multiple destination buckets. 
-
-The destination buckets can be in different AWS Regions or within the same Region as the source bucket.
 
 If you specify an object version ID to delete, Amazon S3 deletes that object version in the source bucket. 
 But it doesn't replicate the deletion in the destination bucket. In other words, 
@@ -2262,9 +2240,10 @@ When you add a replication rule to a bucket, the rule is enabled by default, so 
 
 S3 Replication supports two-way replication between two or more buckets in the same or different AWS Regions. 
 
-Area:
-=====
-Global but Data is Regional.
+
+• CRR - Use cases: compliance, lower latency access, replication across accounts
+• SRR – Use cases: log aggregation, live replication between production and test accounts
+
 
 UseCase:
 ========
@@ -2273,11 +2252,7 @@ or different AWS Regions, with different encryption types, or across different a
 Replicate objects to more cost-effective storage classes.
 Maintain object copies under a different account.
 
-BillCost:
-=========
-Security:
-=========
-Security is a shared responsibility.
+
 
 
 
@@ -2285,21 +2260,17 @@ Security is a shared responsibility.
 ##S3 Pre-signed URLs
 -------------------------------------------------
 S3 objects are private. Only the object owner has permission to access them. 
-However, the object owner can optionally share objects with others by creating a presigned URL, 
-using their own security credentials, to grant time-limited permission to download the objects.
 
+Can generate pre-signed URLs using SDK or CLI
+• For downloads (easy, can use the CLI)
+• For uploads (harder, must use the SDK)
+• Users given a pre-signed URL inherit the permissions of the person who generated the URL for GET / PUT
 
-Area:
-=====
-Global but Data is Regional.
+UseCase :
+• Allow only logged-in users to download a premium video on your S3 bucket
+• Allow an ever changing list of users to download files by generating URLs dynamically
+• Allow temporarily a user to upload a file to a precise location in our bucket
 
-UseCase:
-========
-BillCost:
-=========
-Security:
-=========
-Security is a shared responsibility.
 
 
 
@@ -2314,17 +2285,6 @@ Amazon S3 Glacier Instant Retrieval
 Amazon S3 Glacier Flexible Retrieval
 Amazon S3 Glacier Deep Archive
 
-Area:
-=====
-Global but Data is Regional.
-
-UseCase:
-========
-BillCost:
-=========
-Security:
-=========
-Security is a shared responsibility.
 
 
 
@@ -2333,94 +2293,40 @@ Security is a shared responsibility.
 -------------------------------------------------
 An S3 Lifecycle configuration is a set of rules that define actions that Amazon S3 applies to a group of objects. 
 
-There are two types of actions:
-Transition actions – These actions define when objects transition to another storage class.
-Expiration actions – These actions define when objects expire. Amazon S3 deletes expired objects on your behalf.
+Transition actions: It defines when objects are transitioned to another storage class.
+	• Move objects to Standard IA class 60 days after creation
+	• Move to Glacier for archiving after 6 months
+Expiration actions: configure objects to expire (delete) after some time
+	• Access log files can be set to delete after a 365 days
+	• Can be used to delete old versions of files (if versioning is enabled)
+	• Can be used to delete incomplete multi-part uploads
+• Rules can be created for a certain prefix (ex - s3://mybucket/mp3/*)
+• Rules can be created for certain objects tags (ex - Department: Finance)
 
-
-Area:
-=====
-Global but Data is Regional.
-
-UseCase:
-========
-BillCost:
-=========
-Security:
-=========
-Security is a shared responsibility.
 
 
 
 
 ##S3 Analytics
 -------------------------------------------------
-By using Amazon S3 analytics Storage Class Analysis you can analyze storage access patterns to help you decide when to transition 
-the right data to the right storage class. This new Amazon S3 analytics feature observes data access patterns to help you 
-determine when to transition less frequently accessed STANDARD storage to the STANDARD_IA (IA, for infrequent access) storage class.
-
+By using Amazon S3 analytics Storage Class Analysis you can analyze storage access patterns to 
+help you decide when to transition the right data to the right storage class. 
 
 Storage class analysis only provides recommendations for Standard to Standard IA classes.
-
-
-Area:
-=====
-Global but Data is Regional.
-UseCase:
-========
-BillCost:
-=========
-Security:
-=========
-Security is a shared responsibility.
-
-
-
-
-
-##S3 Performance
--------------------------------------------------
-Area:
-=====
-Global but Data is Regional.
-UseCase:
-========
-BillCost:
-=========
-Security:
-=========
-Security is a shared responsibility.
 
 
 
 
 ##S3 Select & Glacier Select
 -------------------------------------------------
-Use S3 Select to retrieve specific data from object contents and Glacier Select to run queries on data stored in Amazon Glacier. 
-With Amazon S3 Select and Glacier S3, you can easily retrieve only a subset of data from an object by using simple SQL expressions.
-
-
 With Amazon S3 Select, you can use simple structured query language (SQL) statements to filter the contents of an 
 Amazon S3 object and retrieve just the subset of data that you need. 
 By using Amazon S3 Select to filter this data, you can reduce the amount of data that 
 Amazon S3 transfers, which reduces the cost and latency to retrieve this data.
 
-With S3 Glacier Select, you can perform filtering operations using simple 
-Structured Query Language (SQL) statements directly on your data in S3 Glacier.
-
-
-
-Area:
-=====
-Global but Data is Regional.
-
-UseCase:
-========
-BillCost:
-=========
-Security:
-=========
-Security is a shared responsibility.
+• Retrieve less data using SQL by performing server side filtering
+• Can filter by rows & columns (simple SQL statements)
+• Less network transfer, less CPU cost client-side
 
 
 
@@ -2432,21 +2338,10 @@ Make sure that it also identifies the destinations where you want Amazon S3 to s
 
 You store this configuration in the notification subresource that's associated with a bucket
 
-
-Area:
-=====
-Global but Data is Regional.
 UseCase:
 ========
 Amazon S3 supports For Event:Amazon SNS, Amazon SQS, Lambda.
 
-
-
-BillCost:
-=========
-Security:
-=========
-Security is a shared responsibility.
 
 
 
@@ -2461,22 +2356,12 @@ The bucket owner always pays the cost of storing data.
 
 If you enable Requester Pays on a bucket, anonymous access to that bucket is not allowed.
 
-
-Area:
-=====
-Global but Data is Regional.
-
-
 UseCase:
 ========
 Typically, you configure buckets to be Requester Pays buckets when you want to share data but not incur 
 charges associated with others accessing the data. 
 
-BillCost:
-=========
-Security:
-=========
-Security is a shared responsibility.
+
 
 
 
