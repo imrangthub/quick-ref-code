@@ -4578,25 +4578,14 @@ Comes with OpenSearch Dashboards (visualization)
 
 
 
+
+
 ##AWS Monitoring 
 -------------------------------------------------
 Amazon Web Services (AWS) monitoring is a set of practices you can use to verify the security and performance of your 
 AWS resources and data.
 
-
-Area:
-=====
-UseCase:
-========
-Use a single platform for observability
-Collect metrics on AWS and on premises
-
-BillCost:
-=========
-Security:
-=========
-
-
+Use a single platform for observability, Collect metrics on AWS and on premises.
 
 
 
@@ -4604,23 +4593,34 @@ Security:
 -------------------------------------------------
 CloudWatch collects monitoring and operational data in the form of logs, metrics, and events. 
 
-CloudWatch collects monitoring and operational data in the form of logs, metrics, and events.
 You can use CloudWatch to detect anomalous behavior in your environments, set alarms, visualize logs and metrics side by side, 
 take automated actions, troubleshoot issues, and discover insights to keep your applications running smoothly.
 
-You get a unified view of operational health and gain complete visibility of your AWS resources, applications, and services running on 
-AWS and on-premises. You can use CloudWatch to detect anomalous behavior in your environments, set alarms, 
+You get a unified view of operational health and gain complete visibility of your AWS resources, applications, 
+and services running on AWS and on-premises. 
+You can use CloudWatch to detect anomalous behavior in your environments, set alarms, 
 visualize logs and metrics side by side, take automated actions, troubleshoot issues, and discover insights to 
 keep your applications running smoothly.
 
 You can use metrics to calculate statistics and then present the data graphically in the CloudWatch console. 
 You can configure alarm actions to stop, start, or terminate an Amazon EC2 instance when certain criteria are met.
 
-CloudWatch is NOT CloudTrail so it is important to know that only CloudTrail can monitor AWS access for security and auditing reasons. 
+CloudWatch is NOT CloudTrail so it is important to know that only CloudTrail can monitor AWS access for 
+security and auditing reasons. 
+
 CloudWatch is all about performance. CloudTrail is all about auditing.
+
+
+• EC2 instance metrics have metrics “every 5 minutes”
+• With detailed monitoring (for a cost), you get data “every 1 minute”
+
+
 
 Area:
 =====
+MayRegional
+
+
 UseCase:
 ========
  - Use a single platform for observability
@@ -4643,6 +4643,8 @@ You simply pay for what you use and will be charged at the end of the month for 
 
 Security:
 =========
+It is a aws managed service, security is a shared responsibility.
+
 
 
 
@@ -4650,20 +4652,12 @@ Security:
 ##AWS CloudWatch Metrics
 -------------------------------------------------
 Metrics are data about the performance of your systems. By default, many services provide free metrics for resources 
-such as Amazon EC2 instances, Amazon EBS volumes, and Amazon RDS DB instances). You can also enable detailed monitoring 
-for some resources, such as your Amazon EC2 instances, or publish your own application metrics. 
+such as Amazon EC2 instances, Amazon EBS volumes, and Amazon RDS DB instances). 
+You can also enable detailed monitoring for some resources, such as your Amazon EC2 instances, or publish your own 
+application metrics. 
+
 Amazon CloudWatch can load all the metrics in your account (both AWS resource metrics and application metrics that you provide) 
 for search, graphing, and alarms.
-
-
-Area:
-=====
-UseCase:
-========
-BillCost:
-=========
-Security:
-=========
 
 
 
@@ -4673,19 +4667,16 @@ Security:
 A custom metric enables you to monitor a specific application binary or runtime. 
 CloudWatch helps you monitor the infrastructure portion of an EC2 instance, such as CPU, hard disk and network.
 
-
-Area:
-=====
-UseCase:
-========
 When CloudWatch doesn't have a metric for your specific use case, you'll want to implement a custom metric.
 
 
-BillCost:
-=========
-Security:
-=========
+Possibility to define and send your own custom metrics to CloudWatch
+• Example: memory (RAM) usage, disk space, number of logged in users …
+• Use API call PutMetricData
 
+
+Important: Accepts metric data points two weeks in the past and two hours in the
+future (make sure to configure your EC2 instance time correctly)
 
 
 
@@ -4693,29 +4684,80 @@ Security:
 -------------------------------------------------
 Amazon CloudWatch dashboards are customizable home pages in the CloudWatch console that you can use to 
 monitor your resources in a single view, even those resources that are spread across different Regions. 
+
 You can use CloudWatch dashboards to create customized views of the metrics and alarms for your AWS resources.
 
+• Dashboards can include graphs from different AWS accounts and regions
+• Dashboards can be shared with people who don’t have an AWS account (public,
+email address, 3rd party SSO provider through Amazon Cognito)
 
 Area:
 =====
+Dashboards are global
+
+
 UseCase:
 ========
+Monitor your resources in a single view.
+
 BillCost:
 =========
+• 3 dashboards (up to 50 metrics) for free
+• $3/dashboard/month afterwards
+
+
 Security:
 =========
+It is a aws managed service, security is a shared responsibility.
+
+
 
 
 
 
 ##CloudWatch Logs
 -------------------------------------------------
-You can use Amazon CloudWatch Logs to monitor, store, and access your log files from Amazon Elastic Compute Cloud (Amazon EC2) instances, AWS CloudTrail, Route 53, and other sources.
+You can use Amazon CloudWatch Logs to monitor, store, and access your log files from 
+Amazon Elastic Compute Cloud (Amazon EC2) instances, AWS CloudTrail, Route 53, and other sources.
 
-CloudWatch Logs enables you to centralize the logs from all of your systems, applications, and AWS services that you use, in a single, highly scalable service. 
+CloudWatch Logs enables you to centralize the logs from all of your systems, applications, and 
+AWS services that you use, in a single, highly scalable service.
+
+
+CloudWatch Logs - Sources:
+• SDK, CloudWatch Logs Agent, CloudWatch Unified Agent 
+• Elastic Beanstalk: collection of logs from application 
+• ECS: collection from containers 
+• AWS Lambda: collection from function logs 
+• VPC Flow Logs: VPC specific logs 
+• API Gateway 
+• CloudTrail based on filter 
+• Route53: Log DNS queries
+
+
+• Log groups: arbitrary name, usually representing an application
+• Log stream: instances within application / log files / containers
+• Can define log expiration policies (never expire, 30 days, etc..)
+
+CloudWatch Logs can send logs to:
+• Amazon S3 (exports)
+• Kinesis Data Streams
+• Kinesis Data Firehose
+• AWS Lambda
+• ElasticSearch
+
+ CloudWatch Logs for EC2:
+• By default, no logs from your EC2 machine will go to CloudWatch
+• You need to run a CloudWatch agent on EC2 to push the log files you want
+• Make sure IAM permissions are correct
+• The CloudWatch log agent can be setup on-premises too
+
 
 Area:
 =====
+MayRegional
+
+
 UseCase:
 ========
 Query your log data
@@ -4725,8 +4767,12 @@ Log retention
 
 BillCost:
 =========
+
+
 Security:
 =========
+It is a aws managed service, security is a shared responsibility.
+
 
 
 
@@ -4734,22 +4780,22 @@ Security:
 
 ##CloudWatch Agent | Logs Agent
 -------------------------------------------------
-The CloudWatch Logs agent provides an automated way to send log data to CloudWatch Logs from Amazon EC2 instances. The agent includes the following components:
+The CloudWatch Logs agent provides an automated way to send log data to CloudWatch Logs from Amazon EC2 instances. 
+The agent includes the following components:
 
 A plug-in to the AWS CLI that pushes log data to CloudWatch Logs.
 A script (daemon) that initiates the process to push data to CloudWatch Logs.
 A cron job that ensures that the daemon is always running.
 
-
-Area:
-=====
-UseCase:
-========
-BillCost:
-=========
-Security:
-=========
-
+CloudWatch Unified Agent – Metrics:
+• Collected directly on your Linux server / EC2 instance
+• CPU (active, guest, idle, system, user, steal)
+• Disk metrics (free, used, total), Disk IO (writes, reads, bytes, iops)
+• RAM (free, inactive, used, total, cached)
+• Netstat (number of TCP and UDP connections, net packets, bytes)
+• Processes (total, dead, bloqued, idle, running, sleep)
+• Swap Space (free, used, used %)
+• Reminder: out-of-the box metrics for EC2 – disk, CPU, network (high level)
 
 
 
@@ -4758,42 +4804,58 @@ Security:
 CloudWatch alarms perform an action when a CloudWatch metric exceeds a specified value for some amount of time.
 
 An alarm watches a single metric over a specified time period, and performs one or more specified actions,
- based on the value of the metric relative to a threshold over time. The action is a notification sent to an 
- Amazon SNS topic or an Auto Scaling policy. You can also add alarms to dashboards.
-
- You can attach multiple Alarms to each metric and each one can have multiple actions.
- A CloudWatch Alarm is always in one of three states: OK, ALARM, or INSUFFICIENT_DATA
+ based on the value of the metric relative to a threshold over time. 
  
-Area:
-=====
-UseCase:
-========
-BillCost:
-=========
-Security:
-=========
+
+You can attach multiple Alarms to each metric and each one can have multiple actions.
+A CloudWatch Alarm is always in one of three states: OK, ALARM, or INSUFFICIENT_DATA
+ 
+CloudWatch Alarm Targets:
+• Stop, Terminate, Reboot, or Recover an EC2 Instance
+• Trigger Auto Scaling Action
+• Send notification to SNS (from which you can do pretty much anything)
 
 
-##Eventbridge
+
+
+
+##CloudWatch Events
 -------------------------------------------------
 Event:
 An event indicates a change in an environment such as an AWS environment, a SaaS partner service or application, 
-or one of your applications or services. The following are examples of events:
+or one of your applications or services. 
+
+The following are examples of events:
 Amazon EC2 generates an event when the state of an instance changes from pending to running.
 Amazon EC2 Auto Scaling generates events when it launches or terminates instances.
+
 AWS CloudTrail publishes events when you make API calls.
 You can also set up scheduled events that are generated on a periodic basis.
 Events are represented as JSON objects and they all have a similar structure, and the same top-level fields.
 
 
+Amazon CloudWatch Events delivers a near real-time stream of system events that describe changes in 
+Amazon Web Services (AWS) resources.
+
+• Event Pattern: Intercept events from AWS services (Sources)
+	• Example sources: EC2 Instance Start, CodeBuild Failure, S3, Trusted Advisor
+	• Can intercept any API call with CloudTrail integration
+• Schedule or Cron (example: create an event every 4 hours)
+
+• A JSON payload is created from the event and passed to a target…
+	• Compute: Lambda, Batch, ECS task
+	• Integration: SQS, SNS, Kinesis Data Streams, Kinesis Data Firehose
+	• Orchestration: Step Functions, CodePipeline, CodeBuild
+	• Maintenance: SSM, EC2 Actions
+
+
+
+##Eventbridge
+-------------------------------------------------
 EventBridge is an event bus for messages that you want to propagate across your (micro)services. 
 Those events can come from state changes of AWS services, other AWS accounts, or external 
 applications like Auth0, Shopify, and others. You can, of course, also send your custom messages.
 
-EventBridge delivers a stream of real-time data from event sources such as Zendesk or Shopify to targets like 
-AWS Lambda and other SaaS applications. You can set up routing rules to determine 
-where to send your data to build application architectures that react in real-time to your data sources 
-with event publisher and consumer completely decoupled.
 
 EventBridge sends metrics to Amazon CloudWatch every minute for everything from the number of 
 matched events to the number of times a target is invoked by a rule.
@@ -4805,8 +4867,29 @@ Events are JSON objects that tell you information about something that happened 
 In event-driven architecture, each component of the application raises an event whenever anything changes. 
 Other components listen and decide what to do with it and how they would like to react.
 
+
+• Default Event Bus – generated by AWS services (CloudWatch Events)
+• Partner Event Bus – receive events from SaaS service or applications (Zendesk, DataDog, Segment, Auth0…)
+• Custom Event Buses – for your own applications
+• Event buses can be accessed by other AWS accounts
+
+The Schema Registry allows you to generate code for your application, that will know in advance 
+how data is structured in the event bus.
+
+
+Amazon EventBridge vs CloudWatch Events:
+• Amazon EventBridge builds upon and extends CloudWatch Events.
+• It uses the same service API and endpoint, and the same underlying service infrastructure.
+• EventBridge allows extension to add event buses for your custom applications and your third-party SaaS apps.
+• Event Bridge has the Schema Registry capability
+• EventBridge has a different name to mark the new capabilities
+• Over time, the CloudWatch Events name will be replaced with EventBridge.
+
+
 Area:
 =====
+MayRegional
+
 UseCase:
 ========
 Build event-driven architectures
@@ -4819,25 +4902,20 @@ Amazon EventBridge, you pay for events published to your event bus, events inges
 There are no additional charges for rules or event delivery. 
 Glue
 
+
+
 Security:
 =========
-
+It is a aws managed service, security is a shared responsibility.
 
 
 
 ##CloudTrail
 -------------------------------------------------
-CloudTrail logs actions inside your AWS environment.CloudTrail has a feature called CloudTrail Insights.
-Insights let you detect unusual API activities on your account by automation.
-
-AWS CloudTrail is an AWS service that helps you enable governance, compliance, and operational and risk auditing of your AWS account. 
+AWS CloudTrail is an AWS service that helps you enable governance, compliance, and operational and risk auditing of your 
+AWS account. 
 Actions taken by a user, role, or an AWS service are recorded as events in CloudTrail. 
 Events include actions taken in the AWS Management Console, AWS Command Line Interface, and AWS SDKs and APIs.
-
-CloudTrail is enabled on your AWS account when you create it. 
-When activity occurs in your AWS account, that activity is recorded in a CloudTrail event. 
-You can easily view recent events in the CloudTrail console by going to Event history. 
-For an ongoing record of activity and events in your AWS account, create a trail.
 
 
 There are two types of events that can be logged in CloudTrail: management events and data events.
@@ -4860,15 +4938,48 @@ Lambda function execution activity
 By default, CloudTrail logs management events, but not data events.
 
 
+CloudTrail Events
+• Management Events:
+	• Operations that are performed on resources in your AWS account
+  Examples:
+	• Configuring security (IAM AttachRolePolicy)
+	• Configuring rules for routing data (Amazon EC2 CreateSubnet)
+	• Setting up logging (AWS CloudTrail CreateTrail)
+	• By default, trails are configured to log management events.
+	• Can separate Read Events (that don’t modify resources) from Write Events (that may modify resources)
+• Data Events:
+	• By default, data events are not logged (because high volume operations)
+	• Amazon S3 object-level activity (ex: GetObject, DeleteObject, PutObject): can separate Read and Write Events
+	• AWS Lambda function execution activity (the Invoke API)
+
+• Insights Events:
+  Enable CloudTrail Insights to detect unusual activity in your account:
+	• inaccurate resource provisioning
+	• hitting service limits
+	• Bursts of AWS IAM actions
+	• Gaps in periodic maintenance activity
+• CloudTrail Insights analyzes normal management events to create a baseline
+	• And then continuously analyzes write events to detect unusual patterns
+	• Anomalies appear in the CloudTrail console
+	• Event is sent to Amazon S3
+	• An EventBridge event is generated (for automation needs)
+
+CloudTrail Events Retention:
+• Events are stored for 90 days in CloudTrail
+• To keep events beyond this period, log them to S3 and use Athena
+
 
 Area:
 =====
+MayRegional
+
+
 UseCase:
 ========
 AWS CloudTrail is a service that automatically records events such as AWS API calls. 
 You can create EventBridge rules that use the information from CloudTrail. 
-For more information about CloudTrail, see What is AWS CloudTrail?.
 
+For more information about CloudTrail, see What is AWS CloudTrail?.
 Audit activity: Monitor, store, and validate activity events for authenticity. 
 Identify security incidents: Detect unauthorized access using the Who, What, and When information in CloudTrail Events.
 Troubleshoot operational issues.
@@ -4877,7 +4988,9 @@ Troubleshoot operational issues.
 BillCost:
 =========
 For CloudTrail Insights, choose which event to analyze and pay as you go.
-For AWS CloudTrail Lake, you pay for ingestion and storage together. You can store your data for up to seven years. Choose which data to analyze, and pay as you go.
+For AWS CloudTrail Lake, you pay for ingestion and storage together. 
+You can store your data for up to seven years. 
+Choose which data to analyze, and pay as you go.
 
 
 Security:
@@ -4897,28 +5010,77 @@ Config continuously monitors and records your AWS resource configurations and al
 of recorded configurations against desired configurations.
 
 
+AWS Config Rules does not prevent actions from happening (no deny)
+You can set Remediation Retries if the resource is still non-compliant after auto- remediation
+
+
+Config Rules – Notifications:
+Use EventBridge to trigger notifications when AWS resources are noncompliant
+Ability to send configuration changes and compliance state notifications
+to SNS (all events – use SNS Filtering or filter at client-side)
+
+
+
+CloudWatch vs CloudTrail vs Config:
+CloudWatch 
+	• Performance monitoring (metrics, CPU, network, etc…) & dashboards 
+	• Events & Alerting 
+	• Log Aggregation & Analysis 
+CloudTrail 
+	• Record API calls made within your Account by everyone 
+	• Can define trails for specific resources 
+	• Global Service 
+Config 
+	• Record configuration changes 
+	• Evaluate resources against compliance rules 
+	• Get timeline of changes and compliance
+
+
+For an Elastic Load Balancer:
+CloudWatch:
+	• Monitoring Incoming connections metric
+	• Visualize error codes as % over time
+	• Make a dashboard to get an idea of your load balancer performance
+Config:
+	• Track security group rules for the Load Balancer
+	• Track configuration changes for the Load Balancer
+	• Ensure an SSL certificate is always assigned to the Load Balancer (compliance)
+CloudTrail:
+	• Track who made any changes to the Load Balancer with API calls
+
+
+
 Area:
 =====
+MayRegional
+
+
 UseCase:
 ========
-Discovery: AWS Config will discover resources that exist in your account, record their current configuration, and capture any 
-changes to these configurations. 
-
-Config will also retain configuration details for resources that have been deleted. 
-
-Change management
-Continuous audit and compliance
+Helps with auditing and recording compliance of your AWS resources
+• Helps record configurations and changes over time
+• Questions that can be solved by AWS Config:
+	• Is there unrestricted SSH access to my security groups?
+	• Do my buckets have any public access?
+	• How has my ALB configuration changed over time?
+• You can receive alerts (SNS notifications) for any changes
+• AWS Config is a per-region service
+• Can be aggregated across regions and accounts
+• Possibility of storing the configuration data into S3 (analyzed by Athena)
 
 
 BillCost:
 =========
-You pay $0.003 per configuration item recorded in your AWS account per AWS Region. 
-With AWS Config, you are charged based on the number of configuration items recorded, 
-the number of active AWS Config rule evaluations and the number of conformance 
-pack evaluations in your account. 
+Pricing: no free tier, $0.003 per configuration item recorded per region,
+$0.001 per config rule evaluation per region
+
+
 
 Security:
 =========
+It is a aws managed service, security is a shared responsibility.
+
+
 
 
 
