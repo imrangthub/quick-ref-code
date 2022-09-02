@@ -6312,14 +6312,22 @@ AWS provides two features that you can use to increase security in your VPC: sec
 -------------------------------------------------
 An internet gateway is a horizontally scaled, redundant, and highly available VPC component that allows communication between your 
 VPC and the internet. It supports IPv4 and IPv6 traffic. 
-It does not cause availability risks or bandwidth constraints on your network traffic.
+
+• Must be created separately from a VPC
+• One VPC can only be attached to one IGW and vice versa
+• Internet Gateways on their own do not allow Internet access…
+• Route tables must also be edited!
+
+
 
 Area:
 =====
+MayRegional.
 
 UseCase:
 ========
-An internet gateway enables resources in your public subnets (such as EC2 instances) to connect to the internet if the resource has a public IPv4 address or an IPv6 address.
+An internet gateway enables resources in your public subnets (such as EC2 instances) to connect to the internet 
+if the resource has a public IPv4 address or an IPv6 address.
 
 BillCost:
 =========
@@ -6335,26 +6343,21 @@ Security is a shared responsibility
 
 
 ##Route Table 
--------------------------------------------------\
+-------------------------------------------------
 A route table contains a set of rules, called routes, that determine where network traffic from your subnet or gateway is directed.
 
 Main route table—The route table that automatically comes with your VPC. It controls the routing for all 
 subnets that are not explicitly associated with any other route table.
 Custom route table—A route table that you create for your VPC.
-Destination—The range of IP addresses where you want traffic to go (destination CIDR). For example, an external corporate network with the CIDR 172.16.0.0/12.
+
+Destination—The range of IP addresses where you want traffic to go (destination CIDR). 
+For example, an external corporate network with the CIDR 172.16.0.0/12.
 Target—The gateway, network interface, or connection through which to send the destination traffic; for example, an internet gateway.
 
-Area:
-=====
-UseCase:
-========
-BillCost:
-=========
 There are no additional charges
 
-Security:
-=========
-Security is a shared responsibility
+
+
 
 
 
@@ -6363,28 +6366,89 @@ Security is a shared responsibility
 -------------------------------------------------
 A bastion host is a server whose purpose is to provide access to a private network from an external network, such as the Internet.
 
+
+We can use a Bastion Host to SSH into our private EC2 instances
+• The bastion is in the public subnet which is then connected to all other private subnets
+• Bastion Host security group must be tightened
+
+Exam Tip: Make sure the bastion host only has port 22 traffic from the IP address you need,
+not from the security groups of your other EC2 instances
+
+
 Area:
 =====
+MayRegional
+
+
+
 UseCase:
 ========
+SSH into our private EC2
+
+
+
 BillCost:
 =========
+Instance cost.
+
+
+
 Security:
 =========
+Security group.
+
+
+
+
+
+
+
 
 
 ##NAT Instances
 -------------------------------------------------
-launch a NAT instance in a public subnet to enable instances in the private subnet to initiate outbound 
-IPv4 traffic to the internet or other AWS services, but prevent the instances from receiving inbound traffic initiated on the internet.
+AWS provides two kinds of NAT devices:
+NAT gateway 
+NAT instance
+
+NAT = Network Address Translation
+• Allows EC2 instances in private subnets to connect to the Internet
+• Must be launched in a public subnet
+• Must disable EC2 setting: Source / destination Check
+• Must have Elastic IP attached to it
+• Route Tables must be configured to route traffic from private subnets to the NAT Instance
+
+
+• Pre-configured Amazon Linux AMI is available
+• Reached the end of standard support on December 31, 2020
+• Not highly available / resilient setup out of the box
+• You need to create an ASG in multi-AZ + resilient user-data script
+• Internet traffic bandwidth depends on EC2 instance type
+• You must manage Security Groups & rules:
+	Inbound:
+	• Allow HTTP / HTTPS traffic coming from Private Subnets
+	• Allow SSH from your home network (access is provided through Internet Gateway)
+	Outbound:
+	• Allow HTTP / HTTPS traffic to the Internet
+
 
 Area:
 =====
+MayRegional
+
+
+
 UseCase:
 ========
+Private subnets to connect to the Internet
+
+
+
 BillCost:
 =========
 NAT Gateway Hourly Charge: NAT Gateway is charged on an hourly basis.
+
+
 
 Security:
 =========
@@ -6392,13 +6456,12 @@ Security is a shared responsibility
 
 
 
+
+
 ##NAT Gateways
 -------------------------------------------------
 NAT device is added to the public subnet to get internet connectivity.
-
-AWS provides two kinds of NAT devices:
-NAT gateway 
-NAT instance 
+ 
 
 NAT Gateway
 A NAT gateway must be launched in a public subnet because it needs internet connectivity. 
@@ -6419,36 +6482,60 @@ IP address of your instance is replaced with the NAT device address, and when th
 the NAT device translates the address to your instance’s private IP address.
 
 
+• NATGW is created in a specific Availability Zone, uses an Elastic IP
+• Can’t be used by EC2 instance in the same subnet (only from other subnets)
+• Requires an IGW (Private Subnet => NATGW => IGW)
+• NAT Gateway is resilient within a single Availability Zone
+• Must create multiple NAT Gateways in multiple AZs for fault-tolerance
+
 Area:
 =====
 Each NAT gateway is created in a specific Availability Zone
+
+
 
 UseCase:
 ========
 A NAT gateway supports the following protocols: TCP, UDP, and ICMP.
 NAT gateways are supported for IPv4 or IPv6 traffic. 
 
+
 BillCost:
 =========
+ Pay per hour for usage and bandwidth
 When you provision a NAT gateway, you are charged for each hour that your 
 NAT gateway is available and each Gigabyte of data that it processes. 
 
+
+
 Security:
 =========
-Security is a shared responsibility
+No Security Groups to manage / required
+It is a aws managed service, security is a shared responsibility.
+
+
+
+
 
 
 
 ##DNS Resolution
 -------------------------------------------------
-Area:
-=====
-UseCase:
-========
-BillCost:
-=========
-Security:
-=========
+DNS Resolution (enableDnsSupport)
+• Decides if DNS resolution from Route 53 Resolver server is supported for the VPC
+• True (default): it queries the Amazon Provider DNS Server at 169.254.169.253 or the
+reserved IP address at the base of the VPC IPv4 network range plus two (.2)
+
+DNS Hostnames (enableDnsHostnames)
+• By default,
+• True => default VPC
+• False => newly created VPCs
+• Won’t do anything unless enableDnsSupport=true
+• If True, assigns public hostname to EC2 instance if it has a public IPv4
+
+If you use custom DNS domain names in a Private Hosted Zone in
+Route 53, you must set both these attributes (enableDnsSupport & enableDnsHostname) to true
+
 
 
 
@@ -6457,20 +6544,10 @@ Security:
 ##Route53 Private Zones
 -------------------------------------------------
 A private hosted zone is a container that holds information about how you want Amazon Route 53 to respond to
- DNS queries for a domain and its subdomains within one or more VPCs that you create with the Amazon VPC service.
+DNS queries for a domain and its subdomains within one or more VPCs that you create with the Amazon VPC service.
 
-ou create a private hosted zone, such as example.com, and specify the VPCs that you want to associate with the hosted zone.
-
-Area:
-=====
-UseCase:
-========
-BillCost:
-=========
+You create a private hosted zone, such as example.com, and specify the VPCs that you want to associate with the hosted zone.
 Managing hosted zones: You pay a monthly charge for each hosted zone managed with Route 53.
-
-Security:
-=========
 
 
 
@@ -6493,6 +6570,32 @@ Security Groups are stateful:
 NACL:
 NACL also adds an additional layer of security associated with subnets that control both inbound and outbound traffic at the subnet level.
 
+• NACL are like a firewall which control traffic from and to subnets
+• One NACL per subnet, new subnets are assigned the Default NACL
+• You define NACL Rules:
+	• Rules have a number (1-32766), higher precedence with a lower number
+	• First rule match will drive the decision
+	• Example: if you define #100 ALLOW 10.0.0.10/32 and #200 DENY 10.0.0.10/32, the IP address will be allowed because 
+	  100 has a higher precedence over 200
+	• The last rule is an asterisk (*) and denies a request in case of no rule match
+	• AWS recommends adding rules by increment of 100
+• Newly created NACLs will deny everything
+• NACL are a great way of blocking a specific IP address at the subnet leve
+
+
+Default NACL:
+• Accepts everything inbound/outbound with the subnets it’s associated with
+• Do NOT modify the Default NACL, instead create custom NACLs
+
+Ephemeral Ports:
+• For any two endpoints to establish a connection, they must use ports
+• Clients connect to a defined port, and expect a response on an ephemeral port
+• Different Operating Systems use different port ranges, examples:
+• IANA & MS Windows 10 è 49152 – 65535
+• Many Linux Kernels è 32768 – 60999
+
+
+
 
 Area:
 =====
@@ -6503,42 +6606,72 @@ between multiple VPCs. However, you can copy a Security Group to create a new Se
 rules in another VPC for the same AWS Account.
 
 
+
 UseCase:
 ========
 You cannot block specific IP addresses with Security Groups (use NACLs instead)
+
+
 
 BillCost:
 =========
 There are no additional charges
 
+
+
 Security:
 =========
+It is a aws managed service, security is a shared responsibility.
+
+
+
+
+
+
 
 
 ##VPC Reachability Analyzer
 -------------------------------------------------
-VPC Reachability Analyzer to determine whether a destination resource in your virtual private cloud (VPC) is reachable from a source resource. 
+VPC Reachability Analyzer to determine whether a destination resource in your virtual private cloud (VPC) is reachable 
+from a source resource. 
+
+
+• A network diagnostics tool that troubleshoots network connectivity between two endpoints in your VPC(s)
+• It builds a model of the network configuration, then checks the reachability based on these configurations (it doesn’t send packets).
+• When the destination is
+	• Reachable – it produces hop-by-hop details of the virtual network path
+	• Not reachable – it identifies the blocking component(s) (e.g., config
+
+
 
 Area:
 =====
+MayGlobal
+
+
 UseCase:
 ========
+Troubleshoot connectivity issues,
+ensure network configuration is as intended,
+
+
+
 BillCost:
 =========
 You are charged per analysis run between a source and destination.
 
+
+
 Security:
 =========
+It is a aws managed service, security is a shared responsibility.
+
 
 
 
 
 ##VPC Peering
 -------------------------------------------------
-A VPC peering connection is a networking connection between two VPCs that enables you to route traffic between them using private 
-IPv4 addresses or IPv6 addresses. Instances in either VPC can communicate with each other as if they are within the same network.
-
-VPC Peering: 
 A peering connection can be made between your own VPCs or with a VPC in another AWS account, as long as it is in the same region.
 
 VPCs, but transitive peering is not supported. In other words, VPC A can connect to B and C in the above diagram, 
@@ -6546,16 +6679,40 @@ but C cannot communicate with B unless directly paired.
 
 We can have up to 200 Subnets per Amazon Virtual Private Cloud (VPC).
 
+Privately connect two VPCs using AWS’network:
+• Make them behave as if they were in thesame network
+• Must not have overlapping CIDRs • VPC Peering connection is NOT transitive(must be established for each VPC that
+  need to communicate with one another)
+• You must update route tables in each VPC’ssubnets to ensure EC2 instances can communicate with each other
+• You can create VPC Peering connection between VPCs in different AWSaccounts/regions
+• You can reference a security group in a peered VPC (works crossaccounts – same region)
+
+
 Area:
 =====
+MayRegional
+
+
+
 UseCase:
 ========
+Privately connect two VPCs.
+
+
+
 BillCost:
 =========
 There is no charge to create a VPC peering connection. There is a charge for data transfer across peering connections.
 
+
+
 Security:
 =========
+It is a aws managed service, security is a shared responsibility.
+
+
+
+
 
 
 
@@ -6566,14 +6723,50 @@ A VPC endpoint enables you to privately connect your VPC to supported AWS servic
 powered by PrivateLink without requiring an internet gateway, NAT device, VPN connection, or AWS Direct Connect connection.
 
 
+VPC Endpoints (AWS PrivateLink)
+• Every AWS service is publicly exposed (public URL)
+• VPC Endpoints (powered by AWS PrivateLink) allows you to connect to AWS services using a private network instead of 
+  using the public Internet
+• They’re redundant and scale horizontally
+• They remove the need of IGW, NATGW, to access AWS Services
+
+
+
+In case of issues:
+• Check DNS Setting Resolution in your VPC
+• Check Route Tables
+
+Types of Endpoints:
+
+Interface Endpoints
+	• Provisions an ENI (private IP address) as an entry point (must attach a Security Group)
+	• Supports most AWS services
+Gateway Endpoints
+	• Provisions a gateway and must be used as a target in a route table
+	• Supports both S3 and DynamoDB
+
+
+
+
 Area:
 =====
+MayRegional
+
+
+
 UseCase:
 ========
+Enables you to privately connect your VPC
+
+
 BillCost:
 =========
+
+
 Security:
 =========
+It is a aws managed service, security is a shared responsibility.
+
 
 
 
@@ -6582,35 +6775,101 @@ Security:
 ##VPC Flow Logs
 -------------------------------------------------
 VPC Flow Logs is a feature that enables you to capture information about the IP traffic going to and from network 
-interfaces in your VPC. Flow log data can be published to Amazon CloudWatch Logs or Amazon S3. 
+interfaces in your VPC. 
+Flow log data can be published to Amazon CloudWatch Logs or Amazon S3. 
 After you create a flow log, you can retrieve and view its data in the chosen destination.
 
-Area:
-=====
-UseCase:
-========
-BillCost:
-=========
-Security:
-=========
+
+• Capture information about IP traffic going into your interfaces:
+	• VPC Flow Logs
+	• Subnet Flow Logs
+	• Elastic Network Interface (ENI) Flow Logs
+• Helps to monitor & troubleshoot connectivity issues
+• Flow logs data can go to S3 / CloudWatch Logs
+• Captures network information from AWS managed interfaces too: ELB,
+  RDS, ElastiCache, Redshift, WorkSpaces, NATGW, Transit Gateway
+
+
+VPC Flow Logs Syntax:
+• srcaddr & dstaddr – help identify problematic IP
+• srcport & dstport – help identity problematic ports
+• Action – success or failure of the request due to Security Group / NACL
+• Can be used for analytics on usage patterns, or malicious behavior
+• Query VPC flow logs using Athena on S3 or CloudWatch Logs Insights
+
 
 
 
 
 ##Site to Site VPN
 -------------------------------------------------
-You can enable access to your remote network from your VPC by creating an AWS Site-to-Site VPN (Site-to-Site VPN) connection, and configuring routing to pass traffic through the connection.
+You can enable access to your remote network from your VPC by creating an AWS Site-to-Site VPN (Site-to-Site VPN) connection, 
+and configuring routing to pass traffic through the connection.
+
+
+Virtual Private Gateway (VGW):
+	• VPN concentrator on the AWS side of the VPN connection
+	• VGW is created and attached to the VPC from which you want to create the Site-to-Site VPN connection
+	• Possibility to customize the ASN (Autonomous System Number)
+
+Customer Gateway (CGW):
+	• Software application or physical device on customer side of the VPN connection
+
+
+
+
+Virtual Private Gateway:
+-------------------------------------------------
+A virtual private gateway is a logical, fully redundant distributed edge routing function that sits at the edge of your VPC. 
+As it is capable of terminating VPN connections from your on-prem or customer environments, the VPG is the VPN concentrator on the 
+Amazon side of the Site-to-Site VPN connection
+
+
+
+Customer Gateway:
+-------------------------------------------------
+A customer gateway is a resource that you create in AWS that represents the customer gateway device in your on-premises network. 
+When you create a customer gateway, you provide information about your device to AWS.
+
+
+Customer Gateway Device (On-premises):
+• What IP address to use?
+	• Public Internet-routable IP address for your Customer Gateway device
+	• If it’s behind a NAT device that’s enabled for NAT traversal (NAT-T), use the public IP address of the NAT device
+• Important step: enable Route Propagation for the Virtual Private Gateway in the route table
+  that is associated with your subnets
+• If you need to ping your EC2 instances from on-premises, make sure you add the ICMP protocol on the inbound of your security groups.
+
+
+
+
+AWS VPN CloudHub:
+• Provide secure communication between multiple sites, if you have multiple VPN connections
+• Low-cost hub -and-spoke model for primary or secondary network connectivity between different locations (VPN only)
+• It’s a VPN connection so it goes over the public Internet
+• To set it up, connect multiple VPN connections on the same VGW, setup
+  dynamic routing and configure route tables
 
 
 Area:
 =====
+MayRegional 
+
+
+
 UseCase:
 ========
-Application Migration: Moving applications to the cloud is easier with a Site-to-site VPN connection between your network and the AWS cloud. You can host Amazon VPCs behind your corporate firewall and seamlessly move your IT resources, without changing the way your users access these applications.
+Application Migration: Moving applications to the cloud is easier with a Site-to-site 
+VPN connection between your network and the AWS cloud. 
+You can host Amazon VPCs behind your corporate firewall and seamlessly move your IT resources, without 
+changing the way your users access these applications.
 You can use AWS Site-to-Site VPN connections to securely communicate between remote sites.
+
+
 BillCost:
 =========
-You are charged for each VPN connection hour that your VPN connection is provisioned and available. 
+You are charged for each VPN connection hour that your VPN connection is provisioned and available.
+ 
 
 Security:
 =========
@@ -6619,58 +6878,68 @@ Security is a shared responsibility
 
 
 
-##Virtual Private Gateway
--------------------------------------------------
-A virtual private gateway is a logical, fully redundant distributed edge routing function that sits at the edge of your VPC. 
-As it is capable of terminating VPN connections from your on-prem or customer environments, the VPG is the VPN concentrator on the 
-Amazon side of the Site-to-Site VPN connection
-
-Area:
-=====
-UseCase:
-========
-BillCost:
-=========
-Security:
-=========
-
-
-
-
-##Customer Gateway
--------------------------------------------------
-
-A customer gateway is a resource that you create in AWS that represents the customer gateway device in your on-premises network. 
-When you create a customer gateway, you provide information about your device to AWS. For more information, 
-see Customer gateway options for your Site-to-Site VPN connection.
-
-
-Area:
-=====
-UseCase:
-========
-BillCost:
-=========
-Security:
-=========
-
 
 
 
 ##Direct Connect
 -------------------------------------------------
+AWS Direct Connect (DX) has been a popular method for businesses to connect to AWS services, giving users a 
+secure and reliable connection to an AWS Region. There are more than 100 DX locations available globally across major cities.
+
+• Provides a dedicated private connection from a remote network to your VPC
+• Dedicated connection must be setup between your DC and AWS Direct Connect locations
+• You need to setup a Virtual Private Gateway on your VPC
+• Access public resources (S3) and private (EC2) on same connection
+Supports both IPv4 and IPv6
+
 AWS Direct Connect Private dedicated network connection from on-premises to AWS.
 
 Direct Connect is an AWS service that establishes a dedicated network connection between your premises and AWS. 
 You can create this private connectivity to reduce network costs, increase bandwidth, and provide more consistent network experience 
 compared to regular internet-based connections.
 
+
+
+Direct Connect Gateway:
+• If you want to setup a Direct Connect to one or more VPC in many
+different regions (same account), you must use a Direct Connect Gateway
+
+
+A Direct Connect gateway does not allow gateway associations that are on the same Direct Connect gateway to send traffic to 
+each other (for example, a virtual private gateway to another virtual private gateway). 
+
+Using Direct Connect gateway, by attaching a private virtual interface (VIF) from your DX location and associate with designated 
+Region virtual private gateway (VGW), your DX traffic is route to your the Region using shortest path, 
+without reaching the home-associated Region.
+
+
+
+Direct Connect – Connection Types:
+• Dedicated Connections: 1Gbps and 10 Gbps capacity
+	• Physical ethernet port dedicated to a customer
+	• Request made to AWS first, then completed by AWS Direct Connect Partners
+• Hosted Connections: 50Mbps, 500 Mbps, to 10 Gbps
+	• Connection requests are made via AWS Direct Connect Partners
+	• Capacity can be added or removed on demand
+	• 1, 2, 5, 10 Gbps available at select AWS Direct Connect Partners
+Lead times are often longer than 1 month to establish a new connection
+
+
 Area:
 =====
+MayRegional
+
+
 UseCase:
 ========
+• Increase bandwidth throughput - working with large data sets – lower cost
+• More consistent network experience - applications using real-time data feeds
+• Hybrid Environments (on prem + cloud)
+
 The use case for Direct Connect is high throughput workloads or if you need a stable or reliable connection
 DirectConnect connects your on-prem with your VPC through a non-public tunnel.
+
+
 
 BillCost:
 =========
@@ -6678,34 +6947,18 @@ AWS Direct Connect has two separate charges: port hours and data transfer.
 Pricing is per port-hour consumed for each port type. Partial port hours consumed are billed as full hours. 
 The account that owns the port will be charged the port hour charges.
 
+
+
 Security:
 =========
+• Data in transit is not encrypted but is private
+• AWS Direct Connect + VPN provides an IPsec-encrypted private connection
+• Good for an extra level of security, but slightly more complex to put in place
+
+It is a aws managed service, security is a shared responsibility.
 
 
 
-
-
-##Direct Connect Gateway
--------------------------------------------------
-AWS Direct Connect (DX) has been a popular method for businesses to connect to AWS services, giving users a secure and reliable connection to an AWS Region. There are more than 100 DX locations available globally across major cities.
-
-A Direct Connect gateway does not allow gateway associations that are on the same Direct Connect gateway to send traffic to each other (for example, a virtual private gateway to another virtual private gateway). 
-
-Using Direct Connect gateway, by attaching a private virtual interface (VIF) from your DX location and associate with designated 
-Region virtual private gateway (VGW), your DX traffic is route to your the Region using shortest path, 
-without reaching the home-associated Region
-
-
-Area:
-=====
-globally available resource.
-
-UseCase:
-========
-BillCost:
-=========
-Security:
-=========
 
 
 
@@ -6714,12 +6967,34 @@ Security:
 -------------------------------------------------
 AWS PrivateLink provides private connectivity between VPCs, AWS services, and your on-premises networks, without exposing your 
 traffic to the public internet. 
+
 AWS PrivateLink makes it easy to connect services across different accounts and VPCs to significantly 
 simplify your network architecture.
 
 
+
+VPC End Point Service
+-------------------------------------------------
+A VPC endpoint enables you to privately connect your VPC to supported AWS services and VPC endpoint services powered by 
+PrivateLink without requiring an internet gateway, NAT device, VPN connection, or AWS Direct Connect connection. 
+Instances in your VPC do not require public IP addresses to communicate with resources in the service. 
+Traffic between your VPC and the other service does not leave the Amazon network.
+
+
+AWS PrivateLink (VPC Endpoint Services):
+• Most secure & scalable way to expose a service to 1000s of VPC (own or other accounts)
+• Does not require VPC peering, internet gateway, NAT, route tables…
+• Requires a network load balancer (Service VPC) and ENI (Customer VPC) or GWLB
+• If the NLB is in multiple AZ, and the ENIs in multiple AZ, the solution is fault tolerant! 
+
+
+
+
 Area:
 =====
+MayRegional
+
+
 UseCase:
 ========
 This is useful because different AWS services often talk to each other over the internet. 
@@ -6732,26 +7007,14 @@ MIGRATE TO HYBRID CLOUD
 
 BillCost:
 =========
+
 Security:
 =========
+It is a aws managed service, security is a shared responsibility.
 
 
-##VPC End Point Service
--------------------------------------------------
-A VPC endpoint enables you to privately connect your VPC to supported AWS services and VPC endpoint services powered by 
-PrivateLink without requiring an internet gateway, NAT device, VPN connection, or AWS Direct Connect connection. 
-Instances in your VPC do not require public IP addresses to communicate with resources in the service. 
-Traffic between your VPC and the other service does not leave the Amazon network.
 
 
-Area:
-=====
-UseCase:
-========
-BillCost:
-=========
-Security:
-=========
 
 
 
@@ -6762,16 +7025,20 @@ ClassicLink allows you to link EC2-Classic instances to a VPC in your account, w
 If you associate the VPC security groups with a EC2-Classic instance, this enables communication between your 
 EC2-Classic instance and instances in your VPC using private IPv4 addresses.
 
-Area:
-=====
-UseCase:
-========
-BillCost:
-=========
-Security:
-=========
+
 Linking your EC2-Classic instance to a VPC does not affect your EC2-Classic security groups. 
 They continue to control all traffic to and from the instance. 
+
+
+EC2-Classic: instances run in a single network shared with other customers
+• Amazon VPC: your instances run logically isolated to your AWS account
+• ClassicLink allows you to link EC2-Classic instances to a VPC in your account
+	• Must associate a security group
+	• Enables communication using private IPv4 addresses
+	• Removes the need to make use of public IPv4 addresses or Elastic IP addresses
+
+
+
 
 
 
@@ -6780,9 +7047,6 @@ They continue to control all traffic to and from the instance.
 -------------------------------------------------
 AWS Transit Gateway connects your Amazon Virtual Private Clouds (VPCs) and on-premises networks through a central hub. 
 
-AWS Transit Gateway connects your Amazon Virtual Private Clouds (VPCs) and on-premises networks 
-through a central hub. This simplifies your network and puts an end to complex peering relationships. 
-It acts as a cloud router – each new connection is only made once.
 
 Transit Gateway is a Regional resource and can connect thousands of VPCs within the same AWS Region. 
 You can create multiple Transit Gateway instances per Region, and you can 
@@ -6792,14 +7056,23 @@ connect to a maximum of three Transit Gateway instances over a single Direct Con
 As your cloud infrastructure expands globally you need to find out a way to connect your resources which are in different VPCs. 
 A Transit Gateway is a network hub that you can use to interconnect your virtual private clouds (VPCs) and on-premises networks. 
 
-It is like a hub and spoke design or star topology design for connecting VPCs and on-premises networks. 
-Transit Gateway allows customers to connect thousands of VPCs together. It is a regional service. 
-It gives you simplified connectivity to the multiple VPC as compared to a complex VPC peering connection. 
+
+• For having transitive peering between thousands of VPC and on-premises, hub-and-spoke (star) connection
+• Regional resource, can work cross-region
+• Share cross-account using Resource Access Manager (RAM)
+• You can peer Transit Gateways across regions
+• Route Tables: limit which VPC can talk with other VPC
+• Works with Direct Connect Gateway, VPN connections
+• Supports IP Multicast (not supported by any other AWS service)
 
 
 
 Area:
 =====
+Regional resource
+
+
+
 UseCase:
 ========
 Deliver applications around the world
@@ -6812,9 +7085,15 @@ Transit Gateways in different regions can peer with each other to enable VPC com
 Transit Gateway inter-Region peering encrypts all traffic, with no single point of 
 failure or bandwidth bottleneck which helps you to get improved security.
 
+
+
 BillCost:
 =========
-In AWS Transit Gateway you are charged for the number of connections that you make to the Transit Gateway per hour and the amount of traffic that flows through AWS Transit Gateway.
+Create multiple Siteto-Site VPN connections to increase the bandwidth of your connection to AWS
+In AWS Transit Gateway you are charged for the number of connections that you make to the Transit 
+Gateway per hour and the amount of traffic that flows through AWS Transit Gateway.
+
+
 
 Security:
 =========
@@ -6826,21 +7105,28 @@ FedRAMP High and HIPAA eligibility.
 
 
 
+
 ##VPC Traffic Mirroring
 -------------------------------------------------
 Traffic Mirroring is an Amazon VPC feature that you can use to copy network traffic from an elastic network interface of type interface. 
 You can then send the traffic to out-of-band security and monitoring appliances for:
 
-Traffic Mirroring copies inbound and outbound traffic from the network interfaces that are attached to your instances. 
-You can send the mirrored traffic to the network interface of another instance, a Network Load Balancer that has a UDP listener, 
-or a Gateway Load Balancer that has a UDP listener. The traffic mirror source and the traffic mirror target (monitoring appliance) 
-can be in the same VPC. Or they can be in a different VPCs that are connected 
-through intra-Region VPC peering, a transit gateway, or by a Gateway Load Balancer endpoint to connect to a 
-Gateway Load Balancer in a different VPC.
+• Allows you to capture and inspect network traffic in your VPC
+• Route the traffic to security appliances that you manage
+• Capture the traffic
+	• From (Source) – ENIs
+	• To (Targets) – an ENI or a Network Load Balancer
+• Capture all packets or capture the packets of your interest (optionally, truncate packets)
+• Source and Target can be in the same VPC or different VPCs (VPC Peering)
+• Use cases: content inspection, threat monitoring, troubleshooting
+
 
 
 Area:
 =====
+MayRegional
+
+
 UseCase:
 ========
 Content inspection
@@ -6849,8 +7135,13 @@ Troubleshooting
 
 BillCost:
 =========
+
+
 Security:
 =========
+It is a aws managed service, security is a shared responsibility.
+
+
 
 
 
@@ -6861,14 +7152,14 @@ Your VPC can operate in dual-stack mode — your resources can communicate over 
 IPv4 and IPv6 communication are independent of each other. You cannot disable IPv4 support for your VPC and subnets; 
 this is the default IP addressing system for Amazon VPC and Amazon EC2.
 
-Area:
-=====
-UseCase:
-========
-BillCost:
-=========
-Security:
-=========
+
+• IPv4 cannot be disabled for your VPC and subnets
+• You can enable IPv6 (they’re public IP addresses) to operate in dual-stack mode
+• Your EC2 instances will get at least a private internal IPv4 and a public IPv6
+• They can communicate using either IPv4 or IPv6 to the internet through an Internet Gateway
+
+
+
 
 
 ##Egress Only Internet Gateway
@@ -6876,6 +7167,14 @@ Security:
 An egress-only internet gateway is used to enable outbound communication over IPv6 from instances in your VPC to the internet, 
 and prevents hosts outside of your VPC from initiating an IPv6 connection with your instance.
 
+Used for IPv6 only (similar to a NAT Gateway but for IPv6)
+You must update the Route Tables
+
+Minimizing egress traffic network cost
+• Try to keep as much internet traffic within AWS to minimize costs
+• Direct Connect location that are co-located in the same AWS Region result in lower cost for egress network
+
+
 Area:
 =====
 UseCase:
@@ -6884,32 +7183,243 @@ BillCost:
 =========
 Security:
 =========
+
+
+
+
+
+##VPC Section Summary
+-------------------------------------------------
+• CIDR – IP Range
+• VPC – Virtual Private Cloud => we define a list of IPv4 & IPv6 CIDR
+• Subnets – tied to an AZ, we define a CIDR
+• Internet Gateway – at the VPC level, provide IPv4 & IPv6 Internet Access
+• Route Tables – must be edited to add routes from subnets to the IGW, VPC Peering Connections, VPC Endpoints, …
+• Bastion Host – public EC2 instance to SSH into, that has SSH connectivity to EC2 instances in private subnets
+• NAT Instances – gives Internet access to EC2 instances in private subnets. Old, must be setup in a public subnet, disable Source / Destination check flag
+• NAT Gateway – managed by AWS, provides scalable Internet access to private EC2 instances, IPv4 only
+• Private DNS + Route 53 – enable DNS Resolution + DNS Hostnames (VPC).
+
+• NACL – stateless, subnet rules for inbound and outbound, don’t forget Ephemeral Ports
+• Security Groups – stateful, operate at the EC2 instance level
+• Reachability Analyzer – perform network connectivity testing between AWS resources
+• VPC Peering – connect two VPCs with non overlapping CIDR, non-transitive
+• VPC Endpoints – provide private access to AWS Services (S3, DynamoDB, CloudFormation, SSM) within a VPC
+• VPC Flow Logs – can be setup at the VPC / Subnet / ENI Level, for ACCEPT and REJECT traffic, helps identifying attacks, 
+  analyze using Athena or CloudWatch Logs Insights
+• Site-to-Site VPN – setup a Customer Gateway on DC, a Virtual Private Gateway on VPC, and site-to-site VPN over public Internet
+• AWS VPN CloudHub – hub-and-spoke VPN model to connect your sites
+• Direct Connect – setup a Virtual Private Gateway on VPC, and establish a direct private connection to an AWS Direct Connect Location
+• Direct Connect Gateway – setup a Direct Connect to many VPCs in different AWS regions
+
+AWS PrivateLink / VPC Endpoint Services:
+	• Connect services privately from your service VPC to customers VPC
+	• Doesn’t need VPC Peering, public Internet, NAT Gateway, Route Tables
+	• Must be used with Network Load Balancer & ENI
+• ClassicLink – connect EC2-Classic EC2 instances privately to your VPC
+• Transit Gateway – transitive peering connections for VPC, VPN & DX
+• Traffic Mirroring – copy network traffic from ENIs for further analysis
+• Egress-only Internet Gateway – like a NAT Gateway, but for IPv6
+
+
 
 
 
 
 ##Networking Cost
 -------------------------------------------------
-Area:
-=====
-UseCase:
-========
-BillCost:
-=========
-Security:
-=========
+• Use Private IP instead of Public IP for good savings and better network performance
+• Use same AZ for maximum savings (at the cost of high availability)
+
+
+
+##S3 Data Transfer Pricing – Analysis for USA
+-------------------------------------------------
+• S3 ingress: free
+• S3 to Internet: $0.09 per GB
+• S3 Transfer Acceleration:
+	• Faster transfer times (50 to 500% better)
+	• Additional cost on top of Data Transfer Pricing: +$0.04 to $0.08 per GB
+	• S3 to CloudFront: $0.00 per GB
+• CloudFront to Internet: $0.085 per GB (slightly cheaper than S3)
+	• Caching capability (lower latency)
+	• Reduce costs associated with S3 Requests Pricing (7x cheaper with CloudFront)
+• S3 Cross Region Replication: $0.02 per GB
+
+
+
+##Pricing: NAT Gateway vs Gateway VPC Endpoint
+-------------------------------------------------
+
+
+
+
+##Disaster Recovery Overview
+-------------------------------------------------
+• Any event that has a negative impact on a company’s business continuity or finances is a disaster
+• Disaster recovery (DR) is about preparing for and recovering from a disaster
+• What kind of disaster recovery?
+	• On-premise => On-premise: traditional DR, and very expensive
+	• On-premise => AWS Cloud: hybrid recovery
+	• AWS Cloud Region A => AWS Cloud Region B
+• Need to define two terms:
+	• RPO: Recovery Point Objective
+	• RTO: Recovery Time Objective
+
+
+
+RTO and RPO
+-------------------------------------------------
+Among the components of a DR plan are two key parameters that define how long your business can afford to be offline and how
+much data loss it can tolerate. 
+These are the Recovery Time Objective (RTO) and Recovery Point Objective (RPO).
+
+
+RTO:
+RTO is the goal your organization sets for the maximum length of time it should take to restore normal 
+operations following an outage or data loss.
+
+RTO refers to how much time an application can be down without causing significant damage to the business. 
+Some applications can be down for days without significant consequences. 
+
+RTO is not simply the duration of time between loss and recovery. The objective also accounts for the steps 
+IT must take to restore the application and its data.
+
+
+
+RPO:
+RPO is your goal for the maximum amount of data the organization can tolerate losing. 
+This parameter is measured in time: from the moment a failure occurs to your last valid data backup. 
+For example, if you experience a failure now and your last full data backup was 24 hours ago, the RPO is 24 hours. 
+
+
+Recovery point objectives refer to your company’s loss tolerance: the amount of data that can be lost before significant 
+harm to the business occurs. 
+
+If you back up all or most of your data in regularly scheduled 24-hour increments, then in the worst-case scenario you 
+will lose 24 hours’ worth of data.
+
+For example, if you have a 4-hour RPO for an application then you will have a maximum 4-hour gap between backup and data loss.
+Having a 4-hour RPO does not necessarily mean you will lose 4 hours’ worth of data.
+
+
+
+Disaster Recovery Strategies:
+• Backup and Restore 
+• Pilot Light 
+• Warm Standby 
+• Hot Site / Multi Site Approach
+
+
+Disaster Recovery – Pilot Light
+• A small version of the app is always running in the cloud
+• Useful for the critical core (pilot light)
+• Very similar to Backup and Restore
+• Faster than Backup and Restore as critical systems are already up
+
+
+Warm Standby 
+• Full system is up and running, but at minimum size 
+• Upon disaster, we can scale to production load
+
+Multi Site / Hot Site Approach 
+• Very low RTO (minutes or seconds) – very expensive 
+• Full Production Scale is running AWS and On Premise
+
+
+
+
+Disaster Recovery Tips:
+• Backup 
+	• EBS Snapshots, RDS automated backups / Snapshots, etc… 
+	• Regular pushes to S3 / S3 IA / Glacier, Lifecycle Policy, Cross Region Replication 
+	• From On-Premise: Snowball or Storage Gateway 
+• High Availability 
+	• Use Route53 to migrate DNS over from Region to Region 
+	• RDS Multi-AZ, ElastiCache Multi-AZ, EFS, S3 
+	• Site to Site VPN as a recovery from Direct Connect 
+• Replication 
+	• RDS Replication (Cross Region), AWS Aurora + Global Databases 
+	• Database replication from on-premises to RDS 
+	• Storage Gateway 
+• Automation 
+	• CloudFormation / Elastic Beanstalk to re-create a whole new environment 
+	• Recover / Reboot EC2 instances with CloudWatch if alarms fail 
+	• AWS Lambda functions for customized automations 
+• Chaos 
+	• Netflix has a “simian-army” randomly terminating EC2
+
 
 
 
 
 ##DMS (Database Migration Service)
 -------------------------------------------------
-AWS Database Migration Service (AWS DMS) helps you migrate databases to AWS quickly and securely. The source database remains fully operational during the migration, minimizing downtime to applications that rely on the database. The AWS Database Migration Service can migrate your data to and from the most widely used commercial and open-source databases.
-AWS Database Migration Service supports homogeneous migrations such as Oracle to Oracle, as well as heterogeneous migrations between different database platforms, such as Oracle or Microsoft SQL Server to Amazon Aurora.
+AWS Database Migration Service (AWS DMS) helps you migrate databases to AWS quickly and securely. 
+
+The source database remains fully operational during the migration, minimizing downtime to applications that rely on the database. 
+The AWS Database Migration Service can migrate your data to and from the most widely used commercial and open-source databases.
+
+AWS Database Migration Service supports homogeneous migrations such as Oracle to Oracle, as well as 
+heterogeneous migrations between different database platforms, such as Oracle or Microsoft SQL Server to Amazon Aurora.
+
+
+You must create an EC2 instance to perform the replication tasks.
+
+
+DMS Sources and Targets:
+SOURCES:
+	• On-Premise and EC2 instances databases: Oracle, MS SQL Server, MySQL, MariaDB, PostgreSQL, MongoDB, SAP, DB2
+	• Azure: Azure SQL Database
+	• Amazon RDS: all including Aurora
+	• Amazon S3
+
+TARGETS:
+	• On-Premise and EC2 instances databases: Oracle, MS SQL Server, MySQL, MariaDB, PostgreSQL, SAP
+	• Amazon RDS
+	• Amazon Redshift
+	• Amazon DynamoDB
+	• Amazon S3
+	• ElasticSearch Service
+	• Kinesis Data Streams
+	• DocumentDB
+
+
+AWS Schema Conversion Tool (SCT):
+• Convert your Database’s Schema from one engine to another
+• Example OLTP: (SQL Server or Oracle) to MySQL, PostgreSQL, Aurora
+• Example OLAP: (Teradata or Oracle) to Amazon Redshift
+• Prefer compute-intensive instances to optimize data conversions
+
+You do not need to use SCT if you are migrating the same DB engine
+• Ex: On-Premise PostgreSQL => RDS PostgreSQL
+• The DB engine is still PostgreSQL (RDS is the platform)
+
+
+On-Premise strategy with AWS:
+• Ability to download Amazon Linux 2 AMI as a VM (.iso format) 
+	• VMWare, KVM, VirtualBox (Oracle VM), Microsoft Hyper-V 
+• VM Import / Export 
+	• Migrate existing applications into EC2 
+	• Create a DR repository strategy for your on-premises VMs 
+	• Can export back the VMs from EC2 to on-premises 
+• AWS Application Discovery Service 
+	• Gather information about your on-premises servers to plan a migration 
+	• Server utilization and dependency mappings 
+	• Track with AWS Migration Hub 
+• AWS Database Migration Service (DMS) 
+	• replicate On-premise => AWS , AWS => AWS, AWS => On-premise 
+	• Works with various database technologies (Oracle, MySQL, DynamoDB, etc..) 
+• AWS Server Migration Service (SMS) 
+	• Incremental replication of on-premises live servers to AWS
+
+
 
 
 Area:
 =====
+MayRegional
+
 UseCase:
 ========
 Homogeneous Database Migrations
@@ -6930,10 +7440,29 @@ Security:
 
 ##DataSync
 -------------------------------------------------
-AWS DataSync is a secure, online service that automates and accelerates moving data between on premises and AWS Storage services. DataSync can copy data between Network File System (NFS) shares, Server Message Block (SMB) shares, Hadoop Distributed File Systems (HDFS), self-managed object storage, AWS Snowcone, Amazon Simple Storage Service (Amazon S3) buckets, Amazon Elastic File System (Amazon EFS) file systems, Amazon FSx for Windows File Server file systems, Amazon FSx for Lustre file systems, Amazon FSz for OpenZFS file systems, and Amazon FSx for NetApp ONTAP file systems.
+AWS DataSync is a secure, online service that automates and accelerates moving data between on premises and 
+AWS Storage services. 
+DataSync can copy data between Network File System (NFS) shares, Server Message Block (SMB) shares, 
+Hadoop Distributed File Systems (HDFS), self-managed object storage, AWS Snowcone, Amazon Simple Storage 
+Service (Amazon S3) buckets, Amazon Elastic File System (Amazon EFS) file systems, 
+Amazon FSx for Windows File Server file systems, Amazon FSx for Lustre file systems, 
+Amazon FSz for OpenZFS file systems, and Amazon FSx for NetApp ONTAP file systems.
+
+
+Move large amount of data from on-premises to AWS
+• Can synchronize to: Amazon S3 (any storage classes – including Glacier), Amazon EFS, Amazon FSx (Windows, Lustre...)
+• Move data from your NAS or file system via NFS or SMB
+• Replication tasks can be scheduled hourly, daily, weekly
+• Leverage the DataSync agent to connect to your systems
+• Can setup a bandwidth limit
+
+
 
 Area:
 =====
+MayRegional
+
+
 UseCase:
 ========
 Migrate your data
@@ -6943,52 +7472,128 @@ Securely replicate your data into cost-efficient AWS storage services, including
 Manage your hybrid data workflows
 Seamlessly move data between on-premises systems and AWS to accelerate your critical hybrid workflows.
 
+
+
 BillCost:
 =========
 Pay only for the amount of data that you migrate based on a flat, per-gigabyte fee according to your region.
 
+
+
 Security:
 =========
-
+It is a aws managed service, security is a shared responsibility.
 
 
 
 ##AWS Backup
 -------------------------------------------------
 AWS Backup is a fully managed service that enables you to centralize and automate data protection across on-premises and AWS services. 
-Together with AWS Organizations, AWS Backup allows you to centrally deploy data protection (backup) policies to configure, manage, 
-and govern your backup activity across your organization’s AWS accounts and resources. 
-AWS Backup also enables you to audit and report on the compliance of your data protection policies with AWS Backup Audit Manager.
 
-AWS Backup allows you to define a central data protection policy (called a backup plan) that works across AWS services for compute,
- storage, and databases. 
+
+• Fully managed service 
+• Centrally manage and automate backups across AWS services 
+• No need to create custom scripts and manual processes 
+• Supported services: 
+	• Amazon EC2 / Amazon EBS 
+	• Amazon S3 
+	• Amazon RDS (all DBs engines) / Amazon Aurora / Amazon DynamoDB 
+	• Amazon DocumentDB / Amazon Neptune 
+	• Amazon EFS / Amazon FSx (Lustre & Windows File Server) 
+	• AWS Storage Gateway (Volume Gateway) 
+• Supports cross-region backups 
+• Supports cross-account backups
+
+Supports PITR for supported services
+• On-Demand and Scheduled backups
+• Tag-based backup policies
+	• You create backup policies known as Backup Plans
+	• Backup frequency (every 12 hours, daily, weekly, monthly, cron expression)
+	• Backup window
+	• Transition to Cold Storage (Never, Days, Weeks, Months, Years)
+	• Retention Period (Always, Days, Weeks, Months, Years)
+
+
+
+AWS Backup Vault Lock:
+• Enforce a WORM (Write Once Read Many) state for all the backups that you store in your AWS Backup Vault
+• Additional layer of defense to protect your backups against: 
+	• Inadvertent or malicious delete operations 
+	• Updates that shorten or alter retention periods
+• Even the root user cannot delete backups when enabled
+
+
+
+Transferring large amount of data into AWS:
+• Example: transfer 200 TB of data in the cloud. We have a 100 Mbps internet connection.
+
+• Over the internet / Site-to-Site VPN:
+	• Immediate to setup
+	• Will take 200(TB)*1000(GB)*1000(MB)*8(Mb)/100 Mbps = 16,000,000s = 185d
+• Over direct connect 1Gbps:
+	• Long for the one-time setup (over a month)
+	• Will take 200(TB)*1000(GB)*8(Gb)/1 Gbps = 1,600,000s = 18.5d
+• Over Snowball:
+	• Will take 2 to 3 snowballs in parallel
+	• Takes about 1 week for the end-to-end transfer
+	• Can be combined with DMS
+• For on-going replication / transfers: Site-to-Site VPN or DX with DMS or DataSync
+
+
+
 
 Area:
 =====
+MayGlobal
+
+
 UseCase:
 ========
+Backup
+
+
+
 BillCost:
 =========
 With AWS Backup, you pay only for the amount of backup storage you use,
 
+
+
 Security:
 =========
+It is a aws managed service, security is a shared responsibility.
+
+
+
 
 
 
 
 ##Rekognition
 -------------------------------------------------
+• Find objects, people, text, scenes in images and videos using ML
+• Facial analysis and facial search to do user verification, people counting
+• Create a database of “familiar faces” or compare against celebrities
 
-Amazon Rekognition makes it easy to add image and video analysis to your applications. 
-You just provide an image or video to the Amazon Rekognition API, 
-and the service can identify objects, people, text, scenes, and activities.
 
 
 Area:
 =====
+MayRegional
+
+
 UseCase:
 ========
+• Labeling
+• Content Moderation
+• Text Detection
+• Face Detection and Analysis (gender, age range, emotions…)
+• Face Search and Verification
+• Celebrity Recognition
+• Pathing (ex: for sports game analysis)
+
+
+
 BillCost:
 =========
 As part of the AWS Free Tier, 
@@ -6997,8 +7602,13 @@ Amazon Rekognition Image pricing
 Amazon Rekognition Video pricing
 Amazon Rekognition Custom Labels pricing
 
+
+
 Security:
 =========
+It is a aws managed service, security is a shared responsibility.
+
+
 
 
 
@@ -7006,11 +7616,23 @@ Security:
 ##Transcribe
 -------------------------------------------------
 Automatically convert speech to text
+Uses a deep learning process called automatic speech recognition (ASR) to convert speech to text quickly and accurately
+
+
 
 Area:
 =====
+MayRegional
+
+
+
 UseCase:
 ========
+• transcribe customer service calls
+• automate closed captioning and subtitling
+• generate metadata for media assets to create a fully searchable archive
+
+
 Get insights from customer conversations
 Search and analyze media content
 Create subtitles and meeting notes
@@ -7022,25 +7644,39 @@ BillCost:
 AWS Free Tier
 Amazon Transcribe API for both streaming and batch transcriptions is billed monthly based on the tiered pricing
 
+
+
 Security:
 =========
+It is a aws managed service, security is a shared responsibility.
+
+
+
+
 
 
 
 
 ##Polly
 -------------------------------------------------
-
 Amazon Polly is a service that turns text into lifelike speech, allowing you to create applications that talk, 
 and build entirely new categories of speech-enabled products. 
+• Turn text into lifelike speech using deep learning 
+• Allowing you to create applications that talk
 
 
 Area:
 =====
+MayRegional
+
+
+
 UseCase:
 ========
 Content creation
 Audio can be used as a complementary media to written and/or visual communication.
+
+
 
 BillCost:
 =========
@@ -7048,8 +7684,13 @@ AWS Free Tier
 PAY-AS-YOU-GO MODEL
 You are billed monthly for the number of characters of text that you processed.
 
+
 Security:
 =========
+It is a aws managed service, security is a shared responsibility.
+
+
+
 
 
 
@@ -7060,22 +7701,36 @@ Security:
 Amazon Translate is a neural machine translation service that delivers fast, high-quality, affordable, and customizable 
 language translation.
 
+• Natural and accurate language translation
+• Amazon Translate allows you to localize content - such as websites and applications - 
+for international users, and to easily translate large
+volumes of text efficiently.
+
 
 Area:
 =====
+MayRegional
+
 
 UseCase:
 ========
 Language Localization
 It’s very difficult for human translation teams to keep up with dynamic or real-time content.
 
+
+
 BillCost:
 =========
 AWS Free Tiering
 Amazon Translate, you pay-as-you-go based on the number of characters of text that you processed.
 
+
+
 Security:
 =========
+It is a aws managed service, security is a shared responsibility.
+
+
 
 
 
@@ -7084,28 +7739,62 @@ Security:
 -------------------------------------------------
 With Amazon Lex, you can build conversational interactions (bots) that feel natural to your customers. 
 
+
+Amazon Lex: (same technology that powers Alexa)
+• Automatic Speech Recognition (ASR) to convert speech to text
+• Natural Language Understanding to recognize the intent of text, callers
+• Helps build chatbots, call center bots
+
+Amazon Connect:
+• Receive calls, create contact flows, cloud-based virtual contact center
+• Can integrate with other CRM systems or AWS
+• No upfront payments, 80% cheaper than traditional contact center solutions
+
+
+
 Area:
 =====
+MayRegional
+
+
 UseCase:
 ========
+
 BillCost:
 =========
 Security:
 =========
+It is a aws managed service, security is a shared responsibility.
+
+
+
 
 
 ##Comprehend
 -------------------------------------------------
-Amazon Comprehend is a natural-language processing (NLP) service that uses machine learning to uncover valuable insights and connections in text
-
 Amazon Comprehend provides natural language processing, Personal Identifiable Information (PII) detection and redaction, 
 Custom Classification and Entity detection, and topic modeling, enabling a broad range of 
 applications that can analyze raw text, and with some APIs, document formats like PDF and Word.
+
+For Natural Language Processing – NLP:
+	• Fully managed and serverless service
+	• Uses machine learning to find insights and relationships in text
+	• Language of the text
+	• Extracts key phrases, places, people, brands, or events
+	• Understands how positive or negative the text is
+	• Analyzes text using tokenization and parts of speech
+	• Automatically organizes a collection of text files by topic
+
+
 
 Area:
 =====
 UseCase:
 ========
+• analyze customer interactions (emails) to find what leads to a positive or negative experience
+• Create and groups articles by topics that Comprehend will uncover
+
+
 Mine business and call center analytics
 Index and search product reviews
 Legal briefs management
@@ -7116,8 +7805,13 @@ BillCost:
 =========
 Amazon Comprehend offers a free tier covering 50K units
 
+
+
 Security:
 =========
+It is a aws managed service, security is a shared responsibility.
+
+
 
 
 
@@ -7129,24 +7823,46 @@ With SageMaker, data scientists and developers can quickly and easily build and 
 and then directly deploy them into a production-ready hosted environment. 
 
 
+
+Fully managed service for developers / data scientists to build ML models
+• Typically, difficult to do all the processes in one place + provision servers
+• Machine learning process (simplified): predicting your exam score
+
+
 Area:
 =====
+MayRegional
+
 UseCase:
 ========
+
+
 BillCost:
 =========
+
+
 Security:
 =========
+It is a aws managed service, security is a shared responsibility.
+
+
 
 
 
 
 ##Forecast
 -------------------------------------------------
-Amazon Forecast is a time-series forecasting service based on machine learning (ML) and built for business metrics analysis.
+Fully managed service that uses ML to deliver highly accurate forecasts
+• Example: predict the future sales of a raincoat
+• 50% more accurate than looking at the data itself
+• Reduce forecasting time from months to hours
+• Use cases: Product Demand Planning, Financial Planning, Resource Planning
+
 
 Area:
 =====
+
+
 UseCase:
 ========
 Add ML forecasting to your SaaS solutions
@@ -7156,6 +7872,8 @@ Predict inventory needs at individual stores by combining historical sales and d
 Manage resources efficiently
 
 Improve utilization and customer satisfaction with accurate resource requirement forecasting in near-real time.
+
+
 
 BillCost:
 =========
@@ -7167,8 +7885,13 @@ Training a predictor: Cost for each hour of infrastructure use required for buil
 Generated forecast data points:  Cost for number of unique forecast values generated across all time series (items and dimensions) combinations.
 Forecast explanations: Cost for explaining the impact of attributes or related data on your forecasts for each item and time point. 
 
+
+
+
 Security:
 =========
+It is a aws managed service, security is a shared responsibility.
+
 
 
 
@@ -7176,10 +7899,17 @@ Security:
 
 ##Kendra
 -------------------------------------------------
-Amazon Kendra is an intelligent search service powered by machine learning (ML). 
+Fully managed document search service powered by Machine Learning
+• Extract answers from within a document (text, pdf, HTML, PowerPoint, MS Word, FAQs…)
+• Natural language search capabilities
+• Learn from user interactions/feedback to promote preferred results (Incremental Learning)
+• Ability to manually fine-tune search results (importance of data, freshness, custom, …)
+
 
 Area:
 =====
+MayRegional
+
 
 UseCase:
 ========
@@ -7193,43 +7923,101 @@ BillCost:
 =========
 AWS Free Tier
 
+
+
 Security:
 =========
+It is a aws managed service, security is a shared responsibility.
+
+
+
 
 
 
 
 ##Personalize
 -------------------------------------------------
-Amazon Personalize enables developers to build applications with the same machine learning (ML) technology used by Amazon.com for real-time personalized recommendations – no ML expertise required.
+Fully managed ML-service to build apps with real-time personalized recommendations
+• Example: personalized product recommendations/re-ranking, customized direct marketing
+	• Example: User bought gardening tools, provide recommendations on the next one to buy
+• Same technology used by Amazon.com
+• Integrates into existing websites, applications, SMS, email marketing systems, …
+• Implement in days, not months (you don’t need to build, train, and deploy ML solutions)
+
+
 
 Area:
 =====
+MayRegional
+
 UseCase:
 ========
+• Use cases: retail stores, media and entertainment…
+
+
 BillCost:
 =========
+
 Security:
 =========
+It is a aws managed service, security is a shared responsibility.
+
+
+
 
 
 ##Textract
 -------------------------------------------------
+• Automatically extracts text, handwriting, and data from any scanned documents using AI and ML
+• Extract data from forms and tables
+• Read and process any type of document (PDFs, images, …)
+
+
 Area:
 =====
+MayRegional
+
+
 UseCase:
 ========
+• Financial Services (e.g., invoices, financial reports)
+• Healthcare (e.g., medical records, insurance claims)
+• Public Sector (e.g., tax forms, ID documents, passports)
+
 Personalized recommendations
 Similar items
 Personalized reranking (i.e. rerank a list of items for a user)
 Personalized promotions/notifications
 
+
 BillCost:
 =========
 2 months free
 
+
 Security:
 =========
+It is a aws managed service, security is a shared responsibility.
+
+
+
+
+AWS Machine Learning- Summary:
+• Rekognition: face detection, labeling, celebrity recognition
+• Transcribe: audio to text (ex: subtitles) 
+• Polly: text to audio 
+• Translate: translations 
+• Lex: build conversational bots – chatbots 
+• Connect: cloud contact center 
+• Comprehend: natural language processing 
+• SageMaker: machine learning for every developer and data scientist 
+• Forecast: build highly accurate forecasts 
+• Kendra: ML-powered search engine 
+• Personalize: real-time personalized recommendations 
+• Textract: detect text and data in documents
+
+
+
 
 
 
@@ -7239,14 +8027,32 @@ Security:
 An event is the occurrence of an immutable message describing something that happened in the past. 
 The event data payload typically contains details of the occurrence and associated metadata.
 
+
+S3:ObjectCreated, S3:ObjectRemoved,
+S3:ObjectRestore, S3:Replication…
+• Object name filtering possible (*.jpg)
+• Use case: generate thumbnails of images uploaded to S3
+• Can create as many “S3 events” as desired
+• S3 event notifications typically deliver events in seconds but can sometimes take a minute or longer
+• If two writes are made to a single non- versioned object at the same time, it is
+   possible that only a single event notification will be sent
+• If you want to ensure that an event notification is sent for every successful write, you can enable versioning on your bucket.
+
+
+
 Area:
 =====
+MayRegional
+
+
 UseCase:
 ========
 BillCost:
 =========
 Security:
 =========
+It is a aws managed service, security is a shared responsibility.
+
 
 
 
@@ -7254,11 +8060,16 @@ Security:
 ##Caching Strategies
 -------------------------------------------------
 Caching helps applications perform dramatically faster and cost significantly less at scale
+In computing, a cache is a high-speed data storage layer which stores a subset of data, typically transient in nature,
+ so that future requests for that data are served up faster than is possible by accessing the data’s 
+ primary storage location. Caching allows you to efficiently reuse previously retrieved or computed data.
 
-In computing, a cache is a high-speed data storage layer which stores a subset of data, typically transient in nature, so that future requests for that data are served up faster than is possible by accessing the data’s primary storage location. Caching allows you to efficiently reuse previously retrieved or computed data.
 
 Area:
 =====
+MayRegional
+
+
 UseCase:
 ========
 Database Caching
@@ -7267,10 +8078,15 @@ Session Management
 Application Programming Interfaces (APIs)
 Web Caching
 
+
 BillCost:
 =========
+
+
 Security:
 =========
+It is a aws managed service, security is a shared responsibility.
+
 
 
 
@@ -7278,58 +8094,119 @@ Security:
 
 ##Blocking and IP address
 -------------------------------------------------
-To allow or block specific IP addresses for your EC2 instances, use a network Access Control List (ACL) or security group rules in your VPC. Network ACLs and security group rules act as firewalls allowing or blocking IP addresses from accessing your resources.
+To allow or block specific IP addresses for your EC2 instances, use a network Access Control List (ACL) 
+or security group rules in your VPC. 
+Network ACLs and security group rules act as firewalls allowing or blocking IP addresses from accessing your resources.
 
-Area:
-=====
-UseCase:
-========
-BillCost:
-=========
-Security:
-=========
 
 
 
 
 ##HPC (High performance Computing)
 -------------------------------------------------
-HPC has been key to solving the most complex problems in every industry, and changing the way we work and live. From weather modeling to genome mapping to the search for extraterrestrial intelligence, HPC is helping to push the boundaries of what’s possible with advanced computing technologies.
-
-Area:
-=====
-UseCase:
-========
-BillCost:
-=========
-Security:
-=========
+HPC has been key to solving the most complex problems in every industry, and changing the way we work and live. 
+From weather modeling to genome mapping to the search for extraterrestrial intelligence,
+HPC is helping to push the boundaries of what’s possible with advanced computing technologies.
 
 
-##Ec2 Instance High Availability
+The cloud is the perfect place to perform HPC
+• You can create a very high number of resources in no time
+• You can speed up time to results by adding more resources
+• You can pay only for the systems you have used
+• Perform genomics, computational chemistry, financial risk modeling,
+weather prediction, machine learning, deep learning, autonomous driving
+• Which services help perform HPC?
+
+
+
+Data Management & Transfer:
+• AWS Direct Connect:
+• Move GB/s of data to the cloud, over a private secure network
+• Snowball & Snowmobile
+• Move PB of data to the cloud
+• AWS DataSync
+• Move large amount of data between on-premises and S3, EFS, FSx for Windows
+
+
+
+
+Compute and Networking
+• EC2 Instances:
+• CPU optimized, GPU optimized
+• Spot Instances / Spot Fleets for cost savings + Auto Scaling
+• EC2 Placement Groups: Cluster for good network performance
+
+EC2 Enhanced Networking (SR-IOV)
+• Higher bandwidth, higher PPS (packet per second), lower latency
+• Option 1: Elastic Network Adapter (ENA) up to 100 Gbps
+• Option 2: Intel 82599 VF up to 10 Gbps – LEGACY
+
+
+
+#Elastic Fabric Adapter (EFA)
 -------------------------------------------------
-Area:
-=====
-UseCase:
-========
-BillCost:
-=========
-Security:
-=========
+An Elastic Fabric Adapter (EFA) is a network device that you can attach to your Amazon EC2 instance to accelerate 
+High Performance Computing (HPC) and machine learning applications. EFA enables you to achieve the application performance of 
+an on-premises HPC cluster, with the scalability, flexibility, and elasticity provided by the AWS Cloud.
+
+Elastic Fabric Adapter (EFA) is a network interface for Amazon EC2 instances that enables customers to run applications 
+requiring high levels of inter-node communications at scale on AWS. 
+Its custom-built operating system (OS) bypass hardware interface enhances the performance of inter-instance communications, 
+which is critical to scaling these applications. 
+
+
+You can create, use, and manage an EFA much like any other elastic network interface in Amazon EC2. 
+However, unlike elastic network interfaces, EFAs cannot be attached to or detached from an instance in a running state.
+
+
+Improved ENA for HPC, only works for Linux
+• Great for inter-node communications, tightly coupled workloads
+• Leverages Message Passing Interface (MPI) standard
+• Bypasses the underlying Linux OS to provide low-latency, reliable transport
+
+ 
+ 
+Storage:
+Instance-attached storage:
+	• EBS: scale up to 256,000 IOPS with io2 Block Express
+	• Instance Store: scale to millions of IOPS, linked to EC2 instance, low latency
+Network storage:
+	• Amazon S3: large blob, not a file system
+	• Amazon EFS: scale IOPS based on total size, or use provisioned IOPS
+	• Amazon FSx for Lustre:
+	• HPC optimized distributed file system, millions of IOPS
+	• Backed by S3 
 
 
 
 
-##Bastion Host high Availability
--------------------------------------------------
-Area:
-=====
-UseCase:
-========
-BillCost:
-=========
-Security:
-=========
+Automation and Orchestration:
+AWS Batch
+	• AWS Batch supports multi-node parallel jobs, which enables you to run single jobs that span multiple EC2 instances.
+	• Easily schedule jobs and launch EC2 instances accordingly
+
+AWS ParallelCluster
+	• Open-source cluster management tool to deploy HPC on AWS
+	• Configure with text files
+	• Automate creation of VPC, Subnet, cluster type and instance types
+	• Ability to enable EFA on the cluster (improves network performance)
+
+
+
+Creating a highly available EC2 instance
+Creating a highly available EC2 instance With an Auto Scaling Group
+Creating a highly available EC2 instance With ASG + EBS
+
+
+High Availability for a Bastion Host
+HA options for the bastion host:
+	• Run 2 across 2 AZ
+	• Run 1 across 2 AZ with 1 ASG 1:1:1
+Routing to the bastion host:
+	• If 1 bastion host, use an elastic IP withcec2 user-data script to access it
+	• If 2 bastion hosts, use an NetworkcLoad Balancer (layer 4) deployed in multiple AZ
+	• If NLB, the bastion hosts can live in the private subnet directly
+Note: Can’t use ALB as the ALB is layer 7 (HTTP protocol)
 
 
 
@@ -7346,17 +8223,36 @@ Tools:
 -CodeDeploy - Automate Deployment (EC2, ECS, Elastic Beanstalk, EKS, Lambda etc)
 
 
+Infrastructure as Code:
+• Currently, we have been doing a lot of manual work
+• All this manual work will be very tough to reproduce:
+• In another region
+• in another AWS account
+• Within the same region if everything was deleted
+• Wouldn’t it be great, if all our infrastructure was… code?
+• That code would be deployed and create / update / delete our infrastructure
+
+
 
 Area:
 =====
+MayRegional
+
 UseCase:
 ========
+
+
 BillCost:
 =========
 AWS Free Tier, AWS CodePipeline offers new and existing customers one free active pipeline each month.
 
+
+
 Security:
 =========
+It is a aws managed service, security is a shared responsibility.
+
+
 
 
 
@@ -7364,36 +8260,19 @@ Security:
 
 ##CloudFormation
 -------------------------------------------------
-AWS CloudFormation is an AWS service that uses template files to automate the setup of AWS resources.
+• It can take over 3 hours to properly learn and master CloudFormation
+• This lecture is meant so you get a good idea of how it works
+• The exam expects you to understand how to read CloudFormation
 
+
+AWS CloudFormation is an AWS service that uses template files to automate the setup of AWS resources.
 An AWS CloudFormation template is a formatted text file in JSON or YAML language that describes your AWS infrastructure. 
-To create, view and modify templates, you can use AWS CloudFormation Designer or any text editor tool. 
-An AWS CloudFormation template consists of nine main objects:
+
 
 Format version: Format version defines the capability of a template.
 Description: Any comments about your template can be specified in the description.
 Metadata: Metadata can be used in the template to provide further information using JSON or YAML objects. 
 
-CloudFormation is an infrastructure automation platform for AWS that deploys AWS resources in a repeatable, testable and auditable manner.
-AWS CloudFormation provides users with a simple way to create and manage a collection of Amazon Web Services (AWS)
-resources by provisioning and updating them in a predictable way. AWS CloudFormation enables you to manage your 
-complete infrastructure or AWS resources in a text file.
-
-
-
-You can use CloudFormation to automate the configuration of workloads that run on the most popular AWS services, 
-like the EC2 compute service, the S3 storage service, and the IAM service for configuring access control.
-
-You can also apply CloudFormation templates to AWS services that cater to niche use cases, like Ground Station, 
-the AWS satellite management solution.
-
-In general, if a service runs on AWS, it is a safe bet that you can use CloudFormation to automate its configuration and deployment.
-
-It is worth noting that CloudFormation is not the only way to configure and deploy services on AWS. 
-You can handle these processes manually using the AWS command-line interface, API, or Web console. 
-
-AWS CloudFormation enables you to manage your complete infrastructure or AWS resources in a text file, or template. 
-A collection of AWS resources is called a stack. AWS resources can be created or updated by using a stack.
 
 
 HowToWork:
@@ -7404,8 +8283,58 @@ HowToWork:
 the relationship between the services, and provisions the services one after the other.
 
 
+CloudFormation is a declarative way of outlining your AWS
+Infrastructure, for any resources (most of them are supported).
+For example, within a CloudFormation template, you say:
+	• I want a security group
+	• I want two EC2 machines using this security group
+	• I want two Elastic IPs for these EC2 machines
+	• I want an S3 bucket
+	• I want a load balancer (ELB) in front of these machines
+• Then CloudFormation creates those for you, in the right order, with the exact configuration that you specify.
+
+
+Infrastructure as code:
+• No resources are manually created, which is excellent for control
+• The code can be version controlled for example using git
+• Changes to the infrastructure are reviewed through code
+
+
+How CloudFormation Works:
+• Templates have to be uploaded in S3 and then referenced in CloudFormation
+• To update a template, we can’t edit previous ones. We have to reupload a new version of the template to AWS
+• Stacks are identified by a name
+• Deleting a stack deletes every single artifact that was created by CloudFormation.
+
+
+Deploying CloudFormation templates:
+Manual way:
+	• Editing templates in the CloudFormation Designer
+	• Using the console to input parameters, etc
+Automated way:
+	• Editing templates in a YAML file
+	• Using the AWS CLI (Command Line Interface) to deploy the templates
+	• Recommended way when you fully want to automate your flow
+
+
+CloudFormation Building Blocks:
+Templates components
+	1. Resources: your AWS resources declared in the template (MANDATORY)
+	2. Parameters: the dynamic inputs for your template
+	3. Mappings: the static variables for your template
+	4. Outputs: References to what has been created
+	5. Conditionals: List of conditions to perform resource creation
+	6. Metadata
+Templates helpers:
+	1. References
+	2. Functions
+
+
+
 Area:
 =====
+MayRegional
+
 UseCase:
 ========
 Manage infrastructure with DevOps
@@ -7420,27 +8349,49 @@ BillCost:
 Free Tier
 Handler operation
 Handler operation duration
+
+• Each resources within the stack is tagged with an identifier so you can easily see how
+much a stack costs you
+• You can estimate the costs of your resources using the CloudFormation template
+• Savings strategy: In Dev, you could automation deletion of templates at 5 PM and
+recreated at 8 AM, safe
+
+
 Security:
 =========
+It is a aws managed service, security is a shared responsibility.
+
 
 
 
 
 ##Step Function 
 -------------------------------------------------
-
 AWS Step Functions is a serverless orchestration service that lets developers create and manage multi-step 
 application workflows in the cloud. 
 
-By using the service’s drag-and-drop visual editor, 
-teams can easily assemble individual microservices into unified workflows. At each step of a given workflow, 
-Step Functions manages input, output, error handling, and retries, so that developers can focus on 
-higher-value business logic for their applications.
+Build serverless visual workflow to orchestrate your Lambda functions
+• Represent flow as a JSON state machine
+• Features: sequence, parallel, conditions, timeouts, error handling…
+• Can also integrate with EC2, ECS, On premise servers, API Gateway
+• Maximum execution time of 1 year
+• Possibility to implement human approval feature
+
+
 
 Area:
 =====
+MayRegional
+
 UseCase:
 ========
+• Order fulfillment
+• Data processing
+• Web applications
+• Any workflow
+
+
+
 Automate Extract, Transform, and Load (ETL) process
 Prepare Data for Machine Learning (ML)
 Orchestrate microservices
@@ -7450,19 +8401,37 @@ Liberty Mutual
 
 BillCost:
 =========
+
+
 Security:
 =========
+It is a aws managed service, security is a shared responsibility.
+
+
+
+
 
 
 ##SWF
 -------------------------------------------------
-The Amazon Simple Workflow Service (Amazon SWF) makes it easy to build applications that coordinate work across distributed components. In Amazon SWF, a task represents a logical unit of work that is performed by a component of your application. 
-
-Using Amazon SWF to manage workflows within your application is easy. 
+The Amazon Simple Workflow Service (Amazon SWF) makes it easy to build applications that coordinate work across distributed components. 
 Amazon SWF acts as the coordination hub for all of the different components of your application:
+
+Coordinate work amongst applications
+• Code runs on EC2 (not serverless)
+• 1 year max runtime
+• Concept of “activity step” and “decision step”
+• Has built-in “human intervention” step
+• Example: order fulfilment from web to warehouse to delivery
+• Step Functions is recommended to be used for new applications, except:
+• If you need external signals to intervene in the processes
+• If you need child processes that return values to parent processes
+
 
 Area:
 =====
+MayRegional
+
 UseCase:
 ========
 Maintaining application state
@@ -7475,8 +8444,13 @@ BillCost:
 Free Tier *
 All charges are metered daily and billed monthly.
 
+
+
 Security:
 =========
+It is a aws managed service, security is a shared responsibility.
+
+
 
 
 
@@ -7484,29 +8458,45 @@ Security:
 ##EMR
 -------------------------------------------------
 Easily run and scale Apache Spark, Hive, Presto, and other big data workloads
-Amazon EMR is the industry-leading cloud big data solution for petabyte-scale data processing, interactive analytics, and machine learning using open-source frameworks such as Apache Spark, Apache Hive, and Presto.
+Amazon EMR is the industry-leading cloud big data solution for petabyte-scale data processing, interactive analytics, 
+and machine learning using open-source frameworks such as Apache Spark, Apache Hive, and Presto.
 
 With it, organizations can process and analyze massive amounts of data.
 
 Amazon Elastic MapReduce (Amazon EMR) is a web service that makes it easy to quickly and cost-effectively process vast amounts of data.
 Amazon EMR is the industry-leading cloud big data platform for processing vast amounts of data using 
 open source tools such as Apache Spark, Apache Hive, Apache HBase, Apache Flink, Apache Hudi, and Presto. 
-Amazon EMR makes it easy to set up, operate, and scale your big data environments 
-by automating time-consuming tasks like provisioning capacity and tuning clusters and uses 
-Hadoop, an open source framework, to distribute your data and processing across a resizable cluster of Amazon EC2 instances. 
+
+• EMR stands for “Elastic MapReduce”
+• EMR helps creating Hadoop clusters (Big Data) to analyze and process vast amount of data
+• The clusters can be made of hundreds of EC2 instances
+• Also supports Apache Spark, HBase, Presto, Flink…
+• EMR takes care of all the provisioning and configuration
+• Auto-scaling and integrated with Spot instances
+
+
+ 
 
 
 Area:
 =====
+MayRegional
+
 UseCase:
 ========
+Data processing, machine learning, web indexing, big data
+
+
 BillCost:
 =========
 Amazon EMR pricing is simple and predictable: you pay a per-second rate for every second you use, with a one-minute minimum.
  
+ 
+ 
 Security:
 =========
 Amazon S3 provides authentication mechanisms to ensure that stored data is secured against unauthorized access.
+
 
 
 
@@ -7519,15 +8509,10 @@ OpsWorks lets you use Chef and Puppet to automate how servers are configured, de
 your Amazon EC2 instances or on-premises compute environments. OpsWorks has three offerings, 
 AWS Opsworks for Chef Automate, AWS OpsWorks for Puppet Enterprise, and AWS OpsWorks Stacks.
 
-Area:
-=====
-UseCase:
-========
-BillCost:
-=========
-Security:
-=========
-
+Chef & Puppet help you perform server configuration automatically, or repetitive actions
+• They work great with EC2 & On Premise VM
+• AWS Opsworks = Managed Chef & Puppet
+• It’s an alternative to AWS SSM
 
 
 
@@ -7538,16 +8523,28 @@ Security:
 --Provision Windows or Linux desktops in minutes
 -Eliminate traditional desktop management - Virtual Desktop Infrastructure (VDI)
 
+Managed, Secure Cloud Desktop
+• Great to eliminate management of on-premises VDI (Virtual Desktop Infrastructure)
+• On Demand, pay per by usage
+• Secure, Encrypted, Network Isolation
+• Integrated with Microsoft Active Directory
 
 
 Area:
 =====
+MayRegional
+
+
 UseCase:
 ========
+
 BillCost:
 =========
+
 Security:
 =========
+It is a aws managed service, security is a shared responsibility.
+
 
 
 
@@ -7555,7 +8552,8 @@ Security:
 ##AppSync
 -------------------------------------------------
 AWS AppSync is a serverless GraphQL and Pub/Sub API service that simplifies building modern web and mobile applications.
-AWS AppSync GraphQL APIs simplify application development by providing a single endpoint to securely query or update data from multiple databases, microservices, and APIs.
+AWS AppSync GraphQL APIs simplify application development by providing a single endpoint to securely 
+query or update data from multiple databases, microservices, and APIs.
 
 AWS AppSync Pub/Sub APIs make it easy to create engaging real-time experiences by automatically publishing data updates to subscribed API clients via serverless WebSockets connections. 
 
@@ -7563,12 +8561,22 @@ GraphQL APIs built with AWS AppSync give front-end developers the ability to que
 Pub/Sub APIs built with AWS AppSync give front-end developers the ability to publish real-time data updates to subscribed API clients via serverless WebSockets connections.
 
 AWS AppSync SDKs support iOS, Android, and JavaScript. 
-The JavaScript support spans web frameworks such as React and Angular as well as technologies such as React Native and Ionic. 
-You can also use open source clients to connect to the AppSync GraphQL endpoint for using other platform such as generic 
-HTTP libraries or even a simple CURL command.
+
+Store and sync data across mobile and web apps in real-time
+• Makes use of GraphQL (mobile technology from Facebook)
+• Client Code can be generated automatically
+• Integrations with DynamoDB / Lambda
+• Real-time subscriptions
+• Offline data synchronization (replaces Cognito Sync)
+• Fine Grained Security
+
+
+
 
 Area:
 =====
+MayRegional
+
 UseCase:
 ========
 Unified data access
@@ -7585,32 +8593,45 @@ You are billed separately for query and data modification operations, and for pe
 
 Security:
 =========
+It is a aws managed service, security is a shared responsibility.
+
+
+
 
 
 ##Cost Explorer
 -------------------------------------------------
-Area:
-=====
-UseCase:
-========
-BillCost:
-=========
-Security:
-=========
+Visualize, understand, and manage your AWS costs and usage over time
+• Create custom reports that analyze cost and usage data.
+• Analyze your data at a high level: total costs and usage across all accounts
+• Or Monthly, hourly, resource level granularity
+• Choose an optimal Savings Plan (to lower prices on your bill)
+• Forecast usage up to 12 months based on previous usage
 
 
 
 
 ##AWS Well-Architected Framework And Tool
 -------------------------------------------------
-Area:
-=====
-UseCase:
-========
-BillCost:
-=========
-Security:
-=========
+Well Architected Framework 6 Pillars
+• 1) Operational Excellence
+• 2) Security
+• 3) Reliability
+• 4) Performance Efficiency
+• 5) Cost Optimization
+• 6) Sustainability
+
+They are not something to balance, or trade-offs, they’re a synergy
+
+
+
+AWS Well-Architected Tool:
+• Free tool to review your architectures against the 6 pillars Well-Architected
+  Framework and adopt architectural best practices
+• How does it work?
+	• Select your workload and answer questions
+	• Review your answers against the 6 pillars
+	• Obtain advice: get videos and documentations, generate a report, see the results in a dashboard
 
 
 
@@ -7621,8 +8642,36 @@ AWS Trusted Advisor provides recommendations that help you follow AWS best pract
 Trusted Advisor evaluates your account by using checks. These checks identify ways to optimize your AWS infrastructure, 
 improve security and performance, reduce costs, and monitor service quotas
 
+No need to install anything – high level AWS account assessment
+Analyze your AWS accounts and provides recommendation:
+Core Checks and recommendations – all customers
+• Can enable weekly email notification from the console
+• Full Trusted Advisor – Available for Business & Enterprise support plans
+	• Ability to set CloudWatch alarms when reaching limits
+	• Programmatic Access using AWS Support API
+
+
+
+Trusted Advisor Checks Examples:
+• Cost Optimization: 
+	• low utilization EC2 instances, idle load balancers, under-utilized EBS volumes… 
+	• Reserved instances & savings plans optimizations, 
+• Performance: 
+	• High utilization EC2 instances, CloudFront CDN optimizations 
+	• EC2 to EBS throughput optimizations, Alias records recommendations 
+• Security: 
+	• MFA enabled on Root Account, IAM key rotation, exposed Access Keys 
+	• S3 Bucket Permissions for public access, security groups with unrestricted ports 
+• Fault Tolerance: 
+	• EBS snapshots age, Availability Zone Balance 
+	• ASG Multi-AZ, RDS Multi-AZ, ELB configuration… 
+	• Service Limits
+
+
 Area:
 =====
+Gloabl
+
 UseCase:
 ========
 Recommendations for cost optimization, performance, security and fault tolerance
@@ -7643,12 +8692,80 @@ Basic Support Plan is included
 
 Security:
 =========
+It is a aws managed service, security is a shared responsibility.
+
+
+
+
+
+#BGP |   Border Gateway Protocol          
+-------------------------------------------------
+BGP is a means by which all junction points on the internet (routers) communicate with each other to dynamically establish the 
+correct (and correctly weighted) paths that network packets should follow to traverse the global networking
+
+
+
+
+##AWS Policy Simulator | IAM
+-------------------------------------------------
+The AWS IAM Simulator is a tool that helps you to test the effects of IAM access control policies. 
+This tool helps when you find yourself manually performing actions to test a policy. 
+The IAM simulator can simulate actions for any IAM principal, resource, and policy conditions.
+
+The simulator does not make an actual AWS service request, so you can safely test 
+requests that might make unwanted changes to your live AWS environment.
+
+
+
+#GraphQL:
+------------------------------------------------
+GraphQL is a query language for APIs and a runtime for fulfilling those queries with your existing data. 
+
+Send a GraphQL query to your API and get exactly what you need, nothing more and nothing less. 
+GraphQL queries always return predictable results. Apps using GraphQL are fast and stable because they 
+control the data they get, not the server.
+
+
+
+#ECMP
+-------------------------------------------------
+Equal-cost multi-path routing (ECMP) is a routing strategy where packet forwarding to a single destination can occur over 
+multiple best paths with equal routing priority. 
+
+AWS Transit Gateway VPN supports ECMP protocol that can load balance traffic across multiple VPN tunnels. 
+The question is, can Transit Gateway ECMP be used to deploy a transit DMZ as shown in the diagram below?
+
+
+
+ 
+ 
+#ENA (Elastic Network Adapter)
+-------------------------------------------------
+The Elastic Network Adapter (ENA) is designed to improve operating system health and reduce 
+the chances of long-term disruption because of unexpected hardware behavior and or failures. 
+
+
+#With EC2
+The Elastic Network Adapter (ENA) driver publishes network performance metrics from the instances where they are enabled. 
+
+
+
+
+
+
+#ParallelCluster 
+-------------------------------------------------
+AWS ParallelCluster is an open source cluster management tool that makes it easy for you to deploy and manage High Performance 
+Computing (HPC) clusters on AWS. 
+
+ParallelCluster uses a simple text file to model and provision all the 
+resources needed for your HPC applications in an automated and secure manner.
+It also supports multiple  instance types and job submission queues, and job schedulers like AWS Batch and Slurm.
 
 
 
 #Managed Services | IAAS| PAAS       
 -------------------------------------------------
-
 AWS Managed Service Offerings:
 
 -Elastic Load Balancing - Distribute incoming traffic across multiple targets
@@ -7727,6 +8844,11 @@ You are responsible for
 (FOR AWS RDS) Managing in database users
 -Configuring the right security groups (control inbound and outbound traffic)
 -Disabling external access (public vs private)
+
+
+
+
+
 
 
 =================================================
