@@ -3280,40 +3280,91 @@ start sending events to a topic to deliver them to all subscribers (potentially 
 
 ##Amazon Kinesis
 -------------------------------------------------
+Makes it easy to collect, process, and analyze streaming data in real-time and that can be run on EC2 instances.
+Ingest real-time data such as: Application logs, Metrics, Website clickstreams,IoT telemetry data.
+
+• Kinesis Data Streams: capture, process, and store data streams
+• Kinesis Data Firehose: load data streams into AWS data stores
+• Kinesis Data Analytics: analyze data streams with SQL or Apache Flink
+• Kinesis Video Streams: capture, process, and store video streams
+
 
 Amazon Kinesis Data Streams is a serverless streaming data service that makes it easy to capture, process, 
 and store data streams at any scale.
 
-Amazon Kinesis makes it easy to collect, process, and analyze real-time, streaming data so you can get timely 
-insights and react quickly to new information.
-
-Amazon Kinesis is a managed, scalable, cloud-based service that allows real-time processing of streaming large amount of data per second. 
-It is designed for real-time applications and allows developers to take in any amount of data from several sources, 
-scaling up and down that can be run on EC2 instances.
-
-It is used to capture, store, and process data from large, distributed streams such as event logs and social media feeds. 
-After processing the data, Kinesis distributes it to multiple consumers simultaneously.
 
 The producers continually push data to Kinesis Data Streams, and the consumers process the data in real time. 
 Consumers (such as a custom application running on Amazon EC2 or an Amazon Kinesis Data Firehose delivery stream) 
 can store their results using an AWS service such as Amazon DynamoDB, Amazon Redshift, or Amazon S3.
 
 
+Kinesis Data Streams:
+• Streaming service for ingest at scale
+• Write custom code (producer / consumer)
+• Real-time (~200 ms)
+• Manage scaling (shard splitting / merging)
+• Data storage for 1 to 365 days
+• Supports replay capability
+
+
+Provisioned mode:
+	• You choose the number of shards provisioned, scale manually or using API
+	• Each shard gets 1MB/s in (or 1000 records per second)
+	• Each shard gets 2MB/s out (classic or enhanced fan-out consumer)
+	• You pay per shard provisioned per hour
+On-demand mode:
+	• No need to provision or manage the capacity
+	• Default capacity provisioned (4 MB/s in or 4000 records per second)
+	• Scales automatically based on observed throughput peak during the last 30 days
+	• Pay per stream per hour & data in/out per GB
+
+
+
+
+Kinesis Data Firehose:
+Load streaming data into S3 / Redshift / ES / 3rd party / custom HTTP.
+• Fully managed
+• Near real-time (buffer time min. 60 sec)
+• Automatic scaling
+• No data storage
+• Doesn’t support replay capability
+
+
+Pay for data going through Firehose
+
+
+Perform real-time analytics on Kinesis Streams using SQL
+
+
+
 Area:
 =====
+May Regional.
+
+
 UseCase:
 ========
 Kinesis Video Streams
 Kinesis Data Streams
-Fully managed
-Real-time: Amazon Kinesis enables you to ingest, buffer, and process streaming data in real-time, so you can derive insights in seconds or minutes instead of hours or days.
+Real-time
+
+• Time-series analytics
+• Real-time dashboards
+• Real-time metrics
+
 
 BillCost:
 =========
 You pay only for the volume of data you ingest, store, and consume in your video streams.
 
+
+
 Security:
 =========
+It is a Fully-managed, serverless service.
+Security is a shared responsibility.
+
+
 
 
 
@@ -3323,10 +3374,13 @@ Security:
 Amazon MQ is a managed message broker service for Apache ActiveMQ and RabbitMQ that makes it easy to set up and operate 
 message brokers on AWS.
 
-You get direct access to the ActiveMQ and RabbitMQ consoles and industry standard APIs and protocols for messaging, 
-including JMS, NMS, AMQP 1.0 and 0.9.1, STOMP, MQTT, and WebSocket. 
-You can easily move from any message broker that uses these standards to Amazon MQ because you 
-don’t have to rewrite any messaging code in your applications.
+• SQS, SNS are “cloud-native” services, and they’re using proprietary protocols from AWS.
+• Traditional applications running from on-premises may use open protocols such as: MQTT, AMQP, STOMP, Openwire, WSS
+• When migrating to the cloud, instead of re-engineering the application to use SQS and SNS, we can use Amazon MQ
+• Amazon MQ = managed Apache ActiveMQ
+• Amazon MQ doesn’t “scale” as much as SQS / SNS
+• Amazon MQ runs on a dedicated machine, can run in HA with failover
+• Amazon MQ has both queue feature (~SQS) and topic features (~SNS)
 
 How do I migrate if I'm using a different message broker instead of ActiveMQ or RabbitMQ?
 Amazon MQ provides compatibility with the most common messaging APIs, such as Java Message Service (JMS) and 
@@ -3340,8 +3394,15 @@ and start sending messages.
 
 Area:
 =====
+May Regional.
+
+
+
 UseCase:
 ========
+Migration MQ service to AWS.
+
+
 BillCost:
 =========
 Amazon MQ is free to try.
@@ -3353,6 +3414,11 @@ Broker Storage Pricing Monthly storage usag
 
 Security:
 =========
+It is a Fully-managed, serverless service.
+Security is a shared responsibility.
+
+
+
 
 
 
@@ -3365,10 +3431,10 @@ scale containerized applications.
 
 There are two models that you can use to run your containers:
 
-Fargate launch type - This is a serverless pay-as-you-go option. 
+-Fargate launch type - This is a serverless pay-as-you-go option. 
 You can run containers without needing to manage your infrastructure.
 
-EC2 launch type - Configure and deploy EC2 instances in your cluster to run your containers.
+-EC2 launch type - Configure and deploy EC2 instances in your cluster to run your containers.
 
 
 The Fargate launch type is suitable for the following workloads:
@@ -3384,7 +3450,6 @@ Large workloads that need to be optimized for price
 Your applications need to access persistent storage
 You must directly manage your infrastructure
 
-Amazon Elastic Container Service (Amazon ECS) is a fully managed service for container orchestration.
 
 Amazon ECR is a Fully-managed Docker container registry provided by AWS. Its an alternative to Docker Hub.
 
@@ -3403,7 +3468,8 @@ Remember:
 -You can load balance using Application Load Balancers
 -Two features of ALB are important for ECS:
 -Dynamic host port mapping: Multiple tasks from the same service are allowed per EC2 (container) instance
--Path-based routing: Multiple services can use the same listener port on same ALB and be routed based on path (www.app.com/microservice-a and www.app.com/microservice-b)
+-Path-based routing: Multiple services can use the same listener port on same ALB and be routed based 
+on path (www.app.com/microservice-a and www.app.com/microservice-b)
 
 
 Elastic Beanstalk:
@@ -3424,19 +3490,48 @@ Amazon EKS:
 AWS managed service for Kubernetes
 Recommended if you are already using Kubernetes and would want to move the workload to AWS
 
+Amazon ECS – Load Balancer Integrations:
+• Application Load Balancer supported and works for most use cases
+• Network Load Balancer recommended only for high throughput / high performance use cases, or to pair it with AWS Private Link
+• Elastic Load Balancer supported but not recommended (no advanced features – no Fargate)
+
+
+Mount EFS file systems onto ECS tasks
+Works for both EC2 and Fargate launch types
+Use cases: persistent multi-AZ shared storage for your containers
+Note: Amazon S3 cannot be mounted as a file system
+
+
+ECS Service Auto Scaling
+• Automatically increase/decrease the desired number of ECS tasks
+ECS Service Auto Scaling (task level) ≠ EC2 Auto Scaling (EC2 instance level)
+
+ECS Rolling Updates:
+• When updating from v1 to v2, we can control how many tasks can be started and stopped, and in which order
+
 
 
 Area:
 =====
+May Regional
+
+
+
 UseCase:
 ========
 Support batch processing
 Scale web applications
-Deploy in a hybrid environment: Build container-based applications on-premises or in the cloud with Amazon ECS Anywhere and enjoy consistent tooling, management, workload scheduling, and monitoring across environments.
+Deploy in a hybrid environment: Build container-based applications on-premises or in the cloud with 
+Amazon ECS Anywhere and enjoy consistent tooling, management, workload scheduling, and monitoring across environments.
+
+
 
 BillCost:
 =========
-Amazon ECS pricing is dependent on whether you use AWS Fargate or Amazon EC2 infrastructure to host your containerized workloads.
+Amazon ECS pricing is dependent on whether you use AWS Fargate or Amazon EC2 infrastructure to host your 
+containerized workloads.
+
+
 
 Security:
 =========
@@ -3446,31 +3541,53 @@ Security Groups and networks ACLs allow you to control inbound and outbound netw
 
 
 
+
+
+
 ##Amazon ECR
 -------------------------------------------------
-Amazon ECR is a fully managed container registry offering high-performance hosting, so you can reliably deploy application images and artifacts anywhere.
+Amazon ECR is a fully managed container registry offering high-performance hosting, 
+so you can reliably deploy application images and artifacts anywhere.
+
+Amazon ECR:
+• Private repository
+• Public repository (Amazon ECR Public Gallery https://gallery.ecr.aws)
+
+
 
 Area:
 =====
 Amazon ECR is a Regional service
+
+
 
 UseCase:
 ========
 Manage software vulnerabilities
 Manage image lifecycle policies
 
+
+
 BillCost:
 =========
 AWS Free Tier *
-As a new Amazon ECR customer, you get 500 MB per month of storage for your private repositories for one year as part of the AWS Free Tier.
+As a new Amazon ECR customer, you get 500 MB per month of storage for your private repositories for one 
+year as part of the AWS Free Tier.
 
-With Amazon ECR, there are no upfront fees or commitments. You pay only for the amount of data you store in your public or private repositories and for data transferred to the internet.
+With Amazon ECR, there are no upfront fees or commitments. 
+You pay only for the amount of data you store in your public or private repositories and for data transferred to the internet.
+
 
 
 Security:
 =========
-Amazon ECR automatically encrypts images at rest using Amazon S3 server-side encryption or AWS KMS encryption and transfers your container images over HTTPS.
-You can configure policies to manage permissions and control access to your images using AWS Identity and Access Management (IAM).
+Amazon ECR automatically encrypts images at rest using Amazon S3 server-side encryption or 
+AWS KMS encryption and transfers your container images over HTTPS.
+You can configure policies to manage permissions and control access to your images using AWS Identity and 
+Access Management (IAM).
+
+It is a Fully-managed, serverless service.
+Security is a shared responsibility.
 
 
 
@@ -3481,25 +3598,53 @@ You can configure policies to manage permissions and control access to your imag
 -------------------------------------------------
 Serverless on AWS Build and run applications without thinking about servers.
 
+Serverless in AWS: 
+• AWS Lambda 
+• DynamoDB 
+• AWS Cognito 
+• AWS API Gateway 
+• Amazon S3 
+• AWS SNS & SQS 
+• AWS Kinesis Data Firehose 
+• Aurora Serverless 
+• Step Functions 
+• Fargate
+
+
 Area:
 =====
+May Regional.
+
+
 UseCase:
 ========
 Compute:
-AWS Lambda:AWS Lambda is an event-driven, pay-as-you-go compute service that lets you run code without provisioning or managing servers.
-AWS Fargate:AWS Fargate is a serverless compute engine that works with Amazon Elastic Container Service (ECS) and Amazon Elastic Kubernetes Service (EKS).
+AWS Lambda:AWS Lambda is an event-driven, pay-as-you-go compute service that lets you run code without 
+provisioning or managing servers.
+
+AWS Fargate:AWS Fargate is a serverless compute engine that works with Amazon 
+Elastic Container Service (ECS) and Amazon Elastic Kubernetes Service (EKS).
 
 Application integration:
-Amazon EventBridge
-Amazon EventBridge is a serverless event bus that lets you build event-driven applications at scale across AWS and existing systems.
-AWS Step Functions
-AWS Step Functions is a visual workflow orchestrator that makes it easy to sequence multiple AWS services into business-critical applications.
-Amazon SQS
-Amazon Simple Queue Service (SQS) is a message queuing service enabling you to decouple and scale microservices, distributed systems, and serverless applications.
-Amazon SNS
-Amazon Simple Notification Service (SNS) is a fully managed messaging service for both application-to-application (A2A) and application-to-person (A2P) communication.
-Amazon API Gateway
+Amazon EventBridge:
+Amazon EventBridge is a serverless event bus that lets you build event-driven applications at scale 
+across AWS and existing systems.
+
+AWS Step Functions:
+AWS Step Functions is a visual workflow orchestrator that makes it easy to sequence multiple
+ AWS services into business-critical applications.
+ 
+Amazon SQS:
+Amazon Simple Queue Service (SQS) is a message queuing service enabling you to decouple and scale 
+microservices, distributed systems, and serverless applications.
+
+Amazon SNS:
+Amazon Simple Notification Service (SNS) is a fully managed messaging service for both ]
+application-to-application (A2A) and application-to-person (A2P) communication.
+
+Amazon API Gateway:
 Amazon API Gateway is a fully managed service that makes it easy to create and publish APIs at any scale.
+
 AWS AppSync
 AWS AppSync is a fully managed service that accelerates application development with scalable GraphQL APIs.
 
@@ -3507,17 +3652,30 @@ AWS AppSync is a fully managed service that accelerates application development 
 Data store:
 Amazon S3
 Amazon Simple Storage Service (Amazon S3) is an object storage service designed to store and protect any amount of data.
-Amazon DynamoDB
+
+Amazon DynamoDB:
 Amazon DynamoDB is a key-value and document database service, delivering single-digit millisecond performance at any scale.
-Amazon RDS Proxy
-Amazon RDS Proxy is a managed database proxy for Amazon Relational Database Service (RDS) that makes applications more scalable and secure.
-Amazon Aurora Serverless
-Amazon Aurora Serverless is a MySQL and PostgreSQL-compatible relational database that automatically scales capacity based on your application's needs.
+
+Amazon RDS Proxy:
+Amazon RDS Proxy is a managed database proxy for Amazon Relational Database Service (RDS) 
+that makes applications more scalable and secure.
+
+Amazon Aurora Serverless:
+Amazon Aurora Serverless is a MySQL and PostgreSQL-compatible relational database that automatically scales 
+capacity based on your application's needs.
+
 
 BillCost:
 =========
+Different cost about different services.
+
+
+
 Security:
 =========
+It is a Fully-managed, serverless service.
+Security is a shared responsibility.
+
 
 
 
@@ -3527,12 +3685,30 @@ Security:
 -------------------------------------------------
 AWS Lambda is a serverless, event-driven compute service that lets you run code for virtually any type of 
 application or backend service without provisioning or managing servers. 
-You can trigger Lambda from over 200 AWS services and software as a service (SaaS) applications, and only pay for what you use.
+You can trigger Lambda from over 200 AWS services and software as a service (SaaS) applications, 
+and only pay for what you use.
+
+
+AWS Lambda Limits to Know - per region:
+Execution:
+	• Memory allocation: 128 MB – 10GB (1 MB increments)
+	• Maximum execution time: 900 seconds (15 minutes)
+	• Environment variables (4 KB)
+	• Disk capacity in the “function container” (in /tmp): 512 MB
+	• Concurrency executions: 1000 (can be increased)
+Deployment:
+	• Lambda function deployment size (compressed .zip): 50 MB
+	• Size of uncompressed deployment (code + dependencies): 250 MB
+	• Can use the /tmp directory to load other files at startup
+	• Size of environment variables: 4 KB
+
 
 
 Area:
 =====
 AWS Lambda is a regional service.
+
+
 
 UseCase:
 ========
@@ -3541,11 +3717,14 @@ Run interactive web and mobile backends
 Enable powerful ML insights
 Create event-driven applications
 
+
+
 BillCost:
 =========
-The AWS Lambda free tier includes 
-Only pay for what you use. 
-You are charged based on the number of requests for your functions and the duration it takes for your code to execute.
+Pay per request and compute time
+Free tier of 1,000,000 AWS Lambda requests and 400,000 GBs of compute time
+
+
 
 Security:
 =========
@@ -3555,43 +3734,98 @@ Security and Compliance is a shared responsibility.
 
 
 
+
 ##Labmbda@Edge
 -------------------------------------------------
+You can use Lambda to change CloudFront requests and responses.
+You can also generate responses to viewers without ever sending the request to the origin.
 
 Lambda@Edge is a feature of Amazon CloudFront that lets you run code closer to users of your application, 
-which improves performance and reduces latency. With Lambda@Edge, you don't have to provision or manage 
-infrastructure in multiple locations around the world. You pay only for the compute time you consume - 
-there is no charge when your code is not running.
+which improves performance and reduces latency. 
+With Lambda@Edge, you don't have to provision or manage infrastructure in multiple locations around the world. 
+
 
 
 Area:
 =====
 Lambda@Edge is a global service.
 
+
+
 UseCase:
 ========
+• Website Security and Privacy 
+• Dynamic Web Application at the Edge 
+• Search Engine Optimization (SEO) 
+• Intelligently Route Across Origins and Data Centers 
+• Bot Mitigation at the Edge 
+• Real-time Image Transformation 
+• A/B Testing 
+• User Authentication and Authorization 
+• User Prioritization 
+• User Tracking and Analytics
+
+
+
 BillCost:
 =========
+You pay only for the compute time you consume - there is no charge when your code is not running.
+
+
+
 Security:
 =========
+It is a Fully-managed, serverless service.
+Security is a shared responsibility.
+
+
+
+
+
 
 
 ##DynamoDB
 -------------------------------------------------
 Amazon DynamoDB Fast, flexible NoSQL database service for single-digit millisecond performance at any scale.
 
-Amazon DynamoDB is a fully managed, serverless, key-value NoSQL database designed to run high-performance applications at any scale. 
-DynamoDB offers built-in security, continuous backups, automated multi-Region replication, in-memory caching, and data import and 
-export tools.
+Amazon DynamoDB is a fully managed, serverless, key-value NoSQL database designed to run high-performance 
+applications at any scale. 
+DynamoDB offers built-in security, continuous backups, automated multi-Region replication, in-memory caching, 
+and data import and export tools.
 
 
 The main components of DynamoDB are:
 -a collection which serves as the foundational table
 -a document which is equivalent to a row in a SQL database
 -key-value pairs which are the fields within the document or row
+-Maximum size of an item is 400KB
+-Data types supported are:
+	• Scalar Types – String, Number, Binary, Boolean, Null
+	• Document Types – List, Map
+	• Set Types – String Set, Number Set, Binary Set
 
 DynamoDB is accessible via an HTTP API and performs authentication & authorization via IAM roles, 
 making it a perfect fit for building Serverless applications.
+
+
+DynamoDB – Read/Write Capacity Modes:
+• Control how you manage your table’s capacity (read/write throughput)
+Provisioned Mode (default)
+	• You specify the number of reads/writes per second
+	• You need to plan capacity beforehand
+	• Pay for provisioned Read Capacity Units (RCU) & Write Capacity Units (WCU)
+	• Possibility to add auto-scaling mode for RCU & WCU
+On-Demand Mode
+	• Read/writes automatically scale up/down with your workloads
+	• No capacity planning needed
+	• Pay for what you use, more expensive ($$$)
+	• Great for unpredictable workloads
+
+
+Time To Live (TTL):
+• Automatically delete items after an expiry timestamp
+• Use cases: reduce stored data by keeping only current items, adhere to regulatory obligations.
+
 
 
 DAX:
@@ -3603,15 +3837,19 @@ Area:
 =====
 It is a global service.
 
+
+
 UseCase:
 ========
 Develop software applications
-Develop software applications
 Scale gaming platforms
+
+
 
 BillCost:
 =========
-DynamoDB charges for reading, writing, and storing data in your DynamoDB tables, along with any optional features you choose to enable.
+DynamoDB charges for reading, writing, and storing data in your DynamoDB tables, along with any optional 
+features you choose to enable.
 
 DynamoDB has two capacity modes,:
 Pricing for on-demand capacity mode
@@ -3627,11 +3865,16 @@ Run applications whose traffic is consistent or ramps gradually
 Can forecast capacity requirements to control costs
 
 
+
 Security:
 =========
 Security is a shared responsibility.
-DynamoDB encrypts data at rest by default and also in transit using the keys stored in AWS Key Management Service (or customer-provided keys).
+DynamoDB encrypts data at rest by default and also in transit using the keys stored in 
+AWS Key Management Service (or customer-provided keys).
 DynamoDB also provides access control via AWS IAM roles.
+
+
+
 
 
 
@@ -3646,15 +3889,6 @@ API Types;
 RESTful: Build RESTful APIs optimized for serverless workloads and HTTP backends using HTTP APIs.
 WebSocket: Build real-time two-way communication applications, such as chat apps and streaming dashboards, with WebSocket APIs.
 
-
-Area:
-=====
-UseCase:
-========
-Efficient API development
-Performance at any scale
-Flexible security controls
-Cost savings at scale
 
 Features:
 -Integrates with AWS Lambda, Amazon EC2, Amazon ECS or any web application
@@ -3677,10 +3911,56 @@ Features:
 
 
 
+Endpoint Types:
+Edge-Optimized (default): For global clients
+	• Requests are routed through the CloudFront Edge locations (improves latency)
+	• The API Gateway still lives in only one region
+Regional:
+	• For clients within the same region
+	• Could manually combine with CloudFront (more control over the caching strategies and the distribution)
+Private:
+	• Can only be accessed from your VPC using an interface VPC endpoint (ENI)
+	• Use a resource policy to define access
+
+
+
+API Gateway – Security – Summary:
+IAM:
+	• Great for users / roles already within your AWS account
+	• Handle authentication + authorization
+	• Leverages Sig v4
+Custom Authorizer:
+	• Great for 3rd party tokens
+	• Very flexible in terms of what IAM policy is returned
+	• Handle Authentication + Authorization
+	• Pay per Lambda invocation
+Cognito User Pool:
+	• You manage your own user pool (can be backed by Facebook, Google login etc…)
+	• No need to write any custom code
+	• Must implement authorization in the backend
+
+
+
+Area:
+=====
+May Regional.
+
+
+
+UseCase:
+========
+Efficient API development
+Performance at any scale
+Flexible security controls
+Cost savings at scale
+
+
+
 BillCost:
 =========
 The API Gateway free tier includes.
 You pay only for the API calls you receive and the amount of data transferred out.
+
 
 
 Security:
@@ -3693,8 +3973,11 @@ you can execute a Lambda authorizer from AWS Lambda.
 
 
 
+
+
 ##AWS Cognito
 -------------------------------------------------
+Cognito only helps with authentication, not authorization.
 Amazon Cognito lets you add user sign-up, sign-in, and access control to your web and mobile apps quickly and easily. 
 Amazon Cognito scales to millions of users and supports sign-in with social identity providers, such as Apple, Facebook, Google, and 
 Amazon, and enterprise identity providers via SAML 2.0 and OpenID Connect.  
@@ -3705,8 +3988,45 @@ Developers can use Cognito Identity to add sign-up and sign-in to their apps and
 users to securely access their app’s resources. 
 Cognito also enables developers to sync data across devices, platforms, and applications.
 
+
+
+AWS Cognito:
+• We want to give our users an identity so that they can interact with our application.
+Cognito User Pools:
+	• Sign in functionality for app users
+	• Integrate with API Gateway
+Cognito Identity Pools (Federated Identity):
+	• Provide AWS credentials to users so they can access AWS resources directly
+	• Integrate with Cognito User Pools as an identity provider
+Cognito Sync:
+	• Synchronize data from device to Cognito.
+	• May be deprecated and replaced by AppSync
+
+
+Cognito User Pools (CUP):
+• Create a serverless database of user for your mobile apps
+• Simple login: Username (or email) / password combination
+• Possibility to verify emails / phone numbers and add MFA
+• Can enable Federated Identities (Facebook, Google, SAML…)
+• Sends back a JSON Web Tokens (JWT)
+• Can be integrated with API Gateway for authentication
+
+
+Cognito – Federated Identity Pools:
+Goal:
+• Provide direct access to AWS Resources from the Client Side
+Example:
+• provide (temporary) access to write to S3
+bucket using Facebook Login
+
+
+
 Area:
 =====
+MayRegional.
+
+
+
 UseCase:
 ========
 Secure and scalable identity store
@@ -3716,10 +4036,14 @@ Access control for AWS resources
 Amazon Cognito provides solutions to control access to AWS resources from your app.
 Easy integration with your app
 
+
+
 BillCost:
 =========
 Free Tier
 If you are using Cognito Identity to create a User Pool, you pay based on your monthly active users (MAUs) only. 
+
+
 
 Security:
 =========
@@ -3731,14 +4055,27 @@ Amazon Cognito is HIPAA eligible and PCI DSS, SOC, ISO/IEC 27001, ISO/IEC 27017,
 
 
 
+
 ##SAM (Serverless Appliction Model)
 -------------------------------------------------
-The AWS Serverless Application Model (AWS SAM) is an open-source framework that you can use to build serverless applications on AWS.
-A serverless application is a combination of Lambda functions, event sources, and other resources that work together to perform tasks.
+The AWS Serverless Application Model (AWS SAM) is an open-source framework that you can use to build serverless 
+applications on AWS.
+A serverless application is a combination of Lambda functions, event sources, and other resources that work 
+together to perform tasks.
+
+All the configuration is YAML code:
+• Lambda Functions
+• DynamoDB tables
+• API Gateway
+• Cognito User Pools
+
 
 
 Area:
 =====
+MayRegional.
+
+
 UseCase:
 ========
 Single-deployment configuration.
@@ -3752,22 +4089,21 @@ There is no additional charge to use AWS SAM.
 
 Security:
 =========
+It is a aws managed service, security is a shared responsibility.
+
+
 
 
 
 
 ##AWS MicroServices Architecture 
 -------------------------------------------------
-Microservices are an architectural and organizational approach to software development created to speed up deployment cycles, foster innovation and ownership, improve maintainability and scalability of software applications,
+Microservices are an architectural and organizational approach to software development created to 
+speed up deployment cycles, foster innovation and ownership, improve maintainability and scalability of 
+software applications.
 
-Area:
-=====
-UseCase:
-========
-BillCost:
-=========
-Security:
-=========
+
+
 
 
 ##AWS Distributing Paid Content
@@ -3775,39 +4111,69 @@ Security:
 You can configure CloudFront to require that users access your files using either signed URLs or signed cookies. 
 
 
-Area:
-=====
-UseCase:
-========
+
+Premium User Video service:
+We have implemented a fully serverless solution:
+• Cognito for authentication
+• DynamoDB for storing users that are premium
+• 2 serverless applications
+	• Premium User registration
+	• CloudFront Signed URL generator
+• Content is stored in S3 (serverless and scalable)
+• Integrated with CloudFront with OAI for security (users can’t bypass)
+• CloudFront can only be used using Signed URLs to prevent unauthorized users
+• What about S3 Signed URL? They’re not efficient for global access-enabled
+
+
 An ending date and time, after which the URL is no longer valid.
-
 (Optional) The date and time that the URL becomes valid.
-
 (Optional) The IP address or range of addresses of the computers that can be used to access your content.
 
-
-BillCost:
-=========
-Security:
-=========
 
 
 
 
 ##Software Updates distribution
 -------------------------------------------------
-AWS Systems Manager Distributor provides simplified package creation, enabling you to deploy your software packages across instances quickly.
-With Distributor, you can securely store and manage software packages, such as software agents, from a centralized, version-controlled repository.
+AWS Systems Manager Distributor provides simplified package creation, enabling you to deploy your 
+software packages across instances quickly.
+With Distributor, you can securely store and manage software packages, such as software agents, 
+from a centralized, version-controlled repository.
+
+Why CloudFront?
+• No changes to architecture
+• Will cache software update files at the edge
+• Software update files are not dynamic, they’re static (never changing)
+• Our EC2 instances aren’t serverless
+• But CloudFront is, and will scale for us
+• Our ASG will not scale as much, and we’ll save tremendously in EC2
+• We’ll also save in availability, network bandwidth cost, etc
+• Easy way to make an existing application more scalable and cheaper
+
 
 Area:
 =====
+Global
+
+
+
 UseCase:
 ========
+Software update and paching.
+
+
+
 BillCost:
 =========
+Distributor is priced on a pay-per-use model.
+
+
+
 Security:
 =========
-Distributor is priced on a pay-per-use model. 
+It is a aws managed service, security is a shared responsibility.
+ 
+
 
 
 
@@ -3815,26 +4181,193 @@ Distributor is priced on a pay-per-use model.
 
 ##Big Data Ingestion Pipeline
 -------------------------------------------------
-AWS Data Pipeline is a web service that helps you reliably process and move data between different AWS compute and storage services, 
-as well as on-premises data sources, at specified intervals. With AWS Data Pipeline, you can regularly access 
-your data where it’s stored, transform and process it at scale, and efficiently transfer the results to 
+AWS Data Pipeline is a web service that helps you reliably process and move data between different 
+AWS compute and storage services, as well as on-premises data sources, at specified intervals. 
+
+With AWS Data Pipeline, you can regularly access your data where it’s stored, transform and process it at scale, 
+and efficiently transfer the results to 
 AWS services such as Amazon S3, Amazon RDS, Amazon DynamoDB, and Amazon EMR.
 
 
-AWS Data Pipeline helps you easily create complex data processing workloads that are fault tolerant, repeatable, and highly available. 
+AWS Data Pipeline helps you easily create complex data processing workloads that are fault tolerant, 
+repeatable, and highly available. 
 AWS Data Pipeline also allows you to move and process data that was previously locked up in on-premises data silos.
  
- 
-Area:
-=====
-UseCase:
-========
-BillCost:
-=========
-AWS Data Pipeline is billed based on how often your activities and preconditions are scheduled to run and where they run (AWS or on-premises). 
+AWS Data Pipeline is billed based on how often your activities and preconditions are scheduled to run and 
+where they run (AWS or on-premises). 
 
-Security:
-=========
+ 
+Big Data Ingestion Pipeline discussion:
+• IoT Core allows you to harvest data from IoT devices
+• Kinesis is great for real-time data collection
+• Firehose helps with data delivery to S3 in near real-time (1 minute)
+• Lambda can help Firehose with data transformations
+• Amazon S3 can trigger notifications to SQS
+• Lambda can subscribe to SQS (we could have connecter S3 to Lambda)
+• Athena is a serverless SQL service and results are stored in S3
+• The reporting bucket contains analyzed data and can be used by reporting tool such as AWS QuickSight, Redshift, etc.
+
+
+
+##Databases
+-------------------------------------------------
+Choosing the Right Database:
+• We have a lot of managed databases on AWS to choose from
+• Questions to choose the right database based on your architecture:
+	• Read-heavy, write-heavy, or balanced workload? Throughput needs? Will it
+	  change, does it need to scale or fluctuate during the day?
+	• How much data to store and for how long? Will it grow? Average object size?
+	  How are they accessed?
+	• Data durability? Source of truth for the data ?
+	• Latency requirements? Concurrent users?
+	• Data model? How will you query the data? Joins? Structured? Semi-Structured?
+	• Strong schema? More flexibility? Reporting? Search? RDBMS / NoSQL?
+	• License costs? Switch to Cloud Native DB such as Aurora?
+
+
+Database Types:
+• RDBMS (= SQL / OLTP): RDS, Aurora – great for joins
+• NoSQL database: DynamoDB (~JSON), ElastiCache (key / value pairs), Neptune (graphs) – no joins, no SQL
+• Object Store: S3 (for big objects) / Glacier (for backups / archives)
+• Data Warehouse (= SQL Analytics / BI): Redshift (OLAP), Athena
+• Search: ElasticSearch (JSON) – free text, unstructured searches
+• Graphs: Neptune – displays relationships between data
+
+
+RDS Overview:
+• Managed PostgreSQL / MySQL / Oracle / SQL Server
+• Must provision an EC2 instance & EBS Volume type and size
+• Support for Read Replicas and Multi AZ
+• Security through IAM, Security Groups, KMS , SSL in transit
+• Backup / Snapshot / Point in time restore feature
+• Managed and Scheduled maintenance
+• Monitoring through CloudWatch
+• Use case: Store relational datasets (RDBMS / OLTP), perform SQL queries, transactional inserts / update / delete is available.
+
+
+
+RDS for Solutions Architect:
+• Operations: small downtime when failover happens, when maintenance
+  happens, scaling in read replicas / ec2 instance / restore EBS implies manual intervention, application changes.
+• Security: AWS responsible for OS security, we are responsible for setting
+  up KMS, security groups, IAM policies, authorizing users in DB, using SSL
+• Reliability: Multi AZ feature, failover in case of failures
+• Performance: depends on EC2 instance type, EBS volume type, ability to
+  add Read Replicas. Storage auto-scaling & manual scaling of instances
+• Cost: Pay per hour based on provisioned EC2 and EBS.
+
+
+
+Aurora Overvie:
+• Compatible API for PostgreSQL / MySQL 
+• Data is held in 6 replicas, across 3 AZ 
+• Auto healing capability 
+• Multi AZ, Auto Scaling Read Replicas 
+• Read Replicas can be Global 
+• Aurora database can be Global for DR or latency purposes 
+• Auto scaling of storage from 10GB to 128 TB 
+• Define EC2 instance type for aurora instances 
+• Same security / monitoring / maintenance features as RDS 
+• Aurora Serverless – for unpredictable / intermittent workloads 
+• Aurora Multi-Master – for continuous writes failover 
+Use case: same as RDS, but with less maintenance / more flexibility / more performance
+
+
+Aurora for Solutions Architect:
+• Operations: less operations, auto scaling storage
+• Security: AWS responsible for OS security, we are responsible for setting
+  up KMS, security groups, IAM policies, authorizing users in DB, using SSL
+• Reliability: Multi AZ, highly available, possibly more than RDS, Aurora
+  Serverless option, Aurora Multi-Master option
+• Performance: 5x performance (according to AWS) due to architectural
+  optimizations. Up to 15 Read Replicas (only 5 for RDS)
+• Cost: Pay per hour based on EC2 and storage usage. Possibly lower
+  costs compared to Enterprise grade databases such as Oracle
+
+
+
+ElastiCache Overview:
+• Managed Redis / Memcached (similar offering as RDS, but for caches)
+• In-memory data store, sub-millisecond latency
+• Must provision an EC2 instance type
+• Support for Clustering (Redis) and Multi AZ, Read Replicas (sharding)
+• Security through IAM, Security Groups, KMS, Redis Auth
+• Backup / Snapshot / Point in time restore feature
+• Managed and Scheduled maintenance
+• Monitoring through CloudWatch
+• Use Case: Key/Value store, Frequent reads, less writes, cache results for DB queries, store session data for websites, cannot use SQL
+
+ElastiCache for Solutions Architect:
+• Operations: same as RDS
+• Security: AWS responsible for OS security, we are responsible for setting up KMS, security groups, 
+  IAM policies, users (Redis Auth), using SSL.
+• Reliability: Clustering, Multi AZ
+• Performance: Sub-millisecond performance, in memory, read replicas for sharding, very popular cache option.
+• Cost: Pay per hour based on EC2 and storage usage
+
+
+
+DynamoDB Overview:
+• AWS proprietary technology, managed NoSQL database
+• Serverless, provisioned capacity, auto scaling, on demand capacity (Nov 2018)
+• Can replace ElastiCache as a key/value store (storing session data for example)
+• Highly Available, Multi AZ by default, Read and Writes are decoupled, DAX for read cache
+• Reads can be eventually consistent or strongly consistent
+• Security, authentication and authorization is done through IAM
+• DynamoDB Streams to integrate with AWS Lambda
+• Backup / Restore feature, Global Table feature
+• Monitoring through CloudWatch
+• Can only query on primary key, sort key, or indexes
+• Use Case: Serverless applications development (small documents 100s KB), distributed serverless cache, 
+doesn’t have SQL query language available, has transactions capability from Nov 2018.
+
+
+DynamoDB for Solutions Architect:
+• Operations: no operations needed, auto scaling capability, serverless
+• Security: full security through IAM policies, KMS encryption, SSL in flight
+• Reliability: Multi AZ, Backups
+• Performance: single digit millisecond performance, DAX for caching reads, performance doesn’t degrade if 
+your application scales
+• Cost: Pay per provisioned capacity and storage usage (no need to guess in advance any capacity – can use auto scaling).
+
+
+S3 Overview:
+• S3 is a… key / value store for objects
+• Great for big objects, not so great for small objects
+• Serverless, scales infinitely, max object size is 5 TB
+• Strong consistency
+• Tiers: S3 Standard, S3 IA, S3 One Zone IA, Glacier for backups
+• Features: Versioning, Encryption, Cross Region Replication, etc…
+• Security: IAM, Bucket Policies, ACL
+• Encryption: SSE-S3, SSE-KMS, SSE-C, client side encryption, SSL in transit
+• Use Case: static files, key value store for big files, website hosting
+
+
+S3 for Solutions Architect:
+• Operations: no operations needed
+• Security: IAM, Bucket Policies, ACL, Encryption (Server/Client), SSL
+• Reliability: 99.999999999% durability / 99.99% availability, Multi AZ, CRR
+• Performance: scales to thousands of read / writes per second, transfer
+acceleration / multi-part for big files
+• Cost: pay per storage usage, network cost, requests number
+
+
+
+Athena Overview:
+• Fully Serverless database with SQL capabilities
+• Used to query data in S3
+• Pay per query
+• Output results back to S3
+• Secured through IAM
+• Use Case: one time SQL queries, serverless queries on S3, log analytics
+
+
+Athena for Solutions Architect:
+• Operations: no operations needed, serverless
+• Security: IAM + S3 security
+• Reliability: managed service, uses Presto engine, highly available
+• Performance: queries scale based on data size
+• Cost: pay per query / per TB of data scanned, serverless
 
 
 
@@ -3858,16 +4391,31 @@ A data warehouse is a type of database the integrates copies of transaction data
 from disparate source systems and provisions them for analytical use.
 
 
+Redshift for Solutions Architect:
+• Operations: like RDS
+• Security: IAM, VPC, KMS, SSL (like RDS)
+• Reliability: auto healing features, cross-region snapshot copy
+• Performance: 10x performance vs other data warehousing, compression
+• Cost: pay per node provisioned, 1/10th of the cost vs other warehouses
+• vs Athena: faster queries / joins / aggregations thanks to indexes
+• Remember: Redshift = Analytics / BI / Data Warehouse
+
+
+
+
 Area:
 =====
 Redshift is not multi-AZ, if you want multi-AZ you will need to spin up a separate cluster ingesting the same input. 
 You can also manually restore snapshots to a new AZ in the event of an outage.
+
 
 UseCase:
 ========
 Improve financial and demand forecasts
 Collaborate and share data
 Increase developer productivity
+
+
 
 BillCost:
 =========
@@ -3884,53 +4432,82 @@ You can also enable encryption, all the data written to disk will be encrypted.
 
 ##Glue
 -------------------------------------------------
-AWS Glue is a fully managed ETL (extract, transform, and load) service that makes it simple and cost-effective to categorize your data, 
+AWS Glue is a fully managed ETL (extract, transform, and load) service that makes it simple and
+cost-effective to categorize your data, 
 clean it, enrich it, and move it reliably between various data stores and data streams. 
 
 
-Athena uses the AWS Glue Data Catalog to store and retrieve table metadata for the Amazon S3 data in your Amazon Web Services account. 
+Athena uses the AWS Glue Data Catalog to store and retrieve table metadata for the Amazon S3 data in your 
+Amazon Web Services account. 
 The table metadata lets the Athena query engine know how to find, read, and process the data that you want to query.
 
-
-Data integration is the process of preparing and combining data for analytics, machine learning, and application development. 
-It involves multiple tasks, such as discovering and extracting data from various sources; enriching, cleaning, normalizing, 
-and combining data; and loading and organizing data in databases, data warehouses, and data lakes. These tasks are 
-often handled by different types of users that each use different products.
 
 AWS Glue provides both visual and code-based interfaces to make data integration easier. 
 Users can easily find and access data using the AWS Glue Data Catalog.
 
+• Managed extract, transform, and load (ETL) service
+• Useful to prepare and transform data for analytics
+• Fully serverless service
+
+
 Area:
 =====
+MayRegional.
+
+
 UseCase:
 ========
+WS Glue is a serverless data integration service that makes it easy to discover, prepare, and combine data for 
+analytics, machine learning, and application development.
+
+
 BillCost:
 =========
 With AWS Glue, you pay an hourly rate, billed by the second, for crawlers (discovering data) and ETL jobs 
 processing and loading data). For the AWS Glue Data Catalog, you pay a simple monthly fee for storing and accessing the metadata.
 
+
+
 Security:
 =========
+IAM, VPC, KMS, SSL (like RDS).
 We provide server-side encryption for data at rest and SSL for data in motion.
+
+
+
 
 
 
 ##Neptune
 -------------------------------------------------
-Amazon Neptune is a fast, reliable, fully managed graph database service that makes it easy to build and run applications.
+Fully managed graph database.
+
+
+Neptune for Solutions Architect:
+• Operations: similar to RDS
+• Security: IAM, VPC, KMS, SSL (similar to RDS) + IAM Authentication
+• Reliability: Multi-AZ, clustering
+• Performance: best suited for graphs, clustering to improve performance
+• Remember: Neptune = Graphs
+
 
 Area:
 =====
+MayRegional.
+
+
 UseCase:
 ========
-Build connections between identities
-Build knowledge graph applications
+• High relationship data 
+• Social Networking: Users friends with Users, replied to comment on post of user and likes other comments.
+• Knowledge graphs (Wikipedia) 
 
 
 BillCost:
 =========
-As part of the AWS Free Tier, you can get started with Amazon Neptune for free.
-You pay for your database by the hour, using On-Demand instances
+Pay per node provisioned (similar to RDS)
+
+
 
 Security:
 =========
@@ -3940,18 +4517,47 @@ manage through AWS Key Management Service (KMS).
 
 
 
+
+
+
 ##OpenSearch
 -------------------------------------------------
 Amazon OpenSearch Service makes it easy for you to perform interactive log analytics, real-time application monitoring, 
-website search, and more. OpenSearch is an open source, distributed search and analytics suite derived from Elasticsearch.
+website search, and more. 
+OpenSearch is an open source, distributed search and analytics suite derived from Elasticsearch.
+
+Amazon OpenSearch is successor to Amazon ElasticSearch
+• Example: In DynamoDB, you can only find by primary key or indexes
+• With OpenSearch, you can search any field, even partially matches
+• It’s common to use OpenSearch as a complement to another database
+• OpenSearch also has some usage for Big Data applications
+• You can provision a cluster of instances
+• Built-in integrations: Amazon Kinesis Data Firehose, AWS IoT, and Amazon
+CloudWatch Logs for data ingestion
+
+
+OpenSearch for Solutions Architect:
+• Operations: similar to RDS
+• Security: Cognito, IAM, VPC, KMS, SSL
+• Reliability: Multi-AZ, clustering
+• Performance: based on ElasticSearch project (open source), petabyte scale
+• Cost: pay per node provisioned (similar to RDS)
+• Remember: OpenSearch = Search / Indexing
+
 
 
 Area:
 =====
+MayRegional.
+
+
+
 UseCase:
 ========
 Monitor and debug applications and infrastructure
 Manage security and event information (SIEM)
+
+
 
 BillCost:
 =========
@@ -3964,8 +4570,11 @@ storage tier and type of instance you choose.
 
 Security:
 =========
-Amazon OpenSearch Service supports encryption at rest through AWS Key Management Service (KMS), 
-node-to-node encryption over TLS, and the ability to require clients to communicate of HTTPS.
+Security through Cognito & IAM, KMS encryption, SSL & VPC
+Comes with OpenSearch Dashboards (visualization)
+
+
+
 
 
 
