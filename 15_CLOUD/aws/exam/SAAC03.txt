@@ -3,32 +3,32 @@
 ##################################################
 
 
-=>sudo chmod 777 -R destinationFolder/*
-Allow ec2 file permission
-
-=>/mnt/efs/fs1
-MetadataURL is http://169.254.169.254/latest/meta-data
-
-
-
-KeyWord:
 Latency:বিলম্ব, দেরী,  বাধা, 
 Availability:প্রাপ্যতা, লভ্যতা
+Durability:স্থায়িত্ব, টেকসইতা
+Resilience:সহনশীলতা,স্বাভাবিক অবস্থায় প্রত্যাবর্তন
+
 Provision:বন্দোবস্ত,ব্যবস্থা
 Consistent:সামঞ্জস্যপূর্ণ,সমান
 Retained:ধরে রাখা
 Leverage:উদ্দেশ্যসাধনের উপায়
 sole:একমাত্র
+Exploits:শোষণ
 Reliable:নির্ভরযোগ্য
 Proprietary:মালিকানা
 Regardless:মনোযোগ বা পাত্তা না দিয়ে
 Potentially:সম্ভাব্য
 Compliance:সম্মতি,অনুরোধ বা আদেশ পালন
+Elasticity:স্থিতিস্থাপকতা, নমনীয়তা
+Successor:উত্তরাধিকারী
 
 
 =================================================
 #To Do           
 ================================================= 
+
+ConfusingTakeaLook
+------------------
 
 
 S3/IAM/SDK/AdvanceS3
@@ -1937,7 +1937,7 @@ Amazon EC2 instances that you specify.
 
 
 37
-##Route53
+##Route 53
 -------------------------------------------------
 Amazon Route 53 is a highly available and scalable Domain Name System (DNS) web service. 
 Route 53 connects user requests to internet applications running on AWS or on-premises.
@@ -2007,6 +2007,8 @@ Alias Records Targets:
 • Route 53 record in the same hosted zone
 You cannot set an ALIAS record for an EC2 DNS name
 
+
+Enable DNS Hostnames in your VPC — this creates and manages an invisible Route 53 Private Hosted zone. 
 
 
 Area:
@@ -6124,6 +6126,7 @@ Intelligent Threat discovery to Protect AWS Account
 	• VPC Flow Logs – unusual internal traffic, unusual IP address
 	• DNS Logs – compromised EC2 instances sending encoded data within DNS queries
 	• Kubernetes Audit Logs – suspicious activities and potential EKS cluster compromises
+	
 • Can setup CloudWatch Event rules to be notified in case of findings
 • CloudWatch Events rules can target AWS Lambda or SNS
 • Can protect against CryptoCurrency attacks (has a dedicated “finding” for it)
@@ -6137,6 +6140,7 @@ UseCase:
 ========
 Improve security operations visibility
 Assist security analysts in investigations
+Protect AWS accounts with intelligent threat detection
 
 BillCost:
 =========
@@ -6921,7 +6925,7 @@ It is a aws managed service, security is a shared responsibility.
 
 
 121
-##VPC Endpoints
+##VPC Endpoint
 -------------------------------------------------
 A VPC endpoint enables you to privately connect your VPC to supported AWS services and VPC endpoint services 
 powered by PrivateLink without requiring an internet gateway, NAT device, VPN connection, or AWS Direct Connect connection.
@@ -6931,9 +6935,6 @@ VPC Endpoints (AWS PrivateLink)
 • Every AWS service is publicly exposed (public URL)
 • VPC Endpoints (powered by AWS PrivateLink) allows you to connect to AWS services using a private network instead of 
   using the public Internet
-• They’re redundant and scale horizontally
-• They remove the need of IGW, NATGW, to access AWS Services
-
 
 
 In case of issues:
@@ -6941,13 +6942,17 @@ In case of issues:
 • Check Route Tables
 
 Types of Endpoints:
-
 Interface Endpoints
 	• Provisions an ENI (private IP address) as an entry point (must attach a Security Group)
 	• Supports most AWS services
+	An interface endpoint is an elastic network interface that allows a private IP address in a subnet to connect 
+	VPC resources to a number of AWS services, such as CloudFormation,Elastic Load Balancers (ELBs), SNS, and more.
+	
 Gateway Endpoints
 	• Provisions a gateway and must be used as a target in a route table
 	• Supports both S3 and DynamoDB
+	In contrast, a gateway endpoint is a target for a route in a route table to connect VPC resources to S3 or DynamoDB. 
+	Traffic is then routed from instances in a subnet to one of these two services.
 
 
 
@@ -6965,7 +6970,12 @@ Enables you to privately connect your VPC
 
 BillCost:
 =========
+Interface endpoints:
+AWS charges usage and data processing rates for PrivateLink, so there are additional costs 
+involved with creating and using an interface endpoint. 
 
+Gateway endpoints: do not use PrivateLink. Therefore, apart from the standard costs of data transfer and resource use, 
+AWS doesn't charge extra for using gateway endpoints, unlike interface endpoints.
 
 Security:
 =========
@@ -7020,24 +7030,6 @@ Virtual Private Gateway (VGW):
 
 Customer Gateway (CGW):
 	• Software application or physical device on customer side of the VPN connection
-
-
-
-
-Virtual Private Gateway:
--------------------------------------------------
-A virtual private gateway is a logical, fully redundant distributed edge routing function that sits at the edge of your VPC. 
-As it is capable of terminating VPN connections from your on-prem or customer environments, the VPG is the VPN concentrator on the 
-Amazon side of the Site-to-Site VPN connection
-
-
-
-Customer Gateway:
--------------------------------------------------
-A customer gateway is a resource that you create in AWS that represents the customer gateway device in your on-premises network. 
-When you create a customer gateway, you provide information about your device to AWS.
-
-
 Customer Gateway Device (On-premises):
 • What IP address to use?
 	• Public Internet-routable IP address for your Customer Gateway device
@@ -7089,8 +7081,7 @@ Security is a shared responsibility
 124
 ##Direct Connect
 -------------------------------------------------
-AWS Direct Connect (DX) has been a popular method for businesses to connect to AWS services, giving users a 
-secure and reliable connection to an AWS Region. There are more than 100 DX locations available globally across major cities.
+DirectConnect connects your on-prem with your VPC through a non-public tunnel.
 
 • Provides a dedicated private connection from a remote network to your VPC
 • Dedicated connection must be setup between your DC and AWS Direct Connect locations
@@ -7131,6 +7122,12 @@ Direct Connect – Connection Types:
 Lead times are often longer than 1 month to establish a new connection
 
 
+
+A virtual interface (VIF) is necessary to access AWS services, and is either public or private. 
+A public virtual interface enables access to public services, such as Amazon S3. 
+A private virtual interface enables access to your VPC.
+
+
 Area:
 =====
 MayRegional
@@ -7143,7 +7140,7 @@ UseCase:
 • Hybrid Environments (on prem + cloud)
 
 The use case for Direct Connect is high throughput workloads or if you need a stable or reliable connection
-DirectConnect connects your on-prem with your VPC through a non-public tunnel.
+
 
 
 
@@ -7159,9 +7156,11 @@ Security:
 =========
 • Data in transit is not encrypted but is private
 • AWS Direct Connect + VPN provides an IPsec-encrypted private connection
-• Good for an extra level of security, but slightly more complex to put in place
+AWS Direct Connect does not involve the Internet; instead, it uses dedicated, private network connections between 
+your intranet and Amazon VPC. ,
+Customers can also implement additional security controls by encrypting the traffic that rides the direct connections 
+using similar protocols like SSL, HTTPs and SSH.
 
-It is a aws managed service, security is a shared responsibility.
 
 
 

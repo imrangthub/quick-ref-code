@@ -16,7 +16,6 @@ systemctl start httpd
 systemctl enable httpd
 echo "<h1>Hello World from $(hostname -f)</h1>" > /var/www/html/index.html
 
-We all know Route53, IAM, CloudFront, WAF are Global.
 =================================================
 #General | Basic | Info      
 ================================================= 
@@ -33,7 +32,7 @@ AWS-
  -Gateway
 
 
-It is a aws managed service, security is a shared responsibility.
+We all know Route53, IAM, CloudFront, WAF are Global.
 
 
 =================================================
@@ -55,40 +54,44 @@ Virtual Private Cloud
 	VPC Endpoints – Regional
 		You cannot create an endpoint between a VPC and an AWS service in a different region.
 	VPC Peering – Regional
-		VPC Peering can be performed across VPC in the same account of different AWS accounts but only within the same region. They cannot span across regions
+		VPC Peering can be performed across VPC in the same account of different AWS accounts but only within the same region. 
+		They cannot span across regions
 		VPC Peering can now span inter-region
 	Elastic IP Address – Regional
 		Elastic IP address created within the region can be assigned to instances within the region only
 EC2
 	Resource Identifiers – Regional
-		Each resource identifier, such as an AMI ID, instance ID, EBS volume ID, or EBS snapshot ID, is tied to its region and can be used only in the region where you created the resource.
+		Each resource identifier, such as an AMI ID, instance ID, EBS volume ID, or EBS snapshot ID, is tied to its region and 
+		can be used only in the region where you created the resource.
 	Instances – Availability Zone
 		An instance is tied to the Availability Zones in which you launched it. However, note that its instance ID is tied to the region.
 	EBS Volumes – Availability Zone
 		Amazon EBS volume is tied to its Availability Zone and can be attached only to instances in the same Availability Zone.
 	EBS Snapshot – Regional
-		An EBS snapshot is tied to its region and can only be used to create volumes in the same region and has to be copied from One region to other if needed
-
+		An EBS snapshot is tied to its region and can only be used to create volumes in the same region and has to be copied from 
+		One region to other if needed.
 AMIs – Regional
 	AMI provides templates to launch EC2 instances
-	AMI is tied to the Region where its files are located with Amazon S3. For using AMI in different regions, the AMI can be copied to other regions
+	AMI is tied to the Region where its files are located with Amazon S3. For using AMI in different regions, the AMI can be copied 
+	to other regions.
 Auto Scaling – Regional
 	Auto Scaling spans across multiple Availability Zones within the same region but cannot span across regions
 Elastic Load Balancer – Regional
 	Elastic Load Balancer distributes traffic across instances in multiple Availability Zones in the same region
 Cluster Placement Groups – Availability Zone
 	Cluster Placement groups can be span across Instances within the same Availability Zones
-
 S3 – Global but Data is Regional
 	S3 buckets are created within the selected region
-	Objects stored are replicated across Availability Zones to provide high durability but are not cross region replicated unless done explicitly
+	Objects stored are replicated across Availability Zones to provide high durability but are not cross region replicated unless 
+	done explicitly.
 Route53 – Global
 	Route53 services are offered at AWS edge locations and are global
 DynamoDb – Regional
 	All data objects are stored within the same region and replicated across multiple Availability Zones in the same region
 	Data objects can be explicitly replicated across regions using cross-region replication
 WAF – Global
-	Web Application Firewall (WAF) services protects web applications from common web exploits are offered at AWS edge locations and are global
+	Web Application Firewall (WAF) services protects web applications from common web exploits are offered at AWS edge locations 
+	and are global
 CloudFront – Global
 	CloudFront is the global content delivery network (CDN) services are offered at AWS edge locations
 Storage Gateway – Regional
@@ -98,10 +101,12 @@ AWS GuardDuty – Regional
 
 
 
+
+
 =================================================
 #AWS Security, Identity, & Compliance services
 ================================================= 
-Category | Use cases | AWS service
+Category:UseCases:AWSService
 
 Identity & access management:
 	Securely manage access to services and resources
@@ -186,4 +191,75 @@ Compliance:
 	AWS Audit Manager
 
 
-  
+=================================================
+#AWS Service list
+=================================================
+AWS Analytics
+	Amazon Athena - Serverless Query S3 using SQL
+	Amazon Cloudsearch - Search Solution for Websites and Apps
+	Amazon Elastic Search - Deploy and run ElasticSearch
+	Amazon EMR - Big Data Platform and Analysis
+	Amazon Kenesis - Real time streaming data capture and analysis
+	Amazon Redshift - Data Warehouse Service
+	Amazon QuickSight - Serverless ML BI Dashboards
+	Amazon Data Exchange - Subscribe to 3rd Party Data Sets
+	Amazon Data Pipeline - Transfer and process data
+	Amazon Glue - Data discovery, enrichment and transfer
+	AWS Lake Formation - Set up Data Lakes quickly
+AWS Application Integration Services
+	AWS Step Functions - Serverless Function Orchestration
+	Amazon AppFlow - Integrate 3rd party app data
+	Amazon EventBridge - Serverless Event Bus
+	Amazon MQ - Message Broker Service for Apache/Rabbit MQ
+	Amazon SNS - Simple Notification Messaging System
+	Amazon SQS - Simple Queue Service Inter Component Messaging
+	Amazon AppSync - GraphQL API Service
+AWS Cost Management Services
+	AWS Cost Explorer - Visualize and manage AWS costs
+	AWS Budgets - Service to set and monitor usage budgets
+	AWS Cost and Usage Report - reporting to analyse AWS usage
+BlockChain
+	Amazon Managed Blockchain - Hyperledger & Ethereum Service
+	Quantum Ledger DB (QLDB) - Fully managed financial ledger db
+AWS Compute Services
+	Amazon EC2 - Secure, resizable Compute Instances (400+)
+	EC2 Autoscaling - Automated compute capacity scaling
+	Amazon LightSail - Easy virtual private server instances
+	Elastic Beanstalk - Deploy & scale web apps (Java/Ruby/etc)
+	Lambda - Serverless Compute Functions
+Container Services
+	ECR - Elastic Container Registry
+	ECS - Elastic Container Service to deploy/manage clusters & tasks
+	EKS - Elastic Kubernetes Service
+	AWS Copilot - CLI to launch and manage containers
+	AWS Fargate - Serverless Compute Engine for ECS/EKS Containers
+AWS Database Services
+	Aurora - MySQL and PostgreSQL compatible database service
+	DynamoDB - KeyValue / Document Database
+	Elasticache - Scalable in-memory database
+	Neptune - Graph database for highly connected data sets
+	Amazon RDS - Relational Database (MySQL/Postgres/Maria etc)
+	Timestream - Serverless time series db for IoT
+AWS Network and Content Delivery
+	AWS VPC - logically isolated virtual private clouds
+	API Gateway - Create and manage APIs
+	CloudFront - Fast content delivery network CDN service
+	Route53 - fast DNS service
+	AWS PrivateLink - Connect your on-prem network to AWS
+	AWS App Mesh - Service Mesh for inter compute instance comms
+	AWS CloudMap - Resource discovery for app usage
+	AWS Direct Connect - Fast connection from your equipment to AWS
+	Global Accellerator - App traffic routing over the AWS network
+	AWS Transit Gateway - Centralised VPC and on prem connectivity
+	Elastic Load Balancing - Service to evenly distribute network traffic
+AWS Storage
+	Amazon S3 - Widely used AWS object storage service
+	EBS - Elastic Block Store, Persistent block
+	EFS - Serverless Elastic File System
+	FSx for Lustre - High performance file storage using Lustre
+	FSx for Windows File System - AWS Windows file system
+	S3 Glacier - Durable low cost archival storage
+	AWS Backup - Policy driven data protection
+	AWS Snow - Edge infrastructure for storage and compute
+	AWS Storage Gateway - Hybrid on prem AWS storage 
+	CloudEndure - Disaster recovery service 
