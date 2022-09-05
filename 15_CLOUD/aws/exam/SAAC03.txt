@@ -21,7 +21,7 @@ Potentially:সম্ভাব্য
 Compliance:সম্মতি,অনুরোধ বা আদেশ পালন
 Elasticity:স্থিতিস্থাপকতা, নমনীয়তা
 Successor:উত্তরাধিকারী
-
+Assume:গ্রহণ করা, দায়িত্বগ্রহণ করা
 
 =================================================
 #To Do           
@@ -29,43 +29,18 @@ Successor:উত্তরাধিকারী
 
 ConfusingTakeaLook
 ------------------
-
+S3 Permormance
 
 
 
 HandOnRemain
 ----------------------------
-
-
-S3/IAM/SDK/AdvanceS3
-1)S3Encription
-2)Cross 
-
-Section 14: Advanced Amazon S3 & Athena
-Some of handsOn remaind done 
-
-Section 15: CloudFront & AWS Global Accelerator
-Global Accelerator not free.
-
-
-
-
-
-IAM advance 
-AWS Sceurity/KMS/SSM
+SSM-with Lambda
+Serverless
 
 
 Route53
 Need to review this section
-
-
-ECS/ECR
-Need to Review this section
-
-Serverless
-HandsOnRemain
-
-
 
 ELB
 ---------
@@ -74,12 +49,10 @@ ELB
 5)AuthScalingPolicy
 
 
-
-RDS | Aurora| ElastiCache
--------------------------
+ECS/ECR
 Need to Review this section
-1)AurorHandOn (No free)
-2)ElastiCache (Limated free 2Month)
+
+
 
 
 DisterRecoverWhitepaper
@@ -1880,9 +1853,6 @@ Amazon ElastiCache is a fully managed in-memory data store and cache service by 
 ElastiCache supports two open-source in-memory caching engines: Memcached and Redis.
 
 
-Amazon ElastiCache:
-ElastiCache is to get managed Redis or Memcached
-
 
 
 Area:
@@ -1895,6 +1865,7 @@ The new Global Datastore feature is available with Amazon ElastiCache for Redis 
 
 UseCase:
 ========
+Gamming Leadboard
 Accelerate application performance.
 Ease backend database load.
 Build low-latency data stores.
@@ -2055,21 +2026,27 @@ Amazon Route 53 supports DNSSEC signing as well as DNSSEC for domain registratio
 38
 ##AWS Elastic Beanstalk 
 -------------------------------------------------
-AWS Elastic Beanstalk is an orchestration service offered by Amazon Web Services for deploying applications which orchestrates 
-various AWS services, including EC2, S3, Simple Notification Service, CloudWatch, autoscaling, and Elastic Load Balancers.
+
+AWS Elastic Beanstalk is an easy-to-use service for deploying and scaling web applications and services developed with Java, .NET, 
+PHP, Node.js, Python, Ruby, Go, and 
+Docker on familiar servers such as Apache, Nginx, Passenger, and IIS.
+
+You can simply upload your code and Elastic Beanstalk automatically handles the deployment, from capacity provisioning, 
+load balancing, auto-scaling to application health monitoring. 
+
+You can develop code in a number of languages which is then zipped up and the zip file is used 
+when instantiating a new elastic beanstalk instance.
 
 Elastic Beanstalk isn't great if you need a lot of environment variables. 
 The simple reason is that Elastic Beanstalk has a hard limit of 4KB to store all key-value pairs.
 Beanstalk is PaaS (platform as a service) while CloudFormation is IaC (infrastructure as code).
 
-AWS Elastic Beanstalk allows you to quickly deploy applications and services without having to worry about 
-configuring underlying resources, services, operating systems or web servers.
+
 
 Elastic Beanstalk takes care of the hosting infrastructure, coding language interpreter, operating system, 
 security, https service and application layer. All you need to worry about is writing your code.
 
-You can develop code in a number of languages which is then zipped up and the zip file is used 
-when instantiating a new elastic beanstalk instance.
+
 
 
 
@@ -2091,7 +2068,7 @@ AWS Elastic Beanstalk is combined with the developer tools to help you manage th
 
 BillCost:
 =========
-Beanstalk is free but you pay for the underlying instances.
+There is no additional charge for Elastic Beanstalk - you pay only for the AWS resources needed to store and run your applications.
 
 
 
@@ -2475,6 +2452,7 @@ and lock the policy from future edits.
 
 After a Vault Lock policy is locked, the policy can no longer be changed or deleted.
 
+Object lock: Block an object version deleeion for a specified amount of time
 Object retention:
 	• Retention Period: specifies a fixed period
 	• Legal Hold: same protection, no expiry date
@@ -2542,6 +2520,7 @@ CloudFront– Origins:
 S3 bucket 
 	• For distributing files and caching them at the edge 
 	• Enhanced security with CloudFront Origin Access Identity (OAI) 
+	  Private S3 bucket file can be access by ClourFront using OAI
 	• CloudFront can be used as an ingress (to upload files to S3) 
 Custom Origin (HTTP) 
 	• Application Load Balancer 
@@ -5192,16 +5171,6 @@ the AWS command line interface (CLI)
 AWS provides AWS Security Token Service (AWS STS) as a web service that enables you to request temporary, 
 limited-privilege credentials for AWS Identity and Access Management (IAM) users or for users you authenticate (federated users).
 
-Recording API requests:
-AWS STS supports AWS CloudTrail, a service that records AWS calls for your AWS account and delivers log files to an 
-Amazon S3 bucket. 
-By using information collected by CloudTrail, you can determine the requests successfully sent to AWS STS, 
-as well as who sent the request, and when it was sent.
-
-The STS token lifecycle is determined by you and can be anywhere from 15 minutes to 36 hours.
-
-External web identities can be authenticated by a third party online identity manager like amazon, google, 
-facebook or any other open-id connect compatible service. 
 
 This web identity federation also removes the need to distribute long-term security credentials to facilitate 
 access to your AWS resources.
@@ -5245,7 +5214,7 @@ Federations can have many flavors:
 Using federation, you don’t need to create IAM users (user management is outside of AWS)
 
 
-
+ExamTips: Any time you see AssumeRole or Cross account access, its STS.
 
 Area:
 =====
@@ -5760,6 +5729,7 @@ Custom KMS Key Policy:
 	• Useful for cross-account access of your KMS key
 
 
+
 Area:
 =====
 AWS KMS has been strictly isolated to a single AWS Region for each implementation, with no sharing of keys, 
@@ -5823,6 +5793,8 @@ KMS Manual Key Rotation:
 Better to use aliases in this case (to hide the change of key for theapplication)
 
 
+ExamTips:Automatic key Rotation period One Year and Manual Key Rotation period 90 or 180 days.
+Not need to know in details on exam.
 
 
 
