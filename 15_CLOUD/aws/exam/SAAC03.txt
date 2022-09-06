@@ -7,6 +7,7 @@ Latency:বিলম্ব, দেরী,  বাধা,
 Availability:প্রাপ্যতা, লভ্যতা
 Durability:স্থায়িত্ব, টেকসইতা
 Resilience:সহনশীলতা,স্বাভাবিক অবস্থায় প্রত্যাবর্তন
+Reliable:নির্ভরযোগ্য
 
 Provision:বন্দোবস্ত,ব্যবস্থা
 Consistent:সামঞ্জস্যপূর্ণ,সমান
@@ -14,7 +15,6 @@ Retained:ধরে রাখা
 Leverage:উদ্দেশ্যসাধনের উপায়
 sole:একমাত্র
 Exploits:শোষণ
-Reliable:নির্ভরযোগ্য
 Proprietary:মালিকানা
 Regardless:মনোযোগ বা পাত্তা না দিয়ে
 Potentially:সম্ভাব্য
@@ -41,12 +41,6 @@ Serverless
 
 Route53
 Need to review this section
-
-ELB
----------
-1)ALB Sticky Session
-4)ConnectionDraining
-5)AuthScalingPolicy
 
 
 ECS/ECR
@@ -167,9 +161,20 @@ They’re separate from each other, so that they’re isolated from disasters.
 
 
 5
-##AWS Points of Presence (Edge Locations)
+##Edge Locations
 -------------------------------------------------
+A site that CloudFront uses to cache copies of your content for faster delivery to users at any location.
+
+An edge location is the nearest point to the consumer(user) who is consuming the AWS service. 
+In these locations, the server is not present but a small setup is there. 
+They are located in major cities around the world.
+
+
 Content is delivered to end users with lower latency.
+
+An edge location is where end users access services located at AWS. They are located in most of the major cities 
+around the world and are specifically used by CloudFront (CDN) to distribute content to end user to reduce latency. 
+It is like frontend for the service we access which are located in AWS cloud.
 
 
 AWS has Global Services:
@@ -190,6 +195,15 @@ Most AWS services are Region-scoped:
 6
 ##IAM
 -------------------------------------------------
+Identity and Access Management (IAM) lets administrators authorize who can take action on specific resources, 
+giving you full control and visibility to manage.
+
+AWS Identity and Access Management (IAM) is a web service that helps you securely control access to AWS resources. 
+
+Three types of Principals — root users, IAM users and Instance Principals
+IAM deals with four principle entities: users, groups, roles and policies.
+
+
 IAM Policies Structure:
 • Version: policy language version, always include “2012-10-17”
 • Id: an identifier for the policy (optional) 
@@ -202,18 +216,15 @@ IAM Policies Structure:
 • Resource: list of resources to which the actions applied to 
 • Condition: conditions for when this policy is in effect (optional)
 
-AWS Identity and Access Management (IAM) is a web service that helps you securely control access to AWS resources. 
-You use IAM to control who is authenticated (signed in) and authorized (has permissions) to use resources.
-
-Three types of Principals — root users, IAM users and Instance Principals
-IAM deals with four principle entities: users, groups, roles and policies.
-
 
 IAM Security Tools:
 IAM Credentials Report (account-level)
 • a report that lists all your account's users and the status of their various credentials
 
 IAM Access Advisor (user-level)
+IAM access advisor helps you audit service access, remove unnecessary permissions, and set 
+	zappropriate permissions providing the last timestamp when an 
+	IAM entity (e.g., user, role, or a group) accessed an AWS service.
 • Access advisor shows the service permissions granted to a user and when those services were last accessed.
 • You can use this information to revise your policies.
 
@@ -241,8 +252,7 @@ UseCase:
 
 BillCost:
 =========
-AWS Identity and Access Management (IAM) and AWS Security Token Service (AWS STS) are features of your 
-AWS account offered at no additional charge. 
+No additional charge for IAM and STS. 
 You are charged only when you access other AWS services using your IAM users or AWS STS temporary security credentials. 
 
 
@@ -261,6 +271,7 @@ NonOffcial:Identity and access management (IAM) is a framework and AWS manage se
 -------------------------------------------------
 An IAM user is an entity that you create in AWS. 
 The IAM user represents the person or service who uses the IAM user to interact with AWS. 
+An IAM user with administrator permissions is not the same thing as the AWS account root user.
 
 A user in AWS consists of a name, a password to sign into the AWS 
 Management Console, and up to two access keys that can be used with the API or CLI. 
@@ -334,8 +345,8 @@ It is a aws managed service, security is a shared responsibility.
 A policy is an object in AWS that, when associated with an identity or resource, defines their permissions.
 
 Identity-based policies – Attach managed and inline policies to IAM identities (users, groups to which users belong, or roles). 
-Identity-based policies grant permissions to an identity.
 
+Identity-based policies grant permissions to an identity.
 Resource-based policies – Attach inline policies to resources. 
 
 Permissions boundaries – Use a managed policy as the permissions boundary for an IAM entity (user or role). 
@@ -345,6 +356,11 @@ for account members of an organization or organizational unit (OU).
 
 Access control lists (ACLs) – Use ACLs to control which principals in other accounts can access the resource to 
 which the ACL is attached.
+
+A network access control list (ACL) allows or denies specific inbound or outbound traffic at the subnet level. 
+You can use the default network ACL for your VPC, or you can create a custom network ACL for your VPC with rules that are 
+similar to the rules for your security groups in order to add an additional layer of security to your VPC.
+
 
 Session policies – Pass advanced session policies when you use the AWS CLI or AWS API to assume a role or a federated user.
 
@@ -384,8 +400,6 @@ It is a aws managed service, security is a shared responsibility.
 10
 ##IAM Role
 -------------------------------------------------
-IAM roles allow you to delegate access to users or services that normally don't have access to your organization's AWS resources. 
-
 Some AWS service will need to perform actions on your behalf. 
 To do so, we will assign permissions to AWS services with IAM Roles.
 
@@ -545,7 +559,8 @@ Storage optimized
 Area:
 =====
 Resource Identifiers – Regional
-	Each resource identifier, such as an AMI ID, instance ID, EBS volume ID, or EBS snapshot ID, is tied to its region and can be used only in the region where you created the resource.
+	Each resource identifier, such as an AMI ID, instance ID, EBS volume ID, or EBS snapshot ID, is tied to its region 
+	and can be used only in the region where you created the resource.
 Instances – Availability Zone
 	An instance is tied to the Availability Zones in which you launched it. However, note that its instance ID is tied to the region.
 EBS Volumes – Availability Zone
@@ -591,12 +606,6 @@ Security:
 =========
 Security is a shared responsibility between AWS and you:
 
-Security of the cloud – AWS is responsible for protecting the infrastructure that runs AWS services in the AWS Cloud. 
-AWS also provides you with services that you can use securely. 
-
-Security in the cloud – Your responsibility includes the following areas:
-Controlling network access to your instances, for example, through configuring your VPC and security groups. 
-
 Managing the credentials used to connect to your instances.
 Managing the guest operating system and software deployed to the guest operating system, including updates and security patches.
 Configuring the IAM roles that are attached to the instance and the permissions associated with those roles. 
@@ -633,7 +642,7 @@ In AWS VPCs, AWS Security Groups act as virtual firewalls,Control traffic to res
 
 BillCost:
 =========
-There is no charge applicable to Security Groups in Amazon EC2 / Amazon VPC. 
+There is no charge applicable to Security Groups in Amazon EC2/Amazon VPC. 
 
 
 
@@ -685,8 +694,9 @@ so that your domain points to your instance.
  
 BillCost:
 =========
-To ensure efficient use of Elastic IP addresses, we impose a small hourly charge if an Elastic IP address is 
+To ensure efficient use of Elastic IP addresses, aws impose a small hourly charge if an Elastic IP address is 
 not associated with a running instance, or if it is associated with a stopped instance or an unattached network interface. 
+
 While your instance is running, you are not charged for one Elastic IP address associated with the instance, 
 but you are charged for any additional Elastic IP addresses associated with the instance.
 
@@ -714,13 +724,19 @@ Use case:
 • Big Data job that needs to complete fast
 • Application that needs extremely low latency and high network throughput
 
-Partition—spreads instances across many different partitions (which rely on
-different sets of racks) within an AZ. Scales to 100s of EC2 instances per group (Hadoop, Cassandra, Kafka)
+Partition — spreads instances across many different partitions (which rely on
+different sets of racks) within a single AZ.
+do not share the same rack.  
+
+Scales to 100s of EC2 instances per group (Hadoop, Cassandra, Kafka)
 Can span across multiple AZs in the same region.
 The instances in a partition do not share racks with the instances in the other partitions.
 
+
 Spread – strictly places a small group of instances across distinct underlying hardware to reduce correlated failures.
-It spread the instances across underlying hardware.
+It spread the instances across multiple AZ.
+It reduces the risk of failure of the network since other instances are active in other zones.
+
 Use case:
 • Application that needs to maximize high availability.
 • Critical Applications where each instance must be isolated from failure from each other.
@@ -873,13 +889,13 @@ AWS Storage:
   - Glacier
   - Snowball
   
-  
+S3:
 Amazon S3 is an object storage service that stores data as objects within buckets. that offers 
 industry-leading scalability, data availability, security, and performance.
 
-
 An object is a file and any metadata that describes the file. A bucket is a container for objects.
 Each object has a key (or key name), which is the unique identifier for the object within the bucket.
+
 
 Buckets:
 -Buckets are a universal namespace, i.e., the bucket names must be unique.
@@ -920,12 +936,11 @@ traditional solutions.
 
 
 
-
 22
 ##EBS
 -------------------------------------------------
 AWS Elastic Block Store (EBS) is Amazon’s block-level storage solution used with the EC2 cloud service to store persistent data. 
-This means that the data is kept on the AWS EBS servers even when the EC2 instances are shut down. 
+This means that the data is kept on the AWS EBS servers even when the EC2 instances are shutdown. 
 
 
 
@@ -1115,7 +1130,7 @@ management required.
 BillCost:
 =========
 5 GB of standard storage for 12 months with the AWS Free Tier
-EFS serverless, set-and-forget, elastic file system. There is no minimum fee or setup charge. 
+EFS serverless, set-and-forget, elastic file system.
 You pay only for the storage you use, for read and write access to data stored in Infrequent Access storage classes, 
 and for any provisioned throughput.
 
@@ -1126,7 +1141,6 @@ Security:
 Uses security group to control access to EFS
 Encryption at rest using KMS
 
-The AWS shared responsibility model applies to data protection in Amazon Elastic File System.
 When using Amazon EFS, you specify Amazon EC2 security groups for your EC2 instances and security groups for the 
 EFS mount targets associated with the file system.
 
@@ -1533,7 +1547,8 @@ HTTPS listener:
 
 
 
-SSL – Server Name Indication (SNI):
+SSL:
+Server Name Indication (SNI):
 • SNI solves the problem of loading multiple SSL certificates onto one web server (to serve multiple websites)
 • The server will then find the correct certificate, or return the default one
 Note:
@@ -1557,12 +1572,13 @@ Network Load Balancer (v2)
 
 
 Connection Draining:
+Stops sending new requests to the EC2 instance which is willing to de-registering.
+
 AWS ELB connection draining prevents breaking open network connections while taking an instance out of service, 
 updating its software, or replacing it with a fresh instance that contains updated software.
 
-Stops sending new requests to the EC2 instance which is willing to de-registering.
 
-Feature naming:
+Feature naming (Call same feature different way ! ):
 • Connection Draining – for CLB
 • Deregistration Delay – for ALB & NLB
 
@@ -1605,15 +1621,15 @@ It is possible to scale an ASG based on CloudWatch alarms
 An alarm monitors a metric (such as Average CPU, or a custom metric)
 
 Auto Scaling Groups – Dynamic Scaling Policies:
-Target Tracking Scaling
+Target Tracking Scaling:
 • Most simple and easy to set-up
 • Example: I want the average ASG CPU to stay at around 40%
 
-Simple / Step Scaling
+Simple / Step Scaling:
 • When a CloudWatch alarm is triggered (example CPU > 70%), then add 2 units
 • When a CloudWatch alarm is triggered (example CPU < 30%), then remove 1
 
-Scheduled Actions
+Scheduled Actions:
 • Anticipate a scaling based on known usage patterns
 • Example: increase the min capacity to 10 at 5 pm on Fridays
 
@@ -1629,7 +1645,7 @@ After a scaling activity happens, you are in the cooldown period (default 300 se
 During the cooldown period, the ASG will not launch or terminate additional instances (to allow for metrics to stabilize)
 
 Advice: Use a ready-to-use AMI to reduce configuration time in order to be serving request fasters and reduce the cooldown
-period.
+period.g4
 
 ASG tries the balance the number of instances across AZ by default.
 
@@ -1639,7 +1655,7 @@ ASG Lifecycle Hooks:
 • You have the ability to perform some actions before the instance is terminated (Terminating state)
 
 
-Launch Configuration (legacy):
+Launch Configuration (legacy,deprecated):
 • Must be re-created every time
 Launch Template (newer):
 • Can have multiple versions
@@ -1702,23 +1718,24 @@ RDS is a managed service:
 • Storage backed by EBS (gp2 or io1)
 • Backups are automatically enabled in RDS
 
-
 Supports all RDS database engines (MariaDB, MySQL,PostgreSQL, SQL Server, Oracle)
+
 
 RDS Read Replicas for read scalability: 
 • Up to 5 Read Replicas
 • Within AZ, Cross AZ or Cross Region
 • Replication is ASYNC, so reads are eventually consistent
-Read replicas are used for SELECT =read) only kind of statements(not INSERT, UPDATE, DELETE)
+  Read replicas are used for SELECT =read) only kind of statements(not INSERT, UPDATE, DELETE)
 
 RDS – From Single-AZ to Multi-AZ, Zero downtime operation (no need to stop the DB)
+
 
 RDS Security – Summary:
 • Encryption at rest:
 	• Is done only when you first create the DB instance
 	• or: unencrypted DB => snapshot => copy snapshot as encrypted => create DB from snapshot
 • Your responsibility:
-	• Check the ports / IP / security group inbound rules in DB’s SG
+	• Check the ports /IP/ security group inbound rules in DB’s SG
 	• In-database user creation and permissions or manage through IAM
 	• Creating a database with or without public access
 	• Ensure parameter groups or DB is configured to only allow SSL connections
@@ -1733,6 +1750,10 @@ Area:
 =====
 Amazon RDS for SQL Server provides a Multi-AZ deployment, which replicates data synchronously across AZs.
 By default, the Multi-AZ feature is not enabled for the RDS instance.
+
+In an Amazon RDS Multi-AZ deployment, Amazon RDS automatically creates a primary database (DB) instance and 
+synchronously  replicates the data to an instance in a different AZ.
+
 
 
 
@@ -1781,11 +1802,12 @@ IAM-based authentication can be used to login into RDS MySQL & PostgreSQL
 35
 ##Amazon Aurora
 -------------------------------------------------
-Amazon Aurora Global Database is designed for globally distributed applications, allowing a single 
-Amazon Aurora database to span multiple AWS Regions.
+Amazon Aurora Global Database is designed for globally distributed applications, allowing a single Amazon Aurora 
+database to span multiple AWS Regions.
 
 Amazon Aurora (Aurora) is a fully managed relational database engine that's compatible with MySQL and PostgreSQL.
-The underlying storage grows automatically as needed. An Aurora cluster volume can grow to a maximum size of 128 tebibytes (TiB). 
+The underlying storage grows automatically as needed. 
+An Aurora cluster volume can grow to a maximum size of 128 tebibytes (TiB). 
 
 5 times faster than standard MySQL
 3 times faster than standard PostgreSQL
@@ -1809,8 +1831,7 @@ Aurora Multi-Master.
 
 Area:
 =====
-Amazon Aurora Global Database is designed for globally distributed applications, allowing a single 
-Amazon Aurora database to span multiple AWS Regions. 
+Multiple AWS Regions. 
 It replicates your data with no impact on database performance, 
 enables fast local reads with low latency in each Region, and provides disaster recovery from Region-wide outages.
 
@@ -1826,6 +1847,8 @@ BillCost:
 =========
 Prices vary according to the region.
 With Amazon Aurora Global Database, you pay for replicated write I/Os between the primary Region and each secondary Region.
+
+
 
 Security:
 =========
@@ -1859,7 +1882,8 @@ Area:
 =====
 Amazon ElastiCache is available in multiple AWS Regions. This means that you can launch ElastiCache clusters in 
 locations that meet your requirements.
-The new Global Datastore feature is available with Amazon ElastiCache for Redis 5.0. 6 or above, and is supported on M5 and R5 nodes
+The new Global Datastore feature is available with Amazon ElastiCache for Redis 5.0. 6 or above, and is 
+supported on M5 and R5 nodes.
 
 
 
@@ -1873,12 +1897,14 @@ Primary data store for use cases that don't require durability like
 session stores, gaming leaderboards, streaming, and analytics
 
 
+
 BillCost:
 =========
 750 hours free For 12 months with the AWS Free Tier.
 You are charged hourly based on the number of nodes, node type, and pricing model you select. 
-ElastiCache supports both on-demand nodes, which allow you to pay by hour with no long-term commitments, and reserved nodes, 
-which offer discounts for customers who commit to either one-year or three-year terms.
+ElastiCache supports both on-demand nodes, which allow you to pay by hour with no long-term commitments, and reserved 
+nodes, which offer discounts for customers who commit to either one-year or three-year terms.
+
 
 
 Security:
@@ -1915,13 +1941,17 @@ Amazon Route 53 supports both forward (AAAA) and reverse (PTR) IPv6 records.
 
 
 Routing Policies:
-Simple routing policy — Use for a single resource that performs a given function for your domain, for example, a web server that serves content for the example.com website.
+Simple routing policy — Use for a single resource that performs a given function for your domain, 
+	for example, a web server that serves content for the example.com website.
 Weighted routing policy — Use to route traffic to multiple resources in proportions that you specify.
-Latency routing policy — Use when you have resources in multiple AWS Regions and you want to route traffic to the region that provides the best latency.
+Latency routing policy — Use when you have resources in multiple AWS Regions and you want to 
+	route traffic to the region that provides the best latency.
 Failover routing policy — Use when you want to configure active-passive failover.
 Geolocation routing policy — Use when you want to route traffic based on the location of your users.
-Geoproximity routing policy — Use when you want to route traffic based on the location of your resources and, optionally, shift traffic from resources in one location to resources in another.
-Multivalue answer routing policy — Use when you want Route 53 to respond to DNS queries with up to eight healthy records selected at random.
+Geoproximity routing policy — Use when you want to route traffic based on the location of your resources and, 
+	optionally, shift traffic from resources in one location to resources in another.
+Multivalue answer routing policy — Use when you want Route 53 to respond to DNS queries with up to eight healthy 
+	records selected at random.
 
 
 • Route 53 supports the following DNS record types:
@@ -1957,7 +1987,7 @@ CNAME vs Alias:
 	• lb1-1234.us-east-2.elb.amazonaws.com and you want myapp.mydomain.com
 CNAME:
 	• Points a hostname to any other hostname. (app.mydomain.com => blabla.anything.com)
-	• ONLY FOR NON ROOT DOMAIN (aka. something.mydomain.com)
+	• ONLY FOR NON ROOT DOMAIN (aka.something.mydomain.com)
 Alias:
 	• Points a hostname to an AWS Resource (app.mydomain.com => blabla.amazonaws.com)
 	• Works for ROOT DOMAIN and NON ROOT DOMAIN (aka mydomain.com)
@@ -2026,7 +2056,6 @@ Amazon Route 53 supports DNSSEC signing as well as DNSSEC for domain registratio
 38
 ##AWS Elastic Beanstalk 
 -------------------------------------------------
-
 AWS Elastic Beanstalk is an easy-to-use service for deploying and scaling web applications and services developed with Java, .NET, 
 PHP, Node.js, Python, Ruby, Go, and 
 Docker on familiar servers such as Apache, Nginx, Passenger, and IIS.
@@ -2044,9 +2073,8 @@ Beanstalk is PaaS (platform as a service) while CloudFormation is IaC (infrastru
 
 
 Elastic Beanstalk takes care of the hosting infrastructure, coding language interpreter, operating system, 
-security, https service and application layer. All you need to worry about is writing your code.
-
-
+security, https service and application layer. 
+All you need to worry about is writing your code.
 
 
 
@@ -2147,7 +2175,7 @@ Run cloud-native applications.
 BillCost:
 =========
 AWS Free Tier, you can get started with Amazon S3 for free.
-Amazon S3 charges you only for what you actually use, with no hidden fees and no overage charges. \
+Amazon S3 charges you only for what you actually use, with no hidden fees and no overage charges.
 Bucket pricing varies by region.
 
 
@@ -2959,7 +2987,7 @@ Exam Tip: You need to know the differences between all 3!
 
 
 
-File Gateway:
+File Gateway:Used for flat files only, stored directly on S3.
 • Configured S3 buckets are accessible using the NFS and SMB protocol
 • Supports S3 standard, S3 IA, S3 One Zone IA
 • Bucket access using IAM roles for each File Gateway
@@ -2969,6 +2997,10 @@ File Gateway:
 
 
 Volume Gateway:
+Cached Volume mode – the entire dataset is stored on S3, and a cache of the most frequently accessed data is cached on-site.
+Stored Volume mode – the entire dataset is stored on-site and is asynchronously backed up to S3 (EBS point-in-time snapshots). 
+Snapshots are incremental and compressed.
+
 • Block storage using iSCSI protocol backed by S3
 • Backed by EBS snapshots which can help restore on-premises volumes!
 • Cached volumes: low latency access to most recent data
@@ -2976,6 +3008,8 @@ Volume Gateway:
 
 
 Tape Gateway:
+It is supported by NetBackup, Backup Exec, Veeam, etc. Instead of using physical tape, they are using virtual tape, and these virtual tapes are 
+further stored in Amazon S3.
 • Some companies have backup processes using physical tapes (!)
 • With Tape Gateway, companies use the same processes but, in the cloud
 • Virtual Tape Library (VTL) backed by Amazon S3 and Glacier
@@ -2988,6 +3022,9 @@ Storage Gateway – Hardware appliance:
 
 
 Amazon FSx File Gateway:
+File Gateway synchronizes changed data to FSx for Windows File Server in the background. With these capabilities,
+you can consolidate all of your on-premises file share data in AWS on FSx for 
+Windows File Server and benefit from protected, resilient, fully managed file systems.
 • Native access to Amazon FSx for Windows File Server
 • Local cache for frequently accessed data
 • Windows native compatibility (SMB, NTFS, Active Directory...)
@@ -3013,7 +3050,7 @@ AWS Storage Gateway stores volume, snapshot, and tape data in the AWS region in 
 
 UseCase:
 ========
-Store data coming from specialized on-premises instruments in Amazon Simple Storage Service (Amazon S3) and use AWS services for data analysis.
+Store data coming from specialized on-premises instruments in  S3 and use AWS services for data analysis.
 Provide cloud-based backup for on-premises files and database applications for low-cost, virtually unlimited scale.
 Transform your on-premises user and group file shares to a hybrid cloud architecture for simplified management and cost reduction.
 
