@@ -3,9 +3,14 @@
 ##################################################
 
 
+https://digitalcloud.training/courses/aws-csaa-practice-exams/
+
+
+
 Latency:বিলম্ব, দেরী,  বাধা, 
 Availability:প্রাপ্যতা, লভ্যতা
 Durability:স্থায়িত্ব, টেকসইতা
+Resilient:স্থিতিস্থাপক
 Resilience:সহনশীলতা,স্বাভাবিক অবস্থায় প্রত্যাবর্তন
 Reliable:নির্ভরযোগ্য
 
@@ -3146,6 +3151,9 @@ Security is a shared responsibility.
 59
 ##Decouple your applications:
 -------------------------------------------------
+SQS, SNS are “cloud-native” services, and they’re using proprietary protocols from AWS.
+Traditional applications running from on-premises may use open protocols such as: MQTT, AMQP, STOMP, Openwire, WSS
+
 • using SQS: queue model
 • using SNS: pub/sub model
 • using Kinesis: real-time streaming model
@@ -3184,8 +3192,9 @@ Consuming:
 Message Visibility Timeout:
 • After a message is polled by a consumer, it becomes invisible to other consumers
 • By default, the “message visibility timeout” is 30 seconds
-• That means the message has 30 seconds to be processed
-• After the message visibility timeout is over, the message is “visible” in SQS
+• That means the message has 30 seconds to be processed consumer need more time to process then consumer 
+  clud call ChangeMessageVisible API to  get more time.
+• After the message visibility timeout is over, the message is “visible” in SQS again for every consumer
 
 
 Dead Letter Queue:
@@ -3209,6 +3218,12 @@ Long Polling:
 • LongPolling decreases the number of API calls made to SQS while increasing the efficiency and
   reducing latency of your application
 • The wait time can be between 1 sec to 20 sec (20 sec preferable)
+
+
+
+SQS – Request-Response Systems:
+• To implement this pattern: use the SQS Temporary Queue Client
+• It leverages virtual queues instead of creating / deleting SQS queues (cost-effective)
 
 
 FIFO Queue:
@@ -3423,6 +3438,70 @@ Pay for data going through Firehose
 Perform real-time analytics on Kinesis Streams using SQL
 
 
+Kinesis Data Analytics (SQL application):
+• Perform real-time analytics on Kinesis Streams using SQL
+• Fully managed, no servers to provision
+• Automatic scaling
+• Real-time analytics
+• Pay for actual consumption rate
+• Can create streams out of the real-time queries
+• Use cases:
+	• Time-series analytics
+	• Real-time dashboards
+	• Real-time metrics
+
+
+
+Ordering data into Kinesis:
+• Imagine you have 100 trucks (truck_1, truck_2, … truck_100) on the road sending their GPS positions regularly into AWS.
+• You want to consume the data in order for each truck, so that you can track their movement accurately.
+• How should you send that data into Kinesis?
+• Answer: send using a “Partition Key” value of the “truck_id”
+• The same key will always go to the same shard
+
+
+
+Ordering data into SQS:
+• For SQS standard, there is no ordering.
+• For SQS FIFO, if you don’t use a Group ID, messages are consumed in the order they are sent, with only one consumer
+• You want to scale the number of consumers, but you want messages to be “grouped” when they are related to each other
+• Then you use a Group ID (similar to Partition Key in Kinesis)
+
+
+
+SQS vs SNS vs Kinesis:
+
+SQS:
+• Consumer “pull data”
+• Data is deleted after being consumed
+• Can have as many workers (consumers) as we want
+• No need to provision throughput
+• Ordering guarantees only on FIFO queues
+• Individual message delay capability
+
+SNS:
+• Push data to many subscribers
+• Up to 12,500,000 subscribers
+• Data is not persisted (lost if not delivered)
+• Pub/Sub
+• Up to 100,000 topics
+• No need to provision throughput
+• Integrates with SQS for fan- out architecture pattern
+• FIFO capability for SQS FIFO
+
+Kinesis:
+• Standard: pull data
+• 2 MB per shard
+• Enhanced-fan out: push data
+• 2 MB per shard per consumer
+• Possibility to replay data
+• Meant for real-time big data, analytics and ETL
+• Ordering at the shard level
+• Data expires after X days
+• Provisioned mode or ondemand capacity mode
+
+
+
 
 Area:
 =====
@@ -3472,7 +3551,9 @@ message brokers on AWS.
 How do I migrate if I'm using a different message broker instead of ActiveMQ or RabbitMQ?
 Amazon MQ provides compatibility with the most common messaging APIs, such as Java Message Service (JMS) and 
 .NET Message Service (NMS), and protocols, including AMQP, STOMP, MQTT, and WebSocket. 
-This makes it easy to switch from any standards-based message broker to Amazon MQ without rewriting the messaging code in your applications. 
+
+This makes it easy to switch from any standards-based message broker to Amazon MQ without rewriting the messaging code 
+in your applications. 
 In most cases, you can simply update the endpoints of your Amazon MQ broker to connect to your existing applications, 
 and start sending messages.
 
@@ -3538,11 +3619,8 @@ Your applications need to access persistent storage
 You must directly manage your infrastructure
 
 
-Amazon ECR is a Fully-managed Docker container registry provided by AWS. Its an alternative to Docker Hub.
-
 
 AWS Fargate is a serverless option.
-
 -Service: Allows you to run and maintain a specified number (the “desired count”) of tasks
 -ECS cluster: Grouping of one or more container instances (EC2 instances) where you run your tasks
 -Container Instance - EC2 instance in the cluster running a container agent (helps it communicate with the cluster)
@@ -3577,6 +3655,7 @@ Amazon EKS:
 AWS managed service for Kubernetes
 Recommended if you are already using Kubernetes and would want to move the workload to AWS
 
+
 Amazon ECS – Load Balancer Integrations:
 • Application Load Balancer supported and works for most use cases
 • Network Load Balancer recommended only for high throughput / high performance use cases, or to pair it with AWS Private Link
@@ -3598,6 +3677,16 @@ ECS Rolling Updates:
 
 
 
+
+ECS Task Role is the IAM Role used by the ECS task itself. 
+Use when your container wants to call other AWS services like S3, SQS, etc.
+
+
+EFS volume can be shared between different EC2 instances and different ECS Tasks. 
+It can be used as a persistent multi-AZ shared storage for your containers.
+
+
+
 Area:
 =====
 Amazon ECS is a regional service that simplifies running containers in a highly available manner across 
@@ -3607,15 +3696,15 @@ multiple Availability Zones within a Region
 
 UseCase:
 ========
-Support batch processing
-Scale web applications
 Deploy in a hybrid environment: Build container-based applications on-premises or in the cloud with 
-Amazon ECS Anywhere and enjoy consistent tooling, management, workload scheduling, and monitoring across environments.
-
 
 
 BillCost:
 =========
+Fargate is not on the free tier list. 
+Amazon ECS is always free. You pay for AWS resources (e.g. EC2 instances, EBS volumes, and memory) you 
+create to store and run your application.
+
 Amazon ECS pricing is dependent on whether you use AWS Fargate or Amazon EC2 infrastructure to host your 
 containerized workloads.
 
@@ -3623,7 +3712,9 @@ containerized workloads.
 
 Security:
 =========
-Your EC2 instances use an IAM role to access the ECS service.
+We can add security group for ECS and ECS Task.
+
+Your EC2 instances use an IAM role to access the ECS/ECR service.
 Your ECS tasks use an IAM role to access services and resources.
 Security Groups and networks ACLs allow you to control inbound and outbound network access to and from your instances.
 
@@ -3634,12 +3725,27 @@ Security Groups and networks ACLs allow you to control inbound and outbound netw
 66
 ##Amazon ECR
 -------------------------------------------------
+Amazon ECR is a Fully-managed Docker container registry provided by AWS. Its an alternative to Docker Hub.
+
 Amazon ECR is a fully managed container registry offering high-performance hosting, 
 so you can reliably deploy application images and artifacts anywhere.
 
 Amazon ECR:
 • Private repository
 • Public repository (Amazon ECR Public Gallery https://gallery.ecr.aws)
+
+
+
+Amazon EKS Overview:
+• Amazon EKS = Amazon Elastic Kubernetes Service
+• It is a way to launch managed Kubernetes clusters on AWS
+• Kubernetes is an open-source system for automatic deployment, scaling and management of containerized (usually Docker) application
+• It’s an alternative to ECS, similar goal but different API
+• EKS supports EC2 if you want to deploy worker nodes or Fargate to deploy serverless containers
+• Use case: if your company is already using Kubernetes on-premises or in another cloud, and wants to migrate to AWS using Kubernetes
+• Kubernetes is cloud-agnostic (can be used in any cloud – Azure, GCP…)
+• For multiple regions, deploy one EKS cluster per region
+
 
 
 
@@ -3659,10 +3765,6 @@ Manage image lifecycle policies
 BillCost:
 =========
 AWS Free Tier *
-As a new Amazon ECR customer, you get 500 MB per month of storage for your private repositories for one 
-year as part of the AWS Free Tier.
-
-With Amazon ECR, there are no upfront fees or commitments. 
 You pay only for the amount of data you store in your public or private repositories and for data transferred to the internet.
 
 
@@ -3676,6 +3778,8 @@ Access Management (IAM).
 
 It is a Fully-managed, serverless service.
 Security is a shared responsibility.
+
+
 
 
 
@@ -3919,6 +4023,11 @@ Time To Live (TTL):
 DAX:
 DynamoDB Accelerator (DAX) delivers fast response times for accessing eventually consistent data. 
 Certain usecases requires microseconds response times.
+
+
+DymanoDB Stream is kind of event to interact with other servies like:lambda,s3,sns etc to doing some thing.
+as: User complated their registration and with DymanoDB Stream we cand send a welcome email using Lambda and SNS.
+For Global table Multi Region replication Need to enable DymanoDB Stream.
 
 
 Area:
