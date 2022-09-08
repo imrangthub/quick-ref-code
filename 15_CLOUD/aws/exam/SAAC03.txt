@@ -4030,6 +4030,8 @@ as: User complated their registration and with DymanoDB Stream we cand send a we
 For Global table Multi Region replication Need to enable DymanoDB Stream.
 
 
+
+
 Area:
 =====
 Regional.
@@ -4134,7 +4136,7 @@ Custom Authorizer:
 Cognito User Pool:
 	• You manage your own user pool (can be backed by Facebook, Google login etc…)
 	• No need to write any custom code
-	• Must implement authorization in the backend
+	• Only authentication, must implement authorization in the backend
 
 
 
@@ -4163,8 +4165,8 @@ You pay only for the API calls you receive and the amount of data transferred ou
 Security:
 =========
 Authorize access to your APIs with AWS Identity and Access Management (IAM) and Amazon Cognito. 
-If you use OAuth tokens, API Gateway offers native OIDC and OAuth2 support. To support custom authorization requirements, 
-you can execute a Lambda authorizer from AWS Lambda.
+If you use OAuth tokens, API Gateway offers native OIDC and OAuth2 support. 
+To support custom authorization requirements, you can execute a Lambda authorizer from AWS Lambda.
 
 
 
@@ -4213,8 +4215,7 @@ Cognito – Federated Identity Pools:
 Goal:
 • Provide direct access to AWS Resources from the Client Side
 Example:
-• provide (temporary) access to write to S3
-bucket using Facebook Login
+• provide (temporary) access to write to S3 bucket using Facebook Login
 
 
 
@@ -4529,7 +4530,7 @@ DynamoDB for Solutions Architect:
 • Security: full security through IAM policies, KMS encryption, SSL in flight
 • Reliability: Multi AZ, Backups
 • Performance: single digit millisecond performance, DAX for caching reads, performance doesn’t degrade if 
-your application scales
+  your application scales
 • Cost: Pay per provisioned capacity and storage usage (no need to guess in advance any capacity – can use auto scaling).
 
 
@@ -4550,12 +4551,14 @@ S3 for Solutions Architect:
 • Security: IAM, Bucket Policies, ACL, Encryption (Server/Client), SSL
 • Reliability: 99.999999999% durability / 99.99% availability, Multi AZ, CRR
 • Performance: scales to thousands of read / writes per second, transfer
-acceleration / multi-part for big files
+  acceleration / multi-part for big files
 • Cost: pay per storage usage, network cost, requests number
 
 
 
 Athena Overview:
+Amazon Athena is an interactive query service that makes it easy to analyze data directly in Amazon S3 using standard SQL.
+Athena is not a database but rather a query engine.
 • Fully Serverless database with SQL capabilities
 • Used to query data in S3
 • Pay per query
@@ -4581,6 +4584,7 @@ Fastest, easiest, and most widely used cloud data warehouse
 
 Amazon Redshift is a fully managed data warehouse service in the cloud. Its datasets range from 
 100s of gigabytes to a petabyte. 
+
 The initial process to create a data warehouse is to launch a 
 set of compute resources called nodes, which are organized into groups called cluster. 
 After that you can process your queries.
@@ -4624,6 +4628,8 @@ BillCost:
 AWS Free Tier
 Customers can use the Redshift for just $0.25 per hour with no commitments or upfront costs and scale to a petabyte or more for $1,000 per terabyte per year.
 
+
+
 Security:
 =========
 With a couple of parameter settings, you can set the Redshift to use SSL to secure your data. 
@@ -4632,18 +4638,17 @@ You can also enable encryption, all the data written to disk will be encrypted.
 
 
 
+
+
+
+
 78
 ##Glue
 -------------------------------------------------
-AWS Glue is a fully managed ETL (extract, transform, and load) service that makes it simple and
-cost-effective to categorize your data, 
-clean it, enrich it, and move it reliably between various data stores and data streams. 
-
-
-Athena uses the AWS Glue Data Catalog to store and retrieve table metadata for the Amazon S3 data in your 
-Amazon Web Services account. 
-The table metadata lets the Athena query engine know how to find, read, and process the data that you want to query.
-
+AWS Glue is detailed as "Fully managed extract, transform, and load (ETL) service". 
+A fully managed extract, transform, and load (ETL) service that makes it easy for customers to prepare and 
+load their data for analytics.
+Amazon Athena and AWS Glue can be categorized as "Big Data" tools.
 
 AWS Glue provides both visual and code-based interfaces to make data integration easier. 
 Users can easily find and access data using the AWS Glue Data Catalog.
@@ -4668,7 +4673,8 @@ analytics, machine learning, and application development.
 BillCost:
 =========
 With AWS Glue, you pay an hourly rate, billed by the second, for crawlers (discovering data) and ETL jobs 
-processing and loading data). For the AWS Glue Data Catalog, you pay a simple monthly fee for storing and accessing the metadata.
+processing and loading data). 
+For the AWS Glue Data Catalog, you pay a simple monthly fee for storing and accessing the metadata.
 
 
 
@@ -4820,6 +4826,8 @@ Area:
 Regional
 All dashboards are global, not region-specific.
 
+
+
 UseCase:
 ========
  - Use a single platform for observability
@@ -4835,9 +4843,12 @@ UseCase:
 -Set Alarms
 -Monitor and React to Resource Changes
  
+ 
+ 
 BillCost:
 =========
 You simply pay for what you use and will be charged at the end of the month for your usage.
+
 
 
 Security:
@@ -4897,19 +4908,25 @@ You can use CloudWatch dashboards to create customized views of the metrics and 
 • Dashboards can be shared with people who don’t have an AWS account (public,
 email address, 3rd party SSO provider through Amazon Cognito)
 
+
+
 Area:
 =====
 Dashboards are global
+
 
 
 UseCase:
 ========
 Monitor your resources in a single view.
 
+
+
 BillCost:
 =========
 • 3 dashboards (up to 50 metrics) for free
 • $3/dashboard/month afterwards
+
 
 
 Security:
@@ -4953,11 +4970,13 @@ CloudWatch Logs can send logs to:
 • AWS Lambda
 • ElasticSearch
 
- CloudWatch Logs for EC2:
+
+CloudWatch Logs for EC2:
 • By default, no logs from your EC2 machine will go to CloudWatch
 • You need to run a CloudWatch agent on EC2 to push the log files you want
 • Make sure IAM permissions are correct
 • The CloudWatch log agent can be setup on-premises too
+
 
 
 Area:
@@ -4972,8 +4991,12 @@ Monitor logs from Amazon EC2 instances
 Monitor AWS CloudTrail logged events 
 Log retention
 
+
 BillCost:
 =========
+There are 2 components to the price you pay:
+1) ingestion costs: you pay when you send/upload the logs
+2) storage costs: you pay to keep the logs around.
 
 
 Security:
@@ -4988,8 +5011,8 @@ It is a aws managed service, security is a shared responsibility.
 ##CloudWatch Agent | Logs Agent
 -------------------------------------------------
 The CloudWatch Logs agent provides an automated way to send log data to CloudWatch Logs from Amazon EC2 instances. 
-The agent includes the following components:
 
+The agent includes the following components:
 A plug-in to the AWS CLI that pushes log data to CloudWatch Logs.
 A script (daemon) that initiates the process to push data to CloudWatch Logs.
 A cron job that ensures that the daemon is always running.
@@ -5095,14 +5118,19 @@ Amazon EventBridge vs CloudWatch Events:
 • Over time, the CloudWatch Events name will be replaced with EventBridge.
 
 
+
 Area:
 =====
 MayRegional
+
+
 
 UseCase:
 ========
 Build event-driven architectures
 Write less custom code
+
+
 
 BillCost:
 =========
@@ -5181,20 +5209,18 @@ CloudTrail Events Retention:
 • To keep events beyond this period, log them to S3 and use Athena
 
 
+
 Area:
 =====
 MayRegional
 
 
+
 UseCase:
 ========
 AWS CloudTrail is a service that automatically records events such as AWS API calls. 
-You can create EventBridge rules that use the information from CloudTrail. 
-
-For more information about CloudTrail, see What is AWS CloudTrail?.
 Audit activity: Monitor, store, and validate activity events for authenticity. 
-Identify security incidents: Detect unauthorized access using the Who, What, and When information in CloudTrail Events.
-Troubleshoot operational issues.
+
 
 
 BillCost:
@@ -5229,12 +5255,6 @@ of recorded configurations against desired configurations.
 
 AWS Config Rules does not prevent actions from happening (no deny)
 You can set Remediation Retries if the resource is still non-compliant after auto- remediation
-
-
-Config Rules – Notifications:
-Use EventBridge to trigger notifications when AWS resources are noncompliant
-Ability to send configuration changes and compliance state notifications
-to SNS (all events – use SNS Filtering or filter at client-side)
 
 
 
@@ -5280,9 +5300,6 @@ Helps with auditing and recording compliance of your AWS resources
 	• Is there unrestricted SSH access to my security groups?
 	• Do my buckets have any public access?
 	• How has my ALB configuration changed over time?
-• You can receive alerts (SNS notifications) for any changes
-• AWS Config is a per-region service
-• Can be aggregated across regions and accounts
 • Possibility of storing the configuration data into S3 (analyzed by Athena)
 
 
@@ -5312,14 +5329,6 @@ for IAM authenticated users and users that are authenticated in AWS such as fede
 
 You use STS to provide trusted users with temporary access to resources via API calls, your AWS console or 
 the AWS command line interface (CLI)
-
-
-AWS provides AWS Security Token Service (AWS STS) as a web service that enables you to request temporary, 
-limited-privilege credentials for AWS Identity and Access Management (IAM) users or for users you authenticate (federated users).
-
-
-This web identity federation also removes the need to distribute long-term security credentials to facilitate 
-access to your AWS resources.
 
 
 
@@ -5377,8 +5386,7 @@ UseCase:
 
 BillCost:
 =========
-AWS Identity and Access Management (IAM) and AWS Security Token Service (AWS STS) are features of your 
-AWS account offered at no additional charge.
+No additional charge.
 
 
 
@@ -5551,10 +5559,9 @@ If you want the master account of the old organization to also join the new orga
 
 
 IAM Roles vs Resource Based Policies:
-• Attach a policy to a resource (example: S3 bucket policy) versus attaching of a using a role as a proxy.
 • When you assume a role (user, application or service), you give up your original permissions and take the 
-permissions assigned to the role.
-• When using a resource based policy, the principal doesn’t have to give up his permissions
+  permissions assigned to the role.
+• When using a resource based policy, the principal doesn’t have to give up his permissions.
 • Example: User in account A needs to scan a DynamoDB table in Account A and dump it in an S3 bucket in Account B.
 • Supported by: Amazon S3 buckets, SNS topics, SQS queues.
 
@@ -5562,14 +5569,13 @@ permissions assigned to the role.
 IAM Permission Boundaries:
 • IAM Permission Boundaries are supported for users and roles (not groups)
 • Advanced feature to use a managed policy to set the maximum permissions an IAM entity can get.
+
 Use cases:
-• Delegate responsibilities to non
-administrators within their permission
-boundaries, for example create new IAM
-users
+• Delegate responsibilities to non administrators within their permission boundaries, for example create new IAM users.
 • Allow developers to self-assign policies and manage their own permissions, while
-making sure they can’t “escalate” their
-privileges (= make themselves admin)
+  making sure they can’t “escalate” their privileges (= make themselves admin).
+
+
 
 
 Area:
@@ -5641,11 +5647,6 @@ Network is shared so:
 
 
 
-Simple, secure service to share AWS resources
-AWS Resource Access Manager
-
-
-
 
 
 
@@ -5688,9 +5689,10 @@ AWS Identity & Access Management (IAM)
 
 98
 ##SSO
--------------------------------------------------\
+-------------------------------------------------
 AWS Single Sign-On (AWS SSO) is a cloud service that allows you to grant your users access to AWS resources, 
 such as Amazon EC2 instances, across multiple AWS accounts. 
+
 By default, AWS SSO now provides a directory that  you can use to create users, 
 organize them in groups, and set permissions across those groups.
 
@@ -5813,7 +5815,7 @@ Share Public Key with everybody and keep the Private Key with you(YEAH, ITS PRIV
 ------------------------------------------------- 
 KMS is a managed service that makes it easy for you to create and control the encryption keys used to encrypt your data. 
 AWS KMS uses Hardware Security Modules (HSMs) to protect the security of your keys. 
-You can use AWS KMS to protect your data in AWS services and in your applications
+You can use AWS KMS to protect your data in AWS services and in your applications.
 
 AWS KMS is integrated with AWS CloudTrail to provide you with logs of all key usage to help meet your regulatory and compliance needs.
 AWS KMS keys must be in the same Region as the bucket.
@@ -5900,11 +5902,7 @@ The standard AWS CloudHSM charges apply
 
 
 Security:
-=========
-Key storage and management
-AWS Key Management Service (KMS)
-	
-	
+=========	
 AWS KMS is designed so that no one, including AWS employees, can retrieve your plaintext keys from the service. 
 The service uses hardware security modules (HSMs) that have been validated under FIPS 140-2, or are in the process 
 of being validated, to protect the confidentiality and integrity of your keys.
@@ -5939,7 +5937,7 @@ KMS Manual Key Rotation:
 Better to use aliases in this case (to hide the change of key for theapplication)
 
 
-ExamTips:Automatic key Rotation period One Year and Manual Key Rotation period 90 or 180 days.
+ExamTips:Automatic key Rotation period 1 Year and Manual Key Rotation period 90 or 180 days.
 Not need to know in details on exam.
 
 
@@ -5948,8 +5946,7 @@ Not need to know in details on exam.
 94
 ##SSM Parameter Store
 -------------------------------------------------
-Parameter Store, a capability of AWS Systems Manager, provides secure, hierarchical storage for configuration data 
-management and secrets management. 
+Parameter Store, a capability of AWS Systems Manager,  configuration data  management and secrets management. 
 You can store data such as passwords, database strings, Amazon Machine Image (AMI) IDs, and license codes as parameter values. 
 You can store values as plain text or encrypted data. 
 
@@ -5969,10 +5966,9 @@ MayRegional.
 UseCase:
 ========
 Use a secure, scalable, hosted secrets management service with no servers to manage.
-Improve your security posture by separating your data from your code.
-Store configuration data and encrypted strings in hierarchies and track versions.
 Store parameters reliably because Parameter Store is hosted in multiple Availability Zones in an AWS Region.
-
+You can store data such as passwords, database strings, 
+Amazon Machine Image (AMI) IDs, and license codes as parameter values.
 
 BillCost:
 =========
@@ -5982,9 +5978,8 @@ you are charged based on the number of advanced parameters stored each month and
 
 Security:
 =========
-Parameter Store, a capability of AWS Systems Manager, provides secure, hierarchical storage for configuration data 
-management and secrets management. You can store data such as passwords, database strings, 
-Amazon Machine Image (AMI) IDs, and license codes as parameter values.
+AWS Manage service.
+
 
 
 
@@ -5999,7 +5994,7 @@ AWS Secrets Manager is a secrets management service that helps you protect acces
 This service enables you to easily rotate, manage, and retrieve database credentials, 
 API keys, and other secrets throughout their lifecycle. 
 
-Using Secrets Manager, you can secure and manage secrets used to access resources in the AWS Cloud, on 
+Using Secrets Manager - you can secure and manage secrets used to access resources in the AWS Cloud, on 
 third-party services, and on-premises.
 
 Newer service, meant for storing secrets
@@ -6095,6 +6090,9 @@ Security is a shared responsibility.
 
 
 
+
+
+
 97
 ##Shield | DDoS Protection
 -------------------------------------------------
@@ -6132,6 +6130,7 @@ Protect
 -Amazon Elastic Compute Cloud (EC2) instances
 -Elastic Load Balancers (ELB)
 
+
 BillCost:
 =========
 AWS Shield Standard provides protection for all AWS customers from common.
@@ -6140,10 +6139,7 @@ AWS Shield Advanced is a paid service that provides additional protections
 
 Security:
 =========
-DDoS protection
-AWS Shield
-
-	
+DDoS protection AWS Shield.
 It is a aws managed service, security is a shared responsibility.
 
 
@@ -6169,9 +6165,14 @@ Define Web ACL (Web Access Control List):
 • Size constraints, geo-match (block countries)
 • Rate-based rules (to count occurrences of events) – for DDoS protection
 
+
+
+
 Area:
 =====
 Global.
+
+
 
 UseCase:
 ========
@@ -6181,6 +6182,7 @@ IP addresses, HTTP headers, HTTP body, URI strings, SQL injection and cross-site
 
 BillCost:
 =========
+AWS Firewall Manager protection policy - Monthly fee per Region.
 
 
 Security:
@@ -6203,7 +6205,6 @@ AWS WAF is a firewall that can protect you from multiple types of attacks and pr
 AWS Shield is a single-purpose service. 
 AWS Shield is a managed Distributed Denial of Service (DDoS)  protection tool for your AWS-based applications.
 
-AWS Shield provides protection against a wide range of known DDoS attack vectors and zero-day attack vectors
 
 AWS Firewall Manager:
 • Manage rules in all accounts of an AWS Organization
@@ -6217,7 +6218,7 @@ AWS Firewall Manager:
 
 
 100
-##GuardDutu
+##GuardDuty
 -------------------------------------------------
 Amazon GuardDuty is a threat detection service that continuously monitors your AWS accounts and workloads for
 malicious activity and delivers detailed security findings for visibility and remediation.
@@ -6243,11 +6244,13 @@ Area:
 =====
 Regional
 
+
 UseCase:
 ========
 Improve security operations visibility
 Assist security analysts in investigations
 Protect AWS accounts with intelligent threat detection
+
 
 BillCost:
 =========
@@ -6260,6 +6263,7 @@ Security:
 Protect AWS accounts with intelligent threat detection
 Amazon GuardDuty
 It is a aws managed service, security is a shared responsibility.
+
 
 
 
