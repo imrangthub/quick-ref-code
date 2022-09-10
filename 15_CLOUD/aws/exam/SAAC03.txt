@@ -1755,6 +1755,20 @@ RDS Security – Summary:
 
 ++RDS Custom for Oracle and Microsoft SqL Server
 -------------------------------------------------
+• Managed Oracle and Microsoft SQL Server Database with OS and database customization
+• RDS: Automates setup, operation, and scaling of database in AWS
+• Custom: access to the underlying database and OS so you can
+	• Configure settings
+	• Install patches
+	• Enable native features
+	• Access the underlying EC2 Instance using SSH or SSM Session Manager
+• De-activate Automation Mode to perform your customization, better to take a DB snapshot before
+• RDS vs. RDS Custom
+	• RDS: entire database and the OS to be managed by AWS
+	• RDS Custom: full admin access to the underlying OS and the database
+
+
+
 
 Area:
 =====
@@ -1837,8 +1851,6 @@ Amazon Aurora Serverless is an on-demand, autoscaling configuration for Amazon A
 Aurora Multi-Master.
 
 
-++RDS and Aurora - Backup and Monitoring
-++RDS Proxy
 
 Area:
 =====
@@ -1871,6 +1883,93 @@ It is a aws managed service, security is a shared responsibility.
 • Possibility to authenticate using IAM token (same method as RDS)
 • You are responsible for protecting the instance with security groups
 • You can’t SSH
+
+
+
+
+
+
+++RDS and Aurora - Backup and Monitoring
+-------------------------------------------------
+RDS Backups:
+• Automated backups:
+	• Daily full backup of the database (during the maintenance window)
+	• Transaction logs are backed-up by RDS every 5 minutes
+	• => ability to restore to any point in time (from oldest backup to 5 minutes ago)
+	• 1 to 35 days of retention, set 0 to disable automated backups
+• Manual DB Snapshots:
+	• Manually triggered by the user
+	• Retention of backup for as long as you want
+
+
+ExamTrick: in a stopped RDS database, you will still pay for storage. If you plan on
+stopping it for a long time, you should snapshot & restore instead.
+
+
+
+Aurora Backups:
+• Automated backups:
+	• 1 to 35 days (cannot be disabled) 
+	• point-in-time recovery in that timeframe 
+• Manual DB Snapshots:
+	• Manually triggered by the user 
+	• Retention of backup for as long as you want
+
+
+
+
+RDS & Aurora Restore options:
+• Restoring a RDS / Aurora backup or a snapshot creates a new database
+• Restoring MySQL RDS database from S3
+	• Create a backup of your on-premises database
+	• Store it on Amazon S3 (object storage)
+	• Restore the backup file onto a new RDS instance running MySQL
+• Restoring MySQL Aurora cluster from S3
+	• Create a backup of your on-premises database using Percona XtraBackup
+	• Store the backup file on Amazon S3
+	• Restore the backup file onto a new Aurora cluster running MySQL
+
+
+
+Aurora Database Cloning:
+• Create a new Aurora DB Cluster from an existing one
+• Faster than snapshot & restore
+• The new DB cluster uses the same cluster volume and data as the original but will change when data updates are made.
+• Very fast & cost-effective
+• Useful to create a “staging” database from a “production” database without impacting the production database
+
+
+
+
+RDS & Aurora Security:
+• At-rest encryption:
+	• Database master & replicas encryption using AWS KMS – must be defined as launch time
+	• If the master is not encrypted, the read replicas cannot be encrypted
+	• To encrypt an un-encrypted database, go through a DB snapshot & restore as encrypted
+• In-flight encryption: TLS-ready by default, use the AWS TLS root certificates client-side
+• IAM Authentication: IAM roles to connect to your database (instead of username/pw)
+• Security Groups: Control Network access to your RDS and Aurora DB
+• No SSH available except on RDS Custom
+• Audit Logs can be enabled and sent to CloudWatch Logs for longer retention
+
+
+
+
+
+
+++RDS Proxy
+-------------------------------------------------
+Amazon RDS Proxy:
+• Fully managed database proxy for RDS
+• Allows apps to pool and share DB connections established with the database
+• Improving database efficiency by reducing the stress on database resources (e.g., CPU, RAM) and
+  minimize open connections (and timeouts)
+• Serverless, autoscaling, highly available (multi-AZ)
+• Reduced RDS & Aurora failover time by up 66%
+• Supports RDS (MySQL, PostgreSQL, MariaDB) and Aurora (MySQL, PostgreSQL)
+• No code changes required for most apps
+• Enforce IAM Authentication for DB, and securely store credentials in AWS Secrets Manager
+• RDS Proxy is never publicly accessible (must be accessed from VPC)
 
 
 
@@ -2505,10 +2604,6 @@ Object retention:
 
 
 
-++S3 Object Lambda
-++S3 Batch Operations
-
-
 
 
 Area:
@@ -2531,6 +2626,39 @@ Security:
 Security is a shared responsibility.
 
 
+
+
+
+
+
+++S3 Object Lambda
+-------------------------------------------------
+Use AWS Lambda Functions to change the object before it is retrieved by the caller application
+
+Only one S3 bucket is needed, on top of which we create S3 Access Point and S3 Object Lambda Access Points.
+
+Use Cases:
+	• Redacting personally identifiable information for analytics or non- production environments.
+	• Converting across data formats, such as converting XML to JSON.
+	• Resizing and watermarking images on the fly using caller-specific details, such as the user who requested the object.
+
+
+
+
+
+
+++S3 Batch Operations
+-------------------------------------------------
+• Perform bulk operations on existing S3 objects with asingle request, example:
+	• Modify object metadata & properties
+	• Copy objects between S3 buckets
+	• Encrypt un-encrypted objects
+	• Modify ACLs, tags
+	• Restore objects from S3 Glacier
+	• Invoke Lambda function to perform custom action on each object
+• A job consists of a list of objects, the action to perform, and optional parameters
+• S3 Batch Operations manages retries, tracks progress, sends completion notifications, generate reports …
+• You can use S3 Inventory to get object list and use S3 Select to filter your objects
 
 
 
@@ -2700,11 +2828,6 @@ area of a website.
 
 
 
-++CloudFront - price Classes
-++CloudFront Cache Invalidation
-
-
-
 
 Area:
 =====
@@ -2729,6 +2852,46 @@ Security:
 Support for Encryption at Rest and Transit.
 onfigure HTTPS connections.
 Use signed URLs or cookies to restrict access for selected users.
+
+
+
+
+++CloudFront - price Classes
+-------------------------------------------------
+• CloudFront Edge locations are all around the world 
+• The cost of data out per edge location varies
+
+CloudFront – Price Classes:
+• You can reduce the number of edge locations for cost reduction
+Three price classes:
+	1. Price Class All: all regions – best performance
+	2. Price Class 200: most regions, but excludes the most expensive regions
+	3. Price Class 100: only the least expensive regions
+
+
+
+
+
+
+
+++CloudFront Cache Invalidation
+-------------------------------------------------
+• In case you update the back-end origin, CloudFront doesn’t know about it and will only get the
+  refreshed content after the TTL has expired
+• However, you can force an entire or partial cache refresh (thus bypassing the TTL) by performing a CloudFront Invalidation.
+• You can invalidate all files (*) or a special path (/images/*
+
+
+Global users for our application:
+• You have deployed an application and have global users who want to access it directly.
+• They go over the public internet, which can add a lot of latency due to many hops
+• We wish to go as fast as possible through AWS network to minimize latency
+
+
+Unicast IP vs Anycast IP:
+• Unicast IP: one server holds one IP address
+• Anycast IP: all servers hold the same IP address and the client is routed to the nearest one
+
 
 
 
@@ -3768,9 +3931,6 @@ Amazon EKS Overview:
 
 
 
-++AWS App Runner
-
-
 
 
 Area:
@@ -3804,6 +3964,19 @@ It is a Fully-managed, serverless service.
 Security is a shared responsibility.
 
 
+
+
+
+++AWS App Runner
+-------------------------------------------------
+• Fully managed service that makes it easy to deploy web applications and APIs at scale
+• No infrastructure experience required
+• Start with your source code or container image
+• Automatically builds and deploy the web app
+• Automatic scaling, highly available, load balancer, encryption
+• VPC access support
+• Connect to database, cache, and message queue services
+• Use cases: web apps, APIs, microservices, rapid production eployments
 
 
 
@@ -3962,9 +4135,6 @@ With Lambda@Edge, you don't have to provision or manage infrastructure in multip
 
 
 
-++Lambda in VPC
-
-
 
 Area:
 =====
@@ -3998,6 +4168,25 @@ Security:
 It is a Fully-managed, serverless service.
 Security is a shared responsibility.
 
+
+
+
+
+++Lambda in VPC
+-------------------------------------------------
+• You must define the VPC ID, the Subnets and the Security Groups
+• Lambda will create an ENI (Elastic Network Interface) in your subnets
+
+
+
+++Lambda with RDS Proxy 
+-------------------------------------------------
+• If Lambda functions directly access your database, they may open too many connections under high load
+• RDS Proxy:
+	• Improve scalability by pooling and sharing DB connections
+	• Improve availability by reducing by 66% the failover time and preserving connections
+	• Improve security by enforcing IAM authentication and storing credentials in Secrets Manager
+• The Lambda function must be deployed in your VPC, because RDS Proxy is never publicly accessible
 
 
 
@@ -4585,9 +4774,80 @@ S3 for Solutions Architect:
 
 
 ++ Document DB
+-------------------------------------------------
+• Aurora is an “AWS-implementation” of PostgreSQL / MySQL …
+• DocumentDB is the same for MongoDB (which is a NoSQL database)
+• MongoDB is used to store, query, and index JSON data
+• Similar “deployment concepts” as Aurora
+• Fully Managed, highly available with replication across 3 AZ
+• Aurora storage automatically grows in increments of 10GB, up to 64 TB.
+• Automatically scales to workloads with millions of requests per seconds
+
+ExamTips:If any thing related to MongoDB this is Document DB.
+
+
+
+
+##Amazon Neptune 
+-------------------------------------------------
+• Fully managed graph database 
+• A popular graph dataset would be a social network 
+	• Users have friends 
+	• Posts have comments 
+	• Comments have likes from users 
+	• Users share and like posts… 
+• Highly available across 3 AZ, with up to 15 read replicas 
+• Build and run applications working with highly connected datasets – optimized for these complex and hard queries
+• Can store up to billions of relations and query the graph with milliseconds latency
+• Highly available with replications across multiple AZs 
+• Great for knowledge graphs (Wikipedia), fraud detection, recommendation engines, social networking
+
+
+
 ++Keyspaces (for Apache Cassandra)
-++OLDB
+-------------------------------------------------
+• Apache Cassandra is an open-source NoSQL distributed database
+• A managed Apache Cassandra-compatible database service
+• Serverless, Scalable, highly available, fully managed by AWS
+• Automatically scale tables up/down based on the application’s traffic
+• Tables are replicated 3 times across multiple AZ
+• Using the Cassandra Query Language (CQL)
+• Single-digit millisecond latency at any scale, 1000s of requests per second
+• Capacity: On-demand mode or provisioned mode with auto-scaling
+• Encryption, backup, Point-In-Time Recovery (PITR) up to 35 days
+• Use cases: store IoT devices info, time-series data,
+
+ExamTips:any thing about apache Cassandra, its Amazon Keyspace.
+
+
+
+++QLDB
+-------------------------------------------------
+• QLDB stands for ”Quantum Ledger Database”
+• A ledger is a book recording financial transactions
+• Fully Managed, Serverless, High available, Replication across 3 AZ
+• Used to review history of all the changes made to your application data over time
+• Immutable system: no entry can be removed or modified, cryptographically verifiable
+
+ExamTips:Any time you see Financial transaction or Ledger, its QLDB.
+
+
+
+
 ++Timestream
+-------------------------------------------------
+• Fully managed, fast, scalable, serverless time series database 
+• Automatically scales up/down to adjust capacity 
+• Store and analyze trillions of events per day 
+• 1000s times faster & 1/10th the cost of relational databases 
+• Scheduled queries, multi-measure records, SQL compatibility 
+• Data storage tiering: recent data kept in memory and historical data kept in a cost-optimized storage
+• Built-in time series analytics functions (helps you identify patterns in your data in near real-time)
+• Encryption in transit and at rest 
+• Use cases: IoT apps, operational applications, real-time analytics,
+
+
+
 
 
 
@@ -4676,6 +4936,91 @@ You can also enable encryption, all the data written to disk will be encrypted.
 
 
 ++QuickSight
+-------------------------------------------------
+• Serverless machine learning-powered business intelligence service to create interactive dashboards
+• Fast, automatically scalable, embeddable, with per-session pricing
+• Use cases:
+	• Business analytics
+	• Building visualizations
+	• Perform ad-hoc analysis
+	• Get business insights using data
+• Integrated with RDS, Aurora, Athena, Redshift, S3…
+• In-memory computation using SPICE engine if data is imported into QuickSight
+• Enterprise edition: Possibility to setup Column-Level security (CLS)
+
+
+
+QuickSight – Dashboard & Analysis:
+• Define Users (standard versions) and Groups (enterprise version)
+• These users & groups only exist within QuickSight, not IAM !!
+• A dashboard…
+	• is a read-only snapshot of an analysis that you can share
+	• preserves the configuration of the analysis (filtering, parameters, controls, sort)
+• You can share the analysis or the dashboard with Users or Groups
+• To share a dashboard, you must first publish it
+• Users who see the dashboard can also see the underlying data 
+
+
+
+
+++AWS Lake Formation
+-------------------------------------------------
+• Data lake = central place to have all your data for analytics purposes
+• Fully managed service that makes it easy to setup a data lake in days
+• Discover, cleanse, transform, and ingest data into your Data Lake
+• It automates many complex manual steps (collecting, cleansing, moving, cataloging data, …) and de-duplicate (using ML Transforms)
+• Combine structured and unstructured data in the data lake
+• Out-of-the-box source blueprints: S3, RDS, Relational & NoSQL DB…
+• Fing-grained Access Control for your applications (row and column-level)
+• Built on top of AWS Glue
+
+
+++Amazon Managed Streaming for Apache Kafka (Amazon MSK)
+-------------------------------------------------
+• Alternative to Amazon Kinesis
+• Fully managed Apache Kafka on AWS
+• Allow you to create, update, delete clusters
+• MSK creates & manages Kafka brokers nodes & Zookeeper nodes for you
+• Deploy the MSK cluster in your VPC, multi-AZ (up to 3 for HA)
+• Automatic recovery from common Apache Kafka failures
+• Data is stored on EBS volumes for as long as you want
+• MSK Serverless
+• Run Apache Kafka on MSK without managing the capacity
+• MSK automatically provisions resources and scales compute & storage
+
+
+
+Kinesis Data Streams vs. Amazon MSK:
+Kinesis Data Streams:
+• 1 MB message size limit
+• Data Streams with Shards
+• Shard Splitting & Merging
+• TLS In-flight encryption
+• KMS at-rest encryption
+
+
+Amazon MSK
+• 1MB default, configure for higher (ex: 10MB)
+• Kafka Topics with Partitions
+• Can only add partitions to a topic
+• PLAINTEXT or TLS In-flight Encryption
+• KMS at-rest encryption
+
+
+
+
+
+Big Data Ingestion Pipeline:
+• We want the ingestion pipeline to be fully serverless
+• We want to collect data in real time
+• We want to transform the data
+• We want to query the transformed data using SQL
+• The reports created using the queries should be in S3
+• We want to load that data into a warehouse and create dashboards
+
+
+
+
 
 78
 ##Glue
@@ -4763,11 +5108,6 @@ Security:
 Amazon Neptune supports HTTPS encrypted client connections and also allows you to encrypt your databases using keys you 
 manage through AWS Key Management Service (KMS). 
 
-
-
-
-++Lake Formation
-++MSK - Managed Streaming for Apache Kafka
 
 80
 ##OpenSearch
@@ -5188,6 +5528,65 @@ It is a aws managed service, security is a shared responsibility.
 
 
 ++CloudWatch Insights and Operational Visibility
+-------------------------------------------------
+Collect, aggregate, summarize metrics and logs from containers
+• Available for containers on…
+	• Amazon Elastic Container Service (Amazon ECS)
+	• Amazon Elastic Kubernetes Services (Amazon EKS)
+	• Kubernetes platforms on EC2
+	• Fargate (both for ECS and EKS)
+	• In Amazon EKS and Kubernetes, CloudWatch
+Insights is using a containerized version of the
+CloudWatch Agent to discover containers
+
+
+
+CloudWatch Lambda Insights :
+• Monitoring and troubleshooting solution for serverless applications running on AWS Lambda
+• Collects, aggregates, and summarizes system -level metrics including CPU time, memory, disk, and network
+• Collects, aggregates, and summarizes diagnostic information such as cold starts and Lambda worker shutdowns
+• Lambda Insights is provided as a Lambda Layer
+
+
+CloudWatch Contributor Insights:
+• Analyze log data and create time series that display contributor data.
+	• See metrics about the top-N contributors
+	• The total number of unique contributors, and their usage.
+• This helps you find top talkers and understand who or what is impacting system performance.
+• Works for any AWS-generated logs (VPC, DNS, etc..)
+• For example, you can find bad hosts, identify the heaviest network users, or find the URLs that generate the most errors.
+• You can build your rules from scratch, or you can also
+  use sample rules that AWS has created – leverages your CloudWatch Logs
+• CloudWatch also provides built-in rules that you can use to analyze metrics from other AWS services.
+
+
+
+CloudWatch Application Insights:
+• Provides automated dashboards that show potential problems with monitored applications, to help isolate ongoing issues
+• Your applications run on Amazon EC2 Instances with select technologies only (Java, .NET, Microsoft IIS Web Server, databases…)
+• And you can use other AWS resources such as Amazon EBS, RDS, ELB, ASG, Lambda, SQS, DynamoDB, S3 bucket, ECS, EKS, SNS, API Gateway.
+• Powered by SageMaker
+• Enhanced visibility into your application health to reduce the time it will take you to troubleshoot and repair your applications
+• Findings and alerts are sent to Amazon EventBridge and SSM OpsCenter
+
+
+
+
+CloudWatch Insights and Operational Visibility:
+• CloudWatch Container Insights
+	• ECS, EKS, Kubernetes on EC2, Fargate, needs agent for Kubernetes
+	• Metrics and logs
+• CloudWatch Lambda Insights
+	• Detailed metrics to troubleshoot serverless applications
+• CloudWatch Contributors Insights
+	• Find “Top-N” Contributors through CloudWatch Logs
+• CloudWatch Application Insights
+	• Automatic dashboard to troubleshoot your application and related AWS services
+
+
+
+
+
 
 90
 ##CloudTrail
@@ -5651,7 +6050,27 @@ It is a aws managed service, security is a shared responsibility.
 
 
 
-++IAM - Resource - based Policies vs IAM Roles
+
+++IAM Roles vs Resource Based Policies
+-------------------------------------------------
+ Cross account:
+• attaching a resource-based policy to a resource (example: S3 bucket policy)
+• OR using a role as a proxy
+• When you assume a role (user, application or service), you give up your
+  original permissions and take the permissions assigned to the role
+• When using a resource-based policy, the principal doesn’t have to give up his permissions
+• Example: User in account A needs to scan a DynamoDB table in
+  Account A and dump it in an S3 bucket in Account B.
+• Supported by: Amazon S3 buckets, SNS topics, SQS queues, etc…
+
+
+
+++Amazon EventBridge – Security
+-------------------------------------------------
+• When a rule runs, it needs permissions on the target
+• Resource-based policy: Lambda, SNS, SQS, CloudWatch Logs, API Gateway…
+• IAM role: Kinesis stream, Systems Manager Run Command, ECS task…
+
 
 96
 ##RAM (Resource Access Manager)
@@ -5983,9 +6402,66 @@ Not need to know in details on exam.
 
 
 
-++KMS  - Multi-Region Keys
-++S3 Replication with Encypation
-++Encrpted AMI Sharing Process
+
+++KMS Multi-Region Keys
+-------------------------------------------------
+• Identical KMS keys in different AWS Regions that can be used interchangeably
+• Multi-Region keys have the same key ID, key material, automatic rotation…
+• Encrypt in one Region and decrypt in other Regions
+• No need to re-encrypt or making cross-Region API calls
+• KMS Multi-Region are NOT global (Primary + Replicas)
+• Each Multi-Region key is managed independently
+• Use cases: global client-side encryption, encryption on Global DynamoDB, Global Aurora
+
+
+
+++DynamoDB Global Tables and KMS MultiRegion Keys Client-Side encryption:
+-------------------------------------------------
+• We can encrypt specific attributes client-side in our DynamoDB table using the Amazon DynamoDB Encryption Client
+• Combined with Global Tables, the client-side encrypted data is replicated to other regions
+• If we use a multi-region key, replicated in the same region as the DynamoDB Global table,
+  then clients in these regions can use lowlatency API calls to KMS in their region to decrypt the data client-side
+• Using client-side encryption we can protect specific fields and guarantee only decryption if the client has access to an API key
+
+
+
+++Global Aurora and KMS Multi-Region Keyspace
+-------------------------------------------------
+Client-Side encryption
+• We can encrypt specific attributes client-side in our Aurora table using the AWS Encryption SDK
+• Combined with Aurora Global Tables, the client-side encrypted data is replicated to other regions
+• If we use a multi-region key, replicated in the same region as the Global Aurora DB, then clients in these regions can use low-latency
+ API calls to KMS in their region to decrypt the data client-side
+• Using client-side encryption we can protect specific fields and guarantee only decryption
+  if the client has access to an API key, we can protect specific fields even from database admins
+
+
+++S3 Replication Encryption Considerations
+-------------------------------------------------
+• Unencrypted objects and objects encrypted with SSE-S3 are replicated by default
+• Objects encrypted with SSE-C (customer provided key) are never replicated
+• For objects encrypted with SSE-KMS, you need to enable the option
+• Specify which KMS Key to encrypt the objects within the target bucket
+• Adapt the KMS Key Policy for the target key
+• An IAM Role with kms:Decrypt for the source KMS Key and kms:Encrypt for the target KMS Key
+• You might get KMS throttling errors, in which case you can ask for a Service Quotas increase
+• You can use multi-region AWS KMS Keys, but they are currently treated as
+independent keys by Amazon S3 (the object will still be decrypted and then
+encrypted)
+
+
+
+++AMI Sharing Process Encrypted via KMS
+-------------------------------------------------
+1. AMI in Source Account is encrypted with KMS Key from Source Account
+2. Must modify the image attribute to add a Launch
+Permission which corresponds to the specified target AWS account
+3. Must share the KMS Keys used to encrypted the snapshot the AMI references with the target account / IAM Role
+4. The IAM Role/User in the target account must have the permissions to DescribeKey, ReEncrypted, CreateGrant, Decrypt
+5. When launching an EC2 instance from the AMI, optionally the target account can specify a new KMS
+   key in its own account to re-encrypt the volumes
+
+
 
 
 
@@ -6192,7 +6668,96 @@ It is a aws managed service, security is a shared responsibility.
 
 
 
+
+++AWS Certificate Manager (ACM)
+-------------------------------------------------
+Easily provision, manage, and deploy TLS Certificates
+• Provide in-flight encryption for websites (HTTPS)
+• Supports both public and private TLS certificates
+• Free of charge for public TLS certificates
+• Automatic TLS certificate renewal
+• Integrations with (load TLS certificates on)
+	• Elastic Load Balancers (CLB, ALB, NLB)
+	• CloudFront Distributions
+	• APIs on API Gateway
+• Cannot use ACM with EC2 (can’t be extracted)
+
+
+
+
+++ACM– Requesting Public Certificates
+-------------------------------------------------
+1. List domain names to be included in the certificate 
+	• Fully Qualified Domain Name (FQDN): corp.example.com 
+	• Wildcard Domain: *.example.com
+2. Select Validation Method: DNS Validation or Email validation 
+	• DNS Validation is preferred for automation purposes 
+	• Email validation will send emails to contact addresses in the WHOIS database 
+	• DNS Validation will leverage a CNAME record to DNS config (ex: Route 53)
+3. It will take a few hours to get verified
+4. The Public Certificate will be enrolled for automatic renewal 
+	• ACM automatically renews ACM-generated certificates 60 days before expiry
+
+
+
+
+++ACM – Importing Public Certificates
+-------------------------------------------------
+• Option to generate the certificate outside of ACM and then import it
+• No automatic renewal, must import a new certificate before expiry
+• ACM sends daily expiration events starting 45 days prior to expiration
+• The # of days can be configured
+• Events are appearing in EventBridge
+• AWS Config has a managed rule named acm-certificate-expiration-check
+  to check for expiring certificates (configurable number of days)
+
+
+
+++API Gateway - Endpoint Types
+-------------------------------------------------
+• Edge-Optimized (default): For global clients
+	• Requests are routed through the CloudFront Edge locations (improves latency)
+	• The API Gateway still lives in only one region
+• Regional:
+	• For clients within the same region
+	• Could manually combine with CloudFront (more control over the caching strategies and the distribution)
+• Private:
+	• Can only be accessed from your VPC using an interface VPC endpoint (ENI)
+	• Use a resource policy to define access
+
+
+
+
 ++Firwall Manager
+-------------------------------------------------
+• Manage rules in all accounts of an AWS Organization
+• Security policy: common set of security rules
+	• WAF rules (Application Load Balancer, API Gateways, CloudFront)
+	• AWS Shield Advanced (ALB, CLB, NLB, Elastic IP, CloudFront)
+	• Security Groups for EC2, Application Load BAlancer and ENI resources in VPC
+	• AWS Network Firewall (VPC Level)
+	• Amazon Route 53 Resolver DNS Firewall
+	• Policies are created at the region level
+• Rules are applied to new resources as they are created (good for compliance) across all and future accounts in your Organization
+
+
+
+
+++WAF vs. Firewall Manager vs. Shield
+-------------------------------------------------
+• WAF, Shield and Firewall Manager are used together for comprehensive protection
+• Define your Web ACL rules in WAF
+• For granular protection of your resources, WAF alone is the correct choice
+• If you want to use AWS WAF across accounts, accelerate WAF configuration,
+  automate the protection of new resources, use Firewall Manager with AWS WAF
+• Shield Advanced adds additional features on top of AWS WAF, such as dedicated
+  support from the Shield Response Team (SRT) and advanced reporting.
+• If you’re prone to frequent DDoS attacks, consider purchasing Shield Advanced
+
+
+
+
+
 
 98
 ##WAF (Web Application Firewall)
@@ -6261,6 +6826,65 @@ AWS Firewall Manager:
 • AWS Shield Advanced (ALB, CLB, Elastic IP, CloudFront)
 • Security Groups for EC2 and ENI resources in VPC
 
+
+
+
+
+++AWS Best Practices for DDoS Resiliency Edge Location Mitigation (BP1, BP3)
+-------------------------------------------------
+• BP1 – CloudFront
+	• Web Application delivery at the edge
+	• Protect from DDoS Common Attacks (SYN floods, UDP reflection…)
+• BP1 – Global Accelerator
+	• Access your application from the edge
+	• Integration with Shield for DDoS protection
+	• Helpful if your backend is not compatible with CloudFront
+• BP3 – Route 53
+	• Domain Name Resolution at the edge
+	• DDoS Protection mechanism
+
+
+
+++AWS Best Practices for DDoS Resiliency Best pratices for DDoS mitigation
+-------------------------------------------------
+• Infrastructure layer defense (BP1, BP3, BP6)
+	• Protect Amazon EC2 against high traffic
+	• That includes using Global Accelerator, Route 53, CloudFront, Elastic Load Balancing
+• Amazon EC2 with Auto Scaling (BP7)
+	• Helps scale in case of sudden traffic surges including a flash crowd or a DDoS attack
+• Elastic Load Balancing (BP6)
+	• Elastic Load Balancing scales with the traffic increases and will distribute the traffic to many EC2 instances
+
+
+
+
+++AWS Best Practices for DDoS Resiliency Application Layer Defense
+-------------------------------------------------
+• Detect and filter malicious web requests (BP1, BP2)
+	• CloudFront cache static content and serve it from edge locations, protecting your backend
+	• AWS WAF is used on top of CloudFront and Application Load Balancer to filter and block requests based on request signatures
+	• WAF rate-based rules can automatically block the IPs of bad actors
+	• Use managed rules on WAF to block attacks based on IP reputation, or block anonymous Ips
+	• CloudFront can block specific geographies
+• Shield Advanced (BP1, BP2, BP6)
+	• Shield Advanced automatic application layer DDoS mitigation automatically creates, evaluates and deploys AWS
+  WAF rules to mitigate layer 7 attacks
+
+
+
+
+
+++AWS Best Practices for DDoS Resiliency Attack surface reduction
+-------------------------------------------------
+• Obfuscating AWS resources (BP1, BP4, BP6)
+	• Using CloudFront, API Gateway, Elastic Load Balancing to hide your backend resources (Lambda functions, EC2 instances)
+• Security groups and Network ACLs (BP5)
+	• Use security groups and NACLs to filter traffic based on specific IP at the subnet or ENI-level
+	• Elastic IP are protected by AWS Shield Advanced
+• Protecting API endpoints (BP4)
+	• Hide EC2, Lambda, elsewhere
+	• Edge-optimized mode, or CloudFront + regional mode (more control for DDoS)
+	• WAF + API Gateway: burst limits, headers filtering, use API keys
 
 
 
@@ -7328,7 +7952,13 @@ using similar protocols like SSL, HTTPs and SSH.
 
 
 
-++Direct Connect +Site to Site VPN
+++Site-to-Site VPN connection as a backup
+-------------------------------------------------
+In case Direct Connect fails, you can set up a backup Direct Connect
+connection (expensive), or a Site-to-Site VPN connection
+
+
+
 
 125
 ##AWS PrivateLink
@@ -7627,6 +8257,42 @@ AWS PrivateLink / VPC Endpoint Services:
 
 
 ++AWs Network Firewall
+-------------------------------------------------
+Network Protection on AWS
+• To protect network on AWS, we’ve seen
+	• Network Access Control Lists (NACLs)
+	• Amazon VPC security groups
+	• AWS WAF (protect against malicious requests)
+	• AWS Shield & AWS Shield Advanced
+	• AWS Firewall Manager (to manage them across accounts)
+• But what if we want to protect in a sophisticated way our entire VPC?
+• Protect your entire Amazon VPC
+• From Layer 3 to Layer 7 protection
+• Any direction, you can inspect
+	• VPC to VPC traffic
+	• Outbound to internet
+	• Inbound from internet
+	• To / from Direct Connect & Site-to-Site VPN
+• Internally, the AWS Network Firewall uses the AWS Gateway Load Balancer
+• Rules can be centrally managed cross- account by AWS Firewall Manager to apply to many VPCs
+
+
+
+
+Network Firewall – Fine Grained Controls:
+• Supports 1000s of rules
+	• IP & port - example: 10,000s of IPs filtering
+	• Protocol – example: block the SMB protocol for outbound communications
+	• Stateful domain list rule groups: only allow outbound traffic to *.mycorp.com or third-party software repo
+	• General pattern matching using regex
+• Traffic filtering: Allow, drop, or alert for the traffic that matches the rules
+• Active flow inspection to protect against network threats with intrusion-prevention
+  capabilities (like Gateway Load Balancer, but all managed by AWS)
+• Send logs of rule matches to Amazon S3, CloudWatch Logs, Kinesis Data Firehose
+
+
+
+
 
 
 
@@ -7812,7 +8478,47 @@ Security:
 =========
 
 
-++RDS & Aurora Migrations
+
+
+
+++RDS & Aurora MySQL Migrations
+-------------------------------------------------
+• RDS MySQL to Aurora MySQL
+	• Option 1: DB Snapshots from RDS MySQL restored asvMySQL Aurora DB
+	• Option 2: Create an Aurora Read Replica from your RDS MySQL, and when the replication lag is 0, promote it as its
+      own DB cluster (can take time and cost $)
+• External MySQL to Aurora MySQL
+	• Option 1:
+		• Use Percona XtraBackup to create a file backup in Amazon S3
+		• Create an Aurora MySQL DB from Amazon S3
+	• Option 2:
+		• Create an Aurora MySQL DB
+		• Use the mysqldump utility to migrate MySQL into Aurora (slower than S3 method)
+• Use DMS if both databases are up and running
+
+
+
+
+
+RDS & Aurora PostgreSQL Migrations:
+• RDS PostgreSQL to Aurora PostgreSQL
+	• Option 1: DB Snapshots from RDS PostgreSQL restored as PostgreSQL Aurora DB
+	• Option 2: Create an Aurora Read Replica from your RDS PostgreSQL, and when the replication lag is 0, promote it
+	- as its own DB cluster (can take time and cost $)
+• External PostgreSQL to Aurora PostgreSQL
+	• Create a backup and put it in Amazon S3
+	• Import it using the aws_s3 Aurora extension
+• Use DMS if both databases are up and running
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -7948,10 +8654,25 @@ It is a aws managed service, security is a shared responsibility.
 
 
 
-++Application Migration Services (MGN)
+++AWS Application Migration Service (MGN)
+-------------------------------------------------
+• The “AWS evolution” of CloudEndure Migration, replacing AWS Server Migration Service (SMS)
+• Lift-and-shift (rehost) solution which simplify migrating applications to AWS
+• Converts your physical, virtual, and cloud-based servers to run natively on AWS
+• Supports wide range of platforms, Operating Systems, and databases
+• Minimal downtime, reduced costs
+
+
+
 ++VMware Cloud on Aws
-
-
+-------------------------------------------------
+• Some customers use VMware Cloud to manage their on-premises Data Center
+• They want to extend the Data Center capacity to AWS, but keep using the VMware Cloud software
+• …Enter VMware Cloud on AWS
+• Use cases
+	• Migrate your VMware vSphere-based workloads to AWS
+	• Run your production workloads across VMware vSphere-based private, public, and hybrid cloud environments
+	• Have a disaster recover strategy
 
 
 139
@@ -8201,6 +8922,21 @@ It is a aws managed service, security is a shared responsibility.
 
 
 ++Comprehend Medical Overview
+-------------------------------------------------
+Amazon Comprehend Medical detects and returns useful information in unstructured clinical text:
+	• Physician’s notes
+	• Discharge summaries
+	• Test results
+	• Case notes
+• Uses NLP to detect Protected Health Information (PHI) – DetectPHI API
+• Store your documents in Amazon S3, analyze real-time data with Kinesis
+  Data Firehose, or use Amazon Transcribe to transcribe patient narratives
+  into text that can be analyzed by Amazon Comprehend Medical.
+
+
+
+
+
 
 145
 ##SageMaker
@@ -8753,12 +9489,100 @@ It is a aws managed service, security is a shared responsibility.
 
 
 
-++Amazon SES
+
+++Amazon Simple Email Service (Amazon SES)
+-------------------------------------------------
+• Fully managed service to send emails securely, globally and at scale
+• Allows inbound/outbound emails
+• Reputation dashboard, performance insights, anti-spam feedback
+• Provides statistics such as email deliveries, bounces, feedback loop results, email open
+• Supports DomainKeys Identified Mail (DKIM) and Sender Policy Framework (SPF)
+• Flexible IP deployment: shared, dedicated, and customer-owned IPs
+• Send emails using your application using AWS Console, APIs, or SMTP
+• Use cases: transactional, marketing and bulk email communications
+
+
+
+
+
 ++Amazon Pinpoint
-++SSM Session Manager
-++Elastic Transcoder
+-------------------------------------------------
+• Scalable 2-way (outbound/inbound) marketing communications service
+• Supports email, SMS, push, voice, and in-app messaging
+• Ability to segment and personalize messages with the right content to customers
+• Possibility to receive replies
+• Scales to billions of messages per day
+• Use cases: run campaigns by sending marketing, bulk, transactional SMS messages
+• Versus Amazon SNS or Amazon SES
+	• In SNS & SES you managed each message's audience, content, and delivery schedule
+	• In Amazon Pinpoint, you create message templates, delivery schedules, highly-targeted segments, and full campaigns
+
+
+
+++SSM Systems Manager – SSM Session Manager
+-------------------------------------------------
+Allows you to start a secure shell on your EC2 and on-premises servers
+• No SSH access, bastion hosts, or SSH keys needed
+• No port 22 needed (better security)
+• Supports Linux, macOS, and Windows
+• Send session log data to S3 or CloudWatch Logs
+
+
+
+++Amazon Elastic Transcoder
+-------------------------------------------------
+• Elastic Transcoder is used to convert media files stored in S3 into media
+  files in the formats required by consumer playback devices (phones etc..)
+• Benefits:
+	• Easy to use
+	• Highly scalable – can handle large volumes of media files and large file sizes
+	• Cost effective – duration-based pricing model
+	• Fully managed & secure, pay for what you use
+
+
+
+
 ++AWS Batch
+-------------------------------------------------
+• Fully managed batch processing at any scale
+• Efficiently run 100,000s of computing batch jobs on AWS
+• A “batch” job is a job with a start and an end (opposed to continuous)
+• Batch will dynamically launch EC2 instances or Spot Instances
+• AWS Batch provisions the right amount of compute / memory
+• You submit or schedule batch jobs and AWS Batch does the rest!
+• Batch jobs are defined as Docker images and run on ECS
+• Helpful for cost optimizations and focusing less on the infrastructure
+
+
+
+Batch vs Lambda:
+• Lambda: 
+	• Time limit 
+	• Limited runtimes 
+	• Limited temporary disk space 
+	• Serverless 
+• Batch: 
+	• No time limit 
+	• Any runtime as long as it’s packaged as a Docker image 
+	• Rely on EBS / instance store for disk space 
+	• Relies on EC2 (can be managed by AWS)
+
+
+
+
+
+
 ++Amazon AppFlow
+-------------------------------------------------
+• Fully managed integration service that enables you to securely transfer
+  data between Software-as-a-Service (SaaS) applications and AWS
+• Sources: Salesforce, SAP, Zendesk, Slack, and ServiceNow
+• Destinations: AWS services like Amazon S3, Amazon Redshift or nonAWS such as SnowFlake and Salesforce
+• Frequency: on a schedule, in response to events, or on demand
+• Data transformation capabilities like filtering and validation
+• Encrypted over the public internet or privately over AWS PrivateLink
+• Don’t spend time writing the integrations and leverage APIs immediately
+
 
 
 
