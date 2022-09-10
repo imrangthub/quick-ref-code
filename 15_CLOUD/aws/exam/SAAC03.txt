@@ -443,7 +443,7 @@ It is a aws managed service, security is a shared responsibility.
 
 
 11
-##MFA
+##MFA | IAM Security tools
 -------------------------------------------------
 MFA enabled, when a user signs in to an AWS Management Console, they will be prompted for their user 
 name and password (the first factor—what they know), as well as for an authentication code from their 
@@ -1699,7 +1699,7 @@ It is a aws managed service, security is a shared responsibility.
 
 
 34
-##RDS
+##RDS 
 -------------------------------------------------
 RDS stands for Relational Database Service
 • It’s a managed DB service for DB use SQL as a query language.
@@ -1750,6 +1750,11 @@ RDS Security – Summary:
 	• No manual OS patching
 	• No way to audit the underlying instance
 
+
+
+
+++RDS Custom for Oracle and Microsoft SqL Server
+-------------------------------------------------
 
 Area:
 =====
@@ -1832,7 +1837,8 @@ Amazon Aurora Serverless is an on-demand, autoscaling configuration for Amazon A
 Aurora Multi-Master.
 
 
-
+++RDS and Aurora - Backup and Monitoring
+++RDS Proxy
 
 Area:
 =====
@@ -2498,6 +2504,13 @@ Object retention:
 	can't be shortened.
 
 
+
+++S3 Object Lambda
+++S3 Batch Operations
+
+
+
+
 Area:
 =====
 Global but Data is Regional.
@@ -2683,6 +2696,12 @@ Signed URLs are used to deliver private content securely.
 CloudFront signed cookies allow you to control who can access your content when you don't want to change your current 
 URLs or when you want to provide access to multiple restricted files, for example, all of the files in the subscribers' 
 area of a website.
+
+
+
+
+++CloudFront - price Classes
+++CloudFront Cache Invalidation
 
 
 
@@ -3749,6 +3768,11 @@ Amazon EKS Overview:
 
 
 
+++AWS App Runner
+
+
+
+
 Area:
 =====
 Amazon ECR is a Regional service
@@ -3935,6 +3959,10 @@ You can also generate responses to viewers without ever sending the request to t
 Lambda@Edge is a feature of Amazon CloudFront that lets you run code closer to users of your application, 
 which improves performance and reduces latency. 
 With Lambda@Edge, you don't have to provision or manage infrastructure in multiple locations around the world. 
+
+
+
+++Lambda in VPC
 
 
 
@@ -4412,7 +4440,7 @@ Big Data Ingestion Pipeline discussion:
 
 
 76
-##Databases
+##Databases in AWS
 -------------------------------------------------
 Choosing the Right Database:
 • We have a lot of managed databases on AWS to choose from
@@ -4556,6 +4584,13 @@ S3 for Solutions Architect:
 
 
 
+++ Document DB
+++Keyspaces (for Apache Cassandra)
+++OLDB
+++Timestream
+
+
+
 Athena Overview:
 Amazon Athena is an interactive query service that makes it easy to analyze data directly in Amazon S3 using standard SQL.
 Athena is not a database but rather a query engine.
@@ -4640,7 +4675,7 @@ You can also enable encryption, all the data written to disk will be encrypted.
 
 
 
-
+++QuickSight
 
 78
 ##Glue
@@ -4701,6 +4736,10 @@ Neptune for Solutions Architect:
 • Remember: Neptune = Graphs
 
 
+
+
+
+
 Area:
 =====
 Regional.
@@ -4727,7 +4766,8 @@ manage through AWS Key Management Service (KMS).
 
 
 
-
+++Lake Formation
+++MSK - Managed Streaming for Apache Kafka
 
 80
 ##OpenSearch
@@ -5147,7 +5187,7 @@ It is a aws managed service, security is a shared responsibility.
 
 
 
-
+++CloudWatch Insights and Operational Visibility
 
 90
 ##CloudTrail
@@ -5611,7 +5651,7 @@ It is a aws managed service, security is a shared responsibility.
 
 
 
-
+++IAM - Resource - based Policies vs IAM Roles
 
 96
 ##RAM (Resource Access Manager)
@@ -5943,6 +5983,13 @@ Not need to know in details on exam.
 
 
 
+++KMS  - Multi-Region Keys
+++S3 Replication with Encypation
+++Encrpted AMI Sharing Process
+
+
+
+
 94
 ##SSM Parameter Store
 -------------------------------------------------
@@ -6145,6 +6192,7 @@ It is a aws managed service, security is a shared responsibility.
 
 
 
+++Firwall Manager
 
 98
 ##WAF (Web Application Firewall)
@@ -6443,7 +6491,7 @@ VPC Two Type
 - Default Vpc
 - Custom Vpc
 
-Primary diffent of of both, default vpc has internet gatway custom vpc has not, you can added.
+Primary diffent of this tow: default vpc has internet gatway custom vpc has not, you can added.
 
 
 Monitor VPC by using:
@@ -6479,6 +6527,8 @@ UseCase:
 ========
 Private Network.
 
+
+
 BillCost:
 =========
 There are no additional charges for creating and using the VPC itself. 
@@ -6492,6 +6542,8 @@ You'll also incur standard AWS data transfer charges for all data transferred vi
 If you create a NAT gateway in your VPC, Charges are levied for each NAT gateway hour that your NAT gateway is 
 provisioned and available for. Data processing charges apply for each gigabyte processed through a NAT gateway. 
 Each partial NAT gateway hour consumed is billed as a full hour.
+
+
 
 
 Security:
@@ -6533,9 +6585,9 @@ CIDR blocks from the RFC 1918* range:
 
 
 Private IP can only allow certain values:
-	• 10.0.0.0 – 10.255.255.255 (10.0.0.0/8) ç in big networks
-	• 172.16.0.0 – 172.31.255.255 (172.16.0.0/12) ç AWS default VPC in that range
-	• 192.168.0.0 – 192.168.255.255 (192.168.0.0/16) ç e.g., home networks
+	• 10.0.0.0 – 10.255.255.255 (10.0.0.0/8)  big networks
+	• 172.16.0.0 – 172.31.255.255 (172.16.0.0/12)  AWS default VPC in that range
+	• 192.168.0.0 – 192.168.255.255 (192.168.0.0/16) home networks
 All the rest of the IP addresses on the Internet are Public
 
 
@@ -6569,7 +6621,7 @@ After you add subnets, you can deploy AWS resources in your VPC.
 
 Public and private subnets:
 If a subnet is associated with a route table that has a route to an internet gateway, it's known as a public subnet. 
-If a subnet is associated with a route table that does not have a route to an internet gateway, it's known as a private subnet.
+other wise it's known as a private subnet.
 
 The first four and last IP address of Subnet cannot be assigned.
 Suppose a IP: 10.0.0.0/16
@@ -6730,7 +6782,7 @@ NAT = Network Address Translation
 • Route Tables must be configured to route traffic from private subnets to the NAT Instance
 
 
-• Pre-configured Amazon Linux AMI is available
+• Pre-configured Amazon Linux AMI is availablez
 • Reached the end of standard support on December 31, 2020
 • Not highly available / resilient setup out of the box
 • You need to create an ASG in multi-AZ + resilient user-data script
@@ -6816,7 +6868,7 @@ NAT gateways are supported for IPv4 or IPv6 traffic.
 
 BillCost:
 =========
- Pay per hour for usage and bandwidth
+Pay per hour for usage and bandwidth
 When you provision a NAT gateway, you are charged for each hour that your 
 NAT gateway is available and each Gigabyte of data that it processes. 
 
@@ -7276,7 +7328,7 @@ using similar protocols like SSL, HTTPs and SSH.
 
 
 
-
+++Direct Connect +Site to Site VPN
 
 125
 ##AWS PrivateLink
@@ -7574,6 +7626,9 @@ AWS PrivateLink / VPC Endpoint Services:
 
 
 
+++AWs Network Firewall
+
+
 
 135
 ##Disaster Recovery Overview
@@ -7757,6 +7812,8 @@ Security:
 =========
 
 
+++RDS & Aurora Migrations
+
 
 
 137
@@ -7888,6 +7945,11 @@ Security:
 It is a aws managed service, security is a shared responsibility.
 
 
+
+
+
+++Application Migration Services (MGN)
+++VMware Cloud on Aws
 
 
 
@@ -8138,6 +8200,7 @@ It is a aws managed service, security is a shared responsibility.
 
 
 
+++Comprehend Medical Overview
 
 145
 ##SageMaker
@@ -8687,6 +8750,15 @@ recreated at 8 AM, safe
 Security:
 =========
 It is a aws managed service, security is a shared responsibility.
+
+
+
+++Amazon SES
+++Amazon Pinpoint
+++SSM Session Manager
+++Elastic Transcoder
+++AWS Batch
+++Amazon AppFlow
 
 
 
