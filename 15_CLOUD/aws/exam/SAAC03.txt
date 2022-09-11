@@ -4,6 +4,8 @@
 
 
 https://digitalcloud.training/courses/aws-csaa-practice-exams/
+https://portal.tutorialsdojo.com/product/aws-certified-solutions-architect-associate-practice-exams/
+https://www.udemy.com/course/practice-exams-aws-certified-solutions-architect-associate/
 
 
 
@@ -27,7 +29,7 @@ Compliance:সম্মতি,অনুরোধ বা আদেশ পাল�
 Elasticity:স্থিতিস্থাপকতা, নমনীয়তা
 Successor:উত্তরাধিকারী
 Assume:গ্রহণ করা, দায়িত্বগ্রহণ করা
-
+Tenancy:ভাড়াটিয়া রূপে অধিকার
 =================================================
 #To Do           
 ================================================= 
@@ -92,31 +94,73 @@ Classic Ports to know:
 
 
 
-
-
-
+AWS History:
+2002: Internally launched
+2003: Amazon infrastructure is one of their core strength. Idea to market
+2004: Launched publicly with SQS
+2006: Re -launched publicly with SQS, S3 & EC2
+2007:Launched in Europe
 =================================================
 ##Contain | Element | Object | Keyworkd     
-================================================= 
+=================================================
+IAM-dentity and Access Management
+EC2-Elastic Compute Cloud
+ECR-Elastic Container Registry 
+ECS-Elastic Container Service
+KMS-AWS Key Management Service
+S3-Amazon Simple Storage Service
+AWS Lambda
+SES-Amazon Simple Email Service
+RDS-Amazon Relational Database Service
+Amazon DynamoDB
+Amazon ElastiCache
+SQS-Amazon Simple Queue Service
+SNS-Amazon Simple Notification Service
+Auto Scaling
+Amazon Route 53
+Amazon CloudFront
+Amazon CloudWatch
+AWS CloudTrail
+AWS CloudFormation
+AWS Step Functions
+Amazon Kinesis
+Amazon API Gateway
+Elastic Load Balancing
+AWS Elastic Beanstalk
+
+
+
 
 1
 ##Cloud Computing?           
 -------------------------------------------------
 Cloud computing is a computing service made available over the internet.
 Cloud computing is a pay-as-you-go model for delivering IT resources.
-You pay only for what you use.
-
-Cloud computing differs from a traditional, on-premises environment in many ways,
-including flexible, global, and scalable capacity, managed services, built-in security,
-options for cost optimization, and various operating models.
-
-
-
 
 
 2
 ##AWS BasicInfo
 -------------------------------------------------
+AWS Global Infrastructure: 
+• AWS Regions 
+• AWS Availability Zones 
+• AWS Data Centers 
+• AWS Edge Locations / Points of Presence
+
+
+AWS- 
+  -Region
+  -VPC
+	-AvailableZone
+	-Router 
+      -NACL*
+	-Subnet
+      -SecurityGroup	
+	  -EC2
+ -Gateway
+
+
+
 Amazon web service is an online platform that provides scalable and cost-effective cloud computing solutions.
 AWS has Regions all around the world.
 
@@ -130,11 +174,12 @@ AWS:
 -Scheduling: This enables you to start and stop AWS services at predetermined times
 -Reliability: AWS takes multiple backups at servers at multiple physical locations.
 
-Use cases:
+
+
+AWS Use cases:
 • Enterprise IT, Backup & Storage, Big Data analytics
 • Website hosting, Mobile & Social Apps
 • Gaming
-
 
 
 
@@ -154,12 +199,17 @@ How to choose  and AWS Region?
  
  
  
+ 
 4
 ##Availabiulity Zones |  AZ | az      
 -------------------------------------------------
 Each region hase many availabuility zone.
 Usually 3, Min 2 and Max 6;
+
 They’re separate from each other, so that they’re isolated from disasters.
+Each availability zone (AZ) is one or more discrete data centers with redundant power, networking, and connectivity
+
+
 
 
 
@@ -168,6 +218,7 @@ They’re separate from each other, so that they’re isolated from disasters.
 5
 ##Edge Locations
 -------------------------------------------------
+Content is delivered to end users with lower latency.
 A site that CloudFront uses to cache copies of your content for faster delivery to users at any location.
 
 An edge location is the nearest point to the consumer(user) who is consuming the AWS service. 
@@ -175,11 +226,9 @@ In these locations, the server is not present but a small setup is there.
 They are located in major cities around the world.
 
 
-Content is delivered to end users with lower latency.
 
-An edge location is where end users access services located at AWS. They are located in most of the major cities 
-around the world and are specifically used by CloudFront (CDN) to distribute content to end user to reduce latency. 
-It is like frontend for the service we access which are located in AWS cloud.
+
+
 
 
 AWS has Global Services:
@@ -188,11 +237,15 @@ AWS has Global Services:
 • CloudFront (Content Delivery Network)
 • WAF (Web Application Firewall)
 
+
 Most AWS services are Region-scoped:
 • Amazon EC2 (Infrastructure as a Service)
 • Elastic Beanstalk (Platform as a Service)
 • Lambda (Function as a Service)
 • Rekognition (Software as a Service)
+RegionalServices:https://aws.amazon.com/about-aws/global-infrastructure/regional-product-services/
+
+
 
 
 
@@ -200,13 +253,10 @@ Most AWS services are Region-scoped:
 6
 ##IAM
 -------------------------------------------------
-Identity and Access Management (IAM) lets administrators authorize who can take action on specific resources, 
-giving you full control and visibility to manage.
-
 AWS Identity and Access Management (IAM) is a web service that helps you securely control access to AWS resources. 
 
-Three types of Principals — root users, IAM users and Instance Principals
-IAM deals with four principle entities: users, groups, roles and policies.
+Three types of Principals — Root Users, IAM Users and Instance Principals
+IAM deals with four principle entities: Users, Groups, Roles and Policies.
 
 
 IAM Policies Structure:
@@ -220,6 +270,25 @@ IAM Policies Structure:
 • Action: list of actions this policy allows or denies 
 • Resource: list of resources to which the actions applied to 
 • Condition: conditions for when this policy is in effect (optional)
+
+
+
+Multi Factor Authentication - MFA:
+MFA = password you know + security device you own
+Main benefit of MFA:
+if a password is stolen or hacked, the account is not compromised
+
+
+
+How can users access AWS:
+Three options:
+	• AWS Management Console (protected by password + MFA)
+	• AWS Command Line Interface (CLI): protected by access keys
+	• AWS Software Developer Kit (SDK) - for code: protected by access keys
+• Access Keys are secret, just like a password. Don’t share them
+• Access Key ID ~= username
+• Secret Access Key ~= password
+
 
 
 IAM Security Tools:
@@ -243,6 +312,8 @@ Key Pairs – Global or Regional
 	Amazon EC2 created key pairs are specific to the region
 	RSA key pair can be created and uploaded that can be used in all regions
 
+
+
 UseCase:
 ========
 -Shared access to your AWS account
@@ -258,7 +329,6 @@ UseCase:
 BillCost:
 =========
 No additional charge for IAM and STS. 
-You are charged only when you access other AWS services using your IAM users or AWS STS temporary security credentials. 
 
 
 Security:
@@ -275,7 +345,6 @@ NonOffcial:Identity and access management (IAM) is a framework and AWS manage se
 ##User
 -------------------------------------------------
 An IAM user is an entity that you create in AWS. 
-The IAM user represents the person or service who uses the IAM user to interact with AWS. 
 An IAM user with administrator permissions is not the same thing as the AWS account root user.
 
 A user in AWS consists of a name, a password to sign into the AWS 
@@ -335,6 +404,7 @@ BillCost:
 IAM is offered at no additional charge.
 
 
+
 Security:
 =========
 It is a aws managed service, security is a shared responsibility.
@@ -349,15 +419,20 @@ It is a aws managed service, security is a shared responsibility.
 -------------------------------------------------
 A policy is an object in AWS that, when associated with an identity or resource, defines their permissions.
 
+
 Identity-based policies – Attach managed and inline policies to IAM identities (users, groups to which users belong, or roles). 
 
-Identity-based policies grant permissions to an identity.
-Resource-based policies – Attach inline policies to resources. 
+
+Identity-based policies are attached to an IAM user, group, or role to specify what that identity can do (its permissions).
+Resource-based policies – Attach inline policies to resources, you can specify who has access to the resource 
+         and what actions they can perform on it.  
 
 Permissions boundaries – Use a managed policy as the permissions boundary for an IAM entity (user or role). 
 
-Organizations SCPs – Use an AWS Organizations service control policy (SCP) to define the maximum permissions 
+
+Organizations SCPs – Organizations service control policy (SCP) to define the maximum permissions 
 for account members of an organization or organizational unit (OU). 
+
 
 Access control lists (ACLs) – Use ACLs to control which principals in other accounts can access the resource to 
 which the ACL is attached.
@@ -365,6 +440,7 @@ which the ACL is attached.
 A network access control list (ACL) allows or denies specific inbound or outbound traffic at the subnet level. 
 You can use the default network ACL for your VPC, or you can create a custom network ACL for your VPC with rules that are 
 similar to the rules for your security groups in order to add an additional layer of security to your VPC.
+Creating an Access Control List (ACL) using the AWS CLI.
 
 
 Session policies – Pass advanced session policies when you use the AWS CLI or AWS API to assume a role or a federated user.
@@ -377,12 +453,11 @@ Global Service.
 
 UseCase:
 ========
-You manage access in AWS by creating policies and attaching them to AWS Identity and Access Management 
-(IAM) principals (roles, users, or groups of users) or AWS resources. 
-AWS evaluates these policies when an IAM principal makes a request, such as uploading an object to an 
+You manage access in AWS by creating policies and attaching them to 
+AWS (IAM) principals (roles, users, or groups of users) or AWS resources. 
 
-Amazon Simple Storage Service (Amazon S3) bucket. 
-Permissions in the policies determine whether the request is allowed or denied.
+AWS evaluates these policies when an IAM principal makes a request, such as uploading an object.
+
 
 
 
@@ -408,6 +483,11 @@ It is a aws managed service, security is a shared responsibility.
 Some AWS service will need to perform actions on your behalf. 
 To do so, we will assign permissions to AWS services with IAM Roles.
 
+
+Common roles: 
+• EC2 Instance Roles 
+• Lambda Function Roles 
+• Roles for CloudFormation 
 
 
 Area:
@@ -443,41 +523,7 @@ It is a aws managed service, security is a shared responsibility.
 
 
 11
-##MFA | IAM Security tools
--------------------------------------------------
-MFA enabled, when a user signs in to an AWS Management Console, they will be prompted for their user 
-name and password (the first factor—what they know), as well as for an authentication code from their 
-AWS MFA device (the second factor—what they have).
-
-
-
-Area:
-=====
-Global Service.
-
-
-
-UseCase:
-========
-Multi-Factor Authentication.
-
-
-
-BillCost:
-=========
-IAM is offered at no additional charge.
-
-
-
-Security:
-=========
-It is a aws managed service, security is a shared responsibility.
-
-
-
-
-
-IAM Section – Summary:
+#IAM Section – Summary:
 -------------------------------------------------
 • Users: mapped to a physical user, has a password for AWS Console
 • Groups: contains users only
@@ -510,9 +556,11 @@ Common development and operations tools are pre-installed, so no local installat
 AccessKey:Access keys consist of an access key ID and secret access key, which are used to sign programmatic 
 requests that you make to AWS. 
 
+
 Programmatic access:
 You must provide your AWS access keys to make programmatic calls to AWS or to use the 
 AWS Command Line Interface or AWS Tools for PowerShell.
+
 
 
 Area:
@@ -524,6 +572,7 @@ UseCase:
 ========
 User/Object access.
 CloudShell, you can quickly run scripts with the AWS Command Line Interface (AWS CLI).
+
 
 BillCost:
 =========
@@ -543,8 +592,7 @@ It is a aws managed service, security is a shared responsibility.
 13
 ##EC2
 -------------------------------------------------
-EC2 = Elastic Compute Cloud = Infrastructure as a Service
-Amazon Elastic Compute Cloud (Amazon EC2) provides scalable computing capacity in the Amazon Web Services (AWS) Cloud. 
+EC2 = Elastic Compute Cloud = Infrastructure as a Service, Its provides scalable computing capacity in the  Cloud. 
 
 EC2 sizing & configuration options: 
 • Operating System (OS): Linux, Windows or Mac OS 
@@ -559,17 +607,19 @@ EC2 sizing & configuration options:
 
 AWS has a limit of 20 instances per region. 
 
+
 m5.2xlarge-
 m: instance class
 5: generation (AWS improves them over time)
 2xlarge: size within the instance class
 
+
 TypeOfEC2:
-General purpose
-Compute optimized
-Memory-optimized
-Accelerated Computing
-Storage optimized
+	-General purpose
+	-Compute optimized
+	-Memory-optimized
+	-Accelerated Computing
+	-Storage optimized
 
 
 
@@ -612,8 +662,8 @@ EC2 Instances Purchasing Options:
 	• Convertible Reserved Instances – long workloads with flexible instances
 • Savings Plans (1 & 3 years) –commitment to an amount of usage, long workload
 • Spot Instances – short workloads, cheap, can lose instances (less reliable)
-• Dedicated Hosts – book an entire physical server, control instance placement
 • Dedicated Instances – no other customers will share your hardware
+• Dedicated Hosts – book an entire physical server, control instance placement
 • Capacity Reservations – reserve capacity in a specific AZ for any duration
   No need for 1 or 3-year commitment, The Availability Zone in which to reserve the capacity (only one).
 
@@ -621,11 +671,9 @@ EC2 Instances Purchasing Options:
 
 Security:
 =========
-Security is a shared responsibility between AWS and you:
-
-Managing the credentials used to connect to your instances.
+Security is a shared responsibility between AWS and you.
 Managing the guest operating system and software deployed to the guest operating system, including updates and security patches.
-Configuring the IAM roles that are attached to the instance and the permissions associated with those roles. 
+
 
 
 
@@ -642,6 +690,10 @@ You can specify one or more security groups for each EC2 instance, with a maximu
 All inbound traffic is blocked by default.
 All outbound traffic is authorised by default.
 
+Can be attached to multiple instances.
+
+
+
 
 
 Area:
@@ -653,8 +705,11 @@ we can only use it in that same region or VPC.
 
 UseCase:
 ========
-In AWS VPCs, AWS Security Groups act as virtual firewalls,Control traffic to resources using security groups.
-
+They regulate: 
+• Access to Ports 
+• Authorised IP ranges – IPv4 and IPv6 
+• Control of inbound network (from other to the instance) 
+• Control of outbound network (from the instance to other
 
 
 BillCost:
@@ -666,6 +721,19 @@ There is no charge applicable to Security Groups in Amazon EC2/Amazon VPC.
 Security:
 =========
 It is a aws managed service, security is a shared responsibility.
+
+
+
+
+
+
+##EC2 Instance Connect
+-------------------------------------------------
+• Connect to your EC2 instance within your browser
+• No need to use your key file that was downloaded
+• The “magic” is that a temporary key is uploaded onto EC2 by AWS
+• Works only out-of-the-box with Amazon Linux 2
+• Need to make sure the port 22 is still opened!
 
 
 
@@ -684,9 +752,6 @@ When you launch an Amazon EC2 instance, you specify an IAM role to associate wit
 15
 ##Elastic IP | PublicVsPrivate
 -------------------------------------------------
-An Elastic IP address is a static (doesn't change) public IPv4 address associated with your AWS account. 
-WS accounts are limited to five (5) Elastic IP addresses per Region.
-
 PublicVsPrivate:
 A private IPv4 address is an IP address that's not reachable over the Internet. 
 You can use private IPv4 addresses for communication between instances in the same VPC.
@@ -694,11 +759,16 @@ You can use private IPv4 addresses for communication between instances in the sa
 A public IP address is an IPv4 address that's reachable from the Internet. 
 You can use public addresses for communication between your instances and the Internet.
 
+An Elastic IP address is a static (doesn't change) public IPv4 address associated with your AWS account. 
+WS accounts are limited to five (5) Elastic IP addresses per Region.
+
 
 
 Area:
 =====
 Elastic IP Address – Regional
+
+
 
 UseCase:
 ========
@@ -728,31 +798,35 @@ It is a aws managed service, security is a shared responsibility.
 
 
 16
-##EC2 Placement Group
+##Placement Group
 -------------------------------------------------
 Placement Groups are logical groupings or clusters of instances in the selected AWS region. 
 Placement groups are specifically used for launching cluster compute instance types.
 
 Placement type:
-Cluster – (Same Rack Same AZ )clusters instances into a low-latency group in a single Availability Zone.
+Cluster(Same Rack Same AZ ) – (Same Rack Same AZ )clusters instances into a low-latency group in a single Availability Zone.
 This strategy enables workloads to achieve the low-latency network performance.
+:If the rack fails, all instances fails at the same time
 
 Use case:
 • Big Data job that needs to complete fast
 • Application that needs extremely low latency and high network throughput
 
-Partition — spreads instances across many different partitions (which rely on
+
+Partition(Not Same Rack Same AZ ) — spreads instances across many different partitions (which rely on
 different sets of racks) within a single AZ.
-do not share the same rack.  
+Do not share the same rack.  
 
 Scales to 100s of EC2 instances per group (Hadoop, Cassandra, Kafka)
 Can span across multiple AZs in the same region.
 The instances in a partition do not share racks with the instances in the other partitions.
+:A partition failure can affect many EC2 but won’t affect other partitions
 
 
-Spread – strictly places a small group of instances across distinct underlying hardware to reduce correlated failures.
+Spread(Not Same Rack Not Same AZ ) – strictly places a small group of instances across distinct underlying hardware to reduce correlated failures.
 It spread the instances across multiple AZ.
 It reduces the risk of failure of the network since other instances are active in other zones.
+:Limited to 7 instances per AZ per placement group
 
 Use case:
 • Application that needs to maximize high availability.
@@ -825,7 +899,7 @@ SSH access down to a private subnet on a secondary network interface.
 
 BillCost:
 =========
-ENIs are entirely free to use, though they are not exempt from the standard AWS data charges.
+ENIs are entirely free to use, it has standard AWS data charges.
 
 
 
@@ -846,7 +920,7 @@ Hibernation gives you the ability to launch EC2 instances, set them up as desire
 bring them back to life when you need them. 
 Applications pick up exactly where they left off instead of rebuilding their memory footprint. 
 
-Hibernation saves the contents from the instance memory (RAM) to your Amazon Elastic Block Store (Amazon EBS) root volume.
+Hibernation saves the contents from the instance memory (RAM) to your Amazon EBS root volume.
 Root Volume – must be EBS, encrypted, not instance store, and large
 An instance can NOT be hibernated more than 60 day
 
@@ -879,76 +953,31 @@ It is a aws managed service, security is a shared responsibility.
 
 
 
-
 19
-##EC2 Nitro
+##EC2 Instance Storage Section
 -------------------------------------------------
-Underlying Platform for the next generation of EC2 instances
-• New virtualization technology
-• Allows for better performance:
-	• Better networking options (enhanced networking, HPC, IPv6)
-	• Higher Speed EBS (Nitro is necessary for 64,000 EBS IOPS – max 32,000 on non-Nitro)
-• Better underlying security
+You can use block-level storage only in combination with an EC2 instance where the OS runs.
 
+There are two block-level storage options for EC2 instances.
+
+Instance store:
+An instance store volume is a disk that is physically attached to the host computer that runs the EC2 virtual machine (VM).
+
+EBS volume:
+EBS volume, which provides off-instance storage that will persist independently from the life of the instance. 
 
 
 
 20
-#Storage | DB | db | s3 | efs | ebs           
+#         
 -------------------------------------------------
-There are several categories of databases:
-Relational (OLTP and OLAP), Document, Key Value, Graph, In Memory among others
-
-AWS Storage:
-  - Simple Storage service (S3)
-  - Elastic file system (EFS)
-  - Elastic Block Storage (EBS)
-  - Glacier
-  - Snowball
-  
-S3:
-Amazon S3 is an object storage service that stores data as objects within buckets. that offers 
-industry-leading scalability, data availability, security, and performance.
-
-An object is a file and any metadata that describes the file. A bucket is a container for objects.
-Each object has a key (or key name), which is the unique identifier for the object within the bucket.
-
-
-Buckets:
--Buckets are a universal namespace, i.e., the bucket names must be unique.
--If uploading of an object to S3 bucket is successful, we receive a HTTP 200 code.
--S3, S3-IA, S3 Reduced Redundancy Storage are the storage classes.
--Encryption is of two types, i.e., Client Side Encryption and Server Side Encryption
--Access to the buckets can be controlled by using either ACL (Access Control List) or bucket policies.
--By default buckets are private and all the objects stored in a bucket are also private.
-
-
-
-Access control lists (ACLs)
-You can use ACLs to grant read and write permissions to authorized users for individual buckets and objects. 
-Each bucket and object has an ACL attached to it as a subresource. 
-The ACL defines which AWS accounts or groups are granted access and the type of access.
-
-Amazon S3 cloud storage is an object-based storage service. You cannot install an operating system when you use 
-Amazon S3 storage because data cannot be accessed on the block level as it is required by an operating system.
-
-
 
   
 
 21
-#Data Warehouse
 -------------------------------------------------
-A data warehouse is a specialized type of relational database, which is optimized for
-analysis and reporting of large amounts of data. It can be used to combine
-transactional data from disparate sources (such as user behavior in a web application,
-data from your finance and billing system, or customer relationship management or
-CRM) to make them available for analysis and decision-making.
 
-Traditionally, setting up, running, and scaling a data warehouse has been complicated
-and expensive. On AWS, you can leverage Amazon Redshift, a managed data
-warehouse service that is designed to operate at less than a tenth the cost of
-traditional solutions.
+
 
 
 
@@ -977,8 +1006,7 @@ Migrate mid-range, on-premises storage area network (SAN) workloads to the cloud
 
 BillCost:
 =========
-30 GB of storage for 12 months with the AWS Free Tier
-With Amazon Elastic Block Store (EBS), you pay only for what you provision. 
+30 GB of storage for 12 months with the AWS Free Tier 
 Volume storage for all EBS volume types is charged by the amount of GB you provision per month until you release the storage. 
 Costs increase for EBS volumes that support additional input/output operations per second (IOPS) and throughput 
 beyond baseline performance.
@@ -988,11 +1016,6 @@ beyond baseline performance.
 Security:
 =========
 Ensure EBS volumes are encrypted with KMS CMKs in order to have full control over data encryption and decryption.
-
-Use Amazon EBS encryption as a straight-forward encryption solution for your EBS resources associated with your EC2 instances. 
-With Amazon EBS encryption, you aren't required to build, maintain, and secure your own key management infrastructure. 
-Amazon EBS encryption uses AWS KMS keys when creating encrypted volumes and snapshots.
-
 Encrypted Volumes and snapshots  with CMK
 
 
@@ -1133,13 +1156,19 @@ Amazon EFS provides a simple, serverless, set-and-forget elastic file system.
 With Amazon EFS, you can create a file system, 
 mount the file system on an Amazon EC2 instance, and then read and write data to and from your file system.
 
+• Managed NFS (network file system) that can be mounted on many EC2
+• EFS works with EC2 instances in multi-AZ
+• Highly available, automatically scalable, expensive (3x gp2), pay per use 
+
+
 Amazon EFS offers four storage classes: 
+	Two standard storage classes(Multi-AZ):
+		Amazon EFS Standard 
+		Amazon EFS Standard-Infrequent Access (EFS Standard-IA). 
 
-Two standard storage classes, including Amazon EFS Standard and 
-Amazon EFS Standard-Infrequent Access (EFS Standard-IA). 
-
-Two One Zone storage classes, including Amazon EFS 
-One Zone and Amazon EFS One Zone-Infrequent Access (EFS One Zone-IA).
+	Two One Zone storage classes:
+		Amazon EFS One Zone
+		Amazon EFS One Zone-Infrequent Access (EFS One Zone-IA).
 
 Can copy snapshots across AZ or Region.
 
@@ -1157,14 +1186,12 @@ UseCase:
 Content management, web serving, data sharing, Wordpress
 
 Share code and other files in a secure, organized way to increase DevOps agility and respond faster to customer feedback.
-Persist and share data from your AWS containers and serverless applications with zero
-management required.
+Persist and share data from your AWS containers and serverless applications with zero management required.
 
 
 BillCost:
 =========
 5 GB of standard storage for 12 months with the AWS Free Tier
-EFS serverless, set-and-forget, elastic file system.
 You pay only for the storage you use, for read and write access to data stored in Infrequent Access storage classes, 
 and for any provisioned throughput.
 
@@ -1252,6 +1279,12 @@ Some load balancers can be setup as internal (private) or external (public) ELBs
 
 
 
+Health Checks:
+• They enable the load balancer to know if instances it forwards traffic to are available to reply to requests
+• The health check is done on a port and a route (/health is common)
+• If the response is not 200 (OK), then the instance is unhealthy
+
+
 
 Area:
 =====
@@ -1261,16 +1294,13 @@ Elastic Load Balancer distributes traffic across instances in multiple Availabil
 
 UseCase:
 ========
-A load balancer distributes workloads across multiple compute resources, such as virtual servers. 
 Using a load balancer increases the availability and fault tolerance of your applications.
 
 
 
 BillCost:
 =========
-Get started with Elastic Load Balancing for free with the AWS Free Tier. Upon sign-up, new 
-AWS customers receive 750 hours per month shared between Classic and Application load balancers; 
-15 GB of data processing for Classic load balancers; and 15 LCUs for Application Load Balancers.
+AWS Free Tier.
 
 ELB pricing also follows an AWS rule: “You only pay for what you use with your setup.” 
 To properly bill you for your ELB usage, AWS has introduced a component called the Load Balancer Capacity Unit (LCU), 
@@ -1296,8 +1326,7 @@ identify and troubleshoot security issues.
 29
 ##CLB (Classic Load Balancer)
 -------------------------------------------------
-The AWS Classic Load Balancer (CLB) operates at Layer 4 of the OSI model. 
-What this means is that the load balancer routes traffic between clients and backend servers based on IP address and TCP port. 
+Load balancer routes traffic between clients and backend servers based on IP address and TCP port. 
 For example, an ELB at a given IP address receives a request from a client on TCP port 80 (HTTP).
 
 • Supports TCP (Layer 4), HTTP & HTTPS (Layer 7)
@@ -1435,7 +1464,7 @@ It is mainly used for load balancing TCP traffic.
 
 BillCost:
 =========
-Not included in the AWS free tier
+Not AWS free tier
 You are charged for each hour or partial hour that a Network Load Balancer is running, and the number of 
 Network Load Balancer Capacity Units (NLCU) used by Network Load Balancer per hour.
 
@@ -1475,7 +1504,6 @@ Runs within one AZ and is recommended to be deployed in multiple AZs for greater
 UseCase:
 ========
 Deploy third-party virtual appliances faster.
-Centralize your third-party virtual appliances
 Improve virtual appliance availability.
 Centralize your third-party virtual appliances
 Add third-party security appliances to your network
@@ -1520,18 +1548,18 @@ Use case:
 Make sure the user doesn’t lose his session data.
 
 
-Sticky Sessions – Cookie Names:
+Sticky Sessions – Cookie:
+
 • Application-based Cookies
+	Custom cookie
+		• Generated by the target
+		• Can include any custom attributes required by the application
+		• Cookie name must be specified individually for each target group
+		• Don’t use AWSALB, AWSALBAPP, or AWSALBTG (reserved for use by the ELB)
 
-Custom cookie
-	• Generated by the target
-	• Can include any custom attributes required by the application
-	• Cookie name must be specified individually for each target group
-	• Don’t use AWSALB, AWSALBAPP, or AWSALBTG (reserved for use by the ELB)
-
-Application cookie
-	• Generated by the load balancer
-	• Cookie name is AWSALBAPP
+	Application cookie
+		• Generated by the load balancer
+		• Cookie name is AWSALBAPP
 
 • Duration-based Cookies
 	• Cookie generated by the load balancer
@@ -1562,7 +1590,7 @@ Cross-Zone Load Balancing:
 
 SSL/TLS - Basics:
 • An SSL Certificate allows traffic between your clients and your load balancer
-to be encrypted in transit (in-flight encryption)
+  to be encrypted in transit (in-flight encryption)
 • SSL refers to Secure Sockets Layer, used to encrypt connections
 • TLS refers to Transport Layer Security, which is a newer version
 • Nowadays, TLS certificates are mainly used, but people still refer as SSL
@@ -1675,11 +1703,9 @@ Predictive scaling:
 Continuously forecast load and schedule scaling ahead.
 
 Cooldown period:
-After a scaling activity happens, you are in the cooldown period (default 300 seconds).
+mAfter a scaling activity happens, you are in the cooldown period (default 300 seconds = 5M).
 During the cooldown period, the ASG will not launch or terminate additional instances (to allow for metrics to stabilize)
-
-Advice: Use a ready-to-use AMI to reduce configuration time in order to be serving request fasters and reduce the cooldown
-period.g4
+Advice: Use a ready-to-use AMI to reduce configuration time in order to be serving request fasters and reduce the cooldown period.
 
 ASG tries the balance the number of instances across AZ by default.
 
@@ -1759,7 +1785,7 @@ RDS Read Replicas for read scalability:
 • Up to 5 Read Replicas
 • Within AZ, Cross AZ or Cross Region
 • Replication is ASYNC, so reads are eventually consistent
-  Read replicas are used for SELECT =read) only kind of statements(not INSERT, UPDATE, DELETE)
+  Read replicas are used for SELECT =read only kind of statements(not INSERT, UPDATE, DELETE)
 
 RDS – From Single-AZ to Multi-AZ, Zero downtime operation (no need to stop the DB)
 
@@ -1968,6 +1994,12 @@ Aurora Database Cloning:
 • Useful to create a “staging” database from a “production” database without impacting the production database
 
 
+Aurora Machine Learning:
+• Enables you to add ML-based predictions to your applications via SQL
+• Simple, optimized, and secure integration between Aurora and AWS ML services
+• Supported services
+	• Amazon SageMaker (use with any ML model)
+	• Amazon Comprehend (for sentiment analysis)
 
 
 ++RDS & Aurora Security:
@@ -2008,6 +2040,9 @@ Amazon RDS Proxy:
 36
 ##Elasticache
 -------------------------------------------------
+The same way RDS is to get managed Relational Databases.
+ElastiCache is to get managed Redis or Memcached.
+
 Amazon ElastiCache is a web service that makes it easy to deploy, operate, and scale an in-memory data store or 
 cache in the cloud.
 Amazon ElastiCache is a fully managed in-memory data store and cache service by Amazon Web Services (AWS). 
@@ -2016,6 +2051,25 @@ Amazon ElastiCache is a fully managed in-memory data store and cache service by 
 ElastiCache supports two open-source in-memory caching engines: Memcached and Redis.
 
 
+REDIS:
+• Multi AZ with Auto-Failover
+• Read Replicas to scale reads and have high availability
+• Data Durability using AOF persistence
+• Backup and restore features
+
+Use Case:
+	• Gaming Leaderboards are computationally complex
+	• Redis Sorted sets guarantee both uniqueness and element ordering
+	• Each time a new element added, it’s ranked in real time, then added in correct order
+
+
+
+MEMCACHED:
+• Multi-node for partitioning of data (sharding)
+• No high availability (replication)
+• Non persistent
+• No backup and restore
+• Multi-threaded architecture
 
 
 Area:
@@ -2126,11 +2180,12 @@ CNAME vs Alias:
 	• AWS Resources (Load Balancer, CloudFront...) expose an AWS hostname:
 	• lb1-1234.us-east-2.elb.amazonaws.com and you want myapp.mydomain.com
 CNAME:
+    • The target is a domain name which must have an A or AAAA record
 	• Points a hostname to any other hostname. (app.mydomain.com => blabla.anything.com)
 	• ONLY FOR NON ROOT DOMAIN (aka.something.mydomain.com)
 Alias:
 	• Points a hostname to an AWS Resource (app.mydomain.com => blabla.amazonaws.com)
-	• Works for ROOT DOMAIN and NON ROOT DOMAIN (aka mydomain.com)
+	• Works for ROOT DOMAIN and NON ROOT DOMAIN (aka.mydomain.com)
 	• Free of charge
 	• Native health check
 
