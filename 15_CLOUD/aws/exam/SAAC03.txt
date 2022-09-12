@@ -2258,8 +2258,6 @@ Docker on familiar servers such as Apache, Nginx, Passenger, and IIS.
 You can simply upload your code and Elastic Beanstalk automatically handles the deployment, from capacity provisioning, 
 load balancing, auto-scaling to application health monitoring. 
 
-You can develop code in a number of languages which is then zipped up and the zip file is used 
-when instantiating a new elastic beanstalk instance.
 
 Elastic Beanstalk isn't great if you need a lot of environment variables. 
 The simple reason is that Elastic Beanstalk has a hard limit of 4KB to store all key-value pairs.
@@ -2304,6 +2302,9 @@ security group to your environment.
 
 
 
+
+
+
 39
 ##AmazonS3 | S3
 -------------------------------------------------
@@ -2325,6 +2326,7 @@ Amazon S3 Glacier Instant Retrieval
 Amazon S3 Glacier Flexible Retrieval
 Amazon S3 Glacier Deep Archive
 
+
 S3 in Amazon has two entities called buckets and objects. 
 Objects are stored inside buckets.
 By default, the maximum number of buckets that can be created per account is 100.
@@ -2344,6 +2346,32 @@ This action deletes objects in the Amazon S3 bucket.
 CORS:
 Cross-origin resource sharing (CORS) defines a way for client web applications that are loaded in one domain to interact 
 with resources in a different domain. 
+
+
+
+
+There are 4 methods of encrypting objects in S3:
+• SSE-S3: encrypts S3 objects using keys handled & managed by AWS
+• SSE-KMS: leverage AWS Key Management Service to manage encryption keys
+• SSE-C: when you want to manage your own encryption keys
+• Client Side Encryption
+
+EmaxTips:It’s important to understand which ones are adapted to which situation for the exam
+
+
+
+API calls can be logged in AWS CloudTrail
+S3 can host static websites and have them accessible on the www
+
+
+CORS:
+• An origin is a scheme (protocol), host (domain) and port
+• Web Browser based mechanism to allow requests to other origins while visiting the main origin
+
+The requests won’t be fulfilled unless the other origin allows for the
+requests, using CORS Headers (ex: Access-Control-Allow-Origin)
+
+
 
 
 
@@ -2369,7 +2397,7 @@ Run cloud-native applications.
  
 BillCost:
 =========
-AWS Free Tier, you can get started with Amazon S3 for free.
+AWS Free Tier
 Amazon S3 charges you only for what you actually use, with no hidden fees and no overage charges.
 Bucket pricing varies by region.
 
@@ -2377,29 +2405,13 @@ Bucket pricing varies by region.
 
 Security:
 =========
-To protect your data in Amazon S3, by default, users only have access to the S3 resources they create. 
-
-You can grant access to other users by using one or a combination of the following access management features: 
-
 AWS Identity and Access Management (IAM) to create users and manage their respective access; 
 Access Control Lists (ACLs) to make individual objects accessible to authorized users; bucket policies to configure permissions 
 for all objects within a single S3 bucket;
 
-
-Query String Authentication to grant time-limited access to others with temporary URLs. 
-Amazon S3 also supports Audit Logs that list the requests made against your S3 resources for complete 
-visibility into who is accessing what data.
-
-
+-Amazon S3 also supports Audit Logs.
 -Enabling detective controls such as AWS CloudTrail or Amazon GuardDuty for Amazon S3.
--Server-Side Encryption.
 
-
-There are 4 methods of encrypting objects in S3:
-• SSE-S3: encrypts S3 objects using keys handled & managed by AWS
-• SSE-KMS: leverage AWS Key Management Service to manage encryption keys
-• SSE-C: when you want to manage your own encryption keys
-• Client Side Encryption
 
 
 
@@ -2422,6 +2434,11 @@ User Security:
 	• MFA Delete: MFA (multi factor authentication) can be required in versioned buckets to delete objects
 	• Pre-Signed URLs: URLs that are valid only for a limited time (ex: premium video service for logged in users)
 
+Encryption in flight is also called SSL / TLS.
+
+
+
+
 
 
 
@@ -2431,11 +2448,13 @@ User Security:
 -------------------------------------------------
 Instance metadata is data about your instance that you can use to configure or manage the running instance. 
 AWS EC2 Instance Metadata is powerful but one of the least known features to developers.
+
 • It allows AWS EC2 instances to ”learn about themselves” without using an IAM Role for that purpose.
 • The URL is http://169.254.169.254/latest/meta-data
 • You can retrieve the IAM Role name from the metadata, but you CANNOT retrieve the IAM Policy.
-• Metadata = Info about the EC2 instance
-• Userdata = launch script of the EC2 instance
+
+Metadata = Info about the EC2 instance
+Userdata = launch script of the EC2 instance
 
 
 
@@ -2495,8 +2514,19 @@ When you add a replication rule to a bucket, the rule is enabled by default, so 
 S3 Replication supports two-way replication between two or more buckets in the same or different AWS Regions. 
 
 
-• CRR - Use cases: compliance, lower latency access, replication across accounts
-• SRR – Use cases: log aggregation, live replication between production and test accounts
+• CRR(Cross Region Replication) - Use cases: compliance, lower latency access, replication across accounts
+• SRR(Same Region Replication) – Use cases: log aggregation, live replication between production and test accounts
+
+
+After activating, only new objects are replicated
+• Optionally, you can replicate existing objects using S3 Batch Replication
+• Replicates existing objects and objects that failed replication
+
+
+For DELETE operations:
+• Can replicate delete markers from source to target (optional setting)
+• Deletions with a version ID are not replicated (to avoid malicious deletes)
+• There is no “chaining” of replication
 
 
 UseCase:
@@ -2529,17 +2559,74 @@ UseCase :
 
 
 
+
 45
 ##S3 Storage Class
 -------------------------------------------------
 Amazon S3 Storage Classes:
-Amazon S3 Standard
-Amazon S3 Intelligent-Tiering
-Amazon S3 Standard-Infrequent Access
-Amazon S3 One Zone-Infrequent Access
-Amazon S3 Glacier Instant Retrieval
-Amazon S3 Glacier Flexible Retrieval
-Amazon S3 Glacier Deep Archive
+S3 Standard
+S3 Intelligent-Tiering
+S3 Standard-Infrequent Access
+S3 One Zone-Infrequent Access
+S3 Glacier Instant Retrieval
+S3 Glacier Flexible Retrieval
+S3 Glacier Deep Archive
+
+
+
+S3 Standard – General Purpose:
+	• 99.99% Availability
+	• Used for frequently accessed data
+	• Low latency and high throughput
+	• Sustain 2 concurrent facility failures
+Use Cases: Big Data analytics, mobile & gaming applications, content distribution
+
+
+
+S3 Infrequent Access:
+• For data that is less frequently accessed, but requires rapid access when needed
+• Lower cost than S3 Standard
+
+•S3 Standard-Infrequent Access (S3 Standard-IA)
+	• 99.9% Availability
+	• Use cases: Disaster Recovery, backups
+•S3 One Zone-Infrequent Access (S3 One Zone-IA)
+	• In a single AZ; data lost when AZ is destroyed
+	• 99.5% Availability
+    • Use Cases: Storing secondary backup copies of on-premises data, or data you can recreate
+
+
+
+S3 Glacier Storage Classes:
+	• Low-cost object storage meant for archiving / backup
+	• Pricing: price for storage + object retrieval cost
+	
+• S3 Glacier Instant Retrieval
+	• Millisecond retrieval, great for data accessed once a quarter
+	• Minimum storage duration of 90 days
+• S3 Glacier Flexible Retrieval (formerly Amazon S3 Glacier):
+	• Expedited (1 to 5 minutes), Standard (3 to 5 hours), Bulk (5 to 12 hours) – free
+	• Minimum storage duration of 90 days
+• S3 Glacier Deep Archive – for long term storage:
+	• Standard (12 hours), Bulk (48 hours)
+	• Minimum storage duration of 180 days
+
+
+S3 Intelligent-Tiering:
+	• Small monthly monitoring and auto-tiering fee
+	• Moves objects automatically between Access Tiers based on usage
+	• There are no retrieval charges in S3 Intelligent-Tiering
+	• Frequent Access tier (automatic): default tier
+	• Infrequent Access tier (automatic): objects not accessed for 30 days
+	• Archive Instant Access tier (automatic): objects not accessed for 90 days
+	• Archive Access tier (optional): configurable from 90 days to 700+ days
+	• Deep Archive Access tier (optional): config. from 180 days to 700+ days
+
+
+You can transition objects between storage classes 
+Moving objects can be automated using a lifecycle configuration
+
+
 
 
 
@@ -2548,6 +2635,7 @@ Amazon S3 Glacier Deep Archive
 ##S3 Lifecycle | Rule
 -------------------------------------------------
 An S3 Lifecycle configuration is a set of rules that define actions that Amazon S3 applies to a group of objects. 
+Can move between classes manually or using S3 Lifecycle configurations
 
 Transition actions: It defines when objects are transitioned to another storage class.
 	• Move objects to Standard IA class 60 days after creation
@@ -2562,13 +2650,41 @@ Expiration actions: configure objects to expire (delete) after some time
 
 
 
+
+
 46
 ##S3 Analytics
 -------------------------------------------------
-By using Amazon S3 analytics Storage Class Analysis you can analyze storage access patterns to 
-help you decide when to transition the right data to the right storage class. 
+• You can setup S3 Analytics to help determine when to transition objects from Standard to Standard_IA
+• Does not work for ONEZONE_IA or GLACIER
+• Report is updated daily
+• Takes about 24h to 48h hours to first start
+• Good first step to put together Lifecycle Rules (or improve them)!
 
-Storage class analysis only provides recommendations for Standard to Standard IA classes.
+
+
+
+S3 – Baseline Performance
+-------------------------------------------------
+• Amazon S3 automatically scales to high request rates, latency 100-200 ms
+• Your application can achieve at least 3,500 PUT/COPY/POST/DELETE and
+5,500 GET/HEAD requests per second per prefix in a bucket
+
+
+S3 – KMS Limitation:
+• If you use SSE-KMS, you may be impacted by the KMS limits
+• When you upload, it calls the GenerateDataKey KMS API
+• When you download, it calls the Decrypt KMS API
+
+
+Multi-Part upload:
+• recommended for files > 100MB, must use for files > 5GB
+• Can help parallelize uploads (speedup transfers)
+
+S3 Transfer Acceleration:
+• Increase transfer speed by transferring file to an AWS edge location which will forward the data to the 
+  S3 bucket in the target region.
+• Compatible with multi-part upload
 
 
 
@@ -2577,11 +2693,6 @@ Storage class analysis only provides recommendations for Standard to Standard IA
 47
 ##S3 Select & Glacier Select
 -------------------------------------------------
-With Amazon S3 Select, you can use simple structured query language (SQL) statements to filter the contents of an 
-Amazon S3 object and retrieve just the subset of data that you need. 
-By using Amazon S3 Select to filter this data, you can reduce the amount of data that 
-Amazon S3 transfers, which reduces the cost and latency to retrieve this data.
-
 • Retrieve less data using SQL by performing server side filtering
 • Can filter by rows & columns (simple SQL statements)
 • Less network transfer, less CPU cost client-side
@@ -2589,14 +2700,20 @@ Amazon S3 transfers, which reduces the cost and latency to retrieve this data.
 
 
 
+
+
 48
 ##S3 Event Nofifications
 -------------------------------------------------
+Can create as many “S3 events” as desired
+
 You can use the Amazon S3 Event Notifications feature to receive notifications when certain events happen in your S3 bucket. 
 To enable notifications, add a notification configuration that identifies the events that you want Amazon S3 to publish. 
 Make sure that it also identifies the destinations where you want Amazon S3 to send the notifications. 
 
 You store this configuration in the notification subresource that's associated with a bucket
+
+
 
 UseCase:
 ========
@@ -2616,51 +2733,14 @@ the requester instead of the bucket owner pays the cost of the request and the d
 The bucket owner always pays the cost of storing data.
 
 
-If you enable Requester Pays on a bucket, anonymous access to that bucket is not allowed.
+Helpful when you want to share large datasets with other accounts
+The requester must be authenticated in AWS (cannot be anonymous)
+
 
 UseCase:
 ========
 Typically, you configure buckets to be Requester Pays buckets when you want to share data but not incur 
 charges associated with others accessing the data. 
-
-
-
-
-
-50
-##Athena
--------------------------------------------------
-Serverless query service to perform analytics against S3 objects
-• Uses standard SQL language to query the files
-• Supports CSV, JSON, ORC, Avro, and Parquet (built on Presto)
-
-
-
-Area:
-=====
-Global.
-Athena supports the ability to query Amazon S3 data in an AWS Region that is different from the Region in which you are using Athena.
-
-
-UseCase:
-========
-Athena helps you analyze unstructured, semi-structured, and structured data stored in Amazon S3. 
-Examples include CSV, JSON, or columnar data formats such as Apache Parquet and Apache ORC. 
-You can use Athena to run ad-hoc queries using ANSI SQL, without the need to aggregate or load the data into Athena.
-
-
-BillCost:
-=========
-You are charged based on the amount of data scanned by each query.
-Pricing: $5.00 per TB of data scanned
-
-
-
-
-Security:
-=========
-Security is a shared responsibility.
-
 
 
 
@@ -2689,8 +2769,6 @@ Object retention:
 
 
 
-
-
 Area:
 =====
 Global but Data is Regional.
@@ -2704,7 +2782,7 @@ S3 Glacier vaults with a Vault Lock policy.
 
 BillCost:
 =========
-
+No aditional cost.
 
 Security:
 =========
@@ -2713,6 +2791,13 @@ Security is a shared responsibility.
 
 
 
+
+
+++S3 – Access Points
+-------------------------------------------------
+• Each Access Point gets its own DNS and policy to limit who can access it
+• A specific IAM user / group
+• One policy per Access Point => Easier to manage than complex bucket policies
 
 
 
