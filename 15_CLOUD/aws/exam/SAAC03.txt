@@ -5049,6 +5049,7 @@ ExamTips:Any time you see Financial transaction or Ledger, its QLDB.
 -------------------------------------------------
 Amazon Athena is an interactive query service that makes it easy to analyze data directly in Amazon S3 using standard SQL.
 Athena is not a database but rather a query engine.
+
 • Fully Serverless database with SQL capabilities
 • Used to query data in S3
 • Pay per query
@@ -5071,6 +5072,18 @@ Serverless query service to perform analytics against S3 objects
 
 
 
+Exam Tip: analyze data in S3 using serverless SQL, use Athena
+
+
+
+Amazon Athena – Performance Improvement:
+• Use columnar data for cost-savings (less scan)
+• Apache Parquet or ORC is recommended
+• Huge performance improvement
+• Use Glue to convert your data your Parquet or ORC
+
+
+
 Area:
 =====
 Global.
@@ -5079,6 +5092,11 @@ Athena supports the ability to query Amazon S3 data in an AWS Region that is dif
 
 UseCase:
 ========
+
+Use cases: Business intelligence / analytics / reporting, analyze &
+query VPC Flow Logs, ELB Logs, CloudTrail trails.
+
+
 Athena helps you analyze unstructured, semi-structured, and structured data stored in Amazon S3. 
 Examples include CSV, JSON, or columnar data formats such as Apache Parquet and Apache ORC. 
 You can use Athena to run ad-hoc queries using ANSI SQL, without the need to aggregate or load the data into Athena.
@@ -5123,13 +5141,44 @@ from disparate source systems and provisions them for analytical use.
 
 
 Redshift for Solutions Architect:
-• Operations: like RDS
-• Security: IAM, VPC, KMS, SSL (like RDS)
-• Reliability: auto healing features, cross-region snapshot copy
-• Performance: 10x performance vs other data warehousing, compression
-• Cost: pay per node provisioned, 1/10th of the cost vs other warehouses
+• Redshift is based on PostgreSQL, but it’s not used for OLTP
+• It’s OLAP – online analytical processing (analytics and data warehousing)
+• 10x better performance than other data warehouses, scale to PBs of data
+• Columnar storage of data (instead of row based) & parallel query engine
+• Pay as you go based on the instances provisioned
+• Has a SQL interface for performing the queries
+• BI tools such as Amazon Quicksight or Tableau integrate with it
 • vs Athena: faster queries / joins / aggregations thanks to indexes
-• Remember: Redshift = Analytics / BI / Data Warehouse
+
+Remember: Redshift = Analytics / BI / Data Warehouse
+
+
+
+Redshift – Snapshots & DR:
+• Redshift has no “Multi-AZ” mode
+• Snapshots are point-in-time backups of a cluster, stored internally in S3
+• Snapshots are incremental (only what has changed is saved)
+• You can restore a snapshot into a new cluster
+• Automated: every 8 hours, every 5 GB, or on a schedule. Set retention between 1 to 35 days
+• Manual: snapshot is retained until you delete it
+• You can configure Amazon Redshift to automatically copy snapshots (automated or manual) of a cluster to another AWS Region
+
+
+
+Loading data into Redshift: Large inserts are MUCH better
+Amazon Kinesis -> Data Firehose
+S3 using -> COPY command
+EC2 Instance -> DBC driver
+
+
+
+
+
+Redshift Spectrum:
+• Query data that is already in S3 without loading it
+• Must have a Redshift cluster available to start the query
+• The query is then submitted to thousands of Redshift Spectrum nodes
+
 
 
 
@@ -5151,7 +5200,8 @@ Increase developer productivity
 BillCost:
 =========
 AWS Free Tier
-Customers can use the Redshift for just $0.25 per hour with no commitments or upfront costs and scale to a petabyte or more for $1,000 per terabyte per year.
+Customers can use the Redshift for just $0.25 per hour with no commitments or upfront costs and scale to a petabyte 
+or more for $1,000 per terabyte per year.
 
 
 
@@ -5164,183 +5214,8 @@ You can also enable encryption, all the data written to disk will be encrypted.
 
 
 
-
-++QuickSight
--------------------------------------------------
-• Serverless machine learning-powered business intelligence service to create interactive dashboards
-• Fast, automatically scalable, embeddable, with per-session pricing
-• Use cases:
-	• Business analytics
-	• Building visualizations
-	• Perform ad-hoc analysis
-	• Get business insights using data
-• Integrated with RDS, Aurora, Athena, Redshift, S3…
-• In-memory computation using SPICE engine if data is imported into QuickSight
-• Enterprise edition: Possibility to setup Column-Level security (CLS)
-
-
-
-QuickSight – Dashboard & Analysis:
-• Define Users (standard versions) and Groups (enterprise version)
-• These users & groups only exist within QuickSight, not IAM !!
-• A dashboard…
-	• is a read-only snapshot of an analysis that you can share
-	• preserves the configuration of the analysis (filtering, parameters, controls, sort)
-• You can share the analysis or the dashboard with Users or Groups
-• To share a dashboard, you must first publish it
-• Users who see the dashboard can also see the underlying data 
-
-
-
-
-++AWS Lake Formation
--------------------------------------------------
-• Data lake = central place to have all your data for analytics purposes
-• Fully managed service that makes it easy to setup a data lake in days
-• Discover, cleanse, transform, and ingest data into your Data Lake
-• It automates many complex manual steps (collecting, cleansing, moving, cataloging data, …) and de-duplicate (using ML Transforms)
-• Combine structured and unstructured data in the data lake
-• Out-of-the-box source blueprints: S3, RDS, Relational & NoSQL DB…
-• Fing-grained Access Control for your applications (row and column-level)
-• Built on top of AWS Glue
-
-
-++Amazon Managed Streaming for Apache Kafka (Amazon MSK)
--------------------------------------------------
-• Alternative to Amazon Kinesis
-• Fully managed Apache Kafka on AWS
-• Allow you to create, update, delete clusters
-• MSK creates & manages Kafka brokers nodes & Zookeeper nodes for you
-• Deploy the MSK cluster in your VPC, multi-AZ (up to 3 for HA)
-• Automatic recovery from common Apache Kafka failures
-• Data is stored on EBS volumes for as long as you want
-• MSK Serverless
-• Run Apache Kafka on MSK without managing the capacity
-• MSK automatically provisions resources and scales compute & storage
-
-
-
-Kinesis Data Streams vs. Amazon MSK:
-Kinesis Data Streams:
-• 1 MB message size limit
-• Data Streams with Shards
-• Shard Splitting & Merging
-• TLS In-flight encryption
-• KMS at-rest encryption
-
-
-Amazon MSK
-• 1MB default, configure for higher (ex: 10MB)
-• Kafka Topics with Partitions
-• Can only add partitions to a topic
-• PLAINTEXT or TLS In-flight Encryption
-• KMS at-rest encryption
-
-
-
-
-
-Big Data Ingestion Pipeline:
-• We want the ingestion pipeline to be fully serverless
-• We want to collect data in real time
-• We want to transform the data
-• We want to query the transformed data using SQL
-• The reports created using the queries should be in S3
-• We want to load that data into a warehouse and create dashboards
-
-
-
-
-
-78
-##Glue
--------------------------------------------------
-AWS Glue is detailed as "Fully managed extract, transform, and load (ETL) service". 
-A fully managed extract, transform, and load (ETL) service that makes it easy for customers to prepare and 
-load their data for analytics.
-Amazon Athena and AWS Glue can be categorized as "Big Data" tools.
-
-AWS Glue provides both visual and code-based interfaces to make data integration easier. 
-Users can easily find and access data using the AWS Glue Data Catalog.
-
-• Managed extract, transform, and load (ETL) service
-• Useful to prepare and transform data for analytics
-• Fully serverless service
-
-
-Area:
-=====
-Regional.
-AWS Glue is available in several AWS Regions
-
-
-UseCase:
-========
-WS Glue is a serverless data integration service that makes it easy to discover, prepare, and combine data for 
-analytics, machine learning, and application development.
-
-
-BillCost:
-=========
-With AWS Glue, you pay an hourly rate, billed by the second, for crawlers (discovering data) and ETL jobs 
-processing and loading data). 
-For the AWS Glue Data Catalog, you pay a simple monthly fee for storing and accessing the metadata.
-
-
-
-Security:
-=========
-IAM, VPC, KMS, SSL (like RDS).
-We provide server-side encryption for data at rest and SSL for data in motion.
-
-
-
-
-
-79
-##Neptune
--------------------------------------------------
-Fully managed graph database.
-
-
-Neptune for Solutions Architect:
-• Operations: similar to RDS
-• Security: IAM, VPC, KMS, SSL (similar to RDS) + IAM Authentication
-• Reliability: Multi-AZ, clustering
-• Performance: best suited for graphs, clustering to improve performance
-• Remember: Neptune = Graphs
-
-
-
-
-
-
-Area:
-=====
-Regional.
-
-
-UseCase:
-========
-• High relationship data 
-• Social Networking: Users friends with Users, replied to comment on post of user and likes other comments.
-• Knowledge graphs (Wikipedia) 
-
-
-BillCost:
-=========
-Pay per node provisioned (similar to RDS)
-
-
-
-Security:
-=========
-Amazon Neptune supports HTTPS encrypted client connections and also allows you to encrypt your databases using keys you 
-manage through AWS Key Management Service (KMS). 
-
-
 80
-##OpenSearch
+##OpenSearch Service
 -------------------------------------------------
 Amazon OpenSearch Service makes it easy for you to perform interactive log analytics, real-time application monitoring, 
 website search, and more. 
@@ -5397,6 +5272,693 @@ Comes with OpenSearch Dashboards (visualization)
 
 
 
+##Amazon EMR
+-------------------------------------------------
+• EMR stands for “Elastic MapReduce”
+• EMR helps creating Hadoop clusters (Big Data) to analyze and process vast amount of data
+• The clusters can be made of hundreds of EC2 instances
+• EMR comes bundled with Apache Spark, HBase, Presto, Flink…
+• EMR takes care of all the provisioning and configuration
+• Auto-scaling and integrated with Spot instances
+• Use cases: data processing, machine learning, web indexing, big data…
+
+
+
+Amazon EMR – Node types & purchasing:
+• Master Node: Manage the cluster, coordinate, manage health – long running
+• Core Node: Run tasks and store data – long running
+• Task Node (optional): Just to run tasks – usually Spot
+• Purchasing options:
+	• On-demand: reliable, predictable, won’t be terminated
+	• Reserved (min 1 year): cost savings (EMR will automatically use if available)
+	• Spot Instances: cheaper, can be terminated, less reliable
+• Can have long-running cluster, or transient (temporary) cluster
+
+
+
+
+
+
+
+++QuickSight
+-------------------------------------------------
+• Serverless machine learning-powered business intelligence service to create interactive dashboards
+• Fast, automatically scalable, embeddable, with per-session pricing
+• Use cases:
+	• Business analytics
+	• Building visualizations
+	• Perform ad-hoc analysis
+	• Get business insights using data
+• Integrated with RDS, Aurora, Athena, Redshift, S3…
+• In-memory computation using SPICE engine if data is imported into QuickSight
+• Enterprise edition: Possibility to setup Column-Level security (CLS)
+
+
+
+QuickSight – Dashboard & Analysis:
+• Define Users (standard versions) and Groups (enterprise version)
+• These users & groups only exist within QuickSight, not IAM !!
+• A dashboard…
+	• is a read-only snapshot of an analysis that you can share
+	• preserves the configuration of the analysis (filtering, parameters, controls, sort)
+• You can share the analysis or the dashboard with Users or Groups
+• To share a dashboard, you must first publish it
+• Users who see the dashboard can also see the underlying data 
+
+
+
+
+
+78
+##Glue
+-------------------------------------------------
+A fully managed extract, transform, and load (ETL) service that makes it easy for customers to prepare and 
+load their data for analytics.
+
+Amazon Athena and AWS Glue can be categorized as "Big Data" tools.
+
+AWS Glue provides both visual and code-based interfaces to make data integration easier. 
+Users can easily find and access data using the AWS Glue Data Catalog.
+
+• Managed extract, transform, and load (ETL) service
+• Useful to prepare and transform data for analytics
+• Fully serverless service
+
+
+Glue – things to know at a high-level:
+• Glue Job Bookmarks: prevent re-processing old data
+• Glue Elastic Views:
+	• Combine and replicate data across multiple data stores using SQL
+	• No custom code, Glue monitors for changes in the source data, serverless
+	• Leverages a “virtual table” (materialized view)
+• Glue DataBrew: clean and normalize data using pre-built transformation
+• Glue Studio: new GUI to create, run and monitor ETL jobs in Glue
+• Glue Streaming ETL (built on Apache Spark Structured Streaming):
+  compatible with Kinesis Data Streaming, Kafka, MSK (managed Kafka)
+
+
+
+Area:
+=====
+Regional.
+AWS Glue is available in several AWS Regions
+
+
+UseCase:
+========
+AWS Glue is a serverless data integration service that makes it easy to discover, prepare, and combine data for 
+analytics, machine learning, and application development.
+
+
+BillCost:
+=========
+With AWS Glue, you pay an hourly rate, billed by the second, for crawlers (discovering data) and ETL jobs 
+processing and loading data). 
+For the AWS Glue Data Catalog, you pay a simple monthly fee for storing and accessing the metadata.
+
+
+
+Security:
+=========
+IAM, VPC, KMS, SSL (like RDS).
+We provide server-side encryption for data at rest and SSL for data in motion.
+
+
+
+
+
+
+++AWS Lake Formation
+-------------------------------------------------
+• Data lake = central place to have all your data for analytics purposes
+• Fully managed service that makes it easy to setup a data lake in days
+• Discover, cleanse, transform, and ingest data into your Data Lake
+• It automates many complex manual steps (collecting, cleansing, moving, cataloging data, …) and de-duplicate (using ML Transforms)
+• Combine structured and unstructured data in the data lake
+• Out-of-the-box source blueprints: S3, RDS, Relational & NoSQL DB…
+• Fing-grained Access Control for your applications (row and column-level)
+• Built on top of AWS Glue
+
+
+
+
+++Amazon Managed Streaming for Apache Kafka (Amazon MSK)
+-------------------------------------------------
+
+What is Kafka?
+Apache Kafka is a distributed publish-subscribe messaging system and a robust queue that can handle a high volume of 
+data and enables you to pass messages from one end-point to another.
+
+
+• Alternative to Amazon Kinesis
+• Fully managed Apache Kafka on AWS
+• Allow you to create, update, delete clusters
+• MSK creates & manages Kafka brokers nodes & Zookeeper nodes for you
+• Deploy the MSK cluster in your VPC, multi-AZ (up to 3 for HA)
+• Automatic recovery from common Apache Kafka failures
+• Data is stored on EBS volumes for as long as you want
+• MSK Serverless
+• Run Apache Kafka on MSK without managing the capacity
+• MSK automatically provisions resources and scales compute & storage
+
+
+
+Kinesis Data Streams vs. Amazon MSK:
+Kinesis Data Streams:
+• 1 MB message size limit
+• Data Streams with Shards
+• Shard Splitting & Merging
+• TLS In-flight encryption
+• KMS at-rest encryption
+
+
+Amazon MSK
+• 1MB default, configure for higher (ex: 10MB)
+• Kafka Topics with Partitions
+• Can only add partitions to a topic
+• PLAINTEXT or TLS In-flight Encryption
+• KMS at-rest encryption
+
+
+
+
+
+Big Data Ingestion Pipeline:
+• We want the ingestion pipeline to be fully serverless
+• We want to collect data in real time
+• We want to transform the data
+• We want to query the transformed data using SQL
+• The reports created using the queries should be in S3
+• We want to load that data into a warehouse and create dashboards
+
+
+
+Big Data Ingestion Pipeline discussion
+• IoT Core allows you to harvest data from IoT devices
+• Kinesis is great for real-time data collection
+• Firehose helps with data delivery to S3 in near real-time (1 minute)
+• Lambda can help Firehose with data transformations
+• Amazon S3 can trigger notifications to SQS
+• Lambda can subscribe to SQS (we could have connecter S3 to Lambda)
+• Athena is a serverless SQL service and results are stored in S3
+• The reporting bucket contains analyzed data and can be used by
+reporting tool such as AWS QuickSight, Redshift, etc…
+
+
+
+
+
+##Rekognition
+-------------------------------------------------
+• Find objects, people, text, scenes in images and videos using ML
+• Facial analysis and facial search to do user verification, people counting
+• Create a database of “familiar faces” or compare against celebrities
+
+
+Amazon Rekognition – Content Moderation:
+• Detect content that is inappropriate, unwanted, or offensive (image and videos)
+• Used in social media, broadcast media, advertising, and e-commerce situations to create
+a safer user experience
+• Set a Minimum Confidence Threshold for items that will be flagged
+• Flag sensitive content for manual review in Amazon Augmented AI (A2I)
+• Help comply with regulations
+
+
+
+Area:
+=====
+MayRegional
+
+
+UseCase:
+========
+• Labeling
+• Content Moderation
+• Text Detection
+• Face Detection and Analysis (gender, age range, emotions…)
+• Face Search and Verification
+• Celebrity Recognition
+• Pathing (ex: for sports game analysis)
+
+
+
+BillCost:
+=========
+As part of the AWS Free Tier, 
+Rekognition there are 3 different types of usage
+Amazon Rekognition Image pricing 
+Amazon Rekognition Video pricing
+Amazon Rekognition Custom Labels pricing
+
+
+
+Security:
+=========
+It is a aws managed service, security is a shared responsibility.
+
+
+
+
+
+140
+##Transcribe
+-------------------------------------------------
+Automatically convert speech to text
+Uses a deep learning process called automatic speech recognition (ASR) to convert speech to text quickly and accurately
+Automatically remove Personally Identifiable Information (PII) using Redaction
+
+
+Area:
+=====
+MayRegional
+
+
+
+UseCase:
+========
+• transcribe customer service calls
+• automate closed captioning and subtitling
+• generate metadata for media assets to create a fully searchable archive
+
+
+Get insights from customer conversations
+Search and analyze media content
+Create subtitles and meeting notes
+Improve clinical documentation
+
+
+BillCost:
+=========
+AWS Free Tier
+Amazon Transcribe API for both streaming and batch transcriptions is billed monthly based on the tiered pricing
+
+
+
+Security:
+=========
+It is a aws managed service, security is a shared responsibility.
+
+
+
+
+
+
+
+141
+##Polly
+-------------------------------------------------
+Amazon Polly is a service that turns text into lifelike speech, allowing you to create applications that talk, 
+and build entirely new categories of speech-enabled products. 
+• Turn text into lifelike speech using deep learning 
+• Allowing you to create applications that talk
+
+
+
+Amazon Polly – Lexicon & SSML:
+• Customize the pronunciation of words with Pronunciation lexicons
+	• Stylized words: St3ph4ne => “Stephane”
+	• Acronyms: AWS => “Amazon Web Services”
+• Upload the lexicons and use them in the SynthesizeSpeech operation
+• Generate speech from plain text or from documents marked up with Speech Synthesis Markup Language (SSML) – enables more customization
+	• emphasizing specific words or phrases
+	• using phonetic pronunciation
+	• including breathing sounds, whispering
+	• using the Newscaster speaking style
+
+
+Area:
+=====
+MayRegional
+
+
+
+UseCase:
+========
+Content creation
+Audio can be used as a complementary media to written and/or visual communication.
+
+
+
+BillCost:
+=========
+AWS Free Tier
+PAY-AS-YOU-GO MODEL
+You are billed monthly for the number of characters of text that you processed.
+
+
+Security:
+=========
+It is a aws managed service, security is a shared responsibility.
+
+
+
+
+
+
+
+142
+##Translate
+-------------------------------------------------
+Amazon Translate is a neural machine translation service that delivers fast, high-quality, affordable, and customizable 
+language translation.
+
+• Natural and accurate language translation
+• Amazon Translate allows you to localize content - such as websites and applications - 
+for international users, and to easily translate large
+volumes of text efficiently.
+
+
+Area:
+=====
+MayRegional
+
+
+UseCase:
+========
+Language Localization
+It’s very difficult for human translation teams to keep up with dynamic or real-time content.
+
+
+
+BillCost:
+=========
+AWS Free Tiering
+Amazon Translate, you pay-as-you-go based on the number of characters of text that you processed.
+
+
+
+Security:
+=========
+It is a aws managed service, security is a shared responsibility.
+
+
+
+
+
+143
+##Lex+Connect
+-------------------------------------------------
+With Amazon Lex, you can build conversational interactions (bots) that feel natural to your customers. 
+
+
+Amazon Lex: (same technology that powers Alexa)
+• Automatic Speech Recognition (ASR) to convert speech to text
+• Natural Language Understanding to recognize the intent of text, callers
+• Helps build chatbots, call center bots
+
+Amazon Connect:
+• Receive calls, create contact flows, cloud-based virtual contact center
+• Can integrate with other CRM systems or AWS
+• No upfront payments, 80% cheaper than traditional contact center solutions
+
+
+
+Area:
+=====
+MayRegional
+
+
+UseCase:
+========
+
+BillCost:
+=========
+Security:
+=========
+It is a aws managed service, security is a shared responsibility.
+
+
+
+
+144
+##Comprehend
+-------------------------------------------------
+Amazon Comprehend provides natural language processing, Personal Identifiable Information (PII) detection and redaction, 
+Custom Classification and Entity detection, and topic modeling, enabling a broad range of 
+applications that can analyze raw text, and with some APIs, document formats like PDF and Word.
+
+For Natural Language Processing – NLP:
+	• Fully managed and serverless service
+	• Uses machine learning to find insights and relationships in text
+	• Language of the text
+	• Extracts key phrases, places, people, brands, or events
+	• Understands how positive or negative the text is
+	• Analyzes text using tokenization and parts of speech
+	• Automatically organizes a collection of text files by topic
+
+
+
+Area:
+=====
+
+
+UseCase:
+========
+• analyze customer interactions (emails) to find what leads to a positive or negative experience
+• Create and groups articles by topics that Comprehend will uncover
+
+
+Mine business and call center analytics
+Index and search product reviews
+Legal briefs management
+Process financial documents
+
+
+BillCost:
+=========
+Amazon Comprehend offers a free tier covering 50K units
+
+
+
+Security:
+=========
+It is a aws managed service, security is a shared responsibility.
+
+
+
+
+++Comprehend Medical Overview
+-------------------------------------------------
+Amazon Comprehend Medical detects and returns useful information in unstructured clinical text:
+	• Physician’s notes
+	• Discharge summaries
+	• Test results
+	• Case notes
+• Uses NLP to detect Protected Health Information (PHI) – DetectPHI API
+• Store your documents in Amazon S3, analyze real-time data with Kinesis
+  Data Firehose, or use Amazon Transcribe to transcribe patient narratives
+  into text that can be analyzed by Amazon Comprehend Medical.
+
+
+
+
+
+
+145
+##SageMaker
+-------------------------------------------------
+Amazon SageMaker is a fully managed machine learning service. 
+With SageMaker, data scientists and developers can quickly and easily build and train machine learning models, 
+and then directly deploy them into a production-ready hosted environment. 
+
+
+
+Fully managed service for developers / data scientists to build ML models
+• Typically, difficult to do all the processes in one place + provision servers
+• Machine learning process (simplified): predicting your exam score
+
+
+Area:
+=====
+MayRegional
+
+UseCase:
+========
+
+
+BillCost:
+=========
+
+
+Security:
+=========
+It is a aws managed service, security is a shared responsibility.
+
+
+
+
+
+146
+##Forecast
+-------------------------------------------------
+Fully managed service that uses ML to deliver highly accurate forecasts
+• Example: predict the future sales of a raincoat
+• 50% more accurate than looking at the data itself
+• Reduce forecasting time from months to hours
+• Use cases: Product Demand Planning, Financial Planning, Resource Planning
+
+
+Area:
+=====
+
+
+UseCase:
+========
+Add ML forecasting to your SaaS solutions
+Enhance software as a service (SaaS) product capabilities with integrated ML-based forecasts to identify complex demand relationships.
+Optimize product demand planning
+
+Predict inventory needs at individual stores by combining historical sales and demand data with associated web traffic, 
+pricing, product category, weather, and holiday information.
+
+Improve utilization and customer satisfaction with accurate resource requirement forecasting in near-real time.
+
+
+
+BillCost:
+=========
+AWS Free Tier
+There are four different types of costs to consider when using Amazon Forecast:
+ 
+Imported data: Cost for each GB of data imported into Amazon Forecast for training and forecasting.
+Training a predictor: Cost for each hour of infrastructure use required for building a custom predictor based on your input data or for monitoring predictor performance.
+Generated forecast data points:  Cost for number of unique forecast values generated across all time series (items and dimensions) combinations.
+Forecast explanations: Cost for explaining the impact of attributes or related data on your forecasts for each item and time point. 
+
+
+
+
+Security:
+=========
+It is a aws managed service, security is a shared responsibility.
+
+
+
+
+
+146
+##Kendra
+-------------------------------------------------
+Fully managed document search service powered by Machine Learning
+• Extract answers from within a document (text, pdf, HTML, PowerPoint, MS Word, FAQs…)
+• Natural language search capabilities
+• Learn from user interactions/feedback to promote preferred results (Incremental Learning)
+• Ability to manually fine-tune search results (importance of data, freshness, custom, …)
+
+
+Area:
+=====
+MayRegional
+
+
+UseCase:
+========
+Accelerate research and development
+Minimize regulatory and compliance risks
+Improve customer interactions
+Increase employee productivity
+
+
+BillCost:
+=========
+AWS Free Tier
+
+
+
+Security:
+=========
+It is a aws managed service, security is a shared responsibility.
+
+
+
+
+
+
+148
+##Personalize
+-------------------------------------------------
+Fully managed ML-service to build apps with real-time personalized recommendations
+• Example: personalized product recommendations/re-ranking, customized direct marketing
+	• Example: User bought gardening tools, provide recommendations on the next one to buy
+• Same technology used by Amazon.com
+• Integrates into existing websites, applications, SMS, email marketing systems, …
+• Implement in days, not months (you don’t need to build, train, and deploy ML solutions)
+
+
+
+Area:
+=====
+MayRegional
+
+UseCase:
+========
+• Use cases: retail stores, media and entertainment…
+
+
+BillCost:
+=========
+
+Security:
+=========
+It is a aws managed service, security is a shared responsibility.
+
+
+
+
+148
+##Textract
+-------------------------------------------------
+• Automatically extracts text, handwriting, and data from any scanned documents using AI and ML
+• Extract data from forms and tables
+• Read and process any type of document (PDFs, images, …)
+
+
+Area:
+=====
+MayRegional
+
+
+UseCase:
+========
+• Financial Services (e.g., invoices, financial reports)
+• Healthcare (e.g., medical records, insurance claims)
+• Public Sector (e.g., tax forms, ID documents, passports)
+
+Personalized recommendations
+Similar items
+Personalized reranking (i.e. rerank a list of items for a user)
+Personalized promotions/notifications
+
+
+BillCost:
+=========
+2 months free
+
+
+Security:
+=========
+It is a aws managed service, security is a shared responsibility.
+
+
+
+
+AWS Machine Learning- Summary:
+• Rekognition: face detection, labeling, celebrity recognition
+• Transcribe: audio to text (ex: subtitles) 
+• Polly: text to audio 
+• Translate: translations 
+• Lex: build conversational bots – chatbots 
+• Connect: cloud contact center 
+• Comprehend: natural language processing 
+• SageMaker: machine learning for every developer and data scientist 
+• Forecast: build highly accurate forecasts 
+• Kendra: ML-powered search engine 
+• Personalize: real-time personalized recommendations 
+• Textract: detect text and data in documents
+
+
+
+
 
 
 81
@@ -5406,6 +5968,8 @@ Amazon Web Services (AWS) monitoring is a set of practices you can use to verify
 AWS resources and data.
 
 Use a single platform for observability, Collect metrics on AWS and on premises.
+
+
 
 
 
@@ -5481,9 +6045,19 @@ Amazon CloudWatch can load all the metrics in your account (both AWS resource me
 for search, graphing, and alarms.
 
 
+• CloudWatch provides metrics for every services in AWS
+• Metric is a variable to monitor (CPUUtilization, NetworkIn…)
+• Metrics belong to namespaces
+• Dimension is an attribute of a metric (instance id, environment, etc…).
+• Up to 10 dimensions per metric
+• Metrics have timestamps
+• Can create CloudWatch dashboards of metrics
+• Can create CloudWatch Custom Metrics (for the RAM for example)
 
 
 
+
+$$
 83
 ##CloudWatch Custom Metrics
 -------------------------------------------------
@@ -5505,7 +6079,7 @@ future (make sure to configure your EC2 instance time correctly)
 
 
 
-
+$$
 84
 ##CloudWatch Dashboards
 -------------------------------------------------
@@ -5569,9 +6143,27 @@ CloudWatch Logs - Sources:
 • Route53: Log DNS queries
 
 
+CloudWatch Logs Metric Filter & Insights:
+• CloudWatch Logs can use filter expressions
+	• For example, find a specific IP inside of a log
+	• Or count occurrences of “ERROR” in your logs
+• Metric filters can be used to trigger CloudWatch alarms
+• CloudWatch Logs Insights can be used to query logs and add queries to CloudWatch Dashboards
+
+
+
+CloudWatch Logs – S3 Export:
+• Log data can take up to 12 hours to become available for export
+• The API call is CreateExportTask
+• Not near-real time or real-time… use Logs Subscriptions instead
+
+
+
+
 • Log groups: arbitrary name, usually representing an application
 • Log stream: instances within application / log files / containers
 • Can define log expiration policies (never expire, 30 days, etc..)
+
 
 CloudWatch Logs can send logs to:
 • Amazon S3 (exports)
@@ -5586,6 +6178,8 @@ CloudWatch Logs for EC2:
 • You need to run a CloudWatch agent on EC2 to push the log files you want
 • Make sure IAM permissions are correct
 • The CloudWatch log agent can be setup on-premises too
+
+
 
 
 
@@ -5627,6 +6221,19 @@ A plug-in to the AWS CLI that pushes log data to CloudWatch Logs.
 A script (daemon) that initiates the process to push data to CloudWatch Logs.
 A cron job that ensures that the daemon is always running.
 
+
+
+CloudWatch Logs Agent & Unified Agent:
+• For virtual servers (EC2 instances, on-premises servers…)
+• CloudWatch Logs Agent
+	• Old version of the agent
+	• Can only send to CloudWatch Logs
+• CloudWatch Unified Agent
+	• Collect additional system-level metrics such as RAM, processes, etc…
+	• Collect logs to send to CloudWatch Logs
+	• Centralized configuration using SSM Parameter Store
+
+
 CloudWatch Unified Agent – Metrics:
 • Collected directly on your Linux server / EC2 instance
 • CPU (active, guest, idle, system, user, steal)
@@ -5635,7 +6242,9 @@ CloudWatch Unified Agent – Metrics:
 • Netstat (number of TCP and UDP connections, net packets, bytes)
 • Processes (total, dead, bloqued, idle, running, sleep)
 • Swap Space (free, used, used %)
-• Reminder: out-of-the box metrics for EC2 – disk, CPU, network (high level)
+Reminder: out-of-the box metrics for EC2 – disk, CPU, network (high level)
+
+
 
 
 
@@ -5656,6 +6265,14 @@ CloudWatch Alarm Targets:
 • Stop, Terminate, Reboot, or Recover an EC2 Instance
 • Trigger Auto Scaling Action
 • Send notification to SNS (from which you can do pretty much anything)
+
+
+• Recovery: Same Private, Public, Elastic IP, metadata, placement group
+
+
+To test alarms and notifications, set the alarm state to Alarm using CLI
+=>aws cloudwatch set-alarm-state --alarm-name "myalarm" --state-value ALARM --state-reason "testing purposes"
+
 
 
 
@@ -5705,13 +6322,6 @@ EventBridge sends metrics to Amazon CloudWatch every minute for everything from 
 matched events to the number of times a target is invoked by a rule.
 
 
-In event-driven architecture, services interact with each other through events. 
-An event is something that happened in your application (for example, an item was put into a cart, a new order was placed). 
-Events are JSON objects that tell you information about something that happened in your application. 
-In event-driven architecture, each component of the application raises an event whenever anything changes. 
-Other components listen and decide what to do with it and how they would like to react.
-
-
 • Default Event Bus – generated by AWS services (CloudWatch Events)
 • Partner Event Bus – receive events from SaaS service or applications (Zendesk, DataDog, Segment, Auth0…)
 • Custom Event Buses – for your own applications
@@ -5726,6 +6336,75 @@ Amazon EventBridge vs CloudWatch Events:
 • Event Bridge has the Schema Registry capability
 • EventBridge has a different name to mark the new capabilities
 • Over time, the CloudWatch Events name will be replaced with EventBridge.
+
+
+
+• Event buses can be accessed by other AWS accounts using Resource-based Policies
+• You can archive events (all/filter) sent to an event bus (indefinitely or set period)
+• Ability to replay archived events
+
+The Schema Registry allows you to generate code for your application, that will know in advance how data is structured in the event bus.
+Schema can be versioned.
+
+
+Amazon EventBridge – Resource-based Policy:
+• Manage permissions for a specific Event Bus
+• Example: allow/deny events from another AWS account or AWS region
+• Use case: aggregate all events from your AWS Organization in a single AWS account or AWS region
+
+
+
+CloudWatch Container Insights:
+• Collect, aggregate, summarize metrics and logs from containers
+• Available for containers on…
+	• Amazon Elastic Container Service (Amazon ECS)
+	• Amazon Elastic Kubernetes Services (Amazon EKS)
+	• Kubernetes platforms on EC2
+	• Fargate (both for ECS and EKS)
+• In Amazon EKS and Kubernetes, CloudWatch Insights is using a containerized version of the CloudWatch Agent to discover containers.
+
+
+
+CloudWatch Lambda Insights:
+• Monitoring and troubleshooting solution for serverless applications running on AWS Lambda
+• Collects, aggregates, and summarizes system-level metrics including CPU time, memory, disk, and network
+• Collects, aggregates, and summarizes diagnostic information such as cold starts and Lambda worker shutdowns
+• Lambda Insights is provided as a Lambda Layer
+
+
+
+
+CloudWatch Contributor Insights:
+• Analyze log data and create time series that display contributor data.
+• See metrics about the top-N contributors
+• The total number of unique contributors, and their usage.
+• This helps you find top talkers and understand who or what is impacting system performance.
+• Works for any AWS-generated logs (VPC, DNS, etc..)
+• For example, you can find bad hosts, identify the heaviest network users, or find the URLs that generate the most errors.
+• You can build your rules from scratch, or you can also use sample rules that AWS has created – leverages your CloudWatch Logs
+• CloudWatch also provides built-in rules that you can use to analyze metrics from other AWS services.
+
+
+
+CloudWatch Application Insights:
+• Provides automated dashboards that show potential problems with monitored applications, to help isolate ongoing issues
+• Findings and alerts are sent to Amazon EventBridge and SSM OpsCenter
+
+
+
+CloudWatch Insights and Operational Visibility | Summary:
+• CloudWatch Container Insights
+• ECS, EKS, Kubernetes on EC2, Fargate, needs agent for Kubernetes
+• Metrics and logs
+• CloudWatch Lambda Insights
+• Detailed metrics to troubleshoot serverless applications
+• CloudWatch Contributors Insights
+• Find “Top-N” Contributors through CloudWatch Logs
+• CloudWatch Application Insights
+• Automatic dashboard to troubleshoot your application and related AWS services
+
+
+
 
 
 
@@ -5757,70 +6436,17 @@ It is a aws managed service, security is a shared responsibility.
 
 
 
-++CloudWatch Insights and Operational Visibility
--------------------------------------------------
-Collect, aggregate, summarize metrics and logs from containers
-• Available for containers on…
-	• Amazon Elastic Container Service (Amazon ECS)
-	• Amazon Elastic Kubernetes Services (Amazon EKS)
-	• Kubernetes platforms on EC2
-	• Fargate (both for ECS and EKS)
-	• In Amazon EKS and Kubernetes, CloudWatch
-Insights is using a containerized version of the
-CloudWatch Agent to discover containers
-
-
-
-CloudWatch Lambda Insights :
-• Monitoring and troubleshooting solution for serverless applications running on AWS Lambda
-• Collects, aggregates, and summarizes system -level metrics including CPU time, memory, disk, and network
-• Collects, aggregates, and summarizes diagnostic information such as cold starts and Lambda worker shutdowns
-• Lambda Insights is provided as a Lambda Layer
-
-
-CloudWatch Contributor Insights:
-• Analyze log data and create time series that display contributor data.
-	• See metrics about the top-N contributors
-	• The total number of unique contributors, and their usage.
-• This helps you find top talkers and understand who or what is impacting system performance.
-• Works for any AWS-generated logs (VPC, DNS, etc..)
-• For example, you can find bad hosts, identify the heaviest network users, or find the URLs that generate the most errors.
-• You can build your rules from scratch, or you can also
-  use sample rules that AWS has created – leverages your CloudWatch Logs
-• CloudWatch also provides built-in rules that you can use to analyze metrics from other AWS services.
-
-
-
-CloudWatch Application Insights:
-• Provides automated dashboards that show potential problems with monitored applications, to help isolate ongoing issues
-• Your applications run on Amazon EC2 Instances with select technologies only (Java, .NET, Microsoft IIS Web Server, databases…)
-• And you can use other AWS resources such as Amazon EBS, RDS, ELB, ASG, Lambda, SQS, DynamoDB, S3 bucket, ECS, EKS, SNS, API Gateway.
-• Powered by SageMaker
-• Enhanced visibility into your application health to reduce the time it will take you to troubleshoot and repair your applications
-• Findings and alerts are sent to Amazon EventBridge and SSM OpsCenter
-
-
-
-
-CloudWatch Insights and Operational Visibility:
-• CloudWatch Container Insights
-	• ECS, EKS, Kubernetes on EC2, Fargate, needs agent for Kubernetes
-	• Metrics and logs
-• CloudWatch Lambda Insights
-	• Detailed metrics to troubleshoot serverless applications
-• CloudWatch Contributors Insights
-	• Find “Top-N” Contributors through CloudWatch Logs
-• CloudWatch Application Insights
-	• Automatic dashboard to troubleshoot your application and related AWS services
-
-
-
-
 
 
 90
 ##CloudTrail
 -------------------------------------------------
+• Provides governance, compliance and audit for your AWS Account
+• CloudTrail is enabled by default!
+• Can put logs from CloudTrail into CloudWatch Logs or S3
+• A trail can be applied to All Regions (default) or a single Region.
+• If a resource is deleted in AWS, investigate CloudTrail first!
+
 AWS CloudTrail is an AWS service that helps you enable governance, compliance, and operational and risk auditing of your 
 AWS account. 
 Actions taken by a user, role, or an AWS service are recorded as events in CloudTrail. 
@@ -5830,6 +6456,7 @@ Events include actions taken in the AWS Management Console, AWS Command Line Int
 There are two types of events that can be logged in CloudTrail: management events and data events.
 Management events provide information about management operations that are performed on resources in your AWS account.
 Think of Management events as things normally done by people when they are in AWS. 
+
 
 Examples:
 a user sign in
@@ -5861,7 +6488,8 @@ CloudTrail Events
 	• Amazon S3 object-level activity (ex: GetObject, DeleteObject, PutObject): can separate Read and Write Events
 	• AWS Lambda function execution activity (the Invoke API)
 
-• Insights Events:
+
+CloudTrail Insights:
   Enable CloudTrail Insights to detect unusual activity in your account:
 	• inaccurate resource provisioning
 	• hitting service limits
@@ -5921,9 +6549,35 @@ AWS Config is a service that enables you to assess, audit, and evaluate the conf
 Config continuously monitors and records your AWS resource configurations and allows you to automate the evaluation 
 of recorded configurations against desired configurations.
 
+• Helps with auditing and recording compliance of your AWS resources
+• Helps record configurations and changes over time
+• Questions that can be solved by AWS Config:
+• Is there unrestricted SSH access to my security groups?
+• Do my buckets have any public access?
+• How has my ALB configuration changed over time?
+• You can receive alerts (SNS notifications) for any changes
+• AWS Config is a per-region service
+• Can be aggregated across regions and accounts
+• Possibility of storing the configuration data into S3 (analyzed by Athena)
+
+
 
 AWS Config Rules does not prevent actions from happening (no deny)
 You can set Remediation Retries if the resource is still non-compliant after auto- remediation
+
+
+Config Rules – Remediations:
+Automate remediation of non-compliant resources using SSM Automation Documents
+You can set Remediation Retries if the resource is still non-compliant after auto- remediation
+
+
+
+
+Config Rules – Notifications:
+• Use EventBridge to trigger notifications when AWS resources are noncompliant
+• Ability to send configuration changes and compliance state notifications 
+  to SNS (all events – use SNS Filtering or filter at client-side)
+
 
 
 
@@ -5989,179 +6643,32 @@ It is a aws managed service, security is a shared responsibility.
 
 
 
-
-92
-##STS (Security Token Services)
--------------------------------------------------
-AWS STS is an AWS service that allows you to request temporary security credentials for your AWS resources, 
-for IAM authenticated users and users that are authenticated in AWS such as federated users via OpenID or SAML2.0.
-
-You use STS to provide trusted users with temporary access to resources via API calls, your AWS console or 
-the AWS command line interface (CLI)
-
-
-
-AWS STS – Security Token Service:
-• Allows to grant limited and temporary access to AWS resources.
-• Token is valid for up to one hour (must be refreshed)
-• AssumeRole
-• Within your own account: for enhanced security
-• Cross Account Access: assume role in target account to perform actions there
-• AssumeRoleWithSAML
-• return credentials for users logged with SAML
-• AssumeRoleWithWebIdentity
-• return creds for users logged with an IdP (Facebook Login, Google Login, OIDC compatible…)
-• AWS recommends against using this, and using Cognito instead
-• GetSessionToken
-• for MFA, from a user or AWS account root user
-
-
-Using STS to Assume a Role:
-• Define an IAM Role within your account or cross-account
-• Define which principals can access this IAM Role
-• Use AWS STS (Security Token Service) to retrieve credentials and impersonate the IAM Role you
-  have access to (AssumeRole API)
-• Temporary credentials can be valid between 15 minutes to 1 hour
-
-
-
-Identity Federation in AWS:
-• Federation lets users outside of AWS to assume temporary role for accessing AWS resources.
-• These users assume identity provided access role.
-Federations can have many flavors:
-	• SAML 2.0
-	• Custom Identity Broker
-	• Web Identity Federation with Amazon Cognito
-	• Web Identity Federation without Amazon Cognito
-	• Single Sign On
-	• Non-SAML with AWS Microsoft AD
-Using federation, you don’t need to create IAM users (user management is outside of AWS)
-
-
-ExamTips: Any time you see AssumeRole or Cross account access, its STS.
-
-Area:
-=====
-STS is a global service
-
-
-UseCase:
-========
--Identity Federation Use-Case
--Cross-Account Access using AWS STS
--EC2 Instance STS Credentials
-
-
-
-BillCost:
-=========
-No additional charge.
-
-
-
-Security:
-=========
-It is a aws managed service, security is a shared responsibility.
-
-
-
-
-
-
-93
-##Identity Federation & Cognito
--------------------------------------------------
-Amazon Cognito identity pools (federated identities) enable you to create unique identities for your users and federate them 
-with identity providers. 
-With an identity pool, you can obtain temporary, limited-privilege AWS credentials to access other AWS services. 
-
-Amazon Cognito identity pools support the following identity providers:
-Public providers: Login with Amazon (identity pools), Facebook (identity pools), Google (identity pools), 
-Sign in with Apple (identity pools).
-
-Amazon Cognito user pools:
-Open ID Connect providers (identity pools)
-SAML identity providers (identity pools)
-Developer authenticated identities (identity pools)
-
-
-AWS Free Tier
-Amazon Cognito Identity to create a User Pool, you pay based on your monthly active users (MAUs) only.
-
-
-Identity management for your apps
-Amazon Cognito
-	
-
-
-
-
-94
-##Directory Services 
--------------------------------------------------
-AWS Directory Service for Microsoft Active Directory, also known as AWS Managed Microsoft Active Directory (AD), 
-enables your directory-aware workloads and AWS resources to use managed Active Directory (AD) in AWS.
-
-AWS Directory Service for Microsoft Active Directory allows you to use a directory in one account and share it with 
-multiple accounts and VPCs.
-
-
-AWS Managed Microsoft AD makes it easy to migrate AD-dependent applications and Windows workloads to AWS. 
-With AWS Managed Microsoft AD, you can use Group Policies to manage EC2 instances and run AD-dependent applications in the 
-AWS Cloud without the need to deploy your own AD infrastructure
-
-
-AWS Directory Services:
-AWS Managed Microsoft AD
-	• Create your own AD in AWS, manage users locally, supports MFA
-	• Establish “trust” connections with your on- premises AD
-AD Connector
-	• Directory Gateway (proxy) to redirect to on- premises AD, supports MFA
-	• Users are managed on the on-premises AD
-Simple AD
-	• AD-compatible managed directory on AWS
-	• Cannot be joined with on-premises AD
-	
-	
-	
-Area:
-=====
-May REgional.
-
-
-UseCase:
-========
--Manage users and groups
--Provide single sign-on to applications and services
--Create and apply group policy
--Simplify the deployment and management of cloud-based Linux and Microsoft Windows workloads
--You can use AWS Managed Microsoft AD to enable multi-factor authentication by integrating with your 
- existing RADIUS-based MFA infrastructure to provide an additional layer of security when users access AWS applications.
--Securely connect to Amazon EC2 Linux and Windows instances
-
-
-
-BillCost:
-=========
-With AWS Directory Service, you pay only for the type and size of the managed directory that you use.
-
-
-
-Security:
-=========
-Managed Microsoft Active Directory
-AWS Directory Service
-It is a aws managed service, security is a shared responsibility.
-
-
-
-
-
-
-
 95
 ##Organizations
 -------------------------------------------------
+Global service
+• Allows to manage multiple AWS accounts
+• The main account is the management account
+• Other accounts are member accounts
+• Member accounts can only be part of one organization
+• Consolidated Billing across all accounts - single payment method
+• Pricing benefits from aggregated usage (volume discount for EC2, S3…)
+• Shared reserved instances and Savings Plans discounts across accounts
+• API is available to automate AWS account creation
+
+
+Advantages:
+	• Multi Account vs One Account Multi VPC
+	• Use tagging standards for billing purposes
+	• Enable CloudTrail on all accounts, send logs to central S3 account
+	• Send CloudWatch Logs to central logging account
+	• Establish Cross Account Roles for Admin purposes
+Security: Service Control Policies (SCP):
+	• IAM policies applied to OU or Accounts to restrict Users and Roles
+	• They do not apply to the management account (full admin power)
+	• Must have an explicit allow (does not allow anything by default – like IAM)
+
+
 An organization is an entity that you create to consolidate a collection of accounts so that you can administer them as a single unit.
 
 An organizational unit (OU) provides a means to group accounts within a root. 
@@ -6200,7 +6707,6 @@ Features:
 
 
 Service Control Policies (SCP):
-
 • Whitelist or blacklist IAM actions
 • Applied at the OU or Account level
 • Does not apply to the Master Account
@@ -6283,7 +6789,7 @@ It is a aws managed service, security is a shared responsibility.
 
 ++IAM Roles vs Resource Based Policies
 -------------------------------------------------
- Cross account:
+Cross account:
 • attaching a resource-based policy to a resource (example: S3 bucket policy)
 • OR using a role as a proxy
 • When you assume a role (user, application or service), you give up your
@@ -6297,80 +6803,97 @@ It is a aws managed service, security is a shared responsibility.
 
 ++Amazon EventBridge – Security
 -------------------------------------------------
-• When a rule runs, it needs permissions on the target
+• When a rule runs, it needs permissions from the target.
 • Resource-based policy: Lambda, SNS, SQS, CloudWatch Logs, API Gateway…
 • IAM role: Kinesis stream, Systems Manager Run Command, ECS task…
 
 
-96
-##RAM (Resource Access Manager)
+
+++IAM Permission Boundaries
 -------------------------------------------------
-AWS Resource Access Manager (RAM) helps you securely share your resources across AWS accounts, within your organization or 
-organizational units (OUs) in AWS Organizations, and with IAM roles and IAM users for supported resource types. 
-
-You can use AWS RAM to share resources with other AWS accounts.
-This eliminates the need to provision and manage resources in every account. 
-When you share a resource with another account, that account is granted access to the resource and any 
-policies and permissions in that account apply to the shared resource.
-
-
-Avoid resource duplication!
-VPC Subnets:
-	• allow to have all the resources launched in the same subnets
-	• must be from the same AWS Organizations.
-	• Cannot share security groups and default VPC
-	• Participants can manage their own resources in there
-	• Participants can't view, modify, delete resources that belong to other participants or the owner
-• AWS Transit Gateway
-• Route53 Resolver Rules
-• License Manager Configurations
-
-
-Each account:
-	• is responsible for its own resources
-	• cannot view, modify or delete other resources in other accounts
-Network is shared so:
-	• Anything deployed in the VPC can talk to other resources in the VPC
-	• Applications are accessed easily across accounts, using private IP!
-	• Security groups from other accounts can be referenced for maximum security.
+• IAM Permission Boundaries are supported for users and roles (not groups)
+• Advanced feature to use a managed policy to set the maximum permissions an IAM entity can get.
 
 
 
 
 
-
-
-97
-##AWS IAM Identity Center
+71
+##AWS Cognito
 -------------------------------------------------
-AWS Identity and Access Management (IAM), you can specify who or what can access services and resources in AWS, 
-centrally manage fine-grained permissions, and analyze access to refine permissions across AWS.
+Cognito only helps with authentication, not authorization.
+Amazon Cognito lets you add user sign-up, sign-in, and access control to your web and mobile apps quickly and easily. 
+Amazon Cognito scales to millions of users and supports sign-in with social identity providers, such as Apple, Facebook, Google, and 
+Amazon, and enterprise identity providers via SAML 2.0 and OpenID Connect.  
+
+
+Amazon Cognito is designed for developers who want to add user management and sync functionality to their mobile and web apps. 
+Developers can use Cognito Identity to add sign-up and sign-in to their apps and to enable their 
+users to securely access their app’s resources. 
+Cognito also enables developers to sync data across devices, platforms, and applications.
+
+
+
+AWS Cognito:
+• We want to give our users an identity so that they can interact with our application.
+Cognito User Pools:
+	• Sign in functionality for app users
+	• Integrate with API Gateway
+Cognito Identity Pools (Federated Identity):
+	• Provide AWS credentials to users so they can access AWS resources directly
+	• Integrate with Cognito User Pools as an identity provider
+Cognito Sync:
+	• Synchronize data from device to Cognito.
+	• May be deprecated and replaced by AppSync
+
+
+Cognito User Pools (CUP):
+• Create a serverless database of user for your mobile apps
+• Simple login: Username (or email) / password combination
+• Possibility to verify emails / phone numbers and add MFA
+• Can enable Federated Identities (Facebook, Google, SAML…)
+• Sends back a JSON Web Tokens (JWT)
+• Can be integrated with API Gateway for authentication
+
+
+Cognito – Federated Identity Pools:
+Goal:
+• Provide direct access to AWS Resources from the Client Side
+Example:
+• provide (temporary) access to write to S3 bucket using Facebook Login
+
 
 
 Area:
 =====
-Global
+Regional.
+Amazon Cognito user pools are each created in one AWS Region, and they store the user profile data only in that region. 
+User pools can send user data to a different 
+AWS Region, depending on how optional features are configured.
 
 
 UseCase:
 ========
-Apply fine-grained permissions and scale with attribute-based access control
-Manage per-account access or scale access across AWS accounts and applications
+Secure and scalable identity store
+Social and enterprise identity federation
+Standards-based authentication
+Access control for AWS resources
+Amazon Cognito provides solutions to control access to AWS resources from your app.
+Easy integration with your app
+
 
 
 BillCost:
 =========
-IAM is offered at no additional charge.
+Free Tier
+If you are using Cognito Identity to create a User Pool, you pay based on your monthly active users (MAUs) only. 
+
 
 
 Security:
 =========
-Cloud single-sign-on (SSO) service
-AWS IAM Identity Center (successor to AWS SSO)
-
-Securely manage access to services and resources
-AWS Identity & Access Management (IAM)
-
+Amazon Cognito supports multi-factor authentication and encryption of data-at-rest and in-transit. 
+Amazon Cognito is HIPAA eligible and PCI DSS, SOC, ISO/IEC 27001, ISO/IEC 27017, ISO/IEC 27018, and ISO 9001 compliant.
 
 
 
@@ -8903,472 +9426,6 @@ It is a aws managed service, security is a shared responsibility.
 	• Migrate your VMware vSphere-based workloads to AWS
 	• Run your production workloads across VMware vSphere-based private, public, and hybrid cloud environments
 	• Have a disaster recover strategy
-
-
-139
-##Rekognition
--------------------------------------------------
-• Find objects, people, text, scenes in images and videos using ML
-• Facial analysis and facial search to do user verification, people counting
-• Create a database of “familiar faces” or compare against celebrities
-
-
-
-Area:
-=====
-MayRegional
-
-
-UseCase:
-========
-• Labeling
-• Content Moderation
-• Text Detection
-• Face Detection and Analysis (gender, age range, emotions…)
-• Face Search and Verification
-• Celebrity Recognition
-• Pathing (ex: for sports game analysis)
-
-
-
-BillCost:
-=========
-As part of the AWS Free Tier, 
-Rekognition there are 3 different types of usage
-Amazon Rekognition Image pricing 
-Amazon Rekognition Video pricing
-Amazon Rekognition Custom Labels pricing
-
-
-
-Security:
-=========
-It is a aws managed service, security is a shared responsibility.
-
-
-
-
-
-140
-##Transcribe
--------------------------------------------------
-Automatically convert speech to text
-Uses a deep learning process called automatic speech recognition (ASR) to convert speech to text quickly and accurately
-
-
-
-Area:
-=====
-MayRegional
-
-
-
-UseCase:
-========
-• transcribe customer service calls
-• automate closed captioning and subtitling
-• generate metadata for media assets to create a fully searchable archive
-
-
-Get insights from customer conversations
-Search and analyze media content
-Create subtitles and meeting notes
-Improve clinical documentation
-
-
-BillCost:
-=========
-AWS Free Tier
-Amazon Transcribe API for both streaming and batch transcriptions is billed monthly based on the tiered pricing
-
-
-
-Security:
-=========
-It is a aws managed service, security is a shared responsibility.
-
-
-
-
-
-
-
-141
-##Polly
--------------------------------------------------
-Amazon Polly is a service that turns text into lifelike speech, allowing you to create applications that talk, 
-and build entirely new categories of speech-enabled products. 
-• Turn text into lifelike speech using deep learning 
-• Allowing you to create applications that talk
-
-
-Area:
-=====
-MayRegional
-
-
-
-UseCase:
-========
-Content creation
-Audio can be used as a complementary media to written and/or visual communication.
-
-
-
-BillCost:
-=========
-AWS Free Tier
-PAY-AS-YOU-GO MODEL
-You are billed monthly for the number of characters of text that you processed.
-
-
-Security:
-=========
-It is a aws managed service, security is a shared responsibility.
-
-
-
-
-
-
-
-142
-##Translate
--------------------------------------------------
-Amazon Translate is a neural machine translation service that delivers fast, high-quality, affordable, and customizable 
-language translation.
-
-• Natural and accurate language translation
-• Amazon Translate allows you to localize content - such as websites and applications - 
-for international users, and to easily translate large
-volumes of text efficiently.
-
-
-Area:
-=====
-MayRegional
-
-
-UseCase:
-========
-Language Localization
-It’s very difficult for human translation teams to keep up with dynamic or real-time content.
-
-
-
-BillCost:
-=========
-AWS Free Tiering
-Amazon Translate, you pay-as-you-go based on the number of characters of text that you processed.
-
-
-
-Security:
-=========
-It is a aws managed service, security is a shared responsibility.
-
-
-
-
-
-143
-##Lex+Connect
--------------------------------------------------
-With Amazon Lex, you can build conversational interactions (bots) that feel natural to your customers. 
-
-
-Amazon Lex: (same technology that powers Alexa)
-• Automatic Speech Recognition (ASR) to convert speech to text
-• Natural Language Understanding to recognize the intent of text, callers
-• Helps build chatbots, call center bots
-
-Amazon Connect:
-• Receive calls, create contact flows, cloud-based virtual contact center
-• Can integrate with other CRM systems or AWS
-• No upfront payments, 80% cheaper than traditional contact center solutions
-
-
-
-Area:
-=====
-MayRegional
-
-
-UseCase:
-========
-
-BillCost:
-=========
-Security:
-=========
-It is a aws managed service, security is a shared responsibility.
-
-
-
-
-144
-##Comprehend
--------------------------------------------------
-Amazon Comprehend provides natural language processing, Personal Identifiable Information (PII) detection and redaction, 
-Custom Classification and Entity detection, and topic modeling, enabling a broad range of 
-applications that can analyze raw text, and with some APIs, document formats like PDF and Word.
-
-For Natural Language Processing – NLP:
-	• Fully managed and serverless service
-	• Uses machine learning to find insights and relationships in text
-	• Language of the text
-	• Extracts key phrases, places, people, brands, or events
-	• Understands how positive or negative the text is
-	• Analyzes text using tokenization and parts of speech
-	• Automatically organizes a collection of text files by topic
-
-
-
-Area:
-=====
-UseCase:
-========
-• analyze customer interactions (emails) to find what leads to a positive or negative experience
-• Create and groups articles by topics that Comprehend will uncover
-
-
-Mine business and call center analytics
-Index and search product reviews
-Legal briefs management
-Process financial documents
-
-
-BillCost:
-=========
-Amazon Comprehend offers a free tier covering 50K units
-
-
-
-Security:
-=========
-It is a aws managed service, security is a shared responsibility.
-
-
-
-
-++Comprehend Medical Overview
--------------------------------------------------
-Amazon Comprehend Medical detects and returns useful information in unstructured clinical text:
-	• Physician’s notes
-	• Discharge summaries
-	• Test results
-	• Case notes
-• Uses NLP to detect Protected Health Information (PHI) – DetectPHI API
-• Store your documents in Amazon S3, analyze real-time data with Kinesis
-  Data Firehose, or use Amazon Transcribe to transcribe patient narratives
-  into text that can be analyzed by Amazon Comprehend Medical.
-
-
-
-
-
-
-145
-##SageMaker
--------------------------------------------------
-Amazon SageMaker is a fully managed machine learning service. 
-With SageMaker, data scientists and developers can quickly and easily build and train machine learning models, 
-and then directly deploy them into a production-ready hosted environment. 
-
-
-
-Fully managed service for developers / data scientists to build ML models
-• Typically, difficult to do all the processes in one place + provision servers
-• Machine learning process (simplified): predicting your exam score
-
-
-Area:
-=====
-MayRegional
-
-UseCase:
-========
-
-
-BillCost:
-=========
-
-
-Security:
-=========
-It is a aws managed service, security is a shared responsibility.
-
-
-
-
-
-146
-##Forecast
--------------------------------------------------
-Fully managed service that uses ML to deliver highly accurate forecasts
-• Example: predict the future sales of a raincoat
-• 50% more accurate than looking at the data itself
-• Reduce forecasting time from months to hours
-• Use cases: Product Demand Planning, Financial Planning, Resource Planning
-
-
-Area:
-=====
-
-
-UseCase:
-========
-Add ML forecasting to your SaaS solutions
-Enhance software as a service (SaaS) product capabilities with integrated ML-based forecasts to identify complex demand relationships.
-Optimize product demand planning
-Predict inventory needs at individual stores by combining historical sales and demand data with associated web traffic, pricing, product category, weather, and holiday information.
-Manage resources efficiently
-
-Improve utilization and customer satisfaction with accurate resource requirement forecasting in near-real time.
-
-
-
-BillCost:
-=========
-AWS Free Tier
-There are four different types of costs to consider when using Amazon Forecast:
- 
-Imported data: Cost for each GB of data imported into Amazon Forecast for training and forecasting.
-Training a predictor: Cost for each hour of infrastructure use required for building a custom predictor based on your input data or for monitoring predictor performance.
-Generated forecast data points:  Cost for number of unique forecast values generated across all time series (items and dimensions) combinations.
-Forecast explanations: Cost for explaining the impact of attributes or related data on your forecasts for each item and time point. 
-
-
-
-
-Security:
-=========
-It is a aws managed service, security is a shared responsibility.
-
-
-
-
-
-146
-##Kendra
--------------------------------------------------
-Fully managed document search service powered by Machine Learning
-• Extract answers from within a document (text, pdf, HTML, PowerPoint, MS Word, FAQs…)
-• Natural language search capabilities
-• Learn from user interactions/feedback to promote preferred results (Incremental Learning)
-• Ability to manually fine-tune search results (importance of data, freshness, custom, …)
-
-
-Area:
-=====
-MayRegional
-
-
-UseCase:
-========
-Accelerate research and development
-Minimize regulatory and compliance risks
-Improve customer interactions
-Increase employee productivity
-
-
-BillCost:
-=========
-AWS Free Tier
-
-
-
-Security:
-=========
-It is a aws managed service, security is a shared responsibility.
-
-
-
-
-
-
-148
-##Personalize
--------------------------------------------------
-Fully managed ML-service to build apps with real-time personalized recommendations
-• Example: personalized product recommendations/re-ranking, customized direct marketing
-	• Example: User bought gardening tools, provide recommendations on the next one to buy
-• Same technology used by Amazon.com
-• Integrates into existing websites, applications, SMS, email marketing systems, …
-• Implement in days, not months (you don’t need to build, train, and deploy ML solutions)
-
-
-
-Area:
-=====
-MayRegional
-
-UseCase:
-========
-• Use cases: retail stores, media and entertainment…
-
-
-BillCost:
-=========
-
-Security:
-=========
-It is a aws managed service, security is a shared responsibility.
-
-
-
-
-148
-##Textract
--------------------------------------------------
-• Automatically extracts text, handwriting, and data from any scanned documents using AI and ML
-• Extract data from forms and tables
-• Read and process any type of document (PDFs, images, …)
-
-
-Area:
-=====
-MayRegional
-
-
-UseCase:
-========
-• Financial Services (e.g., invoices, financial reports)
-• Healthcare (e.g., medical records, insurance claims)
-• Public Sector (e.g., tax forms, ID documents, passports)
-
-Personalized recommendations
-Similar items
-Personalized reranking (i.e. rerank a list of items for a user)
-Personalized promotions/notifications
-
-
-BillCost:
-=========
-2 months free
-
-
-Security:
-=========
-It is a aws managed service, security is a shared responsibility.
-
-
-
-
-AWS Machine Learning- Summary:
-• Rekognition: face detection, labeling, celebrity recognition
-• Transcribe: audio to text (ex: subtitles) 
-• Polly: text to audio 
-• Translate: translations 
-• Lex: build conversational bots – chatbots 
-• Connect: cloud contact center 
-• Comprehend: natural language processing 
-• SageMaker: machine learning for every developer and data scientist 
-• Forecast: build highly accurate forecasts 
-• Kendra: ML-powered search engine 
-• Personalize: real-time personalized recommendations 
-• Textract: detect text and data in documents
-
 
 
 

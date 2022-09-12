@@ -349,3 +349,396 @@ AWS Storage:
 SDK:
 • Good to know: if you don’t specify or configure a default region, then
 us-east-1 will be chosen by default
+
+
+
+
+
+72
+##SAM (Serverless Appliction Model)
+-------------------------------------------------
+The AWS Serverless Application Model (AWS SAM) is an open-source framework that you can use to build serverless 
+applications on AWS.
+A serverless application is a combination of Lambda functions, event sources, and other resources that work 
+together to perform tasks.
+
+All the configuration is YAML code:
+• Lambda Functions
+• DynamoDB tables
+• API Gateway
+• Cognito User Pools
+
+
+
+Area:
+=====
+Regional.
+
+
+UseCase:
+========
+Single-deployment configuration.
+Extension of AWS CloudFormation.
+
+
+BillCost:
+=========
+There is no additional charge to use AWS SAM. 
+
+
+Security:
+=========
+It is a aws managed service, security is a shared responsibility.
+
+
+
+
+73
+##AWS Distributing Paid Content
+-------------------------------------------------
+You can configure CloudFront to require that users access your files using either signed URLs or signed cookies. 
+
+Premium User Video service:
+We have implemented a fully serverless solution:
+• Cognito for authentication
+• DynamoDB for storing users that are premium
+• 2 serverless applications
+	• Premium User registration
+	• CloudFront Signed URL generator
+• Content is stored in S3 (serverless and scalable)
+• Integrated with CloudFront with OAI for security (users can’t bypass)
+• CloudFront can only be used using Signed URLs to prevent unauthorized users
+• What about S3 Signed URL? They’re not efficient for global access-enabled
+
+
+An ending date and time, after which the URL is no longer valid.
+(Optional) The date and time that the URL becomes valid.
+(Optional) The IP address or range of addresses of the computers that can be used to access your content.
+
+
+
+
+
+
+75
+##Big Data Ingestion Pipeline
+-------------------------------------------------
+AWS Data Pipeline is a web service that helps you reliably process and move data between different 
+AWS compute and storage services, as well as on-premises data sources, at specified intervals. 
+
+With AWS Data Pipeline, you can regularly access your data where it’s stored, transform and process it at scale, 
+and efficiently transfer the results to 
+AWS services such as Amazon S3, Amazon RDS, Amazon DynamoDB, and Amazon EMR.
+
+
+AWS Data Pipeline helps you easily create complex data processing workloads that are fault tolerant, 
+repeatable, and highly available. 
+AWS Data Pipeline also allows you to move and process data that was previously locked up in on-premises data silos.
+ 
+AWS Data Pipeline is billed based on how often your activities and preconditions are scheduled to run and 
+where they run (AWS or on-premises). 
+
+ 
+Big Data Ingestion Pipeline discussion:
+• IoT Core allows you to harvest data from IoT devices
+• Kinesis is great for real-time data collection
+• Firehose helps with data delivery to S3 in near real-time (1 minute)
+• Lambda can help Firehose with data transformations
+• Amazon S3 can trigger notifications to SQS
+• Lambda can subscribe to SQS (we could have connecter S3 to Lambda)
+• Athena is a serverless SQL service and results are stored in S3
+• The reporting bucket contains analyzed data and can be used by reporting tool such as AWS QuickSight, Redshift, etc.
+
+
+
+
+
+
+79
+##Neptune
+-------------------------------------------------
+Fully managed graph database.
+
+
+Neptune for Solutions Architect:
+• Operations: similar to RDS
+• Security: IAM, VPC, KMS, SSL (similar to RDS) + IAM Authentication
+• Reliability: Multi-AZ, clustering
+• Performance: best suited for graphs, clustering to improve performance
+• Remember: Neptune = Graphs
+
+
+
+
+
+
+Area:
+=====
+Regional.
+
+
+UseCase:
+========
+• High relationship data 
+• Social Networking: Users friends with Users, replied to comment on post of user and likes other comments.
+• Knowledge graphs (Wikipedia) 
+
+
+BillCost:
+=========
+Pay per node provisioned (similar to RDS)
+
+
+
+Security:
+=========
+Amazon Neptune supports HTTPS encrypted client connections and also allows you to encrypt your databases using keys you 
+manage through AWS Key Management Service (KMS). 
+
+
+
+
+
+
+92
+##STS (Security Token Services)
+-------------------------------------------------
+AWS STS is an AWS service that allows you to request temporary security credentials for your AWS resources, 
+for IAM authenticated users and users that are authenticated in AWS such as federated users via OpenID or SAML2.0.
+
+You use STS to provide trusted users with temporary access to resources via API calls, your AWS console or 
+the AWS command line interface (CLI)
+
+
+
+AWS STS – Security Token Service:
+• Allows to grant limited and temporary access to AWS resources.
+• Token is valid for up to one hour (must be refreshed)
+• AssumeRole
+• Within your own account: for enhanced security
+• Cross Account Access: assume role in target account to perform actions there
+• AssumeRoleWithSAML
+• return credentials for users logged with SAML
+• AssumeRoleWithWebIdentity
+• return creds for users logged with an IdP (Facebook Login, Google Login, OIDC compatible…)
+• AWS recommends against using this, and using Cognito instead
+• GetSessionToken
+• for MFA, from a user or AWS account root user
+
+
+Using STS to Assume a Role:
+• Define an IAM Role within your account or cross-account
+• Define which principals can access this IAM Role
+• Use AWS STS (Security Token Service) to retrieve credentials and impersonate the IAM Role you
+  have access to (AssumeRole API)
+• Temporary credentials can be valid between 15 minutes to 1 hour
+
+
+
+Identity Federation in AWS:
+• Federation lets users outside of AWS to assume temporary role for accessing AWS resources.
+• These users assume identity provided access role.
+Federations can have many flavors:
+	• SAML 2.0
+	• Custom Identity Broker
+	• Web Identity Federation with Amazon Cognito
+	• Web Identity Federation without Amazon Cognito
+	• Single Sign On
+	• Non-SAML with AWS Microsoft AD
+Using federation, you don’t need to create IAM users (user management is outside of AWS)
+
+
+ExamTips: Any time you see AssumeRole or Cross account access, its STS.
+
+Area:
+=====
+STS is a global service
+
+
+UseCase:
+========
+-Identity Federation Use-Case
+-Cross-Account Access using AWS STS
+-EC2 Instance STS Credentials
+
+
+
+BillCost:
+=========
+No additional charge.
+
+
+
+Security:
+=========
+It is a aws managed service, security is a shared responsibility.
+
+
+
+
+
+
+93
+##Identity Federation & Cognito
+-------------------------------------------------
+Amazon Cognito identity pools (federated identities) enable you to create unique identities for your users and federate them 
+with identity providers. 
+With an identity pool, you can obtain temporary, limited-privilege AWS credentials to access other AWS services. 
+
+Amazon Cognito identity pools support the following identity providers:
+Public providers: Login with Amazon (identity pools), Facebook (identity pools), Google (identity pools), 
+Sign in with Apple (identity pools).
+
+Amazon Cognito user pools:
+Open ID Connect providers (identity pools)
+SAML identity providers (identity pools)
+Developer authenticated identities (identity pools)
+
+
+AWS Free Tier
+Amazon Cognito Identity to create a User Pool, you pay based on your monthly active users (MAUs) only.
+
+
+Identity management for your apps
+Amazon Cognito
+	
+
+
+
+
+94
+##Directory Services 
+-------------------------------------------------
+AWS Directory Service for Microsoft Active Directory, also known as AWS Managed Microsoft Active Directory (AD), 
+enables your directory-aware workloads and AWS resources to use managed Active Directory (AD) in AWS.
+
+AWS Directory Service for Microsoft Active Directory allows you to use a directory in one account and share it with 
+multiple accounts and VPCs.
+
+
+AWS Managed Microsoft AD makes it easy to migrate AD-dependent applications and Windows workloads to AWS. 
+With AWS Managed Microsoft AD, you can use Group Policies to manage EC2 instances and run AD-dependent applications in the 
+AWS Cloud without the need to deploy your own AD infrastructure
+
+
+AWS Directory Services:
+AWS Managed Microsoft AD
+	• Create your own AD in AWS, manage users locally, supports MFA
+	• Establish “trust” connections with your on- premises AD
+AD Connector
+	• Directory Gateway (proxy) to redirect to on- premises AD, supports MFA
+	• Users are managed on the on-premises AD
+Simple AD
+	• AD-compatible managed directory on AWS
+	• Cannot be joined with on-premises AD
+	
+	
+	
+Area:
+=====
+May REgional.
+
+
+UseCase:
+========
+-Manage users and groups
+-Provide single sign-on to applications and services
+-Create and apply group policy
+-Simplify the deployment and management of cloud-based Linux and Microsoft Windows workloads
+-You can use AWS Managed Microsoft AD to enable multi-factor authentication by integrating with your 
+ existing RADIUS-based MFA infrastructure to provide an additional layer of security when users access AWS applications.
+-Securely connect to Amazon EC2 Linux and Windows instances
+
+
+
+BillCost:
+=========
+With AWS Directory Service, you pay only for the type and size of the managed directory that you use.
+
+
+
+Security:
+=========
+Managed Microsoft Active Directory
+AWS Directory Service
+It is a aws managed service, security is a shared responsibility.
+
+
+
+
+
+
+
+96
+##RAM (Resource Access Manager)
+-------------------------------------------------
+AWS Resource Access Manager (RAM) helps you securely share your resources across AWS accounts, within your organization or 
+organizational units (OUs) in AWS Organizations, and with IAM roles and IAM users for supported resource types. 
+
+You can use AWS RAM to share resources with other AWS accounts.
+This eliminates the need to provision and manage resources in every account. 
+When you share a resource with another account, that account is granted access to the resource and any 
+policies and permissions in that account apply to the shared resource.
+
+
+Avoid resource duplication!
+VPC Subnets:
+	• allow to have all the resources launched in the same subnets
+	• must be from the same AWS Organizations.
+	• Cannot share security groups and default VPC
+	• Participants can manage their own resources in there
+	• Participants can't view, modify, delete resources that belong to other participants or the owner
+• AWS Transit Gateway
+• Route53 Resolver Rules
+• License Manager Configurations
+
+
+Each account:
+	• is responsible for its own resources
+	• cannot view, modify or delete other resources in other accounts
+Network is shared so:
+	• Anything deployed in the VPC can talk to other resources in the VPC
+	• Applications are accessed easily across accounts, using private IP!
+	• Security groups from other accounts can be referenced for maximum security.
+
+
+
+
+
+
+
+97
+##AWS IAM Identity Center
+-------------------------------------------------
+AWS Identity and Access Management (IAM), you can specify who or what can access services and resources in AWS, 
+centrally manage fine-grained permissions, and analyze access to refine permissions across AWS.
+
+
+Area:
+=====
+Global
+
+
+UseCase:
+========
+Apply fine-grained permissions and scale with attribute-based access control
+Manage per-account access or scale access across AWS accounts and applications
+
+
+BillCost:
+=========
+IAM is offered at no additional charge.
+
+
+Security:
+=========
+Cloud single-sign-on (SSO) service
+AWS IAM Identity Center (successor to AWS SSO)
+
+Securely manage access to services and resources
+AWS Identity & Access Management (IAM)
+
+
+
+
+
