@@ -2857,7 +2857,7 @@ CloudFront improves performance for both cacheable content (such as images and v
 dynamic content (such as API acceleration and dynamic site delivery).
 
 Global Accelerator improves performance for a wide range of applications over TCP or UDP by proxying packets at the 
-edge to applications running in one or more AWS Regions.
+edge to applications running in one or more AWS Regions.It use dedicated AWS Global Network.
 
 
 CloudFront– Origins:
@@ -2956,7 +2956,7 @@ geographical area, keeping their needs in the forefront.
 
 BillCost:
 =========
-AWS CloudFront is in Free Usage Tier.
+AWS CloudFront is in Free Tier.
 Pricing varies by usage type, geographical region, and feature selection.
 
 
@@ -2972,60 +2972,6 @@ All CloudFront customers benefit from the automatic protections of AWS Shield St
 
 
 53
-##CloudFront Signed URL/Coocks
--------------------------------------------------
-You can control user access to your private content in two ways:
--Restrict access to files in CloudFront edge caches
--Restrict access to files in your Amazon S3 bucket (unless you’ve configured it as a website endpoint)
-You can configure CloudFront to require that users access your files using either signed URLs or signed cookies.
-
-
-CloudFront signed URLs and signed cookies provide the same basic functionality: they allow you to control 
-who can access your content. 
-If you want to serve private content through CloudFront and you're trying to decide whether to use signed URLs or 
-signed cookies, consider the following.
-
-
-Signed URL is a url with a signature. The signature allows you to verify your credibility to access the 
-resource while url locates the resource. 
-Signed URLs are used to deliver private content securely.
-
-
-CloudFront signed cookies allow you to control who can access your content when you don't want to change your current 
-URLs or when you want to provide access to multiple restricted files, for example, all of the files in the subscribers' 
-area of a website.
-
-
-
-
-
-Area:
-=====
-Global servicew.
-
-
-UseCase:
-========
-For accessing private contain Use a signed URL a user gets access only to a single file whereas with a 
-signed cookie a user can access multiple files.
-
-
-
-BillCost:
-=========
-Pricing varies by usage type, geographical region, and feature selection.
-
-
-
-Security:
-=========
-Support for Encryption at Rest and Transit.
-onfigure HTTPS connections.
-Use signed URLs or cookies to restrict access for selected users.
-
-
-
-
 ++CloudFront - price Classes
 -------------------------------------------------
 • CloudFront Edge locations are all around the world 
@@ -3043,13 +2989,12 @@ Three price classes:
 
 
 
-
 ++CloudFront Cache Invalidation
 -------------------------------------------------
 • In case you update the back-end origin, CloudFront doesn’t know about it and will only get the
   refreshed content after the TTL has expired
 • However, you can force an entire or partial cache refresh (thus bypassing the TTL) by performing a CloudFront Invalidation.
-• You can invalidate all files (*) or a special path (/images/*
+• You can invalidate all files (*) or a special path (/images/*)
 
 
 Global users for our application:
@@ -3144,6 +3089,11 @@ from denial-of-service attacks by using always-on network flow monitoring and au
 55
 ##Snow Family
 -------------------------------------------------
+AWS Snow Family: offline devices to perform data migrations
+If it takes more than a week to transfer over the network, use Snowball devices
+We setup a Snowball Edge/Snowcone device to do edge computing.
+
+
 Highly-secure, portable devices to collect and process data at the edge, and migrate data into and out of AWS. 
 It is a cost-effective way to transfer data offline. 
 
@@ -3157,19 +3107,32 @@ AWS snow family service model is of three types:
 AWS snow cone: AWS Snow cone is the most compact and portable device weighing in at 4.5 pounds (2.1kg). 
 It is available in HDD and SDD options. Snowcone is ruggedized, secure, and purpose-built for use outside of a 
 traditional data centre. 
+Can be sent back to AWS offline, or connect it to internet and use AWS DataSync to send data
 
 AWS snowball: AWS snowball is available as compute optimized device and storage optimized device. 
 These devices are suited for extreme conditions, tamper-proof, and highly secure. 
+Use cases: large data cloud migrations, DC decommission, disaster recovery
+Pay per data transfer job
 
 AWS snowmobile: AWS snowmobile is an Exabyte-scale data migration device which is used to move extremely large data. 
 It migrates up to 100PB in a 45-foot-long ruggedized shipping container, pulled by a semi-trailer truck. 
+• High security: temperature controlled, GPS, 24/7 video surveillance
+• Better than Snowball if you transfer more than 10 PB
 
-We setup a Snowball Edge/Snowcone device to do edge computing.
-AWS Snow Family: offline devices to perform data migrations
-If it takes more than a week to transfer over the network, use Snowball devices
 
 
 Snow Family – Edge Computing:
+• Process data while it’s being created on an edge location
+• A truck on the road, a ship on the sea, a mining station underground...
+• These locations may have
+	• Limited / no internet access
+	• Limited / no easy access to computing power
+• We setup a Snowball Edge / Snowcone device to do edge computing
+• Use cases of Edge Computing:
+	• Preprocess data
+	• Machine learning at the edge
+	• Transcoding media streams
+	
 • Snowcone (smaller)
 	• 2 CPUs, 4 GB of memory, wired or wireless access
 	• USB-C power using a cord or the optional battery
@@ -3184,9 +3147,20 @@ Snow Family – Edge Computing:
 • Long-term deployment options: 1 and 3 years discounted pricing
 
 
+
 AWS OpsHub (a software you install on your computer / laptop) to manage your Snow Family Device.
 Snowball cannot import to Glacier directly.
 You must use Amazon S3 first, in combination with an S3 lifecycle policy.
+
+
+Snow Family – Usage Process:
+1. Request Snowball devices from the AWS console for delivery
+2. Install the snowball client / AWS OpsHub on your servers
+3. Connect the snowball to your servers and copy files using the client
+4. Ship back the device when you’re done (goes to the right AWS facility)
+5. Data will be loaded into an S3 bucket
+6. Snowball is completely wiped.
+
 
 
 Area:
@@ -3196,6 +3170,11 @@ Global.
 
 UseCase:
 ========
+AWS Snow Family: offline devices to perform data migrations
+If it takes more than a week to transfer over the network, use Snowball devices
+We setup a Snowball Edge/Snowcone device to do edge computing.
+
+
 The AWS Snow Family helps customers that need to run operations in austere, non-data center environments, 
 and in locations where there's lack of consistent network connectivity. 
 
@@ -3214,6 +3193,7 @@ Snowmobile pricing is based on the amount of data stored on the truck per month.
 
 With AWS Snowball, you pay only for your use of the device and for data transfer out of AWS. 
 There are two ways to pay for AWS Snowball: on-demand and committed upfront pricing.
+
 
 
 Security:
@@ -3267,22 +3247,68 @@ Seamless integration with S3:
 • Can be used from on-premises servers (VPN or Direct Connect)
 
 
+FSx Lustre - File System Deployment Options:
+•Scratch File System
+	• Temporary storage
+	• Data is not replicated (doesn’t persist if file server fails)
+	• High burst (6x faster, 200MBps per TiB)
+	• Usage: short-term processing, optimize costs
+• Persistent File System
+	• Long-term storage
+	• Data is replicated within same AZ
+	• Replace failed files within minutes
+	• Usage: long-term processing, sensitive data
+
+
+Amazon FSx for NetApp ONTAP:
+• Managed NetApp ONTAP on AWS
+• File System compatible with NFS, SMB, iSCSI protocol
+• Move workloads running on ONTAP or NAS to AWS
+• Works with:
+	• Linux
+	• Windows
+	• MacOS
+	• VMware Cloud on AWS
+	• Amazon Workspaces & AppStream 2.0
+	• Amazon EC2, ECS and EKS
+• Storage shrinks or grows automatically
+• Snapshots, replication, low-cost, compression and data de-duplication
+• Point-in-time instantaneous cloning (helpful for testing new workloads)
+
+
+
+Amazon FSx for OpenZFS:
+• Managed OpenZFS file system on AWS
+• File System compatible with NFS (v3, v4, v4.1, v4.2)
+• Move workloads running on ZFS to AWS
+• Works with:
+	• Linux
+	• Windows
+	• MacOS
+	• VMware Cloud on AWS
+	• Amazon Workspaces & AppStream 2.0
+	• Amazon EC2, ECS and EKS
+• Up to 1,000,000 IOPS with < 0.5ms latency
+• Snapshots, compression and low-cost
+• Point-in-time instantaneous cloning (helpful for testing new workloads)
+
+
 
 Hybrid Cloud for Storage:
 • S3 is a proprietary storage technology (unlike EFS / NFS), so how do you expose the S3 data on-premises?
-  AWS Storage Gateway.
+  Ans: AWS Storage Gateway.
 
 
 AWS Storage Cloud Native Options:
-
 Block  
-Amazon EBS EC2 Instance Store
+Amazon EBS, EC2 Instance Store
 
 File
-Amazon EFS Amazon FSx 
+Amazon EFS, Amazon FSx 
 
 Object
-Amazon S3 Amazon Glacier
+Amazon S3, Amazon Glacier
+
 
 
 
