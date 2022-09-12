@@ -3353,13 +3353,11 @@ The service has ISO, PCI-DSS, and SOC certifications, and is also HIPAA eligible
 57
 ##Storage Gateway
 -------------------------------------------------
-AWS Storage Gateway is a set of hybrid cloud storage services that provide on-premises access to virtually 
-unlimited cloud storage.
+Bridge between on-premises data and cloud data
 
 Storage Gateway provides a standard set of storage protocols such as 
 iSCSI, SMB, and NFS, which allow you to use AWS storage without rewriting your existing applications. 
 
-AWS Storage Gateway: Bridge between on-premises data and cloud data in S3
 Use cases: disaster recovery, backup & restore, tiered storage
 
 3 types of Storage Gateway:
@@ -3368,15 +3366,34 @@ Use cases: disaster recovery, backup & restore, tiered storage
 • Tape Gateway
 Exam Tip: You need to know the differences between all 3!
 
+++
+• S3 File Gateway
+• FSx File Gateway
+• Volume Gateway
+• Tape Gateway
 
 
-File Gateway:Used for flat files only, stored directly on S3.
+
+S3 File Gateway:Used for flat files only, stored directly on S3.
 • Configured S3 buckets are accessible using the NFS and SMB protocol
 • Supports S3 standard, S3 IA, S3 One Zone IA
 • Bucket access using IAM roles for each File Gateway
 • Most recently used data is cached in the file gateway
 • Can be mounted on many servers
 • Integrated with Active Directory (AD) for user authentication
+
+
+
+Amazon FSx File Gateway:
+File Gateway synchronizes changed data to FSx for Windows File Server in the background. With these capabilities,
+you can consolidate all of your on-premises file share data in AWS on FSx for 
+Windows File Server and benefit from protected, resilient, fully managed file systems.
+• Native access to Amazon FSx for Windows File Server
+• Local cache for frequently accessed data
+• Windows native compatibility (SMB, NTFS, Active Directory...)
+• Useful for group file shares and home directories
+
+
 
 
 Volume Gateway:
@@ -3403,16 +3420,9 @@ Storage Gateway – Hardware appliance:
 • Otherwise, you can use a Storage Gateway Hardware Appliance
 • You can buy it on amazon.com
 
-
-Amazon FSx File Gateway:
-File Gateway synchronizes changed data to FSx for Windows File Server in the background. With these capabilities,
-you can consolidate all of your on-premises file share data in AWS on FSx for 
-Windows File Server and benefit from protected, resilient, fully managed file systems.
-• Native access to Amazon FSx for Windows File Server
-• Local cache for frequently accessed data
-• Windows native compatibility (SMB, NTFS, Active Directory...)
-• Useful for group file shares and home directories
-
+• Works with File Gateway, Volume Gateway, Tape Gateway
+• Has the required CPU, memory, network, SSD cache resources
+• Helpful for daily NFS backups in small data centers
 
 
 Gateway Types:
@@ -3454,6 +3464,8 @@ All data transferred between the gateway and AWS storage is encrypted using SSL.
 
 
 
+
+
 58
 ##Transfer Famamily 
 -------------------------------------------------
@@ -3480,18 +3492,6 @@ WinSCP (Microsoft Windows only)
 Cyberduck (Windows, macOS, and Linux)
 FileZilla (Windows, macOS, and Linux)
 
-
-Storage Comparison:
-• S3: Object Storage
-• Glacier: Object Archival
-• EFS: Network File System for Linux instances, POSIX filesystem
-• FSx for Windows: Network File System for Windows servers
-• FSx for Lustre: High Performance Computing Linux file system
-• EBS volumes: Network storage for one EC2 instance at a time
-• Instance Storage: Physical storage for your EC2 instance (high IOPS)
-• Storage Gateway: File Gateway, Volume Gateway (cache & stored), Tape Gateway
-• Snowball / Snowmobile: to move large amount of data to the cloud, physically
-• Database: for specific workloads, usually with indexing and querying
 
 
 
@@ -3526,11 +3526,32 @@ Security is a shared responsibility.
 
 ++DataSynce
 -------------------------------------------------
+Schedule data sync from on-premises to AWS, or AWS to AWS.
+
+S3-to-S3
+AWS DataSync copy data and metadata between AWS Storage Services
 
 
 
-++All Aws Storage Options Compared
+
+
+++All Aws Storage Comparison
 -------------------------------------------------
+Storage Comparison:
+• S3: Object Storage
+• S3 Glacier: Object Archival
+• EBS volumes: Network storage for one EC2 instance at a time
+• Instance Storage: Physical storage for your EC2 instance (high IOPS)
+• EFS: Network File System for Linux instances, POSIX filesystem
+• FSx for Windows: Network File System for Windows servers
+• FSx for Lustre: High Performance Computing Linux file system
+• FSx for NetApp ONTAP: High OS Compatibility
+• FSx for OpenZFS: Managed ZFS file system
+• Storage Gateway: S3 & FSx File Gateway, Volume Gateway (cache & stored), Tape Gateway
+• Transfer Family: FTP, FTPS, SFTP interface on top of Amazon S3 or Amazon EFS
+• DataSync: Schedule data sync from on-premises to AWS, or AWS to AWS
+• Snowcone / Snowball / Snowmobile: to move large amount of data to the cloud, physically
+• Database: for specific workloads, usually with indexing and querying
 
 
 
@@ -3538,6 +3559,13 @@ Security is a shared responsibility.
 59
 ##Decouple your applications:
 -------------------------------------------------
+There are two patterns of application communication:
+	1) Synchronous communications (application to application)
+	2) Asynchronous / Event based (application to queue to application)
+	
+• Synchronous between applications can be problematic if there are sudden spikes of traffic
+• What if you need to suddenly encode 1000 videos but usually it’s 10?
+
 SQS, SNS are “cloud-native” services, and they’re using proprietary protocols from AWS.
 Traditional applications running from on-premises may use open protocols such as: MQTT, AMQP, STOMP, Openwire, WSS
 
@@ -3584,19 +3612,21 @@ Message Visibility Timeout:
 • After the message visibility timeout is over, the message is “visible” in SQS again for every consumer
 
 
+
 Dead Letter Queue:
-• We can set a threshold of how many times a message
-can go back to the queue
-• After the MaximumReceives threshold is exceeded, the
-message goes into a dead letter queue (DLQ)
-• Useful for debugging! 
-Good to set a retention of 14 days in the DLQ
+• We can set a threshold of how many times a message can go back to the queue
+• After the MaximumReceives threshold is exceeded, the message goes into a dead letter queue (DLQ)
+• Useful for debugging!  Good to set a retention of 14 days in the DLQ
+
+
 
 Delay Queue:
 • Delay a message (consumers don’t see it immediately) up to 15 minutes
 • Default is 0 seconds (message is available right away)
 • Can set a default at queue level
 • Can override the default on send using the DelaySeconds parameter
+
+
 
 Long Polling:
 • When a consumer requests messages from the queue, it can optionally “wait” for messages to
@@ -3627,13 +3657,18 @@ Area:
 SQS is a regional service, that is highly available within a single region. 
 There is no cross-region replication capability.
 
+
+
 UseCase:
 ========
-Decouple and scale
+SQS as a buffer to database writes
+SQS to decouple between application tiers
+
 Eliminate administrative overhead
 Reliably deliver messages
-Keep sensitive data secure
 Scale elastically and cost-effectively
+
+
 
 BillCost:
 =========
@@ -3664,6 +3699,10 @@ As a managed service, Amazon SQS is protected by the AWS global network security
 
 ++SQS+Auto Scaling Group
 -------------------------------------------------
+CloudWatch Metric – Queue Length ApproximateNumberOfMessages and scale EC2
+
+
+
 
 
 61
@@ -3673,13 +3712,13 @@ Amazon Simple Notification Service (Amazon SNS) is a fully managed messaging ser
 application-to-application (A2A) and application-to-person (A2P) communication.
 
 The A2A pub/sub functionality provides topics for high-throughput, push-based, many-to-many messaging between 
-distributed systems, 
-microservices, and event-driven serverless applications. 
+distributed systems,  microservices, and event-driven serverless applications. 
 
 Using Amazon SNS topics, your publisher systems can fanout messages to a 
 large number of subscriber systems, including Amazon SQS queues, AWS Lambda functions, HTTPS endpoints, and 
 Amazon Kinesis Data Firehose,  for parallel processing. 
 The A2P functionality enables you to send messages to users at scale via SMS, mobile push, and email.
+
 
 Fan Out:
 • Push once in SNS, receive in all SQS queues that are subscribers
@@ -3700,7 +3739,7 @@ Message Filtering:
 • If a subscription doesn’t have a filter policy, it receives every message
 
 
-
+SNS can send to Kinesis and therefore we can have the following solutions architecture.
 
 Area:
 =====
@@ -3723,11 +3762,10 @@ Increase security with message encryption and privacy.
 
 BillCost:
 =========
-The Free Tier includes 1 Million Publishes, 100K HTTP/S Deliveries and 1,000 Email Deliveries.
-
-SNS topics are defined as Standard topics or FIFO topics. You will be charged at the end of the month for your usage.
-Amazon SNS has no upfront costs. You pay based on the number of messages that you publish, the number of notifications that you 
-deliver, and any additional API calls for managing topics and subscriptions. Delivery pricing varies by endpoint type.
+The Free Tier 
+You pay based on the number of messages that you publish, the number of notifications that you 
+deliver, and any additional API calls for managing topics and subscriptions. 
+Delivery pricing varies by endpoint type.
 
 
 
@@ -3766,6 +3804,7 @@ create a topic,
 subscribe to a topic,
 confirm the subscription,
 start sending events to a topic to deliver them to all subscribers (potentially multiple applications and people).
+
 
 
 
@@ -3870,6 +3909,7 @@ SQS:
 • Ordering guarantees only on FIFO queues
 • Individual message delay capability
 
+
 SNS:
 • Push data to many subscribers
 • Up to 12,500,000 subscribers
@@ -3879,6 +3919,7 @@ SNS:
 • No need to provision throughput
 • Integrates with SQS for fan- out architecture pattern
 • FIFO capability for SQS FIFO
+
 
 Kinesis:
 • Standard: pull data
@@ -3987,13 +4028,21 @@ Security is a shared responsibility.
 Amazon ECS is a fully managed container orchestration service that makes it easy for you to deploy, manage, and 
 scale containerized applications.
 
+Launch Docker containers on AWS = Launch ECS Tasks on ECS Clusters
 
 There are two models that you can use to run your containers:
+EC2 Launch Type: you must provision & maintain the infrastructure (the EC2 instances)
+• Each EC2 Instance must run the ECS Agent to register in the ECS Cluster
+• AWS takes care of starting / stopping containers
 
--Fargate launch type - This is a serverless pay-as-you-go option. 
-You can run containers without needing to manage your infrastructure.
+Fargate launch type: This is a serverless pay-as-you-go option. 
+You do not provision the infrastructure (no EC2 instances to manage)
+• It’s all Serverless!
+• You just create task definitions
+• AWS just runs ECS Tasks for you based on the CPU / RAM you need
+• To scale, just increase the number of tasks. Simple - no more EC2 instances
 
--EC2 launch type - Configure and deploy EC2 instances in your cluster to run your containers.
+
 
 
 The Fargate launch type is suitable for the following workloads:
@@ -4061,7 +4110,7 @@ Note: Amazon S3 cannot be mounted as a file system
 
 ECS Service Auto Scaling
 • Automatically increase/decrease the desired number of ECS tasks
-ECS Service Auto Scaling (task level) ≠ EC2 Auto Scaling (EC2 instance level)
+  ECS Service Auto Scaling (task level) ≠ EC2 Auto Scaling (EC2 instance level)
 
 ECS Rolling Updates:
 • When updating from v1 to v2, we can control how many tasks can be started and stopped, and in which order
@@ -4073,8 +4122,17 @@ ECS Task Role is the IAM Role used by the ECS task itself.
 Use when your container wants to call other AWS services like S3, SQS, etc.
 
 
-EFS volume can be shared between different EC2 instances and different ECS Tasks. 
-It can be used as a persistent multi-AZ shared storage for your containers.
+Amazon ECS – Data Volumes (EFS):
+• Mount EFS file systems onto ECS tasks
+• Works for both EC2 and Fargate launch types
+• Tasks running in any AZ will share the same data in the EFS file system
+• Fargate + EFS = Serverless
+• Use cases: persistent multi-AZ shared storage for your containers
+• Amazon S3 cannot be mounted as a file system
+
+
+ECS tasks invoked by Event Bridge
+ECS tasks invoked by Event Bridge Schedule
 
 
 
@@ -4126,22 +4184,6 @@ Amazon ECR:
 • Public repository (Amazon ECR Public Gallery https://gallery.ecr.aws)
 
 
-
-Amazon EKS Overview:
-• Amazon EKS = Amazon Elastic Kubernetes Service
-• It is a way to launch managed Kubernetes clusters on AWS
-• Kubernetes is an open-source system for automatic deployment, scaling and management of containerized (usually Docker) application
-• It’s an alternative to ECS, similar goal but different API
-• EKS supports EC2 if you want to deploy worker nodes or Fargate to deploy serverless containers
-• Use case: if your company is already using Kubernetes on-premises or in another cloud, and wants to migrate to AWS using Kubernetes
-• Kubernetes is cloud-agnostic (can be used in any cloud – Azure, GCP…)
-• For multiple regions, deploy one EKS cluster per region
-
-
-
-
-
-
 Area:
 =====
 Amazon ECR is a Regional service
@@ -4177,7 +4219,38 @@ Security is a shared responsibility.
 
 ++Amazon EKS
 -------------------------------------------------
+Amazon EKS = Amazon Elastic Kubernetes Service
+• It is a way to launch managed Kubernetes clusters on AWS
+• Kubernetes is an open-source system for automatic deployment, scaling and management of containerized (usually Docker) application
+• It’s an alternative to ECS, similar goal but different API
+• EKS supports EC2 if you want to deploy worker nodes or Fargate to deploy serverless containers
+• Use case: if your company is already using Kubernetes on-premises or in another cloud, and wants to migrate to AWS using Kubernetes
+• Kubernetes is cloud-agnostic (can be used in any cloud – Azure, GCP…)
+• For multiple regions, deploy one EKS cluster per region
+• Collect logs and metrics using CloudWatch Container Insights
 
+
+Amazon EKS – Node Types:
+• Managed Node Groups
+	• Creates and manages Nodes (EC2 instances) for you
+	• Nodes are part of an ASG managed by EKS
+	• Supports On-Demand or Spot Instances
+• Self-Managed Nodes
+	• Nodes created by you and registered to the EKS cluster and managed by an ASG
+	• You can use prebuilt AMI - Amazon EKS Optimized AMI
+	• Supports On-Demand or Spot Instances
+• AWS Fargate
+	• No maintenance required; no nodes managed
+
+
+Amazon EKS – Data Volumes:
+• Need to specify StorageClass manifest on your EKS cluster
+• Leverages a Container Storage Interface (CSI) compliant driver
+• Support for…
+• Amazon EBS
+• Amazon EFS (works with Fargate)
+• Amazon FSx for Lustre
+• Amazon FSx for NetApp ONTAP
 
 
 
@@ -4192,6 +4265,7 @@ Security is a shared responsibility.
 • VPC access support
 • Connect to database, cache, and message queue services
 • Use cases: web apps, APIs, microservices, rapid production eployments
+
 
 
 
@@ -4215,6 +4289,46 @@ Serverless in AWS:
 • Fargate
 
 
+
+Compute:
+	AWS Lambda:AWS Lambda is an event-driven, pay-as-you-go compute service that lets you run code without 
+	provisioning or managing servers.
+
+	AWS Fargate:AWS Fargate is a serverless compute engine that works with Amazon 
+	Elastic Container Service (ECS) and Amazon Elastic Kubernetes Service (EKS).
+
+Application integration:
+	Amazon EventBridge: Amazon EventBridge is a serverless event bus that lets you build event-driven applications at scale 
+	across AWS and existing systems.
+
+	AWS Step Functions: AWS Step Functions is a visual workflow orchestrator that makes it easy to sequence multiple
+	AWS services into business-critical applications.
+	 
+	Amazon SQS: Amazon Simple Queue Service (SQS) is a message queuing service enabling you to decouple and scale 
+	microservices, distributed systems, and serverless applications.
+
+	Amazon SNS: Amazon Simple Notification Service (SNS) is a fully managed messaging service for both ]
+	application-to-application (A2A) and application-to-person (A2P) communication.
+
+Amazon API Gateway: Amazon API Gateway is a fully managed service that makes it easy to create and publish APIs at any scale.
+	AWS AppSync: AWS AppSync is a fully managed service that accelerates application development with scalable GraphQL APIs.
+
+
+Data store:
+	Amazon S3: Amazon Simple Storage Service (Amazon S3) is an object storage service designed to store and protect any amount of data.
+
+	Amazon DynamoDB:Amazon DynamoDB is a key-value and document database service, delivering single-digit millisecond 
+	performance at any scale.
+
+	Amazon RDS Proxy: Amazon RDS Proxy is a managed database proxy for Amazon Relational Database Service (RDS) 
+	that makes applications more scalable and secure.
+
+	Amazon Aurora Serverless: Amazon Aurora Serverless is a MySQL and PostgreSQL-compatible relational database that automatically scales 
+	capacity based on your application's needs.
+
+
+
+
 Area:
 =====
 May Regional.
@@ -4222,51 +4336,7 @@ May Regional.
 
 UseCase:
 ========
-Compute:
-AWS Lambda:AWS Lambda is an event-driven, pay-as-you-go compute service that lets you run code without 
-provisioning or managing servers.
 
-AWS Fargate:AWS Fargate is a serverless compute engine that works with Amazon 
-Elastic Container Service (ECS) and Amazon Elastic Kubernetes Service (EKS).
-
-Application integration:
-Amazon EventBridge:
-Amazon EventBridge is a serverless event bus that lets you build event-driven applications at scale 
-across AWS and existing systems.
-
-AWS Step Functions:
-AWS Step Functions is a visual workflow orchestrator that makes it easy to sequence multiple
- AWS services into business-critical applications.
- 
-Amazon SQS:
-Amazon Simple Queue Service (SQS) is a message queuing service enabling you to decouple and scale 
-microservices, distributed systems, and serverless applications.
-
-Amazon SNS:
-Amazon Simple Notification Service (SNS) is a fully managed messaging service for both ]
-application-to-application (A2A) and application-to-person (A2P) communication.
-
-Amazon API Gateway:
-Amazon API Gateway is a fully managed service that makes it easy to create and publish APIs at any scale.
-
-AWS AppSync
-AWS AppSync is a fully managed service that accelerates application development with scalable GraphQL APIs.
-
-
-Data store:
-Amazon S3
-Amazon Simple Storage Service (Amazon S3) is an object storage service designed to store and protect any amount of data.
-
-Amazon DynamoDB:
-Amazon DynamoDB is a key-value and document database service, delivering single-digit millisecond performance at any scale.
-
-Amazon RDS Proxy:
-Amazon RDS Proxy is a managed database proxy for Amazon Relational Database Service (RDS) 
-that makes applications more scalable and secure.
-
-Amazon Aurora Serverless:
-Amazon Aurora Serverless is a MySQL and PostgreSQL-compatible relational database that automatically scales 
-capacity based on your application's needs.
 
 
 BillCost:
@@ -4389,6 +4459,9 @@ Security is a shared responsibility.
 
 ++Lambda in VPC
 -------------------------------------------------
+• By default, your Lambda function is launched outside your own VPC (in an AWS -owned VPC)
+• Therefore, it cannot access resources in your VPC (RDS, ElastiCache,internal ELB…)
+
 • You must define the VPC ID, the Subnets and the Security Groups
 • Lambda will create an ENI (Elastic Network Interface) in your subnets
 
@@ -4460,6 +4533,20 @@ Certain usecases requires microseconds response times.
 DymanoDB Stream is kind of event to interact with other servies like:lambda,s3,sns etc to doing some thing.
 as: User complated their registration and with DymanoDB Stream we cand send a welcome email using Lambda and SNS.
 For Global table Multi Region replication Need to enable DymanoDB Stream.
+
+
+
+DynamoDB – Backups for disaster recovery:
+• Continuous backups using point-in-time recovery (PITR)
+	• Optionally enabled for the last 35 days
+	• Point-in-time recovery to any time within the backup window
+	• The recovery process creates a new table
+• On-demand backups
+	• Full backups for long-term retention, until explicitely deleted
+	• Doesn’t affect performance or latency
+	• Can be configured and managed in AWS Backup (enables cross-region copy)
+	• The recovery process creates a new table
+
 
 
 
@@ -4606,81 +4693,14 @@ To support custom authorization requirements, you can execute a Lambda authorize
 
 
 71
-##AWS Cognito
+##AWS Step Functions
 -------------------------------------------------
-Cognito only helps with authentication, not authorization.
-Amazon Cognito lets you add user sign-up, sign-in, and access control to your web and mobile apps quickly and easily. 
-Amazon Cognito scales to millions of users and supports sign-in with social identity providers, such as Apple, Facebook, Google, and 
-Amazon, and enterprise identity providers via SAML 2.0 and OpenID Connect.  
+• Build serverless visual workflow to orchestrate your Lambda functions
+• Features: sequence, parallel, conditions,timeouts, error handling, …
+• Can integrate with EC2, ECS, On -premises servers, API Gateway, SQS queues, etc
+• Possibility of implementing human approval feature
+• Use cases: order fulfillment, data processing, web applications, any workflow
 
-
-Amazon Cognito is designed for developers who want to add user management and sync functionality to their mobile and web apps. 
-Developers can use Cognito Identity to add sign-up and sign-in to their apps and to enable their 
-users to securely access their app’s resources. 
-Cognito also enables developers to sync data across devices, platforms, and applications.
-
-
-
-AWS Cognito:
-• We want to give our users an identity so that they can interact with our application.
-Cognito User Pools:
-	• Sign in functionality for app users
-	• Integrate with API Gateway
-Cognito Identity Pools (Federated Identity):
-	• Provide AWS credentials to users so they can access AWS resources directly
-	• Integrate with Cognito User Pools as an identity provider
-Cognito Sync:
-	• Synchronize data from device to Cognito.
-	• May be deprecated and replaced by AppSync
-
-
-Cognito User Pools (CUP):
-• Create a serverless database of user for your mobile apps
-• Simple login: Username (or email) / password combination
-• Possibility to verify emails / phone numbers and add MFA
-• Can enable Federated Identities (Facebook, Google, SAML…)
-• Sends back a JSON Web Tokens (JWT)
-• Can be integrated with API Gateway for authentication
-
-
-Cognito – Federated Identity Pools:
-Goal:
-• Provide direct access to AWS Resources from the Client Side
-Example:
-• provide (temporary) access to write to S3 bucket using Facebook Login
-
-
-
-Area:
-=====
-Regional.
-Amazon Cognito user pools are each created in one AWS Region, and they store the user profile data only in that region. 
-User pools can send user data to a different 
-AWS Region, depending on how optional features are configured.
-
-
-UseCase:
-========
-Secure and scalable identity store
-Social and enterprise identity federation
-Standards-based authentication
-Access control for AWS resources
-Amazon Cognito provides solutions to control access to AWS resources from your app.
-Easy integration with your app
-
-
-
-BillCost:
-=========
-Free Tier
-If you are using Cognito Identity to create a User Pool, you pay based on your monthly active users (MAUs) only. 
-
-
-
-Security:
-=========
-Amazon Cognito supports multi-factor authentication and encryption of data-at-rest and in-transit. 
-Amazon Cognito is HIPAA eligible and PCI DSS, SOC, ISO/IEC 27001, ISO/IEC 27017, ISO/IEC 27018, and ISO 9001 compliant.
 
 
 
@@ -4688,47 +4708,52 @@ Amazon Cognito is HIPAA eligible and PCI DSS, SOC, ISO/IEC 27001, ISO/IEC 27017,
 
 
 72
-##SAM (Serverless Appliction Model)
+##Serverless Architectures
 -------------------------------------------------
-The AWS Serverless Application Model (AWS SAM) is an open-source framework that you can use to build serverless 
-applications on AWS.
-A serverless application is a combination of Lambda functions, event sources, and other resources that work 
-together to perform tasks.
+MyTodoList:
+• We want to create a mobile application with the following requirements
+• Expose as REST API with HTTPS
+• Serverless architecture
+• Users should be able to directly interact with their own folder in S3
+• Users should authenticate through a managed serverless service
+• The users can write and read to-dos, but they mostly read them
+• The database should scale, and have some high read throughput
 
-All the configuration is YAML code:
-• Lambda Functions
-• DynamoDB tables
-• API Gateway
-• Cognito User Pools
-
-
-
-Area:
-=====
-Regional.
-
-
-UseCase:
-========
-Single-deployment configuration.
-Extension of AWS CloudFormation.
+Ans:
+• Serverless REST API: HTTPS, API Gateway, Lambda, DynamoDB
+• Using Cognito to generate temporary credentials with STS to access S3 bucket with restricted policy. 
+  App users can directly access AWS resources this way. Pattern can be applied to DynamoDB, Lambda…
+• Caching the reads on DynamoDB using DAX
+• Caching the REST requests at the API Gateway level
+• Security for authentication and authorization with Cognito, STS
 
 
-BillCost:
-=========
-There is no additional charge to use AWS SAM. 
 
 
-Security:
-=========
-It is a aws managed service, security is a shared responsibility.
+MyBlog.com:
+• This website should scale globally
+• Blogs are rarely written, but often read
+• Some of the website is purely static files, the rest is a dynamic REST API
+• Caching must be implement where possible
+• Any new users that subscribes should receive a welcome email
+• Any photo uploaded to the blog should have a thumbnail generated
+
+Ans:
+• We’ve seen static content being distributed using CloudFront with S3
+• The REST API was serverless, didn’t need Cognito because public
+• We leveraged a Global DynamoDB table to serve the data globally
+• (we could have used Aurora Global Database)
+• We enabled DynamoDB streams to trigger a Lambda function
+• The lambda function had an IAM role which could use SES
+• SES (Simple Email Service) was used to send emails in a serverless way
+• S3 can trigger SQS / SNS / Lambda to notify of events
 
 
 
 
 
 72
-##AWS MicroServices Architecture 
+##AWS MicroServices Architecture | Micro Services
 -------------------------------------------------
 Microservices are an architectural and organizational approach to software development created to 
 speed up deployment cycles, foster innovation and ownership, improve maintainability and scalability of 
@@ -4736,43 +4761,29 @@ software applications.
 
 
 
+• You are free to design each micro-service the way you want
+• Synchronous patterns: API Gateway, Load Balancers
+• Asynchronous patterns: SQS, Kinesis, SNS, Lambda triggers (S3)
+• Challenges with micro-services:
+	• repeated overhead for creating each new microservice,
+	• issues with optimizing server density/utilization
+	• complexity of running multiple versions of multiple microservices simultaneously
+	• proliferation of client-side code requirements to integrate with many separate services.
+• Some of the challenges are solved by Serverless patterns:
+	• API Gateway, Lambda scale automatically and you pay per usage
+	• You can easily clone API, reproduce environments
+	• Generated client SDK through Swagger integration for the API Gateway
+
 
 
 73
-##AWS Distributing Paid Content
+##Software updates offloading
 -------------------------------------------------
-You can configure CloudFront to require that users access your files using either signed URLs or signed cookies. 
+• We have an application running on EC2, that distributes software updates once in a while
+• When a new software update is out, we get a lot of request and the content is distributed in mass over the network. It’s very costly
+• We don’t want to change our application, but want to optimize our cost and CPU, how can we do it?
 
-Premium User Video service:
-We have implemented a fully serverless solution:
-• Cognito for authentication
-• DynamoDB for storing users that are premium
-• 2 serverless applications
-	• Premium User registration
-	• CloudFront Signed URL generator
-• Content is stored in S3 (serverless and scalable)
-• Integrated with CloudFront with OAI for security (users can’t bypass)
-• CloudFront can only be used using Signed URLs to prevent unauthorized users
-• What about S3 Signed URL? They’re not efficient for global access-enabled
-
-
-An ending date and time, after which the URL is no longer valid.
-(Optional) The date and time that the URL becomes valid.
-(Optional) The IP address or range of addresses of the computers that can be used to access your content.
-
-
-
-
-
-74
-##Software Updates distribution
--------------------------------------------------
-AWS Systems Manager Distributor provides simplified package creation, enabling you to deploy your 
-software packages across instances quickly.
-With Distributor, you can securely store and manage software packages, such as software agents, 
-from a centralized, version-controlled repository.
-
-Why CloudFront?
+Ans:CloudFront
 • No changes to architecture
 • Will cache software update files at the edge
 • Software update files are not dynamic, they’re static (never changing)
@@ -4780,7 +4791,7 @@ Why CloudFront?
 • But CloudFront is, and will scale for us
 • Our ASG will not scale as much, and we’ll save tremendously in EC2
 • We’ll also save in availability, network bandwidth cost, etc
-• Easy way to make an existing application more scalable and cheaper
+• Easy way to make an existing application more scalable and cheaper!
 
 
 Area:
@@ -4805,39 +4816,6 @@ Security:
 =========
 It is a aws managed service, security is a shared responsibility.
  
-
-
-
-
-
-75
-##Big Data Ingestion Pipeline
--------------------------------------------------
-AWS Data Pipeline is a web service that helps you reliably process and move data between different 
-AWS compute and storage services, as well as on-premises data sources, at specified intervals. 
-
-With AWS Data Pipeline, you can regularly access your data where it’s stored, transform and process it at scale, 
-and efficiently transfer the results to 
-AWS services such as Amazon S3, Amazon RDS, Amazon DynamoDB, and Amazon EMR.
-
-
-AWS Data Pipeline helps you easily create complex data processing workloads that are fault tolerant, 
-repeatable, and highly available. 
-AWS Data Pipeline also allows you to move and process data that was previously locked up in on-premises data silos.
- 
-AWS Data Pipeline is billed based on how often your activities and preconditions are scheduled to run and 
-where they run (AWS or on-premises). 
-
- 
-Big Data Ingestion Pipeline discussion:
-• IoT Core allows you to harvest data from IoT devices
-• Kinesis is great for real-time data collection
-• Firehose helps with data delivery to S3 in near real-time (1 minute)
-• Lambda can help Firehose with data transformations
-• Amazon S3 can trigger notifications to SQS
-• Lambda can subscribe to SQS (we could have connecter S3 to Lambda)
-• Athena is a serverless SQL service and results are stored in S3
-• The reporting bucket contains analyzed data and can be used by reporting tool such as AWS QuickSight, Redshift, etc.
 
 
 
@@ -5066,7 +5044,9 @@ ExamTips:Any time you see Financial transaction or Ledger, its QLDB.
 
 
 
-Athena Overview:
+
+##Amazon Athena
+-------------------------------------------------
 Amazon Athena is an interactive query service that makes it easy to analyze data directly in Amazon S3 using standard SQL.
 Athena is not a database but rather a query engine.
 • Fully Serverless database with SQL capabilities
@@ -5083,6 +5063,41 @@ Athena for Solutions Architect:
 • Reliability: managed service, uses Presto engine, highly available
 • Performance: queries scale based on data size
 • Cost: pay per query / per TB of data scanned, serverless
+
+
+Serverless query service to perform analytics against S3 objects
+• Uses standard SQL language to query the files
+• Supports CSV, JSON, ORC, Avro, and Parquet (built on Presto)
+
+
+
+Area:
+=====
+Global.
+Athena supports the ability to query Amazon S3 data in an AWS Region that is different from the Region in which you are using Athena.
+
+
+UseCase:
+========
+Athena helps you analyze unstructured, semi-structured, and structured data stored in Amazon S3. 
+Examples include CSV, JSON, or columnar data formats such as Apache Parquet and Apache ORC. 
+You can use Athena to run ad-hoc queries using ANSI SQL, without the need to aggregate or load the data into Athena.
+
+
+BillCost:
+=========
+You are charged based on the amount of data scanned by each query.
+Pricing: $5.00 per TB of data scanned
+
+
+
+
+Security:
+=========
+Security is a shared responsibility.
+
+
+
 
 
 
