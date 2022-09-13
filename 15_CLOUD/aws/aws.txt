@@ -19,6 +19,21 @@ echo "<h1>Hello World from $(hostname -f)</h1>" > /var/www/html/index.html
 =================================================
 #General | Basic | Info      
 ================================================= 
+AWS- 
+  -Region
+  	-AvailableZone
+		-VPC 
+		-Router 
+		-Gateway
+		-Internet Gateway
+			-Subnet
+			-NACL
+				-EC2
+				-SecurityGroup
+
+
+
+
 We all know Route53, IAM, CloudFront, WAF are Global.
 
 SSM
@@ -300,6 +315,86 @@ def lambda_handler(event, context):
 	
 	
 =====================
+
+
+
+
+
+119
+##VPC Reachability Analyzer
+-------------------------------------------------
+VPC Reachability Analyzer to determine whether a destination resource in your virtual private cloud (VPC) is reachable 
+from a source resource. 
+
+
+• A network diagnostics tool that troubleshoots network connectivity between two endpoints in your VPC(s)
+• It builds a model of the network configuration, then checks the reachability based on these configurations (it doesn’t send packets).
+• When the destination is
+	• Reachable – it produces hop-by-hop details of the virtual network path
+	• Not reachable – it identifies the blocking component(s) (e.g., config
+
+
+
+Area:
+=====
+MayGlobal
+
+
+UseCase:
+========
+Troubleshoot connectivity issues,
+ensure network configuration is as intended,
+
+
+
+BillCost:
+=========
+You are charged per analysis run between a source and destination.
+
+
+
+Security:
+=========
+It is a aws managed service, security is a shared responsibility.
+
+
+
+
+
+116
+##DNS Resolution
+-------------------------------------------------
+DNS Resolution (enableDnsSupport)
+• Decides if DNS resolution from Route 53 Resolver server is supported for the VPC
+• True (default): it queries the Amazon Provider DNS Server at 169.254.169.253 or the
+reserved IP address at the base of the VPC IPv4 network range plus two (.2)
+
+DNS Hostnames (enableDnsHostnames)
+• By default,
+• True => default VPC
+• False => newly created VPCs
+• Won’t do anything unless enableDnsSupport=true
+• If True, assigns public hostname to EC2 instance if it has a public IPv4
+
+If you use custom DNS domain names in a Private Hosted Zone in
+Route 53, you must set both these attributes (enableDnsSupport & enableDnsHostname) to true
+
+
+
+
+
+117
+##Route53 Private Zones
+-------------------------------------------------
+A private hosted zone is a container that holds information about how you want Amazon Route 53 to respond to
+DNS queries for a domain and its subdomains within one or more VPCs that you create with the Amazon VPC service.
+
+You create a private hosted zone, such as example.com, and specify the VPCs that you want to associate with the hosted zone.
+Managing hosted zones: You pay a monthly charge for each hosted zone managed with Route 53.
+
+
+
+
 
 21
 #Data Warehouse
@@ -822,58 +917,6 @@ AWS CloudHSM
 Security is a shared responsibility.
 
 
-
-
-
-
-97
-##Shield | DDoS Protection
--------------------------------------------------
-AWS Shield Standard is automatically enabled to all  AWS customers at no additional cost. 
-
-AWS Shield Advanced is an optional paid service. 
-AWS Shield Advanced provides additional protections against more sophisticated and larger attacks for your 
-applications running on Amazon Elastic Compute Cloud (EC2), Elastic Load Balancing (ELB), Amazon CloudFront, 
-AWS Global Accelerator, and Route 53.
-
-AWS Shield Standard:
-• Free service that is activated for every AWS customer
-• Provides protection from attacks such as SYN/UDP Floods, Reflection attacks and other layer 3/layer 4 attacks
-
-AWS Shield Advanced:
-• Optional DDoS mitigation service ($3,000 per month per organization)
-• Protect against more sophisticated attack on Amazon EC2, Elastic Load
-  Balancing (ELB), Amazon CloudFront, AWS Global Accelerator, and Route 53
-• 24/7 access to AWS DDoS response team (DRP)
-• Protect against higher fees during usage spikes due to DDoS
-
-
-
-Area:
-=====
-Global.
-
-
-UseCase:
-========
-Protect
--Amazon Route 53
--Amazon CloudFront
--AWS Global Accelerator
--Amazon Elastic Compute Cloud (EC2) instances
--Elastic Load Balancers (ELB)
-
-
-BillCost:
-=========
-AWS Shield Standard provides protection for all AWS customers from common.
-AWS Shield Advanced is a paid service that provides additional protections
-
-
-Security:
-=========
-DDoS protection AWS Shield.
-It is a aws managed service, security is a shared responsibility.
 
 
 
