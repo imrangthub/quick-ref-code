@@ -8291,26 +8291,49 @@ powered by PrivateLink without requiring an internet gateway, NAT device, VPN co
 
 VPC Endpoints (AWS PrivateLink)
 • Every AWS service is publicly exposed (public URL)
-• VPC Endpoints (powered by AWS PrivateLink) allows you to connect to AWS services using a private network instead of 
+• VPC Endpoints (powered by AWS PrivateLink) allows you to connect to AWS services using from a private network instead of
   using the public Internet
+• They’re redundant and scale horizontally
+• They remove the need of IGW, NATGW, … to access AWS Services
+• In case of issues:
+	• Check DNS Setting Resolution in your VPC
+	• Check Route Tables
 
-
-In case of issues:
-• Check DNS Setting Resolution in your VPC
-• Check Route Tables
 
 Types of Endpoints:
-Interface Endpoints
+Interface Endpoints:
 	• Provisions an ENI (private IP address) as an entry point (must attach a Security Group)
 	• Supports most AWS services
+	• $ per hour + $ per GB of data processed
+	• Supports most AWS services
 	An interface endpoint is an elastic network interface that allows a private IP address in a subnet to connect 
-	VPC resources to a number of AWS services, such as CloudFormation,Elastic Load Balancers (ELBs), SNS, and more.
+	VPC resources to  AWS services, such as CloudFormation,Elastic Load Balancers (ELBs), SNS, and more.
 	
-Gateway Endpoints
-	• Provisions a gateway and must be used as a target in a route table
+Gateway Endpoints:
+	• Provisions a gateway and must be used as a target in a route table (does not use security groups)
 	• Supports both S3 and DynamoDB
+	• Free 
 	In contrast, a gateway endpoint is a target for a route in a route table to connect VPC resources to S3 or DynamoDB. 
 	Traffic is then routed from instances in a subnet to one of these two services.
+
+
+
+Gateway or Interface Endpoint for S3?
+• Gateway is most likely going to be preferred all the time at the exam
+• Cost: free for Gateway, $ for interface endpoint
+• Interface Endpoint is preferred access is required from onpremises (Site to Site VPN or Direct Connect), a different VPC
+  or a different region
+
+
+
+Lambda in VPC accessing DynamoDB:
+• DynamoDB is a public service from AWS
+• Option 1: Access from the public internet
+	• Because Lambda is in a VPC, it needs a NAT Gateway in a public subnet and an internet gateway
+• Option 2 (better & free): Access from the private VPC network
+	• Deploy a VPC Gateway endpoint for DynamoDB
+	• Change the Route Tables
+
 
 
 
@@ -8388,6 +8411,8 @@ Virtual Private Gateway (VGW):
 
 Customer Gateway (CGW):
 	• Software application or physical device on customer side of the VPN connection
+	
+	
 Customer Gateway Device (On-premises):
 • What IP address to use?
 	• Public Internet-routable IP address for your Customer Gateway device
@@ -8481,6 +8506,21 @@ Lead times are often longer than 1 month to establish a new connection
 
 
 
+Direct Connect – Encryption:
+• Data in transit is not encrypted but is private
+• AWS Direct Connect + VPN provides an IPsec-encrypted private connection
+• Good for an extra level of security, but slightly more complex to put in place
+
+
+Direct Connect - Resiliency:
+-One connection at multiple locations
+-Maximum resilience is achieved by separate connections terminating on separate devices in more than one location.
+
+
+Site-to-Site VPN connection as a backup
+• In case Direct Connect fails, you can set up a backup Direct Connect connection (expensive), or a Site-to-Site VPN connection
+
+
 A virtual interface (VIF) is necessary to access AWS services, and is either public or private. 
 A public virtual interface enables access to public services, such as Amazon S3. 
 A private virtual interface enables access to your VPC.
@@ -8523,94 +8563,6 @@ using similar protocols like SSL, HTTPs and SSH.
 
 
 
-++Site-to-Site VPN connection as a backup
--------------------------------------------------
-In case Direct Connect fails, you can set up a backup Direct Connect
-connection (expensive), or a Site-to-Site VPN connection
-
-
-
-
-125
-##AWS PrivateLink
--------------------------------------------------
-AWS PrivateLink provides private connectivity between VPCs, AWS services, and your on-premises networks, without exposing your 
-traffic to the public internet. 
-
-AWS PrivateLink makes it easy to connect services across different accounts and VPCs to significantly 
-simplify your network architecture.
-
-
-
-VPC End Point Service
--------------------------------------------------
-A VPC endpoint enables you to privately connect your VPC to supported AWS services and VPC endpoint services powered by 
-PrivateLink without requiring an internet gateway, NAT device, VPN connection, or AWS Direct Connect connection. 
-Instances in your VPC do not require public IP addresses to communicate with resources in the service. 
-Traffic between your VPC and the other service does not leave the Amazon network.
-
-
-AWS PrivateLink (VPC Endpoint Services):
-• Most secure & scalable way to expose a service to 1000s of VPC (own or other accounts)
-• Does not require VPC peering, internet gateway, NAT, route tables…
-• Requires a network load balancer (Service VPC) and ENI (Customer VPC) or GWLB
-• If the NLB is in multiple AZ, and the ENIs in multiple AZ, the solution is fault tolerant! 
-
-
-
-
-Area:
-=====
-MayRegional
-
-
-UseCase:
-========
-This is useful because different AWS services often talk to each other over the internet. 
-If you do not want that behavior and instead want AWS services to only communicate within the AWS network, use AWS PrivateLink. 
-AWS PrivateLink connects your AWS services with other AWS services through a non-public tunnel.
-
-SECURELY ACCESS SAAS APPLICATIONS
-MAINTAIN REGULATORY COMPLIANCE
-MIGRATE TO HYBRID CLOUD
-
-BillCost:
-=========
-
-Security:
-=========
-It is a aws managed service, security is a shared responsibility.
-
-
-
-
-
-
-
-126
-##VPC Classic Link 
--------------------------------------------------
-ClassicLink allows you to link EC2-Classic instances to a VPC in your account, within the same Region. 
-If you associate the VPC security groups with a EC2-Classic instance, this enables communication between your 
-EC2-Classic instance and instances in your VPC using private IPv4 addresses.
-
-
-Linking your EC2-Classic instance to a VPC does not affect your EC2-Classic security groups. 
-They continue to control all traffic to and from the instance. 
-
-
-EC2-Classic: instances run in a single network shared with other customers
-• Amazon VPC: your instances run logically isolated to your AWS account
-• ClassicLink allows you to link EC2-Classic instances to a VPC in your account
-	• Must associate a security group
-	• Enables communication using private IPv4 addresses
-	• Removes the need to make use of public IPv4 addresses or Elastic IP addresses
-
-
-
-
-
-
 127
 ##Transit  Gateway 
 -------------------------------------------------
@@ -8634,6 +8586,11 @@ A Transit Gateway is a network hub that you can use to interconnect your virtual
 • Works with Direct Connect Gateway, VPN connections
 • Supports IP Multicast (not supported by any other AWS service)
 
+
+Transit Gateway: Site-to-Site VPN ECMP":
+• ECMP = Equal-cost multi-path routing
+• Routing strategy to allow to forward a packet over multiple best path
+• Use case: create multiple Siteto-Site VPN connections to increase the bandwidth of your connection to AWS
 
 
 Area:
@@ -8802,6 +8759,15 @@ AWS PrivateLink / VPC Endpoint Services:
 
 
 
+Minimizing egress traffic network cost:
+• Egress traffic: outbound traffic (from AWS to outside)
+• Ingress traffic: inbound traffic - from outside to AWS (typically free)
+• Try to keep as much internet traffic within AWS to minimize costs
+• Direct Connect location that are co-located in the same AWS Region result in lower cost for egress network
+
+
+
+
 
 133
 ##S3 Data Transfer Pricing – Analysis for USA
@@ -8827,9 +8793,9 @@ AWS PrivateLink / VPC Endpoint Services:
 
 
 
-++AWs Network Firewall
+++Network Protection on AWS
 -------------------------------------------------
-Network Protection on AWS
+
 • To protect network on AWS, we’ve seen
 	• Network Access Control Lists (NACLs)
 	• Amazon VPC security groups
@@ -8848,6 +8814,17 @@ Network Protection on AWS
 • Rules can be centrally managed cross- account by AWS Firewall Manager to apply to many VPCs
 
 
+
+AWS Network Firewall:
+• Protect your entire Amazon VPC
+• From Layer 3 to Layer 7 protection
+• Any direction, you can inspect
+• VPC to VPC traffic
+• Outbound to internet
+• Inbound from internet
+• To / from Direct Connect & Site-to-Site VPN
+• Internally, the AWS Network Firewall uses the AWS Gateway Load Balancer
+• Rules can be centrally managed cross- account by AWS Firewall Manager to apply to many VPCs
 
 
 Network Firewall – Fine Grained Controls:

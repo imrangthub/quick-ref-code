@@ -921,3 +921,82 @@ Security is a shared responsibility.
 
 
 
+125
+##AWS PrivateLink
+-------------------------------------------------
+AWS PrivateLink provides private connectivity between VPCs, AWS services, and your on-premises networks, without exposing your 
+traffic to the public internet. 
+
+AWS PrivateLink makes it easy to connect services across different accounts and VPCs to significantly 
+simplify your network architecture.
+
+
+
+VPC End Point Service
+-------------------------------------------------
+A VPC endpoint enables you to privately connect your VPC to supported AWS services and VPC endpoint services powered by 
+PrivateLink without requiring an internet gateway, NAT device, VPN connection, or AWS Direct Connect connection. 
+Instances in your VPC do not require public IP addresses to communicate with resources in the service. 
+Traffic between your VPC and the other service does not leave the Amazon network.
+
+
+AWS PrivateLink (VPC Endpoint Services):
+• Most secure & scalable way to expose a service to 1000s of VPC (own or other accounts)
+• Does not require VPC peering, internet gateway, NAT, route tables…
+• Requires a network load balancer (Service VPC) and ENI (Customer VPC) or GWLB
+• If the NLB is in multiple AZ, and the ENIs in multiple AZ, the solution is fault tolerant! 
+
+
+
+
+Area:
+=====
+MayRegional
+
+
+UseCase:
+========
+This is useful because different AWS services often talk to each other over the internet. 
+If you do not want that behavior and instead want AWS services to only communicate within the AWS network, use AWS PrivateLink. 
+AWS PrivateLink connects your AWS services with other AWS services through a non-public tunnel.
+
+SECURELY ACCESS SAAS APPLICATIONS
+MAINTAIN REGULATORY COMPLIANCE
+MIGRATE TO HYBRID CLOUD
+
+BillCost:
+=========
+
+Security:
+=========
+It is a aws managed service, security is a shared responsibility.
+
+
+
+
+
+
+
+126
+##VPC Classic Link 
+-------------------------------------------------
+ClassicLink allows you to link EC2-Classic instances to a VPC in your account, within the same Region. 
+If you associate the VPC security groups with a EC2-Classic instance, this enables communication between your 
+EC2-Classic instance and instances in your VPC using private IPv4 addresses.
+
+
+Linking your EC2-Classic instance to a VPC does not affect your EC2-Classic security groups. 
+They continue to control all traffic to and from the instance. 
+
+
+EC2-Classic: instances run in a single network shared with other customers
+• Amazon VPC: your instances run logically isolated to your AWS account
+• ClassicLink allows you to link EC2-Classic instances to a VPC in your account
+	• Must associate a security group
+	• Enables communication using private IPv4 addresses
+	• Removes the need to make use of public IPv4 addresses or Elastic IP addresses
+
+
+
+
+
