@@ -6823,15 +6823,9 @@ Cross account:
 -------------------------------------------------
 Cognito only helps with authentication, not authorization.
 Amazon Cognito lets you add user sign-up, sign-in, and access control to your web and mobile apps quickly and easily. 
+
 Amazon Cognito scales to millions of users and supports sign-in with social identity providers, such as Apple, Facebook, Google, and 
 Amazon, and enterprise identity providers via SAML 2.0 and OpenID Connect.  
-
-
-Amazon Cognito is designed for developers who want to add user management and sync functionality to their mobile and web apps. 
-Developers can use Cognito Identity to add sign-up and sign-in to their apps and to enable their 
-users to securely access their app’s resources. 
-Cognito also enables developers to sync data across devices, platforms, and applications.
-
 
 
 AWS Cognito:
@@ -6862,14 +6856,22 @@ Goal:
 Example:
 • provide (temporary) access to write to S3 bucket using Facebook Login
 
+Cognito Identity Pools (Federated Identities):
+• Get identities for “users” so they obtain temporary AWS credentials
+• Users source can be Cognito User Pools, 3rd party logins, etc…
+• Users can then access AWS services directly or through API Gateway
+• The IAM policies applied to the credentials are defined in Cognito
+• They can be customized based on the user_id for fine grained control
+• Default IAM roles for authenticated and guest users
+
+
 
 
 Area:
 =====
 Regional.
 Amazon Cognito user pools are each created in one AWS Region, and they store the user profile data only in that region. 
-User pools can send user data to a different 
-AWS Region, depending on how optional features are configured.
+User pools can send user data to a different AWS Region, depending on how optional features are configured.
 
 
 UseCase:
@@ -6947,16 +6949,13 @@ AWS IAM Identity Center (successor to AWS SSO)
 
 
 90
-##AWS Security 
+##AWS Security & Encryption
 -------------------------------------------------
-AWS is designed to help you build secure, high-performing, resilient, and efficient infrastructure for your applications. 
-
-
 AWS provides services that help you protect your data, accounts, and workloads from unauthorized access.
-Identity & access management
-Network & application protection
-Threat detection & continuous monitoring
-Compliance & data privacy
+	-Identity & access management
+	-Network & application protection
+	-Threat detection & continuous monitoring
+	-Compliance & data privacy
 
 
 
@@ -6975,27 +6974,26 @@ encrypted data key. Then it can decrypt the ciphertext and return a plaintext me
 
 
 Encryption in flight (SSL):
-• Data is encrypted before sending and decrypted after receiving
-• SSL certificates help with encryption (HTTPS)
+	• Data is encrypted before sending and decrypted after receiving
+	• SSL certificates help with encryption (HTTPS)
+	• Encryption in flight ensures no MITM (man in the middle attack) can happen
+
 
 
 Server side encryption at rest:
-• Data is encrypted after being received by the server
-• Data is decrypted before being sent
-• It is stored in an encrypted form thanks to a key (usually a data key)
-• The encryption / decryption keys must be managed somewhere and the server must have access to it.
+	• Data is encrypted after being received by the server
+	• Data is decrypted before being sent
+	• It is stored in an encrypted form thanks to a key (usually a data key)
+	• The encryption/decryption keys must be managed somewhere and the server must have access to it.
+
 
 Client side encryption:
-• Data is encrypted by the client and never decrypted by the server
-• Data will be decrypted by a receiving client
-• The server should not be able to decrypt the data
-• Could leverage Envelope Encryption
+	• Data is encrypted by the client and never decrypted by the server
+	• Data will be decrypted by a receiving client
+	• The server should not be able to decrypt the data
+	• Could leverage Envelope Encryption
 
 
-
-No crazy questions:
-Will somebody not figure out private key using the public key?
-How do you create Asymmetric Keys
 
 
 
@@ -7016,14 +7014,16 @@ Two Keys : Public Key and Private Key Also called Public Key Cyptography.
 Encrypt data with Public Key and decrypt with Private Key
 Share Public Key with everybody and keep the Private Key with you(YEAH, ITS PRIVATE!)
 
+Asymmetric (RSA & ECC key pairs)
+• Public (Encrypt) and Private Key (Decrypt) pair
+• Used for Encrypt/Decrypt, or Sign/Verify operations
 • The public key is downloadable, but you can’t access the Private Key unencrypted
 • Use case: encryption outside of AWS by users who can’t call the KMS API
 
 
 
-
 92
-##KMS
+##KMS (Key Management Service)
 ------------------------------------------------- 
 KMS is a managed service that makes it easy for you to create and control the encryption keys used to encrypt your data. 
 AWS KMS uses Hardware Security Modules (HSMs) to protect the security of your keys. 
@@ -7059,7 +7059,7 @@ Able to fully manage the keys & policies:
 	• AWS Managed Service Default CMK: free 
 	• User Keys created in KMS: $1 / month 
 	• User Keys imported (must be 256-bit symmetric key): $1 / month 
-• + pay for API call to KMS ($0.03 / 10000 calls)
+•Pay for API call to KMS ($0.03 / 10000 calls)
 
 
 
@@ -7075,7 +7075,9 @@ Able to fully manage the keys & policies:
 	• Make sure the Key Policy allows the user
 	• Make sure the IAM Policy allows the API calls
 	
-	
+
+
+
 KMS Key Policies:
 • Control access to KMS keys, “similar” to S3 bucket policies
 • Difference: you cannot control access without them
@@ -7087,6 +7089,9 @@ Custom KMS Key Policy:
 	• Define users, roles that can access the KMS key
 	• Define who can administer the key
 	• Useful for cross-account access of your KMS key
+
+
+
 
 
 
@@ -7178,6 +7183,7 @@ Not need to know in details on exam.
 
 
 
+
 ++Global Aurora and KMS Multi-Region Keyspace
 -------------------------------------------------
 Client-Side encryption
@@ -7187,6 +7193,8 @@ Client-Side encryption
  API calls to KMS in their region to decrypt the data client-side
 • Using client-side encryption we can protect specific fields and guarantee only decryption
   if the client has access to an API key, we can protect specific fields even from database admins
+
+
 
 
 ++S3 Replication Encryption Considerations
@@ -7230,8 +7238,22 @@ You can reference Systems Manager parameters in your scripts, commands, SSM docu
 by using the unique name that you specified when you created the parameter.
 
 
+• Secure storage for configuration and secrets
+• Optional Seamless Encryption using KMS
+• Serverless, scalable, durable, easy SDK
+• Version tracking of configurations / secrets
+• Configuration management using path & IAM
 • Notifications with CloudWatch Events
 • Integration with CloudFormation
+
+
+Store parameters reliably because Parameter Store is hosted in multiple Availability Zones in an AWS Region.
+
+
+
+Parameters Policies (for advanced parameters):
+• Allow to assign a TTL to a parameter (expiration date) to force updating or deleting sensitive data such as passwords
+• Can assign multiple policies at a time
 
 
 Area:
@@ -7241,8 +7263,6 @@ MayRegional.
 
 UseCase:
 ========
-Use a secure, scalable, hosted secrets management service with no servers to manage.
-Store parameters reliably because Parameter Store is hosted in multiple Availability Zones in an AWS Region.
 You can store data such as passwords, database strings, 
 Amazon Machine Image (AMI) IDs, and license codes as parameter values.
 
@@ -7266,7 +7286,6 @@ AWS Manage service.
 95
 ##AWS Secrets Manager
 -------------------------------------------------
-AWS Secrets Manager is a secrets management service that helps you protect access to your applications, services, and IT resources. 
 This service enables you to easily rotate, manage, and retrieve database credentials, 
 API keys, and other secrets throughout their lifecycle. 
 
@@ -7289,137 +7308,14 @@ AWS Secrets Manager
 	
 
 
-
-
-96
-##CloudHSM
--------------------------------------------------
-AWS CloudHSM is a cloud-based hardware security module (HSM) that enables you to easily 
-generate and use your own encryption keys on the AWS Cloud. 
-
-CloudHSM is standards-compliant and enables you to export all of your keys to most other
-commercially-available HSMs, subject to your configurations. 
-
-
-The AWS CloudHSM service helps you meet corporate, contractual, and regulatory compliance 
-requirements for data security by using dedicated 
-Hardware Security Module (HSM) instances within the AWS cloud. 
-
-AWS CloudHSM provides hardware security modules in the AWS Cloud. 
-A hardware security module (HSM) is a computing device that 
-processes cryptographic operations and provides secure storage for cryptographic keys.
-
-
-Q: What is a Hardware Security Module (HSM)?
-A Hardware Security Module (HSM) provides secure key storage and cryptographic operations within a 
-tamper-resistant hardware device. HSMs are designed to securely store cryptographic 
-key material and use the key material without exposing it outside the cryptographic boundary of the hardware.
-
-
-Q: What can I do with CloudHSM?
-You can use the CloudHSM service to support a variety of use cases and applications, 
-such as database encryption, Digital Rights Management (DRM), Public Key Infrastructure (PKI), 
-authentication and authorization, document signing, and transaction processing.
-
-There are no upfront costs to use AWS CloudHSM. With CloudHSM, you pay an hourly fee for each HSM you launch until you terminate the HSM.
-
-
-
-• You manage your own encryption keys entirely (not AWS)
-• Must use the CloudHSM Client Software
-• Redshift supports CloudHSM for database encryption and key management
-• Good option to use with SSE-C encryption
-
-
-
-Area:
-=====
-Global.
-
-
-UseCase:
-========
-Offload the SSL/TLS processing for web servers
-Protect the private keys for an issuing certificate authority (CA)
-Enable transparent data encryption (TDE) for Oracle databases
-
-Generate, store, import, export, and manage cryptographic keys, including symmetric keys and asymmetric key pairs.
-Use symmetric and asymmetric algorithms to encrypt and decrypt data.
-Use cryptographic hash functions to compute message digests and hash-based message authentication codes (HMACs).
-
-Cryptographically sign data (including code signing) and verify signatures.
-Generate cryptographically secure random data.
-
-
-BillCost:
-=========
-No free tier available
-With AWS CloudHSM, you pay by the hour with no long-term commitments or upfront payments
-
-
-Security:
-=========
-Hardware based key storage for regulatory compliance
-AWS CloudHSM
-	
-Security is a shared responsibility.
-
-
-
-
-
-
-97
-##Shield | DDoS Protection
--------------------------------------------------
-AWS Shield Standard is automatically enabled to all  AWS customers at no additional cost. 
-
-AWS Shield Advanced is an optional paid service. 
-AWS Shield Advanced provides additional protections against more sophisticated and larger attacks for your 
-applications running on Amazon Elastic Compute Cloud (EC2), Elastic Load Balancing (ELB), Amazon CloudFront, 
-AWS Global Accelerator, and Route 53.
-
-AWS Shield Standard:
-• Free service that is activated for every AWS customer
-• Provides protection from attacks such as SYN/UDP Floods, Reflection attacks and other layer 3/layer 4 attacks
-
-AWS Shield Advanced:
-• Optional DDoS mitigation service ($3,000 per month per organization)
-• Protect against more sophisticated attack on Amazon EC2, Elastic Load
-  Balancing (ELB), Amazon CloudFront, AWS Global Accelerator, and Route 53
-• 24/7 access to AWS DDoS response team (DRP)
-• Protect against higher fees during usage spikes due to DDoS
-
-
-
-Area:
-=====
-Global.
-
-
-UseCase:
-========
-Protect
--Amazon Route 53
--Amazon CloudFront
--AWS Global Accelerator
--Amazon Elastic Compute Cloud (EC2) instances
--Elastic Load Balancers (ELB)
-
-
-BillCost:
-=========
-AWS Shield Standard provides protection for all AWS customers from common.
-AWS Shield Advanced is a paid service that provides additional protections
-
-
-Security:
-=========
-DDoS protection AWS Shield.
-It is a aws managed service, security is a shared responsibility.
-
-
-
+ACM – Importing Public Certificates:
+• Option to generate the certificate outside of ACM and then import it
+• No automatic renewal, must import a new certificate before expiry
+• ACM sends daily expiration events starting 45 days prior to expiration
+	• The # of days can be configured
+	• Events are appearing in EventBridge
+• AWS Config has a managed rule named acm-certificate-expiration-check
+  to check for expiring certificates (configurable number of days)
 
 
 ++AWS Certificate Manager (ACM)
