@@ -77,10 +77,55 @@ if (fromDate != null && toDate != null) {
 ================================================
 #  Object Mapping | List | Filter |Stream|Short                                       
 ================================================= 
+Row:
+import com.fasterxml.jackson.databind.ObjectMapper;
+default <T> T objectMapperReadValue(String content, Class<T> valueType) {
+	ObjectMapper objectMapper = new ObjectMapper();
+	try {
 
+		return objectMapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false).readValue(content,
+				valueType);
+
+	} catch (JsonParseException e) {
+		// TODO Auto-generated catch block
+		e.printStackTrace();
+		return null;
+	} catch (JsonMappingException e) {
+		// TODO Auto-generated catch block
+		e.printStackTrace();
+		return null;
+	} catch (IOException e) {
+		// TODO Auto-generated catch block
+		e.printStackTrace();
+		return null;
+	}
+	// return null;
+}
+@SuppressWarnings("unchecked")
+default <T> List<T> objectMapperReadArrayValue(String mapperArrStr, Class<T> clazz) {
+	ObjectMapper objectMapper = new ObjectMapper();
+	try {
+
+		return (List<T>) objectMapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false)
+				.readValue(mapperArrStr, TypeFactory.defaultInstance().constructCollectionType(List.class, clazz));
+
+	} catch (JsonParseException e) {
+		// TODO Auto-generated catch block
+		e.printStackTrace();
+		return null;
+	} catch (JsonMappingException e) {
+		// TODO Auto-generated catch block
+		e.printStackTrace();
+		return null;
+	} catch (IOException e) {
+		// TODO Auto-generated catch block
+		e.printStackTrace();
+		return null;
+	}
+}
+	
 #List From Response Obj
 -------------------------------------------------
-
 response = resultEntryTemplateAuthorInfo.getConsultantInfo();
 if (response.isSuccess() && response.getItems() != null) {
 	consultationInfoList = copyPropertiesEntityListToDtoList(response.getItems(),
