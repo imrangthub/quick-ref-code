@@ -61,12 +61,6 @@ DisterRecoverWhitepaper
 
 
 
-
-
-
-
-
-
 =================================================
 #General | Basic          
 ================================================= 
@@ -127,7 +121,8 @@ Amazon Kinesis
 Amazon API Gateway
 Elastic Load Balancing
 AWS Elastic Beanstalk
-
+RPO: Recovery Point Objective
+RTO: Recovery Time Objective
 
 
 
@@ -8987,6 +8982,40 @@ You do not need to use SCT if you are migrating the same DB engine
 • The DB engine is still PostgreSQL (RDS is the platform)
 
 
+
+
+RDS & Aurora MySQL Migrations
+• RDS MySQL to Aurora MySQL
+	• Option 1: DB Snapshots from RDS MySQL restored asvMySQL Aurora DB
+	• Option 2: Create an Aurora Read Replica from your RDS MySQL, and when the replication lag is 0, promote it as its
+      own DB cluster (can take time and cost $)
+• External MySQL to Aurora MySQL
+	• Option 1:
+		• Use Percona XtraBackup to create a file backup in Amazon S3
+		• Create an Aurora MySQL DB from Amazon S3
+	• Option 2:
+		• Create an Aurora MySQL DB
+		• Use the mysqldump utility to migrate MySQL into Aurora (slower than S3 method)
+• Use DMS if both databases are up and running
+
+
+
+
+RDS & Aurora PostgreSQL Migrations:
+• RDS PostgreSQL to Aurora PostgreSQL
+	• Option 1: DB Snapshots from RDS PostgreSQL restored as PostgreSQL Aurora DB
+	• Option 2: Create an Aurora Read Replica from your RDS PostgreSQL, and when the replication lag is 0, promote it
+	- as its own DB cluster (can take time and cost $)
+• External PostgreSQL to Aurora PostgreSQL
+	• Create a backup and put it in Amazon S3
+	• Import it using the aws_s3 Aurora extension
+• Use DMS if both databases are up and running
+
+
+
+
+
+
 On-Premise strategy with AWS:
 • Ability to download Amazon Linux 2 AMI as a VM (.iso format) 
 	• VMWare, KVM, VirtualBox (Oracle VM), Microsoft Hyper-V 
@@ -9025,97 +9054,6 @@ and data cache for most replications and inbound data transfer is free.
 Security:
 =========
 
-
-
-
-
-++RDS & Aurora MySQL Migrations
--------------------------------------------------
-• RDS MySQL to Aurora MySQL
-	• Option 1: DB Snapshots from RDS MySQL restored asvMySQL Aurora DB
-	• Option 2: Create an Aurora Read Replica from your RDS MySQL, and when the replication lag is 0, promote it as its
-      own DB cluster (can take time and cost $)
-• External MySQL to Aurora MySQL
-	• Option 1:
-		• Use Percona XtraBackup to create a file backup in Amazon S3
-		• Create an Aurora MySQL DB from Amazon S3
-	• Option 2:
-		• Create an Aurora MySQL DB
-		• Use the mysqldump utility to migrate MySQL into Aurora (slower than S3 method)
-• Use DMS if both databases are up and running
-
-
-
-
-
-RDS & Aurora PostgreSQL Migrations:
-• RDS PostgreSQL to Aurora PostgreSQL
-	• Option 1: DB Snapshots from RDS PostgreSQL restored as PostgreSQL Aurora DB
-	• Option 2: Create an Aurora Read Replica from your RDS PostgreSQL, and when the replication lag is 0, promote it
-	- as its own DB cluster (can take time and cost $)
-• External PostgreSQL to Aurora PostgreSQL
-	• Create a backup and put it in Amazon S3
-	• Import it using the aws_s3 Aurora extension
-• Use DMS if both databases are up and running
-
-
-
-
-
-
-
-
-
-
-
-
-
-137
-##DataSync
--------------------------------------------------
-AWS DataSync is a secure, online service that automates and accelerates moving data between on premises and 
-AWS Storage services. 
-DataSync can copy data between Network File System (NFS) shares, Server Message Block (SMB) shares, 
-Hadoop Distributed File Systems (HDFS), self-managed object storage, AWS Snowcone, Amazon Simple Storage 
-Service (Amazon S3) buckets, Amazon Elastic File System (Amazon EFS) file systems, 
-Amazon FSx for Windows File Server file systems, Amazon FSx for Lustre file systems, 
-Amazon FSz for OpenZFS file systems, and Amazon FSx for NetApp ONTAP file systems.
-
-
-Move large amount of data from on-premises to AWS
-• Can synchronize to: Amazon S3 (any storage classes – including Glacier), Amazon EFS, Amazon FSx (Windows, Lustre...)
-• Move data from your NAS or file system via NFS or SMB
-• Replication tasks can be scheduled hourly, daily, weekly
-• Leverage the DataSync agent to connect to your systems
-• Can setup a bandwidth limit
-
-
-
-Area:
-=====
-MayRegional
-
-
-UseCase:
-========
-Migrate your data
-Quickly move file and object data to AWS. Your data is secure with in-flight encryption and end-to-end data validation.
-Protect your data
-Securely replicate your data into cost-efficient AWS storage services, including any Amazon S3 storage class.
-Manage your hybrid data workflows
-Seamlessly move data between on-premises systems and AWS to accelerate your critical hybrid workflows.
-
-
-
-BillCost:
-=========
-Pay only for the amount of data that you migrate based on a flat, per-gigabyte fee according to your region.
-
-
-
-Security:
-=========
-It is a aws managed service, security is a shared responsibility.
 
 
 
@@ -9159,6 +9097,44 @@ AWS Backup Vault Lock:
 
 
 
+AWS Application Discovery Service:
+• Plan migration projects by gathering information about on-premises data centers
+• Server utilization data and dependency mapping are important for migrations
+• Agentless Discovery (AWS Agentless Discovery Connector)
+• VM inventory, configuration, and performance history such as CPU, memory, and disk usage
+• Agent-based Discovery (AWS Application Discovery Agent)
+	• System configuration, system performance, running processes, and details of the network connections between systems
+• Resulting data can be viewed within AWS Migration Hub
+
+
+
+
+AWS Application Migration Service (MGN)
+-------------------------------------------------
+• The “AWS evolution” of CloudEndure Migration, replacing AWS Server Migration Service (SMS)
+• Lift-and-shift (rehost) solution which simplify migrating applications to AWS
+• Converts your physical, virtual, and cloud-based servers to run natively on AWS
+• Supports wide range of platforms, Operating Systems, and databases
+• Minimal downtime, reduced costs
+
+
+
+
+
+VMware Cloud on Aws
+-------------------------------------------------
+• Some customers use VMware Cloud to manage their on-premises Data Center
+• They want to extend the Data Center capacity to AWS, but keep using the VMware Cloud software
+• …Enter VMware Cloud on AWS
+• Use cases
+	• Migrate your VMware vSphere-based workloads to AWS
+	• Run your production workloads across VMware vSphere-based private, public, and hybrid cloud environments
+	• Have a disaster recover strategy
+	
+	
+	
+	
+	
 Transferring large amount of data into AWS:
 • Example: transfer 200 TB of data in the cloud. We have a 100 Mbps internet connection.
 
@@ -9202,61 +9178,36 @@ It is a aws managed service, security is a shared responsibility.
 
 
 
-++AWS Application Migration Service (MGN)
+
+
+==Extra Solution Architecture discussions
+
+
+S3 Event Notifications
 -------------------------------------------------
-• The “AWS evolution” of CloudEndure Migration, replacing AWS Server Migration Service (SMS)
-• Lift-and-shift (rehost) solution which simplify migrating applications to AWS
-• Converts your physical, virtual, and cloud-based servers to run natively on AWS
-• Supports wide range of platforms, Operating Systems, and databases
-• Minimal downtime, reduced costs
-
-
-
-++VMware Cloud on Aws
--------------------------------------------------
-• Some customers use VMware Cloud to manage their on-premises Data Center
-• They want to extend the Data Center capacity to AWS, but keep using the VMware Cloud software
-• …Enter VMware Cloud on AWS
-• Use cases
-	• Migrate your VMware vSphere-based workloads to AWS
-	• Run your production workloads across VMware vSphere-based private, public, and hybrid cloud environments
-	• Have a disaster recover strategy
-
-
-
-
-
-149
-##Event Processing
--------------------------------------------------
-An event is the occurrence of an immutable message describing something that happened in the past. 
-The event data payload typically contains details of the occurrence and associated metadata.
-
-
-S3:ObjectCreated, S3:ObjectRemoved,
-S3:ObjectRestore, S3:Replication…
+Amazon S3 events Lambda Function SQS SNS
+• S3:ObjectCreated, S3:ObjectRemoved, S3:ObjectRestore, S3:Replication…
 • Object name filtering possible (*.jpg)
 • Use case: generate thumbnails of images uploaded to S3
 • Can create as many “S3 events” as desired
 • S3 event notifications typically deliver events in seconds but can sometimes take a minute or longer
-• If two writes are made to a single non- versioned object at the same time, it is
-   possible that only a single event notification will be sent
-• If you want to ensure that an event notification is sent for every successful write, you can enable versioning on your bucket.
 
 
 
-Area:
-=====
-MayRegional
+
+S3 Event Notifications with Amazon EventBridge
+-------------------------------------------------
+S3->Amazon EventBridge -> Over 18 AWS services as destinations
+
+• Advanced filtering options with JSON rules (metadata, object size, name...)
+• Multiple Destinations – ex Step Functions, Kinesis Streams / Firehose…
+• EventBridge Capabilities – Archive, Replay Events, Reliable delivery
 
 
-UseCase:
-========
-BillCost:
-=========
-Security:
-=========
-It is a aws managed service, security is a shared responsibility.
+
+
+Amazon EventBridge – Intercept API Calls
+API Gateway – AWS Service Integration Kinesis Data Streams example
 
 
 
@@ -9305,6 +9256,15 @@ Network ACLs and security group rules act as firewalls allowing or blocking IP a
 
 
 
+Blocking an IP address
+Blocking an IP address–with an ALB
+Blocking an IP address–with an NLB
+Blocking an IP address – ALB + WAF
+Blocking an IP address – ALB, CloudFront WAF
+
+
+
+
 
 
 152
@@ -9320,39 +9280,47 @@ The cloud is the perfect place to perform HPC
 • You can speed up time to results by adding more resources
 • You can pay only for the systems you have used
 • Perform genomics, computational chemistry, financial risk modeling,
-weather prediction, machine learning, deep learning, autonomous driving
+  weather prediction, machine learning, deep learning, autonomous driving
 • Which services help perform HPC?
 
 
 
 Data Management & Transfer:
 • AWS Direct Connect:
-• Move GB/s of data to the cloud, over a private secure network
+	• Move GB/s of data to the cloud, over a private secure network
 • Snowball & Snowmobile
-• Move PB of data to the cloud
+	• Move PB of data to the cloud
 • AWS DataSync
-• Move large amount of data between on-premises and S3, EFS, FSx for Windows
+	• Move large amount of data between on-premises and S3, EFS, FSx for Windows
 
 
 
 
-Compute and Networking
+Compute and Networking:
 • EC2 Instances:
 • CPU optimized, GPU optimized
 • Spot Instances / Spot Fleets for cost savings + Auto Scaling
 • EC2 Placement Groups: Cluster for good network performance
 
-EC2 Enhanced Networking (SR-IOV)
-• Higher bandwidth, higher PPS (packet per second), lower latency
-• Option 1: Elastic Network Adapter (ENA) up to 100 Gbps
-• Option 2: Intel 82599 VF up to 10 Gbps – LEGACY
+
+
+EC2 Enhanced Networking (SR-IOV):
+	• Higher bandwidth, higher PPS (packet per second), lower latency
+	• Option 1: Elastic Network Adapter (ENA) up to 100 Gbps
+	• Option 2: Intel 82599 VF up to 10 Gbps – LEGACY
 
 
 
 
 153
-#Elastic Fabric Adapter (EFA)
+##Elastic Fabric Adapter (EFA)
 -------------------------------------------------
+• Improved ENA for HPC, only works for Linux
+• Great for inter-node communications, tightly coupled workloads
+• Leverages Message Passing Interface (MPI) standard
+• Bypasses the underlying Linux OS to provide low-latency, reliable transport
+
+	
 An Elastic Fabric Adapter (EFA) is a network device that you can attach to your Amazon EC2 instance to accelerate 
 High Performance Computing (HPC) and machine learning applications. EFA enables you to achieve the application performance of 
 an on-premises HPC cluster, with the scalability, flexibility, and elasticity provided by the AWS Cloud.
@@ -9374,7 +9342,10 @@ Improved ENA for HPC, only works for Linux
 
  
  
-Storage:
+ 
+ 
+##Storage
+-------------------------------------------------
 Instance-attached storage:
 	• EBS: scale up to 256,000 IOPS with io2 Block Express
 	• Instance Store: scale to millions of IOPS, linked to EC2 instance, low latency
@@ -9382,13 +9353,14 @@ Network storage:
 	• Amazon S3: large blob, not a file system
 	• Amazon EFS: scale IOPS based on total size, or use provisioned IOPS
 	• Amazon FSx for Lustre:
-	• HPC optimized distributed file system, millions of IOPS
-	• Backed by S3 
+		• HPC optimized distributed file system, millions of IOPS
+		• Backed by S3 
 
 
 
 
-Automation and Orchestration:
+##Automation and Orchestration
+-------------------------------------------------
 AWS Batch
 	• AWS Batch supports multi-node parallel jobs, which enables you to run single jobs that span multiple EC2 instances.
 	• Easily schedule jobs and launch EC2 instances accordingly
@@ -9418,61 +9390,16 @@ Note: Can’t use ALB as the ALB is layer 7 (HTTP protocol)
 
 
 
-154
-##CICD 
--------------------------------------------------
-CI/CD can be pictured as a pipeline, where new code is submitted on one end, tested over a series of stages 
-(source, build, test, staging, and production), and then published as production-ready code.
-
-Tools:
--CodeCommit - Private source control (Git)
--CodePipeline - Orchestrate CI/CD pipelines
--CodeBuild - Build and Test Code (application packages and containers)
--CodeDeploy - Automate Deployment (EC2, ECS, Elastic Beanstalk, EKS, Lambda etc)
-
-
-Infrastructure as Code:
-• Currently, we have been doing a lot of manual work
-• All this manual work will be very tough to reproduce:
-• In another region
-• in another AWS account
-• Within the same region if everything was deleted
-• Wouldn’t it be great, if all our infrastructure was… code?
-• That code would be deployed and create / update / delete our infrastructure
-
-
-
-Area:
-=====
-MayRegional
-
-UseCase:
-========
-
-
-BillCost:
-=========
-AWS Free Tier, AWS CodePipeline offers new and existing customers one free active pipeline each month.
-
-
-
-Security:
-=========
-It is a aws managed service, security is a shared responsibility.
 
 
 
 
+==Other Services
 
 
 155
 ##CloudFormation
 -------------------------------------------------
-• It can take over 3 hours to properly learn and master CloudFormation
-• This lecture is meant so you get a good idea of how it works
-• The exam expects you to understand how to read CloudFormation
-
-
 AWS CloudFormation is an AWS service that uses template files to automate the setup of AWS resources.
 An AWS CloudFormation template is a formatted text file in JSON or YAML language that describes your AWS infrastructure. 
 
@@ -9491,8 +9418,7 @@ HowToWork:
 the relationship between the services, and provisions the services one after the other.
 
 
-CloudFormation is a declarative way of outlining your AWS
-Infrastructure, for any resources (most of them are supported).
+CloudFormation is a declarative way of outlining your AWS Infrastructure, for any resources (most of them are supported).
 For example, within a CloudFormation template, you say:
 	• I want a security group
 	• I want two EC2 machines using this security group
@@ -9502,10 +9428,38 @@ For example, within a CloudFormation template, you say:
 • Then CloudFormation creates those for you, in the right order, with the exact configuration that you specify.
 
 
+
+
+Benefits of AWS CloudFormation (1/2):
 Infrastructure as code:
-• No resources are manually created, which is excellent for control
-• The code can be version controlled for example using git
-• Changes to the infrastructure are reviewed through code
+	• No resources are manually created, which is excellent for control
+	• The code can be version controlled for example using git
+	• Changes to the infrastructure are reviewed through code
+
+Cost:
+	• Each resources within the stack is tagged with an identifier so you can easily see how much a stack costs you
+	• You can estimate the costs of your resources using the CloudFormation template
+	• Savings strategy: In Dev, you could automation deletion of templates at 5 PM and recreated at 8 AM, safely
+
+
+• Productivity
+	• Ability to destroy and re-create an infrastructure on the cloud on the fly
+	• Automated generation of Diagram for your templates!
+	• Declarative programming (no need to figure out ordering and orchestration)
+• Don’t re-invent the wheel
+	• Leverage existing templates on the web!
+	• Leverage the documentation
+• Supports (almost) all AWS resources:
+	• Everything we’ll see in this course is supported
+	• You can use “custom resources” for resources that are not supported
+
+
+CloudFormation Stack Designer:
+	• Example: WordPress CloudFormation Stack
+	• We can see all the resources 
+	• We can see the relations between the components
+
+
 
 
 How CloudFormation Works:
@@ -9601,6 +9555,7 @@ It is a aws managed service, security is a shared responsibility.
 
 
 
+
 ++SSM Systems Manager – SSM Session Manager
 -------------------------------------------------
 Allows you to start a secure shell on your EC2 and on-premises servers
@@ -9608,6 +9563,7 @@ Allows you to start a secure shell on your EC2 and on-premises servers
 • No port 22 needed (better security)
 • Supports Linux, macOS, and Windows
 • Send session log data to S3 or CloudWatch Logs
+
 
 
 
@@ -9664,6 +9620,966 @@ Batch vs Lambda:
 • Data transformation capabilities like filtering and validation
 • Encrypted over the public internet or privately over AWS PrivateLink
 • Don’t spend time writing the integrations and leverage APIs immediately
+
+
+
+
+==White Papers and Architectures
+
+
+
+162
+##AWS Well-Architected Framework And Tool
+-------------------------------------------------
+Well Architected Framework General Guiding Principles -architected
+• Stop guessing your capacity needs 
+• Test systems at production scale 
+• Automate to make architectural experimentation easier 
+• Allow for evolutionary architectures 
+• Design based on changing requirements 
+• Drive architectures using data 
+• Improve through game days 
+• Simulate applications for flash sale days
+
+
+
+Well Architected Framework 6 Pillars
+• 1) Operational Excellence
+• 2) Security
+• 3) Reliability
+• 4) Performance Efficiency
+• 5) Cost Optimization
+• 6) Sustainability
+
+They are not something to balance, or trade-offs, they’re a synergy
+
+
+
+AWS Well-Architected Tool:
+• Free tool to review your architectures against the 6 pillars Well-Architected
+  Framework and adopt architectural best practices
+• How does it work?
+	• Select your workload and answer questions
+	• Review your answers against the 6 pillars
+	• Obtain advice: get videos and documentations, generate a report, see the results in a dashboard
+
+
+
+163
+##AWS Trusted Advisor
+-------------------------------------------------
+AWS Trusted Advisor provides recommendations that help you follow AWS best practices. 
+Trusted Advisor evaluates your account by using checks. These checks identify ways to optimize your AWS infrastructure, 
+improve security and performance, reduce costs, and monitor service quotas
+
+No need to install anything – high level AWS account assessment
+Analyze your AWS accounts and provides recommendation:
+Core Checks and recommendations – all customers
+• Can enable weekly email notification from the console
+• Full Trusted Advisor – Available for Business & Enterprise support plans
+	• Ability to set CloudWatch alarms when reaching limits
+	• Programmatic Access using AWS Support API
+
+
+
+Trusted Advisor Checks Examples:
+• Cost Optimization: 
+	• low utilization EC2 instances, idle load balancers, under-utilized EBS volumes… 
+	• Reserved instances & savings plans optimizations, 
+• Performance: 
+	• High utilization EC2 instances, CloudFront CDN optimizations 
+	• EC2 to EBS throughput optimizations, Alias records recommendations 
+• Security: 
+	• MFA enabled on Root Account, IAM key rotation, exposed Access Keys 
+	• S3 Bucket Permissions for public access, security groups with unrestricted ports 
+• Fault Tolerance: 
+	• EBS snapshots age, Availability Zone Balance 
+	• ASG Multi-AZ, RDS Multi-AZ, ELB configuration… 
+• Service Limits
+
+
+More Architecture Examples:
+• We’ve explored the most important architectural patterns:
+	• Classic: EC2, ELB, RDS, ElastiCache, etc…
+	• Serverless: S3, Lambda, DynamoDB, CloudFront, API Gateway, etc…
+• If you want to see more AWS architectures:
+	• https://aws.amazon.com/architecture/
+	• https://aws.amazon.com/solutions/
+
+
+
+
+
+Area:
+=====
+Gloabl
+
+UseCase:
+========
+Recommendations for cost optimization, performance, security and fault tolerance
+-Red - Action recommended Yellow - investigate and Green - Good to go
+-All AWS customers get 4 checks for free:
+-Service limits (usage > 80%)
+-Security groups having unrestricted access (0.0.0.0/0)
+-Proper use of IAM
+-MFA on Root Account
+-Business or Enterprise AWS support plan provides over 50 checks
+-Disable those you are not interested in
+-How much will you save by using Reserved Instances?
+-How does your resource utilization look like? Are you right sized?
+
+BillCost:
+=========
+Basic Support Plan is included
+
+Security:
+=========
+It is a aws managed service, security is a shared responsibility.
+
+
+=================================================
+=================================================
+@@@Proceed by elimination
+=================================================
+=================================================
+• Most questions are going to be scenario based
+• For all the questions, rule out answers that you know for sure are wrong
+• For the remaining answers, understand which one makes the most sense
+• There are very few trick questions
+• Don’t over-think it
+• If a solution seems feasible but highly complicated, it’s probably wrong
+
+
+
+
+
+
+
+
+119
+##VPC Reachability Analyzer
+-------------------------------------------------
+VPC Reachability Analyzer to determine whether a destination resource in your virtual private cloud (VPC) is reachable 
+from a source resource. 
+
+
+• A network diagnostics tool that troubleshoots network connectivity between two endpoints in your VPC(s)
+• It builds a model of the network configuration, then checks the reachability based on these configurations (it doesn’t send packets).
+• When the destination is
+	• Reachable – it produces hop-by-hop details of the virtual network path
+	• Not reachable – it identifies the blocking component(s) (e.g., config
+
+
+
+Area:
+=====
+MayGlobal
+
+
+UseCase:
+========
+Troubleshoot connectivity issues,
+ensure network configuration is as intended,
+
+
+
+BillCost:
+=========
+You are charged per analysis run between a source and destination.
+
+
+
+Security:
+=========
+It is a aws managed service, security is a shared responsibility.
+
+
+
+
+
+116
+##DNS Resolution
+-------------------------------------------------
+DNS Resolution (enableDnsSupport)
+• Decides if DNS resolution from Route 53 Resolver server is supported for the VPC
+• True (default): it queries the Amazon Provider DNS Server at 169.254.169.253 or the
+reserved IP address at the base of the VPC IPv4 network range plus two (.2)
+
+DNS Hostnames (enableDnsHostnames)
+• By default,
+• True => default VPC
+• False => newly created VPCs
+• Won’t do anything unless enableDnsSupport=true
+• If True, assigns public hostname to EC2 instance if it has a public IPv4
+
+If you use custom DNS domain names in a Private Hosted Zone in
+Route 53, you must set both these attributes (enableDnsSupport & enableDnsHostname) to true
+
+
+
+
+
+117
+##Route53 Private Zones
+-------------------------------------------------
+A private hosted zone is a container that holds information about how you want Amazon Route 53 to respond to
+DNS queries for a domain and its subdomains within one or more VPCs that you create with the Amazon VPC service.
+
+You create a private hosted zone, such as example.com, and specify the VPCs that you want to associate with the hosted zone.
+Managing hosted zones: You pay a monthly charge for each hosted zone managed with Route 53.
+
+
+
+
+
+21
+#Data Warehouse
+-------------------------------------------------
+A data warehouse is a specialized type of relational database, which is optimized for
+analysis and reporting of large amounts of data. It can be used to combine
+transactional data from disparate sources (such as user behavior in a web application,
+data from your finance and billing system, or customer relationship management or
+CRM) to make them available for analysis and decision-making.
+
+Traditionally, setting up, running, and scaling a data warehouse has been complicated
+and expensive. On AWS, you can leverage Amazon Redshift, a managed data
+warehouse service that is designed to operate at less than a tenth the cost of
+traditional solutions.
+
+
+
+
+$$
+19
+##EC2 Nitro
+-------------------------------------------------
+Underlying Platform for the next generation of EC2 instances
+• New virtualization technology
+• Allows for better performance:
+	• Better networking options (enhanced networking, HPC, IPv6)
+	• Higher Speed EBS (Nitro is necessary for 64,000 EBS IOPS – max 32,000 on non-Nitro)
+• Better underlying security
+
+
+20
+#Storage | DB | db | s3 | efs | ebs           
+-------------------------------------------------
+There are several categories of databases:
+Relational (OLTP and OLAP), Document, Key Value, Graph, In Memory among others
+
+AWS Storage:
+  - Simple Storage service (S3)
+  - Elastic file system (EFS)
+  - Elastic Block Storage (EBS)
+  - Glacier
+  - Snowball
+
+
+
+
+SDK:
+• Good to know: if you don’t specify or configure a default region, then
+us-east-1 will be chosen by default
+
+
+
+
+
+72
+##SAM (Serverless Appliction Model)
+-------------------------------------------------
+The AWS Serverless Application Model (AWS SAM) is an open-source framework that you can use to build serverless 
+applications on AWS.
+A serverless application is a combination of Lambda functions, event sources, and other resources that work 
+together to perform tasks.
+
+All the configuration is YAML code:
+• Lambda Functions
+• DynamoDB tables
+• API Gateway
+• Cognito User Pools
+
+
+
+Area:
+=====
+Regional.
+
+
+UseCase:
+========
+Single-deployment configuration.
+Extension of AWS CloudFormation.
+
+
+BillCost:
+=========
+There is no additional charge to use AWS SAM. 
+
+
+Security:
+=========
+It is a aws managed service, security is a shared responsibility.
+
+
+
+
+73
+##AWS Distributing Paid Content
+-------------------------------------------------
+You can configure CloudFront to require that users access your files using either signed URLs or signed cookies. 
+
+Premium User Video service:
+We have implemented a fully serverless solution:
+• Cognito for authentication
+• DynamoDB for storing users that are premium
+• 2 serverless applications
+	• Premium User registration
+	• CloudFront Signed URL generator
+• Content is stored in S3 (serverless and scalable)
+• Integrated with CloudFront with OAI for security (users can’t bypass)
+• CloudFront can only be used using Signed URLs to prevent unauthorized users
+• What about S3 Signed URL? They’re not efficient for global access-enabled
+
+
+An ending date and time, after which the URL is no longer valid.
+(Optional) The date and time that the URL becomes valid.
+(Optional) The IP address or range of addresses of the computers that can be used to access your content.
+
+
+
+
+
+
+75
+##Big Data Ingestion Pipeline
+-------------------------------------------------
+AWS Data Pipeline is a web service that helps you reliably process and move data between different 
+AWS compute and storage services, as well as on-premises data sources, at specified intervals. 
+
+With AWS Data Pipeline, you can regularly access your data where it’s stored, transform and process it at scale, 
+and efficiently transfer the results to 
+AWS services such as Amazon S3, Amazon RDS, Amazon DynamoDB, and Amazon EMR.
+
+
+AWS Data Pipeline helps you easily create complex data processing workloads that are fault tolerant, 
+repeatable, and highly available. 
+AWS Data Pipeline also allows you to move and process data that was previously locked up in on-premises data silos.
+ 
+AWS Data Pipeline is billed based on how often your activities and preconditions are scheduled to run and 
+where they run (AWS or on-premises). 
+
+ 
+Big Data Ingestion Pipeline discussion:
+• IoT Core allows you to harvest data from IoT devices
+• Kinesis is great for real-time data collection
+• Firehose helps with data delivery to S3 in near real-time (1 minute)
+• Lambda can help Firehose with data transformations
+• Amazon S3 can trigger notifications to SQS
+• Lambda can subscribe to SQS (we could have connecter S3 to Lambda)
+• Athena is a serverless SQL service and results are stored in S3
+• The reporting bucket contains analyzed data and can be used by reporting tool such as AWS QuickSight, Redshift, etc.
+
+
+
+
+
+
+79
+##Neptune
+-------------------------------------------------
+Fully managed graph database.
+
+
+Neptune for Solutions Architect:
+• Operations: similar to RDS
+• Security: IAM, VPC, KMS, SSL (similar to RDS) + IAM Authentication
+• Reliability: Multi-AZ, clustering
+• Performance: best suited for graphs, clustering to improve performance
+• Remember: Neptune = Graphs
+
+
+
+
+
+
+Area:
+=====
+Regional.
+
+
+UseCase:
+========
+• High relationship data 
+• Social Networking: Users friends with Users, replied to comment on post of user and likes other comments.
+• Knowledge graphs (Wikipedia) 
+
+
+BillCost:
+=========
+Pay per node provisioned (similar to RDS)
+
+
+
+Security:
+=========
+Amazon Neptune supports HTTPS encrypted client connections and also allows you to encrypt your databases using keys you 
+manage through AWS Key Management Service (KMS). 
+
+
+
+
+
+
+92
+##STS (Security Token Services)
+-------------------------------------------------
+AWS STS is an AWS service that allows you to request temporary security credentials for your AWS resources, 
+for IAM authenticated users and users that are authenticated in AWS such as federated users via OpenID or SAML2.0.
+
+You use STS to provide trusted users with temporary access to resources via API calls, your AWS console or 
+the AWS command line interface (CLI)
+
+
+
+AWS STS – Security Token Service:
+• Allows to grant limited and temporary access to AWS resources.
+• Token is valid for up to one hour (must be refreshed)
+• AssumeRole
+• Within your own account: for enhanced security
+• Cross Account Access: assume role in target account to perform actions there
+• AssumeRoleWithSAML
+• return credentials for users logged with SAML
+• AssumeRoleWithWebIdentity
+• return creds for users logged with an IdP (Facebook Login, Google Login, OIDC compatible…)
+• AWS recommends against using this, and using Cognito instead
+• GetSessionToken
+• for MFA, from a user or AWS account root user
+
+
+Using STS to Assume a Role:
+• Define an IAM Role within your account or cross-account
+• Define which principals can access this IAM Role
+• Use AWS STS (Security Token Service) to retrieve credentials and impersonate the IAM Role you
+  have access to (AssumeRole API)
+• Temporary credentials can be valid between 15 minutes to 1 hour
+
+
+
+Identity Federation in AWS:
+• Federation lets users outside of AWS to assume temporary role for accessing AWS resources.
+• These users assume identity provided access role.
+Federations can have many flavors:
+	• SAML 2.0
+	• Custom Identity Broker
+	• Web Identity Federation with Amazon Cognito
+	• Web Identity Federation without Amazon Cognito
+	• Single Sign On
+	• Non-SAML with AWS Microsoft AD
+Using federation, you don’t need to create IAM users (user management is outside of AWS)
+
+
+ExamTips: Any time you see AssumeRole or Cross account access, its STS.
+
+Area:
+=====
+STS is a global service
+
+
+UseCase:
+========
+-Identity Federation Use-Case
+-Cross-Account Access using AWS STS
+-EC2 Instance STS Credentials
+
+
+
+BillCost:
+=========
+No additional charge.
+
+
+
+Security:
+=========
+It is a aws managed service, security is a shared responsibility.
+
+
+
+
+
+
+93
+##Identity Federation & Cognito
+-------------------------------------------------
+Amazon Cognito identity pools (federated identities) enable you to create unique identities for your users and federate them 
+with identity providers. 
+With an identity pool, you can obtain temporary, limited-privilege AWS credentials to access other AWS services. 
+
+Amazon Cognito identity pools support the following identity providers:
+Public providers: Login with Amazon (identity pools), Facebook (identity pools), Google (identity pools), 
+Sign in with Apple (identity pools).
+
+Amazon Cognito user pools:
+Open ID Connect providers (identity pools)
+SAML identity providers (identity pools)
+Developer authenticated identities (identity pools)
+
+
+AWS Free Tier
+Amazon Cognito Identity to create a User Pool, you pay based on your monthly active users (MAUs) only.
+
+
+Identity management for your apps
+Amazon Cognito
+	
+
+
+
+
+94
+##Directory Services 
+-------------------------------------------------
+AWS Directory Service for Microsoft Active Directory, also known as AWS Managed Microsoft Active Directory (AD), 
+enables your directory-aware workloads and AWS resources to use managed Active Directory (AD) in AWS.
+
+AWS Directory Service for Microsoft Active Directory allows you to use a directory in one account and share it with 
+multiple accounts and VPCs.
+
+
+AWS Managed Microsoft AD makes it easy to migrate AD-dependent applications and Windows workloads to AWS. 
+With AWS Managed Microsoft AD, you can use Group Policies to manage EC2 instances and run AD-dependent applications in the 
+AWS Cloud without the need to deploy your own AD infrastructure
+
+
+AWS Directory Services:
+AWS Managed Microsoft AD
+	• Create your own AD in AWS, manage users locally, supports MFA
+	• Establish “trust” connections with your on- premises AD
+AD Connector
+	• Directory Gateway (proxy) to redirect to on- premises AD, supports MFA
+	• Users are managed on the on-premises AD
+Simple AD
+	• AD-compatible managed directory on AWS
+	• Cannot be joined with on-premises AD
+	
+	
+	
+Area:
+=====
+May REgional.
+
+
+UseCase:
+========
+-Manage users and groups
+-Provide single sign-on to applications and services
+-Create and apply group policy
+-Simplify the deployment and management of cloud-based Linux and Microsoft Windows workloads
+-You can use AWS Managed Microsoft AD to enable multi-factor authentication by integrating with your 
+ existing RADIUS-based MFA infrastructure to provide an additional layer of security when users access AWS applications.
+-Securely connect to Amazon EC2 Linux and Windows instances
+
+
+
+BillCost:
+=========
+With AWS Directory Service, you pay only for the type and size of the managed directory that you use.
+
+
+
+Security:
+=========
+Managed Microsoft Active Directory
+AWS Directory Service
+It is a aws managed service, security is a shared responsibility.
+
+
+
+
+
+
+
+96
+##RAM (Resource Access Manager)
+-------------------------------------------------
+AWS Resource Access Manager (RAM) helps you securely share your resources across AWS accounts, within your organization or 
+organizational units (OUs) in AWS Organizations, and with IAM roles and IAM users for supported resource types. 
+
+You can use AWS RAM to share resources with other AWS accounts.
+This eliminates the need to provision and manage resources in every account. 
+When you share a resource with another account, that account is granted access to the resource and any 
+policies and permissions in that account apply to the shared resource.
+
+
+Avoid resource duplication!
+VPC Subnets:
+	• allow to have all the resources launched in the same subnets
+	• must be from the same AWS Organizations.
+	• Cannot share security groups and default VPC
+	• Participants can manage their own resources in there
+	• Participants can't view, modify, delete resources that belong to other participants or the owner
+• AWS Transit Gateway
+• Route53 Resolver Rules
+• License Manager Configurations
+
+
+Each account:
+	• is responsible for its own resources
+	• cannot view, modify or delete other resources in other accounts
+Network is shared so:
+	• Anything deployed in the VPC can talk to other resources in the VPC
+	• Applications are accessed easily across accounts, using private IP!
+	• Security groups from other accounts can be referenced for maximum security.
+
+
+
+
+
+
+
+97
+##AWS IAM Identity Center
+-------------------------------------------------
+AWS Identity and Access Management (IAM), you can specify who or what can access services and resources in AWS, 
+centrally manage fine-grained permissions, and analyze access to refine permissions across AWS.
+
+
+Area:
+=====
+Global
+
+
+UseCase:
+========
+Apply fine-grained permissions and scale with attribute-based access control
+Manage per-account access or scale access across AWS accounts and applications
+
+
+BillCost:
+=========
+IAM is offered at no additional charge.
+
+
+Security:
+=========
+Cloud single-sign-on (SSO) service
+AWS IAM Identity Center (successor to AWS SSO)
+
+Securely manage access to services and resources
+AWS Identity & Access Management (IAM)
+
+
+
+
+
+
+
+
+
+
+
+96
+##CloudHSM
+-------------------------------------------------
+AWS CloudHSM is a cloud-based hardware security module (HSM) that enables you to easily 
+generate and use your own encryption keys on the AWS Cloud. 
+
+CloudHSM is standards-compliant and enables you to export all of your keys to most other
+commercially-available HSMs, subject to your configurations. 
+
+
+The AWS CloudHSM service helps you meet corporate, contractual, and regulatory compliance 
+requirements for data security by using dedicated 
+Hardware Security Module (HSM) instances within the AWS cloud. 
+
+AWS CloudHSM provides hardware security modules in the AWS Cloud. 
+A hardware security module (HSM) is a computing device that 
+processes cryptographic operations and provides secure storage for cryptographic keys.
+
+
+Q: What is a Hardware Security Module (HSM)?
+A Hardware Security Module (HSM) provides secure key storage and cryptographic operations within a 
+tamper-resistant hardware device. HSMs are designed to securely store cryptographic 
+key material and use the key material without exposing it outside the cryptographic boundary of the hardware.
+
+
+Q: What can I do with CloudHSM?
+You can use the CloudHSM service to support a variety of use cases and applications, 
+such as database encryption, Digital Rights Management (DRM), Public Key Infrastructure (PKI), 
+authentication and authorization, document signing, and transaction processing.
+
+There are no upfront costs to use AWS CloudHSM. With CloudHSM, you pay an hourly fee for each HSM you launch until you terminate the HSM.
+
+
+
+• You manage your own encryption keys entirely (not AWS)
+• Must use the CloudHSM Client Software
+• Redshift supports CloudHSM for database encryption and key management
+• Good option to use with SSE-C encryption
+
+
+
+Area:
+=====
+Global.
+
+
+UseCase:
+========
+Offload the SSL/TLS processing for web servers
+Protect the private keys for an issuing certificate authority (CA)
+Enable transparent data encryption (TDE) for Oracle databases
+
+Generate, store, import, export, and manage cryptographic keys, including symmetric keys and asymmetric key pairs.
+Use symmetric and asymmetric algorithms to encrypt and decrypt data.
+Use cryptographic hash functions to compute message digests and hash-based message authentication codes (HMACs).
+
+Cryptographically sign data (including code signing) and verify signatures.
+Generate cryptographically secure random data.
+
+
+BillCost:
+=========
+No free tier available
+With AWS CloudHSM, you pay by the hour with no long-term commitments or upfront payments
+
+
+Security:
+=========
+Hardware based key storage for regulatory compliance
+AWS CloudHSM
+	
+Security is a shared responsibility.
+
+
+
+
+
+
+125
+##AWS PrivateLink
+-------------------------------------------------
+AWS PrivateLink provides private connectivity between VPCs, AWS services, and your on-premises networks, without exposing your 
+traffic to the public internet. 
+
+AWS PrivateLink makes it easy to connect services across different accounts and VPCs to significantly 
+simplify your network architecture.
+
+
+
+VPC End Point Service
+-------------------------------------------------
+A VPC endpoint enables you to privately connect your VPC to supported AWS services and VPC endpoint services powered by 
+PrivateLink without requiring an internet gateway, NAT device, VPN connection, or AWS Direct Connect connection. 
+Instances in your VPC do not require public IP addresses to communicate with resources in the service. 
+Traffic between your VPC and the other service does not leave the Amazon network.
+
+
+AWS PrivateLink (VPC Endpoint Services):
+• Most secure & scalable way to expose a service to 1000s of VPC (own or other accounts)
+• Does not require VPC peering, internet gateway, NAT, route tables…
+• Requires a network load balancer (Service VPC) and ENI (Customer VPC) or GWLB
+• If the NLB is in multiple AZ, and the ENIs in multiple AZ, the solution is fault tolerant! 
+
+
+
+
+Area:
+=====
+MayRegional
+
+
+UseCase:
+========
+This is useful because different AWS services often talk to each other over the internet. 
+If you do not want that behavior and instead want AWS services to only communicate within the AWS network, use AWS PrivateLink. 
+AWS PrivateLink connects your AWS services with other AWS services through a non-public tunnel.
+
+SECURELY ACCESS SAAS APPLICATIONS
+MAINTAIN REGULATORY COMPLIANCE
+MIGRATE TO HYBRID CLOUD
+
+BillCost:
+=========
+
+Security:
+=========
+It is a aws managed service, security is a shared responsibility.
+
+
+
+
+
+
+
+126
+##VPC Classic Link 
+-------------------------------------------------
+ClassicLink allows you to link EC2-Classic instances to a VPC in your account, within the same Region. 
+If you associate the VPC security groups with a EC2-Classic instance, this enables communication between your 
+EC2-Classic instance and instances in your VPC using private IPv4 addresses.
+
+
+Linking your EC2-Classic instance to a VPC does not affect your EC2-Classic security groups. 
+They continue to control all traffic to and from the instance. 
+
+
+EC2-Classic: instances run in a single network shared with other customers
+• Amazon VPC: your instances run logically isolated to your AWS account
+• ClassicLink allows you to link EC2-Classic instances to a VPC in your account
+	• Must associate a security group
+	• Enables communication using private IPv4 addresses
+	• Removes the need to make use of public IPv4 addresses or Elastic IP addresses
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+137
+##DataSync
+-------------------------------------------------
+AWS DataSync is a secure, online service that automates and accelerates moving data between on premises and 
+AWS Storage services. 
+DataSync can copy data between Network File System (NFS) shares, Server Message Block (SMB) shares, 
+Hadoop Distributed File Systems (HDFS), self-managed object storage, AWS Snowcone, Amazon Simple Storage 
+Service (Amazon S3) buckets, Amazon Elastic File System (Amazon EFS) file systems, 
+Amazon FSx for Windows File Server file systems, Amazon FSx for Lustre file systems, 
+Amazon FSz for OpenZFS file systems, and Amazon FSx for NetApp ONTAP file systems.
+
+
+Move large amount of data from on-premises to AWS
+• Can synchronize to: Amazon S3 (any storage classes – including Glacier), Amazon EFS, Amazon FSx (Windows, Lustre...)
+• Move data from your NAS or file system via NFS or SMB
+• Replication tasks can be scheduled hourly, daily, weekly
+• Leverage the DataSync agent to connect to your systems
+• Can setup a bandwidth limit
+
+
+
+Area:
+=====
+MayRegional
+
+
+UseCase:
+========
+Migrate your data
+Quickly move file and object data to AWS. Your data is secure with in-flight encryption and end-to-end data validation.
+Protect your data
+Securely replicate your data into cost-efficient AWS storage services, including any Amazon S3 storage class.
+Manage your hybrid data workflows
+Seamlessly move data between on-premises systems and AWS to accelerate your critical hybrid workflows.
+
+
+
+BillCost:
+=========
+Pay only for the amount of data that you migrate based on a flat, per-gigabyte fee according to your region.
+
+
+
+Security:
+=========
+It is a aws managed service, security is a shared responsibility.
+
+
+
+
+
+
+
+
+149
+##Event Processing
+-------------------------------------------------
+An event is the occurrence of an immutable message describing something that happened in the past. 
+The event data payload typically contains details of the occurrence and associated metadata.
+
+
+S3:ObjectCreated, S3:ObjectRemoved,
+S3:ObjectRestore, S3:Replication…
+• Object name filtering possible (*.jpg)
+• Use case: generate thumbnails of images uploaded to S3
+• Can create as many “S3 events” as desired
+• S3 event notifications typically deliver events in seconds but can sometimes take a minute or longer
+• If two writes are made to a single non- versioned object at the same time, it is
+   possible that only a single event notification will be sent
+• If you want to ensure that an event notification is sent for every successful write, you can enable versioning on your bucket.
+
+
+
+Area:
+=====
+MayRegional
+
+
+UseCase:
+========
+BillCost:
+=========
+Security:
+=========
+It is a aws managed service, security is a shared responsibility.
+
+
+
+
+
+
+154
+##CICD 
+-------------------------------------------------
+CI/CD can be pictured as a pipeline, where new code is submitted on one end, tested over a series of stages 
+(source, build, test, staging, and production), and then published as production-ready code.
+
+Tools:
+-CodeCommit - Private source control (Git)
+-CodePipeline - Orchestrate CI/CD pipelines
+-CodeBuild - Build and Test Code (application packages and containers)
+-CodeDeploy - Automate Deployment (EC2, ECS, Elastic Beanstalk, EKS, Lambda etc)
+
+
+Infrastructure as Code:
+• Currently, we have been doing a lot of manual work
+• All this manual work will be very tough to reproduce:
+• In another region
+• in another AWS account
+• Within the same region if everything was deleted
+• Wouldn’t it be great, if all our infrastructure was… code?
+• That code would be deployed and create / update / delete our infrastructure
+
+
+
+Area:
+=====
+MayRegional
+
+UseCase:
+========
+
+
+BillCost:
+=========
+AWS Free Tier, AWS CodePipeline offers new and existing customers one free active pipeline each month.
+
+
+
+Security:
+=========
+It is a aws managed service, security is a shared responsibility.
+
 
 
 
@@ -9912,92 +10828,6 @@ Visualize, understand, and manage your AWS costs and usage over time
 • Or Monthly, hourly, resource level granularity
 • Choose an optimal Savings Plan (to lower prices on your bill)
 • Forecast usage up to 12 months based on previous usage
-
-
-
-162
-##AWS Well-Architected Framework And Tool
--------------------------------------------------
-Well Architected Framework 6 Pillars
-• 1) Operational Excellence
-• 2) Security
-• 3) Reliability
-• 4) Performance Efficiency
-• 5) Cost Optimization
-• 6) Sustainability
-
-They are not something to balance, or trade-offs, they’re a synergy
-
-
-
-AWS Well-Architected Tool:
-• Free tool to review your architectures against the 6 pillars Well-Architected
-  Framework and adopt architectural best practices
-• How does it work?
-	• Select your workload and answer questions
-	• Review your answers against the 6 pillars
-	• Obtain advice: get videos and documentations, generate a report, see the results in a dashboard
-
-
-
-163
-##AWS Trusted Advisor
--------------------------------------------------
-AWS Trusted Advisor provides recommendations that help you follow AWS best practices. 
-Trusted Advisor evaluates your account by using checks. These checks identify ways to optimize your AWS infrastructure, 
-improve security and performance, reduce costs, and monitor service quotas
-
-No need to install anything – high level AWS account assessment
-Analyze your AWS accounts and provides recommendation:
-Core Checks and recommendations – all customers
-• Can enable weekly email notification from the console
-• Full Trusted Advisor – Available for Business & Enterprise support plans
-	• Ability to set CloudWatch alarms when reaching limits
-	• Programmatic Access using AWS Support API
-
-
-
-Trusted Advisor Checks Examples:
-• Cost Optimization: 
-	• low utilization EC2 instances, idle load balancers, under-utilized EBS volumes… 
-	• Reserved instances & savings plans optimizations, 
-• Performance: 
-	• High utilization EC2 instances, CloudFront CDN optimizations 
-	• EC2 to EBS throughput optimizations, Alias records recommendations 
-• Security: 
-	• MFA enabled on Root Account, IAM key rotation, exposed Access Keys 
-	• S3 Bucket Permissions for public access, security groups with unrestricted ports 
-• Fault Tolerance: 
-	• EBS snapshots age, Availability Zone Balance 
-	• ASG Multi-AZ, RDS Multi-AZ, ELB configuration… 
-	• Service Limits
-
-
-Area:
-=====
-Gloabl
-
-UseCase:
-========
-Recommendations for cost optimization, performance, security and fault tolerance
--Red - Action recommended Yellow - investigate and Green - Good to go
--All AWS customers get 4 checks for free:
--Service limits (usage > 80%)
--Security groups having unrestricted access (0.0.0.0/0)
--Proper use of IAM
--MFA on Root Account
--Business or Enterprise AWS support plan provides over 50 checks
--Disable those you are not interested in
--How much will you save by using Reserved Instances?
--How does your resource utilization look like? Are you right sized?
-
-BillCost:
-=========
-Basic Support Plan is included
-
-Security:
-=========
-It is a aws managed service, security is a shared responsibility.
 
 
 
