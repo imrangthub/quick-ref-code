@@ -1097,10 +1097,13 @@ EBS Multi-Attach – io1/io2 family:
 • Attach the same EBS volume to multiple EC2 instances in the same AZ
 • Each instance has full read & write permissions to the volume
 
-Use case:
-• Achieve higher application availability in clustered Linux applications (ex: Teradata)
-• Applications must manage concurrent write operations
-• Must use a file system that’s cluster-aware (not XFS, EX4, etc…)
+• Use case:
+	• Achieve higher application availability in clustered Linux applications (ex: Teradata)
+	• Applications must manage concurrent write operations
+	• Up to 16 EC2 Instances at a time (ExamTips)
+	• Must use a file system that’s cluster-aware (not XFS, EX4, etc…) 
+
+
 
 
 
@@ -1421,13 +1424,22 @@ Network load balancers (Layer 4) allow to:
 	• Less latency ~100 ms (vs 400 ms for ALB)
 	
 • NLB has one static IP per AZ, and supports assigning Elastic IP(helpful for whitelisting specific IP)
-
+• NLB are used for extreme performance, TCP or UDP traffic
 
 
 Network Load Balancer –Target Groups:
 • EC2 instances
 • IP Addresses – must be private IPs
 • Application Load Balancer
+• Health Checks support the TCP, HTTP and HTTPS Protocols
+
+
+ExamTips: If you see UDP or TCP, its NLB;
+          If your application access with one,two or three ips then its NLB as option.
+		  If see Extreme performance, UPD,TCP or static IP its NLB;
+		  Back end application Health Checks support the TCP, HTTP and HTTPS Protocols only.
+		  
+
 
 
 Area:
@@ -1759,7 +1771,7 @@ RDS is a managed service:
 • Maintenance windows for upgrades
 • Scaling capability (vertical and horizontal)
 • Storage backed by EBS (gp2 or io1)
-• Backups are automatically enabled in RDS
+• BUT you can’t SSH into your instances
 
 Supports all RDS database engines (MariaDB, MySQL,PostgreSQL, SQL Server, Oracle)
 
@@ -1773,21 +1785,64 @@ RDS Read Replicas for read scalability:
 RDS – From Single-AZ to Multi-AZ, Zero downtime operation (no need to stop the DB)
 
 
-RDS Security – Summary:
-• Encryption at rest:
-	• Is done only when you first create the DB instance
-	• or: unencrypted DB => snapshot => copy snapshot as encrypted => create DB from snapshot
-• Your responsibility:
-	• Check the ports /IP/ security group inbound rules in DB’s SG
-	• In-database user creation and permissions or manage through IAM
-	• Creating a database with or without public access
-	• Ensure parameter groups or DB is configured to only allow SSL connections
-• AWS responsibility:
-	• No SSH access
-	• No manual DB patching
-	• No manual OS patching
-	• No way to audit the underlying instance
+RDS Backups:
+• Automated backups:
+	• Daily full backup of the database (during the maintenance window)
+	• Transaction logs are backed-up by RDS every 5 minutes
+	• => ability to restore to any point in time (from oldest backup to 5 minutes ago)
+	• 1 to 35 days of retention, set 0 to disable automated backups
+• Manual DB Snapshots:
+	• Manually triggered by the user
+	• Retention of backup for as long as you want
 
+
+ExamTrick: in a stopped RDS database, you will still pay for storage. If you plan on
+stopping it for a long time, you should snapshot & restore instead.
+
+
+
+RDS– Storage Auto Scaling:
+• Helps you increase storage on your RDS DB instance dynamically
+• When RDS detects you are running out of free database storage, it scales automatically
+• Avoid manually scaling your database storage • You have to set Maximum Storage Threshold (maximum limit for DB storage)
+
+
+
+RDS Read Replicas for read scalability:
+• Up to 5 Read Replicas
+• Within AZ, Cross AZ or Cross Region
+• Replication is ASYNC, so reads are eventually consistent
+• Replicas can be promoted to their own DB
+• Applications must update the connectionstring to leverage read replicas
+
+
+RDS Read Replicas – Use Cases:
+• You have a production database that is taking on normal load
+• You want to run a reporting application to run some analytics
+• You create a Read Replica to run the new workload there
+• The production application is unaffected
+• Read replicas are used for SELECT (=read) only kind of statements (not INSERT, UPDATE, DELETE)
+
+
+RDS Read Replicas – Network Cost:
+• In AWS there’s a network cost when data goes from one AZ to another
+• For RDS Read Replicas within the same region, you don’t pay that fee
+
+
+RDS Multi AZ (Disaster Recovery):
+• SYNC replication
+• One DNS name – automatic app failover to standby
+• Increase availability
+• Failover in case of loss of AZ, loss of
+ etwork, instance or storage failure
+• No manual intervention in apps
+• Not used for scaling
+• Multi-AZ replication is free
+• Note:The Read Replicas be setup as Multi AZ for Disaster Recovery (DR)
+
+
+RDS – From Single-AZ to Multi-AZ:
+• Zero downtime operation (no need to stop the DB)
 
 
 
@@ -1804,6 +1859,24 @@ RDS Security – Summary:
 • RDS vs. RDS Custom
 	• RDS: entire database and the OS to be managed by AWS
 	• RDS Custom: full admin access to the underlying OS and the database
+
+
+
+
+RDS Security – Summary:
+• Encryption at rest:
+	• Is done only when you first create the DB instance
+	• or: unencrypted DB => snapshot => copy snapshot as encrypted => create DB from snapshot
+• Your responsibility:
+	• Check the ports /IP/ security group inbound rules in DB’s SG
+	• In-database user creation and permissions or manage through IAM
+	• Creating a database with or without public access
+	• Ensure parameter groups or DB is configured to only allow SSL connections
+• AWS responsibility:
+	• No SSH access
+	• No manual DB patching
+	• No manual OS patching
+	• No way to audit the underlying instance
 
 
 
@@ -1889,6 +1962,70 @@ Amazon Aurora Serverless is an on-demand, autoscaling configuration for Amazon A
 Aurora Multi-Master.
 
 
+• Aurora costs more than RDS (20% more) – but is more efficient
+
+
+Features of Aurora:
+• Automatic fail-over
+• Backup and Recovery
+• Isolation and security
+• Industry compliance
+• Push-button scaling
+• Automated Patching with Zero Downtime
+• Advanced Monitoring
+• Routine Maintenance
+• Backtrack: restore data at any point of time without using backups
+
+
+
+Aurora Replicas - Auto Scaling
+
+
+Aurora – Custom Endpoints:
+• Define a subset of Aurora Instances as a Custom Endpoint
+• Example: Run analytical queries on specific replicas
+• The Reader Endpoint is generally not used after defining Custom Endpoints
+
+
+Aurora Serverless:
+• Automated database instantiation and auto - scaling based on actual usage
+• Good for infrequent, intermittent or unpredictable workloads
+• No capacity planning needed
+• Pay per second, can be more cost -effective
+
+
+
+
+Aurora Multi-Master:
+• In case you want immediate failover for write node (HA) –
+• Every node does R/W - vs promoting a RR as the new master
+
+
+Global Aurora:
+Aurora Cross Region Read Replicas:
+	• Useful for disaster recovery
+	• Simple to put in place
+• Aurora Global Database (recommended):
+	• 1 Primary Region (read / write)
+	• Up to 5 secondary (read-only) regions, replication lag is less than 1 second
+	• Up to 16 Read Replicas per secondary region
+	• Helps for decreasing latency
+	• Promoting another region (for disaster recovery) has an RTO of < 1 minute
+	• Typical cross-region replication takes less than 1 second
+
+
+
+
+
+Aurora Machine Learning:
+• Enables you to add ML-based predictions to your applications via SQL
+• Simple, optimized, and secure integration between Aurora and AWS ML services
+• Supported services
+	• Amazon SageMaker (use with any ML model)
+	• Amazon Comprehend (for sentiment analysis) 
+• Use cases: fraud detection, ads targeting, sentiment analysis, product recommendations
+
+
 
 Area:
 =====
@@ -1924,24 +2061,20 @@ It is a aws managed service, security is a shared responsibility.
 
 
 
-
-
-
-++RDS and Aurora - Backup and Monitoring
+Aurora - Backup and Monitoring
 -------------------------------------------------
+
 RDS Backups:
 • Automated backups:
-	• Daily full backup of the database (during the maintenance window)
-	• Transaction logs are backed-up by RDS every 5 minutes
-	• => ability to restore to any point in time (from oldest backup to 5 minutes ago)
-	• 1 to 35 days of retention, set 0 to disable automated backups
-• Manual DB Snapshots:
-	• Manually triggered by the user
-	• Retention of backup for as long as you want
-
-
-ExamTrick: in a stopped RDS database, you will still pay for storage. If you plan on
-stopping it for a long time, you should snapshot & restore instead.
+• Daily full backup of the database (during the maintenance window)
+• Transaction logs are backed-up by RDS every 5 minutes
+• => ability to restore to any point in time (from oldest backup to 5 minutes ago)
+• 1 to 35 days of retention, set 0 to disable automated backups
+• Manual DB Snapshots
+• Manually triggered by the user
+• Retention of backup for as long as you want
+• Trick: in a stopped RDS database, you will still pay for storage. 
+  If you plan on stopping it for a long time, you should snapshot & restore instead
 
 
 
@@ -1976,13 +2109,6 @@ Aurora Database Cloning:
 • Very fast & cost-effective
 • Useful to create a “staging” database from a “production” database without impacting the production database
 
-
-Aurora Machine Learning:
-• Enables you to add ML-based predictions to your applications via SQL
-• Simple, optimized, and secure integration between Aurora and AWS ML services
-• Supported services
-	• Amazon SageMaker (use with any ML model)
-	• Amazon Comprehend (for sentiment analysis)
 
 
 ++RDS & Aurora Security:
@@ -2752,6 +2878,60 @@ Object retention:
 
 
 
+S3 Object Lock (versioning must be enabled):
+• Adopt a WORM (Write Once Read Many) model
+• Block an object version deletion for a specified amount of time
+• Retention mode - Compliance:
+	• Object versions can't be overwritten or deleted by any user, including the root user
+	• Objects retention modes can't be changed, and retention periods can't be shortened
+• Retention mode - Governance:
+	• Most users can't overwrite or delete an object version or alter its lock settings
+	• Some users have special permissions to change the retention or delete the object
+• Retention Period: protect the object for a fixed period, it can be extended
+• Legal Hold:
+	• protect the object indefinitely, independent from retention period
+	• can be freely placed and removed using the s3:PutObjectLegalHold IAM permission
+
+
+
+
+S3 – Access Points:
+• Each Access Point gets its own DNS and policy to limit who can access it
+• A specific IAM user / group
+• One policy per Access Point => Easier to manage than complex bucket policies
+
+
+
+S3 Object Lambda:
+Use AWS Lambda Functions to change the object before it is retrieved by the caller application
+
+Only one S3 bucket is needed, on top of which we create S3 Access Point and S3 Object Lambda Access Points.
+
+Use Cases:
+	• Redacting personally identifiable information for analytics or non- production environments.
+	• Converting across data formats, such as converting XML to JSON.
+	• Resizing and watermarking images on the fly using caller-specific details, such as the user who requested the object.
+
+
+
+
+
+
+S3 Batch Operations:
+• Perform bulk operations on existing S3 objects with asingle request, example:
+	• Modify object metadata & properties
+	• Copy objects between S3 buckets
+	• Encrypt un-encrypted objects
+	• Modify ACLs, tags
+	• Restore objects from S3 Glacier
+	• Invoke Lambda function to perform custom action on each object
+• A job consists of a list of objects, the action to perform, and optional parameters
+• S3 Batch Operations manages retries, tracks progress, sends completion notifications, generate reports …
+• You can use S3 Inventory to get object list and use S3 Select to filter your objects
+
+
+
+
 Area:
 =====
 Global but Data is Regional.
@@ -2771,47 +2951,6 @@ Security:
 =========
 Security is a shared responsibility.
 
-
-
-
-
-
-++S3 – Access Points
--------------------------------------------------
-• Each Access Point gets its own DNS and policy to limit who can access it
-• A specific IAM user / group
-• One policy per Access Point => Easier to manage than complex bucket policies
-
-
-
-++S3 Object Lambda
--------------------------------------------------
-Use AWS Lambda Functions to change the object before it is retrieved by the caller application
-
-Only one S3 bucket is needed, on top of which we create S3 Access Point and S3 Object Lambda Access Points.
-
-Use Cases:
-	• Redacting personally identifiable information for analytics or non- production environments.
-	• Converting across data formats, such as converting XML to JSON.
-	• Resizing and watermarking images on the fly using caller-specific details, such as the user who requested the object.
-
-
-
-
-
-
-++S3 Batch Operations
--------------------------------------------------
-• Perform bulk operations on existing S3 objects with asingle request, example:
-	• Modify object metadata & properties
-	• Copy objects between S3 buckets
-	• Encrypt un-encrypted objects
-	• Modify ACLs, tags
-	• Restore objects from S3 Glacier
-	• Invoke Lambda function to perform custom action on each object
-• A job consists of a list of objects, the action to perform, and optional parameters
-• S3 Batch Operations manages retries, tracks progress, sends completion notifications, generate reports …
-• You can use S3 Inventory to get object list and use S3 Select to filter your objects
 
 
 
@@ -3207,27 +3346,35 @@ Amazon FSx is accessible from Windows, Linux, and MacOS compute instances and de
 Thousands of compute instances and devices can access a file system concurrently. 
 Amazon FSx File Gateway provides low-latency, on-premises access to fully managed file shares in the cloud.
 
-• FSx for Windows is a fully managed Windows file system share drive.
-• Supports SMB protocol & Windows NTFS 
-• Microsoft Active Directory integration, ACLs, user quotas 
-• Can be mounted on Linux EC2 instance
+• FSx for Windows is a fully managed Windows file system share drive
+• Supports SMB protocol & Windows NTFS
+• Microsoft Active Directory integration, ACLs, user quotas
+• Can be mounted on Linux EC2 instances
+• Supports Microsoft's Distributed File System (DFS) Namespaces (group files across multiple FS)
 
-• Can be accessed from your on-premises infrastructure (VPN or Direct Connect) 
-• Can be configured to be Multi-AZ (high availability) 
+• Scale up to 10s of GB/s, millions of IOPS, 100s PB of data
+• Storage Options:
+	• SSD – latency sensitive workloads (databases, media processing, data analytics, …)
+	• HDD – broad spectrum of workloads (home directory, CMS, …)
+• Can be accessed from your on-premises infrastructure (VPN or Direct Connect)
+• Can be configured to be Multi-AZ (high availability)
 • Data is backed-up daily to S3
 
 
 Amazon FSx for Lustre:
-FSx for Lustre can only be used by Linux-based instances.
 • Lustre is a type of parallel distributed file system, for large-scale computing
 • The name Lustre is derived from “Linux” and “cluster
 • Machine Learning, High Performance Computing (HPC)
 • Video Processing, Financial Modeling, Electronic Design Automation
-
-Seamless integration with S3:
-	• Can “read S3” as a file system (through FSx)
-	• Can write the output of the computations back to S3 (through FSx)
+• Scales up to 100s GB/s, millions of IOPS, sub-ms latencies
+• Storage Options:
+• SSD – low-latency, IOPS intensive workloads, small & random file operations
+• HDD – throughput-intensive workloads, large & sequential file operations
+• Seamless integration with S3
+• Can “read S3” as a file system (through FSx)
+• Can write the output of the computations back to S3 (through FSx)
 • Can be used from on-premises servers (VPN or Direct Connect)
+
 
 
 FSx Lustre - File System Deployment Options:
@@ -3338,6 +3485,21 @@ The service has ISO, PCI-DSS, and SOC certifications, and is also HIPAA eligible
 -------------------------------------------------
 Bridge between on-premises data and cloud data
 
+
+Hybrid Cloud for Storage:
+• AWS is pushing for ”hybrid cloud”
+	• Part of your infrastructure is on the cloud
+	• Part of your infrastructure is on-premises
+• This can be due to
+	• Long cloud migrations
+	• Security requirements
+	• Compliance requirements
+	• IT strategy
+• S3 is a proprietary storage technology (unlike EFS / NFS), so how do you expose the S3 data on-premises?
+• AWS Storage Gateway!
+
+
+
 Storage Gateway provides a standard set of storage protocols such as 
 iSCSI, SMB, and NFS, which allow you to use AWS storage without rewriting your existing applications. 
 
@@ -3357,17 +3519,23 @@ Exam Tip: You need to know the differences between all 3!
 
 
 
-S3 File Gateway:Used for flat files only, stored directly on S3.
+S3 File Gateway:
+Used for flat files only, stored directly on S3.
 • Configured S3 buckets are accessible using the NFS and SMB protocol
-• Supports S3 standard, S3 IA, S3 One Zone IA
-• Bucket access using IAM roles for each File Gateway
 • Most recently used data is cached in the file gateway
-• Can be mounted on many servers
-• Integrated with Active Directory (AD) for user authentication
+• Supports S3 Standard, S3 Standard IA, S3 One Zone A, S3 Intelligent Tiering
+• Transition to S3 Glacier using a Lifecycle Policy
+• Bucket access using IAM roles for each File Gateway
+• SMB Protocol has integration with Active Directory (AD) for user authentication
 
 
 
 Amazon FSx File Gateway:
+• Native access to Amazon FSx for Windows File Server
+• Local cache for frequently accessed data
+• Windows native compatibility (SMB, NTFS, Active Directory...)
+• Useful for group file shares and home directories
+
 File Gateway synchronizes changed data to FSx for Windows File Server in the background. With these capabilities,
 you can consolidate all of your on-premises file share data in AWS on FSx for 
 Windows File Server and benefit from protected, resilient, fully managed file systems.
@@ -3380,6 +3548,11 @@ Windows File Server and benefit from protected, resilient, fully managed file sy
 
 
 Volume Gateway:
+• Block storage using iSCSI protocol backed by S3
+• Backed by EBS snapshots which can help restore on-premises volumes!
+• Cached volumes: low latency access to most recent data
+• Stored volumes: entire dataset is on premise, scheduled backups to S3
+
 Cached Volume mode – the entire dataset is stored on S3, and a cache of the most frequently accessed data is cached on-site.
 Stored Volume mode – the entire dataset is stored on-site and is asynchronously backed up to S3 (EBS point-in-time snapshots). 
 Snapshots are incremental and compressed.
@@ -3391,6 +3564,12 @@ Snapshots are incremental and compressed.
 
 
 Tape Gateway:
+• Some companies have backup processes using physical tapes (!)
+• With Tape Gateway, companies use the same processes but, in the cloud
+• Virtual Tape Library (VTL) backed by Amazon S3 and Glacier
+• Back up data using existing tape-based processes (and iSCSI interface)
+• Works with leading backup software vendors 
+
 It is supported by NetBackup, Backup Exec, Veeam, etc. Instead of using physical tape, they are using virtual tape, and these virtual tapes are 
 further stored in Amazon S3.
 • Some companies have backup processes using physical tapes (!)
@@ -3514,6 +3693,19 @@ Schedule data sync from on-premises to AWS, or AWS to AWS.
 S3-to-S3
 AWS DataSync copy data and metadata between AWS Storage Services
 
+• Move large amount of data to and from
+	• On-premises / other cloud to AWS (NFS, SMB, HDFS, S3 API…) – needs agent
+	• AWS to AWS (different storage services) – no agent needed
+• Can synchronize to:
+	• Amazon S3 (any storage classes – including Glacier)
+	• Amazon EFS
+	• Amazon FSx (Windows, Lustre, NetApp, OpenZFS...)
+• Replication tasks can be scheduled hourly, daily, weekly
+• File permissions and metadata are preserved (NFS POSIX, SMB…)
+• One agent task can use 10 Gbps, can setup a bandwidth limit
+
+
+ExamTips:AWS DataSync copy data and metadata between AWS Storage Services
 
 
 
@@ -4247,10 +4439,7 @@ Amazon EKS – Data Volumes:
 • Automatic scaling, highly available, load balancer, encryption
 • VPC access support
 • Connect to database, cache, and message queue services
-• Use cases: web apps, APIs, microservices, rapid production eployments
-
-
-
+• Use cases: web apps, APIs, microservices, rapid production deployments 
 
 
 
@@ -4439,7 +4628,6 @@ Security is a shared responsibility.
 
 
 
-
 ++Lambda in VPC
 -------------------------------------------------
 • By default, your Lambda function is launched outside your own VPC (in an AWS -owned VPC)
@@ -4508,7 +4696,15 @@ Time To Live (TTL):
 
 
 
-DAX:
+DynamoDB Accelerator (DAX):
+
+• Fully-managed, highly available, seamless inmemory cache for DynamoDB
+• Help solve read congestion by caching
+• Microseconds latency for cached data
+• Doesn’t require application logic modification
+(compatible with existing DynamoDB APIs)
+• 5 minutes TTL for cache (default)
+
 DynamoDB Accelerator (DAX) delivers fast response times for accessing eventually consistent data. 
 Certain usecases requires microseconds response times.
 
@@ -4517,6 +4713,16 @@ DymanoDB Stream is kind of event to interact with other servies like:lambda,s3,s
 as: User complated their registration and with DymanoDB Stream we cand send a welcome email using Lambda and SNS.
 For Global table Multi Region replication Need to enable DymanoDB Stream.
 
+
+DynamoDB Streams
+• 24 hours retention
+• Limited # of consumers
+• Process using AWS Lambda Triggers, orDynamoDB Stream Kinesis adapter
+
+Kinesis Data Streams (newer)
+• 1 year retention
+• High # of consumers
+• Process using AWS Lambda, Kinesis DataAnalytics, Kineis Data Firehose, AWS GlueStreaming ETL… 
 
 
 DynamoDB – Backups for disaster recovery:
@@ -4823,23 +5029,28 @@ Choosing the Right Database:
 
 Database Types:
 • RDBMS (= SQL / OLTP): RDS, Aurora – great for joins
-• NoSQL database: DynamoDB (~JSON), ElastiCache (key / value pairs), Neptune (graphs) – no joins, no SQL
+• NoSQL database – no joins, no SQL : DynamoDB (~JSON), ElastiCache (key / value pairs), Neptune (graphs), DocumentDB (for MongoDB), Keyspaces (for Apache Cassandra)
 • Object Store: S3 (for big objects) / Glacier (for backups / archives)
-• Data Warehouse (= SQL Analytics / BI): Redshift (OLAP), Athena
-• Search: ElasticSearch (JSON) – free text, unstructured searches
-• Graphs: Neptune – displays relationships between data
+• Data Warehouse (= SQL Analytics / BI): Redshift (OLAP), Athena, EMR
+• Search: OpenSearch (JSON) – free text, unstructured searches
+• Graphs: Amazon Neptune – displays relationships between data
+• Ledger: Amazon Quantum Ledger Database
+• Time series: Amazon Timestream
+• Note: some databases are being discussed in the Data & Analytics sectionraphs: Neptune – displays relationships between data
 
 
-RDS Overview:
-• Managed PostgreSQL / MySQL / Oracle / SQL Server
-• Must provision an EC2 instance & EBS Volume type and size
+Amazon RDS – Summary:
+• Managed PostgreSQL / MySQL / Oracle / SQL Server / MariaDB / Custom
+• Provisioned RDS Instance Size and EBS Volume Type & Size
+• Auto-scaling capability for Storage
 • Support for Read Replicas and Multi AZ
 • Security through IAM, Security Groups, KMS , SSL in transit
-• Backup / Snapshot / Point in time restore feature
-• Managed and Scheduled maintenance
-• Monitoring through CloudWatch
-• Use case: Store relational datasets (RDBMS / OLTP), perform SQL queries, transactional inserts / update / delete is available.
-
+• Automated Backup with Point in time restore feature (up to 35 days)
+• Manual DB Snapshot for longer-term recovery
+• Managed and Scheduled maintenance (with downtime)
+• Support for IAM Authentication, integration with Secrets Manager
+• RDS Custom for access to and customize the underlying instance (Oracle & SQL Server)
+• Use case: Store relational datasets (RDBMS / OLTP), perform SQL queries, transactions
 
 
 RDS for Solutions Architect:
@@ -4854,19 +5065,20 @@ RDS for Solutions Architect:
 
 
 
-Aurora Overvie:
-• Compatible API for PostgreSQL / MySQL 
-• Data is held in 6 replicas, across 3 AZ 
-• Auto healing capability 
-• Multi AZ, Auto Scaling Read Replicas 
-• Read Replicas can be Global 
-• Aurora database can be Global for DR or latency purposes 
-• Auto scaling of storage from 10GB to 128 TB 
-• Define EC2 instance type for aurora instances 
-• Same security / monitoring / maintenance features as RDS 
-• Aurora Serverless – for unpredictable / intermittent workloads 
-• Aurora Multi-Master – for continuous writes failover 
-Use case: same as RDS, but with less maintenance / more flexibility / more performance
+Aurora Summary:
+• Compatible API for PostgreSQL / MySQL, separation of storage and compute
+• Storage: data is stored in 6 replicas, across 3 AZ – highly available, self-healing, auto-scaling
+• Compute: Cluster of DB Instance across multiple AZ, auto-scaling of Read Replicas
+• Cluster: Custom endpoints for writer and reader DB instances
+• Same security / monitoring / maintenance features as RDS
+• Know the backup & restore options for Aurora
+• Aurora Serverless – for unpredictable / intermittent workloads, no capacity planning
+• Aurora Multi-Master – for continuous writes failover (high write availability)
+• Aurora Global: up to 16 DB Read Instances in each region, < 1 second storage replication
+• Aurora Machine Learning: perform ML using SageMaker & Comprehend on Aurora
+• Aurora Database Cloning: new cluster from existing one, faster than restoring a snapshot
+• Use case: same as RDS, but with less maintenance / more flexibility / more performance / more features
+
 
 
 Aurora for Solutions Architect:
@@ -4882,7 +5094,7 @@ Aurora for Solutions Architect:
 
 
 
-ElastiCache Overview:
+Amazon ElastiCache – Summary:
 • Managed Redis / Memcached (similar offering as RDS, but for caches)
 • In-memory data store, sub-millisecond latency
 • Must provision an EC2 instance type
@@ -4890,8 +5102,9 @@ ElastiCache Overview:
 • Security through IAM, Security Groups, KMS, Redis Auth
 • Backup / Snapshot / Point in time restore feature
 • Managed and Scheduled maintenance
-• Monitoring through CloudWatch
-• Use Case: Key/Value store, Frequent reads, less writes, cache results for DB queries, store session data for websites, cannot use SQL
+• Requires some application code changes to be leveraged
+• Use Case: Key/Value store, Frequent reads, less writes, cache results for DB queries, store session data for websites, cannot use SQL. 
+
 
 ElastiCache for Solutions Architect:
 • Operations: same as RDS
@@ -4901,6 +5114,19 @@ ElastiCache for Solutions Architect:
 • Performance: Sub-millisecond performance, in memory, read replicas for sharding, very popular cache option.
 • Cost: Pay per hour based on EC2 and storage usage
 
+
+Amazon S3 – Summary:
+• S3 is a… key / value store for objects
+• Great for bigger objects, not so great for many small objects
+• Serverless, scales infinitely, max object size is 5 TB, versioning capability
+• Tiers: S3 Standard, S3 Infrequent Access, S3 Intelligent, S3 Glacier + lifecycle policy
+• Features: Versioning, Encryption, Replication, MFA-Delete, Access Logs…
+• Security: IAM, Bucket Policies, ACL, Access Points, Object Lambda, CORS, Object/Vault Lock
+• Encryption: SSE-S3, SSE-KMS, SSE-C, client-side, TLS in transit, default encryption
+• Batch operations on objects using S3 Batch, listing files using S3 Inventory
+• Performance: Multi-part upload, S3 Transfer Acceleration, S3 Select
+• Automation: S3 Event Notifications (SNS, SQS, Lambda, EventBridge)
+• Use Cases: static files, key value store for big files, website hosting
 
 
 DynamoDB Overview:
@@ -5067,6 +5293,17 @@ Amazon Athena – Performance Improvement:
 
 
 
+Serverless query service to analyze data stored in Amazon S3
+• Uses standard SQL language to query the files (built on Presto)
+• Supports CSV, JSON, ORC, Avro, and Parquet
+• Pricing: $5.00 per TB of data scanned
+• Commonly used with Amazon Quicksight for
+reporting/dashboards
+• Use cases: Business intelligence / analytics / reporting, analyze &
+query VPC Flow Logs, ELB Logs, CloudTrail trails, etc...
+• Exam Tip: analyze data in S3 using serverless SQL, use Athena
+
+
 Area:
 =====
 Global.
@@ -5204,7 +5441,7 @@ Amazon OpenSearch Service makes it easy for you to perform interactive log analy
 website search, and more. 
 OpenSearch is an open source, distributed search and analytics suite derived from Elasticsearch.
 
-Amazon OpenSearch is successor to Amazon ElasticSearch
+Amazon OpenSearch is successor to Amazon ElasticSearch (For licence issue ElasticSearch now Open search)
 • Example: In DynamoDB, you can only find by primary key or indexes
 • With OpenSearch, you can search any field, even partially matches
 • It’s common to use OpenSearch as a complement to another database
