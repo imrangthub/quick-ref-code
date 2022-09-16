@@ -36,27 +36,11 @@ Tenancy:ভাড়াটিয়া রূপে অধিকার
 
 ConfusingTakeaLook
 ------------------
-S3 Permormance
 
 
 
 HandOnRemain
 ----------------------------
-SSM-with Lambda
-Serverless
-
-
-Route53
-Need to review this section
-
-
-ECS/ECR
-Need to Review this section
-
-
-
-
-DisterRecoverWhitepaper
 
 
 
@@ -64,17 +48,13 @@ DisterRecoverWhitepaper
 =================================================
 #General | Basic          
 ================================================= 
-
-
-Tags=>This helps to identify instances more quickly. 
+Tags=>This helps to identify,Categorious instances more quickly. 
 
 Stopping => Temporarily shutting down the system
 Terminating => Returning control to Amazon
 
-
 Private key: The user downloads the private key
 Public key: AWS uses the public key to confirm the identity of the user. 
-
 
 
 
@@ -97,7 +77,7 @@ AWS History:
 =================================================
 ##Contain | Element | Object | Keyworkd     
 =================================================
-IAM-dentity and Access Management
+IAM-Identity and Access Management
 EC2-Elastic Compute Cloud
 ECR-Elastic Container Registry 
 ECS-Elastic Container Service
@@ -124,6 +104,7 @@ AWS Elastic Beanstalk
 RPO: Recovery Point Objective
 RTO: Recovery Time Objective
 
+Route53, IAM, CloudFront, WAF are Global.
 
 
 1
@@ -137,10 +118,17 @@ Cloud computing is a pay-as-you-go model for delivering IT resources.
 ##AWS BasicInfo
 -------------------------------------------------
 AWS Global Infrastructure: 
-• AWS Regions 
-• AWS Availability Zones 
-• AWS Data Centers 
-• AWS Edge Locations / Points of Presence
+AWS: 
+  -Region
+  	-AvailableZone
+		-VPC 
+		-Router 
+		-Gateway
+		-Internet Gateway
+			-Subnet
+			-NACL
+				-EC2
+				-SecurityGroup
 
 
 
@@ -170,13 +158,14 @@ AWS Use cases:
 3
 ##Region        
 -------------------------------------------------
+AWS Region is a separate geographic area.
 A region is a cluster of data centers, Most AWS services are region-scoped.
 
 How to choose  and AWS Region?
 • Compliance with data governance and legal requirements: data never leaves a region without your explicit permission.
 • Proximity to customers: reduced latency
 • Available services within a Region: new services and new features aren’t available in every Region
-• Pricing: pricing varies region to region and is transparent in the service pricing page.
+• Pricing: pricing varies region to region.
  
  
  
@@ -190,7 +179,7 @@ Each region hase many availabuility zone.
 Usually 3, Min 2 and Max 6;
 
 They’re separate from each other, so that they’re isolated from disasters.
-Each availability zone (AZ) is one or more discrete data centers with redundant power, networking, and connectivity
+Each availability zone (AZ) is one or more discrete data centers with redundant power, networking, and connectivity.
 
 
 
@@ -201,8 +190,8 @@ Each availability zone (AZ) is one or more discrete data centers with redundant 
 5
 ##Edge Locations
 -------------------------------------------------
-Content is delivered to end users with lower latency.
-A site that CloudFront uses to cache copies of your content for faster delivery to users at any location.
+Edge locations are AWS data centers designed to deliver services with the lowest latency possible.
+CloudFront delivers your content through a worldwide network of data centers called edge locations.
 
 An edge location is the nearest point to the consumer(user) who is consuming the AWS service. 
 In these locations, the server is not present but a small setup is there. 
@@ -239,14 +228,16 @@ RegionalServices:https://aws.amazon.com/about-aws/global-infrastructure/regional
 AWS Identity and Access Management (IAM) is a web service that helps you securely control access to AWS resources. 
 
 Three types of Principals — Root Users, IAM Users and Instance Principals
-IAM deals with four principle entities: Users, Groups, Roles and Policies.
+IAM deals with four Principle Entities: Users, Groups, Roles and Policies.
+
+A principal is a person or application that can make a request for an action or operation on an AWS resource.
 
 
 IAM Policies Structure:
 • Version: policy language version, always include “2012-10-17”
 • Id: an identifier for the policy (optional) 
 • Statement: one or more individual statements (required)
-• Statements consists of 
+• Statements consists of:
 • Sid: an identifier for the statement (optional) 
 • Effect: whether the statement allows or denies access(Allow, Deny)
 • Principal: account/user/role to which this policy applied to 
@@ -257,14 +248,12 @@ IAM Policies Structure:
 
 
 Multi Factor Authentication - MFA:
-MFA = password you know + security device you own
-Main benefit of MFA:
-if a password is stolen or hacked, the account is not compromised
+MFA = Password+Scurity device you own.
+Main benefit of MFA: if a password is stolen or hacked, the account is not compromised.
 
 
 
-How can users access AWS:
-Three options:
+How can users access AWS, Three options:
 	• AWS Management Console (protected by password + MFA)
 	• AWS Command Line Interface (CLI): protected by access keys
 	• AWS Software Developer Kit (SDK) - for code: protected by access keys
@@ -276,7 +265,7 @@ Three options:
 
 IAM Security Tools:
 IAM Credentials Report (account-level)
-• a report that lists all your account's users and the status of their various credentials
+• a report that lists all your account's users and the status of their various credentials.
 
 IAM Access Advisor (user-level)
 IAM access advisor helps you audit service access, remove unnecessary permissions, and set 
