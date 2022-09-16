@@ -392,14 +392,12 @@ It is a aws managed service, security is a shared responsibility.
 A policy is an object in AWS that, when associated with an identity or resource, defines their permissions.
 
 
-Identity-based policies – Attach managed and inline policies to IAM identities (users, groups to which users belong, or roles). 
-
-
-Identity-based policies are attached to an IAM user, group, or role to specify what that identity can do (its permissions).
+Identity-based policies are attached to an IAM user, group, or role to specify what that identity 
+         can do (its permissions).
 Resource-based policies – Attach inline policies to resources, you can specify who has access to the resource 
          and what actions they can perform on it.  
 
-Permissions boundaries – Use a managed policy as the permissions boundary for an IAM entity (user or role). 
+Permissions boundaries: Use a managed policy as the permissions boundary for an IAM entity (user or role). 
 
 
 Organizations SCPs – Organizations service control policy (SCP) to define the maximum permissions 
@@ -412,7 +410,6 @@ which the ACL is attached.
 A network access control list (ACL) allows or denies specific inbound or outbound traffic at the subnet level. 
 You can use the default network ACL for your VPC, or you can create a custom network ACL for your VPC with rules that are 
 similar to the rules for your security groups in order to add an additional layer of security to your VPC.
-Creating an Access Control List (ACL) using the AWS CLI.
 
 
 Session policies – Pass advanced session policies when you use the AWS CLI or AWS API to assume a role or a federated user.
@@ -701,7 +698,8 @@ It is a aws managed service, security is a shared responsibility.
 
 ##EC2 Instance Connect
 -------------------------------------------------
-• Connect to your EC2 instance within your browser
+Connect using the Amazon EC2 console (browser-based client), connect to your instances using Secure Shell (SSH).
+
 • No need to use your key file that was downloaded
 • The “magic” is that a temporary key is uploaded onto EC2 by AWS
 • Works only out-of-the-box with Amazon Linux 2
@@ -773,19 +771,19 @@ It is a aws managed service, security is a shared responsibility.
 ##Placement Group
 -------------------------------------------------
 Placement Groups are logical groupings or clusters of instances in the selected AWS region. 
-Placement groups are specifically used for launching cluster compute instance types.
+Specifically used for launching cluster compute instance types.
 
 Placement type:
-Cluster(Same Rack Same AZ ) – (Same Rack Same AZ )clusters instances into a low-latency group in a single Availability Zone.
+Cluster(Same Rack Same AZ ) – clusters instances into a low-latency group in a single Availability Zone.
 This strategy enables workloads to achieve the low-latency network performance.
-:If the rack fails, all instances fails at the same time
+:If the rack fails, all instances fails at the same time.
 
 Use case:
 • Big Data job that needs to complete fast
-• Application that needs extremely low latency and high network throughput
+• Application that needs extremely low latency and high network throughput.
 
 
-Partition(Not Same Rack Same AZ ) — spreads instances across many different partitions (which rely on
+Partition(Not Same Rack but Same AZ ) — spreads instances across many different partitions (which rely on
 different sets of racks) within a single AZ.
 Do not share the same rack.  
 
@@ -929,7 +927,6 @@ It is a aws managed service, security is a shared responsibility.
 ##EC2 Instance Storage Section
 -------------------------------------------------
 You can use block-level storage only in combination with an EC2 instance where the OS runs.
-
 There are two block-level storage options for EC2 instances.
 
 Instance store:
@@ -944,17 +941,9 @@ EBS volume, which provides off-instance storage that will persist independently 
 #         
 -------------------------------------------------
 
-  
+
 
 21
--------------------------------------------------
-
-
-
-
-
-
-22
 ##EBS
 -------------------------------------------------
 AWS Elastic Block Store (EBS) is Amazon’s block-level storage solution used with the EC2 cloud service to store persistent data. 
@@ -993,6 +982,7 @@ Encrypted Volumes and snapshots  with CMK
 
 
 
+22
 ++EBS Shapshort
 -------------------------------------------------
 • Make a backup (snapshot) of your EBS volume at a point in time
@@ -1009,6 +999,7 @@ EBS Snapshots Features:
 	• Specify retention (from 1 day to 1 year)
 • Fast Snapshot Restore (FSR)
 	• Force full initialization of snap
+
 
 
 
@@ -1145,8 +1136,9 @@ Amazon EFS offers four storage classes:
 		Amazon EFS One Zone
 		Amazon EFS One Zone-Infrequent Access (EFS One Zone-IA).
 
-Can copy snapshots across AZ or Region.
 
+
+Can copy snapshots across AZ or Region.
 
 
 Area:
@@ -1158,7 +1150,7 @@ for high availability and durability.
  
 UseCase:
 ========
-Content management, web serving, data sharing, Wordpress
+Content management, web serving, data sharing, Wordpress.
 
 Share code and other files in a secure, organized way to increase DevOps agility and respond faster to customer feedback.
 Persist and share data from your AWS containers and serverless applications with zero management required.
@@ -1166,7 +1158,7 @@ Persist and share data from your AWS containers and serverless applications with
 
 BillCost:
 =========
-5 GB of standard storage for 12 months with the AWS Free Tier
+AWS Free Tier
 You pay only for the storage you use, for read and write access to data stored in Infrequent Access storage classes, 
 and for any provisioned throughput.
 
@@ -1448,7 +1440,7 @@ It is mainly used for load balancing TCP traffic.
 
 BillCost:
 =========
-Not AWS free tier
+No AWS free tier
 You are charged for each hour or partial hour that a Network Load Balancer is running, and the number of 
 Network Load Balancer Capacity Units (NLCU) used by Network Load Balancer per hour.
 
@@ -1584,6 +1576,8 @@ SSL/TLS - Basics:
 
 You can manage certificates using ACM (AWS Certificate Manager)
 You can create upload your own certificates alternatively
+
+
 
 HTTPS listener:
 • You must specify a default certificate
@@ -1793,7 +1787,8 @@ stopping it for a long time, you should snapshot & restore instead.
 RDS– Storage Auto Scaling:
 • Helps you increase storage on your RDS DB instance dynamically
 • When RDS detects you are running out of free database storage, it scales automatically
-• Avoid manually scaling your database storage • You have to set Maximum Storage Threshold (maximum limit for DB storage)
+• Avoid manually scaling your database storage 
+• You have to set Maximum Storage Threshold (maximum limit for DB storage)
 
 
 
@@ -1803,14 +1798,6 @@ RDS Read Replicas for read scalability:
 • Replication is ASYNC, so reads are eventually consistent
 • Replicas can be promoted to their own DB
 • Applications must update the connectionstring to leverage read replicas
-
-
-RDS Read Replicas – Use Cases:
-• You have a production database that is taking on normal load
-• You want to run a reporting application to run some analytics
-• You create a Read Replica to run the new workload there
-• The production application is unaffected
-• Read replicas are used for SELECT (=read) only kind of statements (not INSERT, UPDATE, DELETE)
 
 
 RDS Read Replicas – Network Cost:
@@ -1823,7 +1810,7 @@ RDS Multi AZ (Disaster Recovery):
 • One DNS name – automatic app failover to standby
 • Increase availability
 • Failover in case of loss of AZ, loss of
- etwork, instance or storage failure
+  etwork, instance or storage failure
 • No manual intervention in apps
 • Not used for scaling
 • Multi-AZ replication is free
