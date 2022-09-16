@@ -2157,6 +2157,7 @@ MEMCACHED:
 • Multi-threaded architecture
 
 
+
 Area:
 =====
 Amazon ElastiCache is available in multiple AWS Regions. This means that you can launch ElastiCache clusters in 
@@ -2246,9 +2247,9 @@ Route 53 – Record Types:
 • A – maps a hostname to IPv4
 • AAAA – maps a hostname to IPv6
 • CNAME – maps a hostname to another hostname
-• The target is a domain name which must have an A or AAAA record
-• Can’t create a CNAME record for the top node of a DNS namespace (Zone Apex)
-• Example: you can’t create for example.com, but you can create for www.example.com
+	• The target is a domain name which must have an A or AAAA record
+	• Can’t create a CNAME record for the top node of a DNS namespace (Zone Apex)
+	• Example: you can’t create for example.com, but you can create for www.example.com
 • NS – Name Servers for the Hosted Zone
 • Control how traffic is routed for a domain
 
@@ -2336,8 +2337,8 @@ Amazon Route 53 supports DNSSEC signing as well as DNSSEC for domain registratio
 38
 ##AWS Elastic Beanstalk 
 -------------------------------------------------
-AWS Elastic Beanstalk is an easy-to-use service for deploying and scaling web applications and services developed with Java, .NET, 
-PHP, Node.js, Python, Ruby, Go, and 
+AWS Elastic Beanstalk is an easy-to-use service for deploying and scaling web applications and services developed with 
+Java, .NET, PHP, Node.js, Python, Ruby, Go, and 
 Docker on familiar servers such as Apache, Nginx, Passenger, and IIS.
 
 You can simply upload your code and Elastic Beanstalk automatically handles the deployment, from capacity provisioning, 
@@ -2346,13 +2347,14 @@ load balancing, auto-scaling to application health monitoring.
 
 Elastic Beanstalk isn't great if you need a lot of environment variables. 
 The simple reason is that Elastic Beanstalk has a hard limit of 4KB to store all key-value pairs.
+
 Beanstalk is PaaS (platform as a service) while CloudFormation is IaC (infrastructure as code).
 
 
 
 Elastic Beanstalk takes care of the hosting infrastructure, coding language interpreter, operating system, 
 security, https service and application layer. 
-All you need to worry about is writing your code.
+
 
 
 
@@ -2374,7 +2376,8 @@ AWS Elastic Beanstalk is combined with the developer tools to help you manage th
 
 BillCost:
 =========
-There is no additional charge for Elastic Beanstalk - you pay only for the AWS resources needed to store and run your applications.
+There is no additional charge for Elastic Beanstalk - you pay only for the AWS resources needed to 
+store and run your applications.
 
 
 
@@ -2396,42 +2399,35 @@ security group to your environment.
 An Amazon S3 bucket is a public cloud storage. Amazon Simple Storage Service (Amazon S3) is an object storage service. 
 You can use Amazon S3 to store and retrieve any amount of data at any time, from anywhere.
 
+S3 in Amazon has two entities called buckets and objects. 
+Objects are stored inside buckets.
+By default, the maximum number of buckets that can be created per account is 100.
+
 Object values are the content of the body:
 • Max Object Size is 5TB (5000GB)
 • If uploading more than 5GB, must use “multi-part upload”
 
 You can version your files in Amazon S3, It is enabled at the bucket level.
 
-Amazon S3 Storage Classes:
-Amazon S3 Standard
-Amazon S3 Intelligent-Tiering
-Amazon S3 Standard-Infrequent Access
-Amazon S3 One Zone-Infrequent Access
-Amazon S3 Glacier Instant Retrieval
-Amazon S3 Glacier Flexible Retrieval
-Amazon S3 Glacier Deep Archive
-
-
-S3 in Amazon has two entities called buckets and objects. 
-Objects are stored inside buckets.
-By default, the maximum number of buckets that can be created per account is 100.
-
 
 Object Lifecycle Management:
 A lifecycle configuration is a set of rules that define actions that AWS S3 applies to a group of objects. 
 
 There are two types of actions:
-Transaction Actions
-This action defines objects’ transition from one storage class to another.
+	Transaction Actions: This action defines objects’ transition from one storage class to another.
 
-Expiration Actions
-This action deletes objects in the Amazon S3 bucket.
+	Expiration Actions: This action deletes objects in the Amazon S3 bucket.
 
 
-CORS:
-Cross-origin resource sharing (CORS) defines a way for client web applications that are loaded in one domain to interact 
-with resources in a different domain. 
 
+Amazon S3 Storage Classes:
+S3 Standard
+S3 Intelligent-Tiering
+S3 Standard-Infrequent Access
+S3 One Zone-Infrequent Access
+S3 Glacier Instant Retrieval
+S3 Glacier Flexible Retrieval
+S3 Glacier Deep Archive
 
 
 
@@ -2452,7 +2448,6 @@ S3 can host static websites and have them accessible on the www
 CORS:
 • An origin is a scheme (protocol), host (domain) and port
 • Web Browser based mechanism to allow requests to other origins while visiting the main origin
-
 The requests won’t be fulfilled unless the other origin allows for the
 requests, using CORS Headers (ex: Access-Control-Allow-Origin)
 
@@ -2491,8 +2486,8 @@ Bucket pricing varies by region.
 Security:
 =========
 AWS Identity and Access Management (IAM) to create users and manage their respective access; 
-Access Control Lists (ACLs) to make individual objects accessible to authorized users; bucket policies to configure permissions 
-for all objects within a single S3 bucket;
+Access Control Lists (ACLs) to make individual objects accessible to authorized users; 
+Bucket policies to configure permissions  for all objects within a single S3 bucket;
 
 -Amazon S3 also supports Audit Logs.
 -Enabling detective controls such as AWS CloudTrail or Amazon GuardDuty for Amazon S3.
@@ -2835,23 +2830,10 @@ charges associated with others accessing the data.
 ##S3 Lock | Vault Lock | Glacier Vault Lock
 -------------------------------------------------
 S3 Glacier Vault Lock helps you to easily deploy and enforce compliance controls for individual S3 Glacier vaults with a 
-Vault Lock policy. You can specify controls such as "write once read many" (WORM) in a Vault Lock policy 
-and lock the policy from future edits.
+Vault Lock policy. 
+You can specify controls such as "write once read many" (WORM) in a Vault Lock policy  and lock the policy from future edits.
 
 After a Vault Lock policy is locked, the policy can no longer be changed or deleted.
-
-Object lock: Block an object version deleeion for a specified amount of time
-Object retention:
-	• Retention Period: specifies a fixed period
-	• Legal Hold: same protection, no expiry date
-• Modes:
-	• Governance mode: users can't overwrite or delete an object version or alter its lock
-	settings unless they have special permissions
-	• Compliance mode: a protected object version can't be overwritten or deleted by
-	any user, including the root user in your AWS account. When an object is locked in
-	compliance mode, its retention mode can't be changed, and its retention period
-	can't be shortened.
-
 
 
 S3 Object Lock (versioning must be enabled):
@@ -2887,9 +2869,6 @@ Use Cases:
 	• Redacting personally identifiable information for analytics or non- production environments.
 	• Converting across data formats, such as converting XML to JSON.
 	• Resizing and watermarking images on the fly using caller-specific details, such as the user who requested the object.
-
-
-
 
 
 
