@@ -8130,8 +8130,8 @@ AWS provides two features that you can use to increase security in your VPC: sec
 143
 ##Internet Gateway (IGW)
 -------------------------------------------------
-An internet gateway is a horizontally scaled, redundant, and highly available VPC component that allows communication between your 
-VPC and the internet. It supports IPv4 and IPv6 traffic. 
+An internet gateway is a horizontally scaled, redundant, and highly available VPC component that allows 
+communication between your  VPC and the internet. It supports IPv4 and IPv6 traffic. 
 
 • Must be created separately from a VPC
 • One VPC can only be attached to one IGW and vice versa
@@ -8173,10 +8173,11 @@ Main route table—The route table that automatically comes with your VPC. It co
 subnets that are not explicitly associated with any other route table.
 Custom route table: A route table that you create for your VPC.
 
-Destination: The range of IP addresses where you want traffic to go (destination CIDR). 
+Destination: The range of IP addresses(subnet) where from you want traffic to go (destination CIDR). 
 For example, an external corporate network with the CIDR 172.16.0.0/12.
 
-Target: The gateway, network interface, or connection through which to send the destination traffic; for example, an internet gateway.
+Target: The gateway, network interface, or connection through which to send the destination traffic; 
+for example, an internet gateway.
 
 There are no additional charges.
 
@@ -8186,7 +8187,8 @@ There are no additional charges.
 145
 ##Bastion Host
 -------------------------------------------------
-A bastion host is a server (EC2 instance in a public subnet) whose purpose is to provide access to a private network from an external network, such as the Internet.
+A bastion host is a server (EC2 instance in a public subnet) whose purpose is to provide access to 
+a private network from an external network, such as the Internet.
 
 
 • We can use a Bastion Host to SSH into our private EC2 instances
@@ -8299,7 +8301,8 @@ NAT device is added to the public subnet to get internet connectivity.
 • 5 Gbps of bandwidth with automatic scaling up to 45 Gbps
 • No Security Groups to manage / required
 
-Once created, you need to update the route table associated with your private subnet to point internet-bound traffic to the NAT gateway. 
+Once created, you need to update the route table associated with your private subnet to point 
+internet-bound traffic to the NAT gateway. 
 This way, the instances in your private subnet can communicate with the internet.
 
 
@@ -8354,7 +8357,8 @@ It is a aws managed service, security is a shared responsibility.
 ##NACL | Security Groups
 -------------------------------------------------
 NACL:
-NACL also adds an additional layer of security associated with subnets that control both inbound and outbound traffic at the subnet level.
+	NACL also adds an additional layer of security associated with subnets that control both inbound and outbound 
+	traffic at the subnet level.
 
 • NACL are like a firewall which control traffic from and to subnets
 • One NACL per Subnet, new subnets are assigned the Default NACL
@@ -8435,7 +8439,8 @@ It is a aws managed service, security is a shared responsibility.
 149
 ##VPC Peering
 -------------------------------------------------
-A peering connection can be made between your own VPCs or with a VPC in another AWS account, as long as it is in the same region.
+A peering connection can be made between your own VPCs or with a VPC in another AWS account, 
+as long as it is in the same region.
 
 VPCs, but transitive peering is not supported. In other words, VPC A can connect to B and C in the above diagram, 
 but C cannot communicate with B unless directly paired.
@@ -8444,7 +8449,8 @@ We can have up to 200 Subnets per Amazon Virtual Private Cloud (VPC).
 
 Privately connect two VPCs using AWS’network:
 • Make them behave as if they were in thesame network
-• Must not have overlapping CIDRs • VPC Peering connection is NOT transitive(must be established for each VPC that
+• Must not have overlapping CIDRs 
+• VPC Peering connection is NOT transitive(must be established for each VPC that
   need to communicate with one another)
 • You must update route tables in each VPC’ssubnets to ensure EC2 instances can communicate with each other
 • You can create VPC Peering connection between VPCs in different AWSaccounts/regions
@@ -8508,8 +8514,8 @@ Interface Endpoints:
 	• Supports most AWS services
 	• $ per hour + $ per GB of data processed
 	• Supports most AWS services
-	An interface endpoint is an elastic network interface that allows a private IP address in a subnet to connect 
-	VPC resources to  AWS services, such as CloudFormation,Elastic Load Balancers (ELBs), SNS, and more.
+An interface endpoint is an elastic network interface that allows a private IP address in a subnet to connect 
+VPC resources to  AWS services, such as CloudFormation,Elastic Load Balancers (ELBs), SNS, and more.
 	
 Gateway Endpoints:
 	• Provisions a gateway and must be used as a target in a route table (does not use security groups)
@@ -8628,10 +8634,12 @@ Customer Gateway Device (On-premises):
 
 AWS VPN CloudHub:
 • Provide secure communication between multiple sites, if you have multiple VPN connections
-• Low-cost hub -and-spoke model for primary or secondary network connectivity between different locations (VPN only)
+• Low-cost hub-and-spoke model for primary or secondary network connectivity between different locations (VPN only)
 • It’s a VPN connection so it goes over the public Internet
 • To set it up, connect multiple VPN connections on the same VGW, setup
   dynamic routing and configure route tables
+
+
 
 
 Area:
@@ -8676,7 +8684,6 @@ Supports both IPv4 and IPv6
 
 AWS Direct Connect Private dedicated network connection from on-premises to AWS.
 
-Direct Connect is an AWS service that establishes a dedicated network connection between your premises and AWS. 
 You can create this private connectivity to reduce network costs, increase bandwidth, and provide more consistent network experience 
 compared to regular internet-based connections.
 
@@ -8836,8 +8843,8 @@ FedRAMP High and HIPAA eligibility.
 155
 ##VPC Traffic Mirroring
 -------------------------------------------------
-Traffic Mirroring is an Amazon VPC feature that you can use to copy network traffic from an elastic network interface of type interface. 
-You can then send the traffic to out-of-band security and monitoring appliances for:
+Traffic Mirroring is an Amazon VPC feature that you can use to copy network traffic from an elastic network interface 
+of type interface. You can then send the traffic to out-of-band security and monitoring appliances for:
 
 • Allows you to capture and inspect network traffic in your VPC
 • Route the traffic to security appliances that you manage
@@ -8888,7 +8895,7 @@ this is the default IP addressing system for Amazon VPC and Amazon EC2.
 
 
 
-130
+157
 ##Egress Only Internet Gateway
 -------------------------------------------------
 An egress-only internet gateway is used to enable outbound communication over IPv6 from instances in your VPC to the internet, 
@@ -8913,8 +8920,7 @@ Security:
 
 
 
-
-131
+158
 ##VPC Section Summary
 -------------------------------------------------
 • CIDR – IP Range
@@ -8952,7 +8958,7 @@ AWS PrivateLink / VPC Endpoint Services:
 
 
 
-132
+159
 ##Networking Cost
 -------------------------------------------------
 • Use Private IP instead of Public IP for good savings and better network performance
@@ -8970,7 +8976,7 @@ Minimizing egress traffic network cost:
 
 
 
-133
+160
 ##S3 Data Transfer Pricing – Analysis for USA
 -------------------------------------------------
 • S3 ingress: free
@@ -8987,13 +8993,7 @@ Minimizing egress traffic network cost:
 
 
 
-134
-##Pricing: NAT Gateway vs Gateway VPC Endpoint
--------------------------------------------------
-
-
-
-
+161
 ++Network Protection on AWS
 -------------------------------------------------
 
@@ -9045,7 +9045,7 @@ Network Firewall – Fine Grained Controls:
 
 
 
-135
+162
 ##Disaster Recovery Overview
 -------------------------------------------------
 • Any event that has a negative impact on a company’s business continuity or finances is a disaster
@@ -9144,7 +9144,7 @@ Disaster Recovery Tips:
 
 
 
-136
+163
 ##DMS (Database Migration Service)
 -------------------------------------------------
 AWS Database Migration Service (AWS DMS) helps you migrate databases to AWS quickly and securely. 
@@ -9264,7 +9264,7 @@ Security:
 
 
 
-138
+164
 ##AWS Backup
 -------------------------------------------------
 AWS Backup is a fully managed service that enables you to centralize and automate data protection across on-premises and AWS services. 
@@ -9388,7 +9388,7 @@ It is a aws managed service, security is a shared responsibility.
 
 ==Extra Solution Architecture discussions
 
-
+165
 S3 Event Notifications
 -------------------------------------------------
 Amazon S3 events Lambda Function SQS SNS
@@ -9417,8 +9417,7 @@ API Gateway – AWS Service Integration Kinesis Data Streams example
 
 
 
-
-150
+166
 ##Caching Strategies
 -------------------------------------------------
 Caching helps applications perform dramatically faster and cost significantly less at scale
@@ -9453,7 +9452,7 @@ It is a aws managed service, security is a shared responsibility.
 
 
 
-151
+167
 ##Blocking and IP address
 -------------------------------------------------
 To allow or block specific IP addresses for your EC2 instances, use a network Access Control List (ACL) 
@@ -9473,7 +9472,7 @@ Blocking an IP address – ALB, CloudFront WAF
 
 
 
-152
+168
 ##HPC (High performance Computing)
 -------------------------------------------------
 HPC has been key to solving the most complex problems in every industry, and changing the way we work and live. 
@@ -9518,7 +9517,7 @@ EC2 Enhanced Networking (SR-IOV):
 
 
 
-153
+169
 ##Elastic Fabric Adapter (EFA)
 -------------------------------------------------
 • Improved ENA for HPC, only works for Linux
@@ -9549,7 +9548,7 @@ Improved ENA for HPC, only works for Linux
  
  
  
-154
+170
 ##Storage
 -------------------------------------------------
 Instance-attached storage:
@@ -9564,7 +9563,7 @@ Network storage:
 
 
 
-155
+171
 ##Automation and Orchestration
 -------------------------------------------------
 AWS Batch
@@ -9603,7 +9602,7 @@ Note: Can’t use ALB as the ALB is layer 7 (HTTP protocol)
 ==Other Services
 
 
-156
+172
 ##CloudFormation
 -------------------------------------------------
 AWS CloudFormation is an AWS service that uses template files to automate the setup of AWS resources.
@@ -9733,7 +9732,7 @@ It is a aws managed service, security is a shared responsibility.
 
 
 
-156
+173
 ++Amazon Simple Email Service (Amazon SES)
 -------------------------------------------------
 • Fully managed service to send emails securely, globally and at scale
@@ -9748,7 +9747,7 @@ It is a aws managed service, security is a shared responsibility.
 
 
 
-157
+174
 ++Amazon Pinpoint
 -------------------------------------------------
 • Scalable 2-way (outbound/inbound) marketing communications service
@@ -9762,8 +9761,7 @@ It is a aws managed service, security is a shared responsibility.
 	• In Amazon Pinpoint, you create message templates, delivery schedules, highly-targeted segments, and full campaigns
 
 
-
-158
+175
 ++SSM Systems Manager – SSM Session Manager
 -------------------------------------------------
 Allows you to start a secure shell on your EC2 and on-premises servers
@@ -9774,7 +9772,7 @@ Allows you to start a secure shell on your EC2 and on-premises servers
 
 
 
-159
+176
 ++Amazon Elastic Transcoder
 -------------------------------------------------
 • Elastic Transcoder is used to convert media files stored in S3 into media
@@ -9787,7 +9785,7 @@ Allows you to start a secure shell on your EC2 and on-premises servers
 
 
 
-160
+177
 ++AWS Batch
 -------------------------------------------------
 • Fully managed batch processing at any scale
@@ -9817,7 +9815,7 @@ Batch vs Lambda:
 
 
 
-161
+178
 ++Amazon AppFlow
 -------------------------------------------------
 • Fully managed integration service that enables you to securely transfer
@@ -9836,7 +9834,7 @@ Batch vs Lambda:
 
 
 
-162
+189
 ##AWS Well-Architected Framework And Tool
 -------------------------------------------------
 Well Architected Framework General Guiding Principles -architected
@@ -9873,7 +9871,7 @@ AWS Well-Architected Tool:
 
 
 
-163
+180
 ##AWS Trusted Advisor
 -------------------------------------------------
 AWS Trusted Advisor provides recommendations that help you follow AWS best practices. 
