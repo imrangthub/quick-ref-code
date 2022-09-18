@@ -30,6 +30,7 @@ Elasticity:স্থিতিস্থাপকতা, নমনীয়তা
 Successor:উত্তরাধিকারী
 Assume:গ্রহণ করা, দায়িত্বগ্রহণ করা
 Tenancy:ভাড়াটিয়া রূপে অধিকার
+Compliance requirements:মেনে চলার প্রয়োজনীয়তা
 =================================================
 #To Do           
 ================================================= 
@@ -56,6 +57,8 @@ Terminating => Returning control to Amazon
 Private key: The user downloads the private key
 Public key: AWS uses the public key to confirm the identity of the user. 
 
+Control of inbound network (from other to the instance) 
+Control of outbound network (from the instance to other)
 
 
 Classic Ports to know:
@@ -1458,9 +1461,12 @@ Network Load Balancers do not have security groups.
 31
 ##GWLB (Gateway Load Balaner)
 -------------------------------------------------
-Gateway Load Balancer helps deploy, scale, and manage virtual appliances, such as firewalls, intrusion detection and 
-prevention systems (IDS/IPS), and deep packet inspection systems.
+A Gateway Load Balancer operates at the 3 layer of the Open Systems Interconnection (OSI) model. 
+It listens for all IP packets across all ports and forwards traffic to the target group that's 
+specified in the listener rule, using the GENEVE protocol on port 6081.
 
+
+Source and destination  are unaware the traffic is inspected and do somthing. (Vertual application like Friewall, IDP)
 Operates at Layer 3 of the OSI model, the network layer.
 Uses the GENEVE protocol on port 6081
 
@@ -1469,7 +1475,13 @@ Gateway Load Balancer –Target Groups:
 • EC2 instances
 • IP Addresses – must be private IPs
 
+Gateway Load Balancer endpoint:
+A Gateway Load Balancer endpoint is a VPC endpoint that provides private connectivity between virtual appliances in 
+the service provider VPC and application servers in the service consumer VPC. 
+You deploy the Gateway Load Balancer in the same VPC as the virtual appliances.
 
+
+https://docs.aws.amazon.com/vpc/latest/privatelink/vpce-gateway-load-balancer.html
 
 Area:
 =====
@@ -1734,6 +1746,8 @@ It is a aws managed service, security is a shared responsibility.
 34
 ##RDS 
 -------------------------------------------------
+As you are only increasing storage size and not changing the instance type or anything else.
+
 RDS stands for Relational Database Service
 • It’s a managed DB service for DB use SQL as a query language.
 • It allows you to create databases in the cloud that are managed by AWS
@@ -2988,7 +3002,7 @@ CloudFront Signed URL / Signed Cookies:
 
 CloudFront Signed URL vs S3 Pre-Signed URL:
 
-only S3 refers to them as Pre-signed URLs; 
+Only S3 refers to them as Pre-signed URLs; 
 CloudFront refers to them as Signed URLs and Signed Cookies.
 
 -Pre-signed URLs use the owner’s security credentials to grant.
@@ -3041,7 +3055,7 @@ Security:
 =========
 Security is a shared responsibility.
 Amazon CloudFront is a highly secure CDN that provides both network and application level protection. 
-All CloudFront customers benefit from the automatic protections of AWS Shield Standard, at no additional charge.
+AWS Shield Standard, at no additional charge.
 
 
 
@@ -3081,8 +3095,8 @@ Global users for our application:
 
 
 Unicast IP vs Anycast IP:
-• Unicast IP: one server holds one IP address
-• Anycast IP: all servers hold the same IP address and the client is routed to the nearest one
+• Unicast IP: one server holds one IP address.
+• Anycast IP: all servers hold the same IP address and the client is routed to the nearest one.
 
 
 
@@ -3152,10 +3166,8 @@ direction that flows through the accelerator.
 Security:
 =========
 only 2 external IP need to be whitelisted
-DDoS protection thanks to AWS Shield
+DDoS protection  AWS Shield
 
-By default, AWS Global Accelerator is protected by AWS Shield Standard, which minimizes application downtime and latency 
-from denial-of-service attacks by using always-on network flow monitoring and automated in-line mitigation.
 
 
 
@@ -3181,12 +3193,12 @@ cloud without depending on networks.
 
 AWS snow family service model is of three types: 
 
-AWS snow cone: AWS Snow cone is the most compact and portable device weighing in at 4.5 pounds (2.1kg). 
+AWS snow cone: Snow cone is the most compact and portable device weighing in at 4.5 pounds (2.1kg). 
 It is available in HDD and SDD options. Snowcone is ruggedized, secure, and purpose-built for use outside of a 
 traditional data centre. 
-Can be sent back to AWS offline, or connect it to internet and use AWS DataSync to send data
+Can be sent back to AWS offline, or connect it to internet and use AWS DataSync to send data.
 
-AWS snowball: AWS snowball is available as compute optimized device and storage optimized device. 
+AWS snowball: Snowball is available as compute optimized device and storage optimized device. 
 These devices are suited for extreme conditions, tamper-proof, and highly secure. 
 Use cases: large data cloud migrations, DC decommission, disaster recovery
 Pay per data transfer job
@@ -3247,11 +3259,6 @@ Global.
 
 UseCase:
 ========
-AWS Snow Family: offline devices to perform data migrations
-If it takes more than a week to transfer over the network, use Snowball devices
-We setup a Snowball Edge/Snowcone device to do edge computing.
-
-
 The AWS Snow Family helps customers that need to run operations in austere, non-data center environments, 
 and in locations where there's lack of consistent network connectivity. 
 
@@ -3297,7 +3304,7 @@ Four widely-used file systems:
  
 
 FSx for Windows:
-Amazon FSx is accessible from Windows, Linux, and MacOS compute instances and devices. 
+Amazon FSx for Windows is accessible from Windows, Linux, and MacOS compute instances and devices. 
 Thousands of compute instances and devices can access a file system concurrently. 
 Amazon FSx File Gateway provides low-latency, on-premises access to fully managed file shares in the cloud.
 
@@ -3385,14 +3392,9 @@ Hybrid Cloud for Storage:
 
 
 AWS Storage Cloud Native Options:
-Block  
-Amazon EBS, EC2 Instance Store
-
-File
-Amazon EFS, Amazon FSx 
-
-Object
-Amazon S3, Amazon Glacier
+	Block: Amazon EBS, EC2 Instance Store
+	File: Amazon EFS, Amazon FSx 
+	Object:Amazon S3, Amazon Glacier
 
 
 
@@ -3505,17 +3507,11 @@ Windows File Server and benefit from protected, resilient, fully managed file sy
 Volume Gateway:
 • Block storage using iSCSI protocol backed by S3
 • Backed by EBS snapshots which can help restore on-premises volumes!
-• Cached volumes: low latency access to most recent data
-• Stored volumes: entire dataset is on premise, scheduled backups to S3
 
 Cached Volume mode – the entire dataset is stored on S3, and a cache of the most frequently accessed data is cached on-site.
 Stored Volume mode – the entire dataset is stored on-site and is asynchronously backed up to S3 (EBS point-in-time snapshots). 
 Snapshots are incremental and compressed.
 
-• Block storage using iSCSI protocol backed by S3
-• Backed by EBS snapshots which can help restore on-premises volumes!
-• Cached volumes: low latency access to most recent data
-• Stored volumes: entire dataset is on premise, scheduled backups to S3
 
 
 Tape Gateway:
@@ -3525,8 +3521,8 @@ Tape Gateway:
 • Back up data using existing tape-based processes (and iSCSI interface)
 • Works with leading backup software vendors 
 
-It is supported by NetBackup, Backup Exec, Veeam, etc. Instead of using physical tape, they are using virtual tape, and these virtual tapes are 
-further stored in Amazon S3.
+It is supported by NetBackup, Backup Exec, Veeam, etc. Instead of using physical tape, they are using virtual tape, 
+and these virtual tapes are further stored in Amazon S3.
 • Some companies have backup processes using physical tapes (!)
 • With Tape Gateway, companies use the same processes but, in the cloud
 • Virtual Tape Library (VTL) backed by Amazon S3 and Glacier
@@ -3562,7 +3558,6 @@ UseCase:
 ========
 Store data coming from specialized on-premises instruments in  S3 and use AWS services for data analysis.
 Provide cloud-based backup for on-premises files and database applications for low-cost, virtually unlimited scale.
-Transform your on-premises user and group file shares to a hybrid cloud architecture for simplified management and cost reduction.
 
 
 
@@ -3699,9 +3694,9 @@ There are two patterns of application communication:
 SQS, SNS are “cloud-native” services, and they’re using proprietary protocols from AWS.
 Traditional applications running from on-premises may use open protocols such as: MQTT, AMQP, STOMP, Openwire, WSS
 
-• using SQS: queue model
-• using SNS: pub/sub model
-• using Kinesis: real-time streaming model
+• SQS: queue model
+• SNS: pub/sub model
+• Kinesis: real-time streaming model
 These services can scale independently from our application!
 
 
@@ -3913,7 +3908,8 @@ Security:
 Amazon SNS provides encrypted topics to protect your messages from unauthorized access. 
 The encryption uses a 256-bit AES-GCM algorithm and a customer master key (CMK) issued with AWS Key Management Service (KMS). 
 Amazon SNS also supports VPC endpoints via AWS PrivateLink, so you can privately publish messages to Amazon SNS topics, from an 
-Amazon Virtual Private Cloud (VPC) subnet, without traversing the Internet. To learn more, see Message Encryption and Traffic Privacy.
+Amazon Virtual Private Cloud (VPC) subnet, without traversing the Internet.
+
 
 
 
@@ -4161,16 +4157,16 @@ scale containerized applications.
 Launch Docker containers on AWS = Launch ECS Tasks on ECS Clusters
 
 There are two models that you can use to run your containers:
-EC2 Launch Type: you must provision & maintain the infrastructure (the EC2 instances)
-• Each EC2 Instance must run the ECS Agent to register in the ECS Cluster
-• AWS takes care of starting / stopping containers
+	EC2 Launch Type: you must provision & maintain the infrastructure (the EC2 instances)
+		• Each EC2 Instance must run the ECS Agent to register in the ECS Cluster
+		• AWS takes care of starting / stopping containers
 
-Fargate launch type: This is a serverless pay-as-you-go option. 
-You do not provision the infrastructure (no EC2 instances to manage)
-• It’s all Serverless!
-• You just create task definitions
-• AWS just runs ECS Tasks for you based on the CPU / RAM you need
-• To scale, just increase the number of tasks. Simple - no more EC2 instances
+	Fargate launch type: This is a serverless pay-as-you-go option. 
+	     You do not provision the infrastructure (no EC2 instances to manage)
+		• It’s all Serverless!
+		• You just create task definitions
+		• AWS just runs ECS Tasks for you based on the CPU / RAM you need
+		• To scale, just increase the number of tasks. Simple - no more EC2 instances
 
 
 
@@ -4207,13 +4203,11 @@ Remember:
 on path (www.app.com/microservice-a and www.app.com/microservice-b)
 
 
+
+
 Elastic Beanstalk:
 Single container or multiple containers in same EC2 instance
 Recommended for simple web applications
-
-Amazon ECS:
-AWS specific solution for container orchestration
-Ideal for microservices
 
 
 Amazon Fargate:
@@ -4230,13 +4224,6 @@ Amazon ECS – Load Balancer Integrations:
 • Application Load Balancer supported and works for most use cases
 • Network Load Balancer recommended only for high throughput / high performance use cases, or to pair it with AWS Private Link
 • Elastic Load Balancer supported but not recommended (no advanced features – no Fargate)
-
-
-Mount EFS file systems onto ECS tasks
-Works for both EC2 and Fargate launch types
-Use cases: persistent multi-AZ shared storage for your containers
-Note: Amazon S3 cannot be mounted as a file system
-
 
 ECS Service Auto Scaling
 • Automatically increase/decrease the desired number of ECS tasks
@@ -4354,7 +4341,8 @@ Amazon EKS = Amazon Elastic Kubernetes Service
 • Kubernetes is an open-source system for automatic deployment, scaling and management of containerized (usually Docker) application
 • It’s an alternative to ECS, similar goal but different API
 • EKS supports EC2 if you want to deploy worker nodes or Fargate to deploy serverless containers
-• Use case: if your company is already using Kubernetes on-premises or in another cloud, and wants to migrate to AWS using Kubernetes
+• Use case: if your company is already using Kubernetes on-premises or in another cloud, and wants to migrate to 
+  AWS using Kubernetes
 • Kubernetes is cloud-agnostic (can be used in any cloud – Azure, GCP…)
 • For multiple regions, deploy one EKS cluster per region
 • Collect logs and metrics using CloudWatch Container Insights
@@ -4438,11 +4426,12 @@ Application integration:
 	application-to-application (A2A) and application-to-person (A2P) communication.
 
 Amazon API Gateway: Amazon API Gateway is a fully managed service that makes it easy to create and publish APIs at any scale.
-	AWS AppSync: AWS AppSync is a fully managed service that accelerates application development with scalable GraphQL APIs.
+AWS AppSync: AWS AppSync is a fully managed service that accelerates application development with scalable GraphQL APIs.
 
 
 Data store:
-	Amazon S3: Amazon Simple Storage Service (Amazon S3) is an object storage service designed to store and protect any amount of data.
+	Amazon S3: Amazon Simple Storage Service (Amazon S3) is an object storage service designed to store and 
+	protect any amount of data.
 
 	Amazon DynamoDB:Amazon DynamoDB is a key-value and document database service, delivering single-digit millisecond 
 	performance at any scale.
@@ -4489,6 +4478,7 @@ application or backend service without provisioning or managing servers.
 You can trigger Lambda from over 200 AWS services and software as a service (SaaS) applications, 
 and only pay for what you use.
 
+WS Lambda allows you to add custom logic to AWS resources such as Amazon S3 buckets and Amazon DynamoDB tables.
 
 AWS Lambda Limits to Know - per region:
 Execution:
@@ -4538,6 +4528,9 @@ Security and Compliance is a shared responsibility.
 68
 ##Labmbda@Edge
 -------------------------------------------------
+Lambda are regional service. Lambda@Edge is a global service. 
+Lambda@Edge allows you to execute the logic across multiple location (Node.js and Paython only)
+
 You can use Lambda to change CloudFront requests and responses.
 You can also generate responses to viewers without ever sending the request to the origin.
 
@@ -4657,7 +4650,7 @@ DynamoDB Accelerator (DAX):
 • Help solve read congestion by caching
 • Microseconds latency for cached data
 • Doesn’t require application logic modification
-(compatible with existing DynamoDB APIs)
+ (compatible with existing DynamoDB APIs)
 • 5 minutes TTL for cache (default)
 
 DynamoDB Accelerator (DAX) delivers fast response times for accessing eventually consistent data. 
@@ -4672,7 +4665,7 @@ For Global table Multi Region replication Need to enable DymanoDB Stream.
 DynamoDB Streams
 • 24 hours retention
 • Limited # of consumers
-• Process using AWS Lambda Triggers, orDynamoDB Stream Kinesis adapter
+• Process using AWS Lambda Triggers, or DynamoDB Stream Kinesis adapter
 
 Kinesis Data Streams (newer)
 • 1 year retention
@@ -4769,7 +4762,7 @@ Features:
 -Integrates with
 -Amazon CloudWatch - Performance metrics, API calls, latency data and error rates
 -Amazon CloudWatch Logs - Debug logging
--WS CloudTrail - Complete history of changes to your REST API
+-AWS CloudTrail - Complete history of changes to your REST API
 
 
 
@@ -4777,7 +4770,7 @@ Endpoint Types:
 Edge-Optimized (default): For global clients
 	• Requests are routed through the CloudFront Edge locations (improves latency)
 	• The API Gateway still lives in only one region
-Regional:
+Regional:d
 	• For clients within the same region
 	• Could manually combine with CloudFront (more control over the caching strategies and the distribution)
 Private:
@@ -4924,7 +4917,8 @@ software applications.
 ##Software updates offloading
 -------------------------------------------------
 • We have an application running on EC2, that distributes software updates once in a while
-• When a new software update is out, we get a lot of request and the content is distributed in mass over the network. It’s very costly
+• When a new software update is out, we get a lot of request and the content is distributed in mass over the network. 
+  It’s very costly
 • We don’t want to change our application, but want to optimize our cost and CPU, how can we do it?
 
 Ans:CloudFront
@@ -4983,162 +4977,164 @@ Choosing the Right Database:
 
 
 Database Types:
-• RDBMS (= SQL / OLTP): RDS, Aurora – great for joins
-• NoSQL database – no joins, no SQL : DynamoDB (~JSON), ElastiCache (key / value pairs), Neptune (graphs), DocumentDB (for MongoDB), Keyspaces (for Apache Cassandra)
-• Object Store: S3 (for big objects) / Glacier (for backups / archives)
-• Data Warehouse (= SQL Analytics / BI): Redshift (OLAP), Athena, EMR
-• Search: OpenSearch (JSON) – free text, unstructured searches
-• Graphs: Amazon Neptune – displays relationships between data
-• Ledger: Amazon Quantum Ledger Database
-• Time series: Amazon Timestream
-• Note: some databases are being discussed in the Data & Analytics sectionraphs: Neptune – displays relationships between data
+	• RDBMS (= SQL/OLTP): RDS, Aurora – great for joins
+	• NoSQL database – no joins, no SQL : DynamoDB (~JSON), ElastiCache (key / value pairs), 
+	  Neptune (graphs), DocumentDB (for MongoDB), Keyspaces (for Apache Cassandra)
+	• Object Store: S3 (for big objects) / Glacier (for backups / archives)
+	• Data Warehouse (= SQL Analytics / BI): Redshift (OLAP), Athena, EMR
+	• Search: OpenSearch (JSON) – free text, unstructured searches
+	• Graphs: Amazon Neptune – displays relationships between data
+	• Ledger: Amazon Quantum Ledger Database
+	• Time series: Amazon Timestream
 
 
 Amazon RDS – Summary:
-• Managed PostgreSQL / MySQL / Oracle / SQL Server / MariaDB / Custom
-• Provisioned RDS Instance Size and EBS Volume Type & Size
-• Auto-scaling capability for Storage
-• Support for Read Replicas and Multi AZ
-• Security through IAM, Security Groups, KMS , SSL in transit
-• Automated Backup with Point in time restore feature (up to 35 days)
-• Manual DB Snapshot for longer-term recovery
-• Managed and Scheduled maintenance (with downtime)
-• Support for IAM Authentication, integration with Secrets Manager
-• RDS Custom for access to and customize the underlying instance (Oracle & SQL Server)
-• Use case: Store relational datasets (RDBMS / OLTP), perform SQL queries, transactions
+	• Managed PostgreSQL / MySQL / Oracle / SQL Server / MariaDB / Custom
+	• Provisioned RDS Instance Size and EBS Volume Type & Size
+	• Auto-scaling capability for Storage
+	• Support for Read Replicas and Multi AZ
+	• Security through IAM, Security Groups, KMS , SSL in transit
+	• Automated Backup with Point in time restore feature (up to 35 days)
+	• Manual DB Snapshot for longer-term recovery
+	• Managed and Scheduled maintenance (with downtime)
+	• Support for IAM Authentication, integration with Secrets Manager
+	• RDS Custom for access to and customize the underlying instance (Oracle & SQL Server)
+	• Use case: Store relational datasets (RDBMS / OLTP), perform SQL queries, transactions
 
 
 RDS for Solutions Architect:
-• Operations: small downtime when failover happens, when maintenance
-  happens, scaling in read replicas / ec2 instance / restore EBS implies manual intervention, application changes.
-• Security: AWS responsible for OS security, we are responsible for setting
-  up KMS, security groups, IAM policies, authorizing users in DB, using SSL
-• Reliability: Multi AZ feature, failover in case of failures
-• Performance: depends on EC2 instance type, EBS volume type, ability to
-  add Read Replicas. Storage auto-scaling & manual scaling of instances
-• Cost: Pay per hour based on provisioned EC2 and EBS.
+	• Operations: small downtime when failover happens, when maintenance
+	  happens, scaling in read replicas / ec2 instance / restore EBS implies manual intervention, application changes.
+	• Security: AWS responsible for OS security, we are responsible for setting
+	  up KMS, security groups, IAM policies, authorizing users in DB, using SSL
+	• Reliability: Multi AZ feature, failover in case of failures
+	• Performance: depends on EC2 instance type, EBS volume type, ability to
+	  add Read Replicas. Storage auto-scaling & manual scaling of instances
+	• Cost: Pay per hour based on provisioned EC2 and EBS.
 
 
 
 Aurora Summary:
-• Compatible API for PostgreSQL / MySQL, separation of storage and compute
-• Storage: data is stored in 6 replicas, across 3 AZ – highly available, self-healing, auto-scaling
-• Compute: Cluster of DB Instance across multiple AZ, auto-scaling of Read Replicas
-• Cluster: Custom endpoints for writer and reader DB instances
-• Same security / monitoring / maintenance features as RDS
-• Know the backup & restore options for Aurora
-• Aurora Serverless – for unpredictable / intermittent workloads, no capacity planning
-• Aurora Multi-Master – for continuous writes failover (high write availability)
-• Aurora Global: up to 16 DB Read Instances in each region, < 1 second storage replication
-• Aurora Machine Learning: perform ML using SageMaker & Comprehend on Aurora
-• Aurora Database Cloning: new cluster from existing one, faster than restoring a snapshot
-• Use case: same as RDS, but with less maintenance / more flexibility / more performance / more features
+	• Compatible API for PostgreSQL / MySQL, separation of storage and compute
+	• Storage: data is stored in 6 replicas, across 3 AZ – highly available, self-healing, auto-scaling
+	• Compute: Cluster of DB Instance across multiple AZ, auto-scaling of Read Replicas
+	• Cluster: Custom endpoints for writer and reader DB instances
+	• Same security / monitoring / maintenance features as RDS
+	• Know the backup & restore options for Aurora
+	• Aurora Serverless – for unpredictable / intermittent workloads, no capacity planning
+	• Aurora Multi-Master – for continuous writes failover (high write availability)
+	• Aurora Global: up to 16 DB Read Instances in each region, < 1 second storage replication
+	• Aurora Machine Learning: perform ML using SageMaker & Comprehend on Aurora
+	• Aurora Database Cloning: new cluster from existing one, faster than restoring a snapshot
+	• Use case: same as RDS, but with less maintenance / more flexibility / more performance / more features
 
 
 
 Aurora for Solutions Architect:
-• Operations: less operations, auto scaling storage
-• Security: AWS responsible for OS security, we are responsible for setting
-  up KMS, security groups, IAM policies, authorizing users in DB, using SSL
-• Reliability: Multi AZ, highly available, possibly more than RDS, Aurora
-  Serverless option, Aurora Multi-Master option
-• Performance: 5x performance (according to AWS) due to architectural
-  optimizations. Up to 15 Read Replicas (only 5 for RDS)
-• Cost: Pay per hour based on EC2 and storage usage. Possibly lower
-  costs compared to Enterprise grade databases such as Oracle
+	• Operations: less operations, auto scaling storage
+	• Security: AWS responsible for OS security, we are responsible for setting
+	  up KMS, security groups, IAM policies, authorizing users in DB, using SSL
+	• Reliability: Multi AZ, highly available, possibly more than RDS, Aurora
+	  Serverless option, Aurora Multi-Master option
+	• Performance: 5x performance (according to AWS) due to architectural
+	  optimizations. Up to 15 Read Replicas (only 5 for RDS)
+	• Cost: Pay per hour based on EC2 and storage usage. Possibly lower
+	  costs compared to Enterprise grade databases such as Oracle
 
 
 
 Amazon ElastiCache – Summary:
-• Managed Redis / Memcached (similar offering as RDS, but for caches)
-• In-memory data store, sub-millisecond latency
-• Must provision an EC2 instance type
-• Support for Clustering (Redis) and Multi AZ, Read Replicas (sharding)
-• Security through IAM, Security Groups, KMS, Redis Auth
-• Backup / Snapshot / Point in time restore feature
-• Managed and Scheduled maintenance
-• Requires some application code changes to be leveraged
-• Use Case: Key/Value store, Frequent reads, less writes, cache results for DB queries, store session data for websites, cannot use SQL. 
+	• Managed Redis / Memcached (similar offering as RDS, but for caches)
+	• In-memory data store, sub-millisecond latency
+	• Must provision an EC2 instance type
+	• Support for Clustering (Redis) and Multi AZ, Read Replicas (sharding)
+	• Security through IAM, Security Groups, KMS, Redis Auth
+	• Backup / Snapshot / Point in time restore feature
+	• Managed and Scheduled maintenance
+	• Requires some application code changes to be leveraged
+	• Use Case: Key/Value store, Frequent reads, less writes, cache results for DB queries, 
+	  store session data for websites, cannot use SQL. 
 
 
 ElastiCache for Solutions Architect:
-• Operations: same as RDS
-• Security: AWS responsible for OS security, we are responsible for setting up KMS, security groups, 
-  IAM policies, users (Redis Auth), using SSL.
-• Reliability: Clustering, Multi AZ
-• Performance: Sub-millisecond performance, in memory, read replicas for sharding, very popular cache option.
-• Cost: Pay per hour based on EC2 and storage usage
+	• Operations: same as RDS
+	• Security: AWS responsible for OS security, we are responsible for setting up KMS, security groups, 
+	  IAM policies, users (Redis Auth), using SSL.
+	• Reliability: Clustering, Multi AZ
+	• Performance: Sub-millisecond performance, in memory, read replicas for sharding, very popular cache option.
+	• Cost: Pay per hour based on EC2 and storage usage
 
 
 Amazon S3 – Summary:
-• S3 is a… key / value store for objects
-• Great for bigger objects, not so great for many small objects
-• Serverless, scales infinitely, max object size is 5 TB, versioning capability
-• Tiers: S3 Standard, S3 Infrequent Access, S3 Intelligent, S3 Glacier + lifecycle policy
-• Features: Versioning, Encryption, Replication, MFA-Delete, Access Logs…
-• Security: IAM, Bucket Policies, ACL, Access Points, Object Lambda, CORS, Object/Vault Lock
-• Encryption: SSE-S3, SSE-KMS, SSE-C, client-side, TLS in transit, default encryption
-• Batch operations on objects using S3 Batch, listing files using S3 Inventory
-• Performance: Multi-part upload, S3 Transfer Acceleration, S3 Select
-• Automation: S3 Event Notifications (SNS, SQS, Lambda, EventBridge)
-• Use Cases: static files, key value store for big files, website hosting
+	• S3 is a… key / value store for objects
+	• Great for bigger objects, not so great for many small objects
+	• Serverless, scales infinitely, max object size is 5 TB, versioning capability
+	• Tiers: S3 Standard, S3 Infrequent Access, S3 Intelligent, S3 Glacier + lifecycle policy
+	• Features: Versioning, Encryption, Replication, MFA-Delete, Access Logs…
+	• Security: IAM, Bucket Policies, ACL, Access Points, Object Lambda, CORS, Object/Vault Lock
+	• Encryption: SSE-S3, SSE-KMS, SSE-C, client-side, TLS in transit, default encryption
+	• Batch operations on objects using S3 Batch, listing files using S3 Inventory
+	• Performance: Multi-part upload, S3 Transfer Acceleration, S3 Select
+	• Automation: S3 Event Notifications (SNS, SQS, Lambda, EventBridge)
+	• Use Cases: static files, key value store for big files, website hosting
+
 
 
 DynamoDB Overview:
-• AWS proprietary technology, managed NoSQL database
-• Serverless, provisioned capacity, auto scaling, on demand capacity (Nov 2018)
-• Can replace ElastiCache as a key/value store (storing session data for example)
-• Highly Available, Multi AZ by default, Read and Writes are decoupled, DAX for read cache
-• Reads can be eventually consistent or strongly consistent
-• Security, authentication and authorization is done through IAM
-• DynamoDB Streams to integrate with AWS Lambda
-• Backup / Restore feature, Global Table feature
-• Monitoring through CloudWatch
-• Can only query on primary key, sort key, or indexes
-• Use Case: Serverless applications development (small documents 100s KB), distributed serverless cache, 
-doesn’t have SQL query language available, has transactions capability from Nov 2018.
+	• AWS proprietary technology, managed NoSQL database
+	• Serverless, provisioned capacity, auto scaling, on demand capacity (Nov 2018)
+	• Can replace ElastiCache as a key/value store (storing session data for example)
+	• Highly Available, Multi AZ by default, Read and Writes are decoupled, DAX for read cache
+	• Reads can be eventually consistent or strongly consistent
+	• Security, authentication and authorization is done through IAM
+	• DynamoDB Streams to integrate with AWS Lambda
+	• Backup / Restore feature, Global Table feature
+	• Monitoring through CloudWatch
+	• Can only query on primary key, sort key, or indexes
+	• Use Case: Serverless applications development (small documents 100s KB), distributed serverless cache, 
+	  doesn’t have SQL query language available, has transactions capability from Nov 2018.
 
 
 DynamoDB for Solutions Architect:
-• Operations: no operations needed, auto scaling capability, serverless
-• Security: full security through IAM policies, KMS encryption, SSL in flight
-• Reliability: Multi AZ, Backups
-• Performance: single digit millisecond performance, DAX for caching reads, performance doesn’t degrade if 
-  your application scales
-• Cost: Pay per provisioned capacity and storage usage (no need to guess in advance any capacity – can use auto scaling).
+	• Operations: no operations needed, auto scaling capability, serverless
+	• Security: full security through IAM policies, KMS encryption, SSL in flight
+	• Reliability: Multi AZ, Backups
+	• Performance: single digit millisecond performance, DAX for caching reads, performance doesn’t degrade if 
+	               your application scales.
+	• Cost: Pay per provisioned capacity and storage usage (no need to guess in advance any capacity – can use auto scaling).
 
 
 S3 Overview:
-• S3 is a… key / value store for objects
-• Great for big objects, not so great for small objects
-• Serverless, scales infinitely, max object size is 5 TB
-• Strong consistency
-• Tiers: S3 Standard, S3 IA, S3 One Zone IA, Glacier for backups
-• Features: Versioning, Encryption, Cross Region Replication, etc…
-• Security: IAM, Bucket Policies, ACL
-• Encryption: SSE-S3, SSE-KMS, SSE-C, client side encryption, SSL in transit
-• Use Case: static files, key value store for big files, website hosting
+	• S3 is a… key / value store for objects
+	• Great for big objects, not so great for small objects
+	• Serverless, scales infinitely, max object size is 5 TB
+	• Strong consistency
+	• Tiers: S3 Standard, S3 IA, S3 One Zone IA, Glacier for backups
+	• Features: Versioning, Encryption, Cross Region Replication, etc…
+	• Security: IAM, Bucket Policies, ACL
+	• Encryption: SSE-S3, SSE-KMS, SSE-C, client side encryption, SSL in transit
+	• Use Case: static files, key value store for big files, website hosting
 
 
 S3 for Solutions Architect:
-• Operations: no operations needed
-• Security: IAM, Bucket Policies, ACL, Encryption (Server/Client), SSL
-• Reliability: 99.999999999% durability / 99.99% availability, Multi AZ, CRR
-• Performance: scales to thousands of read / writes per second, transfer
-  acceleration / multi-part for big files
-• Cost: pay per storage usage, network cost, requests number
+	• Operations: no operations needed
+	• Security: IAM, Bucket Policies, ACL, Encryption (Server/Client), SSL
+	• Reliability: 99.999999999% durability / 99.99% availability, Multi AZ, CRR
+	• Performance: scales to thousands of read / writes per second, transfer
+	  acceleration / multi-part for big files
+	• Cost: pay per storage usage, network cost, requests number
 
 
 
 ++ Document DB
 -------------------------------------------------
-• Aurora is an “AWS-implementation” of PostgreSQL / MySQL …
-• DocumentDB is the same for MongoDB (which is a NoSQL database)
-• MongoDB is used to store, query, and index JSON data
-• Similar “deployment concepts” as Aurora
-• Fully Managed, highly available with replication across 3 AZ
-• Aurora storage automatically grows in increments of 10GB, up to 64 TB.
-• Automatically scales to workloads with millions of requests per seconds
+	• Aurora is an “AWS-implementation” of PostgreSQL / MySQL …
+	• DocumentDB is the same for MongoDB (which is a NoSQL database)
+	• MongoDB is used to store, query, and index JSON data
+	• Similar “deployment concepts” as Aurora
+	• Fully Managed, highly available with replication across 3 AZ
+	• Aurora storage automatically grows in increments of 10GB, up to 64 TB.
+	• Automatically scales to workloads with millions of requests per seconds
 
 ExamTips:If any thing related to MongoDB this is Document DB.
 
@@ -5241,10 +5237,10 @@ Exam Tip: analyze data in S3 using serverless SQL, use Athena
 
 
 Amazon Athena – Performance Improvement:
-• Use columnar data for cost-savings (less scan)
-• Apache Parquet or ORC is recommended
-• Huge performance improvement
-• Use Glue to convert your data your Parquet or ORC
+	• Use columnar data for cost-savings (less scan)
+	• Apache Parquet or ORC is recommended
+	• Huge performance improvement
+	• Use Glue to convert your data your Parquet or ORC
 
 
 
@@ -5253,24 +5249,24 @@ Serverless query service to analyze data stored in Amazon S3
 • Supports CSV, JSON, ORC, Avro, and Parquet
 • Pricing: $5.00 per TB of data scanned
 • Commonly used with Amazon Quicksight for
-reporting/dashboards
+  reporting/dashboards
 • Use cases: Business intelligence / analytics / reporting, analyze &
-query VPC Flow Logs, ELB Logs, CloudTrail trails, etc...
-• Exam Tip: analyze data in S3 using serverless SQL, use Athena
+  query VPC Flow Logs, ELB Logs, CloudTrail trails, etc...
+
+ExamTip: analyze data in S3 using serverless SQL, use Athena
 
 
 Area:
 =====
 Global.
-Athena supports the ability to query Amazon S3 data in an AWS Region that is different from the Region in which you are using Athena.
+Athena supports the ability to query Amazon S3 data in an AWS Region that is different from the Region in 
+which you are using Athena.
 
 
 UseCase:
 ========
-
 Use cases: Business intelligence / analytics / reporting, analyze &
 query VPC Flow Logs, ELB Logs, CloudTrail trails.
-
 
 Athena helps you analyze unstructured, semi-structured, and structured data stored in Amazon S3. 
 Examples include CSV, JSON, or columnar data formats such as Apache Parquet and Apache ORC. 
@@ -5316,34 +5312,34 @@ from disparate source systems and provisions them for analytical use.
 
 
 Redshift for Solutions Architect:
-• Redshift is based on PostgreSQL, but it’s not used for OLTP
-• It’s OLAP – online analytical processing (analytics and data warehousing)
-• 10x better performance than other data warehouses, scale to PBs of data
-• Columnar storage of data (instead of row based) & parallel query engine
-• Pay as you go based on the instances provisioned
-• Has a SQL interface for performing the queries
-• BI tools such as Amazon Quicksight or Tableau integrate with it
-• vs Athena: faster queries / joins / aggregations thanks to indexes
+	• Redshift is based on PostgreSQL, but it’s not used for OLTP
+	• It’s OLAP – online analytical processing (analytics and data warehousing)
+	• 10x better performance than other data warehouses, scale to PBs of data
+	• Columnar storage of data (instead of row based) & parallel query engine
+	• Pay as you go based on the instances provisioned
+	• Has a SQL interface for performing the queries
+	• BI tools such as Amazon Quicksight or Tableau integrate with it
+	• vs Athena: faster queries / joins / aggregations thanks to indexes
 
 Remember: Redshift = Analytics / BI / Data Warehouse
 
 
 
 Redshift – Snapshots & DR:
-• Redshift has no “Multi-AZ” mode
-• Snapshots are point-in-time backups of a cluster, stored internally in S3
-• Snapshots are incremental (only what has changed is saved)
-• You can restore a snapshot into a new cluster
-• Automated: every 8 hours, every 5 GB, or on a schedule. Set retention between 1 to 35 days
-• Manual: snapshot is retained until you delete it
-• You can configure Amazon Redshift to automatically copy snapshots (automated or manual) of a cluster to another AWS Region
+	• Redshift has no “Multi-AZ” mode
+	• Snapshots are point-in-time backups of a cluster, stored internally in S3
+	• Snapshots are incremental (only what has changed is saved)
+	• You can restore a snapshot into a new cluster
+	• Automated: every 8 hours, every 5 GB, or on a schedule. Set retention between 1 to 35 days
+	• Manual: snapshot is retained until you delete it
+	• You can configure Amazon Redshift to automatically copy snapshots (automated or manual) of a cluster to another AWS Region
 
 
 
 Loading data into Redshift: Large inserts are MUCH better
-Amazon Kinesis -> Data Firehose
-S3 using -> COPY command
-EC2 Instance -> DBC driver
+	Amazon Kinesis -> Data Firehose
+	S3 using -> COPY command
+	EC2 Instance -> DBC driver
 
 
 
@@ -5397,22 +5393,22 @@ website search, and more.
 OpenSearch is an open source, distributed search and analytics suite derived from Elasticsearch.
 
 Amazon OpenSearch is successor to Amazon ElasticSearch (For licence issue ElasticSearch now Open search)
-• Example: In DynamoDB, you can only find by primary key or indexes
-• With OpenSearch, you can search any field, even partially matches
-• It’s common to use OpenSearch as a complement to another database
-• OpenSearch also has some usage for Big Data applications
-• You can provision a cluster of instances
-• Built-in integrations: Amazon Kinesis Data Firehose, AWS IoT, and Amazon
+	• Example: In DynamoDB, you can only find by primary key or indexes
+	• With OpenSearch, you can search any field, even partially matches
+	• It’s common to use OpenSearch as a complement to another database
+	• OpenSearch also has some usage for Big Data applications
+	• You can provision a cluster of instances
+	• Built-in integrations: Amazon Kinesis Data Firehose, AWS IoT, and Amazon
 CloudWatch Logs for data ingestion
 
 
 OpenSearch for Solutions Architect:
-• Operations: similar to RDS
-• Security: Cognito, IAM, VPC, KMS, SSL
-• Reliability: Multi-AZ, clustering
-• Performance: based on ElasticSearch project (open source), petabyte scale
-• Cost: pay per node provisioned (similar to RDS)
-• Remember: OpenSearch = Search / Indexing
+	• Operations: similar to RDS
+	• Security: Cognito, IAM, VPC, KMS, SSL
+	• Reliability: Multi-AZ, clustering
+	• Performance: based on ElasticSearch project (open source), petabyte scale
+	• Cost: pay per node provisioned (similar to RDS)
+	• Remember: OpenSearch = Search / Indexing
 
 
 
@@ -5433,9 +5429,9 @@ BillCost:
 =========
 Amazon OpenSearch Service with AWS Free Tier.
 
-You are charged based on three dimensions: instance hours, which are the number of hours an instance is available to you for use; 
-the amount of storage you need; and data transferred in and out of Amazon OpenSearch Service. Storage pricing depends on the 
-storage tier and type of instance you choose.
+You are charged based on three dimensions: instance hours, which are the number of hours an instance is available to you 
+for use;  the amount of storage you need; and data transferred in and out of Amazon OpenSearch Service. 
+Storage pricing depends on the  storge tier and type of instance you choose.
 
 
 Security:
@@ -5455,7 +5451,7 @@ Comes with OpenSearch Dashboards (visualization)
 • EMR comes bundled with Apache Spark, HBase, Presto, Flink…
 • EMR takes care of all the provisioning and configuration
 • Auto-scaling and integrated with Spot instances
-• Use cases: data processing, machine learning, web indexing, big data…
+• Use cases: Data processing, machine learning, web indexing, Big data.
 
 
 
@@ -5568,7 +5564,8 @@ We provide server-side encryption for data at rest and SSL for data in motion.
 • Data lake = central place to have all your data for analytics purposes
 • Fully managed service that makes it easy to setup a data lake in days
 • Discover, cleanse, transform, and ingest data into your Data Lake
-• It automates many complex manual steps (collecting, cleansing, moving, cataloging data, …) and de-duplicate (using ML Transforms)
+• It automates many complex manual steps (collecting, cleansing, moving, cataloging data, …) 
+  and de-duplicate (using ML Transforms)
 • Combine structured and unstructured data in the data lake
 • Out-of-the-box source blueprints: S3, RDS, Relational & NoSQL DB…
 • Fing-grained Access Control for your applications (row and column-level)
@@ -5578,11 +5575,11 @@ We provide server-side encryption for data at rest and SSL for data in motion.
 
 
 83
-++Amazon Managed Streaming for Apache Kafka (Amazon MSK)
+##MSK Amazon Managed Streaming for Apache Kafka
 -------------------------------------------------
 
 What is Kafka?
-Apache Kafka is a distributed publish-subscribe messaging system and a robust queue that can handle a high volume of 
+Apache Kafka is a distributed pub-sub messaging system and a robust queue that can handle a high volume of 
 data and enables you to pass messages from one end-point to another.
 
 
@@ -5599,46 +5596,44 @@ data and enables you to pass messages from one end-point to another.
 
 
 
-Kinesis Data Streams vs. Amazon MSK:
-Kinesis Data Streams:
-• 1 MB message size limit
-• Data Streams with Shards
-• Shard Splitting & Merging
-• TLS In-flight encryption
-• KMS at-rest encryption
+Kinesis Data Streams vs Amazon MSK:
+	Kinesis Data Streams:
+		• 1 MB message size limit
+		• Data Streams with Shards
+		• Shard Splitting & Merging
+		• TLS In-flight encryption
+		• KMS at-rest encryption
 
-
-Amazon MSK
-• 1MB default, configure for higher (ex: 10MB)
-• Kafka Topics with Partitions
-• Can only add partitions to a topic
-• PLAINTEXT or TLS In-flight Encryption
-• KMS at-rest encryption
+	Amazon MSK
+		• 1MB default, configure for higher (ex: 10MB)
+		• Kafka Topics with Partitions
+		• Can only add partitions to a topic
+		• PLAINTEXT or TLS In-flight Encryption
+		• KMS at-rest encryption
 
 ExamTips:Need to know both different.
 
 
 
-Big Data Ingestion Pipeline:
-• We want the ingestion pipeline to be fully serverless
-• We want to collect data in real time
-• We want to transform the data
-• We want to query the transformed data using SQL
-• The reports created using the queries should be in S3
-• We want to load that data into a warehouse and create dashboards
-
+Big Data Ingestion Pipeline?
+	• We want the ingestion pipeline to be fully serverless
+	• We want to collect data in real time
+	• We want to transform the data
+	• We want to query the transformed data using SQL
+	• The reports created using the queries should be in S3
+	• We want to load that data into a warehouse and create dashboards
 
 
 Big Data Ingestion Pipeline discussion
-• IoT Core allows you to harvest data from IoT devices
-• Kinesis is great for real-time data collection
-• Firehose helps with data delivery to S3 in near real-time (1 minute)
-• Lambda can help Firehose with data transformations
-• Amazon S3 can trigger notifications to SQS
-• Lambda can subscribe to SQS (we could have connecter S3 to Lambda)
-• Athena is a serverless SQL service and results are stored in S3
-• The reporting bucket contains analyzed data and can be used by
-reporting tool such as AWS QuickSight, Redshift, etc…
+	• IoT Core allows you to harvest data from IoT devices
+	• Kinesis is great for real-time data collection
+	• Firehose helps with data delivery to S3 in near real-time (1 minute)
+	• Lambda can help Firehose with data transformations
+	• Amazon S3 can trigger notifications to SQS
+	• Lambda can subscribe to SQS (we could have connecter S3 to Lambda)
+	• Athena is a serverless SQL service and results are stored in S3
+	• The reporting bucket contains analyzed data and can be used by
+	  reporting tool such as AWS QuickSight, Redshift, etc.
 
 
 
@@ -5654,7 +5649,7 @@ reporting tool such as AWS QuickSight, Redshift, etc…
 Amazon Rekognition – Content Moderation:
 • Detect content that is inappropriate, unwanted, or offensive (image and videos)
 • Used in social media, broadcast media, advertising, and e-commerce situations to create
-a safer user experience
+  a safer user experience
 • Set a Minimum Confidence Threshold for items that will be flagged
 • Flag sensitive content for manual review in Amazon Augmented AI (A2I)
 • Help comply with regulations
@@ -5751,10 +5746,11 @@ and build entirely new categories of speech-enabled products.
 
 Amazon Polly – Lexicon & SSML:
 • Customize the pronunciation of words with Pronunciation lexicons
-	• Stylized words: St3ph4ne => “Stephane”
+	• Stylized words: St3ph4ne => “Imran”
 	• Acronyms: AWS => “Amazon Web Services”
 • Upload the lexicons and use them in the SynthesizeSpeech operation
-• Generate speech from plain text or from documents marked up with Speech Synthesis Markup Language (SSML) – enables more customization
+• Generate speech from plain text or from documents marked up with Speech 
+  Synthesis Markup Language (SSML) – enables more customization.
 	• emphasizing specific words or phrases
 	• using phonetic pronunciation
 	• including breathing sounds, whispering
@@ -5799,8 +5795,7 @@ language translation.
 
 • Natural and accurate language translation
 • Amazon Translate allows you to localize content - such as websites and applications - 
-for international users, and to easily translate large
-volumes of text efficiently.
+  for international users, and to easily translate large volumes of text efficiently.
 
 
 Area:
@@ -5861,6 +5856,7 @@ BillCost:
 Security:
 =========
 It is a aws managed service, security is a shared responsibility.
+
 
 
 
@@ -5980,7 +5976,8 @@ Area:
 UseCase:
 ========
 Add ML forecasting to your SaaS solutions
-Enhance software as a service (SaaS) product capabilities with integrated ML-based forecasts to identify complex demand relationships.
+Enhance software as a service (SaaS) product capabilities with integrated ML-based forecasts to identify complex 
+demand relationships.
 Optimize product demand planning
 
 Predict inventory needs at individual stores by combining historical sales and demand data with associated web traffic, 
@@ -5993,12 +5990,19 @@ Improve utilization and customer satisfaction with accurate resource requirement
 BillCost:
 =========
 AWS Free Tier
+
 There are four different types of costs to consider when using Amazon Forecast:
  
-Imported data: Cost for each GB of data imported into Amazon Forecast for training and forecasting.
-Training a predictor: Cost for each hour of infrastructure use required for building a custom predictor based on your input data or for monitoring predictor performance.
-Generated forecast data points:  Cost for number of unique forecast values generated across all time series (items and dimensions) combinations.
-Forecast explanations: Cost for explaining the impact of attributes or related data on your forecasts for each item and time point. 
+	Imported data: Cost for each GB of data imported into Amazon Forecast for training and forecasting.
+
+	Training a predictor: Cost for each hour of infrastructure use required for building a custom predictor 
+	based on your input data or for monitoring predictor performance.
+
+	Generated forecast data points:  Cost for number of unique forecast values generated across all time 
+	series (items and dimensions) combinations.
+
+	Forecast explanations: Cost for explaining the impact of attributes or related data on your forecasts for each 
+	item and time point. 
 
 
 
@@ -6085,7 +6089,7 @@ It is a aws managed service, security is a shared responsibility.
 -------------------------------------------------
 • Automatically extracts text, handwriting, and data from any scanned documents using AI and ML
 • Extract data from forms and tables
-• Read and process any type of document (PDFs, images, …)
+• Read and process any type of document for extracts text (PDFs, images, …)
 
 
 Area:
@@ -6160,8 +6164,7 @@ logs, and events data to take automated actions and reduce mean time to resoluti
 You can use metrics to calculate statistics and then present the data graphically in the CloudWatch console. 
 You can configure alarm actions to stop, start, or terminate an Amazon EC2 instance when certain criteria are met.
 
-CloudWatch is NOT CloudTrail so it is important to know that only CloudTrail can monitor AWS access for 
-security and auditing reasons. 
+
 CloudWatch is all about performance. CloudTrail is all about auditing.
 
 
@@ -6341,11 +6344,11 @@ CloudWatch Logs – S3 Export:
 
 
 CloudWatch Logs can send logs to:
-• Amazon S3 (exports)
-• Kinesis Data Streams
-• Kinesis Data Firehose
-• AWS Lambda
-• ElasticSearch
+	• Amazon S3 (exports)
+	• Kinesis Data Streams
+	• Kinesis Data Firehose
+	• AWS Lambda
+	• ElasticSearch
 
 
 CloudWatch Logs for EC2:
@@ -6374,8 +6377,8 @@ Log retention
 BillCost:
 =========
 There are 2 components to the price you pay:
-1) ingestion costs: you pay when you send/upload the logs
-2) storage costs: you pay to keep the logs around.
+	1) ingestion costs: you pay when you send/upload the logs
+	2) storage costs: you pay to keep the logs around.
 
 
 Security:
@@ -6410,13 +6413,13 @@ CloudWatch Logs Agent & Unified Agent:
 
 
 CloudWatch Unified Agent – Metrics:
-• Collected directly on your Linux server / EC2 instance
-• CPU (active, guest, idle, system, user, steal)
-• Disk metrics (free, used, total), Disk IO (writes, reads, bytes, iops)
-• RAM (free, inactive, used, total, cached)
-• Netstat (number of TCP and UDP connections, net packets, bytes)
-• Processes (total, dead, bloqued, idle, running, sleep)
-• Swap Space (free, used, used %)
+	• Collected directly on your Linux server / EC2 instance
+	• CPU (active, guest, idle, system, user, steal)
+	• Disk metrics (free, used, total), Disk IO (writes, reads, bytes, iops)
+	• RAM (free, inactive, used, total, cached)
+	• Netstat (number of TCP and UDP connections, net packets, bytes)
+	• Processes (total, dead, bloqued, idle, running, sleep)
+	• Swap Space (free, used, used %)
 Reminder: out-of-the box metrics for EC2 – disk, CPU, network (high level)
 
 
@@ -6437,9 +6440,9 @@ You can attach multiple Alarms to each metric and each one can have multiple act
 A CloudWatch Alarm is always in one of three states: OK, ALARM, or INSUFFICIENT_DATA
  
 CloudWatch Alarm Targets:
-• Stop, Terminate, Reboot, or Recover an EC2 Instance
-• Trigger Auto Scaling Action
-• Send notification to SNS (from which you can do pretty much anything)
+	• Stop, Terminate, Reboot, or Recover an EC2 Instance
+	• Trigger Auto Scaling Action
+	• Send notification to SNS (from which you can do pretty much anything)
 
 
 • Recovery: Same Private, Public, Elastic IP, metadata, placement group
@@ -6462,8 +6465,8 @@ or one of your applications or services.
 The following are examples of events:
 Amazon EC2 generates an event when the state of an instance changes from pending to running.
 Amazon EC2 Auto Scaling generates events when it launches or terminates instances.
-
 AWS CloudTrail publishes events when you make API calls.
+
 You can also set up scheduled events that are generated on a periodic basis.
 Events are represented as JSON objects and they all have a similar structure, and the same top-level fields.
 
@@ -6541,10 +6544,10 @@ CloudWatch Container Insights:
 
 
 CloudWatch Lambda Insights:
-• Monitoring and troubleshooting solution for serverless applications running on AWS Lambda
-• Collects, aggregates, and summarizes system-level metrics including CPU time, memory, disk, and network
-• Collects, aggregates, and summarizes diagnostic information such as cold starts and Lambda worker shutdowns
-• Lambda Insights is provided as a Lambda Layer
+	• Monitoring and troubleshooting solution for serverless applications running on AWS Lambda
+	• Collects, aggregates, and summarizes system-level metrics including CPU time, memory, disk, and network
+	• Collects, aggregates, and summarizes diagnostic information such as cold starts and Lambda worker shutdowns
+	• Lambda Insights is provided as a Lambda Layer
 
 
 
@@ -6568,15 +6571,15 @@ CloudWatch Application Insights:
 
 
 CloudWatch Insights and Operational Visibility | Summary:
-• CloudWatch Container Insights
-• ECS, EKS, Kubernetes on EC2, Fargate, needs agent for Kubernetes
-• Metrics and logs
-• CloudWatch Lambda Insights
-• Detailed metrics to troubleshoot serverless applications
-• CloudWatch Contributors Insights
-• Find “Top-N” Contributors through CloudWatch Logs
-• CloudWatch Application Insights
-• Automatic dashboard to troubleshoot your application and related AWS services
+	• CloudWatch Container Insights
+	• ECS, EKS, Kubernetes on EC2, Fargate, needs agent for Kubernetes
+	• Metrics and logs
+	• CloudWatch Lambda Insights
+	• Detailed metrics to troubleshoot serverless applications
+	• CloudWatch Contributors Insights
+	• Find “Top-N” Contributors through CloudWatch Logs
+	• CloudWatch Application Insights
+	• Automatic dashboard to troubleshoot your application and related AWS services
 
 
 
@@ -6622,8 +6625,6 @@ It is a aws managed service, security is a shared responsibility.
 • A trail can be applied to All Regions (default) or a single Region.
 • If a resource is deleted in AWS, investigate CloudTrail first!
 
-AWS CloudTrail is an AWS service that helps you enable governance, compliance, and operational and risk auditing of your 
-AWS account. 
 Actions taken by a user, role, or an AWS service are recorded as events in CloudTrail. 
 Events include actions taken in the AWS Management Console, AWS Command Line Interface, and AWS SDKs and APIs.
 
@@ -6961,19 +6962,15 @@ It is a aws managed service, security is a shared responsibility.
 
 
 
+
+
+
 107
 ++IAM Roles vs Resource Based Policies
 -------------------------------------------------
-Cross account:
-• attaching a resource-based policy to a resource (example: S3 bucket policy)
-• OR using a role as a proxy
 • When you assume a role (user, application or service), you give up your
   original permissions and take the permissions assigned to the role
 • When using a resource-based policy, the principal doesn’t have to give up his permissions
-• Example: User in account A needs to scan a DynamoDB table in
-  Account A and dump it in an S3 bucket in Account B.
-• Supported by: Amazon S3 buckets, SNS topics, SQS queues, etc…
-
 
 
 ++Amazon EventBridge – Security
@@ -7123,6 +7120,7 @@ AWS IAM Identity Center (successor to AWS SSO)
 
 
 
+
 110
 ##AWS Security & Encryption
 -------------------------------------------------
@@ -7196,7 +7194,8 @@ Asymmetric (RSA & ECC key pairs)
 • Public (Encrypt) and Private Key (Decrypt) pair
 • Used for Encrypt/Decrypt, or Sign/Verify operations
 • The public key is downloadable, but you can’t access the Private Key unencrypted
-• Use case: encryption outside of AWS by users who can’t call the KMS API
+
+Use case: encryption outside of AWS by users who can’t call the KMS API
 
 
 
@@ -7208,7 +7207,8 @@ KMS is a managed service that makes it easy for you to create and control the en
 AWS KMS uses Hardware Security Modules (HSMs) to protect the security of your keys. 
 You can use AWS KMS to protect your data in AWS services and in your applications.
 
-AWS KMS is integrated with AWS CloudTrail to provide you with logs of all key usage to help meet your regulatory and compliance needs.
+AWS KMS is integrated with AWS CloudTrail to provide you with logs of all key usage to help meet your 
+regulatory and compliance needs.
 AWS KMS keys must be in the same Region as the bucket.
 
 
@@ -7373,7 +7373,7 @@ Client-Side encryption
 • We can encrypt specific attributes client-side in our Aurora table using the AWS Encryption SDK
 • Combined with Aurora Global Tables, the client-side encrypted data is replicated to other regions
 • If we use a multi-region key, replicated in the same region as the Global Aurora DB, then clients in these regions can use low-latency
- API calls to KMS in their region to decrypt the data client-side
+  API calls to KMS in their region to decrypt the data client-side
 • Using client-side encryption we can protect specific fields and guarantee only decryption
   if the client has access to an API key, we can protect specific fields even from database admins
 
@@ -7391,8 +7391,8 @@ Client-Side encryption
 • An IAM Role with kms:Decrypt for the source KMS Key and kms:Encrypt for the target KMS Key
 • You might get KMS throttling errors, in which case you can ask for a Service Quotas increase
 • You can use multi-region AWS KMS Keys, but they are currently treated as
-independent keys by Amazon S3 (the object will still be decrypted and then
-encrypted)
+	independent keys by Amazon S3 (the object will still be decrypted and then
+	encrypted)
 
 
 
@@ -7402,7 +7402,7 @@ encrypted)
 -------------------------------------------------
 1. AMI in Source Account is encrypted with KMS Key from Source Account
 2. Must modify the image attribute to add a Launch
-Permission which corresponds to the specified target AWS account
+	Permission which corresponds to the specified target AWS account
 3. Must share the KMS Keys used to encrypted the snapshot the AMI references with the target account / IAM Role
 4. The IAM Role/User in the target account must have the permissions to DescribeKey, ReEncrypted, CreateGrant, Decrypt
 5. When launching an EC2 instance from the AMI, optionally the target account can specify a new KMS
@@ -7513,7 +7513,7 @@ Easily provision, manage, and deploy TLS Certificates
 
 
 124
-++ACM– Requesting Public Certificates
+++ACM – Requesting Public Certificates
 -------------------------------------------------
 1. List domain names to be included in the certificate 
 	• Fully Qualified Domain Name (FQDN): corp.example.com 
@@ -8027,7 +8027,7 @@ Security products and features:
 140
 ##CIDR
 -------------------------------------------------
-The allowed block size is between a /28 netmask and /16 netmask.
+The allowed block size is between  /16 netmask to /28 netmask.
 The CIDR block must not overlap with any existing CIDR block that's associated with the VPC.
 The CIDR block must not be the same or larger than a destination CIDR range in a route in any of the VPC route tables. 
 
