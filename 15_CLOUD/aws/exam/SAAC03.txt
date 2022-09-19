@@ -9151,6 +9151,23 @@ Disaster Recovery Tips:
 
 
 
+Creating a highly available EC2 instance
+Creating a highly available EC2 instance With an Auto Scaling Group
+Creating a highly available EC2 instance With ASG + EBS
+
+
+High Availability for a Bastion Host
+HA options for the bastion host:
+	• Run 2 across 2 AZ
+	• Run 1 across 2 AZ with 1 ASG 1:1:1
+Routing to the bastion host:
+	• If 1 bastion host, use an elastic IP withcec2 user-data script to access it
+	• If 2 bastion hosts, use an NetworkcLoad Balancer (layer 4) deployed in multiple AZ
+	• If NLB, the bastion hosts can live in the private subnet directly
+Note: Can’t use ALB as the ALB is layer 7 (HTTP protocol)
+
+
+
 
 163
 ##DMS (Database Migration Service)
@@ -9192,7 +9209,7 @@ AWS Schema Conversion Tool (SCT):
 • Prefer compute-intensive instances to optimize data conversions
 
 You do not need to use SCT if you are migrating the same DB engine
-• Ex: On-Premise PostgreSQL => RDS PostgreSQL
+• Ex: On-Premise PostgreSQL => AWS RDS PostgreSQL
 • The DB engine is still PostgreSQL (RDS is the platform)
 
 
@@ -9224,8 +9241,6 @@ RDS & Aurora PostgreSQL Migrations:
 	• Create a backup and put it in Amazon S3
 	• Import it using the aws_s3 Aurora extension
 • Use DMS if both databases are up and running
-
-
 
 
 
@@ -9275,7 +9290,8 @@ Security:
 164
 ##AWS Backup
 -------------------------------------------------
-AWS Backup is a fully managed service that enables you to centralize and automate data protection across on-premises and AWS services. 
+AWS Backup is a fully managed service that enables you to centralize and automate data protection 
+across on-premises and AWS services. 
 
 • Fully managed service 
 • Centrally manage and automate backups across AWS services 
@@ -9534,13 +9550,9 @@ EC2 Enhanced Networking (SR-IOV):
 
 	
 An Elastic Fabric Adapter (EFA) is a network device that you can attach to your Amazon EC2 instance to accelerate 
-High Performance Computing (HPC) and machine learning applications. EFA enables you to achieve the application performance of 
+High Performance Computing (HPC) and machine learning applications. 
+EFA enables you to achieve the application performance of 
 an on-premises HPC cluster, with the scalability, flexibility, and elasticity provided by the AWS Cloud.
-
-Elastic Fabric Adapter (EFA) is a network interface for Amazon EC2 instances that enables customers to run applications 
-requiring high levels of inter-node communications at scale on AWS. 
-Its custom-built operating system (OS) bypass hardware interface enhances the performance of inter-instance communications, 
-which is critical to scaling these applications. 
 
 
 You can create, use, and manage an EFA much like any other elastic network interface in Amazon EC2. 
@@ -9585,21 +9597,6 @@ AWS ParallelCluster
 
 
 
-Creating a highly available EC2 instance
-Creating a highly available EC2 instance With an Auto Scaling Group
-Creating a highly available EC2 instance With ASG + EBS
-
-
-High Availability for a Bastion Host
-HA options for the bastion host:
-	• Run 2 across 2 AZ
-	• Run 1 across 2 AZ with 1 ASG 1:1:1
-Routing to the bastion host:
-	• If 1 bastion host, use an elastic IP withcec2 user-data script to access it
-	• If 2 bastion hosts, use an NetworkcLoad Balancer (layer 4) deployed in multiple AZ
-	• If NLB, the bastion hosts can live in the private subnet directly
-Note: Can’t use ALB as the ALB is layer 7 (HTTP protocol)
-
 
 
 
@@ -9607,7 +9604,6 @@ Note: Can’t use ALB as the ALB is layer 7 (HTTP protocol)
 
 
 ==Other Services
-
 
 172
 ##CloudFormation
