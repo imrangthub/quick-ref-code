@@ -6822,6 +6822,15 @@ It is a aws managed service, security is a shared responsibility.
 106
 ##Organizations
 -------------------------------------------------
+An organization is an entity that you create to consolidate a collection of accounts so that you can 
+administer them as a single unit.
+
+
+How do you centralize your management (billing, access control, compliance and security) across multiple AWS accounts?
+Welcome AWS Organizations!
+Organize accounts into Organizational Units (OU)
+Provides API to automate creation of new accounts
+
 Global service
 • Allows to manage multiple AWS accounts
 • The main account is the management account
@@ -6831,6 +6840,10 @@ Global service
 • Pricing benefits from aggregated usage (volume discount for EC2, S3…)
 • Shared reserved instances and Savings Plans discounts across accounts
 • API is available to automate AWS account creation
+• Allows to manage multiple AWS accounts
+• The main account is the master account – you can’t change it
+• Other accounts are member accounts
+• Member accounts can only be part of one organization
 
 
 Advantages:
@@ -6845,10 +6858,9 @@ Security: Service Control Policies (SCP):
 	• Must have an explicit allow (does not allow anything by default – like IAM)
 
 
-An organization is an entity that you create to consolidate a collection of accounts so that you can administer them as a single unit.
 
-An organizational unit (OU) provides a means to group accounts within a root. 
-An OU can also contain other OUs. When you attach a policy to one of the nodes in the hierarchy, it flows down and affects 
+An organizational unit (OU) provides a means to group accounts within a root. An OU can also contain other OUs. 
+When you attach a policy to one of the nodes in the hierarchy, it flows down and affects 
 all the branches (OUs) and leaves (accounts) beneath it. An OU can have exactly one parent, and each account can be a 
 member of exactly one OU.
 
@@ -6856,16 +6868,6 @@ Organizations typically have multiple AWS accounts
 Different business units
 Different environments
 
-How do you centralize your management (billing, access control, compliance and security) across multiple AWS accounts?
-Welcome AWS Organizations!
-Organize accounts into Organizational Units (OU)
-Provides API to automate creation of new accounts
-
-
-• Allows to manage multiple AWS accounts
-• The main account is the master account – you can’t change it
-• Other accounts are member accounts
-• Member accounts can only be part of one organization
 
 
 Features:
@@ -6874,15 +6876,19 @@ Features:
 -Send AWS CloudTrail data to one S3 bucket (across accounts)
 -AWS Firewall Manager to manage firewall rules (across accounts)
 -AWS WAF, AWS Shield Advanced protections and Security Groups
--Use Service control policies (SCPs) to define restrictions for actions (across accounts):
+-Use Service control policies (SCPs) to define restrictions for actions (across accounts).
 -Prevent users from disabling AWS Config or changing its rules
--Require Amazon EC2 instances to use a specific type
 -Require MFA to stop an Amazon EC2 instance
 -Require a tag upon resource creation
 
 
 
 Service Control Policies (SCP):
+Service control policies (SCPs) are a type of organization policy that you can use to manage permissions in your organization. 
+SCPs offer central control over the maximum available permissions for all accounts in your organization.
+
+SCPs don't affect users or roles in the management account. They affect only the member accounts in your organization.
+
 • Whitelist or blacklist IAM actions
 • Applied at the OU or Account level
 • Does not apply to the Master Account
@@ -6894,6 +6900,7 @@ Use cases:
 	• Restrict access to certain services (for example: can’t use EMR)
 	• Enforce PCI compliance by explicitly disabling services
 Master Account Can do anything (no SCP apply)
+
 
 
 
@@ -6909,15 +6916,7 @@ If you want the master account of the old organization to also join the new orga
 	3. Repeat the process above to invite the old master account to the new org
 
 
-IAM Roles vs Resource Based Policies:
-• When you assume a role (user, application or service), you give up your original permissions and take the 
-  permissions assigned to the role.
-• When using a resource based policy, the principal doesn’t have to give up his permissions.
-• Example: User in account A needs to scan a DynamoDB table in Account A and dump it in an S3 bucket in Account B.
-• Supported by: Amazon S3 buckets, SNS topics, SQS queues.
-
-
-IAM Permission Boundaries:
+IAM Permission Boundaries( with User and Role):
 • IAM Permission Boundaries are supported for users and roles (not groups)
 • Advanced feature to use a managed policy to set the maximum permissions an IAM entity can get.
 
@@ -6954,9 +6953,6 @@ AWS Organizations is offered at no additional charge.
 
 Security:
 =========
-Central governance and management across AWS accounts
-AWS Organizations
-
 It is a aws managed service, security is a shared responsibility.
 
 
@@ -6968,9 +6964,14 @@ It is a aws managed service, security is a shared responsibility.
 107
 ++IAM Roles vs Resource Based Policies
 -------------------------------------------------
-• When you assume a role (user, application or service), you give up your
-  original permissions and take the permissions assigned to the role
-• When using a resource-based policy, the principal doesn’t have to give up his permissions
+
+• When you assume a role (user, application or service), you give up your original permissions and take the 
+   permissions assigned to the role.
+• When using a resource based policy, the principal doesn’t have to give up his permissions.
+• Example: User in account A needs to scan a DynamoDB table in Account A and dump it in an S3 bucket in Account B.
+• Supported by: Amazon S3 buckets, SNS topics, SQS queues.
+
+
 
 
 ++Amazon EventBridge – Security
@@ -6978,13 +6979,6 @@ It is a aws managed service, security is a shared responsibility.
 • When a rule runs, it needs permissions from the target.
 • Resource-based policy: Lambda, SNS, SQS, CloudWatch Logs, API Gateway…
 • IAM role: Kinesis stream, Systems Manager Run Command, ECS task…
-
-
-
-++IAM Permission Boundaries
--------------------------------------------------
-• IAM Permission Boundaries are supported for users and roles (not groups)
-• Advanced feature to use a managed policy to set the maximum permissions an IAM entity can get.
 
 
 
@@ -6998,6 +6992,14 @@ Amazon Cognito lets you add user sign-up, sign-in, and access control to your we
 
 Amazon Cognito scales to millions of users and supports sign-in with social identity providers, such as Apple, Facebook, Google, and 
 Amazon, and enterprise identity providers via SAML 2.0 and OpenID Connect.  
+
+
+
+The two main components of Amazon Cognito are user pools and identity pools. 
+	User pools are user directories that provide sign-up and sign-in options for your app users. 
+	With an identity pool, your users can obtain temporary Amazon credentials to access Amazon services, 
+	such as Amazon S3 and DynamoDB. 
+You can use identity pools and user pools separately or together.
 
 
 AWS Cognito:
@@ -7021,12 +7023,6 @@ Cognito User Pools (CUP):
 • Sends back a JSON Web Tokens (JWT)
 • Can be integrated with API Gateway for authentication
 
-
-Cognito – Federated Identity Pools:
-Goal:
-• Provide direct access to AWS Resources from the Client Side
-Example:
-• provide (temporary) access to write to S3 bucket using Facebook Login
 
 Cognito Identity Pools (Federated Identities):
 • Get identities for “users” so they obtain temporary AWS credentials
@@ -7076,12 +7072,15 @@ Amazon Cognito is HIPAA eligible and PCI DSS, SOC, ISO/IEC 27001, ISO/IEC 27017,
 109
 ##SSO
 -------------------------------------------------
-AWS Single Sign-On (AWS SSO) is a cloud service that allows you to grant your users access to AWS resources, 
-such as Amazon EC2 instances, across multiple AWS accounts. 
+AWS Single Sign-On (AWS SSO) is now AWS IAM Identity Center. It is where you create, or connect, 
+your workforce users once and centrally manage their access to multiple AWS accounts and applications.
 
 By default, AWS SSO now provides a directory that  you can use to create users, 
 organize them in groups, and set permissions across those groups.
 
+AWS IAM Identity Center (successor to AWS Single Sign-On) expands the capabilities of AWS Identity and 
+Access Management (IAM) to provide a central place that brings together administration of users and their access to
+AWS accounts and cloud applications.
 
 AWS Single Sign-On (SSO):
 • Centrally manage Single Sign-On to access multiple accounts and 3rd-party business applications.
@@ -7188,7 +7187,7 @@ Symmetric encryption algorithms use the same key for encryption and decryption
 -------------------------------------------------
 Two Keys : Public Key and Private Key Also called Public Key Cyptography.
 Encrypt data with Public Key and decrypt with Private Key
-Share Public Key with everybody and keep the Private Key with you(YEAH, ITS PRIVATE!)
+Share Public Key with everybody and keep the Private Key with you.
 
 Asymmetric (RSA & ECC key pairs)
 • Public (Encrypt) and Private Key (Decrypt) pair
@@ -7233,8 +7232,9 @@ Able to fully manage the keys & policies:
 	• Rotation policies 
 	• Disable 
 	• Enable 
-• Able to audit key usage (using CloudTrail) 
-• Three types of Customer Master Keys (CMK): 
+• Able to audit key usage (using CloudTrail)
+ 
+Three types of Customer Master Keys (CMK): 
 	• AWS Managed Service Default CMK: free 
 	• User Keys created in KMS: $1 / month 
 	• User Keys imported (must be 256-bit symmetric key): $1 / month 
@@ -7250,24 +7250,25 @@ Able to fully manage the keys & policies:
 • Encrypted secrets can be stored in the code / environment variables
 • KMS can only help in encrypting up to 4KB of data per call
 • If data > 4 KB, use envelope encryption
-• To give access to KMS to someone:
+
+To give access to KMS to someone:
 	• Make sure the Key Policy allows the user
 	• Make sure the IAM Policy allows the API calls
 	
-
-
-
+	
 KMS Key Policies:
-• Control access to KMS keys, “similar” to S3 bucket policies
-• Difference: you cannot control access without them
-Default KMS Key Policy:
-	• Created if you don’t provide a specific KMS Key Policy
-	• Complete access to the key to the root user = entire AWS account
-	• Gives access to the IAM policies to the KMS key
-Custom KMS Key Policy:
-	• Define users, roles that can access the KMS key
-	• Define who can administer the key
-	• Useful for cross-account access of your KMS key
+• Control access to KMS keys, “similar” to S3 bucket policies.
+• Difference: You cannot control access without them.
+
+	Default KMS Key Policy:
+		• Created if you don’t provide a specific KMS Key Policy
+		• Complete access to the key to the root user = entire AWS account
+		• Gives access to the IAM policies to the KMS key
+		
+	Custom KMS Key Policy:
+		• Define users, roles that can access the KMS key
+		• Define who can administer the key
+		• Useful for cross-account access of your KMS key
 
 
 
@@ -7302,7 +7303,6 @@ Security:
 AWS KMS is designed so that no one, including AWS employees, can retrieve your plaintext keys from the service. 
 The service uses hardware security modules (HSMs) that have been validated under FIPS 140-2, or are in the process 
 of being validated, to protect the confidentiality and integrity of your keys.
-
 
 
 
@@ -7372,8 +7372,8 @@ Not need to know in details on exam.
 Client-Side encryption
 • We can encrypt specific attributes client-side in our Aurora table using the AWS Encryption SDK
 • Combined with Aurora Global Tables, the client-side encrypted data is replicated to other regions
-• If we use a multi-region key, replicated in the same region as the Global Aurora DB, then clients in these regions can use low-latency
-  API calls to KMS in their region to decrypt the data client-side
+• If we use a multi-region key, replicated in the same region as the Global Aurora DB, then clients in these 
+  regions can use low-latency API calls to KMS in their region to decrypt the data client-side.
 • Using client-side encryption we can protect specific fields and guarantee only decryption
   if the client has access to an API key, we can protect specific fields even from database admins
 
@@ -7402,7 +7402,7 @@ Client-Side encryption
 -------------------------------------------------
 1. AMI in Source Account is encrypted with KMS Key from Source Account
 2. Must modify the image attribute to add a Launch
-	Permission which corresponds to the specified target AWS account
+   Permission which corresponds to the specified target AWS account.
 3. Must share the KMS Keys used to encrypted the snapshot the AMI references with the target account / IAM Role
 4. The IAM Role/User in the target account must have the permissions to DescribeKey, ReEncrypted, CreateGrant, Decrypt
 5. When launching an EC2 instance from the AMI, optionally the target account can specify a new KMS
@@ -7570,8 +7570,7 @@ AWS WAF gives you control over how traffic reaches your applications by enabling
 rules that block common attack patterns, such as SQL injection or cross-site scripting, 
 and rules that filter out specific traffic patterns that you can define. 
 
-Deploy on Application Load Balancer, API Gateway, CloudFront.
-
+Define your Web ACL rules in WAF.
 
 Define Web ACL (Web Access Control List):
 • Rules can include: IP addresses, HTTP headers, HTTP body, or URI strings
@@ -7766,17 +7765,6 @@ It is a aws managed service, security is a shared responsibility.
 135
 ##Amazon Inspector
 -------------------------------------------------
-
-• Automated Security Assessments
-• For EC2 instances
-• Leveraging the AWS System Manager (SSM) agent
-• Analyze against unintended network accessibility
-• Analyze the running OS against known vulnerabilities
-• For Containers push to Amazon ECR
-• Assessment of containers as they are pushed
-• Reporting & integration with AWS Security Hub
-• Send findings to Amazon Event Bridge
-
 • Remember: only for EC2 instances and container infrastructure
 • Continuous scanning of the infrastructure, only when needed
 • Package vulnerabilities (EC2 & ECR) – database of CVE
@@ -7896,24 +7884,18 @@ Your responsibility:
 The Internet Protocol (IP) uses three types of addressing schemes: Unicast, Multicast, and Anycast.
 
 Unicast:
-A Unicast address is used to identify a single unique host. It is used to send data to a single destination. 
-In computer networking, unicast communication is a one-to-one transmission from one point in the network to another. 
+A Unicast address is used to identify a single unique host. 
 
 
 Multicast:
 A Multicast address is used to deliver data to a group of destinations (a one-to-many transmission). 
 IP multicast group addresses are represented by class-D IP addresses reserved specifically for multicast 
 communications, ranging from 224.0.0.0 through 239.255.255.255. 
-
-Any IP packet sent to a multicast address is 
-delivered to only those hosts that have joined that particular IP Multicast group, resulting in less network traffic, 
-thereby reducing bandwidth and network overhead. If the host hasn’t joined the group, the receiver ignores the packets 
-at the hardware level, eliminating platform software resource consumption in that network element. 
 IPv6 multicast replaces broadcast addresses that were supported in IPv4. 
 
 
 Anycast:
-Anycast, also known as IP Anycast or Anycast routing, is an IP network addressing scheme that allows multiple servers to share the same 
+Anycast,  is an IP network addressing scheme that allows multiple servers to share the same 
 IP address, allowing for multiple physical destination servers to be logically identified by a single IP address. 
 Based on the location of the user request, the anycast routers send it to the server in the network based on a least-cost analysis 
 that includes assessing the number of hops, shortest distance, lowest transit cost, and minimum latency measurements to optimize the 
@@ -7928,7 +7910,7 @@ selection of a destination server.
 -------------------------------------------------
 Amazon Virtual Private Cloud (Amazon VPC) enables you to launch AWS resources into a virtual network that you've defined.
 
-The CIDR block for the default VPC is always a 16 subnet mask; in this example, it's 172.31.0.0/16. 
+The CIDR block for the default VPC is it's 172.31.0.0/16. 
 It means this VPC can provide up to 65,536 IP addresses.
 
 - It is logical Isolated from Other virtual Network in the AWS.
@@ -8169,9 +8151,11 @@ Security is a shared responsibility
 -------------------------------------------------
 A route table contains a set of rules, called routes, that determine where network traffic from your subnet or gateway is directed.
 
-Main route table—The route table that automatically comes with your VPC. It controls the routing for all 
+Main route table: The route table that automatically comes with your VPC. It controls the routing for all 
 subnets that are not explicitly associated with any other route table.
+
 Custom route table: A route table that you create for your VPC.
+
 
 Destination: The range of IP addresses(subnet) where from you want traffic to go (destination CIDR). 
 For example, an external corporate network with the CIDR 172.16.0.0/12.
@@ -8238,12 +8222,13 @@ AWS provides two kinds of NAT devices:
 NAT gateway 
 NAT instance
 
-NAT = Network Address Translation
-• Allows EC2 instances in private subnets to connect to the Internet
-• Must be launched in a public subnet
-• Must disable EC2 setting: Source / destination Check
-• Must have Elastic IP attached to it
-• Route Tables must be configured to route traffic from private subnets to the NAT Instance
+
+NAT instance = Network Address Translation
+	• Allows EC2 instances in private subnets to connect to the Internet
+	• Must be launched in a public subnet
+	• Must disable EC2 setting: Source / destination Check
+	• Must have Elastic IP attached to it
+	• Route Tables must be configured to route traffic from private subnets to the NAT Instance
 
 
 • Pre-configured Amazon Linux AMI is availablez
