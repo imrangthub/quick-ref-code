@@ -8490,6 +8490,87 @@ It is a aws managed service, security is a shared responsibility.
 
 
 
+AWS PrivateLink
+-------------------------------------------------
+AWS PrivateLink provides private connectivity between VPCs, AWS services, and your on-premises networks, without exposing your 
+traffic to the public internet. 
+
+AWS PrivateLink makes it easy to connect services across different accounts and VPCs to significantly 
+simplify your network architecture.
+
+
+
+
+VPC End Point Service
+-------------------------------------------------
+A VPC endpoint enables you to privately connect your VPC to supported AWS services and VPC endpoint services powered by 
+PrivateLink without requiring an internet gateway, NAT device, VPN connection, or AWS Direct Connect connection. 
+Instances in your VPC do not require public IP addresses to communicate with resources in the service. 
+Traffic between your VPC and the other service does not leave the Amazon network.
+
+
+AWS PrivateLink (VPC Endpoint Services):
+• Most secure & scalable way to expose a service to 1000s of VPC (own or other accounts)
+• Does not require VPC peering, internet gateway, NAT, route tables…
+• Requires a network load balancer (Service VPC) and ENI (Customer VPC) or GWLB
+• If the NLB is in multiple AZ, and the ENIs in multiple AZ, the solution is fault tolerant! 
+
+
+
+
+Area:
+=====
+MayRegional
+
+
+UseCase:
+========
+This is useful because different AWS services often talk to each other over the internet. 
+If you do not want that behavior and instead want AWS services to only communicate within the AWS network, use AWS PrivateLink. 
+AWS PrivateLink connects your AWS services with other AWS services through a non-public tunnel.
+
+SECURELY ACCESS SAAS APPLICATIONS
+MAINTAIN REGULATORY COMPLIANCE
+MIGRATE TO HYBRID CLOUD
+
+BillCost:
+=========
+
+Security:
+=========
+It is a aws managed service, security is a shared responsibility.
+
+
+
+
+
+
+
+VPC Classic Link 
+-------------------------------------------------
+ClassicLink allows you to link EC2-Classic instances to a VPC in your account, within the same Region. 
+If you associate the VPC security groups with a EC2-Classic instance, this enables communication between your 
+EC2-Classic instance and instances in your VPC using private IPv4 addresses.
+
+
+Linking your EC2-Classic instance to a VPC does not affect your EC2-Classic security groups. 
+They continue to control all traffic to and from the instance. 
+
+
+EC2-Classic: instances run in a single network shared with other customers
+• Amazon VPC: your instances run logically isolated to your AWS account
+• ClassicLink allows you to link EC2-Classic instances to a VPC in your account
+	• Must associate a security group
+	• Enables communication using private IPv4 addresses
+	• Removes the need to make use of public IPv4 addresses or Elastic IP addresses
+
+
+
+
+
+
+
+
 150
 ##VPC Endpoint
 -------------------------------------------------
@@ -8996,7 +9077,6 @@ Minimizing egress traffic network cost:
 161
 ++Network Protection on AWS
 -------------------------------------------------
-
 • To protect network on AWS, we’ve seen
 	• Network Access Control Lists (NACLs)
 	• Amazon VPC security groups
@@ -9062,8 +9142,9 @@ Network Firewall – Fine Grained Controls:
 
 RTO and RPO
 -------------------------------------------------
-Among the components of a DR plan are two key parameters that define how long your business can afford to be offline and how
-much data loss it can tolerate. 
+Among the components of a DR plan are two key parameters that define:
+	1)how long your business can afford to be offline and 
+	2)how much data loss it can tolerate. 
 These are the Recovery Time Objective (RTO) and Recovery Point Objective (RPO).
 
 
@@ -9074,8 +9155,6 @@ operations following an outage or data loss.
 RTO refers to how much time an application can be down without causing significant damage to the business. 
 Some applications can be down for days without significant consequences. 
 
-RTO is not simply the duration of time between loss and recovery. The objective also accounts for the steps 
-IT must take to restore the application and its data.
 
 
 
@@ -9084,16 +9163,8 @@ RPO is your goal for the maximum amount of data the organization can tolerate lo
 This parameter is measured in time: from the moment a failure occurs to your last valid data backup. 
 For example, if you experience a failure now and your last full data backup was 24 hours ago, the RPO is 24 hours. 
 
-
-Recovery point objectives refer to your company’s loss tolerance: the amount of data that can be lost before significant 
-harm to the business occurs. 
-
 If you back up all or most of your data in regularly scheduled 24-hour increments, then in the worst-case scenario you 
 will lose 24 hours’ worth of data.
-
-For example, if you have a 4-hour RPO for an application then you will have a maximum 4-hour gap between backup and data loss.
-Having a 4-hour RPO does not necessarily mean you will lose 4 hours’ worth of data.
-
 
 
 Disaster Recovery Strategies:
@@ -9268,7 +9339,6 @@ Security:
 ##AWS Backup
 -------------------------------------------------
 AWS Backup is a fully managed service that enables you to centralize and automate data protection across on-premises and AWS services. 
-
 
 • Fully managed service 
 • Centrally manage and automate backups across AWS services 
@@ -9605,7 +9675,6 @@ Note: Can’t use ALB as the ALB is layer 7 (HTTP protocol)
 172
 ##CloudFormation
 -------------------------------------------------
-AWS CloudFormation is an AWS service that uses template files to automate the setup of AWS resources.
 An AWS CloudFormation template is a formatted text file in JSON or YAML language that describes your AWS infrastructure. 
 
 
@@ -9623,8 +9692,7 @@ HowToWork:
 the relationship between the services, and provisions the services one after the other.
 
 
-CloudFormation is a declarative way of outlining your AWS Infrastructure, for any resources (most of them are supported).
-For example, within a CloudFormation template, you say:
+For example,you say:
 	• I want a security group
 	• I want two EC2 machines using this security group
 	• I want two Elastic IPs for these EC2 machines
@@ -9756,7 +9824,7 @@ It is a aws managed service, security is a shared responsibility.
 • Possibility to receive replies
 • Scales to billions of messages per day
 • Use cases: run campaigns by sending marketing, bulk, transactional SMS messages
-• Versus Amazon SNS or Amazon SES
+• Versus Amazon SNS or Amazon SES (Simple Email Service - AWS)
 	• In SNS & SES you managed each message's audience, content, and delivery schedule
 	• In Amazon Pinpoint, you create message templates, delivery schedules, highly-targeted segments, and full campaigns
 
@@ -9792,7 +9860,7 @@ Allows you to start a secure shell on your EC2 and on-premises servers
 • Efficiently run 100,000s of computing batch jobs on AWS
 • A “batch” job is a job with a start and an end (opposed to continuous)
 • Batch will dynamically launch EC2 instances or Spot Instances
-• AWS Batch provisions the right amount of compute / memory
+• AWS Batch provision	s the right amount of compute / memory
 • You submit or schedule batch jobs and AWS Batch does the rest!
 • Batch jobs are defined as Docker images and run on ECS
 • Helpful for cost optimizations and focusing less on the infrastructure
@@ -9834,7 +9902,7 @@ Batch vs Lambda:
 
 
 
-189
+179
 ##AWS Well-Architected Framework And Tool
 -------------------------------------------------
 Well Architected Framework General Guiding Principles -architected
@@ -9959,7 +10027,7 @@ It is a aws managed service, security is a shared responsibility.
 
 
 
-
+181
 ##VPC Reachability Analyzer
 -------------------------------------------------
 VPC Reachability Analyzer to determine whether a destination resource in your virtual private cloud (VPC) is reachable 
@@ -10000,7 +10068,7 @@ It is a aws managed service, security is a shared responsibility.
 
 
 
-116
+182
 ##DNS Resolution
 -------------------------------------------------
 DNS Resolution (enableDnsSupport)
@@ -10022,7 +10090,7 @@ Route 53, you must set both these attributes (enableDnsSupport & enableDnsHostna
 
 
 
-117
+183
 ##Route53 Private Zones
 -------------------------------------------------
 A private hosted zone is a container that holds information about how you want Amazon Route 53 to respond to
@@ -10035,7 +10103,7 @@ Managing hosted zones: You pay a monthly charge for each hosted zone managed wit
 
 
 
-21
+184
 #Data Warehouse
 -------------------------------------------------
 A data warehouse is a specialized type of relational database, which is optimized for
@@ -10051,9 +10119,7 @@ traditional solutions.
 
 
 
-
-$$
-19
+185
 ##EC2 Nitro
 -------------------------------------------------
 Underlying Platform for the next generation of EC2 instances
@@ -10064,7 +10130,9 @@ Underlying Platform for the next generation of EC2 instances
 • Better underlying security
 
 
-20
+
+
+186
 #Storage | DB | db | s3 | efs | ebs           
 -------------------------------------------------
 There are several categories of databases:
@@ -10088,7 +10156,7 @@ us-east-1 will be chosen by default
 
 
 
-72
+187
 ##SAM (Serverless Appliction Model)
 -------------------------------------------------
 The AWS Serverless Application Model (AWS SAM) is an open-source framework that you can use to build serverless 
@@ -10127,7 +10195,7 @@ It is a aws managed service, security is a shared responsibility.
 
 
 
-73
+189
 ##AWS Distributing Paid Content
 -------------------------------------------------
 You can configure CloudFront to require that users access your files using either signed URLs or signed cookies. 
@@ -10154,7 +10222,7 @@ An ending date and time, after which the URL is no longer valid.
 
 
 
-75
+188
 ##Big Data Ingestion Pipeline
 -------------------------------------------------
 AWS Data Pipeline is a web service that helps you reliably process and move data between different 
@@ -10188,7 +10256,7 @@ Big Data Ingestion Pipeline discussion:
 
 
 
-79
+190
 ##Neptune
 -------------------------------------------------
 Fully managed graph database.
@@ -10234,7 +10302,7 @@ manage through AWS Key Management Service (KMS).
 
 
 
-92
+191
 ##STS (Security Token Services)
 -------------------------------------------------
 AWS STS is an AWS service that allows you to request temporary security credentials for your AWS resources, 
@@ -10312,13 +10380,9 @@ It is a aws managed service, security is a shared responsibility.
 
 
 
-93
+192
 ##Identity Federation & Cognito
 -------------------------------------------------
-Amazon Cognito identity pools (federated identities) enable you to create unique identities for your users and federate them 
-with identity providers. 
-With an identity pool, you can obtain temporary, limited-privilege AWS credentials to access other AWS services. 
-
 Amazon Cognito identity pools support the following identity providers:
 Public providers: Login with Amazon (identity pools), Facebook (identity pools), Google (identity pools), 
 Sign in with Apple (identity pools).
@@ -10340,12 +10404,9 @@ Amazon Cognito
 
 
 
-94
+193
 ##Directory Services 
 -------------------------------------------------
-AWS Directory Service for Microsoft Active Directory, also known as AWS Managed Microsoft Active Directory (AD), 
-enables your directory-aware workloads and AWS resources to use managed Active Directory (AD) in AWS.
-
 AWS Directory Service for Microsoft Active Directory allows you to use a directory in one account and share it with 
 multiple accounts and VPCs.
 
@@ -10355,16 +10416,6 @@ With AWS Managed Microsoft AD, you can use Group Policies to manage EC2 instance
 AWS Cloud without the need to deploy your own AD infrastructure
 
 
-AWS Directory Services:
-AWS Managed Microsoft AD
-	• Create your own AD in AWS, manage users locally, supports MFA
-	• Establish “trust” connections with your on- premises AD
-AD Connector
-	• Directory Gateway (proxy) to redirect to on- premises AD, supports MFA
-	• Users are managed on the on-premises AD
-Simple AD
-	• AD-compatible managed directory on AWS
-	• Cannot be joined with on-premises AD
 	
 	
 	
@@ -10403,7 +10454,7 @@ It is a aws managed service, security is a shared responsibility.
 
 
 
-96
+194
 ##RAM (Resource Access Manager)
 -------------------------------------------------
 AWS Resource Access Manager (RAM) helps you securely share your resources across AWS accounts, within your organization or 
@@ -10436,66 +10487,9 @@ Network is shared so:
 	• Security groups from other accounts can be referenced for maximum security.
 
 
-
-
-
-
-
-97
-##AWS IAM Identity Center
--------------------------------------------------
-AWS Identity and Access Management (IAM), you can specify who or what can access services and resources in AWS, 
-centrally manage fine-grained permissions, and analyze access to refine permissions across AWS.
-
-
-Area:
-=====
-Global
-
-
-UseCase:
-========
-Apply fine-grained permissions and scale with attribute-based access control
-Manage per-account access or scale access across AWS accounts and applications
-
-
-BillCost:
-=========
-IAM is offered at no additional charge.
-
-
-Security:
-=========
-Cloud single-sign-on (SSO) service
-AWS IAM Identity Center (successor to AWS SSO)
-
-Securely manage access to services and resources
-AWS Identity & Access Management (IAM)
-
-
-
-
-
-
-
-
-
-
-
-96
+195
 ##CloudHSM
 -------------------------------------------------
-AWS CloudHSM is a cloud-based hardware security module (HSM) that enables you to easily 
-generate and use your own encryption keys on the AWS Cloud. 
-
-CloudHSM is standards-compliant and enables you to export all of your keys to most other
-commercially-available HSMs, subject to your configurations. 
-
-
-The AWS CloudHSM service helps you meet corporate, contractual, and regulatory compliance 
-requirements for data security by using dedicated 
-Hardware Security Module (HSM) instances within the AWS cloud. 
-
 AWS CloudHSM provides hardware security modules in the AWS Cloud. 
 A hardware security module (HSM) is a computing device that 
 processes cryptographic operations and provides secure storage for cryptographic keys.
@@ -10513,7 +10507,6 @@ such as database encryption, Digital Rights Management (DRM), Public Key Infrast
 authentication and authorization, document signing, and transaction processing.
 
 There are no upfront costs to use AWS CloudHSM. With CloudHSM, you pay an hourly fee for each HSM you launch until you terminate the HSM.
-
 
 
 • You manage your own encryption keys entirely (not AWS)
@@ -10560,188 +10553,7 @@ Security is a shared responsibility.
 
 
 
-125
-##AWS PrivateLink
--------------------------------------------------
-AWS PrivateLink provides private connectivity between VPCs, AWS services, and your on-premises networks, without exposing your 
-traffic to the public internet. 
-
-AWS PrivateLink makes it easy to connect services across different accounts and VPCs to significantly 
-simplify your network architecture.
-
-
-
-VPC End Point Service
--------------------------------------------------
-A VPC endpoint enables you to privately connect your VPC to supported AWS services and VPC endpoint services powered by 
-PrivateLink without requiring an internet gateway, NAT device, VPN connection, or AWS Direct Connect connection. 
-Instances in your VPC do not require public IP addresses to communicate with resources in the service. 
-Traffic between your VPC and the other service does not leave the Amazon network.
-
-
-AWS PrivateLink (VPC Endpoint Services):
-• Most secure & scalable way to expose a service to 1000s of VPC (own or other accounts)
-• Does not require VPC peering, internet gateway, NAT, route tables…
-• Requires a network load balancer (Service VPC) and ENI (Customer VPC) or GWLB
-• If the NLB is in multiple AZ, and the ENIs in multiple AZ, the solution is fault tolerant! 
-
-
-
-
-Area:
-=====
-MayRegional
-
-
-UseCase:
-========
-This is useful because different AWS services often talk to each other over the internet. 
-If you do not want that behavior and instead want AWS services to only communicate within the AWS network, use AWS PrivateLink. 
-AWS PrivateLink connects your AWS services with other AWS services through a non-public tunnel.
-
-SECURELY ACCESS SAAS APPLICATIONS
-MAINTAIN REGULATORY COMPLIANCE
-MIGRATE TO HYBRID CLOUD
-
-BillCost:
-=========
-
-Security:
-=========
-It is a aws managed service, security is a shared responsibility.
-
-
-
-
-
-
-
-126
-##VPC Classic Link 
--------------------------------------------------
-ClassicLink allows you to link EC2-Classic instances to a VPC in your account, within the same Region. 
-If you associate the VPC security groups with a EC2-Classic instance, this enables communication between your 
-EC2-Classic instance and instances in your VPC using private IPv4 addresses.
-
-
-Linking your EC2-Classic instance to a VPC does not affect your EC2-Classic security groups. 
-They continue to control all traffic to and from the instance. 
-
-
-EC2-Classic: instances run in a single network shared with other customers
-• Amazon VPC: your instances run logically isolated to your AWS account
-• ClassicLink allows you to link EC2-Classic instances to a VPC in your account
-	• Must associate a security group
-	• Enables communication using private IPv4 addresses
-	• Removes the need to make use of public IPv4 addresses or Elastic IP addresses
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-137
-##DataSync
--------------------------------------------------
-AWS DataSync is a secure, online service that automates and accelerates moving data between on premises and 
-AWS Storage services. 
-DataSync can copy data between Network File System (NFS) shares, Server Message Block (SMB) shares, 
-Hadoop Distributed File Systems (HDFS), self-managed object storage, AWS Snowcone, Amazon Simple Storage 
-Service (Amazon S3) buckets, Amazon Elastic File System (Amazon EFS) file systems, 
-Amazon FSx for Windows File Server file systems, Amazon FSx for Lustre file systems, 
-Amazon FSz for OpenZFS file systems, and Amazon FSx for NetApp ONTAP file systems.
-
-
-Move large amount of data from on-premises to AWS
-• Can synchronize to: Amazon S3 (any storage classes – including Glacier), Amazon EFS, Amazon FSx (Windows, Lustre...)
-• Move data from your NAS or file system via NFS or SMB
-• Replication tasks can be scheduled hourly, daily, weekly
-• Leverage the DataSync agent to connect to your systems
-• Can setup a bandwidth limit
-
-
-
-Area:
-=====
-MayRegional
-
-
-UseCase:
-========
-Migrate your data
-Quickly move file and object data to AWS. Your data is secure with in-flight encryption and end-to-end data validation.
-Protect your data
-Securely replicate your data into cost-efficient AWS storage services, including any Amazon S3 storage class.
-Manage your hybrid data workflows
-Seamlessly move data between on-premises systems and AWS to accelerate your critical hybrid workflows.
-
-
-
-BillCost:
-=========
-Pay only for the amount of data that you migrate based on a flat, per-gigabyte fee according to your region.
-
-
-
-Security:
-=========
-It is a aws managed service, security is a shared responsibility.
-
-
-
-
-
-
-
-
-149
-##Event Processing
--------------------------------------------------
-An event is the occurrence of an immutable message describing something that happened in the past. 
-The event data payload typically contains details of the occurrence and associated metadata.
-
-
-S3:ObjectCreated, S3:ObjectRemoved,
-S3:ObjectRestore, S3:Replication…
-• Object name filtering possible (*.jpg)
-• Use case: generate thumbnails of images uploaded to S3
-• Can create as many “S3 events” as desired
-• S3 event notifications typically deliver events in seconds but can sometimes take a minute or longer
-• If two writes are made to a single non- versioned object at the same time, it is
-   possible that only a single event notification will be sent
-• If you want to ensure that an event notification is sent for every successful write, you can enable versioning on your bucket.
-
-
-
-Area:
-=====
-MayRegional
-
-
-UseCase:
-========
-BillCost:
-=========
-Security:
-=========
-It is a aws managed service, security is a shared responsibility.
-
-
-
-
-
-
-154
+197
 ##CICD 
 -------------------------------------------------
 CI/CD can be pictured as a pipeline, where new code is submitted on one end, tested over a series of stages 
@@ -10788,7 +10600,7 @@ It is a aws managed service, security is a shared responsibility.
 
 
 
-156
+199
 ##Step Function 
 -------------------------------------------------
 AWS Step Functions is a serverless orchestration service that lets developers create and manage multi-step 
@@ -10834,9 +10646,8 @@ It is a aws managed service, security is a shared responsibility.
 
 
 
-
-157
-##SWF
+200
+##SWF - Simple Workflow Service
 -------------------------------------------------
 The Amazon Simple Workflow Service (Amazon SWF) makes it easy to build applications that coordinate work across distributed components. 
 Amazon SWF acts as the coordination hub for all of the different components of your application:
@@ -10878,15 +10689,9 @@ It is a aws managed service, security is a shared responsibility.
 
 
 
-157
-##EMR
+201
+##EMR - Elastic MapReduce
 -------------------------------------------------
-Easily run and scale Apache Spark, Hive, Presto, and other big data workloads
-Amazon EMR is the industry-leading cloud big data solution for petabyte-scale data processing, interactive analytics, 
-and machine learning using open-source frameworks such as Apache Spark, Apache Hive, and Presto.
-
-With it, organizations can process and analyze massive amounts of data.
-
 Amazon Elastic MapReduce (Amazon EMR) is a web service that makes it easy to quickly and cost-effectively process vast amounts of data.
 Amazon EMR is the industry-leading cloud big data platform for processing vast amounts of data using 
 open source tools such as Apache Spark, Apache Hive, Apache HBase, Apache Flink, Apache Hudi, and Presto. 
@@ -10924,7 +10729,7 @@ Amazon S3 provides authentication mechanisms to ensure that stored data is secur
 
 
 
-158
+202
 ##OpsWorks
 -------------------------------------------------
 AWS OpsWorks is a configuration management service that provides managed instances of Chef and Puppet. 
@@ -10936,11 +10741,11 @@ AWS Opsworks for Chef Automate, AWS OpsWorks for Puppet Enterprise, and AWS OpsW
 Chef & Puppet help you perform server configuration automatically, or repetitive actions
 • They work great with EC2 & On Premise VM
 • AWS Opsworks = Managed Chef & Puppet
-• It’s an alternative to AWS SSM
+• It’s an alternative to AWS SSM (AWS Systems Manager)
 
 
 
-159
+203
 ##AWS Workspaces
 -------------------------------------------------
 -Desktop-as-a-Service (DaaS)
@@ -10972,17 +10777,18 @@ It is a aws managed service, security is a shared responsibility.
 
 
 
-160
+207
 ##AppSync
 -------------------------------------------------
 AWS AppSync is a serverless GraphQL and Pub/Sub API service that simplifies building modern web and mobile applications.
 AWS AppSync GraphQL APIs simplify application development by providing a single endpoint to securely 
 query or update data from multiple databases, microservices, and APIs.
 
-AWS AppSync Pub/Sub APIs make it easy to create engaging real-time experiences by automatically publishing data updates to subscribed API clients via serverless WebSockets connections. 
 
-GraphQL APIs built with AWS AppSync give front-end developers the ability to query multiple databases, microservices, and APIs from a single GraphQL endpoint. 
-Pub/Sub APIs built with AWS AppSync give front-end developers the ability to publish real-time data updates to subscribed API clients via serverless WebSockets connections.
+GraphQL APIs built with AWS AppSync give front-end developers the ability 
+        to query multiple databases, microservices, and APIs from a single GraphQL endpoint. 
+Pub/Sub APIs built with AWS AppSync give front-end developers the ability 
+        to publish real-time data updates to subscribed API clients via serverless WebSockets connections.
 
 AWS AppSync SDKs support iOS, Android, and JavaScript. 
 
@@ -11022,7 +10828,7 @@ It is a aws managed service, security is a shared responsibility.
 
 
 
-161
+208
 ##Cost Explorer
 -------------------------------------------------
 Visualize, understand, and manage your AWS costs and usage over time
@@ -11035,7 +10841,7 @@ Visualize, understand, and manage your AWS costs and usage over time
 
 
 
-164
+209
 ##BGP |   Border Gateway Protocol          
 -------------------------------------------------
 BGP is a means by which all junction points on the internet (routers) communicate with each other to dynamically establish the 
@@ -11043,7 +10849,7 @@ correct (and correctly weighted) paths that network packets should follow to tra
 
 
 
-165
+210
 ##AWS Policy Simulator | IAM
 -------------------------------------------------
 The AWS IAM Simulator is a tool that helps you to test the effects of IAM access control policies. 
@@ -11056,7 +10862,7 @@ requests that might make unwanted changes to your live AWS environment.
 
 
 
-166
+211
 ##GraphQL:
 ------------------------------------------------
 GraphQL is a query language for APIs and a runtime for fulfilling those queries with your existing data. 
@@ -11068,7 +10874,7 @@ control the data they get, not the server.
 
 
 
-167
+212
 ##ECMP
 -------------------------------------------------
 Equal-cost multi-path routing (ECMP) is a routing strategy where packet forwarding to a single destination can occur over 
@@ -11079,8 +10885,7 @@ The question is, can Transit Gateway ECMP be used to deploy a transit DMZ as sho
 
 
 
- 
-168
+213
 ##ENA (Elastic Network Adapter)
 -------------------------------------------------
 The Elastic Network Adapter (ENA) is designed to improve operating system health and reduce 
@@ -11094,7 +10899,7 @@ The Elastic Network Adapter (ENA) driver publishes network performance metrics f
 
 
 
-169
+214
 ##ParallelCluster 
 -------------------------------------------------
 AWS ParallelCluster is an open source cluster management tool that makes it easy for you to deploy and manage High Performance 
@@ -11106,8 +10911,7 @@ It also supports multiple  instance types and job submission queues, and job sch
 
 
 
-
-170
+215
 ##Managed Services | IAAS| PAAS       
 -------------------------------------------------
 AWS Managed Service Offerings:
@@ -11154,60 +10958,6 @@ Configuration
 Examples of PAAS
 CAAS (Container as a Service): Containers instead of Applications
 FAAS (Function as a Service) or Serverless: Functions instead of Applications
-
-
-
-171
-##Shared Responsibility Model         
--------------------------------------------------
-Security & Compliance is shared responsibility between AWS and customer
-
-
-Amazon EC2 instances is Infrastructure as a Service (IaaS).
-You are responsible for:
-Guest OS (incl. security patches)
-Application software installed
-Configuring Security Groups (or firewalls)
-
-
-AWS is responsible for infrastructure layer only.
-
-
-Amazon S3 & DynamoDB are managed services.
-
-AWS manages infrastructure layer, OS, and platform.
-
-You are responsible for
--Managing your data
--Managing security of data at rest(encryption)
--Managing security of data in transit
--Mandating SSL/HTTPS
--Using the right network - AWS global network or dedicated private network when possible
--Managing access to the service
--Configure right permissions (IAM users/roles/user policies/resource policies)
-(FOR AWS RDS) Managing in database users
--Configuring the right security groups (control inbound and outbound traffic)
--Disabling external access (public vs private)
-
-
-
-
-
-Incident response:
-	Investigate potential security issues
-	Amazon Detective
-	Scalable, cost-effective application recovery to AWS
-	AWS Elastic Disaster Recovery
-Compliance:
-	No cost, self-service portal for on-demand access to AWS’ compliance reports
-	AWS Artifact
-	
-	Continuously audit your AWS usage to simplify how you assess risk and compliance
-	AWS Audit Manager
-
-
-
-
 
 
 =================================================
