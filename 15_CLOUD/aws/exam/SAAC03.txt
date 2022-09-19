@@ -8380,6 +8380,10 @@ Security Groups are stateful:
 
 
 Ephemeral Ports:
+
+Ports with numbers 0-1023 are called system or well-known ports; ports with numbers 1024-49151 are 
+called user or registered ports, and ports with numbers 49152-65535 are called dynamic, private or ephemeral ports.
+
 • For any two endpoints to establish a connection, they must use ports
 • Clients connect to a defined port, and expect a response on an ephemeral port
 • Different Operating Systems use different port ranges, examples:
@@ -8430,21 +8434,13 @@ as long as it is in the same region.
 VPCs, but transitive peering is not supported. In other words, VPC A can connect to B and C in the above diagram, 
 but C cannot communicate with B unless directly paired.
 
-We can have up to 200 Subnets per Amazon Virtual Private Cloud (VPC).
-
 Privately connect two VPCs using AWS’network:
 • Make them behave as if they were in thesame network
-• Must not have overlapping CIDRs 
-• VPC Peering connection is NOT transitive(must be established for each VPC that
-  need to communicate with one another)
+• Must not have overlapping CIDRs
 • You must update route tables in each VPC’ssubnets to ensure EC2 instances can communicate with each other
 • You can create VPC Peering connection between VPCs in different AWSaccounts/regions
 • You can reference a security group in a peered VPC (works crossaccounts – same region)
 • You must update route tables in each VPC’s subnets to ensure EC2 instances can communicate with each other
-
-
-• You can create VPC Peering connection between VPCs in different AWS accounts/regions
-• You can reference a security group in a peered VPC (works cross accounts – same region)
 
 
 Area:
@@ -8461,7 +8457,8 @@ Privately connect two VPCs.
 
 BillCost:
 =========
-There is no charge to create a VPC peering connection. There is a charge for data transfer across peering connections.
+There is no charge to create a VPC peering connection. 
+There is a charge for data transfer across peering connections.
 
 
 
@@ -8477,81 +8474,13 @@ It is a aws managed service, security is a shared responsibility.
 
 AWS PrivateLink
 -------------------------------------------------
+AWS PrivateLink connects your AWS services with other AWS services through a non-public tunnel.
+
 AWS PrivateLink provides private connectivity between VPCs, AWS services, and your on-premises networks, without exposing your 
 traffic to the public internet. 
 
 AWS PrivateLink makes it easy to connect services across different accounts and VPCs to significantly 
 simplify your network architecture.
-
-
-
-
-VPC End Point Service
--------------------------------------------------
-A VPC endpoint enables you to privately connect your VPC to supported AWS services and VPC endpoint services powered by 
-PrivateLink without requiring an internet gateway, NAT device, VPN connection, or AWS Direct Connect connection. 
-Instances in your VPC do not require public IP addresses to communicate with resources in the service. 
-Traffic between your VPC and the other service does not leave the Amazon network.
-
-
-AWS PrivateLink (VPC Endpoint Services):
-• Most secure & scalable way to expose a service to 1000s of VPC (own or other accounts)
-• Does not require VPC peering, internet gateway, NAT, route tables…
-• Requires a network load balancer (Service VPC) and ENI (Customer VPC) or GWLB
-• If the NLB is in multiple AZ, and the ENIs in multiple AZ, the solution is fault tolerant! 
-
-
-
-
-Area:
-=====
-MayRegional
-
-
-UseCase:
-========
-This is useful because different AWS services often talk to each other over the internet. 
-If you do not want that behavior and instead want AWS services to only communicate within the AWS network, use AWS PrivateLink. 
-AWS PrivateLink connects your AWS services with other AWS services through a non-public tunnel.
-
-SECURELY ACCESS SAAS APPLICATIONS
-MAINTAIN REGULATORY COMPLIANCE
-MIGRATE TO HYBRID CLOUD
-
-BillCost:
-=========
-
-Security:
-=========
-It is a aws managed service, security is a shared responsibility.
-
-
-
-
-
-
-
-VPC Classic Link 
--------------------------------------------------
-ClassicLink allows you to link EC2-Classic instances to a VPC in your account, within the same Region. 
-If you associate the VPC security groups with a EC2-Classic instance, this enables communication between your 
-EC2-Classic instance and instances in your VPC using private IPv4 addresses.
-
-
-Linking your EC2-Classic instance to a VPC does not affect your EC2-Classic security groups. 
-They continue to control all traffic to and from the instance. 
-
-
-EC2-Classic: instances run in a single network shared with other customers
-• Amazon VPC: your instances run logically isolated to your AWS account
-• ClassicLink allows you to link EC2-Classic instances to a VPC in your account
-	• Must associate a security group
-	• Enables communication using private IPv4 addresses
-	• Removes the need to make use of public IPv4 addresses or Elastic IP addresses
-
-
-
-
 
 
 
@@ -8611,6 +8540,27 @@ Lambda in VPC accessing DynamoDB:
 
 
 
+VPC Classic Link 
+-------------------------------------------------
+ClassicLink allows you to link EC2-Classic instances to a VPC in your account, within the same Region. 
+If you associate the VPC security groups with a EC2-Classic instance, this enables communication between your 
+EC2-Classic instance and instances in your VPC using private IPv4 addresses.
+
+
+Linking your EC2-Classic instance to a VPC does not affect your EC2-Classic security groups. 
+They continue to control all traffic to and from the instance. 
+
+
+• ClassicLink allows you to link EC2-Classic instances to a VPC in your account
+	• Must associate a security group
+	• Enables communication using private IPv4 addresses
+	• Removes the need to make use of public IPv4 addresses or Elastic IP addresses
+
+
+
+
+
+
 
 Area:
 =====
@@ -8640,11 +8590,13 @@ It is a aws managed service, security is a shared responsibility.
 
 
 
+
 151
 ##VPC Flow Logs
 -------------------------------------------------
 VPC Flow Logs is a feature that enables you to capture information about the IP traffic going to and from network 
 interfaces in your VPC. 
+
 Flow log data can be published to Amazon CloudWatch Logs or Amazon S3. 
 After you create a flow log, you can retrieve and view its data in the chosen destination.
 
@@ -8756,6 +8708,7 @@ compared to regular internet-based connections.
 
 
 Direct Connect Gateway:
+---------------------------------------------
 • If you want to setup a Direct Connect to one or more VPC in many
 different regions (same account), you must use a Direct Connect Gateway
 
@@ -8766,6 +8719,10 @@ each other (for example, a virtual private gateway to another virtual private ga
 Using Direct Connect gateway, by attaching a private virtual interface (VIF) from your DX location and associate with designated 
 Region virtual private gateway (VGW), your DX traffic is route to your the Region using shortest path, 
 without reaching the home-associated Region.
+
+A virtual interface (VIF) is necessary to access AWS services, and is either public or private. 
+A public virtual interface enables access to public services, such as Amazon S3. 
+A private virtual interface enables access to your VPC.
 
 
 
@@ -8795,10 +8752,6 @@ Direct Connect - Resiliency:
 Site-to-Site VPN connection as a backup
 • In case Direct Connect fails, you can set up a backup Direct Connect connection (expensive), or a Site-to-Site VPN connection
 
-
-A virtual interface (VIF) is necessary to access AWS services, and is either public or private. 
-A public virtual interface enables access to public services, such as Amazon S3. 
-A private virtual interface enables access to your VPC.
 
 
 Area:
@@ -8843,14 +8796,15 @@ using similar protocols like SSL, HTTPs and SSH.
 -------------------------------------------------
 AWS Transit Gateway connects your Amazon Virtual Private Clouds (VPCs) and on-premises networks through a central hub. 
 
+As your cloud infrastructure expands globally you need to find out a way to connect your resources which are in different VPCs. 
+A Transit Gateway is a network hub that you can use to interconnect your virtual private clouds (VPCs) and on-premises networks. 
+
+
 
 Transit Gateway is a Regional resource and can connect thousands of VPCs within the same AWS Region. 
 You can create multiple Transit Gateway instances per Region, and you can 
 connect to a maximum of three Transit Gateway instances over a single Direct Connect connection for hybrid connectivity.
 
-
-As your cloud infrastructure expands globally you need to find out a way to connect your resources which are in different VPCs. 
-A Transit Gateway is a network hub that you can use to interconnect your virtual private clouds (VPCs) and on-premises networks. 
 
 
 • For having transitive peering between thousands of VPC and on-premises, hub-and-spoke (star) connection
@@ -8949,11 +8903,9 @@ It is a aws managed service, security is a shared responsibility.
 ##IPv6 VPC
 -------------------------------------------------
 Your VPC can operate in dual-stack mode — your resources can communicate over IPv4, or IPv6, or both. 
-IPv4 and IPv6 communication are independent of each other. You cannot disable IPv4 support for your VPC and subnets; 
-this is the default IP addressing system for Amazon VPC and Amazon EC2.
+IPv4 and IPv6 communication are independent of each other. 
 
-
-• IPv4 cannot be disabled for your VPC and subnets
+• IPv4 cannot be disabled for your VPC and subnets,this is the default IP addressing system for Amazon VPC.
 • You can enable IPv6 (they’re public IP addresses) to operate in dual-stack mode
 • Your EC2 instances will get at least a private internal IPv4 and a public IPv6
 • They can communicate using either IPv4 or IPv6 to the internet through an Internet Gateway
@@ -8990,7 +8942,7 @@ Security:
 ##VPC Section Summary
 -------------------------------------------------
 • CIDR – IP Range
-• VPC – Virtual Private Cloud => we define a list of IPv4 & IPv6 CIDR
+• VPC – Virtual Private Cloud (list of IPv4 & IPv6 CIDR)
 • Subnets – tied to an AZ, we define a CIDR
 • Internet Gateway – at the VPC level, provide IPv4 & IPv6 Internet Access
 • Route Tables – must be edited to add routes from subnets to the IGW, VPC Peering Connections, VPC Endpoints, …
