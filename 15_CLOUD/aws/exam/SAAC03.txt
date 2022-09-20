@@ -9622,7 +9622,7 @@ HowToWork:
 -Save the code in an S3 bucket, which serves as a repository for the code.
 -Use AWS CloudFormation to call the bucket and create a stack on your template. 
 -CloudFormation reads the file and understands the services that are called, their order, 
-the relationship between the services, and provisions the services one after the other.
+ the relationship between the services, and provisions the services one after the other.
 
 
 For example,you say:
@@ -9703,6 +9703,7 @@ Area:
 =====
 MayRegional
 
+
 UseCase:
 ========
 Manage infrastructure with DevOps
@@ -9718,11 +9719,9 @@ Free Tier
 Handler operation
 Handler operation duration
 
-• Each resources within the stack is tagged with an identifier so you can easily see how
-much a stack costs you
+• Each resources within the stack is tagged with an identifier so you can easily see how much a stack costs you
 • You can estimate the costs of your resources using the CloudFormation template
-• Savings strategy: In Dev, you could automation deletion of templates at 5 PM and
-recreated at 8 AM, safe
+• Savings strategy: In Dev, you could automation deletion of templates at 5 PM and recreated at 8 AM, safe
 
 
 Security:
@@ -9762,14 +9761,21 @@ It is a aws managed service, security is a shared responsibility.
 	• In Amazon Pinpoint, you create message templates, delivery schedules, highly-targeted segments, and full campaigns
 
 
+
+
 175
 ++SSM Systems Manager – SSM Session Manager
 -------------------------------------------------
+AWS Systems Manager Session Manager is a new interactive shell and CLI that helps to provide secure, access-controlled, 
+and audited Windows and Linux EC2 instance management. Session Manager removes the need to open inbound ports, 
+manage SSH keys, or use bastion hosts.
+
 Allows you to start a secure shell on your EC2 and on-premises servers
 • No SSH access, bastion hosts, or SSH keys needed
 • No port 22 needed (better security)
 • Supports Linux, macOS, and Windows
 • Send session log data to S3 or CloudWatch Logs
+Install the SSM Agent IF not already installed.
 
 
 
@@ -9789,6 +9795,9 @@ Allows you to start a secure shell on your EC2 and on-premises servers
 177
 ++AWS Batch
 -------------------------------------------------
+AWS Batch is a set of batch management capabilities that enables developers, scientists, and engineers to easily and 
+efficiently run hundreds of thousands of batch computing jobs on AWS. 
+
 • Fully managed batch processing at any scale
 • Efficiently run 100,000s of computing batch jobs on AWS
 • A “batch” job is a job with a start and an end (opposed to continuous)
@@ -9819,6 +9828,7 @@ Batch vs Lambda:
 178
 ++Amazon AppFlow
 -------------------------------------------------
+As a managed serverless platform, 
 • Fully managed integration service that enables you to securely transfer
   data between Software-as-a-Service (SaaS) applications and AWS
 • Sources: Salesforce, SAP, Zendesk, Slack, and ServiceNow
@@ -10194,7 +10204,6 @@ Big Data Ingestion Pipeline discussion:
 -------------------------------------------------
 Fully managed graph database.
 
-
 Neptune for Solutions Architect:
 • Operations: similar to RDS
 • Security: IAM, VPC, KMS, SSL (similar to RDS) + IAM Authentication
@@ -10241,8 +10250,9 @@ manage through AWS Key Management Service (KMS).
 AWS STS is an AWS service that allows you to request temporary security credentials for your AWS resources, 
 for IAM authenticated users and users that are authenticated in AWS such as federated users via OpenID or SAML2.0.
 
-You use STS to provide trusted users with temporary access to resources via API calls, your AWS console or 
-the AWS command line interface (CLI)
+AWS provides AWS Security Token Service (AWS STS) as a web service that enables you to request temporary, 
+limited-privilege credentials for AWS Identity and 
+Access Management (IAM) users or for users you authenticate (federated users).
 
 
 
@@ -10261,7 +10271,7 @@ AWS STS – Security Token Service:
 • for MFA, from a user or AWS account root user
 
 
-Using STS to Assume a Role:
+Using STS to Assume a Role (IAM):
 • Define an IAM Role within your account or cross-account
 • Define which principals can access this IAM Role
 • Use AWS STS (Security Token Service) to retrieve credentials and impersonate the IAM Role you
@@ -10420,6 +10430,7 @@ Network is shared so:
 	• Security groups from other accounts can be referenced for maximum security.
 
 
+
 195
 ##CloudHSM
 -------------------------------------------------
@@ -10497,16 +10508,6 @@ Tools:
 -CodePipeline - Orchestrate CI/CD pipelines
 -CodeBuild - Build and Test Code (application packages and containers)
 -CodeDeploy - Automate Deployment (EC2, ECS, Elastic Beanstalk, EKS, Lambda etc)
-
-
-Infrastructure as Code:
-• Currently, we have been doing a lot of manual work
-• All this manual work will be very tough to reproduce:
-• In another region
-• in another AWS account
-• Within the same region if everything was deleted
-• Wouldn’t it be great, if all our infrastructure was… code?
-• That code would be deployed and create / update / delete our infrastructure
 
 
 
@@ -10667,6 +10668,7 @@ Amazon S3 provides authentication mechanisms to ensure that stored data is secur
 -------------------------------------------------
 AWS OpsWorks is a configuration management service that provides managed instances of Chef and Puppet. 
 Chef and Puppet are automation platforms that allow you to use code to automate the configurations of your servers. 
+
 OpsWorks lets you use Chef and Puppet to automate how servers are configured, deployed, and managed across 
 your Amazon EC2 instances or on-premises compute environments. OpsWorks has three offerings, 
 AWS Opsworks for Chef Automate, AWS OpsWorks for Puppet Enterprise, and AWS OpsWorks Stacks.
@@ -10675,6 +10677,7 @@ Chef & Puppet help you perform server configuration automatically, or repetitive
 • They work great with EC2 & On Premise VM
 • AWS Opsworks = Managed Chef & Puppet
 • It’s an alternative to AWS SSM (AWS Systems Manager)
+
 
 
 
@@ -10706,6 +10709,19 @@ BillCost:
 Security:
 =========
 It is a aws managed service, security is a shared responsibility.
+
+
+
+
+##GraphQL:
+------------------------------------------------
+GraphQL is a query language for APIs and a runtime for fulfilling those queries with your existing data. 
+
+Send a GraphQL query to your API and get exactly what you need, nothing more and nothing less. 
+GraphQL queries always return predictable results. Apps using GraphQL are fast and stable because they 
+control the data they get, not the server.
+
+
 
 
 
@@ -10795,18 +10811,6 @@ requests that might make unwanted changes to your live AWS environment.
 
 
 
-211
-##GraphQL:
-------------------------------------------------
-GraphQL is a query language for APIs and a runtime for fulfilling those queries with your existing data. 
-
-Send a GraphQL query to your API and get exactly what you need, nothing more and nothing less. 
-GraphQL queries always return predictable results. Apps using GraphQL are fast and stable because they 
-control the data they get, not the server.
-
-
-
-
 212
 ##ECMP
 -------------------------------------------------
@@ -10844,6 +10848,8 @@ It also supports multiple  instance types and job submission queues, and job sch
 
 
 
+
+
 215
 ##Managed Services | IAAS| PAAS       
 -------------------------------------------------
@@ -10859,38 +10865,33 @@ AWS Managed Service Offerings:
 
 
 IAAS:
-
-IAAS (Infrastructure as a Service):
-IAAS (Infrastructure as a Service) is all about using only infrastructure from cloud provider. It is also called “Lift and Shift”. Example: Using EC2 to deploy your applications or databases
+IAAS (Infrastructure as a Service) is all about using only infrastructure from cloud provider. 
+It is also called “Lift and Shift”. Example: Using EC2 to deploy your applications or databases
 
 With IAAS, you are responsible for:
-
-Application Code and Runtime
-Configuring load balancing
-Auto scaling
-OS upgrades and patches
-Availability
-
-
+	Application Code and Runtime
+	Configuring load balancing
+	Auto scaling
+	OS upgrades and patches
+	Availability
 
 
 PAAS:
-PAAS (Platform as a Service)
 PAAS (Platform as a Service) is all about using a platform provided by cloud
 
 Cloud provider is responsible for:
-
-OS (incl. upgrades and patches)
-Application Runtime
-Auto scaling, Availability & Load balancing etc..
-You are responsible for:
-
-Application code
-Configuration
+	OS (incl. upgrades and patches)
+	Application Runtime
+	Auto scaling, Availability & Load balancing etc..
+	You are responsible for:
+	Application code
+	Configuration
 
 Examples of PAAS
 CAAS (Container as a Service): Containers instead of Applications
 FAAS (Function as a Service) or Serverless: Functions instead of Applications
+
+
 
 
 =================================================
