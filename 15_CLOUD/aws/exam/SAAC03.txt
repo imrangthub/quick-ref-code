@@ -8428,8 +8428,8 @@ It is a aws managed service, security is a shared responsibility.
 149
 ##VPC Peering
 -------------------------------------------------
-A peering connection can be made between your own VPCs or with a VPC in another AWS account, 
-as long as it is in the same region.
+A VPC peering connection is a networking connection between two VPCs that 
+enables you to route traffic between them using private IPv4 addresses or IPv6 addresses.
 
 VPCs, but transitive peering is not supported. In other words, VPC A can connect to B and C in the above diagram, 
 but C cannot communicate with B unless directly paired.
@@ -8709,16 +8709,20 @@ compared to regular internet-based connections.
 
 Direct Connect Gateway:
 ---------------------------------------------
-• If you want to setup a Direct Connect to one or more VPC in many
-different regions (same account), you must use a Direct Connect Gateway
+If you want to setup a Direct Connect to one or more VPC in many
+different regions (same account) for your on-parmiss, you must use a Direct Connect Gateway.
 
+A Direct Connect gateway is a globally available resource. You can create the Direct Connect gateway in any 
+Region and access it from all other Regions. You can set up Direct Connect to bypass a parent Availability 
+Zone and connect directly to the internet or through Direct Connect points-of-presence.
 
-A Direct Connect gateway does not allow gateway associations that are on the same Direct Connect gateway to send traffic to 
-each other (for example, a virtual private gateway to another virtual private gateway). 
+Use AWS Direct Connect gateway to connect your VPCs. You associate an AWS Direct Connect 
+gateway with either of the following gateways:
+	A transit gateway when you have multiple VPCs in the same Region
+	A virtual private gateway
 
-Using Direct Connect gateway, by attaching a private virtual interface (VIF) from your DX location and associate with designated 
-Region virtual private gateway (VGW), your DX traffic is route to your the Region using shortest path, 
-without reaching the home-associated Region.
+A Direct Connect gateway does not allow gateway associations that are on the same Direct Connect 
+gateway to send traffic to each other (for example, a virtual private gateway to another virtual private gateway).
 
 A virtual interface (VIF) is necessary to access AWS services, and is either public or private. 
 A public virtual interface enables access to public services, such as Amazon S3. 
@@ -8753,6 +8757,10 @@ Site-to-Site VPN connection as a backup
 • In case Direct Connect fails, you can set up a backup Direct Connect connection (expensive), or a Site-to-Site VPN connection
 
 
+What is the difference between Direct Connect gateway and virtual private gateway?
+The Direct Connect Gateway is connected to multiple AWS VPCs in different AWS regions via Virtual private Gateways. 
+The Direct Connect Gateway is in turn connected to the Direct Connect via a virtual private interface. 
+This allows multiple VPCs to be connected to the customer network via one virtual private interface.
 
 Area:
 =====
@@ -9329,17 +9337,22 @@ AWS Backup Vault Lock:
 AWS Application Discovery Service:
 • Plan migration projects by gathering information about on-premises data centers
 • Server utilization data and dependency mapping are important for migrations
-• Agentless Discovery (AWS Agentless Discovery Connector)
-• VM inventory, configuration, and performance history such as CPU, memory, and disk usage
-• Agent-based Discovery (AWS Application Discovery Agent)
-	• System configuration, system performance, running processes, and details of the network connections between systems
-• Resulting data can be viewed within AWS Migration Hub
+	• Agentless Discovery (AWS Agentless Discovery Connector)
+	    • VM inventory, configuration, and performance history such as CPU, memory, and disk usage
+	• Agent-based Discovery (AWS Application Discovery Agent)
+		• System configuration, system performance, running processes, and details of the network connections between systems
+	• Resulting data can be viewed within AWS Migration Hub
 
 
 
 
 AWS Application Migration Service (MGN)
 -------------------------------------------------
+With Application Migration Service, you can migrate your applications from physical infrastructure, 
+VMware vSphere, Microsoft Hyper-V, Amazon Elastic Compute Cloud (Amazon EC2), 
+Amazon Virtual Private Cloud (Amazon VPC), and other clouds to AWS.
+
+
 • The “AWS evolution” of CloudEndure Migration, replacing AWS Server Migration Service (SMS)
 • Lift-and-shift (rehost) solution which simplify migrating applications to AWS
 • Converts your physical, virtual, and cloud-based servers to run natively on AWS
@@ -9347,7 +9360,10 @@ AWS Application Migration Service (MGN)
 • Minimal downtime, reduced costs
 
 
-
+What are the main differences between AWS Application Migration Service and AWS Server Migration Service?
+Application Migration Service (MGN) utilizes continuous, block-level replication and enables short cutover 
+windows measured in minutes. Server Migration Service (SMS) utilizes incremental, snapshot-based replication 
+and enables cutover windows measured in hours.
 
 
 VMware Cloud on Aws
