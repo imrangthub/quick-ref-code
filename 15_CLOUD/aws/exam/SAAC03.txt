@@ -111,30 +111,15 @@ Route53, IAM, CloudFront, WAF are Global.
 
 
 1
-##Cloud Computing?           
+##Cloud Computing    
 -------------------------------------------------
 Cloud computing is a computing service made available over the internet.
 Cloud computing is a pay-as-you-go model for delivering IT resources.
-
+   
 
 2
 ##AWS BasicInfo
 -------------------------------------------------
-AWS Global Infrastructure: 
-AWS: 
-  -Region
-  	-AvailableZone
-		-VPC 
-		-Router 
-		-Gateway
-		-Internet Gateway
-			-Subnet
-			-NACL
-				-EC2
-				-SecurityGroup
-
-
-
 Amazon web service is an online platform that provides scalable and cost-effective cloud computing solutions.
 AWS has Regions all around the world.
 
@@ -147,7 +132,6 @@ AWS:
 -Cost savings: You only pay for the compute power, storage, and other resources that you use, without any long-term commitments.
 -Scheduling: This enables you to start and stop AWS services at predetermined times
 -Reliability: AWS takes multiple backups at servers at multiple physical locations.
-
 
 
 AWS Use cases:
@@ -174,7 +158,6 @@ How to choose  and AWS Region?
  
  
  
- 
 4
 ##Availabiulity Zones |  AZ | az      
 -------------------------------------------------
@@ -183,8 +166,6 @@ Usually 3, Min 2 and Max 6;
 
 They’re separate from each other, so that they’re isolated from disasters.
 Each availability zone (AZ) is one or more discrete data centers with redundant power, networking, and connectivity.
-
-
 
 
 
@@ -199,10 +180,6 @@ CloudFront delivers your content through a worldwide network of data centers cal
 An edge location is the nearest point to the consumer(user) who is consuming the AWS service. 
 In these locations, the server is not present but a small setup is there. 
 They are located in major cities around the world.
-
-
-
-
 
 
 
@@ -224,7 +201,6 @@ RegionalServices:https://aws.amazon.com/about-aws/global-infrastructure/regional
 
 
 
-
 6
 ##IAM
 -------------------------------------------------
@@ -241,14 +217,19 @@ IAM Policies Structure:
 • Id: an identifier for the policy (optional) 
 • Statement: one or more individual statements (required)
 • Statements consists of:
-• Sid: an identifier for the statement (optional) 
-• Effect: whether the statement allows or denies access(Allow, Deny)
-• Principal: account/user/role to which this policy applied to 
-• Action: list of actions this policy allows or denies 
-• Resource: list of resources to which the actions applied to 
-• Condition: conditions for when this policy is in effect (optional)
+	• Sid: an identifier for the statement (optional) 
+	• Effect: whether the statement allows or denies access(Allow, Deny)
+	• Principal: account/user/role to which this policy applied to 
+	• Action: list of actions this policy allows or denies 
+	• Resource: list of resources to which the actions applied to 
+	• Condition: conditions for when this policy is in effect (optional)
 
-
+Custom inline policy single use, only for one role. cant able to add multiple role.
+When we create a custom policy:
+	-Select a resource which for this policy 
+	  like S3
+	-We can create this policy for specific resource 
+	  like we can set ARN of a backet or all backer
 
 Multi Factor Authentication - MFA:
 MFA = Password+Scurity device you own.
@@ -267,15 +248,15 @@ How can users access AWS, Three options:
 
 
 IAM Security Tools:
-IAM Credentials Report (account-level)
-• a report that lists all your account's users and the status of their various credentials.
+	IAM Credentials Report (account-level)
+		• a report that lists all your account's users and the status of their various credentials.
 
-IAM Access Advisor (user-level)
-IAM access advisor helps you audit service access, remove unnecessary permissions, and set 
-	zappropriate permissions providing the last timestamp when an 
-	IAM entity (e.g., user, role, or a group) accessed an AWS service.
-• Access advisor shows the service permissions granted to a user and when those services were last accessed.
-• You can use this information to revise your policies.
+	IAM Access Advisor (user-level)
+	IAM access advisor helps you audit service access, remove unnecessary permissions, and set 
+		zappropriate permissions providing the last timestamp when an 
+		IAM entity (e.g., user, role, or a group) accessed an AWS service.
+	• Access advisor shows the service permissions granted to a user and when those services were last accessed.
+	• You can use this information to revise your policies.
 
 
 Area:
@@ -6973,14 +6954,37 @@ It is a aws managed service, security is a shared responsibility.
 
 
 
+How to access from AccA   to AccB S3 ?
+
+Way1
+From AccA asumeRole using STS,the Role of AccB to Access S3 of AccB
+
+Way2
+Create a backet with the policy that allow the AccA in AccB.
+
+
+Example:Supose  From AccA, scan a DaynamoDB table and dump it to AccB.
+
+If you asumeRole from AccB, it not work. because you asume a role of AccB then you lost the access of you self account access.
+In this case you have to use resouece base policy.
+
+
+
+
+
 
 ++Amazon EventBridge – Security
 -------------------------------------------------
 • When a rule runs, it needs permissions from the target.
-• Resource-based policy: Lambda, SNS, SQS, CloudWatch Logs, API Gateway…
-• IAM role: Kinesis stream, Systems Manager Run Command, ECS task…
+	• Resource-based policy: Lambda, SNS, SQS, CloudWatch Logs, API Gateway…
+	• IAM role: Kinesis stream, Systems Manager Run Command, ECS task…
 
 
+++SSO
+-------------------------------------------------
+IAM identity center now SSO
+
+If multiple account if required then SSO.
 
 
 
@@ -7004,10 +7008,11 @@ You can use identity pools and user pools separately or together.
 
 AWS Cognito:
 • We want to give our users an identity so that they can interact with our application.
-Cognito User Pools:
+Cognito User Pools: appUser->CUP->ALBOrAPIGateway->LambdaOrOtherBackend
 	• Sign in functionality for app users
 	• Integrate with API Gateway
-Cognito Identity Pools (Federated Identity):
+Cognito Identity Pools (Federated Identity):appUser->CUP/ThardPartyuser->CIP->S3OrDaynamoDB.
+      For direct access AWS resource, without ALB or API Gateway.
 	• Provide AWS credentials to users so they can access AWS resources directly
 	• Integrate with Cognito User Pools as an identity provider
 Cognito Sync:
