@@ -2277,7 +2277,40 @@ Multivalue answer routing policy — Use when you want Route 53 to respond to DN
 
 
 
-In summary: Browser -> TLD -> NS -> SOA -> DNS record. The pipeline reverses when the correct DNS record is found.
+In summary: Browser -> TLD -> NS -> SOA -> DNS record. 
+The pipeline reverses when the correct DNS record is found.
+
+
+A Record:
+	A record (or Address record) value is always an IP address. The IP should be static i.e. it 
+	should not change frequently. For example, Elastic IPs in AWS are static IPs.
+
+CNAME Record:
+	CNAME record maps a name to another name. It can never be an IP address. 
+	Let’s understand it with a common use case from the industry.
+
+An A record for example.com (i.e. root/naked domain) points to the server IP address
+A CNAME record for www.example.com points to example.com
+
+
+
+Alias Record:
+	Alias record is an Amazon Route 53-specific virtual record.  So, it works only with Amazon Route 53. 
+	Whenever you come across questions related to mappings of Amazon specific resources/ services say 
+	Amazon ELBs (Elastic Load Balancers), Amazon CloudFront distributions, AWS Elastic 
+	Beanstalk environments, or Amazon S3 buckets that are configured as websites, it should ring a bell for you to 
+	consider Alias record in Route 53.
+
+
+A CNAME can’t be used for naked/root domain names. 
+Root domain names must be mapped with either an A record or an Alias record (in Route 53).
+
+
+ANS:
+	Alias record in Route 53 which handles this issue. 
+	Alias record will allow ELB DNS name (or any other DNS names produced by AWS services like CloudFront, S3 etc) 
+	to be mapped with the root domain name in Route 53.
+
 
 
 Route 53 – Record Types:
@@ -2290,9 +2323,19 @@ Route 53 – Record Types:
 • NS – Name Servers for the Hosted Zone
 • Control how traffic is routed for a domain
 
+
 Route53-TTL:
 The amount of time, in seconds, that you want DNS recursive resolvers to cache information about this record.
-Amazon Route 53 does not have a default TTL for any record type.
+
+High TTL – e.g., 24 hr
+	• Less traffic on Route 53
+	• Possibly outdated records
+• Low TTL – e.g., 60 sec.
+	• More traffic on Route 53 ($$)
+	• Records are outdated for less time
+	• Easy to change records
+Except for Alias records, TTL is mandatory for each DNS record
+
 
 Route53 - Health Check:
 Amazon Route 53 health checks monitor the health and performance of your web applications, web servers, and other resources. 
@@ -2302,15 +2345,26 @@ when a resource becomes unavailable.
 CNAME vs Alias:
 	• AWS Resources (Load Balancer, CloudFront...) expose an AWS hostname:
 	• lb1-1234.us-east-2.elb.amazonaws.com and you want myapp.mydomain.com
-CNAME:
-    • The target is a domain name which must have an A or AAAA record
-	• Points a hostname to any other hostname. (app.mydomain.com => blabla.anything.com)
-	• ONLY FOR NON ROOT DOMAIN (aka.something.mydomain.com)
-Alias:
-	• Points a hostname to an AWS Resource (app.mydomain.com => blabla.amazonaws.com)
-	• Works for ROOT DOMAIN and NON ROOT DOMAIN (aka.mydomain.com)
-	• Free of charge
-	• Native health check
+	CNAME:
+		• The target is a domain name which must have an A or AAAA record
+		• Points a hostname to any other hostname. (app.mydomain.com => blabla.anything.com)
+		• ONLY FOR NON ROOT DOMAIN (aka.something.mydomain.com)
+	Alias:
+		• Maps a hostname to an AWS resource
+		• An extension to DNS functionality
+		• Automatically recognizes changes in the resource’s IP addresses
+		• Unlike CNAME, it can be used for the top node of a DNS namespace (Zone Apex), e.g.: example.com
+		• Alias Record is always of type A/AAAA for AWS resources (IPv4 / IPv6)
+		• You can’t set the TTL
+
+
+Route 53 – Hosted Zones:
+• A container for records that define how to route traffic to a domain and its subdomains
+	• Public Hosted Zones – contains records that specify how to route traffic on the Internet (public domain names)
+	  application1.mypublicdomain.com
+	• Private Hosted Zones – contain records that specify how you route traffic within one or more VPCs (private domain names)
+	  application1.company.interna
+
 
 
 Alias Records Targets:
