@@ -2318,7 +2318,7 @@ Route 53 – Record Types:
 • AAAA – maps a hostname to IPv6
 • CNAME – maps a hostname to another hostname
 	• The target is a domain name which must have an A or AAAA record
-	• Can’t create a CNAME record for the top node of a DNS namespace (Zone Apex)
+	• Can’t create a CNAME record for the top node of a DNS namespace (Zone Apex->example.com)
 	• Example: you can’t create for example.com, but you can create for www.example.com
 • NS – Name Servers for the Hosted Zone
 • Control how traffic is routed for a domain
@@ -2368,19 +2368,24 @@ Route 53 – Hosted Zones:
 
 
 Alias Records Targets:
-• Elastic Load Balancers
-• CloudFront Distributions
-• API Gateway
-• Elastic Beanstalk environments
-• S3 Websites
-• VPC Interface Endpoints
-• Global Accelerator accelerator
-• Route 53 record in the same hosted zone
-You cannot set an ALIAS record for an EC2 DNS name
+	Elastic Load Balancers
+	CloudFront distributions
+	API Gateway
+	Elastic Beanstalk
+	S3 Website
+	Global Accelerator
+	VPC Interface Endpoints
+	Route 53 record in the same hosted zone
+Alias records do not support
+	EC2 DNS endpoint
+	RDS DNS endpoint
+CNAME record can redirect DNS queries to any DNS record
+
 
 
 Enable DNS Hostnames in your VPC — this creates and manages an invisible Route 53 Private Hosted zone. 
 
+https://www.whizlabs.com/blog/dns-records/
 
 Area:
 =====
@@ -2401,6 +2406,10 @@ Assign and access custom domain names in your Amazon Virtual Private Cloud (VPC)
 
 BillCost:
 =========
+
+Route 53 doesn’t charge for alias queries to AWS resources
+Route 53 charges for CNAME queries
+
 Managing hosted zones: You pay a monthly charge for each hosted zone managed with Route 53.
 Managing domain names: You pay an annual charge for each domain name registered via or transferred into Route 53.
 Serving DNS queries: You incur charges for every DNS query answered by the Amazon Route 53 service, except for queries to Alias A records.
@@ -2422,15 +2431,30 @@ Amazon Route 53 supports DNSSEC signing as well as DNSSEC for domain registratio
 
 
 
+==Classic Solutions Architecture
+• WhatIsTheTime.Com
+• MyClothes.Com
+• MyWordPress.Com
+• Instantiating applications quickly
+• Beanstalk 
 
 
 
 38
 ##AWS Elastic Beanstalk 
 -------------------------------------------------
+Beanstalk is PaaS (platform as a service) while CloudFormation,EC2 is IaC (infrastructure as code).
+
 AWS Elastic Beanstalk is an easy-to-use service for deploying and scaling web applications and services developed with 
 Java, .NET, PHP, Node.js, Python, Ruby, Go, and 
 Docker on familiar servers such as Apache, Nginx, Passenger, and IIS.
+
+If not supported, you can write your custom platform (advanced)
+
+
+Elastic Beanstalk takes care of the hosting infrastructure, coding language interpreter, operating system, 
+security, https service and application layer. 
+
 
 You can simply upload your code and Elastic Beanstalk automatically handles the deployment, from capacity provisioning, 
 load balancing, auto-scaling to application health monitoring. 
@@ -2439,12 +2463,7 @@ load balancing, auto-scaling to application health monitoring.
 Elastic Beanstalk isn't great if you need a lot of environment variables. 
 The simple reason is that Elastic Beanstalk has a hard limit of 4KB to store all key-value pairs.
 
-Beanstalk is PaaS (platform as a service) while CloudFormation is IaC (infrastructure as code).
 
-
-
-Elastic Beanstalk takes care of the hosting infrastructure, coding language interpreter, operating system, 
-security, https service and application layer. 
 
 
 
@@ -2482,7 +2501,7 @@ security group to your environment.
 
 
 
-
+==S3 Storage and Data Management
 
 39
 ##AmazonS3 | S3
@@ -2496,7 +2515,7 @@ By default, the maximum number of buckets that can be created per account is 100
 
 Object values are the content of the body:
 • Max Object Size is 5TB (5000GB)
-• If uploading more than 5GB, must use “multi-part upload”
+• If uploading more than 5GB, must use “multi-part upload” cecommmand for obj>100MB
 
 You can version your files in Amazon S3, It is enabled at the bucket level.
 
@@ -2506,7 +2525,6 @@ A lifecycle configuration is a set of rules that define actions that AWS S3 appl
 
 There are two types of actions:
 	Transaction Actions: This action defines objects’ transition from one storage class to another.
-
 	Expiration Actions: This action deletes objects in the Amazon S3 bucket.
 
 
@@ -2531,19 +2549,64 @@ There are 4 methods of encrypting objects in S3:
 EmaxTips:It’s important to understand which ones are adapted to which situation for the exam
 
 
+SSE-S3:
+	• SSE-S3: encryption using keys handled & managed by Amazon S3
+	• Object is encrypted server side
+	• AES-256 encryption type
+	• Must set header: “x-amz-server-side-encryption": "AES256"
+
+SSE-KMS:
+	• SSE-KMS: encryption using keys handled & managed by KMS
+	• KMS Advantages: user control + audit trail
+	• Object is encrypted server side
+	• Must set header: “x-amz-server-side-encryption": ”aws:kms"
+
+SSE-C:
+	• SSE-C: server-side encryption using data keys fully managed by the customer outside of AWS
+	• Amazon S3 does not store the encryption key you provide
+	• HTTPS is mandatory for SSE-C
+	• Encryption key must provided in HTTP headers, for every HTTP request made
+
+Client Side Encryption:
+	• Client library such as the Amazon S3 Encryption Client
+	• Customer fully manages the keys and encryption cycle
+
+
 
 API calls can be logged in AWS CloudTrail
 S3 can host static websites and have them accessible on the www
 
 
+
+S3 Security:
+User based
+	• IAM policies - which API calls should be allowed for a specific user from IAM console
+Resource Based
+	• Bucket Policies(JSON based policies) - bucket wide rules from the S3 console - allows cross account
+	• Object Access Control List (ACL) – finer grain
+	• Bucket Access Control List (ACL) – less common
+Note: an IAM principal can access an S3 object if
+	• the user IAM permissions allow it OR the resource policy ALLOWS it
+	• AND there’s no explicit DENY
+
+
+Use S3 bucket for policy to: 
+	• Grant public access to the bucket 
+	• Force objects to be encrypted at upload 
+	• Grant access to another account (Cross Account)
+
+
+
+
 CORS:
 • An origin is a scheme (protocol), host (domain) and port
 • Web Browser based mechanism to allow requests to other origins while visiting the main origin
-The requests won’t be fulfilled unless the other origin allows for the
-requests, using CORS Headers (ex: Access-Control-Allow-Origin)
-
-
-
+	The requests won’t be fulfilled unless the other origin allows for the
+	requests, using CORS Headers (ex: Access-Control-Allow-Origin)
+	
+• If a client does a cross-origin request on our S3 bucket, we need to enable the correct CORS headers
+• You can allow for a specific origin or for * (all origins)	
+ExamTip:It’s a popular exam question
 
 
 Area:
@@ -2585,16 +2648,6 @@ Bucket policies to configure permissions  for all objects within a single S3 buc
 
 
 
-
-S3 Security:
-User based
-	• IAM policies - which API calls should be allowed for a specific user from IAM console
-
-Resource Based
-	• Bucket Policies(JSON based policies) - bucket wide rules from the S3 console - allows cross account
-	• Object Access Control List (ACL) – finer grain
-	• Bucket Access Control List (ACL) – less common
-
 S3 Security - Other:
 Networking:
 	• Supports VPC Endpoints (for instances in VPC without www internet)
@@ -2615,7 +2668,7 @@ Encryption in flight is also called SSL / TLS.
 
 
 40
-##EC2 Instance Metadata
+##EAWS EC2 Instance Metadata
 -------------------------------------------------
 Instance metadata is data about your instance that you can use to configure or manage the running instance. 
 AWS EC2 Instance Metadata is powerful but one of the least known features to developers.
@@ -2630,9 +2683,15 @@ Userdata = launch script of the EC2 instance
 
 
 
+AWS SDK: Good to know: if you don’t specify or configure a default region, then
+us-east-1 will be chosen by default
 
 
 
+
+
+
+==Advanced S3
 41
 ##S3 MFA
 -------------------------------------------------
@@ -2659,6 +2718,7 @@ MFA (multi factor authentication) forces user to generate a code on a device
 Server access logging provides detailed records for the requests that are made to an Amazon S3 bucket. 
 Provide the name of the target bucket. This bucket is where you want Amazon S3 to save the access logs as objects. 
 Both the source and target buckets must be in the same AWS Region and owned by the same account.
+That data can be analyzed using data analysis tools.
 
 S3 Access Logs: Warning
 • Do not set your logging bucket to be the monitored bucket
@@ -2672,6 +2732,8 @@ There is no extra charge for enabling server access logging on an Amazon S3 buck
 43
 ##S3 Replication 
 -------------------------------------------------
+Must enable versioning in source and destination.
+
 Replication enables automatic, asynchronous copying of objects across  
 Amazon S3 buckets same AWS account or by different accounts. 
 You can replicate objects to a single destination bucket or to multiple destination buckets. 
@@ -2720,6 +2782,7 @@ Can generate pre-signed URLs using SDK or CLI
 • For downloads (easy, can use the CLI)
 • For uploads (harder, must use the SDK)
 • Users given a pre-signed URL inherit the permissions of the person who generated the URL for GET / PUT
+• Valid for a default of 3600 seconds, can change timeout with --expires-in [TIME_BY_SECONDS] argument
 
 UseCase :
 • Allow only logged-in users to download a premium video on your S3 bucket
@@ -2742,7 +2805,7 @@ S3 One Zone-Infrequent Access
 S3 Glacier Instant Retrieval
 S3 Glacier Flexible Retrieval
 S3 Glacier Deep Archive
-
+• Example: S3 standard has 99.99% availability = not available 53 minutes a year
 
 
 S3 Standard – General Purpose:
@@ -2754,9 +2817,20 @@ Use Cases: Big Data analytics, mobile & gaming applications, content distributio
 
 
 
+S3 Intelligent-Tiering:
+	• Small monthly monitoring and auto-tiering fee
+	• Moves objects automatically between Access Tiers based on usage
+	• There are no retrieval charges in S3 Intelligent-Tiering
+	• Frequent Access tier (automatic): default tier
+	• Infrequent Access tier (automatic): objects not accessed for 30 days
+	• Archive Instant Access tier (automatic): objects not accessed for 90 days
+	• Archive Access tier (optional): configurable from 90 days to 700+ days
+	• Deep Archive Access tier (optional): config. from 180 days to 700+ days
+
+
 S3 Infrequent Access:
-• For data that is less frequently accessed, but requires rapid access when needed
-• Lower cost than S3 Standard
+	• For data that is less frequently accessed, but requires rapid access when needed
+	• Lower cost than S3 Standard
 
 •S3 Standard-Infrequent Access (S3 Standard-IA)
 	• 99.9% Availability
@@ -2771,28 +2845,15 @@ S3 Infrequent Access:
 S3 Glacier Storage Classes:
 	• Low-cost object storage meant for archiving / backup
 	• Pricing: price for storage + object retrieval cost
-	
-• S3 Glacier Instant Retrieval
-	• Millisecond retrieval, great for data accessed once a quarter
-	• Minimum storage duration of 90 days
-• S3 Glacier Flexible Retrieval (formerly Amazon S3 Glacier):
-	• Expedited (1 to 5 minutes), Standard (3 to 5 hours), Bulk (5 to 12 hours) – free
-	• Minimum storage duration of 90 days
-• S3 Glacier Deep Archive – for long term storage:
-	• Standard (12 hours), Bulk (48 hours)
-	• Minimum storage duration of 180 days
-
-
-S3 Intelligent-Tiering:
-	• Small monthly monitoring and auto-tiering fee
-	• Moves objects automatically between Access Tiers based on usage
-	• There are no retrieval charges in S3 Intelligent-Tiering
-	• Frequent Access tier (automatic): default tier
-	• Infrequent Access tier (automatic): objects not accessed for 30 days
-	• Archive Instant Access tier (automatic): objects not accessed for 90 days
-	• Archive Access tier (optional): configurable from 90 days to 700+ days
-	• Deep Archive Access tier (optional): config. from 180 days to 700+ days
-
+	• S3 Glacier Instant Retrieval
+		• Millisecond retrieval, great for data accessed once a quarter
+		• Minimum storage duration of 90 days
+	• S3 Glacier Flexible Retrieval (formerly Amazon S3 Glacier):
+		• Expedited (1 to 5 minutes), Standard (3 to 5 hours), Bulk (5 to 12 hours) – free
+		• Minimum storage duration of 90 days
+	• S3 Glacier Deep Archive – for long term storage:
+		• Standard (12 hours), Bulk (48 hours)
+		• Minimum storage duration of 180 days
 
 You can transition objects between storage classes 
 Moving objects can be automated using a lifecycle configuration
@@ -2831,6 +2892,7 @@ Expiration actions: configure objects to expire (delete) after some time
 • Report is updated daily
 • Takes about 24h to 48h hours to first start
 • Good first step to put together Lifecycle Rules (or improve them)!
+
 
 
 
@@ -2877,6 +2939,7 @@ S3 Transfer Acceleration:
 ##S3 Event Nofifications
 -------------------------------------------------
 Can create as many “S3 events” as desired
+S3 event notifications typically deliver events in seconds but can sometimes take a minute or longer.
 
 You can use the Amazon S3 Event Notifications feature to receive notifications when certain events happen in your S3 bucket. 
 To enable notifications, add a notification configuration that identifies the events that you want Amazon S3 to publish. 
@@ -2884,6 +2947,11 @@ Make sure that it also identifies the destinations where you want Amazon S3 to s
 
 You store this configuration in the notification subresource that's associated with a bucket
 
+
+S3 Event Notifications with Amazon EventBridge:
+	• Advanced filtering options with JSON rules (metadata, object size, name...)
+	• Multiple Destinations – ex Step Functions, Kinesis Streams / Firehose…
+	• EventBridge Capabilities – Archive, Replay Events, Reliable delivery
 
 
 UseCase:
@@ -2945,15 +3013,14 @@ S3 Object Lock (versioning must be enabled):
 
 
 S3 – Access Points:
-• Each Access Point gets its own DNS and policy to limit who can access it
-• A specific IAM user / group
-• One policy per Access Point => Easier to manage than complex bucket policies
+	• Each Access Point gets its own DNS and policy to limit who can access it
+	• A specific IAM user / group
+	• One policy per Access Point => Easier to manage than complex bucket policies
 
 
 
 S3 Object Lambda:
-Use AWS Lambda Functions to change the object before it is retrieved by the caller application
-
+Use AWS Lambda Functions to change the object before it is retrieved by the caller application.
 Only one S3 bucket is needed, on top of which we create S3 Access Point and S3 Object Lambda Access Points.
 
 Use Cases:
@@ -3002,7 +3069,7 @@ Security is a shared responsibility.
 
 
 
-
+==Global Infrastructure
 52
 ##CloudFront
 -------------------------------------------------
