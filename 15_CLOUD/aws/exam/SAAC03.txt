@@ -1188,6 +1188,7 @@ EFS mount targets associated with the file system.
 
 
 
+==AWS Fundamentals–Part II
 
 27
 ##Scalability & High Availability
@@ -1288,7 +1289,7 @@ which is an integral part of your billing calculation, along with the region you
 
 Security:
 =========
-Security Group in Load Balancer => Application Security Group: Allow traffic only from Load Balancer.
+Security Group of Load Balancer => Application Security Group, Allow traffic only from Load Balancer.
 
 Ensure your ELBs do not use insecure or deprecated SSL ciphers.
 Ensure that your AWS ELBs listeners are using a secure protocol (HTTPS or SSL).
@@ -1490,6 +1491,7 @@ You deploy the Gateway Load Balancer in the same VPC as the virtual appliances.
 
 
 https://docs.aws.amazon.com/vpc/latest/privatelink/vpce-gateway-load-balancer.html
+https://aws.amazon.com/blogs/aws/introducing-aws-gateway-load-balancer-easy-deployment-scalability-and-high-availability-for-partner-appliances/
 
 Area:
 =====
@@ -1535,7 +1537,7 @@ targets must use IP addresses to allow traffic from the load balancer
 ##Sticky Sessions (Session Affinity)
 -------------------------------------------------
 It is possible to implement stickiness so that the same client is always redirected to the 
-same instance behind a load balancer
+  same instance behind a load balancer.
 • This works for Classic Load Balancers & Application Load Balancers
 • The “cookie” used for stickiness has an expiration date you control
 • Enabling stickiness may bring imbalance to the load over the backend EC2 instances 
@@ -1564,12 +1566,11 @@ Sticky Sessions – Cookie:
 
 
 Cross-Zone Load Balancing:
-With Cross Zone Load Balancing  each load balancer instance distributes evenly
-across all registered instances in all AZ.(All Host==Host)
+	With Cross Zone Load Balancing  each load balancer instance distributes evenly
+	across all registered instances in all AZ.(All Host==Host)
 
-Without Cross Zone Load Balancing: Requests are distributed in the instances of the
-node of the Elastic Load Balancer (All AZ == AZ)
-
+	Without Cross Zone Load Balancing: Requests are distributed in the instances of the
+	node of the Elastic Load Balancer (All AZ == AZ)
 
 
 Cross-Zone Load Balancing:
@@ -1582,6 +1583,7 @@ Cross-Zone Load Balancing:
 • Classic Load Balancer 
 	• Disabled by default 
 	• No charges for inter AZ data if enabled
+
 
 
 SSL/TLS - Basics:
@@ -1606,9 +1608,7 @@ HTTPS listener:
 • Ability to specify a security policy to support older versions of SSL / TLS (legacy clients)
 
 
-
-SSL:
-Server Name Indication (SNI):
+SSL-Server Name Indication (SNI):
 • SNI solves the problem of loading multiple SSL certificates onto one web server (to serve multiple websites)
 • The server will then find the correct certificate, or return the default one
 Note:
@@ -1634,8 +1634,15 @@ Network Load Balancer (v2)
 Connection Draining:
 Stops sending new requests to the EC2 instance which is willing to de-registering.
 
+When Connection Draining is enabled and configured, the process of deregistering an instance from an 
+Elastic Load Balancer gains an additional step. For the duration of the configured timeout, 
+the load balancer will allow existing, in-flight requests made to an instance to complete, 
+but it will not send any new requests to the instance.
+
 AWS ELB connection draining prevents breaking open network connections while taking an instance out of service, 
 updating its software, or replacing it with a fresh instance that contains updated software.
+
+
 
 
 Feature naming (Call same feature different way ! ):
@@ -1680,28 +1687,30 @@ Auto Scaling Group Attributes:
 It is possible to scale an ASG based on CloudWatch alarms
 An alarm monitors a metric (such as Average CPU, or a custom metric)
 
-Auto Scaling Groups – Dynamic Scaling Policies:
-Target Tracking Scaling:
-• Most simple and easy to set-up
-• Example: I want the average ASG CPU to stay at around 40%
 
-Simple / Step Scaling:
-• When a CloudWatch alarm is triggered (example CPU > 70%), then add 2 units
-• When a CloudWatch alarm is triggered (example CPU < 30%), then remove 1
+Dynamic Scaling Policies:
+	Target Tracking Scaling:
+	• Most simple and easy to set-up
+	• Example: I want the average ASG CPU to stay at around 40%
 
-Scheduled Actions:
-• Anticipate a scaling based on known usage patterns
-• Example: increase the min capacity to 10 at 5 pm on Fridays
+	Simple / Step Scaling:
+	• When a CloudWatch alarm is triggered (example CPU > 70%), then add 2 units
+	• When a CloudWatch alarm is triggered (example CPU < 30%), then remove 1
+
+	Scheduled Actions:
+	• Anticipate a scaling based on known usage patterns
+	• Example: increase the min capacity to 10 at 5 pm on Fridays
 
 
 Manual scaling:
-At any time, you can change the size of an existing Auto Scaling group manually.
+	At any time, you can change the size of an existing Auto Scaling group manually.
 
 Predictive scaling: 
-Continuously forecast load and schedule scaling ahead.
+	Continuously forecast load and schedule scaling ahead.
+
 
 Cooldown period:
-mAfter a scaling activity happens, you are in the cooldown period (default 300 seconds = 5M).
+After a scaling activity happens, you are in the cooldown period (default 300 seconds = 5M).
 During the cooldown period, the ASG will not launch or terminate additional instances (to allow for metrics to stabilize)
 Advice: Use a ready-to-use AMI to reduce configuration time in order to be serving request fasters and reduce the cooldown period.
 
@@ -1714,10 +1723,10 @@ ASG Lifecycle Hooks:
 
 
 Launch Configuration (legacy,deprecated):
-• Must be re-created every time
+	• Must be re-created every time
 Launch Template (newer):
-• Can have multiple versions
-• Create parameters subsets (partial configuration for re-use and inheritance)
+	• Can have multiple versions
+	• Create parameters subsets (partial configuration for re-use and inheritance)
 
 
 
@@ -1738,7 +1747,7 @@ IMPROVE FAULT TOLERANC
 
 BillCost:
 =========
-ASG are free (you only pay for the underlying EC2 instances),.
+ASG are free (you only pay for the underlying EC2 instances).
 
 
 
@@ -1779,6 +1788,7 @@ RDS is a managed service:
 • BUT you can’t SSH into your instances
 
 Supports all RDS database engines (MariaDB, MySQL,PostgreSQL, SQL Server, Oracle)
+
 
 
 RDS Read Replicas for read scalability: 
@@ -1854,6 +1864,7 @@ RDS – From Single-AZ to Multi-AZ:
 	• Enable native features
 	• Access the underlying EC2 Instance using SSH or SSM Session Manager
 • De-activate Automation Mode to perform your customization, better to take a DB snapshot before
+
 • RDS vs. RDS Custom
 	• RDS: entire database and the OS to be managed by AWS
 	• RDS Custom: full admin access to the underlying OS and the database
@@ -2042,7 +2053,7 @@ Aurora Cross Region Read Replicas, Useful for disaster recovery.
 BillCost:
 =========
 Prices vary according to the region.
-With Amazon Aurora Global Database, you pay for replicated write I/Os between the primary Region and each secondary Region.
+With Amazon Aurora Global Database, you pay for replicated write I/Os between the primary Region and each secofndary Region.
 
 
 
@@ -2061,9 +2072,8 @@ It is a aws managed service, security is a shared responsibility.
 
 Aurora - Backup and Monitoring
 -------------------------------------------------
-
 RDS Backups:
-• Automated backups:
+• Automated backups
 • Daily full backup of the database (during the maintenance window)
 • Transaction logs are backed-up by RDS every 5 minutes
 • => ability to restore to any point in time (from oldest backup to 5 minutes ago)
@@ -2089,14 +2099,14 @@ Aurora Backups:
 
 RDS & Aurora Restore options:
 • Restoring a RDS / Aurora backup or a snapshot creates a new database
-• Restoring MySQL RDS database from S3
-	• Create a backup of your on-premises database
-	• Store it on Amazon S3 (object storage)
-	• Restore the backup file onto a new RDS instance running MySQL
-• Restoring MySQL Aurora cluster from S3
-	• Create a backup of your on-premises database using Percona XtraBackup
-	• Store the backup file on Amazon S3
-	• Restore the backup file onto a new Aurora cluster running MySQL
+	• Restoring MySQL RDS database from S3
+		• Create a backup of your on-premises database
+		• Store it on Amazon S3 (object storage)
+		• Restore the backup file onto a new RDS instance running MySQL
+	• Restoring MySQL Aurora cluster from S3
+		• Create a backup of your on-premises database using Percona XtraBackup
+		• Store the backup file on Amazon S3
+		• Restore the backup file onto a new Aurora cluster running MySQL
 
 
 
@@ -2129,16 +2139,16 @@ Aurora Database Cloning:
 ++RDS Proxy
 -------------------------------------------------
 Amazon RDS Proxy:
-• Fully managed database proxy for RDS
-• Allows apps to pool and share DB connections established with the database
-• Improving database efficiency by reducing the stress on database resources (e.g., CPU, RAM) and
-  minimize open connections (and timeouts)
-• Serverless, autoscaling, highly available (multi-AZ)
-• Reduced RDS & Aurora failover time by up 66%
-• Supports RDS (MySQL, PostgreSQL, MariaDB) and Aurora (MySQL, PostgreSQL)
-• No code changes required for most apps
-• Enforce IAM Authentication for DB, and securely store credentials in AWS Secrets Manager
-• RDS Proxy is never publicly accessible (must be accessed from VPC)
+	• Fully managed database proxy for RDS
+	• Allows apps to pool and share DB connections established with the database
+	• Improving database efficiency by reducing the stress on database resources (e.g., CPU, RAM) and
+	  minimize open connections (and timeouts)
+	• Serverless, autoscaling, highly available (multi-AZ)
+	• Reduced RDS & Aurora failover time by up 66%
+	• Supports RDS (MySQL, PostgreSQL, MariaDB) and Aurora (MySQL, PostgreSQL)
+	• No code changes required for most apps
+	• Enforce IAM Authentication for DB, and securely store credentials in AWS Secrets Manager
+	• RDS Proxy is never publicly accessible (must be accessed from VPC)
 
 
 
@@ -2149,6 +2159,11 @@ Amazon RDS Proxy:
 -------------------------------------------------
 The same way RDS is to get managed Relational Databases.
 ElastiCache is to get managed Redis or Memcached.
+
+• Helps reduce load off of databases for read intensive workloads
+• Helps make your application stateless
+• AWS takes care of OS maintenance / patching, optimizations, setup, configuration, monitoring, failure recovery and backups
+• Using ElastiCache involves heavy application code changes
 
 Amazon ElastiCache is a web service that makes it easy to deploy, operate, and scale an in-memory data store or 
 cache in the cloud.
@@ -2202,7 +2217,7 @@ session stores, gaming leaderboards, streaming, and analytics
 
 BillCost:
 =========
-750 hours free For 12 months with the AWS Free Tier.
+AWS Free Tier.
 You are charged hourly based on the number of nodes, node type, and pricing model you select. 
 ElastiCache supports both on-demand nodes, which allow you to pay by hour with no long-term commitments, and reserved 
 nodes, which offer discounts for customers who commit to either one-year or three-year terms.
