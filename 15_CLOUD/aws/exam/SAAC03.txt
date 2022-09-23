@@ -162,12 +162,19 @@ Each availability zone (AZ) is one or more discrete data centers with redundant 
 ##Edge Locations
 -------------------------------------------------
 Edge locations are AWS data centers designed to deliver services with the lowest latency possible.
+Edge location is a physical location where AWS has its servers that are used to stores cdn caching.
 CloudFront delivers your content through a worldwide network of data centers called edge locations.
 
 An edge location is the nearest point to the consumer(user) who is consuming the AWS service. 
 In these locations, the server is not present but a small setup is there. 
 They are located in major cities around the world.
 
+
+Uses:
+	CloudFront: It makes use of edge locations to cache versions of the data it provides, 
+	            allowing the content to be delivered to users more quickly.
+	Route 53: It delivers DNS responses from edge locations, allowing DNS queries to be resolved more quickly.
+	AWS Shield and Web Application Firewall: It screens traffic in edge locations to prevent undesired traffic.
 
 
 AWS has Global Services:
@@ -3020,14 +3027,24 @@ S3 – Access Points:
 
 
 S3 Object Lambda:
+S3 Object Lambda supports only GetObject requests. 
 Use AWS Lambda Functions to change the object before it is retrieved by the caller application.
 Only one S3 bucket is needed, on top of which we create S3 Access Point and S3 Object Lambda Access Points.
 
 Use Cases:
-	• Redacting personally identifiable information for analytics or non- production environments.
-	• Converting across data formats, such as converting XML to JSON.
-	• Resizing and watermarking images on the fly using caller-specific details, such as the user who requested the object.
+	Redacting personally identifiable information for analytics or non-production environments.
+	Converting across data formats, such as converting XML to JSON.
+	Augmenting data with information from other services or databases.
+	Compressing or decompressing files as they are being downloaded.
+	Resizing and watermarking images on the fly using caller-specific details, such as the user who requested the object.
+	Implementing custom authorization rules to access data.
 
+Element:
+The S3 bucket
+An S3 Bucket Access Point
+An S3 Object Lambda Access Point
+
+ClientGetReqRes->S3ObjectLambdaAccessPoint->S3BucketAccessPoint->S3
 
 
 S3 Batch Operations:
@@ -3073,6 +3090,9 @@ Security is a shared responsibility.
 52
 ##CloudFront
 -------------------------------------------------
+UserReq->CloudFront->EdgeLocation->WebServer
+
+CloudFront delivers your content through a worldwide network of data centers called edge locations.
 CloudFront is Amazon’s content delivery network that is primarily used to speed up websites. 
 It’s particularly useful for large, static assets—like images and videos. 
 
@@ -3191,7 +3211,17 @@ geographical area, keeping their needs in the forefront.
 
 BillCost:
 =========
-AWS CloudFront is in Free Tier.
+AWS CloudFront is in Free Tier
+Charge for storage in an S3 bucket.
+	Charge for serving objects from edge locations.
+	Data Transfer Out
+	Charge for submitting data to your origin.
+	Data Transfer Out
+	HTTP/HTTPS Requests
+	Invalidation Requests,
+	Dedicated IP Custom SSL certificates associated with a CloudFront distribution.
+You also incur a surcharge for HTTPS requests, and an additional surcharge for requests that also have field-level encryption enabled
+
 Pricing varies by usage type, geographical region, and feature selection.
 
 
@@ -3863,49 +3893,51 @@ Attributes:
 • Can have duplicate messages (at least once delivery, occasionally)
 • Can have out of order messages (best effort ordering)
 
+
 Produced:
-• Produced to SQS using the SDK (SendMessage API)
-• The message is persisted in SQS until a consumer deletes it
-• Message retention: default 4 days, up to 14 days
+	• Produced to SQS using the SDK (SendMessage API)
+	• The message is persisted in SQS until a consumer deletes it
+	• Message retention: default 4 days, up to 14 days
+
 
 Consuming:
-• Consumers (running on EC2 instances, servers, or AWS Lambda)…
-• Poll SQS for messages (receive up to 10 messages at a time)
-• Process the messages (example: insert the message into an RDS database)
-• Delete the messages using the DeleteMessage API
+	• Consumers (running on EC2 instances, servers, or AWS Lambda)…
+	• Poll SQS for messages (receive up to 10 messages at a time)
+	• Process the messages (example: insert the message into an RDS database)
+	• Delete the messages using the DeleteMessage API
 
 
 Message Visibility Timeout:
-• After a message is polled by a consumer, it becomes invisible to other consumers
-• By default, the “message visibility timeout” is 30 seconds
-• That means the message has 30 seconds to be processed consumer need more time to process then consumer 
-  clud call ChangeMessageVisible API to  get more time.
-• After the message visibility timeout is over, the message is “visible” in SQS again for every consumer
+	• After a message is polled by a consumer, it becomes invisible to other consumers
+	• By default, the “message visibility timeout” is 30 seconds
+	• That means the message has 30 seconds to be processed consumer need more time to process then consumer 
+	  clud call ChangeMessageVisible API to  get more time.
+	• After the message visibility timeout is over, the message is “visible” in SQS again for every consumer
 
 
 
 Dead Letter Queue:
-• We can set a threshold of how many times a message can go back to the queue
-• After the MaximumReceives threshold is exceeded, the message goes into a dead letter queue (DLQ)
-• Useful for debugging!  Good to set a retention of 14 days in the DLQ
+	• We can set a threshold of how many times a message can go back to the queue
+	• After the MaximumReceives threshold is exceeded, the message goes into a dead letter queue (DLQ)
+	• Useful for debugging!  Good to set a retention of 14 days in the DLQ
 
 
 
 Delay Queue:
-• Delay a message (consumers don’t see it immediately) up to 15 minutes
-• Default is 0 seconds (message is available right away)
-• Can set a default at queue level
-• Can override the default on send using the DelaySeconds parameter
+	• Delay a message (consumers don’t see it immediately) up to 15 minutes
+	• Default is 0 seconds (message is available right away)
+	• Can set a default at queue level
+	• Can override the default on send using the DelaySeconds parameter
 
 
 
 Long Polling:
-• When a consumer requests messages from the queue, it can optionally “wait” for messages to
-   arrive if there are none in the queue
-• This is called Long Polling
-• LongPolling decreases the number of API calls made to SQS while increasing the efficiency and
-  reducing latency of your application
-• The wait time can be between 1 sec to 20 sec (20 sec preferable)
+	• When a consumer requests messages from the queue, it can optionally “wait” for messages to
+	  arrive if there are none in the queue
+	• This is called Long Polling
+	• LongPolling decreases the number of API calls made to SQS while increasing the efficiency and
+	  reducing latency of your application
+	• The wait time can be between 1 sec to 20 sec (20 sec preferable)
 
 
 
@@ -3975,8 +4007,42 @@ CloudWatch Metric – Queue Length ApproximateNumberOfMessages and scale EC2
 
 
 
-
 61
+##AWS SNS(Simple Notification Service)
+--------------------------------------------------
+Anytime multiple services need to receive the same event, you should consider SNS rather than SQS.
+
+It provides much more functionality than just the ability to send push notifications (emails, SMS, and mobile push). 
+In fact, it’s a serverless publish-subscribe messaging system allowing to send events to multiple 
+applications (subscribers) at the same time (fan-out), 
+including SQS queues, Lambda functions, Kinesis Data Streams, and generic HTTP endpoints. 
+
+In order to use the service, we only need to:
+create a topic,
+subscribe to a topic,
+confirm the subscription,
+start sending events to a topic to deliver them to all subscribers (potentially multiple applications and people).
+
+
+• The “event producer” only sends message to one SNS topic
+• As many “event receivers” (subscriptions) as we want to listen to the SNS topic notifications
+• Each subscriber to the topic will get all the messages (note: new feature to filter messages)
+• Up to 12,500,000 subscriptions per topic
+• 100,000 topics limit
+
+
+Many AWS services can send data directly to SNS for notifications:
+	CloudWatch Alarms
+	S3 Bucket (Events)
+	Auto Scaling Group (Notifications)
+	CloudFormation (State Changes)
+	AWS Budgets Lambda
+	AWS DMS (New Replic)
+	DynamoDB
+	RDS Events
+	 
+
+62
 ##SNS and SQS | FanOut Pattern
 -------------------------------------------------
 Amazon Simple Notification Service (Amazon SNS) is a fully managed messaging service for both 
@@ -3998,23 +4064,28 @@ Fan Out:
 
 
 Amazon SNS – FIFO Topic:
-• FIFO = First In First Out (ordering of messages in the topic)
-• Ordering by Message Group ID (all messages in the same group are ordered)
-• Deduplication using a Deduplication ID or Content Based Deduplication
-• Can only have SQS FIFO queues as subscribers
-• Limited throughput (same throughput as SQS FIFO)
+	• FIFO = First In First Out (ordering of messages in the topic).
+	• Ordering by Message Group ID (all messages in the same group are ordered).
+	• Deduplication using a Deduplication ID or Content Based Deduplication.
+	• Can only have SQS FIFO queues as subscribers.
+	• Limited throughput (same throughput as SQS FIFO).
+
 
 
 Message Filtering:
-• JSON policy used to filter messages sent to SNS topic’s subscriptions
-• If a subscription doesn’t have a filter policy, it receives every message
+	• JSON policy used to filter messages sent to SNS topic’s subscriptions
+	• If a subscription doesn’t have a filter policy, it receives every message
+
 
 
 SNS can send to Kinesis and therefore we can have the following solutions architecture.
 
+
+
 Area:
 =====
 Regioinal.
+
 
 
 UseCase:
@@ -4057,25 +4128,6 @@ Amazon SNS also supports VPC endpoints via AWS PrivateLink, so you can privately
 Amazon Virtual Private Cloud (VPC) subnet, without traversing the Internet.
 
 
-
-
-
-
-62
-##AWS SNS(Simple Notification Service)
---------------------------------------------------
-Anytime multiple services need to receive the same event, you should consider SNS rather than SQS.
-
-It provides much more functionality than just the ability to send push notifications (emails, SMS, and mobile push). 
-In fact, it’s a serverless publish-subscribe messaging system allowing to send events to multiple 
-applications (subscribers) at the same time (fan-out), 
-including SQS queues, Lambda functions, Kinesis Data Streams, and generic HTTP endpoints. 
-
-In order to use the service, we only need to:
-create a topic,
-subscribe to a topic,
-confirm the subscription,
-start sending events to a topic to deliver them to all subscribers (potentially multiple applications and people).
 
 
 
