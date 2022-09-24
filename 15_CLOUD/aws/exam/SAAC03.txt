@@ -6409,11 +6409,13 @@ Use a single platform for observability, Collect metrics on AWS and on premises.
 
 
 
+
+
 97
 ##CloudWatch 
 -------------------------------------------------
-Amazon CloudWatch is a monitoring and observability service built for DevOps engineers, developers, site reliability engineers (SREs), 
-IT managers, and product owners.
+Amazon CloudWatch is a monitoring and observability service built for DevOps engineers, developers, site reliability 
+engineers (SREs), IT managers, and product owners.
 
 CloudWatch enables you to monitor your complete stack (applications, infrastructure, and services) and use alarms, 
 logs, and events data to take automated actions and reduce mean time to resolution (MTTR). 
@@ -6469,6 +6471,7 @@ It is a aws managed service, security is a shared responsibility.
 
 
 
+
 98
 ##AWS CloudWatch Metrics
 -------------------------------------------------
@@ -6490,6 +6493,7 @@ for search, graphing, and alarms.
 • Can create CloudWatch dashboards of metrics
 • Can create CloudWatch Custom Metrics (for the RAM for example)
 
+Option to filter metrics to only stream a subset of them
 
 
 
@@ -6509,7 +6513,7 @@ Possibility to define and send your own custom metrics to CloudWatch
 
 
 Important: Accepts metric data points two weeks in the past and two hours in the
-future (make sure to configure your EC2 instance time correctly)
+           future (make sure to configure your EC2 instance time correctly)
 
 
 
@@ -6552,6 +6556,7 @@ BillCost:
 Security:
 =========
 It is a aws managed service, security is a shared responsibility.
+
 
 
 
@@ -6610,10 +6615,10 @@ CloudWatch Logs can send logs to:
 
 
 CloudWatch Logs for EC2:
-• By default, no logs from your EC2 machine will go to CloudWatch
-• You need to run a CloudWatch agent on EC2 to push the log files you want
-• Make sure IAM permissions are correct
-• The CloudWatch log agent can be setup on-premises too
+	• By default, no logs from your EC2 machine will go to CloudWatch
+	• You need to run a CloudWatch agent on EC2 to push the log files you want
+	• Make sure IAM permissions are correct
+	• The CloudWatch log agent can be setup on-premises too
 
 
 
@@ -6642,6 +6647,7 @@ There are 2 components to the price you pay:
 Security:
 =========
 It is a aws managed service, security is a shared responsibility.
+
 
 
 
@@ -7077,6 +7083,8 @@ It is a aws managed service, security is a shared responsibility.
 
 
 
+
+==Advanced Identity in AWS
 106
 ##Organizations
 -------------------------------------------------
@@ -7260,8 +7268,10 @@ In this case you have to use resouece base policy.
 ++SSO
 -------------------------------------------------
 IAM identity center now SSO
-
 If multiple account if required then SSO.
+
+
+
 
 
 
@@ -7298,21 +7308,21 @@ Cognito Sync:
 
 
 Cognito User Pools (CUP):
-• Create a serverless database of user for your mobile apps
-• Simple login: Username (or email) / password combination
-• Possibility to verify emails / phone numbers and add MFA
-• Can enable Federated Identities (Facebook, Google, SAML…)
-• Sends back a JSON Web Tokens (JWT)
-• Can be integrated with API Gateway for authentication
+	• Create a serverless database of user for your mobile apps
+	• Simple login: Username (or email) / password combination
+	• Possibility to verify emails / phone numbers and add MFA
+	• Can enable Federated Identities (Facebook, Google, SAML…)
+	• Sends back a JSON Web Tokens (JWT)
+	• Can be integrated with API Gateway for authentication
 
 
 Cognito Identity Pools (Federated Identities):
-• Get identities for “users” so they obtain temporary AWS credentials
-• Users source can be Cognito User Pools, 3rd party logins, etc…
-• Users can then access AWS services directly or through API Gateway
-• The IAM policies applied to the credentials are defined in Cognito
-• They can be customized based on the user_id for fine grained control
-• Default IAM roles for authenticated and guest users
+	• Get identities for “users” so they obtain temporary AWS credentials
+	• Users source can be Cognito User Pools, 3rd party logins, etc…
+	• Users can then access AWS services directly or through API Gateway
+	• The IAM policies applied to the credentials are defined in Cognito
+	• They can be customized based on the user_id for fine grained control
+	• Default IAM roles for authenticated and guest users
 
 
 
@@ -7402,6 +7412,8 @@ AWS IAM Identity Center (successor to AWS SSO)
 
 
 
+
+==AWS Security & Encryption
 110
 ##AWS Security & Encryption
 -------------------------------------------------
@@ -7419,14 +7431,6 @@ AWS provides services that help you protect your data, accounts, and workloads f
 111
 ##Encryption 101
 -------------------------------------------------
-AES-256 is the technology we use to encrypt data in AWS, including Amazon Simple Storage Service (S3) server-side encryption.
-It would take at least a trillion years to break using current computing technology.
-
-Each message is encrypted under a unique data key. Then the data key is encrypted by the wrapping keys you specify. 
-To decrypt the encrypted message, the AWS Encryption SDK uses the wrapping keys you specify to decrypt at least one 
-encrypted data key. Then it can decrypt the ciphertext and return a plaintext message.
-
-
 Encryption in flight (SSL):
 	• Data is encrypted before sending and decrypted after receiving
 	• SSL certificates help with encryption (HTTPS)
@@ -8373,10 +8377,13 @@ Area:
 MayRegional.
 
 
+
 UseCase:
 ========
 An internet gateway enables resources in your public subnets (such as EC2 instances) to connect to the internet 
 if the resource has a public IPv4 address or an IPv6 address.
+
+
 
 BillCost:
 =========
@@ -9315,7 +9322,7 @@ Network Firewall – Fine Grained Controls:
 
 
 
-
+==Disaster Recovery & Migrations
 162
 ##Disaster Recovery Overview
 -------------------------------------------------
