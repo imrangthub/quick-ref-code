@@ -4155,12 +4155,14 @@ can store their results using an AWS service such as Amazon DynamoDB, Amazon Red
 
 
 Kinesis Data Streams:
-• Streaming service for ingest at scale
-• Write custom code (producer / consumer)
-• Real-time (~200 ms)
-• Manage scaling (shard splitting / merging)
-• Data storage for 1 to 365 days
-• Supports replay capability
+• Retention between 1 day to 365 days
+• Ability to reprocess (replay) data
+• Once data is inserted in Kinesis, it can’t be deleted (immutability)
+• Data that shares the same partition goes to the same shard (ordering)
+	• Producers: AWS SDK, Kinesis Producer Library (KPL), Kinesis Agent
+	• Consumers:
+		• Write your own: Kinesis Client Library (KCL), AWS SDK
+		• Managed: AWS Lambda, Kinesis Data Firehose, Kinesis Data Analytics,
 
 
 Provisioned mode:
@@ -4175,6 +4177,14 @@ On-demand mode:
 	• Pay per stream per hour & data in/out per GB
 
 
+
+Kinesis Data Streams Security:
+• Control access / authorization using IAM policies
+• Encryption in flight using HTTPS endpoints
+• Encryption at rest using KMS
+• You can implement encryption/decryption of data on client side (harder)
+• VPC Endpoints available for Kinesis to access within VPC
+• Monitor API calls using CloudTrail
 
 
 Kinesis Data Firehose:
@@ -4345,7 +4355,7 @@ Security is a shared responsibility.
 
 
 
-
+==Container Section
 65
 ##Amazon ECS
 -------------------------------------------------
@@ -4355,6 +4365,7 @@ scale containerized applications.
 Launch Docker containers on AWS = Launch ECS Tasks on ECS Clusters
 
 There are two models that you can use to run your containers:
+
 	EC2 Launch Type: you must provision & maintain the infrastructure (the EC2 instances)
 		• Each EC2 Instance must run the ECS Agent to register in the ECS Cluster
 		• AWS takes care of starting / stopping containers
@@ -4369,18 +4380,18 @@ There are two models that you can use to run your containers:
 
 
 
-The Fargate launch type is suitable for the following workloads:
-Large workloads that need to be optimized for low overhead
-Small workloads that have occasional burst
-Tiny workloads
-Batch workloads
+The Fargate suitable:
+	Large workloads that need to be optimized for low overhead
+	Small workloads that have occasional burst
+	Tiny workloads
+	Batch workloads
 
 
-The EC2 launch type is suitable for the following workloads:
-Workloads that require consistently high CPU core and memory usage
-Large workloads that need to be optimized for price
-Your applications need to access persistent storage
-You must directly manage your infrastructure
+The EC2 launch type is suitable:
+	Workloads that require consistently high CPU core and memory usage
+	Large workloads that need to be optimized for price
+	Your applications need to access persistent storage
+	You must directly manage your infrastructure
 
 
 
@@ -4431,12 +4442,25 @@ ECS Rolling Updates:
 • When updating from v1 to v2, we can control how many tasks can be started and stopped, and in which order
 
 
+Amazon ECS – IAM Roles for ECS:
+	• EC2 Instance Profile (EC2 Launch Type only):
+		• Used by the ECS agent
+		• Makes API calls to ECS service
+		• Send container logs to CloudWatch Logs
+		• Pull Docker image from ECR
+		• Reference sensitive data in Secrets Manager or SSM Parameter Store
+	• ECS Task Role:
+		• Allows each task to have a specific role
+		• Use different roles for the different ECS Services you run
+		• Task Role is defined in the task definition
 
 
+***
 ECS Task Role is the IAM Role used by the ECS task itself. 
 Use when your container wants to call other AWS services like S3, SQS, etc.
 
 
+***
 Amazon ECS – Data Volumes (EFS):
 • Mount EFS file systems onto ECS tasks
 • Works for both EC2 and Fargate launch types
@@ -4466,7 +4490,8 @@ Deploy in a hybrid environment: Build container-based applications on-premises o
 BillCost:
 =========
 Fargate is not on the free tier list. 
-Amazon ECS is always free. You pay for AWS resources (e.g. EC2 instances, EBS volumes, and memory) you 
+Amazon ECS is always free. 
+You pay for AWS resources (e.g. EC2 instances, EBS volumes, and memory) you 
 create to store and run your application.
 
 Amazon ECS pricing is dependent on whether you use AWS Fargate or Amazon EC2 infrastructure to host your 
@@ -4479,7 +4504,7 @@ Security:
 We can add security group for ECS and ECS Task.
 
 Your EC2 instances use an IAM role to access the ECS/ECR service.
-Your ECS tasks use an IAM role to access services and resources.
+ECS Task Role use to access services and resources.
 Security Groups and networks ACLs allow you to control inbound and outbound network access to and from your instances.
 
 
@@ -4623,8 +4648,11 @@ Application integration:
 	Amazon SNS: Amazon Simple Notification Service (SNS) is a fully managed messaging service for both ]
 	application-to-application (A2A) and application-to-person (A2P) communication.
 
-Amazon API Gateway: Amazon API Gateway is a fully managed service that makes it easy to create and publish APIs at any scale.
-AWS AppSync: AWS AppSync is a fully managed service that accelerates application development with scalable GraphQL APIs.
+Amazon API Gateway: 
+	Amazon API Gateway is a fully managed service that makes it easy to create and publish APIs at any scale.
+
+AWS AppSync: 
+	AWS AppSync is a fully managed service that accelerates application development with scalable GraphQL APIs.
 
 
 Data store:
@@ -4673,6 +4701,7 @@ Security is a shared responsibility.
 -------------------------------------------------
 AWS Lambda is a serverless, event-driven compute service that lets you run code for virtually any type of 
 application or backend service without provisioning or managing servers. 
+
 You can trigger Lambda from over 200 AWS services and software as a service (SaaS) applications, 
 and only pay for what you use.
 
@@ -4843,32 +4872,31 @@ Time To Live (TTL):
 
 
 DynamoDB Accelerator (DAX):
-
-• Fully-managed, highly available, seamless inmemory cache for DynamoDB
-• Help solve read congestion by caching
-• Microseconds latency for cached data
-• Doesn’t require application logic modification
- (compatible with existing DynamoDB APIs)
-• 5 minutes TTL for cache (default)
+	• Fully-managed, highly available, seamless in-memory cache for DynamoDB
+	• Help solve read congestion by caching
+	• Microseconds latency for cached data
+	• Doesn’t require application logic modification(compatible with existing DynamoDB APIs)
+	• 5 minutes TTL for cache (default)
 
 DynamoDB Accelerator (DAX) delivers fast response times for accessing eventually consistent data. 
 Certain usecases requires microseconds response times.
 
 
-DymanoDB Stream is kind of event to interact with other servies like:lambda,s3,sns etc to doing some thing.
-as: User complated their registration and with DymanoDB Stream we cand send a welcome email using Lambda and SNS.
-For Global table Multi Region replication Need to enable DymanoDB Stream.
+DymanoDB Stream:
+	DymanoDB Stream is kind of event to interact with other servies like:lambda,s3,sns etc to doing some thing.
+	as: User complated their registration and with DymanoDB Stream we cand send a welcome email using Lambda and SNS.
+	For Global table Multi Region replication Need to enable DymanoDB Stream.
 
 
-DynamoDB Streams
-• 24 hours retention
-• Limited # of consumers
-• Process using AWS Lambda Triggers, or DynamoDB Stream Kinesis adapter
+DynamoDB Streams:
+	• 24 hours retention
+	• Limited # of consumers
+	• Process using AWS Lambda Triggers, or DynamoDB Stream Kinesis adapter
 
-Kinesis Data Streams (newer)
-• 1 year retention
-• High # of consumers
-• Process using AWS Lambda, Kinesis DataAnalytics, Kineis Data Firehose, AWS GlueStreaming ETL… 
+Kinesis Data Streams (newer):
+	• 1 year retention
+	• High # of consumers
+	• Process using AWS Lambda, Kinesis DataAnalytics, Kineis Data Firehose, AWS GlueStreaming ETL… 
 
 
 DynamoDB – Backups for disaster recovery:
@@ -4884,6 +4912,19 @@ DynamoDB – Backups for disaster recovery:
 
 
 
+DynamoDB – Integration with Amazon S3:
+	• Export to S3 (must enable PITR)
+		• Works for any point of time in the last 35 days
+		• Doesn’t affect the read capacity of your table
+		• Perform data analysis on top of DynamoDB
+		• Retain snapshots for auditing
+		• ETL on top of S3 data before importing back into DynamoDB
+		• Export in DynamoDB JSON or ION format
+	• Import to S3:
+		• Import CSV, DynamoDB JSON or ION format
+		• Doesn’t consume any write capacity
+		• Creates a new table
+		• Import errors are logged in CloudWatch Logs
 
 
 Area:
@@ -4965,15 +5006,15 @@ Features:
 
 
 Endpoint Types:
-Edge-Optimized (default): For global clients
-	• Requests are routed through the CloudFront Edge locations (improves latency)
-	• The API Gateway still lives in only one region
-Regional:d
-	• For clients within the same region
-	• Could manually combine with CloudFront (more control over the caching strategies and the distribution)
-Private:
-	• Can only be accessed from your VPC using an interface VPC endpoint (ENI)
-	• Use a resource policy to define access
+	Edge-Optimized (default): For global clients
+		• Requests are routed through the CloudFront Edge locations (improves latency)
+		• The API Gateway still lives in only one region
+	Regional:
+		• For clients within the same region
+		• Could manually combine with CloudFront (more control over the caching strategies and the distribution)
+	Private:
+		• Can only be accessed from your VPC using an interface VPC endpoint (ENI)
+		• Use a resource policy to define access
 
 
 
@@ -4991,6 +5032,18 @@ Cognito User Pool:
 	• You manage your own user pool (can be backed by Facebook, Google login etc…)
 	• No need to write any custom code
 	• Only authentication, must implement authorization in the backend
+
+
+
+API Gateway – Security:
+	• User Authentication through
+	• IAM Roles (useful for internal applications)
+	• Cognito (identity for external users – example mobile users)
+	• Custom Authorizer (your own logic)
+• Custom Domain Name HTTPS security through integration with AWS Certificate Manager (ACM)
+	• If using Edge-Optimized endpoint, then the certificate must be in us-east-1
+	• If using Regional endpoint, the certificate must be in the API Gateway region
+	• Must setup CNAME or A-alias record in Route 53
 
 
 
@@ -5041,7 +5094,7 @@ To support custom authorization requirements, you can execute a Lambda authorize
 
 
 
-
+==Serverless Architectures
 72
 ##Serverless Architectures
 -------------------------------------------------
@@ -5157,6 +5210,8 @@ It is a aws managed service, security is a shared responsibility.
 
 
 
+
+==Databases
 76
 ##Databases in AWS
 -------------------------------------------------
@@ -5402,7 +5457,7 @@ ExamTips:Any time you see Financial transaction or Ledger, its QLDB.
 
 
 
-
+==Data & Analytics
 ##Amazon Athena
 -------------------------------------------------
 Amazon Athena is an interactive query service that makes it easy to analyze data directly in Amazon S3 using standard SQL.
@@ -5699,7 +5754,7 @@ QuickSight – Dashboard & Analysis:
 
 
 81
-##Glue
+##AWS Glue
 -------------------------------------------------
 A fully managed extract, transform, and load (ETL) service that makes it easy for customers to prepare and 
 load their data for analytics.
@@ -5773,7 +5828,7 @@ We provide server-side encryption for data at rest and SSL for data in motion.
 
 
 83
-##MSK Amazon Managed Streaming for Apache Kafka
+##Amazon Managed Streaming for Apache Kafka (Amazon MSK)
 -------------------------------------------------
 
 What is Kafka?
@@ -5836,6 +5891,8 @@ Big Data Ingestion Pipeline discussion
 
 
 
+
+==Machine Learning
 84
 ##Rekognition
 -------------------------------------------------
@@ -6024,7 +6081,7 @@ It is a aws managed service, security is a shared responsibility.
 
 
 88
-##Lex+Connect
+##Amazon Lex & Connect
 -------------------------------------------------
 With Amazon Lex, you can build conversational interactions (bots) that feel natural to your customers. 
 
@@ -6338,6 +6395,9 @@ AWS Machine Learning- Summary:
 
 
 
+
+
+=AWS Monitoring, Audit and Performance
 96
 ##AWS Monitoring 
 -------------------------------------------------
