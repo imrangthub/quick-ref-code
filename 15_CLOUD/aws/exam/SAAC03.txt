@@ -3757,6 +3757,10 @@ All data transferred between the gateway and AWS storage is encrypted using SSL.
 A fully-managed service for file transfers into and out of Amazon S3 or Amazon EFS using the FTP protocol
 
 
+The data transfer between AWS Transfer Family servers and Amazon S3 happens over internal AWS networks and doesn’t 
+traverse the public internet. Because of this, you do not need to use AWS PrivateLink for data transfered from the 
+AWS Transfer Family server to Amazon S3.
+
 • Supported Protocols
 	• AWS Transfer for FTP (File Transfer Protocol (FTP))
 	• AWS Transfer for FTPS (File Transfer Protocol over SSL (FTPS))
@@ -3777,6 +3781,13 @@ WinSCP (Microsoft Windows only)
 Cyberduck (Windows, macOS, and Linux)
 FileZilla (Windows, macOS, and Linux)
 
+
+File Transfer Workflows – MFTW:
+	1)File Transfer Workflows – MFTW is a fully managed, serverless File Transfer Workflow service that makes it easy 
+		to set up, run, automate, and monitor the processing of uploaded files.
+	2)MFTW can be used to automate various processing steps such as copying, tagging, scanning, filtering, 
+		compressing/decompressing, and encrypting/decrypting the data that is transferred using Transfer Family.
+	3)MFTW provides end-to-end visibility for tracking and auditability.
 
 
 
@@ -4023,6 +4034,9 @@ subscribe to a topic,
 confirm the subscription,
 start sending events to a topic to deliver them to all subscribers (potentially multiple applications and people).
 
+
+The event producer only sends a message to one SNS topic at a time
+Many event receivers can be created to listen to an SNS topic notification
 
 • The “event producer” only sends message to one SNS topic
 • As many “event receivers” (subscriptions) as we want to listen to the SNS topic notifications
@@ -4379,7 +4393,13 @@ There are two models that you can use to run your containers:
 
 
 
-
+The EC2 launch type is suitable:
+	Workloads that require consistently high CPU core and memory usage
+	Large workloads that need to be optimized for price
+	Your applications need to access persistent storage
+	You must directly manage your infrastructure
+	
+	
 The Fargate suitable:
 	Large workloads that need to be optimized for low overhead
 	Small workloads that have occasional burst
@@ -4387,11 +4407,6 @@ The Fargate suitable:
 	Batch workloads
 
 
-The EC2 launch type is suitable:
-	Workloads that require consistently high CPU core and memory usage
-	Large workloads that need to be optimized for price
-	Your applications need to access persistent storage
-	You must directly manage your infrastructure
 
 
 
@@ -4407,9 +4422,9 @@ Remember:
 -You can use On-Demand instances or Spot instances to create your cluster.
 -You can load balance using Application Load Balancers
 -Two features of ALB are important for ECS:
--Dynamic host port mapping: Multiple tasks from the same service are allowed per EC2 (container) instance
--Path-based routing: Multiple services can use the same listener port on same ALB and be routed based 
-on path (www.app.com/microservice-a and www.app.com/microservice-b)
+	-Dynamic host port mapping: Multiple tasks from the same service are allowed per EC2 (container) instance
+	-Path-based routing: Multiple services can use the same listener port on same ALB/NLB and be routed based 
+	 on path (www.app.com/microservice-a and www.app.com/microservice-b)
 
 
 
@@ -4598,7 +4613,11 @@ Amazon EKS – Data Volumes:
 
 ++AWS App Runner
 -------------------------------------------------
-• Fully managed service that makes it easy to deploy web applications and APIs at scale
+Fully managed service that makes it easy to deploy web applications and APIs at scale
+You can choose the programming language of your choice since App Runner can deploy directly from source code 
+(in GitHub for example) or a Docker container image (from private or public repo in ECR) — 
+all this without worrying about provisioning and managing the underlying infrastructure.
+
 • No infrastructure experience required
 • Start with your source code or container image
 • Automatically builds and deploy the web app
@@ -4606,6 +4625,8 @@ Amazon EKS – Data Volumes:
 • VPC access support
 • Connect to database, cache, and message queue services
 • Use cases: web apps, APIs, microservices, rapid production deployments 
+
+
 
 
 
@@ -4755,15 +4776,21 @@ Security and Compliance is a shared responsibility.
 68
 ##Labmbda@Edge
 -------------------------------------------------
+The functions run in response to CloudFront events, without provisioning or managing servers. 
+You can use Lambda functions to change CloudFront requests and responses at the following points:
+
+	After CloudFront receives a request from a viewer (viewer request)
+	Before CloudFront forwards the request to the origin (origin request)
+	After CloudFront receives the response from the origin (origin response)
+	Before CloudFront forwards the response to the viewer (viewer response)
+
 Lambda are regional service. Lambda@Edge is a global service. 
 Lambda@Edge allows you to execute the logic across multiple location (Node.js and Paython only)
 
 You can use Lambda to change CloudFront requests and responses.
 You can also generate responses to viewers without ever sending the request to the origin.
 
-Lambda@Edge is a feature of Amazon CloudFront that lets you run code closer to users of your application, 
-which improves performance and reduces latency. 
-With Lambda@Edge, you don't have to provision or manage infrastructure in multiple locations around the world. 
+
 
 
 
@@ -5173,14 +5200,14 @@ software applications.
 • We don’t want to change our application, but want to optimize our cost and CPU, how can we do it?
 
 Ans:CloudFront
-• No changes to architecture
-• Will cache software update files at the edge
-• Software update files are not dynamic, they’re static (never changing)
-• Our EC2 instances aren’t serverless
-• But CloudFront is, and will scale for us
-• Our ASG will not scale as much, and we’ll save tremendously in EC2
-• We’ll also save in availability, network bandwidth cost, etc
-• Easy way to make an existing application more scalable and cheaper!
+	• No changes to architecture
+	• Will cache software update files at the edge
+	• Software update files are not dynamic, they’re static (never changing)
+	• Our EC2 instances aren’t serverless
+	• But CloudFront is, and will scale for us
+	• Our ASG will not scale as much, and we’ll save tremendously in EC2
+	• We’ll also save in availability, network bandwidth cost, etc
+	• Easy way to make an existing application more scalable and cheaper!
 
 
 Area:
@@ -5239,6 +5266,11 @@ Database Types:
 	• Graphs: Amazon Neptune – displays relationships between data
 	• Ledger: Amazon Quantum Ledger Database
 	• Time series: Amazon Timestream
+	
+Amazon Timestream is a fast, scalable, and serverless time series database service for IoT and operational 
+	applications that makes it easy to store and analyze trillions of events per day up to 1,000 times 
+	faster and at as little as 1/10th the cost of relational databases.
+Amazon Timestream saves you time and cost in managing the lifecycle.
 
 
 Amazon RDS – Summary:
@@ -5547,15 +5579,19 @@ Security is a shared responsibility.
 77
 ##Redshift
 -------------------------------------------------
-Fastest, easiest, and most widely used cloud data warehouse
+Fastest, easiest, and most widely used cloud data warehouse.
+
+Redshift warehouse is a collection of computing resources known as nodes, and these nodes are organized in a 
+group known as a cluster. Each cluster runs in a Redshift Engine which contains one or more databases.
+
+When you launch a Redshift instance, it starts with a single node of size 160 GB. When you want to grow, 
+you can add additional nodes to take advantage of parallel processing. You have a leader node that manages 
+the multiple nodes. Leader node handles the client connection as well as compute nodes. It stores the data 
+in compute nodes and performs the query.
+
 
 Amazon Redshift is a fully managed data warehouse service in the cloud. Its datasets range from 
 100s of gigabytes to a petabyte. 
-
-The initial process to create a data warehouse is to launch a 
-set of compute resources called nodes, which are organized into groups called cluster. 
-After that you can process your queries.
-
 
 What are the differences between a database and a data warehouse? 
 A database is any collection of data organized for storage, accessibility, and retrieval. 
@@ -5599,12 +5635,26 @@ Loading data into Redshift: Large inserts are MUCH better
 
 
 Redshift Spectrum:
-• Query data that is already in S3 without loading it
+	Redshift Spectrum is a feature of Amazon Redshift that allows you to query data stored on 
+	Amazon S3 directly and supports nested data types.
+	
+	With Redshift Spectrum, an analyst can perform SQL queries on data stored in Amazon S3 buckets. 
+	This can save time and money because it eliminates the need to move data from a storage service to a 
+	database, and instead directly queries data inside an S3 bucket.
+
+
+• Query(SQL) data that is already in S3 without loading it
 • Must have a Redshift cluster available to start the query
 • The query is then submitted to thousands of Redshift Spectrum nodes
 
-
-
+***
+Today, there are three primary ways to access and analyze data in S3:
+	Amazon Elastic MapReduce (EMR): EMR uses Hadoop-style queries to access and process large data sets in S3.
+	Amazon Athena: Athena offers a console to query S3 data with standard SQL and no infrastructure to manage. 
+	Athena also has an API.
+	Amazon Redshift: You can load data from S3 into an Amazon Redshift cluster for analysis.
+Redshift Spectrum is a logical extension of Redshift to query the data from Redshift as well as 
+Amazon S3 data lakes whereas Athena is an exclusive tool to query data from Amazon S3 only.
 
 
 Area:
@@ -5756,7 +5806,9 @@ QuickSight – Dashboard & Analysis:
 81
 ##AWS Glue
 -------------------------------------------------
-A fully managed extract, transform, and load (ETL) service that makes it easy for customers to prepare and 
+A fully managed extract, transform, and load 
+(ETL = one or more source databases into a target database or information warehouse) 
+service that makes it easy for customers to prepare and 
 load their data for analytics.
 
 Amazon Athena and AWS Glue can be categorized as "Big Data" tools.
@@ -5767,6 +5819,14 @@ Users can easily find and access data using the AWS Glue Data Catalog.
 • Managed extract, transform, and load (ETL) service
 • Useful to prepare and transform data for analytics
 • Fully serverless service
+The AWS Glue service also provides customization, orchestration and monitoring of complex data streams.
+
+AWS Glue Data Catalog:
+AWS Glue Data Catalog provides centralized uniform metadata storing for tracking, querying and transforming data using saved metadata.
+
+The purpose of Glue is to facilitate the construction of an enterprise-class data warehouse. 
+It can move information into the warehouse from a variety of sources, including transactional databases and the Amazon cloud.
+
 
 
 Glue – things to know at a high-level:
@@ -6930,6 +6990,13 @@ CloudTrail Events
 
 
 CloudTrail Insights:
+CloudTrail Insights automatically analyzes write management events from CloudTrail trails and alerts you to unusual activity.
+
+CloudTrail Insights is designed to automatically( Amazon applying Machine Learning to your CloudTrail Events) 
+analyze management events from your CloudTrail trails to 
+establish a baseline for normal behavior, and then raise issues by generating Insights events when it 
+detects unusual patterns.
+
   Enable CloudTrail Insights to detect unusual activity in your account:
 	• inaccurate resource provisioning
 	• hitting service limits
@@ -6946,6 +7013,11 @@ CloudTrail Events Retention:
 • To keep events beyond this period, log them to S3 and use Athena
 
 
+The difference between CloudTrail Insights and CloudTrail Events. CloudTrail Events are a log of 
+every event that takes place inside your AWS environment whereas CloudTrail Insights applies 
+Machine Learning to report on “insights” into groups of events that deviate from expected behavior.
+
+CloudWatch mainly monitors performance, whereas CloudTrail mainly monitors actions in your AWS environment.
 
 Area:
 =====
@@ -12915,17 +12987,25 @@ Decouple your applications using:
 
 
 
-Amazon SQS – Standard Queue:
+Amazon SQS:
 -------------------------------------------------
-• Oldest offering (over 10 years old)
-• Fully managed service, used to decouple applications
-• Attributes:
-• Unlimited throughput, unlimited number of messages in queue
-• Default retention of messages: 4 days, maximum of 14 days
-• Low latency (<10 ms on publish and receive)
-• Limitation of 256KB per message sent
-• Can have duplicate messages (at least once delivery, occasionally)
-• Can have out of order messages (best effort ordering)
+
+Standard Queue:
+	• Oldest offering (over 10 years old)
+	• Fully managed service, used to decouple applications
+	• Attributes:
+	• Unlimited throughput, unlimited number of messages in queue
+	• Default retention of messages: 4 days, maximum of 14 days
+	• Low latency (<10 ms on publish and receive)
+	• Limitation of 256KB per message sent
+	• Can have duplicate messages (at least once delivery, occasionally)
+	• Can have out of order messages (best effort ordering)
+
+SQS FIFO:
+(First-In-First-Out) Queues have all the capabilities of the SQS Standard Queue, plus the following two features. 
+First, The order in which messages are sent and received are strictly preserved and a message is 
+delivered once and remains available until a consumer process and deletes it. 
+Second, duplicated messages are not introduced into the queue.
 
 
 SQS Delay Queues is a period of time during which Amazon SQS keeps new SQS messages invisible to consumers. 
@@ -12943,11 +13023,6 @@ duplicate reading of the message. (default: 30 sec., min.: 0 sec., max.: 12 hour
 SQS Dead Letter Queue is where other SQS queues (source queues) can send messages that can't be processed (consumed) 
 successfully. It's useful for debugging as it allows you to isolate problematic messages so 
 you can debug why their processing doesn't succeed.
-
-SQS FIFO (First-In-First-Out) Queues have all the capabilities of the SQS Standard Queue, plus the following two features. 
-First, The order in which messages are sent and received are strictly preserved and a message is 
-delivered once and remains available until a consumer process and deletes it. 
-Second, duplicated messages are not introduced into the queue.
 
 
 This is a common pattern where only one message is sent to the SNS topic and then "fan-out" to multiple SQS queues. 
@@ -12980,6 +13055,8 @@ Kinesis Data Firehose is now supported, but not Kinesis Data Streams.
 
 Amazon MQ supports industry-standard APIs such as JMS and NMS, and protocols for messaging, 
 including AMQP, STOMP, MQTT, and WebSocket.
+
+
 
 
 Kinesis:
