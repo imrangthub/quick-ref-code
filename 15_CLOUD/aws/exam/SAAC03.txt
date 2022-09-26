@@ -6457,7 +6457,7 @@ AWS Machine Learning- Summary:
 
 
 
-=AWS Monitoring, Audit and Performance
+=dx
 96
 ##AWS Monitoring 
 -------------------------------------------------
@@ -6479,10 +6479,6 @@ engineers (SREs), IT managers, and product owners.
 
 CloudWatch enables you to monitor your complete stack (applications, infrastructure, and services) and use alarms, 
 logs, and events data to take automated actions and reduce mean time to resolution (MTTR). 
-
-
-You can use metrics to calculate statistics and then present the data graphically in the CloudWatch console. 
-You can configure alarm actions to stop, start, or terminate an Amazon EC2 instance when certain criteria are met.
 
 
 CloudWatch is all about performance. CloudTrail is all about auditing.
@@ -6535,8 +6531,9 @@ It is a aws managed service, security is a shared responsibility.
 98
 ##AWS CloudWatch Metrics
 -------------------------------------------------
-Metrics are data about the performance of your systems. By default, many services provide free metrics for resources 
-such as Amazon EC2 instances, Amazon EBS volumes, and Amazon RDS DB instances). 
+Metrics are data about the performance of your systems. 
+By default, many services provide free metrics for resources 
+such as Amazon EC2 instances, Amazon EBS volumes, and Amazon RDS DB instances. 
 You can also enable detailed monitoring for some resources, such as your Amazon EC2 instances, or publish your own 
 application metrics. 
 
@@ -6553,7 +6550,8 @@ for search, graphing, and alarms.
 • Can create CloudWatch dashboards of metrics
 • Can create CloudWatch Custom Metrics (for the RAM for example)
 
-Option to filter metrics to only stream a subset of them
+Option to filter metrics to only stream a subset of them.
+
 
 
 
@@ -6565,7 +6563,7 @@ A custom metric enables you to monitor a specific application binary or runtime.
 CloudWatch helps you monitor the infrastructure portion of an EC2 instance, such as CPU, hard disk and network.
 
 When CloudWatch doesn't have a metric for your specific use case, you'll want to implement a custom metric.
-
+You can define custom metrics for your own use, and Elastic Beanstalk will push those metrics to Amazon CloudWatch.
 
 Possibility to define and send your own custom metrics to CloudWatch
 • Example: memory (RAM) usage, disk space, number of logged in users …
@@ -6877,20 +6875,21 @@ CloudWatch Lambda Insights:
 
 
 CloudWatch Contributor Insights:
-• Analyze log data and create time series that display contributor data.
-• See metrics about the top-N contributors
-• The total number of unique contributors, and their usage.
-• This helps you find top talkers and understand who or what is impacting system performance.
-• Works for any AWS-generated logs (VPC, DNS, etc..)
-• For example, you can find bad hosts, identify the heaviest network users, or find the URLs that generate the most errors.
-• You can build your rules from scratch, or you can also use sample rules that AWS has created – leverages your CloudWatch Logs
-• CloudWatch also provides built-in rules that you can use to analyze metrics from other AWS services.
+	• Analyze log data and create time series that display contributor data.
+	• See metrics about the top-N contributors
+	• The total number of unique contributors, and their usage.
+	• This helps you find top talkers and understand who or what is impacting system performance.
+	• Works for any AWS-generated logs (VPC, DNS, etc..)
+	• For example, you can find bad hosts, identify the heaviest network users, or find the URLs that generate the most errors.
+	• You can build your rules from scratch, or you can also use sample rules that AWS has created – leverages your CloudWatch Logs
+	• CloudWatch also provides built-in rules that you can use to analyze metrics from other AWS services.
 
 
 
 CloudWatch Application Insights:
 • Provides automated dashboards that show potential problems with monitored applications, to help isolate ongoing issues
 • Findings and alerts are sent to Amazon EventBridge and SSM OpsCenter
+
 
 
 
@@ -7013,8 +7012,8 @@ CloudTrail Events Retention:
 • To keep events beyond this period, log them to S3 and use Athena
 
 
-The difference between CloudTrail Insights and CloudTrail Events. CloudTrail Events are a log of 
-every event that takes place inside your AWS environment whereas CloudTrail Insights applies 
+The difference between CloudTrail Insights and CloudTrail Events? 
+CloudTrail Events are a log of every event that takes place inside your AWS environment whereas CloudTrail Insights applies 
 Machine Learning to report on “insights” into groups of events that deviate from expected behavior.
 
 CloudWatch mainly monitors performance, whereas CloudTrail mainly monitors actions in your AWS environment.
@@ -7358,7 +7357,7 @@ Amazon, and enterprise identity providers via SAML 2.0 and OpenID Connect.
 
 
 
-The two main components of Amazon Cognito are user pools and identity pools. 
+The two main components of Amazon Cognito are User pools and Identity pools. 
 	User pools are user directories that provide sign-up and sign-in options for your app users. 
 	With an identity pool, your users can obtain temporary Amazon credentials to access Amazon services, 
 	such as Amazon S3 and DynamoDB. 
@@ -7370,7 +7369,7 @@ AWS Cognito:
 Cognito User Pools: appUser->CUP->ALBOrAPIGateway->LambdaOrOtherBackend
 	• Sign in functionality for app users
 	• Integrate with API Gateway
-Cognito Identity Pools (Federated Identity):appUser->CUP/ThardPartyuser->CIP->S3OrDaynamoDB.
+Cognito Identity Pools (Federated Identity):appUser->CUP/ThardPartyUser->CIP->S3OrDaynamoDB.
       For direct access AWS resource, without ALB or API Gateway.
 	• Provide AWS credentials to users so they can access AWS resources directly
 	• Integrate with Cognito User Pools as an identity provider
@@ -7398,6 +7397,7 @@ Cognito Identity Pools (Federated Identities):
 
 
 
+Cognito: “hundreds of users”, ”mobile users”, “authenticate with SAML”
 
 Area:
 =====
@@ -7414,6 +7414,8 @@ Standards-based authentication
 Access control for AWS resources
 Amazon Cognito provides solutions to control access to AWS resources from your app.
 Easy integration with your app
+
+For MobileUser, ThaousandOf User etc.
 
 
 
@@ -7582,7 +7584,7 @@ Three types of KMS Keys:
 	• Customer-managed KMS Key: (must be enabled) automatic every 1 year
 	• Imported KMS Key: only manual rotation possible using alias
 
-Region1 encrypt EBS snapshort->region2->copySnapshortWithDifferentEncryptKey->backToEBSWithNew key.
+Region1->encryptEBSSnapshort->region2->copySnapshortWithDifferentEncryptKey->backToEBSWithNewkey.
 
 
 • Anytime you need to share sensitive information… use KMS
@@ -7925,9 +7927,11 @@ These conditions include
 IP addresses, HTTP headers, HTTP body, URI strings, SQL injection and cross-site scripting.
 
 
+
 BillCost:
 =========
 AWS Firewall Manager protection policy - Monthly fee per Region.
+
 
 
 Security:
@@ -7937,6 +7941,8 @@ WAF icon AWS Web Application Firewall (WAF)
 
 Central management of firewall rules
 AWS Firewall Manager
+
+
 
 
 
