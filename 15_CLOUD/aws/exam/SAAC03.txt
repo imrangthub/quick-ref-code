@@ -9398,6 +9398,8 @@ Network Firewall – Fine Grained Controls:
 162
 ##Disaster Recovery Overview
 -------------------------------------------------
+You can also use these for Multi-AZ,Multi-Region strategy strategies or hybrid (on-premises workload/cloud recovery) strategies.
+
 • Any event that has a negative impact on a company’s business continuity or finances is a disaster
 • Disaster recovery (DR) is about preparing for and recovering from a disaster
 • What kind of disaster recovery?
@@ -9437,25 +9439,59 @@ If you back up all or most of your data in regularly scheduled 24-hour increment
 will lose 24 hours’ worth of data.
 
 
-Disaster Recovery Strategies:
-• Backup and Restore 
-• Pilot Light 
-• Warm Standby 
-• Hot Site / Multi Site Approach
+Disaster Recovery Strategies (Architecture of the DR strategies):
+• Backup and Restore $
+• Pilot Light $$
+• Warm Standby $$$
+• Hot Site / Multi Site Approach  $$$$
 
 
-Disaster Recovery – Pilot Light
+
+Backup and restore:
+Backups are created in the same Region as their source and are also copied to another Region.
+Backup and restore is a suitable approach for mitigating against data loss or corruption.
+
+For Region failover, in addition to data recovery from backup, you must also be able to restore your infrastructure 
+in the recovery Region. Infrastructure as Code such as AWS CloudFormation or AWS Cloud Development Kit 
+(AWS CDK) enables you to deploy consistent infrastructure across Regions.
+
+The backup and recovery strategy is considered the least efficient for RTO.
+
+
+
+Pilot Light:
+With the pilot light strategy, the data is live, but the services are idle. 
+Live data means the data stores and databases are up-to-date (or nearly up-to-date) with the active 
+Region and ready to service read operations.
+
+In the pilot light strategy, basic infrastructure elements are in place like Elastic Load Balancing 
+and Amazon EC2 Auto Scaling in Figure 6. But functional elements (like compute) are “shut off.” 
+
+
 • A small version of the app is always running in the cloud
 • Useful for the critical core (pilot light)
 • Very similar to Backup and Restore
 • Faster than Backup and Restore as critical systems are already up
 
 
-Warm Standby 
+Warm Standby :
+Like the pilot light strategy, the warm standby strategy maintains live data in addition to periodic backups. 
+A warm standby maintains a minimum deployment that can handle requests, but at a 
+reduced capacity—it cannot handle production-level traffic. 
+
+Before failover, the infrastructure must scale up to meet production needs.
+
 • Full system is up and running, but at minimum size 
 • Upon disaster, we can scale to production load
 
+
+
 Multi Site / Hot Site Approach 
+With multi-site active/active, two or more Regions are actively accepting requests. 
+Failover consists of re-routing requests away from a Region that cannot serve them.
+
+Here, data is replicated across Regions and is actively used to serve read requests in those Regions.
+ 
 • Very low RTO (minutes or seconds) – very expensive 
 • Full Production Scale is running AWS and On Premise
 
@@ -9576,6 +9612,12 @@ RDS & Aurora PostgreSQL Migrations:
 • Use DMS if both databases are up and running
 
 
+AWS Application Discovery Service :
+Application Discovery Service helps enterprises obtain a snapshot of the current state of their 
+data center servers by collecting server specification information, hardware configuration, 
+performance data, and details of running processes and network connections. 
+Once the data is collected, you can use it to perform a Total Cost of Ownership 
+(TCO) analysis and then create a cost optimized migration plan based on your unique business requirements.
 
 
 On-Premise strategy with AWS:
@@ -9693,6 +9735,16 @@ and enables cutover windows measured in hours.
 
 VMware Cloud on Aws
 -------------------------------------------------
+Customers across industries are accelerating adoption of both AWS
+Cloud and VMware infrastructure. Many of them want the ability to integrate
+their on-premises data center environments with AWS using their existing tools and
+skillsets within a common operating environment based on familiar VMware software.
+VMware Cloud™ on AWS delivers on this promise by providing a unified
+infrastructure framework that bridges the gap between private and public clouds.
+VMware Cloud on AWS delivers a seamlessly integrated hybrid cloud that extends
+on-premises vSphere environments to a VMware SDDC running on Amazon EC2
+elastic, bare-metal infrastructure and is fully integrated as part of the AWS Cloud.
+
 • Some customers use VMware Cloud to manage their on-premises Data Center
 • They want to extend the Data Center capacity to AWS, but keep using the VMware Cloud software
 • …Enter VMware Cloud on AWS
@@ -9700,7 +9752,6 @@ VMware Cloud on Aws
 	• Migrate your VMware vSphere-based workloads to AWS
 	• Run your production workloads across VMware vSphere-based private, public, and hybrid cloud environments
 	• Have a disaster recover strategy
-	
 	
 	
 	
