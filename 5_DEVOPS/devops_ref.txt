@@ -355,8 +355,30 @@ server {
 
 
 
+Access log:
+-------------------------------------------
+Disable access log:
+http {
+	access_log off;
+	error_log off;
+}
 
 
+Froward Header
+-------------------------------------------
+server {
+	listen       8282;
+	server_name  localhost;
+
+	location / {
+			proxy_pass   http://localhost:8080;
+			proxy_set_header X-Request-ID $request_id;
+
+   
+		}
+}
+	
+	
 Some helpful commands:
 ---------------------------------------------
 Reload NGINX: /app/nginx/sbin/nginx –s reload
@@ -364,15 +386,57 @@ Reload NGINX: /app/nginx/sbin/nginx –s reload
 Test NGINX conf: /app/nginx/sbin/nginx –t
 
 Check log: tail –f access.log
-Filtering status code except 200 and 202 ok: 
-=>tail –f access.log | grep –v ‘ 200 ‘  | grep –v ‘ 202 ‘     (202 is the status code of otp success)
+
+
+DebugScript1:
+-----------------------------------
+
+=>tail -f access.log | grep -v '200'  | grep -v '202'
+Filtering status code except 200 and 202 
+
+=>cat access.log | awk '{print $(NF-2)}'
 Printing only destination IP: 
-=>cat access.log | awk ‘{print $(NF-2)}‘
+
+=> cat access.log | awk '{print $(NF-2)}' | sort | uniq --count
 Print destination IP count: 
-=>cat access.log | awk ‘{print $(NF-2)} | sort | uniq --count‘
- 
+
+
+=>cat access.log | grep –v '200'  | grep –v '202' | awk '{print $(NF-2)}' | sort | uniq --count
 You can mix between these commands to achieve your goal. For example, you want to see which destination server is failing:
-=>cat access.log | grep –v ‘ 200 ‘  | grep –v ‘ 202 ‘ | awk ‘{print $(NF-2)} | sort | uniq --count‘
+
+
+=>tail -f access.log | grep '254.194'
+
+
+DebugScript2:
+-----------------------------------
+
+=>tail -100000 ../logs/access.log | awk '{ print $8}'|sort |uniq --repeated --count
+Print load balanced IPs and their count
+
+=>tail -10000 access.log |awk '{print $12,$8}'|sort|uniq --repeated --count
+Print load balanced IPs and their status count
+
+
+=>tail -10000 /app/apihub/Nginx_LB/logs/access.log | grep prepaid|awk '{ total += $14; count++ } END { print total/count }'
+Average RTT
+
+=>for (( i = 5; i >=0; i-- )) ; do grep $(date +%d/%b/%Y:%R -d "-$i min") /app/apihub/Nginx_LB/logs/access.log; done| awk '{ print $8}'|sort |uniq --repeated --count
+Last 5 minute request satus
+
+
+=>grep prepaid access.log|tail -1000|awk '{ if ( $14 > .750 ) print $0 }'|wc -l
+If RTT greater than:
+
+
+=>for i in {1..20}; do curl -o /dev/null -s -w '%{http_code},%{time_namelookup},%{time_connect},%{time_pretransfer},%{time_starttransfer}, %{time_total}s\n' "http://10.74.10.10:443/api/v1/subscriptions/32286622/combined-usage-reports"  ; done
+20 continuous calls to check DBSS API performance 
+
+=>tail -1000 ../logs/access.log | grep prepaid|awk '{ if (max<$14){ max=$14 }}END {print max}'
+Max RTT
+
+
+
 
 Debug:
 => tail -f access.log | grep 53489776
