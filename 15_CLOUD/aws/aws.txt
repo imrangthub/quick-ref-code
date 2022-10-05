@@ -27,12 +27,6 @@ Keep in mind that you can always refer to On-Demand Instances to suffice any add
 ConfusingTakeaLook
 ------------------
 
-NLB has one static IP per AZ, and supports assigning Elastic IP
-Aurora Multi-Master
-
-CNAME Record:
-
-
 Route 53 Health Checks
 
 
@@ -58,6 +52,10 @@ NACL with Ephemeral Ports
 AWS Application Migration Service (MGN)
 Spot Instances / Spot Fleets for cost savings + Auto Scaling
 
+AWS App Mesh
+AWS CloudMap
+CloudEndure
+
 
 HandOnRemain
 ----------------------------
@@ -66,7 +64,6 @@ CloudFormation
 
 
 Video Checkout:
-Amazon CloudFront Hands On
 2)Giving permissions to federated/outside users & groups.
 You can't assign role to user.
 
@@ -116,13 +113,14 @@ AWS:
 		-VPC 
 		-Router 
 		-Gateway
-		-Internet Gateway
+		-InternetGateway
 		-VPCEndpoint
-		-VPG(Virtual Private Gateway)+Site-to-Site VPN
-		-DCG(Direct Connect Gateway for DX)
+		-VPG(VirtualPrivateGateway)+Site-to-Site VPN
+		-DCG(DirectConnectGateway for DX)
 			-Subnet
 				-RouteTables
 				-NACL
+				-IGW
 				-NATInstance
 				-NATGateway
 				-EC2
@@ -132,13 +130,14 @@ AWS:
 #Security
 -------------------------------------------------
 SCP->ResourceBase->IdentityBase->IAMPermissionBoundry->SessionPolicy->Go!
+
 Root User:
-	-IAM User      +Permission Policy
-	-User Group    +Permission Policy
-	-IAM Role      +Permission Policy ->For EC2 to doing somthing
+		-IAM User      +Permission Policy
+		-User Group    +Permission Policy
+		-IAM Role      +Permission Policy ->For EC2 to doing somthing
 		
 SCP:
-	-OU			+Permission Policy
+	-OU			   +Permission Policy
 		-User
 		-Role
 	  
@@ -148,7 +147,7 @@ Policy:		=>Predefined+Custome+(Optional)Condition
 IAM Role:	=>Predefined+Custome
 
 Principals: Root Users, IAM Users and Instance Principals.
-Principle Entities: Users, Groups, Roles and Policies.
+PrincipleEntities: Users, Groups, Roles and Policies.
 
 
 
@@ -168,13 +167,11 @@ AWS:
 =================================================
 #AWS Services Scope | Area
 ================================================= 
-Availability zones (AZs) are isolated data centers located within specific regions.
-AZ is the logical building block that makes up an AWS Region.
 
 IAM
 	Users, Groups, Roles, Accounts – Global
 		Same AWS accounts, users, groups and roles can be used in all regions
-	Key Pairs – Global or Regional
+	Key Pairs – Global and Regional
 		Amazon EC2 created key pairs are specific to the region
 		RSA key pair can be created and uploaded that can be used in all regions
 Virtual Private Cloud
@@ -287,7 +284,7 @@ Network and application protection:
 	AWS Shield
 	
 	Filter and control outbound DNS traffic for your VPCs
-	Amazon Route 53 Resolver DNS Firewall
+	Amazon Route53 Resolver DNS Firewall
 	
 	Filter malicious web traffic
 	WAF icon AWS Web Application Firewall (WAF)
@@ -331,7 +328,7 @@ Compute Services
 	Amazon EC2 - Secure, resizable Compute Instances (400+)
 	EC2 Autoscaling - Automated compute capacity scaling
 	Amazon LightSail - Easy virtual private server instances
-	Elastic Beanstalk - Deploy & scale web apps (Java/Ruby/etc)
+	ElasticBeanstalk - Deploy & scale web apps (Java/Ruby/etc)
 	Lambda - Serverless Compute Functions
 Container Services
 	ECR - Elastic Container Registry
@@ -359,7 +356,7 @@ Network and Content Delivery
 	AWS Transit Gateway - Centralised VPC and on prem connectivity
 	Elastic Load Balancing - Service to evenly distribute network traffic
 AWS Storage
-	Amazon S3 - Widely used AWS object storage service
+	S3 - Object storage service
 	EBS - Elastic Block Store, Persistent block
 	EFS - Serverless Elastic File System
 	FSx for Lustre - High performance file storage using Lustre
@@ -370,25 +367,25 @@ AWS Storage
 	AWS Storage Gateway - Hybrid on prem AWS storage 
 	CloudEndure - Disaster recovery service 
 Analytics Service
-	Amazon Athena - Serverless Query S3 using SQL
-	Amazon CloudSearch - Search Solution for Websites and Apps
-	Amazon Elastic Search - Deploy and run ElasticSearch
-	Amazon EMR - Big Data Platform and Analysis
-	Amazon Kenesis - Real time streaming data capture and analysis
-	Amazon Redshift - Data Warehouse Service
-	Amazon QuickSight - Serverless ML BI Dashboards
-	Amazon Data Exchange - Subscribe to 3rd Party Data Sets
-	Amazon Data Pipeline - Transfer and process data
-	Amazon Glue - Data discovery, enrichment and transfer
+	Athena - Serverless Query S3 using SQL
+	CloudSearch - Search Solution for Websites and Apps
+	Elastic Search - Deploy and run ElasticSearch
+	EMR - Big Data Platform and Analysis
+	Kenesis - Real time streaming data capture and analysis
+	Redshift - Data Warehouse Service
+	QuickSight - Serverless ML BI Dashboards
+	Data Exchange - Subscribe to 3rd Party Data Sets
+	Data Pipeline - Transfer and process data
+	Glue - Data discovery, enrichment and transfer
 	AWS Lake Formation - Set up Data Lakes quickly
 Application Integration Services
-	AWS Step Functions - Serverless Function Orchestration
-	Amazon AppFlow - Integrate 3rd party app data
-	Amazon EventBridge - Serverless Event Bus
-	Amazon MQ - Message Broker Service for Apache/Rabbit MQ
-	Amazon SNS - Simple Notification Messaging System
-	Amazon SQS - Simple Queue Service Inter Component Messaging
-	Amazon AppSync - GraphQL API Service
+	Step Functions - Serverless Function Orchestration
+	AppFlow - Integrate 3rd party app data
+	EventBridge - Serverless Event Bus
+	MQ - Message Broker Service for Apache/Rabbit MQ
+	SNS - Simple Notification Messaging System
+	SQS - Simple Queue Service Inter Component Messaging
+	AppSync - GraphQL API Service
 Cost Management Services
 	AWS Cost Explorer - Visualize and manage AWS costs
 	AWS Budgets - Service to set and monitor usage budgets

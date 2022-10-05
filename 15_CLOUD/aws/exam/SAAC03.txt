@@ -28,7 +28,7 @@ Elasticity:স্থিতিস্থাপকতা, নমনীয়তা
 Successor:উত্তরাধিকারী
 Assume:গ্রহণ করা, দায়িত্বগ্রহণ করা
 Tenancy:ভাড়াটিয়া রূপে অধিকার
-Compliance requirements:মেনে চলার প্রয়োজনীয়তা
+ComplianceRequirements:মেনে চলার প্রয়োজনীয়তা
 
 =================================================
 #General | Basic          
@@ -77,16 +77,16 @@ Amazon ElastiCache
 SQS-Amazon Simple Queue Service
 SNS-Amazon Simple Notification Service
 Auto Scaling
-Amazon Route 53
-Amazon CloudFront
-Amazon CloudWatch
-AWS CloudTrail
-AWS CloudFormation
-AWS Step Functions
+Route 53
+CloudFront
+CloudWatch
+CloudTrail
+CloudFormation
+Step Functions
 Amazon Kinesis
 Amazon API Gateway
 Elastic Load Balancing
-AWS Elastic Beanstalk
+Elastic Beanstalk
 RPO: Recovery Point Objective
 RTO: Recovery Time Objective
 SSM: AWS Systems Manager Agent 
@@ -152,6 +152,9 @@ How to choose  and AWS Region?
 4
 ##Availabiulity Zones |  AZ | az      
 -------------------------------------------------
+Availability zones (AZs) are isolated data centers located within specific regions.
+AZ is the logical building block that makes up an AWS Region.
+
 Each region hase many availabuility zone.
 Usually 3, Min 2 and Max 6;
 
@@ -1460,6 +1463,10 @@ Elastic Load Balancing provides a security group.
 An Application Load Balancer (ALB) only works at layer 7 (HTTP).
 A listener checks for connection requests from clients, using the protocol and port that you configure. 
 
+To connect to an ALB, a client needs to resolve its DNS name, No IP address.
+
+So when you need static IP addresses for inbound traffic, the ALB is not an option. 
+Luckily, that’s something the NLB comes with out-of-the-box.
 
 • Load balancing to multiple HTTP applications across machines(target groups)
 • Load balancing to multiple applications on the same machine(ex: containers)
@@ -1528,6 +1535,8 @@ Network load balancers (Layer 4) allow to:
 	
 • NLB has one static IP per AZ, and supports assigning Elastic IP(helpful for whitelisting specific IP)
 • NLB are used for extreme performance, TCP or UDP traffic
+
+Provide IP address - Static, Elastic, not DNS name.
 
 
 Network Load Balancer –Target Groups:
@@ -2119,6 +2128,11 @@ Aurora Multi-Master:
 • In case you want immediate failover for write node (HA) –
 • Every node does R/W - vs promoting a RR as the new master
 
+Multi-master Aurora limitations.
+	Currently, you can have a maximum of four DB instances in a multi-master cluster.
+	Currently, all DB instances in a multi-master cluster must be in the same AWS Region.
+	You can't enable cross-Region replicas from multi-master clusters.
+	Multi-master clusters are not available in all Regions.
 
 Global Aurora:
 Aurora Cross Region Read Replicas:
@@ -2359,12 +2373,12 @@ Amazon EC2 instances that you specify.
 
 
 37
-##Route 53
+##Route53
 -------------------------------------------------
 Amazon Route 53 is a highly available and scalable Domain Name System (DNS) web service. 
 Route 53 connects user requests to internet applications running on AWS or on-premises.
 
-Amazon Route 53 supports both forward (AAAA) and reverse (PTR) IPv6 records. 
+Amazon Route53 supports both forward (AAAA) and reverse (PTR) IPv6 records. 
 
 
 Routing Policies:
@@ -2392,51 +2406,56 @@ The pipeline reverses when the correct DNS record is found.
 
 
 A Record:
-	A record (or Address record) value is always an IP address. The IP should be static i.e. it 
+	A record (or Address record) value is always an IP address. The IP should be static. it 
 	should not change frequently. For example, Elastic IPs in AWS are static IPs.
 
 CNAME Record:
 	CNAME record maps a name to another name. It can never be an IP address. 
-	Let’s understand it with a common use case from the industry.
 
 An A record for example.com (i.e. root/naked domain) points to the server IP address
-A CNAME record for www.example.com points to example.com
+A CNAME record for www.example.com points to example.com.
 
 
+CNAME vs Alias:
+	• AWS Resources (Load Balancer, CloudFront...) expose an AWS hostname:
+	• lb1-1234.us-east-2.elb.amazonaws.com and you want myapp.mydomain.com
+	CNAME:
+		• The target is a domain name which must have an A or AAAA record
+		• Points a hostname to any other hostname. (app.mydomain.com => anything.com)
+		• ONLY FOR NON ROOT DOMAIN (aka.something.mydomain.com)
+	Alias:
+		• Maps a hostname to an AWS resource
+		• An extension to DNS functionality
+		• Automatically recognizes changes in the resource’s IP addresses
+		• Unlike CNAME, it can be used for the top node of a DNS namespace (Zone Apex), e.g.: example.com
+		• Alias Record is always of type A/AAAA for AWS resources (IPv4 / IPv6)
+		• You can’t set the TTL
+		
+		
+A     = example.com <-11.221.32.143 (IP)
+CNAME = www.example.com <-example.com/
 
+Now a AWS service • lb1-1234.us-east-2.elb.amazonaws.com and you want myapp.mydomain.com, how ?
 
+CNAME Record Target only A (example.com i.e. root/naked domain) Record not IP or AWS services DNS name.
 Alias Records Targets Aws Resource or Other Host.
-CName Record Target only A Record not IP.
-
-Alias Record:
-	Alias record is an Amazon Route 53-specific virtual record.  So, it works only with Amazon Route 53. 
-	Whenever you come across questions related to mappings of Amazon specific resources/ services say 
-	Amazon ELBs (Elastic Load Balancers), Amazon CloudFront distributions, AWS Elastic 
-	Beanstalk environments, or Amazon S3 buckets that are configured as websites, it should ring a bell for you to 
-	consider Alias record in Route 53.
 
 
-A CNAME can’t be used for naked/root domain names ( (Zone Apex), e.g.: example.com). 
-    A Redord only support IP.
+
+
+
+A CNAME can’t be used providing for naked/root domain names ( (Zone Apex), e.g.: example.com). 
+    A Redord can providing root(example.com) domain but only support IP.
 	Root domain names (example.com) must be mapped with either an A record or an Alias record (in Route 53).
 
 
-ANS:
-	Alias record in Route 53 which handles this issue. 
-	Alias record will allow ELB DNS name (or any other DNS names produced by AWS services like CloudFront, S3 etc) 
-	to be mapped with the root domain name in Route 53.
+ANS: Alias record in Route 53 which handles this issue. 
+	  Alias record will allow ELB DNS name (or any other DNS names produced by AWS services 
+	  like CloudFront, S3 etc) to be mapped with the root domain (example.com)name in Route53.
+	  
+      Alias = lb1-1234.us-east-2.elb.amazonaws.com ->example.com
 
 
-
-Route 53 – Record Types:
-• A – maps a hostname to IPv4
-• AAAA – maps a hostname to IPv6
-• CNAME – maps a hostname to another hostname
-	• The target is a domain name which must have an A or AAAA record
-	• Can’t create a CNAME record for the top node of a DNS namespace (Zone Apex->example.com)
-	• Example: you can’t create for example.com, but you can create for www.example.com
-• NS – Name Servers for the Hosted Zone
-• Control how traffic is routed for a domain
 
 
 Route53-TTL:
@@ -2457,20 +2476,7 @@ Amazon Route 53 health checks monitor the health and performance of your web app
 You can optionally configure Amazon CloudWatch alarms for your health checks, so that you receive notification 
 when a resource becomes unavailable.
 
-CNAME vs Alias:
-	• AWS Resources (Load Balancer, CloudFront...) expose an AWS hostname:
-	• lb1-1234.us-east-2.elb.amazonaws.com and you want myapp.mydomain.com
-	CNAME:
-		• The target is a domain name which must have an A or AAAA record
-		• Points a hostname to any other hostname. (app.mydomain.com => blabla.anything.com)
-		• ONLY FOR NON ROOT DOMAIN (aka.something.mydomain.com)
-	Alias:
-		• Maps a hostname to an AWS resource
-		• An extension to DNS functionality
-		• Automatically recognizes changes in the resource’s IP addresses
-		• Unlike CNAME, it can be used for the top node of a DNS namespace (Zone Apex), e.g.: example.com
-		• Alias Record is always of type A/AAAA for AWS resources (IPv4 / IPv6)
-		• You can’t set the TTL
+
 
 
 Route 53 – Hosted Zones:
@@ -9019,8 +9025,8 @@ powered by PrivateLink without requiring an internet gateway, NAT device, VPN co
 
 VPC Endpoints (AWS PrivateLink)
 • Every AWS service is publicly exposed (public URL)
-• VPC Endpoints (powered by AWS PrivateLink) allows you to connect to AWS services using from a private network instead of
-  using the public Internet
+• VPC Endpoints (powered by AWS PrivateLink) allows you to connect to AWS services using 
+  from a private network instead of using the public Internet
 • They’re redundant and scale horizontally
 • They remove the need of IGW, NATGW, … to access AWS Services
 • In case of issues:
@@ -9047,10 +9053,10 @@ Gateway Endpoints:
 
 
 Gateway or Interface Endpoint for S3?
-• Gateway is most likely going to be preferred all the time at the exam
-• Cost: free for Gateway, $ for interface endpoint
-• Interface Endpoint is preferred access is required from onpremises (Site to Site VPN or Direct Connect), a different VPC
-  or a different region
+	• Gateway is most likely going to be preferred all the time at the exam
+	• Cost: free for Gateway, $ for interface endpoint
+	• Interface Endpoint is preferred access is required from onpremises (Site to Site VPN or Direct Connect), 
+		a different VPC or a different region
 
 
 
