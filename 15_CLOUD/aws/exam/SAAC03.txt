@@ -645,14 +645,98 @@ https://enlear.academy/aws-ec2-purchasing-options-and-spot-instances-overview-44
 
 1) On-Demand Instances: short workload, predictable pricing.
 2) Reserved Instances: long workloads (≥ 1 year).
-3) Convertible Reserved Instances: long workloads with flexible instances.
-Scheduled Reserved Instances: launch within time window you reserve.
-Spot Instances: short workloads, for cheap, can lose instances.
-Dedicated Instances: no other customers will share your hardware.
-Dedicated Hosts: book an entire physical server, control instance placement.
+	Convertible Reserved Instances: long workloads with flexible instances.
+	Scheduled Reserved Instances: launch within time window you reserve.
+3) Spot Instances: short workloads, for cheap, can lose instances.
+4) Dedicated Instances: no other customers will share your hardware.
+5) Dedicated Hosts: book an entire physical server, control instance placement.
 
 
 
+
+Spot Instances:
+===============
+A Spot Price is the hourly rate for a Spot instance. 
+
+Spot instances can be used for applications flexible in the timing when they can run and also able to 
+handle interruption by storing the state externally for e.g. they are 
+well-suited for data analysis, batch jobs, background processing, and optional tasks
+
+Spot instances differ from the On-Demand instances:
+	they are not launched immediately
+	they can be terminated anytime
+	price varies as per the demand and supply of spot instances
+	
+Spot instances can also be launched with a required duration (also known as Spot blocks), 
+which are not interrupted due to changes in the Spot price.
+
+A Spot Instance request is either one-time or persistent.
+
+
+There are two types of spot requests:
+-A one-time spot request stays active until Amazon EC2 runs the spot instance, you cancel the request, or it expires. 
+If the spot price goes above your bid or capacity is unavailable, 
+Amazon terminates the spot instance and closes the spot request.
+
+-A persistent spot instance request stays active until you cancel it or until it expires—even if Amazon carried out the request. 
+If the spot price goes above your bid or capacity becomes unavailable, the spot instance is interrupted. 
+Amazon keeps the request open, and if conditions change and a spot instance does become available, it starts or 
+resumes the spot instance
+
+
+What are Spot Instance Interruptions?	
+	EC2 can interrupt the Spot instance when the Spot price rises above the bid price, 
+	when the demand for Spot instances rises, or when the supply of Spot instances decreases.
+	not available on the Zone.
+
+EC2 Instance Rebalance Recommendation: is a signal that notifies when a Spot Instance is at elevated risk 
+of interruption. The signal provides an opportunity to proactively manage the Spot Instance
+ in advance of the two-minute Spot Instance interruption notice.
+
+		
+When an instance is interrupted, you can select one of three possible actions—terminating the 
+spot instance (default), stopping the spot instance (making it possible to restart it with the 
+same launch specifications), or hibernating the instance.
+
+Spot Instance Interruption Notice
+is a warning issued two minutes before EC2 interrupts a Spot Instance.
+EC2 automatically stops or hibernates the Spot Instances on interruption, and automatically 
+ the instances when we have available capacity.
+
+
+EC2 tries to maintain the target capacity, adding spot instances if available, 
+based on the request details. When spot instances are terminated, 
+Spot Fleet attempts to replace them using the lowest price option available.
+
+
+A Spot Instance request is either:
+One-time
+	A one-time request remains active until EC2 launches the Spot Instance, the request expires, or 
+	you cancel the request.
+Persistent
+	EC2 automatically resubmits a persistent Spot request after the Spot Instance associated 
+		with the request is terminated.
+	A persistent Spot Instance request remains active until it expires or you cancel it, 
+		even if the request is fulfilled.
+	The Spot Instance request can optionally specify a duration for the Spot Instances.
+	Cancelling spot instance requests does not terminate the instances
+	Be sure to delete the spot request before you delete the instances, else they would be launched again.
+
+
+
+What is AWS Spot Fleet?
+Spot Fleet is a collection of spot instances.
+
+
+Spot Fleet requests type
+Request
+	Spot Fleet places an asynchronous one-time request for the desired capacity.
+I	f capacity is diminished because of Spot interruptions, the fleet does not attempt
+ to replenish Spot Instances, nor does it submit requests in alternative Spot capacity pools if 
+ capacity is unavailable.
+Maintain
+	Spot Fleet places an asynchronous request for the desired capacity and maintains capacity 
+	by automatically replenishing any interrupted Spot Instances.
 
 
 
