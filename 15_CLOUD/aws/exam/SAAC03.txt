@@ -1,6 +1,8 @@
 ##################################################
 ##               AWS | SAACO3                   ##
 ##################################################
+https://www.awsomeblog.com/category/amazon-aws/
+
 
 https://digitalcloud.training/courses/aws-csaa-practice-exams/
 https://portal.tutorialsdojo.com/product/aws-certified-solutions-architect-associate-practice-exams/
@@ -2279,19 +2281,16 @@ Amazon RDS Proxy:
 
 
 36
-##Elasticache
+##ElastiCache
 -------------------------------------------------
 The same way RDS is to get managed Relational Databases.
 ElastiCache is to get managed Redis or Memcached.
+a distributed in-memory key-value environment.
 
 • Helps reduce load off of databases for read intensive workloads
 • Helps make your application stateless
 • AWS takes care of OS maintenance / patching, optimizations, setup, configuration, monitoring, failure recovery and backups
 • Using ElastiCache involves heavy application code changes
-
-Amazon ElastiCache is a web service that makes it easy to deploy, operate, and scale an in-memory data store or 
-cache in the cloud.
-Amazon ElastiCache is a fully managed in-memory data store and cache service by Amazon Web Services (AWS). 
 
 
 ElastiCache supports two open-source in-memory caching engines: Memcached and Redis.
@@ -2317,6 +2316,14 @@ MEMCACHED:
 • No backup and restore
 • Multi-threaded architecture
 
+
+
+ElastiCache (available as a managed service) can cache the results from anything. 
+The difference here is that you need to manage invalidation and you must adjust your code to 
+check the cache before querying the main query store.
+
+Most fo the time, you’ll want to go w/DAX if you’re using DyanmoDB as a data store. 
+Otherwise, use ElastiCache.
 
 
 Area:
@@ -2477,6 +2484,12 @@ You can optionally configure Amazon CloudWatch alarms for your health checks, so
 when a resource becomes unavailable.
 
 
+Types of Amazon Route 53 health checks:
+
+Health checks that monitor an endpoint
+Health checks that monitor other health checks (calculated health checks)
+Health checks that monitor CloudWatch alarms
+Amazon Route 53 Application Recovery Controller
 
 
 Route 53 – Hosted Zones:
@@ -3730,9 +3743,9 @@ The service has ISO, PCI-DSS, and SOC certifications, and is also HIPAA eligible
 
 
 57
-##AWS Storage Gateway
+##Storage Gateway
 -------------------------------------------------
-Bridge between on-premises data and cloud data
+Bridge between on-premises data to AWS, no aws-to-aws
 
 
 Hybrid Cloud for Storage:
@@ -3755,9 +3768,9 @@ iSCSI, SMB, and NFS, which allow you to use AWS storage without rewriting your e
 Use cases: disaster recovery, backup & restore, tiered storage
 
 3 types of Storage Gateway:
-• File Gateway
-• Volume Gateway
-• Tape Gateway
+	• File Gateway
+	• Volume Gateway
+	• Tape Gateway
 Exam Tip: You need to know the differences between all 3!
 
 ++
@@ -3825,12 +3838,6 @@ Storage Gateway – Hardware appliance:
 	• Has the required CPU, memory, network, SSD cache resources
 	• Helpful for daily NFS backups in small data centers
 
-
-Gateway Types:
-	Amazon S3 File Gateway
-	Amazon FSx File Gateway
-	Tape Gateway
-	Volume Gateway
 Needs additional setup on-premises
 
 
@@ -3934,7 +3941,7 @@ Security is a shared responsibility.
 
 
 
-++DataSynce
+##DataSync
 -------------------------------------------------
 Schedule data sync from on-premises to AWS, or AWS to AWS.
 
@@ -3957,7 +3964,14 @@ ExamTips:AWS DataSync copy data and metadata between AWS Storage Services
 
 
 
+S3 to EFS then AWS Datasync is the service to go for as AWS Storage Gateway doesn’t support 
+transfer within cloud.
 
+If you want to transfer on-premises block/tapes to AWS, then AWS Storage Gateway is the option to go with.
+
+ When the requirement is to transfer files from on premises to AWS EFS (elastic file system) 
+ then AWS Datasync is the option as AWS Storage Gateway doesn’t support EFS
+ 
 ++All Aws Storage Comparison
 -------------------------------------------------
 Storage Comparison:
@@ -4485,7 +4499,7 @@ Security is a shared responsibility.
 
 ==Container Section
 65
-##Amazon ECS
+##ECS
 -------------------------------------------------
 Amazon ECS is a fully managed container orchestration service that makes it easy for you to deploy, manage, and 
 scale containerized applications.
@@ -4521,6 +4535,12 @@ The Fargate suitable:
 	Batch workloads
 
 
+TaskDefinition:
+	TaskDefinition resource describes the container and volume definitions of an 
+	Amazon Elastic Container Service (Amazon ECS) task. You can specify which Docker images to use, 
+	the required resources, and other configurations related to launching the task 
+	definition through an Amazon ECS service or task.
+You can define multiple containers in a task definition.
 
 
 
@@ -5022,6 +5042,13 @@ DynamoDB Accelerator (DAX):
 DynamoDB Accelerator (DAX) delivers fast response times for accessing eventually consistent data. 
 Certain usecases requires microseconds response times.
 
+
+What are DynamoDB streams?
+	A DynamoDB Stream is a time-ordered sequence of events recording all the modifications for 
+	DynamoDB tables in near real-time. Similar to change data capture, DynamoDB Streams consist 
+	of multiple Insert, Update, and Delete events. Each record has a unique sequence number 
+	which is used for ordering. 
+https://www.macrometa.com/event-stream-processing/dynamodb-streams
 
 DymanoDB Stream:
 	DymanoDB Stream is kind of event to interact with other servies like:lambda,s3,sns etc to doing some thing.
@@ -5749,12 +5776,12 @@ Loading data into Redshift: Large inserts are MUCH better
 
 
 Redshift Spectrum:
-	Redshift Spectrum is a feature of Amazon Redshift that allows you to query data stored on 
-	Amazon S3 directly and supports nested data types.
-	
-	With Redshift Spectrum, an analyst can perform SQL queries on data stored in Amazon S3 buckets. 
-	This can save time and money because it eliminates the need to move data from a storage service to a 
-	database, and instead directly queries data inside an S3 bucket.
+With Redshift Spectrum, an analyst can perform SQL queries on data stored in Amazon S3 buckets. 
+This can save time and money because it eliminates the need to move data from a storage service 
+to a database, and instead directly queries data inside an S3 bucket. 
+Redshift Spectrum also expands the scope of a given query because it 
+extends beyond a user's existing Redshift data 
+warehouse nodes and into large volumes of unstructured S3 data lakes.
 
 
 • Query(SQL) data that is already in S3 without loading it
@@ -5769,6 +5796,11 @@ Today, there are three primary ways to access and analyze data in S3:
 	Amazon Redshift: You can load data from S3 into an Amazon Redshift cluster for analysis.
 Redshift Spectrum is a logical extension of Redshift to query the data from Redshift as well as 
 Amazon S3 data lakes whereas Athena is an exclusive tool to query data from Amazon S3 only.
+
+If you already RedShift then go for ReadshiftSpectrum other wose Amazon Athena.
+
+Athena and Redshift Spectrum provide compelling, cost-effective solutions to 
+query the contents of your Datalake.
 
 
 Area:
@@ -5930,16 +5962,13 @@ Amazon Athena and AWS Glue can be categorized as "Big Data" tools.
 AWS Glue provides both visual and code-based interfaces to make data integration easier. 
 Users can easily find and access data using the AWS Glue Data Catalog.
 
-• Managed extract, transform, and load (ETL) service
-• Useful to prepare and transform data for analytics
-• Fully serverless service
-The AWS Glue service also provides customization, orchestration and monitoring of complex data streams.
+The purpose of Glue is to facilitate the construction of an enterprise-class data warehouse. 
+It can move information into the warehouse from a variety of sources, including transactional databases and the Amazon cloud.
+
 
 AWS Glue Data Catalog:
 AWS Glue Data Catalog provides centralized uniform metadata storing for tracking, querying and transforming data using saved metadata.
 
-The purpose of Glue is to facilitate the construction of an enterprise-class data warehouse. 
-It can move information into the warehouse from a variety of sources, including transactional databases and the Amazon cloud.
 
 
 
@@ -5954,6 +5983,11 @@ Glue – things to know at a high-level:
 • Glue Streaming ETL (built on Apache Spark Structured Streaming):
   compatible with Kinesis Data Streaming, Kafka, MSK (managed Kafka)
 
+
+What is difference between AWS Glue and lambda?
+Glue can only execute jobs using Scala or Python code. 
+Lambda can execute code from triggers by other services (SQS, Kafka, DynamoDB, Kinesis, CloudWatch, etc.) vs. 
+Glue which can be triggered by lambda events, another Glue jobs, manually or from a schedule.
 
 
 Area:
@@ -7218,6 +7252,15 @@ of recorded configurations against desired configurations.
 • Possibility of storing the configuration data into S3 (analyzed by Athena)
 
 
+ConfigRule:
+	AWS Config rules evaluate the configuration settings of your AWS resources. 
+	A rule can run when AWS Config detects a configuration change to an AWS resource or at 
+	a periodic frequency that you choose (for example, every 24 hours). There are two types of 
+	rules: AWS Config Managed Rules and AWS Config Custom Rules. Managed rules are predefined, 
+	customizable rules created by AWS Config.
+
+After you activate a rule, AWS Config compares your resources to the conditions of the rule. 
+After this initial evaluation, AWS Config continues to run evaluations each time one is triggered.
 
 AWS Config Rules does not prevent actions from happening (no deny)
 You can set Remediation Retries if the resource is still non-compliant after auto- remediation
@@ -8133,6 +8176,7 @@ AWS Firewall Manager
 
 DDoS Protection from AWS:
 -------------------------------------------------
+https://stackarmor.com/protecting-against-a-distributed-denial-of-service-ddos-attack-using-aws/
 https://www.imperva.com/blog/protecting-aws-ec2-ddos-attacks/\
 http://salerno-rafael.blogspot.com/2019/07/what-should-we-know-about-aws-security_27.html
 
@@ -8902,17 +8946,11 @@ Security Groups are stateful:
 
 
 Ephemeral Ports:
+When a client initiates a request it choose a random port from ephemeral port range and 
+it expects the response at that port only. 
 
 Ports with numbers 0-1023 are called system or well-known ports; ports with numbers 1024-49151 are 
 called user or registered ports, and ports with numbers 49152-65535 are called dynamic, private or ephemeral ports.
-
-
-Suppose you send a SSH request to you instance in AWS whose ACL allows inbound SSH connection on 22. 
-You request has both the IPs of sender and receiver and a free port assigned by your client OS e.g. 45000. 
-Now when your server receives it on port 22 it responds on port 45000. 
-Suppose you have allowed port 22 in the outbound rule of ACL this SSH response on port-45000 will be blocked. 
-To avoid this scenarios you put an TCP outbound rule in ACL with ephemeral port range as port because 
-this response port could be anything in that range.
 
 
 • For any two endpoints to establish a connection, they must use ports
@@ -9956,6 +9994,10 @@ AWS Application Discovery Service:
 
 AWS Application Migration Service (MGN)
 -------------------------------------------------
+You can migrate any workload – applications, websites, databases, storage, physical 
+or virtual servers – and even entire data centers from an on-premises environment, 
+hosting facility, or other public cloud to AWS.
+
 With Application Migration Service, you can migrate your applications from physical infrastructure, 
 VMware vSphere, Microsoft Hyper-V, Amazon Elastic Compute Cloud (Amazon EC2), 
 Amazon Virtual Private Cloud (Amazon VPC), and other clouds to AWS.
@@ -9968,10 +10010,35 @@ Amazon Virtual Private Cloud (Amazon VPC), and other clouds to AWS.
 • Minimal downtime, reduced costs
 
 
-What are the main differences between AWS Application Migration Service and AWS Server Migration Service?
-Application Migration Service (MGN) utilizes continuous, block-level replication and enables short cutover 
-windows measured in minutes. Server Migration Service (SMS) utilizes incremental, snapshot-based replication 
-and enables cutover windows measured in hours.
+Differences between AWS Application Migration Service and AWS Server Migration Service?
+	Application Migration Service (MGN) utilizes continuous, block-level replication and enables 
+	short cutover  windows measured in minutes. 
+
+	Server Migration Service (SMS) utilizes incremental, snapshot-based replication 
+	and enables cutover windows measured in hours.
+
+
+
+Application Migration Service is the primary service(New) recommended to migrate your applications to AWS. 
+If Application Migration Service is not available in a specific AWS Region, you can use 
+SMS APIs until March 31, 2023.
+
+
+CloudEndure:
+	Application Migration Service is the next generation of CloudEndure Migration, and offers 
+	key features and operational benefits that are not available with CloudEndure Migration. 
+
+Application Migration Service is not yet supported in AWS GovCloud and China Regions, and 
+does not currently support some legacy operating systems that are supported by CloudEndure Migration. 
+Consider using CloudEndure Migration if your preferred AWS Region or operating system is not currently 
+supported by AWS Application Migration Service.
+
+Note: While CloudEndure Migration will continue to be available for use in AWS GovCloud and 
+China Regions, it will no longer be available in other AWS Regions as of December 30, 2022. 
+After January 1, 2023, CloudEndure Migration will be available only for migrations to 
+AWS Outposts and AWS GovCloud and China Regions.
+
+
 
 
 
@@ -9986,6 +10053,7 @@ skillsets within a common operating environment based on familiar VMware softwar
 
 VMware Cloud™ on AWS delivers on this promise by providing a unified
 infrastructure framework that bridges the gap between private and public clouds.
+
 VMware Cloud on AWS delivers a seamlessly integrated hybrid cloud that extends
 on-premises vSphere environments to a VMware SDDC running on Amazon EC2
 elastic, bare-metal infrastructure and is fully integrated as part of the AWS Cloud.
@@ -11533,6 +11601,17 @@ CAAS (Container as a Service): Containers instead of Applications
 FAAS (Function as a Service) or Serverless: Functions instead of Applications
 
 
+
+
+##CloudMap
+================================================
+AWS Cloud Map is a cloud resource discovery service. Cloud Map enables you to name your 
+application resources with custom names, and it automatically updates the locations of these 
+dynamically changing resources. This increases your application availability because your 
+applications always discover the most up-to-date locations of its resources.
+
+
+AWS Cloud Map ; Implementing lightweight on-premises API connectivity using inverting traffic proxy.
 
 
 =================================================
@@ -17198,6 +17277,11 @@ App Mesh makes it easier to get visibility, security, and control over the commu
 without writing new code or running additional AWS infrastructure. Using App Mesh, you can standardize 
 how services communicate, implement rules for communications between services, and capture metrics, logs, 
 and traces directly into AWS services and third-party tools of your choice.
+
+
+App Mesh uses the open source Envoy proxy, making it compatible with a wide range 
+of AWS partner and open source tools.
+
 
 
 
