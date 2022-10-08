@@ -31,7 +31,14 @@ Successor:উত্তরাধিকারী
 Assume:গ্রহণ করা, দায়িত্বগ্রহণ করা
 Tenancy:ভাড়াটিয়া রূপে অধিকার
 ComplianceRequirements:মেনে চলার প্রয়োজনীয়তা
-
+Contemplating:চিন্তা করা
+legacy:উত্তরাধিকার
+deteriorated:অবনতি
+discrepancies :অসঙ্গতি
+prone:প্রবণ
+contemplating :চিন্তা করা
+adequate :পর্যাপ্ত
+withstand disruptions:বাধা সহ্য করা
 =================================================
 #General | Basic          
 ================================================= 
@@ -378,6 +385,12 @@ It is a aws managed service, security is a shared responsibility.
 -------------------------------------------------
 A policy is an object in AWS that, when associated with an identity or resource, defines their permissions.
 
+
+Policies can be attached to users, groups, or Amazon S3 buckets, enabling 
+centralized management of permissions.
+ 
+ 
+
 AWS supports six types of policies: identity-based policies, resource-based policies, 
 permissions boundaries, Organizations SCPs, ACLs, and session policies.
 
@@ -633,6 +646,8 @@ EC2 Instances Purchasing Options:
 • Capacity Reservations – reserve capacity in a specific AZ for any duration
   No need for 1 or 3-year commitment, The Availability Zone in which to reserve the capacity (only one).
 
+
+Reserved Instances do not renew automatically.
 
 
 Security:
@@ -1146,6 +1161,8 @@ AMI provides templates to launch EC2 instances
 
  
  
+ When the new AMI is copied from region A into region B, it also creates a snapshot in region 
+ B because AMIs are based on the underlying snapshots. 
  
  
 24
@@ -1539,7 +1556,7 @@ Network load balancers (Layer 4) allow to:
 • NLB are used for extreme performance, TCP or UDP traffic
 
 Provide IP address - Static, Elastic, not DNS name.
-
+The load balancer rewrites the destination IP address before forwarding it to the target.
 
 Network Load Balancer –Target Groups:
 • EC2 instances
@@ -2009,6 +2026,34 @@ RDS Security – Summary:
 	• No way to audit the underlying instance
 
 
+Basic Schema Copy will not migrate secondary indexes, foreign keys or stored procedures. 
+When you need to use a more customizable schema migration process (e.g. when you are migrating your 
+production database and need to move your stored procedures and secondary database objects), 
+you must use the AWS Schema Conversion Tool.
+
+
+Encryption of Data in Transit:
+-------------------------------------------------
+Encrypt communications between your application and your DB Instance using SSL/TLS.
+
+Amazon RDS creates an SSL certificate and installs the certificate on the DB instance 
+when the instance is provisioned. 
+
+For MySQL, you launch the mysql client using the --ssl_ca parameter 
+to reference the public key in order to encrypt connections. 
+
+For SQL Server, download the public key 
+and import the certificate into your Windows operating system. 
+
+RDS for Oracle uses Oracle native network encryption with a DB instance. 
+
+
+
+ IAM database authentication works with MySQL and PostgreSQL.
+IAM authentication is just another way to authenticate the user's credentials while accessing 
+the database. It would not significantly enhance the security in a way that 
+enabling SSL does by facilitating the in-transit encryption for the database.
+
 
 
 Area:
@@ -2325,7 +2370,9 @@ check the cache before querying the main query store.
 Most fo the time, you’ll want to go w/DAX if you’re using DyanmoDB as a data store. 
 Otherwise, use ElastiCache.
 
-
+ Elasticache is used as a caching layer in front of relational databases. 
+ It is not a good fit to store data in key-value pairs from the IoT sources.
+ 
 Area:
 =====
 Amazon ElastiCache is available in multiple AWS Regions. This means that you can launch ElastiCache clusters in 
@@ -2638,10 +2685,16 @@ security group to your environment.
 ==S3 Storage and Data Management
 
 39
-##AmazonS3 | S3
+##S3
 -------------------------------------------------
 An Amazon S3 bucket is a public cloud storage. Amazon Simple Storage Service (Amazon S3) is an object storage service. 
 You can use Amazon S3 to store and retrieve any amount of data at any time, from anywhere.
+
+After a successful write of a new object or an overwrite of an existing object, any subsequent 
+read request immediately receives the latest version of the object. S3 also provides strong 
+consistency for list operations, so after a write, you can immediately perform a listing of the 
+objects in a bucket with any changes reflected.
+
 
 S3 in Amazon has two entities called buckets and objects. 
 Objects are stored inside buckets.
@@ -2741,6 +2794,14 @@ CORS:
 • If a client does a cross-origin request on our S3 bucket, we need to enable the correct CORS headers
 • You can allow for a specific origin or for * (all origins)	
 ExamTip:It’s a popular exam question
+
+
+The aws S3 sync command uses the CopyObject APIs to copy objects between S3 buckets. 
+The sync command lists the source and target buckets to identify objects that are in the 
+source bucket but that aren't in the target bucket. 
+The command also identifies objects in the source bucket that have different LastModified dates 
+than the objects that are in the target bucket. The sync command on a versioned bucket copies only the 
+current version of the object—previous versions aren't copied.
 
 
 Area:
@@ -2895,6 +2956,15 @@ For DELETE operations:
 • Deletions with a version ID are not replicated (to avoid malicious deletes)
 • There is no “chaining” of replication
 
+Replication enables automatic, asynchronous copying of objects across Amazon S3 buckets. 
+Buckets that are configured for object replication can be owned by the same AWS account or by different 
+accounts. Object may be replicated to a single destination bucket or multiple destination buckets. 
+Destination buckets can be in different AWS Regions or within the same Region as the source bucket.
+
+
+S3 Transfer Acceleration is a bucket-level feature that enables fast, easy, and secure 
+transfers of files over long distances between your client and an S3 bucket. 
+You cannot use Transfer Acceleration to copy objects across S3 buckets in different Regions using S3 console.
 
 UseCase:
 ========
@@ -2931,6 +3001,11 @@ UseCase :
 45
 ##S3 Storage Class
 -------------------------------------------------
+
+S3 Storage Classes can be configured at the object level, and a single bucket can contain objects 
+stored across S3 Standard, S3 Intelligent-Tiering, S3 Standard-IA, and S3 One Zone-IA.
+
+
 Amazon S3 Storage Classes:
 S3 Standard
 S3 Intelligent-Tiering
@@ -2969,11 +3044,15 @@ S3 Infrequent Access:
 •S3 Standard-Infrequent Access (S3 Standard-IA)
 	• 99.9% Availability
 	• Use cases: Disaster Recovery, backups
-•S3 One Zone-Infrequent Access (S3 One Zone-IA)
+•S3 One Zone-Infrequent Access (S3 One Zone-IA for re-creatable data) 
 	• In a single AZ; data lost when AZ is destroyed
 	• 99.5% Availability
     • Use Cases: Storing secondary backup copies of on-premises data, or data you can recreate
-
+S3 One Zone-IA is for data that is accessed less frequently, but requires rapid access when needed.
+ 
+S3 One Zone-IA is ideal for customers who want a lower-cost option for infrequently accessed and 
+re-creatable data but do not require the availability and resilience of S3 Standard or S3 Standard-IA. 
+The minimum storage duration is 30 days before you can transition objects from S3 Standard to S3 One Zone-IA.
 
 
 S3 Glacier Storage Classes:
@@ -3029,6 +3108,9 @@ Expiration actions: configure objects to expire (delete) after some time
 
 
 
+
+Storage class analysis does not give recommendations for transitions to the ONEZONE_IA or S3 Glacier storage classes.
+Only Standard to Standard-IA
 
 
 S3 – Baseline Performance
@@ -3095,7 +3177,8 @@ Amazon S3 supports For Event:Amazon SNS, Amazon SQS, Lambda.
 
 
 
-
+S3 cannot directly write data into SNS, although it can certainly use S3 event notifications to 
+send an event to SNS.
 
 49
 ##S3 Requester pays
@@ -3189,6 +3272,20 @@ S3 Batch Operations:
 
 
 
+Bucket Policies:
+-------------------------------------------------
+Bucket policies in Amazon S3 can be used to add or deny permissions across some or all of the objects 
+within a single bucket. Policies can be attached to users, groups, or Amazon S3 buckets, enabling 
+centralized management of permissions. With bucket policies, you can grant users within your 
+AWS Account or other AWS Accounts access to your Amazon S3 resources.
+
+IAM->AccNot->UserYes
+ACL-AccYes->UserNot
+Bucket policies->AccYes->UserYes
+
+With IAM policies, you can only grant users within your own AWS account permission to access your Amazon S3 resources.
+With ACLs, you can only grant other AWS accounts (not specific users) access to your Amazon S3 resources. 
+
 Area:
 =====
 Global but Data is Regional.
@@ -3208,6 +3305,31 @@ Security:
 =========
 Security is a shared responsibility.
 
+
+
+
+S3 Transfer Acceleratio
+-------------------------------------------------
+Use Amazon S3 Transfer Acceleration to enable faster file uploads into the destination S3 bucket.
+
+Amazon S3 Transfer Acceleration enables fast, easy, and secure transfers of files over 
+long distances between your client and an S3 bucket. Transfer Acceleration takes advantage of 
+Amazon CloudFront’s globally distributed edge locations. As the data arrives at an edge location, 
+data is routed to Amazon S3 over an optimized network path.
+
+Use multipart uploads for faster file uploads into the destination S3 bucket.
+
+
+
+You can place a retention period on an object version either explicitly or through a 
+bucket default setting. When you apply a retention period to an object version explicitly, 
+you specify a Retain Until Date for the object version.
+
+
+S3 Standard-IA and S3 One Zone-IA have a minimum storage duration charge of 30 days 
+(so instead of 24 hours, you end up paying for 30 days). S3 Standard-IA and S3 One Zone-IA also have 
+retrieval charges (as the results are heavily referenced by other parts of the analytics pipeline, 
+so the retrieval costs would be pretty high).
 
 
 
@@ -3405,7 +3527,7 @@ Unicast IP vs Anycast IP:
 
 
 54
-##AWS Global Accelerator
+##Global Accelerator 
 -------------------------------------------------
 In summary, Global Accelerator is a fast/reliable pipeline between user and application.
 
@@ -3445,6 +3567,20 @@ AWS Global Accelerator vs CloudFront:
 	• Good fit for non-HTTP use cases, such as gaming (UDP), IoT (MQTT), or Voice over IP
 	• Good for HTTP use cases that require static IP addresses
 	• Good for HTTP use cases that required deterministic, fast regional failover
+
+
+AWS Global Accelerator uses endpoint weights to determine the proportion of traffic 
+that is directed to endpoints in an endpoint group, and traffic dials to control 
+the percentage of traffic that is directed to an endpoint group (an AWS region where 
+your application is deployed).
+
+
+With AWS Global Accelerator, you can shift traffic gradually or all at once between the blue and the 
+green environment and vice-versa without being subject to DNS caching on client devices and internet 
+resolvers, traffic dials and endpoint weights changes are effective within seconds.
+
+
+CodeDeploy is not meant to distribute traffic across instances.
 
 
 Area:
@@ -3539,6 +3675,8 @@ Snow Family – Edge Computing:
 • Long-term deployment options: 1 and 3 years discounted pricing
 
 
+For datasets less than 10PB or distributed in multiple locations, you should use Snowball. 
+
 
 AWS OpsHub (a software you install on your computer / laptop) to manage your Snow Family Device.
 Snowball cannot import to Glacier directly.
@@ -3626,6 +3764,10 @@ FSx for Windows:
 	• Data is backed-up daily to S3
 
 
+FSx for Windows does not allow you to present S3 objects as files and does not allow you to 
+write changed data back to S3. Therefore you cannot reference the "cold data" 
+with quick access for reads and updates at low cost.
+
 
 
 Amazon FSx for Lustre:
@@ -3654,6 +3796,9 @@ FSx Lustre - File System Deployment Options:
 	• Replace failed files within minutes
 	• Usage: long-term processing, sensitive data
 
+ FSx for Lustre integrates with Amazon S3.
+FSx for Lustre provides the ability to both process the 'hot data' in a parallel and distributed fashion 
+as well as easily store the 'cold data' on Amazon S3.
 
 
 
@@ -4024,6 +4169,7 @@ These services can scale independently from our application!
 Amazon Simple Queue Service (SQS) is a fully managed message queuing service that enables you to decouple and 
 scale microservices, distributed systems, and serverless applications.
 
+
 Attributes:
 	• Unlimited throughput, unlimited number of messages in queue
 	• Default retention of messages: 4 days, maximum of 14 days
@@ -4093,7 +4239,13 @@ FIFO Queue:
 
 
 
+By default, FIFO queues support up to 3,000 messages per second with batching, or up to 
+300 messages per second (300 send, receive, or delete operations per second) without batching. 
+Therefore, using batching you can meet a throughput requirement of upto 3,000 messages per second.
 
+
+ You can't convert an existing standard queue into a FIFO queue.
+ 
 Area:
 =====
 SQS is a regional service, that is highly available within a single region. 
@@ -4150,6 +4302,8 @@ CloudWatch Metric – Queue Length ApproximateNumberOfMessages and scale EC2
 ##AWS SNS(Simple Notification Service)
 --------------------------------------------------
 Anytime multiple services need to receive the same event, you should consider SNS rather than SQS.
+
+SNS cannot directly send messages to Kinesis Data Streams.
 
 It provides much more functionality than just the ability to send push notifications (emails, SMS, and mobile push). 
 In fact, it’s a serverless publish-subscribe messaging system allowing to send events to multiple 
@@ -4297,6 +4451,10 @@ can store their results using an AWS service such as Amazon DynamoDB, Amazon Red
 
 
 Kinesis Data Streams:
+Amazon Kinesis Data Streams (KDS) is a massively scalable and durable real-time data streaming service. 
+By default, the 2MB/second/shard output is shared between all of the applications consuming data from the stream.
+consumers to use enhanced fan-out and receive their own 2MB/second pipe of read throughput per shard.
+
 • Retention between 1 day to 365 days
 • Ability to reprocess (replay) data
 • Once data is inserted in Kinesis, it can’t be deleted (immutability)
@@ -4330,6 +4488,9 @@ Kinesis Data Streams Security:
 
 
 Kinesis Data Firehose:
+ Amazon Kinesis Data Firehose is the easiest way to reliably load streaming data into data lakes, 
+ data stores, and analytics tools, Not application.
+ 
 Load streaming data into S3 / Redshift / ES / 3rd party / custom HTTP.
 • Fully managed
 • Near real-time (buffer time min. 60 sec)
@@ -4337,6 +4498,9 @@ Load streaming data into S3 / Redshift / ES / 3rd party / custom HTTP.
 • No data storage
 • Doesn’t support replay capability
 
+Kinesis Data Firehose can only write to S3, Redshift, Elasticsearch or Splunk. 
+You can't have applications consuming data streams from Kinesis Data Firehose, 
+that's the job of Kinesis Data Streams.
 
 Pay for data going through Firehose
 
@@ -4385,6 +4549,9 @@ SQS:
 • Ordering guarantees only on FIFO queues
 • Individual message delay capability
 
+As multiple applications are consuming the same stream concurrently, both SQS Standard and 
+SQS FIFO are not the right.
+
 
 SNS:
 • Push data to many subscribers
@@ -4395,6 +4562,7 @@ SNS:
 • No need to provision throughput
 • Integrates with SQS for fan- out architecture pattern
 • FIFO capability for SQS FIFO
+
 
 
 Kinesis:
@@ -4410,6 +4578,10 @@ Kinesis:
 
 
 
+However, the user is expected to manually provision an appropriate number of shards to 
+process the expected volume of the incoming data stream. The throughput of an 
+Amazon Kinesis data stream is designed to scale without limits via increasing the number of 
+shards within a data stream. 
 
 Area:
 =====
@@ -4875,6 +5047,14 @@ Deployment:
 	• Can use the /tmp directory to load other files at startup
 	• Size of environment variables: 4 KB
 
+Lambda functions always operate from an AWS-owned VPC.
+You should only enable your functions for VPC access when you need to interact with a private resource 
+located in a private subnet. An RDS instance is a good example.
+
+
+Once your function is VPC-enabled, all network traffic from your function is subject 
+to the routing rules of your VPC/Subnet. If your function needs to interact with a public 
+resource, you will need a route through a NAT gateway in a public subnet.
 
 
 Area:
@@ -5802,6 +5982,7 @@ If you already RedShift then go for ReadshiftSpectrum other wose Amazon Athena.
 Athena and Redshift Spectrum provide compelling, cost-effective solutions to 
 query the contents of your Datalake.
 
+You cannot use Redshift to capture data in key-value pairs from the IoT sources.
 
 Area:
 =====
@@ -5892,7 +6073,7 @@ Comes with OpenSearch Dashboards (visualization)
 
 
 79
-##Amazon EMR
+##EMR
 -------------------------------------------------
 • EMR stands for “Elastic MapReduce”
 • EMR helps creating Hadoop clusters (Big Data) to analyze and process vast amount of data
@@ -5915,7 +6096,7 @@ Amazon EMR – Node types & purchasing:
 • Can have long-running cluster, or transient (temporary) cluster
 
 
-
+EMR does not offer the same storage and processing speed as FSx for Lustre.
 
 
 
@@ -5950,8 +6131,10 @@ QuickSight – Dashboard & Analysis:
 
 
 81
-##AWS Glue
+##Glue
 -------------------------------------------------
+AWS Glue does not offer the same storage and processing speed as FSx for Lustre.
+
 A fully managed extract, transform, and load 
 (ETL = one or more source databases into a target database or information warehouse) 
 service that makes it easy for customers to prepare and 
@@ -5988,6 +6171,13 @@ What is difference between AWS Glue and lambda?
 Glue can only execute jobs using Scala or Python code. 
 Lambda can execute code from triggers by other services (SQS, Kafka, DynamoDB, Kinesis, CloudWatch, etc.) vs. 
 Glue which can be triggered by lambda events, another Glue jobs, manually or from a schedule.
+
+Using AWS Glue involves significant development efforts to write custom migration scripts to 
+copy the database data into Redshift.
+
+
+AWS Glue job is meant to be used for batch ETL data processing. 
+AWS Glue does not offer the same storage and processing speed as FSx for Lustre.
 
 
 Area:
@@ -7236,6 +7426,8 @@ enabling S3 Multi Factor Authentication (MFA) Delete on your S3 bucket.
 106
 ##AWS Config
 -------------------------------------------------
+AWS Config provides a detailed view of the configuration of AWS resources in your AWS account. 
+
 AWS Config is a service that enables you to assess, audit, and evaluate the configurations of your AWS resources. 
 Config continuously monitors and records your AWS resource configurations and allows you to automate the evaluation 
 of recorded configurations against desired configurations.
@@ -8009,6 +8201,14 @@ AWS Secrets Manager
 123
 ++AWS Certificate Manager (ACM)
 -------------------------------------------------
+Any SSL/TLS certificates created via ACM do not need any monitoring/intervention for expiration. 
+ACM automatically renews such certificates. 
+
+Certificates provided by ACM are automatically renewed. 
+ACM does not automatically renew the certificates that you import. 
+
+AWS Config to stream configuration changes and notifications to an Amazon SNS topic.
+
 Easily provision, manage, and deploy TLS Certificates
 • Provide in-flight encryption for websites (HTTPS)
 • Supports both public and private TLS certificates
@@ -8514,6 +8714,35 @@ Component of VPC:
 -HOWEVER you can add/edit/delete other routing rules to the main route table
 
 
+
+VPC Sharing:
+Using VPC sharing, an account that owns the VPC (owner) shares one or more subnets with other 
+accounts (participants) that belong to the same organization from AWS Organizations. 
+The owner account cannot share the VPC itself. 
+
+You can share Amazon VPCs to leverage the implicit routing within a VPC for applications that 
+require a high degree of interconnectivity and are within the same trust boundaries.
+
+A VPC peering connection is a networking connection between two VPCs that enables you to 
+route traffic between them using private IPv4 addresses or IPv6 addresses. Instances in either 
+VPC can communicate with each other as if they are within the same network. 
+VPC peering does not facilitate centrally managed VPCs.
+
+
+AWS owner account cannot share the VPC itself with another AWS account.
+
+
+VPC console wizard:
+	The Amazon VPC console wizard provides the following four configurations:
+		1)VPC with a single public subnet.
+		2)VPC with public and private subnets (NAT) 
+		3)VPC with public and private subnets and AWS Site-to-Site VPN access
+		4)VPC with a private subnet only and AWS Site-to-Site VPN access
+
+https://docs.aws.amazon.com/vpc/latest/userguide/vpc-scenarios-intro.html
+
+
+
 Area:
 =====
 VPC – Regional
@@ -9012,6 +9241,11 @@ Privately connect two VPCs using AWS’network:
 • You must update route tables in each VPC’s subnets to ensure EC2 instances can communicate with each other
 
 
+
+Since Software VPN just handles connectivity between the remote network and Amazon VPC, 
+therefore it cannot be used to send and receive data between the remote branch offices of the company.
+
+
 Area:
 =====
 VPC Peering – Regional
@@ -9060,6 +9294,8 @@ simplify your network architecture.
 A VPC endpoint enables you to privately connect your VPC to supported AWS services and VPC endpoint services 
 powered by PrivateLink without requiring an internet gateway, NAT device, VPN connection, or AWS Direct Connect connection.
 
+When you use VPC endpoint, the traffic between your VPC and the other AWS service does not 
+leave the Amazon network.
 
 VPC Endpoints (AWS PrivateLink)
 • Every AWS service is publicly exposed (public URL)
@@ -9228,6 +9464,11 @@ AWS VPN CloudHub:
 
 
 
+AWS Site-to-Site VPN enables you to securely connect your on-premises network or branch office 
+site to your Amazon Virtual Private Cloud (Amazon VPC). You can securely extend your data center 
+or branch office network to the cloud with an AWS Site-to-Site VPN (Site-to-Site VPN) connection. 
+It uses internet protocol security (IPSec) communications to create encrypted VPN tunnels 
+between two locations. You cannot use AWS Site-to-Site VPN to integrate data files via the NFS interface
 
 Area:
 =====
@@ -9262,6 +9503,9 @@ Security is a shared responsibility
 ##Direct Connect
 -------------------------------------------------
 DirectConnect connects your on-prem with your VPC through a non-public tunnel.
+
+Data transfer pricing over Direct Connect is lower than data transfer pricing over the internet, 
+so both of these options are incorrect.
 
 • Provides a dedicated private connection from a remote network to your VPC
 • Dedicated connection must be setup between your DC and AWS Direct Connect locations
@@ -9901,7 +10145,22 @@ On-Premise strategy with AWS:
 
 
 
+With AWS Database Migration Service, you can continuously replicate your data with high availability 
+and consolidate databases into a petabyte-scale data warehouse by streaming data to 
+Amazon Redshift and Amazon S3.
 
+
+
+AWS DMS enables you to seamlessly migrate data from supported sources to relational databases, 
+data warehouses, streaming platforms, and other data stores in AWS cloud.
+
+AWS DMS enables you to seamlessly migrate data from supported sources to relational databases, data warehouses, streaming platforms, and other data stores in AWS cloud.
+
+AWS DMS performs this task out of box without any complex configuration or code development. 
+You can also configure an AWS DMS replication instance to scale up or down depending on the workload.
+
+
+https://aws.amazon.com/blogs/big-data/streaming-data-from-amazon-s3-to-amazon-kinesis-data-streams-using-aws-dms/
 Area:
 =====
 MayRegional
@@ -11335,6 +11594,8 @@ It is a aws managed service, security is a shared responsibility.
 201
 ##EMR - Elastic MapReduce
 -------------------------------------------------
+EMR does not offer the same storage and processing speed as FSx for Lustre. 
+
 Amazon Elastic MapReduce (Amazon EMR) is a web service that makes it easy to quickly and cost-effectively process vast amounts of data.
 Amazon EMR is the industry-leading cloud big data platform for processing vast amounts of data using 
 open source tools such as Apache Spark, Apache Hive, Apache HBase, Apache Flink, Apache Hudi, and Presto. 
