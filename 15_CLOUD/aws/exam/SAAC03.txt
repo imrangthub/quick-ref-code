@@ -39,6 +39,7 @@ prone:প্রবণ
 contemplating :চিন্তা করা
 adequate :পর্যাপ্ত
 withstand disruptions:বাধা সহ্য করা
+ingest:গ্রহণ করা
 =================================================
 #General | Basic          
 ================================================= 
@@ -599,7 +600,12 @@ TypeOfEC2:
 	-Storage optimized
 
 
-
+ You can put an instance that is in the InService state into the Standby state, update some software or 
+ troubleshoot the instance, and then return the instance to service. 
+ Instances that are on standby are still part of the Auto Scaling group, 
+ but they do not actively handle application traffic.
+ 
+ 
 Area:
 =====
 Resource Identifiers – Regional
@@ -676,8 +682,14 @@ https://enlear.academy/aws-ec2-purchasing-options-and-spot-instances-overview-44
 
 Spot Instances:
 ===============
-A Spot Price is the hourly rate for a Spot instance. 
+Spot blocks can only be used for a span of up to 6 hours.
+ASpot Price is the hourly rate for a Spot instance. 
 
+ You can use Spot Instances for various stateless, fault-tolerant, or flexible applications.
+ Spot instances can be taken back by AWS with two minutes of notice, so spot instances cannot be 
+ reliably used for running the dev application (which can be up and running for up to 8 hours).
+ 
+ 
 Spot instances can be used for applications flexible in the timing when they can run and also able to 
 handle interruption by storing the state externally for e.g. they are 
 well-suited for data analysis, batch jobs, background processing, and optional tasks
@@ -760,6 +772,7 @@ Maintain
 
 
 
+ 
 13
 ##Security Group
 -------------------------------------------------
@@ -1161,9 +1174,9 @@ AMI provides templates to launch EC2 instances
 
  
  
- When the new AMI is copied from region A into region B, it also creates a snapshot in region 
- B because AMIs are based on the underlying snapshots. 
- 
+When the new AMI is copied from region A into region B, it also creates a snapshot in region 
+B because AMIs are based on the underlying snapshots. 
+
  
 24
 ##EC2 Instance Store
@@ -1512,6 +1525,33 @@ Target Groups:
 • The application servers don’t see the IP of the client directly
 	• The true IP of the client is inserted in the header X-Forwarded-For
 	• We can also get Port (X-Forwarded-Port) and proto (X-Forwarded-Proto)
+
+
+
+Routing different types:
+	Host-based Routing:
+	You can route a client request based on the Host field of the HTTP header allowing you to 
+	route to multiple domains from the same load balancer.
+
+	Path-based Routing:
+	You can route a client request based on the URL path of the HTTP header.
+
+	HTTP header-based routing:
+	You can route a client request based on the value of any standard or custom HTTP header.
+
+	HTTP method-based routing:
+	You can route a client request based on any standard or custom HTTP method.
+
+	Query string parameter-based routing:
+	You can route a client request based on the query string or query parameters.
+
+	Source IP address CIDR-based routing:
+	You can route a client request based on source IP address CIDR from where the request originates.
+
+
+
+If exactly 10 then desired capacity to 10.
+If Range of Instance then minMix.
 
 
 Area:
@@ -1867,7 +1907,14 @@ Launch Template (newer):
 	• Create parameters subsets (partial configuration for re-use and inheritance)
 
 
+Suspend the ReplaceUnhealthy process type for the Auto Scaling group and apply the maintenance 
+patch to the instance. Once the instance is ready, you can manually set the instance's health status 
+back to healthy and activate the ReplaceUnhealthy process type again.
 
+ Taking the snapshot of the existing instance to create a new AMI and then creating a new instance 
+ in order to apply the maintenance patch is not time/resource optimal.
+ 
+ 
 Area:
 =====
 Auto Scaling – Regional
@@ -2110,7 +2157,7 @@ IAM-based authentication can be used to login into RDS MySQL & PostgreSQL
 
 
 35
-##Amazon Aurora
+##Aurora
 -------------------------------------------------
 Amazon Aurora Global Database is designed for globally distributed applications, allowing a single Amazon Aurora 
 database to span multiple AWS Regions.
@@ -2204,6 +2251,32 @@ Aurora Machine Learning:
 	• Amazon SageMaker (use with any ML model)
 	• Amazon Comprehend (for sentiment analysis) 
 • Use cases: fraud detection, ads targeting, sentiment analysis, product recommendations
+
+
+Aurora Replicas have two main purposes. You can issue queries to them to scale the read operations 
+for your application. You typically do so by connecting to the reader endpoint of the cluster. 
+That way, Aurora can spread the load for read-only connections across as many 
+Aurora Replicas as you have in the cluster. Aurora Replicas also help to increase availability. 
+If the writer instance in a cluster becomes unavailable, Aurora automatically 
+promotes one of the reader instances to take its place as the new writer. 
+Up to 15 Aurora Replicas can be distributed across the Availability 
+Zones that a DB cluster spans within an AWS Region.
+
+
+
+Failover rules priority tier:
+	Amazon Aurora features a distributed, fault-tolerant, self-healing storage system that 
+	auto-scales up to 128TB per database instance. It delivers high performance and availability with 
+	up to 15 low-latency read replicas, point-in-time recovery, continuous backup to Amazon S3, and 
+	replication across three Availability Zones (AZs).
+
+For Amazon Aurora, each Read Replica is associated with a priority tier (0-15). 
+In the event of a failover, Amazon Aurora will promote the Read Replica that has the highest priority 
+(the lowest numbered tier). If two or more Aurora Replicas share the same priority, then 
+Amazon RDS promotes the replica that is largest in size.
+ 
+If two or more  Aurora Replicas share the same priority and size, then 
+Amazon Aurora promotes an arbitrary replica in the same promotion tier.
 
 
 
@@ -2330,7 +2403,7 @@ Amazon RDS Proxy:
 -------------------------------------------------
 The same way RDS is to get managed Relational Databases.
 ElastiCache is to get managed Redis or Memcached.
-a distributed in-memory key-value environment.
+adistributed in-memory key-value environment.
 
 • Helps reduce load off of databases for read intensive workloads
 • Helps make your application stateless
@@ -2342,16 +2415,16 @@ ElastiCache supports two open-source in-memory caching engines: Memcached and Re
 
 
 REDIS:
-• Multi AZ with Auto-Failover
-• Read Replicas to scale reads and have high availability
-• Data Durability using AOF persistence
-• Backup and restore features
+	• Multi AZ with Auto-Failover
+	• Read Replicas to scale reads and have high availability
+	• Data Durability using AOF persistence
+	• Backup and restore features
+
 
 Use Case:
 	• Gaming Leaderboards are computationally complex
 	• Redis Sorted sets guarantee both uniqueness and element ordering
 	• Each time a new element added, it’s ranked in real time, then added in correct order
-
 
 
 MEMCACHED:
@@ -2370,9 +2443,15 @@ check the cache before querying the main query store.
 Most fo the time, you’ll want to go w/DAX if you’re using DyanmoDB as a data store. 
 Otherwise, use ElastiCache.
 
- Elasticache is used as a caching layer in front of relational databases. 
- It is not a good fit to store data in key-value pairs from the IoT sources.
+Elasticache is used as a caching layer in front of relational databases. 
+It is not a good fit to store data in key-value pairs from the IoT sources.
+
  
+Amazon ElastiCache for Memcached is an ideal front-end for data stores like Amazon RDS or 
+Amazon DynamoDB, providing a high-performance middle tier for applications with extremely 
+high request rates and/or low latency requirements.
+
+
 Area:
 =====
 Amazon ElastiCache is available in multiple AWS Regions. This means that you can launch ElastiCache clusters in 
@@ -2433,6 +2512,9 @@ Amazon Route 53 is a highly available and scalable Domain Name System (DNS) web 
 Route 53 connects user requests to internet applications running on AWS or on-premises.
 
 Amazon Route53 supports both forward (AAAA) and reverse (PTR) IPv6 records. 
+
+Geolocation routing lets you choose the resources that serve your traffic based on the 
+geographic location of your users, meaning the location that DNS queries originate from.
 
 
 Routing Policies:
@@ -2708,11 +2790,31 @@ You can version your files in Amazon S3, It is enabled at the bucket level.
 
 
 Object Lifecycle Management:
-A lifecycle configuration is a set of rules that define actions that AWS S3 applies to a group of objects. 
+	A lifecycle configuration is a set of rules that define actions that AWS S3 applies to a group of objects. 
 
-There are two types of actions:
-	Transaction Actions: This action defines objects’ transition from one storage class to another.
-	Expiration Actions: This action deletes objects in the Amazon S3 bucket.
+	There are two types of actions:
+		Transaction Actions: This action defines objects’ transition from one storage class to another.
+		Expiration Actions: This action deletes objects in the Amazon S3 bucket.
+
+
+Amazon S3 supports a waterfall model for transitioning between storage classes.
+https://docs.aws.amazon.com/AmazonS3/latest/userguide/lifecycle-transition-general-considerations.html
+
+Here are the supported life cycle transitions for S3 storage classes:
+	The S3 Standard storage class to any other storage class. 
+	Any storage class to the S3 Glacier or S3 Glacier Deep Archive storage classes. 
+	The S3 Standard-IA storage class to the S3 Intelligent-Tiering or S3 One Zone-IA storage classes. 
+	The S3 Intelligent-Tiering storage class to the S3 One Zone-IA storage class. 
+	The S3 Glacier storage class to the S3 Glacier Deep Archive storage class.
+
+
+Following are the unsupported life cycle transitions for S3 storage classes:
+	Any storage class to the S3 Standard storage class. 
+	Any storage class to the Reduced Redundancy storage class. 
+	S3 Intelligent-Tiering storage class to the S3 Standard-IA storage class. 
+	S3 One Zone-IA storage class to the S3 Standard-IA or S3 Intelligent-Tiering storage classes.
+
+
 
 
 
@@ -2802,6 +2904,27 @@ source bucket but that aren't in the target bucket.
 The command also identifies objects in the source bucket that have different LastModified dates 
 than the objects that are in the target bucket. The sync command on a versioned bucket copies only the 
 current version of the object—previous versions aren't copied.
+
+There are no S3 data transfer charges when data is transferred in from the internet. 
+Also with S3TA, you pay only for transfers that are accelerated. Therefore the junior 
+scientist does not need to pay any transfer charges for the image upload because S3TA did not 
+result in an accelerated transfer.
+
+
+If you have workloads that cater to a global client base, AWS recommends that you use AWS Global Accelerator. 
+If you have workloads hosted in a single AWS Region and used by clients in and around the same 
+Region, you can use an Application Load Balancer or Network Load Balancer to manage your resources.
+
+If you create 10 prefixes in an Amazon S3 bucket to parallelize reads, you could scale your read 
+performance to 55,000 read requests per second.
+
+
+
+When you use bucket default settings, you don't specify a Retain Until Date. 
+Instead, you specify a duration, in either days or years.
+
+When you apply a retention period to an object version explicitly, you specify a Retain Until Date 
+for the object version.
 
 
 Area:
@@ -3768,7 +3891,10 @@ FSx for Windows does not allow you to present S3 objects as files and does not a
 write changed data back to S3. Therefore you cannot reference the "cold data" 
 with quick access for reads and updates at low cost.
 
-
+ FSx for Windows does not allow you to present S3 objects as files and does not allow you to 
+ write changed data back to S3. Therefore you cannot reference the "cold data" 
+ with quick access for reads and updates at low cost.
+ 
 
 Amazon FSx for Lustre:
 	• Lustre is a type of parallel distributed file system, for large-scale computing
@@ -3799,6 +3925,13 @@ FSx Lustre - File System Deployment Options:
  FSx for Lustre integrates with Amazon S3.
 FSx for Lustre provides the ability to both process the 'hot data' in a parallel and distributed fashion 
 as well as easily store the 'cold data' on Amazon S3.
+
+FSx for Lustre integrates with Amazon S3, making it easy to process data sets with the Lustre file system. 
+When linked to an S3 bucket, an FSx for Lustre file system transparently presents 
+S3 objects as files and allows you to write changed data back to S3.
+
+FSx for Lustre provides the ability to both process the 'hot data' in a parallel and 
+distributed fashion as well as easily store the 'cold data' on Amazon S3.
 
 
 
@@ -4244,8 +4377,25 @@ By default, FIFO queues support up to 3,000 messages per second with batching, o
 Therefore, using batching you can meet a throughput requirement of upto 3,000 messages per second.
 
 
- You can't convert an existing standard queue into a FIFO queue.
+You can't convert an existing standard queue into a FIFO queue.
  
+ 
+ 
+By default 300 Opration per second, if a 4 msg can process per operation then its will be 1200 Op per second !
+ 
+
+
+By default, FIFO queues support up to 300 messages per second (300 send, receive, or delete operations 
+per second). 
+When you batch 10 messages per operation (maximum), FIFO queues can support up to 
+3,000 messages per second. Therefore you need to process 4 messages per operation so that the 
+FIFO queue can support up to 1200 messages per second, which is well within the peak rate.
+
+If you require higher throughput, you can enable high throughput mode for FIFO on the 
+Amazon SQS console, which will support up to 30,000 messages per second with batching, or up to 
+3,000 messages per second without batching.
+
+
 Area:
 =====
 SQS is a regional service, that is highly available within a single region. 
@@ -4430,7 +4580,7 @@ Amazon Virtual Private Cloud (VPC) subnet, without traversing the Internet.
 
 
 63
-##Amazon Kinesis
+##Kinesis
 -------------------------------------------------
 Makes it easy to collect, process, and analyze streaming data in real-time and that can be run on EC2 instances.
 Ingest real-time data such as: Application logs, Metrics, Website clickstreams,IoT telemetry data.
@@ -4487,6 +4637,14 @@ Kinesis Data Streams Security:
 • Monitor API calls using CloudTrail
 
 
+Kinesis Data Streams cannot directly write the output to S3. 
+Unlike Firehose, KDS does not offer a ready-made integration via an intermediary Lambda 
+function to reliably dump data into S3. You will need to do a lot of custom coding to get the 
+Lambda function to process the incoming stream and then store the transformed output to S3 
+with the constraint that the buffer is maintained reliably and no transformed data is lost.
+
+
+
 Kinesis Data Firehose:
  Amazon Kinesis Data Firehose is the easiest way to reliably load streaming data into data lakes, 
  data stores, and analytics tools, Not application.
@@ -4503,9 +4661,16 @@ You can't have applications consuming data streams from Kinesis Data Firehose,
 that's the job of Kinesis Data Streams.
 
 Pay for data going through Firehose
-
-
 Perform real-time analytics on Kinesis Streams using SQL
+
+
+Amazon Kinesis Data Firehose is the easiest way to load streaming data into data stores and analytics tools. 
+It can capture, transform, and load streaming data into Amazon S3, Amazon Redshift, 
+Amazon Elasticsearch Service, and Splunk, enabling near real-time analytics with existing business 
+intelligence tools and dashboards you’re already using today. It is a fully managed service 
+that automatically scales to match the throughput of your data and requires no ongoing administration. 
+It can also batch, compress, and encrypt the data before loading it, 
+minimizing the amount of storage used at the destination and increasing security.
 
 
 Kinesis Data Analytics (SQL application):
@@ -4519,7 +4684,14 @@ Kinesis Data Analytics (SQL application):
 	• Time-series analytics
 	• Real-time dashboards
 	• Real-time metrics
+Kinesis Data Analytics cannot directly ingest data from the source as it ingests data either from 
+Kinesis Data Streams or Kinesis Data Firehose, so this option is ruled out.
 
+The four most common use cases are streaming 
+	extract-transform-load (ETL), 
+	continuous metric generation, 
+	responsive real-time analytics, and 
+	interactive querying of data streams.
 
 
 Ordering data into Kinesis:
@@ -5811,10 +5983,13 @@ ExamTips:Any time you see Financial transaction or Ledger, its QLDB.
 
 
 ==Data & Analytics
-##Amazon Athena
+##Athena
 -------------------------------------------------
 Amazon Athena is an interactive query service that makes it easy to analyze data directly in Amazon S3 using standard SQL.
 Athena is not a database but rather a query engine.
+
+Athena cannot be used to build a REST API to consume data from the source, 
+No APIGatwaay support to create rest api.
 
 • Fully Serverless database with SQL capabilities
 • Used to query data in S3
@@ -6075,6 +6250,11 @@ Comes with OpenSearch Dashboards (visualization)
 79
 ##EMR
 -------------------------------------------------
+ Amazon EMR is the industry-leading cloud big data platform for processing vast amounts of data 
+ using open source tools such as Apache Spark, Apache Hive, Apache HBase, Apache Flink, 
+ Apache Hudi, and Presto. Amazon EMR uses Hadoop, an open-source framework, to distribute 
+ your data and processing across a resizable cluster of Amazon EC2 instances. 
+ 
 • EMR stands for “Elastic MapReduce”
 • EMR helps creating Hadoop clusters (Big Data) to analyze and process vast amount of data
 • The clusters can be made of hundreds of EC2 instances
@@ -6097,6 +6277,15 @@ Amazon EMR – Node types & purchasing:
 
 
 EMR does not offer the same storage and processing speed as FSx for Lustre.
+
+
+Amazon EMR is the industry-leading cloud big data platform for processing vast amounts 
+of data using open source tools such as Apache Spark, Apache Hive, Apache HBase, 
+Apache Flink, Apache Hudi, and Presto. Amazon EMR uses Hadoop, an open-source framework, 
+to distribute your data and processing across a resizable cluster of Amazon EC2 instances. 
+Using an EMR cluster would imply managing the underlying infrastructure so it’s ruled out 
+because the correct solution for the given use-case should require the least amount of 
+infrastructure maintenance.
 
 
 
@@ -8009,6 +8198,11 @@ Copying Snapshots across accounts:
 	5. Create a volume from the snapshot
 
 
+AWS KMS enforces a waiting period. To delete a CMK in AWS KMS you schedule key deletion. 
+You can set the waiting period from a minimum of 7 days up to a maximum of 30 days. 
+The default waiting period is 30 days.
+
+After the waiting period ends, AWS KMS deletes the KMS key, its aliases, and all related AWS KMS metadata.
 
 Area:
 =====
@@ -8308,6 +8502,15 @@ WAF – Fixed IP while using WAF with a Load Balancer
 
 
 
+You can use AWS WAF with your Application Load Balancer to allow or block requests based on 
+the rules in a web access control list (web ACL). Geographic (Geo) Match Conditions in 
+AWS WAF allows you to use AWS WAF to restrict application access based on the geographic location 
+of your viewers. With geo match conditions you can choose the countries 
+from which AWS WAF should allow access.
+
+
+Geo Restriction feature of CloudFront helps in restricting traffic based on the user's 
+geographic location. But, CloudFront works from edge locations and doesn't belong to a VPC.
 
 
 Area:
@@ -13537,6 +13740,8 @@ Persistent File System
 AWS Storage Gateway
 -------------------------------------------------
 Storage Gateway is a way of Hybrid cloud make possible
+Gateway mean Interface, FileGateway->FileInterface.(AWS Storage Gateway's file interface, or file gateway)
+
 
 3 types of Storage Gateway:
 • File Gateway
@@ -13553,12 +13758,14 @@ File Gateway:
 • Integrated with Active Directory (AD) for user authentication
 
 Volume Gateway:
+
 • Block storage using iSCSI protocol backed by S3
 • Backed by EBS snapshots which can help restore on-premises volumes!
 • Cached volumes: low latency access to most recent data
 • Stored volumes: entire dataset is on premise, scheduled backups to S3
 
 Tape Gateway:
+.
 • Some companies have backup processes using physical tapes (!)
 • With Tape Gateway, companies use the same processes but, in the cloud
 • Virtual Tape Library (VTL) backed by Amazon S3 and Glacier
