@@ -115,6 +115,9 @@ Cloud computing is a pay-as-you-go model for delivering IT resources.
    
 
 
+Throttling is the process of limiting the number of requests an authorized program can 
+submit to a given operation in a given amount of time.
+
 
 2
 ##AWS BasicInfo
@@ -2855,6 +2858,10 @@ consistency for list operations, so after a write, you can immediately perform a
 objects in a bucket with any changes reflected.
 
 
+When you need to access S3 using a file system protocol, you should use File Gateway. 
+You get a local cache in the gateway that provides high throughput and low latency over SMB.
+
+
 
 Buckets can be in one of three states:
 	Unversioned (the default)
@@ -4149,6 +4156,19 @@ The service has ISO, PCI-DSS, and SOC certifications, and is also HIPAA eligible
 -------------------------------------------------
 Bridge between on-premises data to AWS, no aws-to-aws
 
+Storage Gateway provides a standard set of storage protocols such as 
+iSCSI, SMB, and NFS, which allow you to use AWS storage without rewriting your existing applications. 
+
+
+
+SMB or NFS interface->FileGateway
+iSCSI block storage-> Volume Gateway
+
+File gateway offers SMB or NFS-based access to data in Amazon S3 with local caching.
+
+Use cases: disaster recovery, backup & restore, tiered storage.
+
+
 
 Hybrid Cloud for Storage:
 • AWS is pushing for ”hybrid cloud”
@@ -4159,15 +4179,10 @@ Hybrid Cloud for Storage:
 	• Security requirements
 	• Compliance requirements
 	• IT strategy
-• S3 is a proprietary storage technology (unlike EFS / NFS), so how do you expose the S3 data on-premises?
-• AWS Storage Gateway!
 
+S3 is a proprietary storage technology (unlike EFS / NFS), so how do you expose the S3 data on-premises?
+  AWS Storage Gateway!
 
-
-Storage Gateway provides a standard set of storage protocols such as 
-iSCSI, SMB, and NFS, which allow you to use AWS storage without rewriting your existing applications. 
-
-Use cases: disaster recovery, backup & restore, tiered storage
 
 3 types of Storage Gateway:
 	• File Gateway
@@ -4209,8 +4224,8 @@ Windows File Server and benefit from protected, resilient, fully managed file sy
 Volume Gateway:
 	• Block storage using iSCSI protocol backed by S3
 	• Backed by EBS snapshots which can help restore on-premises volumes!
-	• Cached volumes: low latency access to most recent data
-	• Stored volumes: entire dataset is on premise, scheduled backups to S3
+		• Cached volumes: low latency access to most recent data
+		• Stored volumes: entire dataset is on premise, scheduled backups to S3
 Cached Volume mode – the entire dataset is stored on S3, and a cache of the most frequently accessed data is cached on-site.
 Stored Volume mode – the entire dataset is stored on-site and is asynchronously backed up to S3 (EBS point-in-time snapshots). 
 Snapshots are incremental and compressed.
@@ -4242,6 +4257,13 @@ Storage Gateway – Hardware appliance:
 
 Needs additional setup on-premises
 
+
+
+File gateway offers SMB or NFS-based access to data in Amazon S3 with local caching.
+
+Volume Gateway to present cloud-based iSCSI block storage volumes to your on-premises applications. 
+Volume Gateway does not support NFS interface.
+Tape Gateway does not support NFS interface.
 
 
 Area:

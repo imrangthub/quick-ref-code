@@ -22,42 +22,6 @@ echo "<h1>Hello World from $(hostname -f)</h1>" > /var/www/html/index.html
 ================================================= 
 
 
-When you need to access S3 using a file system protocol, you should use File Gateway. 
-You get a local cache in the gateway that provides high throughput and low latency over SMB.
-
-File gateway offers SMB or NFS-based access to data in Amazon S3 with local caching.
-SMBorNFSinterface->FileGateway
-
-cloud-based iSCSI block storage-> Volume Gateway
-
-
-You can use Aurora replicas and CloudFront distribution to make the application more resilient to 
-spikes in request rates.
-
-
-
-
-If you have workloads that cater to a global client base, AWS recommends that you use AWS 
-Global Accelerator. 
-If you have workloads hosted in a single AWS Region and used by clients in 
-and around the same Region, you can use an 
-Application Load Balancer or Network Load Balancer to manage your resources.
-
-
-File gateway offers SMB or NFS-based access to data in Amazon S3 with local caching.
-
-Volume Gateway to present cloud-based iSCSI block storage volumes to your on-premises applications. 
-Volume Gateway does not support NFS interface.
-
-Tape Gateway does not support NFS interface.
- 
-It uses internet protocol security (IPSec) communications to create encrypted VPN tunnels between two locations. 
-You cannot use AWS Site-to-Site VPN to integrate data files via the NFS interface
-
-
-Throttling is the process of limiting the number of requests an authorized program can submit to a given operation in a given amount of time.
-
- 
 ConfusingTakeaLook
 ------------------
 https://stackarmor.com/protecting-against-a-distributed-denial-of-service-ddos-attack-using-aws/
@@ -475,6 +439,9 @@ AWS Site-to-Site VPN:
 A Site-to-Site VPN connection offers two VPN tunnels between a virtual private gateway or a 
 transit gateway on the AWS side, and a customer gateway (which represents a VPN device) on the 
 remote (on-premises) side	
+
+IPSec communications to create encrypted VPN tunnels between two locations. 
+You cannot use AWS Site-to-Site VPN to integrate data files via the NFS interface.
 		
 
 =================================================
@@ -501,6 +468,30 @@ S3:
 -------------------------------------------------
 S3 Standard storage, the pricing is $0.023 per GB per month. Therefore, the monthly storage 
 cost on S3 for the test file is $0.023.
+
+
+
+=================================================
+#Application | Environment | Status
+=================================================
+
+#Resilient
+-------------------------------------------------
+You can use Aurora replicas and CloudFront distribution to make the application more resilient to 
+spikes in request rates.
+
+
+
+#Availability
+-------------------------------------------------
+If you have workloads that cater to a global client base, AWS recommends that you use 
+Global Accelerator. 
+
+If you have workloads hosted in a single AWS Region and used by clients in 
+and around the same Region, you can use an 
+Application Load Balancer or Network Load Balancer to manage your resources.
+
+
 
 
 
