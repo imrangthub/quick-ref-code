@@ -20,15 +20,6 @@ echo "<h1>Hello World from $(hostname -f)</h1>" > /var/www/html/index.html
 =================================================
 #General | Basic | Info      
 ================================================= 
-Reserved Instances:
-Keep in mind that you can always refer to On-Demand Instances to suffice any additional resource requirements
-
-
-IAM
-AWS IAM enables organizations with many employees to create and manage multiple users under a single AWS account.
-
-Use Access Control Lists (ACLs): 
-Within Amazon S3, you can use ACLs to give read or write access on buckets or objects to groups of users. With ACLs, you can only grant other AWS accounts (not specific users) access to your Amazon S3 resources.
 
 
 When you need to access S3 using a file system protocol, you should use File Gateway. 
@@ -64,10 +55,19 @@ It uses internet protocol security (IPSec) communications to create encrypted VP
 You cannot use AWS Site-to-Site VPN to integrate data files via the NFS interface
 
 
+Throttling is the process of limiting the number of requests an authorized program can submit to a given operation in a given amount of time.
+
+ 
 ConfusingTakeaLook
 ------------------
 https://stackarmor.com/protecting-against-a-distributed-denial-of-service-ddos-attack-using-aws/
 
+Organizations SCPs
+ACLs or ACL
+
+Amazon Aurora  failover priority tiers .
+
+Dirrerent Placement Group
 
 which configuration not supported by aws vpc console wizard
 
@@ -476,7 +476,35 @@ A Site-to-Site VPN connection offers two VPN tunnels between a virtual private g
 transit gateway on the AWS side, and a customer gateway (which represents a VPN device) on the 
 remote (on-premises) side	
 		
+
+=================================================
+#Storage pricing | cost 
+=================================================
+
 	
+EFS:
+-------------------------------------------------
+Amazon EFS, you pay only for the resources that you use. 
+The EFS Standard Storage pricing is $0.30 per GB per month. 
+Therefore the cost for storing the test file on EFS is $0.30 for the month.
+
+
+EBS:
+-------------------------------------------------
+EBS General Purpose SSD (gp2) volumes, the charges are $0.10 per GB-month of provisioned storage. 
+Therefore, for a provisioned storage of 100GB for this use-case, the monthly cost on EBS is $0.10*100 = $10. 
+This cost is irrespective of how much storage is actually consumed by the test file.
+
+
+
+S3:
+-------------------------------------------------
+S3 Standard storage, the pricing is $0.023 per GB per month. Therefore, the monthly storage 
+cost on S3 for the test file is $0.023.
+
+
+
+
 
 =================================================
 #Code | Helping Heand | Example

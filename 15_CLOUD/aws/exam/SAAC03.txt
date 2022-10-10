@@ -215,14 +215,20 @@ RegionalServices:https://aws.amazon.com/about-aws/global-infrastructure/regional
 6
 ##IAM
 -------------------------------------------------
-AWS Identity and Access Management (IAM) is a web service that helps you securely control access to AWS resources. 
+AWS Identity and Access Management (IAM) is a web service that helps you securely control access to 
+AWS resources. 
+AWS IAM enables organizations with many employees to create and manage multiple users under a 
+single AWS account.
+
 
 Three types of Principals — Root Users, IAM Users and Instance Principals
 IAM deals with four Principle Entities: Users, Groups, Roles and Policies.
 
 A principal is a person or application that can make a request for an action or operation on an AWS resource.
 
-
+ IAM roles and IAM users are separate IAM entities and should not be mixed. 
+ Only IAM roles can be used to access cross-account resources.
+ 
 IAM Policies Structure:
 • Version: policy language version, always include “2012-10-17”
 • Id: an identifier for the policy (optional) 
@@ -392,33 +398,44 @@ centralized management of permissions.
  
  
 
-AWS supports six types of policies: identity-based policies, resource-based policies, 
-permissions boundaries, Organizations SCPs, ACLs, and session policies.
+AWS supports six types of policies: 
+	Identity-based policies, 
+	resource-based policies, 
+	permissions boundaries, 
+	Organizations SCPs, ACLs, and 
+	Session policies.
 
-Identity-based policies are attached to an IAM user, group, or role to specify what that identity 
-         can do (its permissions).Identity-based policies grant permissions to an identity.
-Resource-based policies – Attach inline policies to resources, you can specify who has access to the resource 
+Identity-based policies: are attached to an IAM user, group, or role to specify what that identity 
+         can do (its permissions).
+		 Identity-based policies grant permissions to an identity.
+		 
+Resource-based policies: Attach inline policies to resources, you can specify who has access to the resource 
          and what actions they can perform on it.  
 
 Permissions boundaries: Use a managed policy as the permissions boundary for an IAM entity (user or role). 
-						for an IAM entity (user or role).
-
+						
+						
 Organizations SCPs: Organizations service control policy (SCP) to define the maximum permissions 
-	for account members of an organization or organizational unit (OU). 
-SCPs limit permissions that identity-based policies or resource-based policies grant to entities 
-(users or roles) within the account, but do not grant permissions.
+		for account members of an organization or organizational unit (OU). 
+	    SCPs limit permissions that identity-based policies or resource-based policies grant to entities 
+	    (users or roles) within the account, but do not grant permissions.
 
-Access control lists (ACLs) – Use ACLs to control which principals in other accounts can access the resource to 
-which the ACL is attached.
-ACLs are cross-account permissions policies that grant permissions to the specified principal. 
-ACLs cannot grant permissions to entities within the same account.
+Access control lists (ACLs) – Use ACLs to control which principals in other accounts can access the 
+    resource to which the ACL is attached.
+	ACLs are cross-account permissions policies that grant permissions to the specified principal. 
+	ACLs cannot grant permissions to entities within the same account.
+	
+With ACLs, you can only grant other AWS accounts (not specific users) access to your 
+Amazon S3 resources(buckets or objects).
+
 
 A network access control list (ACL) allows or denies specific inbound or outbound traffic at the subnet level. 
 You can use the default network ACL for your VPC, or you can create a custom network ACL for your VPC with rules that are 
 similar to the rules for your security groups in order to add an additional layer of security to your VPC.
 
 
-Session policies:Pass advanced session policies when you use the AWS CLI or AWS API to assume a role or a federated user. 
+Session policies: Pass advanced session policies when you use the AWS CLI or AWS API to 
+    assume a role or a federated user. 
 	Session policies limit the permissions that the role or user's identity-based policies grant to the session. 
 	Session policies limit permissions for a created session, but do not grant permissions.
 
@@ -653,7 +670,12 @@ EC2 Instances Purchasing Options:
   No need for 1 or 3-year commitment, The Availability Zone in which to reserve the capacity (only one).
 
 
+
+Reserved Instances:
+-------------------------------------------------
 Reserved Instances do not renew automatically.
+Keep in mind that you can always refer to On-Demand Instances to suffice any additional resource requirements.
+
 
 
 Security:
@@ -899,8 +921,8 @@ Specifically used for launching cluster compute instance types.
 
 Placement type:
 Cluster(Same Rack Same AZ ) – clusters instances into a low-latency group in a single Availability Zone.
-This strategy enables workloads to achieve the low-latency network performance.
-:If the rack fails, all instances fails at the same time.
+	This strategy enables workloads to achieve the low-latency network performance.
+	:If the rack fails, all instances fails at the same time.
 
 Use case:
 • Big Data job that needs to complete fast
@@ -908,19 +930,23 @@ Use case:
 
 
 Partition(Not Same Rack but Same AZ ) — spreads instances across many different partitions (which rely on
-different sets of racks) within a single AZ.
-Do not share the same rack.  
+	different sets of racks) within a single AZ.
+	Do not share the same rack.  
 
 Scales to 100s of EC2 instances per group (Hadoop, Cassandra, Kafka)
 Can span across multiple AZs in the same region.
 The instances in a partition do not share racks with the instances in the other partitions.
 :A partition failure can affect many EC2 but won’t affect other partitions
 
+A partition placement group can have a maximum of seven partitions per Availability Zone. 
+Since a partition placement group can have partitions in multiple Availability Zones in the same region, 
+therefore instances will not have low-latency network performance. 
+
 
 Spread(Not Same Rack Not Same AZ ) – strictly places a small group of instances across distinct underlying hardware to reduce correlated failures.
-It spread the instances across multiple AZ.
-It reduces the risk of failure of the network since other instances are active in other zones.
-:Limited to 7 instances per AZ per placement group
+	It spread the instances across multiple AZ.
+	It reduces the risk of failure of the network since other instances are active in other zones.
+	:Limited to 7 instances per AZ per placement group
 
 Use case:
 • Application that needs to maximize high availability.
@@ -1061,6 +1087,16 @@ EBS volume:
 EBS volume, which provides off-instance storage that will persist independently from the life of the instance. 
 
 
+
+Instance store is ideal for the temporary storage of information that changes frequently such as buffers, 
+caches, scratch data, and other temporary content, or for data that is replicated across a 
+fleet of instances, such as a load-balanced pool of web servers. Instance store volumes are 
+included as part of the instance's usage cost.
+The resilient architecture can adjust for the loss of any instance.
+
+If an instance reboots (intentionally or unintentionally), data in the instance store persists.
+When you stop, hibernate, or terminate an instance, every block of storage in the 
+instance store is reset, data loss.
 
 
 
@@ -1295,6 +1331,13 @@ Amazon EFS offers four storage classes:
 
 
 Can copy snapshots across AZ or Region.
+
+
+
+Amazon EFS is a regional service storing data within and across multiple Availability Zones (AZs) 
+for high availability and durability. Amazon EC2 instances can access your file system across AZs, 
+regions, and VPCs, while on-premises servers can access using AWS Direct Connect or AWS VPN.
+
 
 
 Area:
@@ -1587,6 +1630,8 @@ Elastic Load Balancing provides a security group.
 30
 ##NLB (Network Load Balancer)
 -------------------------------------------------
+Network Load Balancer cannot facilitate content-based routing ALB does it.
+
 Network load balancers (Layer 4) allow to:
 	• Forward TCP & UDP traffic to your instances
 	• Handle millions of request per seconds
@@ -1611,6 +1656,10 @@ ExamTips: If you see UDP or TCP, its NLB;
 		  Back end application Health Checks support the TCP, HTTP and HTTPS Protocols only.
 		  
 
+
+The NLB uses HTTP, HTTPS, and TCP as possible protocols when performing health checks on targets. 
+The default is the TCP protocol. If the target type is ALB, the supported health check protocols are 
+HTTP and HTTPS. 
 
 
 Area:
@@ -1911,10 +1960,18 @@ Suspend the ReplaceUnhealthy process type for the Auto Scaling group and apply t
 patch to the instance. Once the instance is ready, you can manually set the instance's health status 
 back to healthy and activate the ReplaceUnhealthy process type again.
 
- Taking the snapshot of the existing instance to create a new AMI and then creating a new instance 
- in order to apply the maintenance patch is not time/resource optimal.
+Taking the snapshot of the existing instance to create a new AMI and then creating a new instance 
+in order to apply the maintenance patch is not time/resource optimal.
+
+ASG cannot directly use a Cloudwatch alarm as the source for a scale-in or scale-out event.
  
- 
+
+You can put an instance that is in the InService state into the Standby state, 
+update some software or troubleshoot the instance, and then return the instance to service.
+Instances that are on standby are still part of the Auto Scaling group, but they do not actively 
+handle application traffic.
+
+
 Area:
 =====
 Auto Scaling – Regional
@@ -1974,6 +2031,13 @@ RDS is a managed service:
 
 Supports all RDS database engines (MariaDB, MySQL,PostgreSQL, SQL Server, Oracle)
 
+Multi-AZ follows synchronous replication and spans at least two Availability Zones within a single region. 
+Read replicas follow asynchronous replication and can be within an 
+Availability Zone, Cross-AZ, or Cross-Region.
+
+When you provision a Multi-AZ DB Instance, Amazon RDS automatically creates a primary 
+DB Instance and synchronously replicates the data to a standby instance in a different 
+Availability Zone (AZ). Multi-AZ spans at least two Availability Zones within a single region.
 
 
 RDS Read Replicas for read scalability: 
@@ -2405,6 +2469,17 @@ The same way RDS is to get managed Relational Databases.
 ElastiCache is to get managed Redis or Memcached.
 adistributed in-memory key-value environment.
 
+Amazon ElastiCache for Redis is a great choice for real-time transactional and analytical 
+processing use cases such as caching, chat/messaging, gaming leaderboards, geospatial, machine learning, 
+media streaming, queues, real-time analytics, and session store.
+
+Amazon ElastiCache for Memcached is a great choice for implementing an in-memory 
+cache to decrease access latency, 
+increase throughput, and ease the load off your relational or NoSQL database.
+ElastiCache Memcached cannot be used as a cache to serve static content from S3.
+
+Although you can integrate Redis with DynamoDB.
+
 • Helps reduce load off of databases for read intensive workloads
 • Helps make your application stateless
 • AWS takes care of OS maintenance / patching, optimizations, setup, configuration, monitoring, failure recovery and backups
@@ -2772,10 +2847,22 @@ security group to your environment.
 An Amazon S3 bucket is a public cloud storage. Amazon Simple Storage Service (Amazon S3) is an object storage service. 
 You can use Amazon S3 to store and retrieve any amount of data at any time, from anywhere.
 
+S3 Versioning-enabled buckets enable you to recover objects from accidental deletion or overwrite.
+
 After a successful write of a new object or an overwrite of an existing object, any subsequent 
 read request immediately receives the latest version of the object. S3 also provides strong 
 consistency for list operations, so after a write, you can immediately perform a listing of the 
 objects in a bucket with any changes reflected.
+
+
+
+Buckets can be in one of three states:
+	Unversioned (the default)
+	Versioning-enabled
+	Versioning-suspended
+You enable and suspend versioning at the bucket level. After you version-enable a bucket, 
+it can never return to an unversioned state. But you can suspend versioning on that bucket.
+
 
 
 S3 in Amazon has two entities called buckets and objects. 
@@ -3197,6 +3284,10 @@ Moving objects can be automated using a lifecycle configuration
 
 
 
+The minimum storage duration is 30 days before you can transition objects from 
+S3 Standard to S3 One Zone-IA or S3 Standard-IA.
+
+
 
 
 45
@@ -3217,6 +3308,23 @@ Expiration actions: configure objects to expire (delete) after some time
 
 
 
+Amazon S3 supports a waterfall model for transitioning between storage classes.
+
+Supported lifecycle transitions:
+	The S3 Standard storage class to any other storage class.
+	The S3 Standard-IA storage class to the S3 Intelligent-Tiering, S3 One Zone-IA, S3 Glacier Instant Retrieval, S3 Glacier Flexible Retrieval, or S3 Glacier Deep Archive storage classes.
+	The S3 Intelligent-Tiering storage class to the S3 One Zone-IA, S3 Glacier Instant Retrieval, S3 Glacier Flexible Retrieval, or S3 Glacier Deep Archive storage classes.
+	The S3 One Zone-IA storage class to the S3 Glacier Flexible Retrieval or S3 Glacier Deep Archive storage classes.
+	The S3 Glacier Instant Retrieval storage class to the S3 Glacier Flexible Retrieval or S3 Glacier Deep Archive storage classes.
+	The S3 Glacier Flexible Retrieval storage class to the S3 Glacier Deep Archive storage class.
+	Any storage class to the S3 Glacier Deep Archive storage class.
+
+Unsupported lifecycle:
+	Any storage class to the S3 Standard storage class.
+	Any storage class to the Reduced Redundancy Storage (RRS) class.
+	The S3 Intelligent-Tiering storage class to the S3 Standard-IA storage class.
+	The S3 One Zone-IA storage class to the S3 Intelligent-Tiering, S3 Standard-IA, 
+	or S3 Glacier Instant Retrieval storage classes.
 
 
 
@@ -3463,6 +3571,7 @@ so the retrieval costs would be pretty high).
 ##CloudFront
 -------------------------------------------------
 UserReq->CloudFront->EdgeLocation->WebServer
+CloudFront works from edge locations and doesn't belong to a VPC.
 
 CloudFront delivers your content through a worldwide network of data centers called edge locations.
 CloudFront is Amazon’s content delivery network that is primarily used to speed up websites. 
@@ -3470,6 +3579,13 @@ It’s particularly useful for large, static assets—like images and videos.
 
 AWS CloudFront is a globally-distributed network offered by Amazon Web Services, which securely transfers content such as 
 software, SDKs, videos, etc., to the clients, with high transfer speed.
+
+
+Amazon CloudFront uses standard cache control headers you set on your files to identify 
+static and dynamic content. You can use different origins for different types of content on 
+a single site – e.g. Amazon S3 for static objects, Amazon EC2 for dynamic content, and 
+custom origins for third-party content.
+
 
 
 • Content Delivery Network (CDN)
@@ -3706,6 +3822,10 @@ resolvers, traffic dials and endpoint weights changes are effective within secon
 CodeDeploy is not meant to distribute traffic across instances.
 
 
+AWS Global Accelerator for availability and performance of your applications with local or global users.
+CloudFront is better for improving application resiliency to handle spikes in traffic.
+Direct Connect cannot be used to improve application resiliency to handle spikes in traffic.
+ 
 Area:
 =====
 Global Accelerator is a global service.
@@ -3867,7 +3987,10 @@ Four widely-used file systems:
  - Lustre.
  
 
-FSx for Windows:
+FSx for Windows(Service Message Block (SMB) protocol):
+AWS Managed Microsoft AD does not support Microsoft’s Distributed File System (DFS).
+Microsoft SQL Server on AWS does not support Microsoft’s Distributed File System (DFS).
+
 	Amazon FSx for Windows is accessible from Windows, Linux, and MacOS compute instances and devices. 
 	Thousands of compute instances and devices can access a file system concurrently. 
 	Amazon FSx File Gateway provides low-latency, on-premises access to fully managed file shares in the cloud.
@@ -3897,6 +4020,7 @@ with quick access for reads and updates at low cost.
  
 
 Amazon FSx for Lustre:
+ FSx for Lustre does not support Microsoft’s Distributed File System (DFS), so this option is incorrect.
 	• Lustre is a type of parallel distributed file system, for large-scale computing
 	• The name Lustre is derived from “Linux” and “cluster
 	• Machine Learning, High Performance Computing (HPC)
@@ -4604,6 +4728,13 @@ Kinesis Data Streams:
 Amazon Kinesis Data Streams (KDS) is a massively scalable and durable real-time data streaming service. 
 By default, the 2MB/second/shard output is shared between all of the applications consuming data from the stream.
 consumers to use enhanced fan-out and receive their own 2MB/second pipe of read throughput per shard.
+
+
+Kinesis Data Streams cannot directly write the output to S3. 
+Unlike Firehose, KDS does not offer a ready-made integration via an intermediary 
+Lambda function to reliably dump data into S3. 
+You will need to do a lot of custom coding to get the Lambda function to process the 
+incoming stream and then store the transformed output to S3.
 
 • Retention between 1 day to 365 days
 • Ability to reprocess (replay) data
@@ -5564,6 +5695,14 @@ API Gateway – Security:
 	• If using Edge-Optimized endpoint, then the certificate must be in us-east-1
 	• If using Regional endpoint, the certificate must be in the API Gateway region
 	• Must setup CNAME or A-alias record in Route 53
+
+
+Amazon API Gateway, Amazon SQS and Amazon Kinesis:
+To prevent your API from being overwhelmed by too many requests, Amazon API Gateway 
+throttles requests to your API using the token bucket algorithm, where a token counts for a request. 
+Specifically, API Gateway sets a limit on a steady-state rate and a burst of request submissions 
+against all APIs in your account. In the token bucket algorithm, the burst is the maximum bucket size.
+
 
 
 
@@ -7507,6 +7646,9 @@ It is a aws managed service, security is a shared responsibility.
 • A trail can be applied to All Regions (default) or a single Region.
 • If a resource is deleted in AWS, investigate CloudTrail first!
 
+Configure AWS CloudTrail to record all account activity - AWS recommends to turn on 
+CloudTrail to log all IAM actions for monitoring and audit purposes.
+
 Actions taken by a user, role, or an AWS service are recorded as events in CloudTrail. 
 Events include actions taken in the AWS Management Console, AWS Command Line Interface, and AWS SDKs and APIs.
 
@@ -8475,6 +8617,11 @@ AWS WAF gives you control over how traffic reaches your applications by enabling
 rules that block common attack patterns, such as SQL injection or cross-site scripting, 
 and rules that filter out specific traffic patterns that you can define. 
 
+AWS WAF is a web application firewall service that lets you monitor web requests and protect 
+your web applications from malicious requests. Use AWS WAF to block or allow requests based on 
+conditions that you specify, such as the IP addresses. 
+You can also use AWS WAF preconfigured protections to block common attacks like 
+SQL injection or cross-site scripting.
 
 Deploy on
 • Application Load Balancer
@@ -8698,6 +8845,14 @@ Intelligent Threat discovery to Protect AWS Account
 • Can protect against CryptoCurrency attacks (has a dedicated “finding” for it)
 
 
+Disable the service in the general settings:
+	Disabling the service will delete all remaining data, including your findings and configurations 
+	before relinquishing the service permissions and resetting the service.
+
+Suspend the service in the general settings :
+	This will immediately stop the service from analyzing data, but does not delete your 
+	existing findings or configurations.
+
 Area:
 =====
 Regional
@@ -8873,6 +9028,11 @@ selection of a destination server.
 ##VPC 
 -------------------------------------------------
 Amazon Virtual Private Cloud (Amazon VPC) enables you to launch AWS resources into a virtual network that you've defined.
+
+
+VPN Connections are a good solution if you have an immediate need, have low to 
+modest bandwidth requirements, and can tolerate the inherent variability in Internet-based connectivity. 
+However, Site-to-site VPN cannot provide low latency and high throughput connection as DirectConnect.
 
 The CIDR block for the default VPC is it's 172.31.0.0/16. 
 It means this VPC can provide up to 65,536 IP addresses.
@@ -9706,6 +9866,10 @@ Security is a shared responsibility
 ##Direct Connect
 -------------------------------------------------
 DirectConnect connects your on-prem with your VPC through a non-public tunnel.
+
+AWS Direct Connect lets you establish a dedicated network connection between your network 
+and one of the AWS Direct Connect locations.
+
 
 Data transfer pricing over Direct Connect is lower than data transfer pricing over the internet, 
 so both of these options are incorrect.
@@ -12662,7 +12826,7 @@ Each instance has full read & write permissions to the volume.
 
 
 
-#Amazon EFS – Elastic File System
+#EFS – Elastic File System
 -------------------------------------------------
 AWS Elastic File System (EFS) is one of three main storage services offered by Amazon. 
 It is a scalable, cloud-based file system for Linux-based applications and workloads that can be used in combination with 
@@ -12710,7 +12874,6 @@ Instance Storage for single EC2 High permormance and Maximam I/O.
 
 AWS S3:
 Simple Storage Service (S3) provides object storage, without the use of EC2 instances, that is accessible directly through the internet.
-
 
 
 
