@@ -6,7 +6,6 @@ https://www.awsomeblog.com/category/amazon-aws/
 
 https://digitalcloud.training/courses/aws-csaa-practice-exams/
 https://portal.tutorialsdojo.com/product/aws-certified-solutions-architect-associate-practice-exams/
-https://www.udemy.com/course/practice-exams-aws-certified-solutions-architect-associate/
 
 
 Latency:বিলম্ব, দেরী,  বাধা, 
@@ -15,6 +14,7 @@ Durability:স্থায়িত্ব, টেকসইতা
 Resilient:স্থিতিস্থাপক
 Resilience:সহনশীলতা,স্বাভাবিক অবস্থায় প্রত্যাবর্তন
 Reliable:নির্ভরযোগ্য
+Elasticity:স্থিতিস্থাপকতা, নমনীয়তা
 
 Provision:বন্দোবস্ত,ব্যবস্থা
 Consistent:সামঞ্জস্যপূর্ণ,সমান
@@ -26,20 +26,19 @@ Proprietary:মালিকানা
 Regardless:মনোযোগ বা পাত্তা না দিয়ে
 Potentially:সম্ভাব্য
 Compliance:সম্মতি,অনুরোধ বা আদেশ পালন
-Elasticity:স্থিতিস্থাপকতা, নমনীয়তা
 Successor:উত্তরাধিকারী
 Assume:গ্রহণ করা, দায়িত্বগ্রহণ করা
 Tenancy:ভাড়াটিয়া রূপে অধিকার
 ComplianceRequirements:মেনে চলার প্রয়োজনীয়তা
 Contemplating:চিন্তা করা
-legacy:উত্তরাধিকার
-deteriorated:অবনতি
-discrepancies :অসঙ্গতি
-prone:প্রবণ
-contemplating :চিন্তা করা
-adequate :পর্যাপ্ত
-withstand disruptions:বাধা সহ্য করা
-ingest:গ্রহণ করা
+Legacy:উত্তরাধিকার
+Deteriorated:অবনতি
+Discrepancies :অসঙ্গতি
+Prone:প্রবণ
+Contemplating:চিন্তা করা
+Adequate:পর্যাপ্ত
+Withstand disruptions:বাধা সহ্য করা
+Ingest:গ্রহণ করা
 =================================================
 #General | Basic          
 ================================================= 
@@ -50,8 +49,8 @@ Terminating => Returning control to Amazon
 Private key: The user downloads the private key
 Public key: AWS uses the public key to confirm the identity of the user. 
 
-Control of inbound network (from other to the instance) 
-Control of outbound network (from the instance to other)
+Inbound network-> from other to the instance
+Outbound network-> from the instance to other
 
 
 Classic Ports to know:
@@ -80,14 +79,14 @@ ECS-Elastic Container Service
 KMS-AWS Key Management Service
 S3-Amazon Simple Storage Service
 AWS Lambda
-SES-Amazon Simple Email Service
-RDS-Amazon Relational Database Service
+SES-Simple Email Service
+RDS-Relational Database Service
 Amazon DynamoDB
 Amazon ElastiCache
-SQS-Amazon Simple Queue Service
-SNS-Amazon Simple Notification Service
+SQS-Simple Queue Service
+SNS-Simple Notification Service
 Auto Scaling
-Route 53
+Route53
 CloudFront
 CloudWatch
 CloudTrail
@@ -101,7 +100,6 @@ RPO: Recovery Point Objective
 RTO: Recovery Time Objective
 SSM: AWS Systems Manager Agent 
 SCP: Service control policies
-
 Route53, IAM, CloudFront, WAF are Global.
 
 
@@ -422,7 +420,11 @@ Organizations SCPs: Organizations service control policy (SCP) to define the max
 		for account members of an organization or organizational unit (OU). 
 	    SCPs limit permissions that identity-based policies or resource-based policies grant to entities 
 	    (users or roles) within the account, but do not grant permissions.
+The effective permissions are the logical intersection between what is allowed by the 
+SCP and what is allowed by the IAM and resource-based policies.
 
+
+S3 ACL:
 Access control lists (ACLs) – Use ACLs to control which principals in other accounts can access the 
     resource to which the ACL is attached.
 	ACLs are cross-account permissions policies that grant permissions to the specified principal. 
@@ -432,9 +434,12 @@ With ACLs, you can only grant other AWS accounts (not specific users) access to 
 Amazon S3 resources(buckets or objects).
 
 
+VPC ACL:
 A network access control list (ACL) allows or denies specific inbound or outbound traffic at the subnet level. 
 You can use the default network ACL for your VPC, or you can create a custom network ACL for your VPC with rules that are 
 similar to the rules for your security groups in order to add an additional layer of security to your VPC.
+
+
 
 
 Session policies: Pass advanced session policies when you use the AWS CLI or AWS API to 
@@ -12261,7 +12266,7 @@ dynamically changing resources. This increases your application availability bec
 applications always discover the most up-to-date locations of its resources.
 
 
-AWS Cloud Map ; Implementing lightweight on-premises API connectivity using inverting traffic proxy.
+AWS Cloud Map->Implementing lightweight on-premises API connectivity using inverting traffic proxy.
 
 
 =================================================
