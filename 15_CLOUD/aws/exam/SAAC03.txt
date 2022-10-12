@@ -3832,6 +3832,10 @@ resolvers, traffic dials and endpoint weights changes are effective within secon
 
 
 CodeDeploy is not meant to distribute traffic across instances.
+CodeDeploy is a deployment service that automates application deployments to Amazon EC2 instances, 
+on-premises instances, serverless Lambda functions, or Amazon ECS services.
+
+AWS CodeDeploy fully automates your software deployments, allowing you to deploy reliably and rapidly.
 
 
 AWS Global Accelerator for availability and performance of your applications with local or global users.
@@ -4388,6 +4392,11 @@ AWS DataSync copy data and metadata between AWS Storage Services
 • File permissions and metadata are preserved (NFS POSIX, SMB…)
 • One agent task can use 10 Gbps, can setup a bandwidth limit
 
+In order to move files directly into your Amazon VPC, DataSync supports VPC endpoints 
+(powered by AWS PrivateLink).
+
+When you use DataSync with S3, it supports storing data directly into any S3 storage class. 
+You do not need to use lifecycle policies or manually transfer data from S3.
 
 ExamTips:AWS DataSync copy data and metadata between AWS Storage Services
 
@@ -4400,6 +4409,8 @@ If you want to transfer on-premises block/tapes to AWS, then AWS Storage Gateway
 
  When the requirement is to transfer files from on premises to AWS EFS (elastic file system) 
  then AWS Datasync is the option as AWS Storage Gateway doesn’t support EFS
+ 
+ 
  
 ++All Aws Storage Comparison
 -------------------------------------------------
@@ -11870,6 +11881,7 @@ Tools:
 -CodePipeline - Orchestrate CI/CD pipelines
 -CodeBuild - Build and Test Code (application packages and containers)
 -CodeDeploy - Automate Deployment (EC2, ECS, Elastic Beanstalk, EKS, Lambda etc)
+AWS CodeDeploy is a service that automates code deployments to any instance, including Amazon EC2 instances and instances running on-premises. AWS CodeDeploy makes it easier for you to rapidly release new features, helps you avoid downtime during deployment, and handles the complexity of updating your applications.
 
 
 
@@ -12581,58 +12593,88 @@ You have to manually detach it.
 
 #Placement Group        
 -------------------------------------------------
-Placement groups balance the tradeoff between risk tolerance and network performance when it comes to your fleet of EC2 instances.
-The more you care about risk, the more isolated you want your instances to be from each other. 
-The more you care about performance, the more conjoined you want your instances to be with each other.
+
+Placement group is a way to impact the placement of interdependent EC2 instance groups in order 
+to suit your workload requirements. 
+AWS provides three placement strategies which you can use based on the type of your workload.
 
 
-Placing the things at one place or gathering the things together at one place is nothing but placement groups.
-
-When you launch multiple EC2 instances on AWS, the EC2 service makes sure that all of your EC2 instances 
-are spread across different physical machines to minimize the failure of the entire system. 
-But AWS EC2 also provides the customers the ability to put the EC2 instance according to their need. 
-Placement groups are used to determine how the EC2 instances are launched on the underlying hardware. 
+General rules and limitations:
+	You can create a maximum of 500 placement groups per account in each Region.
+	You cannot launch Dedicated Hosts in placement groups.
 
 
-Why use Placement Group?
-Placement groups help us to launch a bunch of EC2 instances close to each other physically within the same AZ. 
-Being close physically and within the same AZ helps it take advantage of high-speed connectivity to 
-provide low latency, high throughput access.
 
 
-Placement groups strategies:
--Cluster placement group: It groups instances into low latency clusters in a single available zone(AZ).
--Spread placement group: It spread the instances across underlying hardware.
--Partition placement group: It spreads the instances across many different partitions within an AZ.
+Cluster Placement Groups: 
+	A logical grouping of instances within a single AZ.
+	A cluster placement group can't span multiple Availability Zones.
+	You can launch multiple instance types into a cluster placement group. 
+	We recommend using the same instance type for all instances in a cluster placement group.
+	Network traffic to the internet and over an AWS Direct Connect connection to on-premises 
+	resources is limited to 5 Gbps.
+
+
+Partition Placement Groups: 
+Logical partition of instance groups such that no two partitions within a 
+placement group share the same underlying hardware.
+
+A partition placement group supports a maximum of seven partitions per Availability Zone. 
+The number of instances that you can launch in a partition placement group is limited 
+only by your account limits.
+	Amazon EC2 doesn’t guarantee an even distribution of instances across all partitions.
+	A partition placement group with Dedicated Instances can have a maximum of two partitions.
+	You can't use Capacity Reservations to reserve capacity in a partition placement group.
+
+
+Spread Placement Groups: 
+each instance within a spread placement group will be placed in a different rack.
+	A rack spread placement group supports a maximum of seven running instances per Availability Zone.
+For example, in a Region with three Availability Zones, you can run a total of 21 instances in 
+the group, with seven instances in each Availability Zone.
+	Spread placement groups are not supported for Dedicated Instances.
+	You can't use Capacity Reservations to reserve capacity in a spread placement group.
+
+Host level spread placement groups are only supported for placement groups on AWS Outposts. 
+There are no restrictions for the number of running instances with host level spread placement groups.
 
 
 Cluster Placement Group:
-In the cluster placement group, all the instances are in the same rack in a single availability zone. 
-Cluster placement groups are designed for high speed performance and low network latency applications as 
-EC2 instances are physically on the same rack and it causes low latency between the EC2 instances in the same cluster placement group. 
-It usually supports up to 10Gbps network. As the EC2 instances in the cluster placement group are in the same physical rack so the 
+	Recommended for low network latency, and/or high network throughput applications.
+	Only specific to a single AZ
+	Can span peered VPCs in the same Region
+It usually supports up to 10Gbps network.
 problem with cluster placement groups is if the rack fails, all the instances will fail at the same time 
 compromising the high availability of the application.
   
-Spread Placement Group:
-Spread Placement Group places your EC2 instances on different physical hardware across different AZs.
+  
 
-In the spread placement group, all EC2 instances are located on different hardware racks in a single availability zone. 
-Each rack is isolated from others and has its own power and networks to reduce the failure of all the instances in the 
-spread placement group at a time. You can create up to 7 EC2 instances per availability zone per spread placement group. 
-Unlike Cluster placement groups, EC2 instances in the spread placement group exist on different hardware within 
-the single availability zone minimizing the failure of all the EC2 instances at a time while making sure of the low latency. 
+
+Partition Placement Group:
+ Each logical partition is composed of multiple instances. The partition placement group option allows 
+ you to place those partitions within a single AZ or in a multi-AZ setup within the same region.
+
+for large distributed and replicated workloads such as kafka, hadoop and cassandra etc.
+	Reduces the impact of correlated hardware failures for your application
+	Mainly used to deploy large distributed and replicated workloads, such as 
+	HDFS, HBase, and Cassandra, across distinct racks.
+	Can have partitions in multiple Availability Zones in the same Region.
+
+
+
+Spread Placement Group:
+If you deploy five instances and put them into this type of placement group, each one of 
+those five instances will reside on a different rack with its own network access and power, 
+either within a single AZ or in multi-AZ architecture.
+
+You can create up to 7 EC2 instances per availability zone per spread placement group. 
 Spread placement groups are designed for applications that require maximum high availability and where 
 each instance must be isolated from failure from each other.
 
-Partition Placement Group:
-In the partition placement group, instances are launched into different partitions on different hardware racks to 
-make sure of high availability. It can span across multiple AZs in the same region. 
-The instances in a partition do not share racks with the instances in the other partitions. 
-A partition failure can affect many EC2 instances in the same partition but won’t affect the EC2 instances on the other partitions. 
-Partition placement groups are designed for applications that require maximum high availability. 
-Partition placement groups are used for big application deployment and are ideal 
-for large distributed and replicated workloads such as kafka, hadoop and cassandra etc.
+Recommended for applications that have a small number of critical instances that should be 
+kept separate from each other.
+Can span multiple Availability Zones in the same Region.
+
 
 
 
