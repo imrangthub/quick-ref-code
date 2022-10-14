@@ -2852,10 +2852,23 @@ security group to your environment.
 39
 ##S3
 -------------------------------------------------
-An Amazon S3 bucket is a public cloud storage. Amazon Simple Storage Service (Amazon S3) is an object storage service. 
-You can use Amazon S3 to store and retrieve any amount of data at any time, from anywhere.
+An Amazon S3 bucket is a public cloud storage.S3 is an object storage service. 
 
-S3 Versioning-enabled buckets enable you to recover objects from accidental deletion or overwrite.
+S3 Versioning-enabled buckets, help you to recover objects from accidental deletion or overwrite.
+
+API calls can be logged in AWS CloudTrail.
+S3 can host static websites and have them accessible on the www.
+
+S3 in Amazon has two entities called buckets and objects. 
+Objects are stored inside buckets.
+By default, the maximum number of buckets that can be created per account is 100.
+
+Object values are the content of the body:
+• Max Object Size is 5TB (5000GB)
+• If uploading more than 5GB, must use “multi-part upload” cecommmand for obj>100MB
+
+You can version your files in Amazon S3, It is enabled at the bucket level.
+
 
 After a successful write of a new object or an overwrite of an existing object, any subsequent 
 read request immediately receives the latest version of the object. S3 also provides strong 
@@ -2876,76 +2889,41 @@ You enable and suspend versioning at the bucket level. After you version-enable 
 it can never return to an unversioned state. But you can suspend versioning on that bucket.
 
 
-
-S3 in Amazon has two entities called buckets and objects. 
-Objects are stored inside buckets.
-By default, the maximum number of buckets that can be created per account is 100.
-
-Object values are the content of the body:
-• Max Object Size is 5TB (5000GB)
-• If uploading more than 5GB, must use “multi-part upload” cecommmand for obj>100MB
-
-You can version your files in Amazon S3, It is enabled at the bucket level.
-
-
-Object Lifecycle Management:
-	A lifecycle configuration is a set of rules that define actions that AWS S3 applies to a group of objects. 
-
-	There are two types of actions:
-		Transaction Actions: This action defines objects’ transition from one storage class to another.
-		Expiration Actions: This action deletes objects in the Amazon S3 bucket.
-
+There are two types of Lifecycle Management actions:
+	Transaction Actions: This action defines objects’ transition from one storage class to another.
+	Expiration Actions: This action deletes objects in the Amazon S3 bucket.
 
 Amazon S3 supports a waterfall model for transitioning between storage classes.
 https://docs.aws.amazon.com/AmazonS3/latest/userguide/lifecycle-transition-general-considerations.html
 
-Here are the supported life cycle transitions for S3 storage classes:
-	The S3 Standard storage class to any other storage class. 
-	Any storage class to the S3 Glacier or S3 Glacier Deep Archive storage classes. 
-	The S3 Standard-IA storage class to the S3 Intelligent-Tiering or S3 One Zone-IA storage classes. 
-	The S3 Intelligent-Tiering storage class to the S3 One Zone-IA storage class. 
-	The S3 Glacier storage class to the S3 Glacier Deep Archive storage class.
-
-
-Following are the unsupported life cycle transitions for S3 storage classes:
-	Any storage class to the S3 Standard storage class. 
-	Any storage class to the Reduced Redundancy storage class. 
-	S3 Intelligent-Tiering storage class to the S3 Standard-IA storage class. 
-	S3 One Zone-IA storage class to the S3 Standard-IA or S3 Intelligent-Tiering storage classes.
-
-
-
-
 
 Amazon S3 Storage Classes:
-S3 Standard
-S3 Intelligent-Tiering
-S3 Standard-Infrequent Access
-S3 One Zone-Infrequent Access
-S3 Glacier Instant Retrieval
-S3 Glacier Flexible Retrieval
-S3 Glacier Deep Archive
-
+	S3 Standard
+	S3 Standard-Infrequent Access
+	S3 Intelligent-Tiering
+	S3 One Zone-Infrequent Access
+	S3 Glacier Instant Retrieval
+	S3 Glacier Flexible Retrieval
+	S3 Glacier Deep Archive
 
 
 There are 4 methods of encrypting objects in S3:
-• SSE-S3: encrypts S3 objects using keys handled & managed by AWS
-• SSE-KMS: leverage AWS Key Management Service to manage encryption keys
-• SSE-C: when you want to manage your own encryption keys
-• Client Side Encryption
-
+	• SSE-S3: encrypts S3 objects using keys handled & managed by AWS
+	• SSE-KMS: AWS Key Management Service to manage encryption keys
+	• SSE-C: when you want to manage your own encryption keys
+	• Client Side Encryption
 EmaxTips:It’s important to understand which ones are adapted to which situation for the exam
 
 
 SSE-S3:
-	• SSE-S3: encryption using keys handled & managed by Amazon S3
+	• SSE-S3: encryption using keys handled & managed by AmazonS3 its self.
 	• Object is encrypted server side
 	• AES-256 encryption type
 	• Must set header: “x-amz-server-side-encryption": "AES256"
 
 SSE-KMS:
 	• SSE-KMS: encryption using keys handled & managed by KMS
-	• KMS Advantages: user control + audit trail
+	• KMS Advantages: user control + Audit trail
 	• Object is encrypted server side
 	• Must set header: “x-amz-server-side-encryption": ”aws:kms"
 
@@ -2961,24 +2939,22 @@ Client Side Encryption:
 
 
 
-API calls can be logged in AWS CloudTrail
-S3 can host static websites and have them accessible on the www
-
 
 
 S3 Security:
 User based
-	• IAM policies - which API calls should be allowed for a specific user from IAM console
+	• IAM policies - which API calls should be allowed for a specific user from IAM console(Web).
 Resource Based
-	• Bucket Policies(JSON based policies) - bucket wide rules from the S3 console - allows cross account
+	• Bucket Policies(JSON based policies) - bucket wide rules from the S3 console - allows cross account.
 	• Object Access Control List (ACL) – finer grain
 	• Bucket Access Control List (ACL) – less common
+	
 Note: an IAM principal can access an S3 object if
 	• the user IAM permissions allow it OR the resource policy ALLOWS it
 	• AND there’s no explicit DENY
 
 
-Use S3 bucket for policy to: 
+Use S3 bucket for policy to:- 
 	• Grant public access to the bucket 
 	• Force objects to be encrypted at upload 
 	• Grant access to another account (Cross Account)
@@ -2997,12 +2973,16 @@ CORS:
 ExamTip:It’s a popular exam question
 
 
-The aws S3 sync command uses the CopyObject APIs to copy objects between S3 buckets. 
-The sync command lists the source and target buckets to identify objects that are in the 
-source bucket but that aren't in the target bucket. 
-The command also identifies objects in the source bucket that have different LastModified dates 
-than the objects that are in the target bucket. The sync command on a versioned bucket copies only the 
-current version of the object—previous versions aren't copied.
+S3 Sync command:
+	The aws S3 sync command uses the CopyObject APIs to copy objects between S3 buckets. 
+	The sync command lists the source and target buckets to identify objects that are in the 
+	source bucket but that aren't in the target bucket.
+	 
+	The command also identifies objects in the source bucket that have different LastModified dates 
+	than the objects that are in the target bucket. The sync command on a versioned bucket copies only the 
+	current version of the object—previous versions aren't copied.
+
+
 
 There are no S3 data transfer charges when data is transferred in from the internet. 
 Also with S3TA, you pay only for transfers that are accelerated. Therefore the junior 
@@ -3028,10 +3008,11 @@ for the object version.
 
 Area:
 =====
+Global but Data is Regional.
 The user interface shows all your buckets, in all regions. 
 But buckets exist in a specific region and you need to specify that region when you create a bucket.
 
-Global but Data is Regional.
+
 
 
 
@@ -3056,8 +3037,8 @@ Bucket pricing varies by region.
 
 Security:
 =========
-AWS Identity and Access Management (IAM) to create users and manage their respective access; 
-Access Control Lists (ACLs) to make individual objects accessible to authorized users; 
+IAM to create users and manage their respective access; 
+ACLs (Resource base) to make individual objects accessible to authorized users; 
 Bucket policies to configure permissions  for all objects within a single S3 bucket;
 
 -Amazon S3 also supports Audit Logs.
@@ -3072,10 +3053,11 @@ Logging and Audit:
 	• S3 Access Logs can be stored in other S3 bucket
 	• API calls can be logged in AWS CloudTrail
 User Security:
-	• MFA Delete: MFA (multi factor authentication) can be required in versioned buckets to delete objects
-	• Pre-Signed URLs: URLs that are valid only for a limited time (ex: premium video service for logged in users)
+	• MFA Delete: MFA can be required in versioned buckets to delete objects.
+	• Pre-Signed URLs: URLs that are valid only for a limited time 
+	  (ex: premium video service for logged in users)
 
-Encryption in flight is also called SSL / TLS.
+Encryption in-flight is also called SSL / TLS.
 
 
 
@@ -3101,7 +3083,7 @@ Userdata = launch script of the EC2 instance
 
 
 AWS SDK: Good to know: if you don’t specify or configure a default region, then
-us-east-1 will be chosen by default
+us-east-1 will be chosen by default.
 
 
 
@@ -4771,17 +4753,19 @@ consumers to use enhanced fan-out and receive their own 2MB/second pipe of read 
 Kinesis Data Streams cannot directly write the output to S3. 
 Unlike Firehose, KDS does not offer a ready-made integration via an intermediary 
 Lambda function to reliably dump data into S3. 
+
 You will need to do a lot of custom coding to get the Lambda function to process the 
 incoming stream and then store the transformed output to S3.
 
 • Retention between 1 day to 365 days
-• Ability to reprocess (replay) data
+• Ability to reprocess (replay) data,
+  you can replay messages, or have multiple consumers that are subscribing to your Kinesis Stream.
 • Once data is inserted in Kinesis, it can’t be deleted (immutability)
 • Data that shares the same partition goes to the same shard (ordering)
 	• Producers: AWS SDK, Kinesis Producer Library (KPL), Kinesis Agent
 	• Consumers:
 		• Write your own: Kinesis Client Library (KCL), AWS SDK
-		• Managed: AWS Lambda, Kinesis Data Firehose, Kinesis Data Analytics,
+		• Managed: AWS Lambda, Kinesis Data Firehose, Kinesis Data Analytics.
 
 
 Provisioned mode:
@@ -4798,63 +4782,49 @@ On-demand mode:
 
 
 Kinesis Data Streams Security:
-• Control access / authorization using IAM policies
-• Encryption in flight using HTTPS endpoints
-• Encryption at rest using KMS
-• You can implement encryption/decryption of data on client side (harder)
-• VPC Endpoints available for Kinesis to access within VPC
-• Monitor API calls using CloudTrail
-
-
-Kinesis Data Streams cannot directly write the output to S3. 
-Unlike Firehose, KDS does not offer a ready-made integration via an intermediary Lambda 
-function to reliably dump data into S3. You will need to do a lot of custom coding to get the 
-Lambda function to process the incoming stream and then store the transformed output to S3 
-with the constraint that the buffer is maintained reliably and no transformed data is lost.
-
+	• Control access/authorization using IAM policies
+	• Encryption in-flight using HTTPS endpoints
+	• Encryption at rest using KMS
+	• You can implement encryption/decryption of data on client side (harder)
+	• VPC Endpoints available for Kinesis to access within VPC
+	• Monitor API calls using CloudTrail
 
 
 Kinesis Data Firehose:
- Amazon Kinesis Data Firehose is the easiest way to reliably load streaming data into data lakes, 
- data stores, and analytics tools, Not application.
+	 Amazon Kinesis Data Firehose is the easiest way to reliably load streaming data into data lakes, 
+	 data stores, and analytics tools, Not application.
  
-Load streaming data into S3 / Redshift / ES / 3rd party / custom HTTP.
-• Fully managed
-• Near real-time (buffer time min. 60 sec)
-• Automatic scaling
-• No data storage
-• Doesn’t support replay capability
+Load streaming data into S3 / Redshift / ElasticSearch / 3rd party / custom HTTP.
+	• Fully managed
+	• Near real-time (buffer time min. 60 sec)
+	• Automatic scaling
+	• No data storage
+	• Doesn’t support replay capability
 
-Kinesis Data Firehose can only write to S3, Redshift, Elasticsearch or Splunk. 
+Kinesis Data Firehose can only write to S3, Redshift, ElasticSearch or Splunk. 
 You can't have applications consuming data streams from Kinesis Data Firehose, 
 that's the job of Kinesis Data Streams.
 
 Pay for data going through Firehose
 Perform real-time analytics on Kinesis Streams using SQL
-
-
-Amazon Kinesis Data Firehose is the easiest way to load streaming data into data stores and analytics tools. 
-It can capture, transform, and load streaming data into Amazon S3, Amazon Redshift, 
-Amazon Elasticsearch Service, and Splunk, enabling near real-time analytics with existing business 
-intelligence tools and dashboards you’re already using today. It is a fully managed service 
-that automatically scales to match the throughput of your data and requires no ongoing administration. 
+ 
 It can also batch, compress, and encrypt the data before loading it, 
 minimizing the amount of storage used at the destination and increasing security.
 
 
 Kinesis Data Analytics (SQL application):
-• Perform real-time analytics on Kinesis Streams using SQL
-• Fully managed, no servers to provision
-• Automatic scaling
-• Real-time analytics
-• Pay for actual consumption rate
-• Can create streams out of the real-time queries
+	• Perform real-time analytics on Kinesis Streams using SQL
+	• Fully managed, no servers to provision
+	• Automatic scaling
+	• Real-time analytics
+	• Pay for actual consumption rate
+	• Can create streams out of the real-time queries
 • Use cases:
 	• Time-series analytics
 	• Real-time dashboards
 	• Real-time metrics
 Kinesis Data Analytics cannot directly ingest data from the source as it ingests data either from 
-Kinesis Data Streams or Kinesis Data Firehose, so this option is ruled out.
+Kinesis Data Streams or Kinesis Data Firehose.
 
 The four most common use cases are streaming 
 	extract-transform-load (ETL), 
@@ -4867,8 +4837,8 @@ Ordering data into Kinesis:
 • Imagine you have 100 trucks (truck_1, truck_2, … truck_100) on the road sending their GPS positions regularly into AWS.
 • You want to consume the data in order for each truck, so that you can track their movement accurately.
 • How should you send that data into Kinesis?
-• Answer: send using a “Partition Key” value of the “truck_id”
-• The same key will always go to the same shard
+	• Answer: send using a “Partition Key” value of the “truck_id”
+	• The same key will always go to the same shard.
 
 
 
@@ -4893,6 +4863,13 @@ SQS:
 As multiple applications are consuming the same stream concurrently, both SQS Standard and 
 SQS FIFO are not the right.
 
+Message Replayability:
+Because consumers usually will delete the message once it processed, there is no message replayability in SQS.
+
+At-least-once delivery guarantee:multiple attempts are made at delivering it.
+In more casual terms this means that messages may be duplicated but not lost.
+
+
 
 SNS:
 • Push data to many subscribers
@@ -4907,20 +4884,21 @@ SNS:
 
 
 Kinesis:
-• Standard: pull data
-• 2 MB per shard
-• Enhanced-fan out: push data
-• 2 MB per shard per consumer
-• Possibility to replay data
-• Meant for real-time big data, analytics and ETL
-• Ordering at the shard level
-• Data expires after X days
-• Provisioned mode or ondemand capacity mode
+	• Standard: pull data
+	• 2 MB per shard
+	• Enhanced-fan out: push data
+	• 2 MB per shard per consumer
+	• Possibility to replay data
+	• Meant for real-time big data, analytics and ETL
+	• Ordering at the shard level
+	• Data expires after X days
+	• Provisioned mode or ondemand capacity mode
 
 
 
 However, the user is expected to manually provision an appropriate number of shards to 
-process the expected volume of the incoming data stream. The throughput of an 
+process the expected volume of the incoming data stream. 
+The throughput of an 
 Amazon Kinesis data stream is designed to scale without limits via increasing the number of 
 shards within a data stream. 
 
@@ -8768,37 +8746,20 @@ https://stackarmor.com/protecting-against-a-distributed-denial-of-service-ddos-a
 https://www.imperva.com/blog/protecting-aws-ec2-ddos-attacks/\
 http://salerno-rafael.blogspot.com/2019/07/what-should-we-know-about-aws-security_27.html
 
-Based on its DDoS-resilient reference architecture, AWS separates its network components into two categories:
-	
-1) AWS Edge Locations
-   BP1,BP2
-	Amazon CloudFront, AWS WAP.
-   BP3
-    Amazon Route53
-   BP4
-    Amazon API Gateway
-	
-2) AWS Regions
-	BP5
-	 Vpc
-	BP6
-	 Elastic Loadblancer
-	BP7
-	 EC2 With Auto Scaling
+There are 7 best practices identified by AWS that can be leveraged to mitigate specific attack vectors.
 
-AWS Edge Location	
+Based on its DDoS-resilient reference architecture, AWS separates its network components into two categories:
+
+1)AWS Edge Location	
 	BP1 = Amazon CloudFront	
 	BP2 = AWS WAF	
 	BP3 = AWS Route 53	
 	BP4 = Amazon API Gateway
-AWS Regions
+2)AWS Regions
 	BP5 = Amazon VPCs
 	BP6 = Elastic Load Balancing
 	BP7 = Amazon EC2 with Auto Scaling
 
-AWS uses BP1 – BP7* which are a combination of the edge locations and AWS regions. 
-BP1, BP2 are Amazon CloudFront with AWS WAF edge locations; 
-while BP5 – BP7 are the AWS regional components to which you need to subscribe.
 
 130
 ++AWS Best Practices for DDoS Resiliency Edge Location Mitigation (BP1, BP3)
@@ -11325,7 +11286,7 @@ Security:
 It is a aws managed service, security is a shared responsibility.
 
 
-=================================================
+##END
 =================================================
 @@@Proceed by elimination
 =================================================
@@ -11344,21 +11305,11 @@ It is a aws managed service, security is a shared responsibility.
 181
 ##VPC Reachability Analyzer
 -------------------------------------------------
-VPC Reachability Analyzer to determine whether a destination resource in your virtual private cloud (VPC) is reachable 
-from a source resource. 
+VPC Reachability Analyzer to determine whether a destination resource in your 
+virtual private cloud (VPC) is reachable from a source resource. 
 
-
-• A network diagnostics tool that troubleshoots network connectivity between two endpoints in your VPC(s)
-• It builds a model of the network configuration, then checks the reachability based on these configurations (it doesn’t send packets).
-• When the destination is
-	• Reachable – it produces hop-by-hop details of the virtual network path
-	• Not reachable – it identifies the blocking component(s) (e.g., config
-
-
-
-Area:
-=====
-MayGlobal
+It builds a model of the network configuration, then checks the reachability based on 
+these configurations (it doesn’t send packets).
 
 
 UseCase:
@@ -11367,17 +11318,9 @@ Troubleshoot connectivity issues,
 ensure network configuration is as intended,
 
 
-
 BillCost:
 =========
 You are charged per analysis run between a source and destination.
-
-
-
-Security:
-=========
-It is a aws managed service, security is a shared responsibility.
-
 
 
 
@@ -11386,7 +11329,7 @@ It is a aws managed service, security is a shared responsibility.
 ##DNS Resolution
 -------------------------------------------------
 DNS Resolution (enableDnsSupport)
-• Decides if DNS resolution from Route 53 Resolver server is supported for the VPC
+• Decides if DNS resolution from Route53 Resolver server is supported for the VPC
 • True (default): it queries the Amazon Provider DNS Server at 169.254.169.253 or the
 reserved IP address at the base of the VPC IPv4 network range plus two (.2)
 
@@ -11398,7 +11341,7 @@ DNS Hostnames (enableDnsHostnames)
 • If True, assigns public hostname to EC2 instance if it has a public IPv4
 
 If you use custom DNS domain names in a Private Hosted Zone in
-Route 53, you must set both these attributes (enableDnsSupport & enableDnsHostname) to true
+Route53, you must set both these attributes (enableDnsSupport & enableDnsHostname) to true
 
 
 
@@ -11407,11 +11350,11 @@ Route 53, you must set both these attributes (enableDnsSupport & enableDnsHostna
 183
 ##Route53 Private Zones
 -------------------------------------------------
-A private hosted zone is a container that holds information about how you want Amazon Route 53 to respond to
-DNS queries for a domain and its subdomains within one or more VPCs that you create with the Amazon VPC service.
+A private hosted zone is a container that holds information about how you want  Route53 to respond to
+DNS queries for a domain and its subdomains within one or more VPCs that you create with the  VPC service.
 
 You create a private hosted zone, such as example.com, and specify the VPCs that you want to associate with the hosted zone.
-Managing hosted zones: You pay a monthly charge for each hosted zone managed with Route 53.
+Managing hosted zones: You pay a monthly charge for each hosted zone managed with Route53.
 
 
 
@@ -11427,7 +11370,8 @@ data from your finance and billing system, or customer relationship management o
 CRM) to make them available for analysis and decision-making.
 
 Traditionally, setting up, running, and scaling a data warehouse has been complicated
-and expensive. On AWS, you can leverage Amazon Redshift, a managed data
+and expensive. 
+On AWS, you can leverage Amazon Redshift, a managed data
 warehouse service that is designed to operate at less than a tenth the cost of
 traditional solutions.
 
@@ -11450,7 +11394,7 @@ Underlying Platform for the next generation of EC2 instances
 #Storage | DB | db | s3 | efs | ebs           
 -------------------------------------------------
 There are several categories of databases:
-Relational (OLTP and OLAP), Document, Key Value, Graph, In Memory among others
+Relational (OLTP and OLAP), Document, KeyValue, Graph, In Memory among others
 
 AWS Storage:
   - Simple Storage service (S3)
@@ -11512,7 +11456,8 @@ It is a aws managed service, security is a shared responsibility.
 189
 ##AWS Distributing Paid Content
 -------------------------------------------------
-You can configure CloudFront to require that users access your files using either signed URLs or signed cookies. 
+You can configure CloudFront to require that users access your files using either 
+signed URLs or signed cookies. 
 
 Premium User Video service:
 We have implemented a fully serverless solution:
@@ -11542,17 +11487,8 @@ An ending date and time, after which the URL is no longer valid.
 AWS Data Pipeline is a web service that helps you reliably process and move data between different 
 AWS compute and storage services, as well as on-premises data sources, at specified intervals. 
 
-With AWS Data Pipeline, you can regularly access your data where it’s stored, transform and process it at scale, 
-and efficiently transfer the results to 
+efficiently transfer the results to 
 AWS services such as Amazon S3, Amazon RDS, Amazon DynamoDB, and Amazon EMR.
-
-
-AWS Data Pipeline helps you easily create complex data processing workloads that are fault tolerant, 
-repeatable, and highly available. 
-AWS Data Pipeline also allows you to move and process data that was previously locked up in on-premises data silos.
- 
-AWS Data Pipeline is billed based on how often your activities and preconditions are scheduled to run and 
-where they run (AWS or on-premises). 
 
  
 Big Data Ingestion Pipeline discussion:
@@ -11585,13 +11521,6 @@ Neptune for Solutions Architect:
 
 
 
-
-
-Area:
-=====
-Regional.
-
-
 UseCase:
 ========
 • High relationship data 
@@ -11618,13 +11547,8 @@ manage through AWS Key Management Service (KMS).
 191
 ##STS (Security Token Services)
 -------------------------------------------------
-AWS STS is an AWS service that allows you to request temporary security credentials for your AWS resources, 
+AWS STS is  to request temporary security credentials for your AWS resources, 
 for IAM authenticated users and users that are authenticated in AWS such as federated users via OpenID or SAML2.0.
-
-AWS provides AWS Security Token Service (AWS STS) as a web service that enables you to request temporary, 
-limited-privilege credentials for AWS Identity and 
-Access Management (IAM) users or for users you authenticate (federated users).
-
 
 
 AWS STS – Security Token Service:
@@ -11640,14 +11564,8 @@ AWS STS – Security Token Service:
 • AWS recommends against using this, and using Cognito instead
 • GetSessionToken
 • for MFA, from a user or AWS account root user
-
-
-Using STS to Assume a Role (IAM):
-• Define an IAM Role within your account or cross-account
-• Define which principals can access this IAM Role
-• Use AWS STS (Security Token Service) to retrieve credentials and impersonate the IAM Role you
-  have access to (AssumeRole API)
 • Temporary credentials can be valid between 15 minutes to 1 hour
+
 
 
 
@@ -11726,7 +11644,7 @@ multiple accounts and VPCs.
 
 
 AWS Managed Microsoft AD makes it easy to migrate AD-dependent applications and Windows workloads to AWS. 
-With AWS Managed Microsoft AD, you can use Group Policies to manage EC2 instances and run AD-dependent applications in the 
+With AD, you can use Group Policies to manage EC2 instances and run AD-dependent applications in the 
 AWS Cloud without the need to deploy your own AD infrastructure
 
 
@@ -11771,11 +11689,10 @@ It is a aws managed service, security is a shared responsibility.
 194
 ##RAM (Resource Access Manager)
 -------------------------------------------------
-AWS Resource Access Manager (RAM) helps you securely share your resources across AWS accounts, within your organization or 
+RAM helps you securely share your resources across AWS accounts, within your organization or 
 organizational units (OUs) in AWS Organizations, and with IAM roles and IAM users for supported resource types. 
 
 You can use AWS RAM to share resources with other AWS accounts.
-This eliminates the need to provision and manage resources in every account. 
 When you share a resource with another account, that account is granted access to the resource and any 
 policies and permissions in that account apply to the shared resource.
 
@@ -11791,11 +11708,6 @@ VPC Subnets:
 • Route53 Resolver Rules
 • License Manager Configurations
 
-
-Each account:
-	• is responsible for its own resources
-	• cannot view, modify or delete other resources in other accounts
-Network is shared so:
 	• Anything deployed in the VPC can talk to other resources in the VPC
 	• Applications are accessed easily across accounts, using private IP!
 	• Security groups from other accounts can be referenced for maximum security.
@@ -11808,13 +11720,6 @@ Network is shared so:
 AWS CloudHSM provides hardware security modules in the AWS Cloud. 
 A hardware security module (HSM) is a computing device that 
 processes cryptographic operations and provides secure storage for cryptographic keys.
-
-
-Q: What is a Hardware Security Module (HSM)?
-A Hardware Security Module (HSM) provides secure key storage and cryptographic operations within a 
-tamper-resistant hardware device. 
-HSMs are designed to securely store cryptographic 
-key material and use the key material without exposing it outside the cryptographic boundary of the hardware.
 
 
 Q: What can I do with CloudHSM?
@@ -11881,16 +11786,11 @@ Tools:
 -CodePipeline - Orchestrate CI/CD pipelines
 -CodeBuild - Build and Test Code (application packages and containers)
 -CodeDeploy - Automate Deployment (EC2, ECS, Elastic Beanstalk, EKS, Lambda etc)
-AWS CodeDeploy is a service that automates code deployments to any instance, including Amazon EC2 instances and instances running on-premises. AWS CodeDeploy makes it easier for you to rapidly release new features, helps you avoid downtime during deployment, and handles the complexity of updating your applications.
+AWS CodeDeploy is a service that automates code deployments to any instance, including 
+Amazon EC2 instances and instances running on-premises. AWS CodeDeploy makes it
+ easier for you to rapidly release new features, helps you avoid downtime during deployment, 
+ and handles the complexity of updating your applications.
 
-
-
-Area:
-=====
-MayRegional
-
-UseCase:
-========
 
 
 BillCost:
@@ -11957,7 +11857,8 @@ It is a aws managed service, security is a shared responsibility.
 200
 ##SWF - Simple Workflow Service
 -------------------------------------------------
-The Amazon Simple Workflow Service (Amazon SWF) makes it easy to build applications that coordinate work across distributed components. 
+The Amazon Simple Workflow Service (Amazon SWF) makes it easy to build applications that 
+coordinate work across distributed components. 
 Amazon SWF acts as the coordination hub for all of the different components of your application:
 
 Coordinate work amongst applications
@@ -12002,7 +11903,8 @@ It is a aws managed service, security is a shared responsibility.
 -------------------------------------------------
 EMR does not offer the same storage and processing speed as FSx for Lustre. 
 
-Amazon Elastic MapReduce (Amazon EMR) is a web service that makes it easy to quickly and cost-effectively process vast amounts of data.
+Amazon Elastic MapReduce (Amazon EMR) is a web service that makes it easy to quickly and 
+cost-effectively process vast amounts of data.
 Amazon EMR is the industry-leading cloud big data platform for processing vast amounts of data using 
 open source tools such as Apache Spark, Apache Hive, Apache HBase, Apache Flink, Apache Hudi, and Presto. 
 
@@ -12043,11 +11945,8 @@ Amazon S3 provides authentication mechanisms to ensure that stored data is secur
 ##OpsWorks
 -------------------------------------------------
 AWS OpsWorks is a configuration management service that provides managed instances of Chef and Puppet. 
-Chef and Puppet are automation platforms that allow you to use code to automate the configurations of your servers. 
-
-OpsWorks lets you use Chef and Puppet to automate how servers are configured, deployed, and managed across 
-your Amazon EC2 instances or on-premises compute environments. OpsWorks has three offerings, 
-AWS Opsworks for Chef Automate, AWS OpsWorks for Puppet Enterprise, and AWS OpsWorks Stacks.
+Chef and Puppet are automation platforms that allow you to use code to automate the configurations 
+of your servers. 
 
 Chef & Puppet help you perform server configuration automatically, or repetitive actions
 • They work great with EC2 & On Premise VM
@@ -12070,21 +11969,6 @@ Managed, Secure Cloud Desktop
 • Secure, Encrypted, Network Isolation
 • Integrated with Microsoft Active Directory
 
-
-Area:
-=====
-MayRegional
-
-
-UseCase:
-========
-
-BillCost:
-=========
-
-Security:
-=========
-It is a aws managed service, security is a shared responsibility.
 
 
 
@@ -12215,12 +12099,14 @@ The Elastic Network Adapter (ENA) driver publishes network performance metrics f
 214
 ##ParallelCluster 
 -------------------------------------------------
-AWS ParallelCluster is an open source cluster management tool that makes it easy for you to deploy and manage High Performance 
+AWS ParallelCluster is an open source cluster management tool that makes it 
+easy for you to deploy and manage High Performance 
 Computing (HPC) clusters on AWS. 
 
 ParallelCluster uses a simple text file to model and provision all the 
 resources needed for your HPC applications in an automated and secure manner.
-It also supports multiple  instance types and job submission queues, and job schedulers like AWS Batch and Slurm.
+It also supports multiple  instance types and job submission queues, and job schedulers like 
+AWS Batch and Slurm.
 
 
 
@@ -12232,7 +12118,7 @@ It also supports multiple  instance types and job submission queues, and job sch
 AWS Managed Service Offerings:
 
 -Elastic Load Balancing - Distribute incoming traffic across multiple targets
--AWS Elastic Beanstalk - Run and Manage Web Apps
+-AWS ElasticBeanstalk - Run and Manage Web Apps
 -Amazon Elastic Container Service (ECS) - Containers orchestration on AWS
 -AWS Fargate - Serverless compute for containers
 -Amazon Elastic Kubernetes Service (EKS) - Run Kubernetes on AWS
@@ -12274,13 +12160,18 @@ FAAS (Function as a Service) or Serverless: Functions instead of Applications
 ================================================
 AWS Cloud Map is a cloud resource discovery service. Cloud Map enables you to name your 
 application resources with custom names, and it automatically updates the locations of these 
-dynamically changing resources. This increases your application availability because your 
+dynamically changing resources. 
+This increases your application availability because your 
 applications always discover the most up-to-date locations of its resources.
 
 
-AWS Cloud Map->Implementing lightweight on-premises API connectivity using inverting traffic proxy.
+CloudMap->Implementing lightweight on-premises API connectivity using inverting traffic proxy.
 
 
+
+
+
+##END
 =================================================
 ##Section 4: IAM & AWS CLI        
 ================================================= 
