@@ -7889,7 +7889,7 @@ It is a aws managed service, security is a shared responsibility.
 
 
 
-==Advanced Identity in AWS
+==|Advanced Identity in AWS
 106
 ##Organizations
 -------------------------------------------------
@@ -8221,7 +8221,7 @@ AWS IAM Identity Center (successor to AWS SSO)
 
 
 
-==AWS Security & Encryption
+==|AWS Security & Encryption
 110
 ##AWS Security & Encryption
 -------------------------------------------------
@@ -8266,8 +8266,9 @@ Client side encryption:
 114
 ##KMS (Key Management Service)
 ------------------------------------------------- 
-KMS is a managed service that makes it easy for you to create and control the encryption keys used to encrypt your data. 
-AWS KMS uses Hardware Security Modules (HSMs) to protect the security of your keys. 
+KMS is a managed service that makes it easy for you to create and control the encryption 
+keys used to encrypt your data. 
+AWS also KMS uses Hardware Security Modules (HSMs) to protect the security of your keys. 
 You can use AWS KMS to protect your data in AWS services and in your applications.
 
 AWS KMS is integrated with AWS CloudTrail to provide you with logs of all key usage to help meet your 
@@ -8279,7 +8280,8 @@ AWS KMS keys must be in the same Region as the bucket.
 • AWS manages encryption keys for us
 • Fully integrated with IAM for authorization
 • Easy way to control access to your data
-• Able to audit KMS Key usage using CloudTrail (Every single api with KMS Key call can track using cloudTrail ExamTip)
+• Able to audit KMS Key usage using CloudTrail 
+  (Every single api with KMS Key call can track using cloudTrail ExamTip)
 • Seamlessly integrated into most AWS services (EBS, S3, RDS, SSM…)
 • Never ever store your secrets in plaintext, especially in your code!
 	• KMS Key Encryption also available through API calls (SDK, CLI)
@@ -8472,7 +8474,8 @@ Client-Side encryption
 ##SSM Parameter Store
 -------------------------------------------------
 Parameter Store, a capability of AWS Systems Manager,  configuration data  management and secrets management. 
-You can store data such as passwords, database strings, Amazon Machine Image (AMI) IDs, and license codes as parameter values. 
+You can store data such as passwords, database strings, 
+Amazon Machine Image (AMI) IDs, and license codes as parameter values. 
 You can store values as plain text or encrypted data. 
 
 You can reference Systems Manager parameters in your scripts, commands, SSM documents, and configuration and automation workflows 
@@ -8626,16 +8629,9 @@ Easily provision, manage, and deploy TLS Certificates
 127
 ##WAF (Web Application Firewall)
 -------------------------------------------------
-AWS WAF is a web application that lets you allow or block the HTTP(s) requests that are bound for CloudFront, 
-API Gateway, Application Load Balancers, EC2, and other Layer 7 entry points into your AWS environment. 
-
-AWS WAF gives you control over how traffic reaches your applications by enabling you to create security 
-rules that block common attack patterns, such as SQL injection or cross-site scripting, 
-and rules that filter out specific traffic patterns that you can define. 
-
 AWS WAF is a web application firewall service that lets you monitor web requests and protect 
-your web applications from malicious requests. Use AWS WAF to block or allow requests based on 
-conditions that you specify, such as the IP addresses. 
+your web applications from malicious requests. 
+Use AWS WAF to block or allow requests based on conditions that you specify, such as the IP addresses. 
 You can also use AWS WAF preconfigured protections to block common attacks like 
 SQL injection or cross-site scripting.
 
@@ -8666,14 +8662,12 @@ WAF – Fixed IP while using WAF with a Load Balancer
 
 
 You can use AWS WAF with your Application Load Balancer to allow or block requests based on 
-the rules in a web access control list (web ACL). Geographic (Geo) Match Conditions in 
-AWS WAF allows you to use AWS WAF to restrict application access based on the geographic location 
-of your viewers. With geo match conditions you can choose the countries 
+the rules in a web access control list (web ACL). With geo match conditions you can choose the countries 
 from which AWS WAF should allow access.
 
 
-Geo Restriction feature of CloudFront helps in restricting traffic based on the user's 
-geographic location. But, CloudFront works from edge locations and doesn't belong to a VPC.
+Geo Restriction feature of CloudFront helps in restricting traffic based on the user's geographic location. 
+But, CloudFront works from edge locations and doesn't belong to a VPC.
 
 
 Area:
@@ -8956,8 +8950,6 @@ Security:
 =========
 Discover and protect your sensitive data at scale
 Amazon Macie
-
-	
 It is a aws managed service, security is a shared responsibility.
 
 
@@ -8995,11 +8987,12 @@ Your responsibility:
 
 
 
-
+==|Virtual Private Cloud (VPC)
 138
 #Internet Protocol (IP)   
 -------------------------------------------------
-The Internet Protocol (IP) uses three types of addressing schemes: Unicast, Multicast, and Anycast.
+The Internet Protocol (IP) uses Three types of addressing schemes: 
+Unicast, Multicast, and Anycast.
 
 Unicast:
 A Unicast address is used to identify a single unique host. 
@@ -9014,9 +9007,11 @@ IPv6 multicast replaces broadcast addresses that were supported in IPv4.
 
 Anycast:
 Anycast,  is an IP network addressing scheme that allows multiple servers to share the same 
-IP address, allowing for multiple physical destination servers to be logically identified by a single IP address. 
-Based on the location of the user request, the anycast routers send it to the server in the network based on a least-cost analysis 
-that includes assessing the number of hops, shortest distance, lowest transit cost, and minimum latency measurements to optimize the 
+IP address, allowing for multiple physical destination servers to be logically identified 
+by a single IP address. 
+Based on the location of the user request, the anycast routers send it to the server in the 
+network based on a least-cost analysis  that includes assessing the number of hops, 
+shortest distance, lowest transit cost, and minimum latency measurements to optimize the 
 selection of a destination server.
 
 
@@ -9024,13 +9019,14 @@ selection of a destination server.
 
 
 139
-##VPC 
+##VPC Amazon Virtual Private Cloud 
 -------------------------------------------------
-Amazon Virtual Private Cloud (Amazon VPC) enables you to launch AWS resources into a virtual network that you've defined.
+VPC enables you to launch AWS resources into a virtual network that you've defined.
 
 
 VPN Connections are a good solution if you have an immediate need, have low to 
 modest bandwidth requirements, and can tolerate the inherent variability in Internet-based connectivity. 
+
 However, Site-to-site VPN cannot provide low latency and high throughput connection as DirectConnect.
 
 The CIDR block for the default VPC is it's 172.31.0.0/16. 
@@ -9052,7 +9048,7 @@ VPC Two Type
 - Default Vpc
 - Custom Vpc
 
-Primary diffent of this tow: default vpc has internet gatway custom vpc has not, you can added.
+Primary diffent of this tow: default vpc has Internet Gatway custom vpc has not, you can added.
 
 
 Monitor VPC by using:
@@ -9109,7 +9105,7 @@ Area:
 =====
 VPC – Regional
 VPC create on Region not available zone. all property of VPC are Regional becaus its exists on Region. 
-One vpc cant extend more then one Region.
+One vpc cannot extend more then one Region.
 
 
 
@@ -9140,8 +9136,9 @@ Security:
 =========
 Security groups in a VPC specify which traffic is allowed to or from an Amazon EC2 instance. 
 Network ACLs operate at the subnet level and evaluate traffic entering and exiting a subnet. 
-Network ACLs can be used to set both Allow and Deny rules. Network ACLs do not filter traffic 
-between instances in the same subnet. In addition, network ACLs perform stateless filtering while 
+Network ACLs can be used to set both Allow and Deny rules. 
+Network ACLs do not filter traffic  between instances in the same subnet. 
+In addition, network ACLs perform stateless filtering while 
 security groups perform stateful filteri
 
 Default VPC has default CIDR, Security Group, NACL and Route table setting.
@@ -9213,8 +9210,8 @@ A subnet is a range of IP addresses in your VPC. A subnet must reside in a singl
 After you add subnets, you can deploy AWS resources in your VPC.
 
 Public and private subnets:
-If a subnet is associated with a route table that has a route to an internet gateway, it's known as a public subnet. 
-other wise it's known as a private subnet.
+If a subnet is associated with a route table that has a route to an internet gateway, 
+it's known as a public subnet. other wise it's known as a private subnet.
 
 The first four and last IP address of Subnet cannot be assigned.
 Suppose a IP: 10.0.0.0/16
@@ -9306,8 +9303,9 @@ Security is a shared responsibility
 -------------------------------------------------
 A route table contains a set of rules, called routes, that determine where network traffic from your subnet or gateway is directed.
 
-Main route table: The route table that automatically comes with your VPC. It controls the routing for all 
-subnets that are not explicitly associated with any other route table.
+Main route table: 
+	The route table that automatically comes with your VPC. It controls the routing for all 
+	subnets that are not explicitly associated with any other route table.
 
 Custom route table: A route table that you create for your VPC.
 
@@ -9336,6 +9334,11 @@ a private network from an external network, such as the Internet.
   CIDR of your corporation
 • Security Group of the EC2 Instances must allow the Security Group of the Bastion Host, or the private IP of the Bastion host.
 
+• Bastion Host security group must allow inbound from the internet on port 22 from
+restricted CIDR, for example the public CIDR of your corporation.
+
+• Security Group of the EC2 Instances must allow the Security Group of the Bastion
+Host, or the private IP of the Bastion host.
 
 Exam Tip: Make sure the bastion host only has port 22 traffic from the IP address you need,
          not from the security groups of your other EC2 instances.
@@ -9343,7 +9346,7 @@ Exam Tip: Make sure the bastion host only has port 22 traffic from the IP addres
 
 Area:
 =====
-MayRegional
+az
 
 
 
@@ -9442,15 +9445,8 @@ NAT device is added to the public subnet to get internet connectivity.
 • No Security Groups to manage / required
 
 Once created, you need to update the route table associated with your private subnet to point 
-internet-bound traffic to the NAT gateway. 
+internet-bound traffic to the NAT gateway.
 This way, the instances in your private subnet can communicate with the internet.
-
-
-• NATGW is created in a specific Availability Zone, uses an Elastic IP
-• Can’t be used by EC2 instance in the same subnet (only from other subnets)
-• Requires an IGW (Private Subnet => NATGW => IGW)
-• NAT Gateway is resilient within a single Availability Zone
-• Must create multiple NAT Gateways in multiple AZs for fault-tolerance
 
 
 
@@ -9537,11 +9533,12 @@ Security Groups are stateful:
 
 
 Ephemeral Ports:
-When a client initiates a request it choose a random port from ephemeral port range and 
-it expects the response at that port only. 
+When a client initiates a request, it choose a random port from ephemeral port range and 
+it expects the response from the server at that port only. 
 
-Ports with numbers 0-1023 are called system or well-known ports; ports with numbers 1024-49151 are 
-called user or registered ports, and ports with numbers 49152-65535 are called dynamic, private or ephemeral ports.
+Ports with numbers 0-1023 are called system or well-known ports; 
+ports with numbers 1024-49151 are called user or registered ports, 
+and ports with numbers 49152-65535 are called dynamic, private or ephemeral ports.
 
 
 • For any two endpoints to establish a connection, they must use ports
@@ -9597,7 +9594,6 @@ but C cannot communicate with B unless directly paired.
 Privately connect two VPCs using AWS’network:
 • Make them behave as if they were in thesame network
 • Must not have overlapping CIDRs
-• You must update route tables in each VPC’ssubnets to ensure EC2 instances can communicate with each other
 • You can create VPC Peering connection between VPCs in different AWSaccounts/regions
 • You can reference a security group in a peered VPC (works crossaccounts – same region)
 • You must update route tables in each VPC’s subnets to ensure EC2 instances can communicate with each other
@@ -9641,8 +9637,8 @@ AWS PrivateLink
 -------------------------------------------------
 AWS PrivateLink connects your AWS services with other AWS services through a non-public tunnel.
 
-AWS PrivateLink provides private connectivity between VPCs, AWS services, and your on-premises networks, without exposing your 
-traffic to the public internet. 
+AWS PrivateLink provides private connectivity between VPCs, AWS services, 
+and your on-premises networks, without exposing your traffic to the public internet. 
 
 AWS PrivateLink makes it easy to connect services across different accounts and VPCs to significantly 
 simplify your network architecture.
@@ -9718,7 +9714,7 @@ Linking your EC2-Classic instance to a VPC does not affect your EC2-Classic secu
 They continue to control all traffic to and from the instance. 
 
 
-• ClassicLink allows you to link EC2-Classic instances to a VPC in your account
+ClassicLink allows you to link EC2-Classic instances to a VPC in your account
 	• Must associate a security group
 	• Enables communication using private IPv4 addresses
 	• Removes the need to make use of public IPv4 addresses or Elastic IP addresses
@@ -9746,7 +9742,8 @@ Interface endpoints:
 AWS charges usage and data processing rates for PrivateLink, so there are additional costs 
 involved with creating and using an interface endpoint. 
 
-Gateway endpoints: do not use PrivateLink. Therefore, apart from the standard costs of data transfer and resource use, 
+Gateway endpoints: do not use PrivateLink. 
+Therefore, apart from the standard costs of data transfer and resource use, 
 AWS doesn't charge extra for using gateway endpoints, unlike interface endpoints.
 
 Security:
@@ -9765,6 +9762,7 @@ VPC Flow Logs is a feature that enables you to capture information about the IP 
 interfaces in your VPC. 
 
 Flow log data can be published to Amazon CloudWatch Logs or Amazon S3. 
+
 After you create a flow log, you can retrieve and view its data in the chosen destination.
 
 
@@ -9793,8 +9791,8 @@ VPC Flow Logs Syntax:
 152
 ##Site to Site VPN
 -------------------------------------------------
-You can enable access to your remote network from your VPC by creating an AWS Site-to-Site VPN (Site-to-Site VPN) connection, 
-and configuring routing to pass traffic through the connection.
+You can enable access to your remote network from your VPC by creating an AWS Site-to-Site VPN 
+(Site-to-Site VPN) connection, and configuring routing to pass traffic through the connection.
 
 
 Virtual Private Gateway (VGW):
@@ -9810,9 +9808,11 @@ Customer Gateway Device (On-premises):
 • What IP address to use?
 	• Public Internet-routable IP address for your Customer Gateway device
 	• If it’s behind a NAT device that’s enabled for NAT traversal (NAT-T), use the public IP address of the NAT device
+
 • Important step: enable Route Propagation for the Virtual Private Gateway in the route table
-  that is associated with your subnets
-• If you need to ping your EC2 instances from on-premises, make sure you add the ICMP protocol on the inbound of your security groups.
+  that is associated with your subnets.
+• If you need to ping your EC2 instances from on-premises, make sure you add the 
+  ICMP protocol on the inbound of your security groups.
 
 
 
@@ -9827,10 +9827,13 @@ AWS VPN CloudHub:
 
 
 AWS Site-to-Site VPN enables you to securely connect your on-premises network or branch office 
-site to your Amazon Virtual Private Cloud (Amazon VPC). You can securely extend your data center 
+site to your Amazon Virtual Private Cloud (Amazon VPC). 
+
+You can securely extend your data center 
 or branch office network to the cloud with an AWS Site-to-Site VPN (Site-to-Site VPN) connection. 
 It uses internet protocol security (IPSec) communications to create encrypted VPN tunnels 
-between two locations. You cannot use AWS Site-to-Site VPN to integrate data files via the NFS interface
+between two locations. 
+You cannot use AWS Site-to-Site VPN to integrate data files via the NFS interface.
 
 Area:
 =====
@@ -9865,13 +9868,16 @@ Security is a shared responsibility
 ##Direct Connect
 -------------------------------------------------
 DirectConnect connects your on-prem with your VPC through a non-public tunnel.
+AWS Direct Connect Private dedicated network connection from on-premises to AWS.
+
+Data transfer pricing over Direct Connect is lower than data transfer pricing over the internet.
 
 AWS Direct Connect lets you establish a dedicated network connection between your network 
 and one of the AWS Direct Connect locations.
 
 
-Data transfer pricing over Direct Connect is lower than data transfer pricing over the internet, 
-so both of these options are incorrect.
+
+
 
 • Provides a dedicated private connection from a remote network to your VPC
 • Dedicated connection must be setup between your DC and AWS Direct Connect locations
@@ -9879,7 +9885,6 @@ so both of these options are incorrect.
 • Access public resources (S3) and private (EC2) on same connection
 Supports both IPv4 and IPv6
 
-AWS Direct Connect Private dedicated network connection from on-premises to AWS.
 
 You can create this private connectivity to reduce network costs, increase bandwidth, and provide more consistent network experience 
 compared to regular internet-based connections.
@@ -9892,7 +9897,9 @@ If you want to setup a Direct Connect to one or more VPC in many
 different regions (same account) for your on-parmiss, you must use a Direct Connect Gateway.
 
 A Direct Connect gateway is a globally available resource. You can create the Direct Connect gateway in any 
-Region and access it from all other Regions. You can set up Direct Connect to bypass a parent Availability 
+Region and access it from all other Regions. 
+
+You can set up Direct Connect to bypass a parent Availability 
 Zone and connect directly to the internet or through Direct Connect points-of-presence.
 
 Use AWS Direct Connect gateway to connect your VPCs. You associate an AWS Direct Connect 
@@ -9917,6 +9924,7 @@ Direct Connect – Connection Types:
 	• Connection requests are made via AWS Direct Connect Partners
 	• Capacity can be added or removed on demand
 	• 1, 2, 5, 10 Gbps available at select AWS Direct Connect Partners
+	
 Lead times are often longer than 1 month to establish a new connection
 
 
@@ -9977,27 +9985,16 @@ using similar protocols like SSL, HTTPs and SSH.
 
 
 
-One AWS account that want to communicate(or use) the resources in another 
-AWS account which can be achieved by using the below following features in AWS.
-	Cross-Account Assume Role
-	VPC Peering
-	Resource Access Manager
-	VPC endpoint service
-	Transit Gateway
-
 
 
 154
 ##Transit  Gateway 
 -------------------------------------------------
-The AWS Transit Gateway is a cloud router, which connects multiple VPCs and even on-premises networks through 
-a central hub. One of the main benefits is that if you have multiple VPCs which need to be interconnected, 
-then each VPC needs just a single connection to the transit gateway rather than one to each other VPC.
-
 Transit Gateway is a Regional resource and can connect thousands of VPCs within the same AWS Region. 
 You can create multiple Transit Gateway instances per Region, and you can 
 connect to a maximum of three Transit Gateway instances over a single Direct Connect connection for hybrid connectivity.
 
+Traffic between VPC and Transit Gateway remains on the AWS global private network and is not exposed to the public internet. 
 
 
 • For having transitive peering between thousands of VPC and on-premises, hub-and-spoke (star) connection
@@ -10035,7 +10032,7 @@ Rapidly move to global scale
 Smoothly respond to spikes in demanding
 Host multicast applications in the cloud
 
-Traffic between VPC and Transit Gateway remains on the AWS global private network and is not exposed to the public internet. 
+
 Transit Gateways in different regions can peer with each other to enable VPC communications across regions. 
 Transit Gateway inter-Region peering encrypts all traffic, with no single point of 
 failure or bandwidth bottleneck which helps you to get improved security.
@@ -10212,7 +10209,7 @@ Minimizing egress traffic network cost:
 
 
 161
-++Network Protection on AWS
+##Network Protection on AWS
 -------------------------------------------------
 • To protect network on AWS, we’ve seen
 	• Network Access Control Lists (NACLs)
@@ -10261,11 +10258,12 @@ Network Firewall – Fine Grained Controls:
 
 
 
-==Disaster Recovery & Migrations
+==|Disaster Recovery & Migrations
 162
 ##Disaster Recovery Overview
 -------------------------------------------------
-You can also use these for Multi-AZ,Multi-Region strategy strategies or hybrid (on-premises workload/cloud recovery) strategies.
+You can also use these for Multi-AZ,Multi-Region strategy strategies 
+or hybrid (on-premises workload/cloud recovery) strategies.
 
 • Any event that has a negative impact on a company’s business continuity or finances is a disaster
 • Disaster recovery (DR) is about preparing for and recovering from a disaster
@@ -10288,13 +10286,8 @@ These are the Recovery Time Objective (RTO) and Recovery Point Objective (RPO).
 
 
 RTO:
-RTO is the goal your organization sets for the maximum length of time it should take to restore normal 
-operations following an outage or data loss.
-
 RTO refers to how much time an application can be down without causing significant damage to the business. 
 Some applications can be down for days without significant consequences. 
-
-
 
 
 RPO:
@@ -10321,7 +10314,8 @@ Backups are created in the same Region as their source and are also copied to an
 Backup and restore is a suitable approach for mitigating against data loss or corruption.
 
 For Region failover, in addition to data recovery from backup, you must also be able to restore your infrastructure 
-in the recovery Region. Infrastructure as Code such as AWS CloudFormation or AWS Cloud Development Kit 
+in the recovery Region. 
+Infrastructure as Code such as AWS CloudFormation or AWS Cloud Development Kit 
 (AWS CDK) enables you to deploy consistent infrastructure across Regions.
 
 The backup and recovery strategy is considered the least efficient for RTO.
@@ -10343,12 +10337,9 @@ and Amazon EC2 Auto Scaling in Figure 6. But functional elements (like compute) 
 • Faster than Backup and Restore as critical systems are already up
 
 
+
 Warm Standby :
 Like the pilot light strategy, the warm standby strategy maintains live data in addition to periodic backups. 
-A warm standby maintains a minimum deployment that can handle requests, but at a 
-reduced capacity—it cannot handle production-level traffic. 
-
-Before failover, the infrastructure must scale up to meet production needs.
 
 • Full system is up and running, but at minimum size 
 • Upon disaster, we can scale to production load
@@ -10419,7 +10410,8 @@ that rely on the database.
 
 
 AWS Database Migration Service supports homogeneous migrations such as Oracle to Oracle, as well as 
-heterogeneous migrations between different database platforms, such as Oracle or Microsoft SQL Server to Amazon Aurora.
+heterogeneous migrations between different database platforms, 
+such as Oracle or Microsoft SQL Server to Amazon Aurora.
 
 
 You must create an EC2 instance to perform the replication tasks.
@@ -10520,8 +10512,6 @@ Amazon Redshift and Amazon S3.
 AWS DMS enables you to seamlessly migrate data from supported sources to relational databases, 
 data warehouses, streaming platforms, and other data stores in AWS cloud.
 
-AWS DMS enables you to seamlessly migrate data from supported sources to relational databases, data warehouses, streaming platforms, and other data stores in AWS cloud.
-
 AWS DMS performs this task out of box without any complex configuration or code development. 
 You can also configure an AWS DMS replication instance to scale up or down depending on the workload.
 
@@ -10561,7 +10551,7 @@ AWS Backup is a fully managed service that enables you to centralize and automat
 across on-premises and AWS services. 
 
 Can I use AWS Backup to back up on-premises data?
-Yes, you can use AWS Backup to back up your on-premises Storage Gateway volumes and VMware virtual machines, 
+Yes, you can use AWS Backup to back up your on-premises Storage Gateway (volumes) and VMware virtual machines, 
 providing a common way to manage the backups of your application data both on premises and on AWS.
 
 AWS Backup supports both of the scenarios above—it lets you backup data from Amazon EFS, 
@@ -10569,7 +10559,8 @@ DynamoDB, RDS or EBS, and also from on-premise resources via the AWS Storage Gat
 
 
 AWS Backup allows you to define a central data protection policy (called a backup plan) that works across 
-AWS services for compute, storage, and databases. The backup plan defines parameters such as backup frequency 
+AWS services for compute, storage, and databases. 
+The backup plan defines parameters such as backup frequency 
 and backup retention period. 
 
 • Fully managed service 
@@ -10614,6 +10605,9 @@ AWS Application Discovery Service:
 		• System configuration, system performance, running processes, and details of the network connections between systems
 	• Resulting data can be viewed within AWS Migration Hub
 
+AWS Application Discovery Service helps enterprise customers plan migration projects by 
+gathering information about their on-premises data centers.
+Not permorming of Migration.
 
 
 
@@ -10670,19 +10664,6 @@ AWS Outposts and AWS GovCloud and China Regions.
 
 VMware Cloud on Aws
 -------------------------------------------------
-Customers across industries are accelerating adoption of both AWS Cloud and VMware infrastructure. 
-
-Many of them want the ability to integrate
-their on-premises data center environments with AWS using their existing tools and
-skillsets within a common operating environment based on familiar VMware software.
-
-VMware Cloud™ on AWS delivers on this promise by providing a unified
-infrastructure framework that bridges the gap between private and public clouds.
-
-VMware Cloud on AWS delivers a seamlessly integrated hybrid cloud that extends
-on-premises vSphere environments to a VMware SDDC running on Amazon EC2
-elastic, bare-metal infrastructure and is fully integrated as part of the AWS Cloud.
-
 • Some customers use VMware Cloud to manage their on-premises Data Center
 • They want to extend the Data Center capacity to AWS, but keep using the VMware Cloud software
 • …Enter VMware Cloud on AWS
@@ -10739,7 +10720,7 @@ It is a aws managed service, security is a shared responsibility.
 
 
 
-==Extra Solution Architecture discussions
+==|Extra Solution Architecture discussions
 
 165
 S3 Event Notifications
@@ -10812,7 +10793,8 @@ It is a aws managed service, security is a shared responsibility.
 -------------------------------------------------
 To allow or block specific IP addresses for your EC2 instances, use a network Access Control List (ACL) 
 or security group rules in your VPC. 
-Network ACLs and security group rules act as firewalls allowing or blocking IP addresses from accessing your resources.
+Network ACLs and security group rules act as firewalls allowing or blocking 
+IP addresses from accessing your resources.
 
 
 
@@ -10890,7 +10872,8 @@ an on-premises HPC cluster, with the scalability, flexibility, and elasticity pr
 
 
 You can create, use, and manage an EFA much like any other elastic network interface in Amazon EC2. 
-However, unlike elastic network interfaces, EFAs cannot be attached to or detached from an instance in a running state.
+However, unlike elastic network interfaces, 
+EFAs cannot be attached to or detached from an instance in a running state.
 
 
 Improved ENA for HPC, only works for Linux
@@ -10941,14 +10924,25 @@ AWS ParallelCluster
 172
 ##CloudFormation
 -------------------------------------------------
-An AWS CloudFormation template is a formatted text file in JSON or YAML language that describes your AWS infrastructure. 
+An AWS CloudFormation template is a formatted text file in JSON or YAML language 
+that describes your AWS infrastructure. 
 
 
 Format version: Format version defines the capability of a template.
-Description: Any comments about your template can be specified in the description.
-Metadata: Metadata can be used in the template to provide further information using JSON or YAML objects. 
+Description: Any comments about your template.
+Metadata: Metadata can be used in the template to provide further information. 
 
-
+CloudFormation Building Blocks:
+Templates components
+	1. Resources: your AWS resources declared in the template (MANDATORY)
+	2. Parameters: the dynamic inputs for your template
+	3. Mappings: the static variables for your template
+	4. Outputs: References to what has been created
+	5. Conditionals: List of conditions to perform resource creation
+	6. Metadata
+Templates helpers:
+	1. References
+	2. Functions
 
 HowToWork:
 -Create or use an existing CloudFormation template using JSON or YAML format.
@@ -10964,9 +10958,6 @@ For example,you say:
 	• I want two Elastic IPs for these EC2 machines
 	• I want an S3 bucket
 	• I want a load balancer (ELB) in front of these machines
-• Then CloudFormation creates those for you, in the right order, with the exact configuration that you specify.
-
-
 
 
 Benefits of AWS CloudFormation (1/2):
@@ -10994,7 +10985,6 @@ Cost:
 
 
 CloudFormation Stack Designer:
-	• Example: WordPress CloudFormation Stack
 	• We can see all the resources 
 	• We can see the relations between the components
 
@@ -11003,7 +10993,8 @@ CloudFormation Stack Designer:
 
 How CloudFormation Works:
 • Templates have to be uploaded in S3 and then referenced in CloudFormation
-• To update a template, we can’t edit previous ones. We have to reupload a new version of the template to AWS
+• To update a template, we can’t edit previous ones. 
+  We have to reupload a new version of the template to AWS.
 • Stacks are identified by a name
 • Deleting a stack deletes every single artifact that was created by CloudFormation.
 
@@ -11018,17 +11009,6 @@ Automated way:
 	• Recommended way when you fully want to automate your flow
 
 
-CloudFormation Building Blocks:
-Templates components
-	1. Resources: your AWS resources declared in the template (MANDATORY)
-	2. Parameters: the dynamic inputs for your template
-	3. Mappings: the static variables for your template
-	4. Outputs: References to what has been created
-	5. Conditionals: List of conditions to perform resource creation
-	6. Metadata
-Templates helpers:
-	1. References
-	2. Functions
 
 
 
@@ -11043,18 +11023,12 @@ Manage infrastructure with DevOps
 Automate, test, and deploy infrastructure templates with continuous integration and delivery (CI/CD) automations.
 Scale production stacks
 Run anything from a single Amazon Elastic Compute Cloud (EC2) instance to a complex multi-region application.
-Share best practices
-Define an Amazon Virtual Private Cloud (VPC) subnet or provisioning services like AWS OpsWorks or Amazon Elastic Container Service (ECS) with ease.
 
 BillCost:
 =========
 Free Tier
 Handler operation
 Handler operation duration
-
-• Each resources within the stack is tagged with an identifier so you can easily see how much a stack costs you
-• You can estimate the costs of your resources using the CloudFormation template
-• Savings strategy: In Dev, you could automation deletion of templates at 5 PM and recreated at 8 AM, safe
 
 
 Security:
@@ -11066,7 +11040,7 @@ It is a aws managed service, security is a shared responsibility.
 
 
 173
-++Amazon Simple Email Service (Amazon SES)
+##SES Amazon Simple Email Service
 -------------------------------------------------
 • Fully managed service to send emails securely, globally and at scale
 • Allows inbound/outbound emails
@@ -11081,7 +11055,7 @@ It is a aws managed service, security is a shared responsibility.
 
 
 174
-++Amazon Pinpoint
+##Pinpoint
 -------------------------------------------------
 • Scalable 2-way (outbound/inbound) marketing communications service
 • Supports email, SMS, push, voice, and in-app messaging
@@ -11097,10 +11071,12 @@ It is a aws managed service, security is a shared responsibility.
 
 
 175
-++SSM Systems Manager – SSM Session Manager
+##SSM Systems Manager – SSM Session Manager
 -------------------------------------------------
-AWS Systems Manager Session Manager is a new interactive shell and CLI that helps to provide secure, access-controlled, 
-and audited Windows and Linux EC2 instance management. Session Manager removes the need to open inbound ports, 
+AWS Systems Manager Session Manager is a new interactive shell and CLI that helps to provide secure, 
+access-controlled, and audited Windows and Linux EC2 instance management. 
+
+Session Manager removes the need to open inbound ports, 
 manage SSH keys, or use bastion hosts.
 
 Allows you to start a secure shell on your EC2 and on-premises servers
@@ -11113,7 +11089,7 @@ Install the SSM Agent IF not already installed.
 
 
 176
-++Amazon Elastic Transcoder
+##Elastic Transcoder
 -------------------------------------------------
 • Elastic Transcoder is used to convert media files stored in S3 into media
   files in the formats required by consumer playback devices (phones etc..)
@@ -11126,10 +11102,10 @@ Install the SSM Agent IF not already installed.
 
 
 177
-++AWS Batch
+##AWS Batch
 -------------------------------------------------
-AWS Batch is a set of batch management capabilities that enables developers, scientists, and engineers to easily and 
-efficiently run hundreds of thousands of batch computing jobs on AWS. 
+AWS Batch is a set of batch management capabilities that enables developers, scientists, 
+and engineers to easily and  efficiently run hundreds of thousands of batch computing jobs on AWS. 
 
 • Fully managed batch processing at any scale
 • Efficiently run 100,000s of computing batch jobs on AWS
@@ -11159,11 +11135,12 @@ Batch vs Lambda:
 
 
 178
-++Amazon AppFlow
+
+##AppFlow
 -------------------------------------------------
 As a managed serverless platform, 
 • Fully managed integration service that enables you to securely transfer
-  data between Software-as-a-Service (SaaS) applications and AWS
+  data between Software-as-a-Service (SaaS) applications and AWS.
 • Sources: Salesforce, SAP, Zendesk, Slack, and ServiceNow
 • Destinations: AWS services like Amazon S3, Amazon Redshift or nonAWS such as SnowFlake and Salesforce
 • Frequency: on a schedule, in response to events, or on demand
@@ -11218,8 +11195,10 @@ AWS Well-Architected Tool:
 ##AWS Trusted Advisor
 -------------------------------------------------
 AWS Trusted Advisor provides recommendations that help you follow AWS best practices. 
-Trusted Advisor evaluates your account by using checks. These checks identify ways to optimize your AWS infrastructure, 
-improve security and performance, reduce costs, and monitor service quotas
+
+Trusted Advisor evaluates your account by using checks. 
+These checks identify ways to optimize your AWS infrastructure, 
+improve security and performance, reduce costs, and monitor service quotas.
 
 No need to install anything – high level AWS account assessment
 Analyze your AWS accounts and provides recommendation:
