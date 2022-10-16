@@ -39,6 +39,7 @@ Contemplating:চিন্তা করা
 Adequate:পর্যাপ্ত
 Withstand disruptions:বাধা সহ্য করা
 Ingest:গ্রহণ করা
+Sustainability:স্থায়িত্ব
 =================================================
 #General | Basic          
 ================================================= 
@@ -4359,6 +4360,7 @@ Security is a shared responsibility.
 ##DataSync
 -------------------------------------------------
 Schedule data sync from on-premises to AWS, or AWS to AWS.
+DataSync makes it easier to move data over the network between storage systems and services.
 
 S3-to-S3
 AWS DataSync copy data and metadata between AWS Storage Services
@@ -4391,9 +4393,19 @@ If you want to transfer on-premises block/tapes to AWS, then AWS Storage Gateway
 
  When the requirement is to transfer files from on premises to AWS EFS (elastic file system) 
  then AWS Datasync is the option as AWS Storage Gateway doesn’t support EFS
- 
- 
- 
+
+
+Datasync can send data to AWS Glacier.
+Datasync can seamlessly move data between multiple on-premise file systems and AWS.
+
+Datasync can also be used to move or sync data between AWS storage services like S3, 
+EFS or FSx in the same or different accounts.
+
+
+You can connect Datasync to NFS (Network File System) shares, SMB (Server Message Block) shares, 
+Hadoop distributed file systems, self managed object storage, AWS Snowcone and move data to S3, 
+Amazon elastic file systems, FSx for Windows file server and FSx for Lustre file systems.
+
 ++All Aws Storage Comparison
 -------------------------------------------------
 Storage Comparison:
@@ -5496,6 +5508,9 @@ applications at any scale.
 DynamoDB offers built-in security, continuous backups, automated multi-Region replication, in-memory caching, 
 and data import and export tools.
 
+A key-value store holds for each key a single value. Arguably, if the value can be an entire document, 
+you can call this database a "document store". In this sense, DynamoDB is a document store.
+
 
 The main components of DynamoDB are:
 -a collection which serves as the foundational table
@@ -5886,7 +5901,7 @@ It is a aws managed service, security is a shared responsibility.
 
 
 
-==Databases
+==|Databases
 76
 ##Databases in AWS
 -------------------------------------------------
@@ -6137,7 +6152,7 @@ ExamTips:Any time you see Financial transaction or Ledger, its QLDB.
 
 
 
-==Data & Analytics
+==|Data & Analytics
 ##Athena
 -------------------------------------------------
 Amazon Athena is an interactive query service that makes it easy to analyze data directly in Amazon S3 using standard SQL.
@@ -6346,7 +6361,7 @@ You can also enable encryption, all the data written to disk will be encrypted.
 
 
 78
-##OpenSearch Service
+##OpenSearch Service|ElasticSearch now Open search
 -------------------------------------------------
 Amazon OpenSearch Service makes it easy for you to perform interactive log analytics, real-time application monitoring, 
 website search, and more. 
@@ -6371,6 +6386,31 @@ OpenSearch for Solutions Architect:
 	• Remember: OpenSearch = Search / Indexing
 
 
+CloudSearch:
+Elasticsearch and CloudSearch are Amazon’s cloud-based solutions for search. 
+Elasticsearch is an open source solution, whereas CloudSearch is a fully managed search service. 
+It is quite simple to set up, easy to, and a cost-effective search solution. 
+Amazon CloudSearch is an AWS Cloud managed service that helps users to create fast, scalable, 
+profitable, easy to setup search solutions for their applications. Amazon CloudSearch uses 
+Apache Solr as the underlying text search engine, which supports full-text search, 
+faceted search, real-time indexing, dynamic clustering, database integration, 
+NoSQL features, and productive document handling.
+
+
+Amazon Elasticsearch and Cloudsearch both are popular AWS-based tools that use proven technologies. 
+These tools allow users to create fast, scalable, and easily usable search solutions 
+for their applications. These can be categorized as "Search as a Service" tools.
+
+Elasticsearch Data and Index backup manual.
+Cloudsearch automatically takes backup of the data. Unlike Elasticsearch.
+
+Amazon Elasticsearch offers a licensed plugin called Shield. It handles the authorization, 
+user authentication and permission allocation.
+Cloudsearch offers an IAM-based access control mechanism.
+
+There is no up-front licensing cost of Elasticsearch. Therefore, users do not need to 
+pay any additional costs for licensing. 
+Cloudsearch charges on an hourly basis, which depends on the size of user searches. 
 
 Area:
 =====
@@ -6634,7 +6674,7 @@ Big Data Ingestion Pipeline discussion
 
 
 
-==Machine Learning
+==| Machine Learning
 84
 ##Rekognition
 -------------------------------------------------
@@ -7139,11 +7179,12 @@ AWS Machine Learning- Summary:
 
 
 
-=dx
+==|AWS Monitoring, Audit and Performance
+
 96
 ##AWS Monitoring 
 -------------------------------------------------
-Amazon Web Services (AWS) monitoring is a set of practices you can use to verify the security and performance of your 
+AWS monitoring is a set of practices you can use to verify the security and performance of your 
 AWS resources and data.
 
 Use a single platform for observability, Collect metrics on AWS and on premises.
@@ -7156,11 +7197,11 @@ Use a single platform for observability, Collect metrics on AWS and on premises.
 97
 ##CloudWatch 
 -------------------------------------------------
-Amazon CloudWatch is a monitoring and observability service built for DevOps engineers, developers, site reliability 
-engineers (SREs), IT managers, and product owners.
+Amazon CloudWatch is a monitoring and observability service built for DevOps engineers, developers, 
+site reliability engineers (SREs), IT managers, and product owners.
 
-CloudWatch enables you to monitor your complete stack (applications, infrastructure, and services) and use alarms, 
-logs, and events data to take automated actions and reduce mean time to resolution (MTTR). 
+CloudWatch enables you to monitor your complete stack (applications, infrastructure, and services) 
+and use alarms, logs, and events data to take automated actions and reduce mean time to resolution (MTTR). 
 
 
 CloudWatch is all about performance. CloudTrail is all about auditing.
@@ -7214,13 +7255,15 @@ It is a aws managed service, security is a shared responsibility.
 ##AWS CloudWatch Metrics
 -------------------------------------------------
 Metrics are data about the performance of your systems. 
+
 By default, many services provide free metrics for resources 
 such as Amazon EC2 instances, Amazon EBS volumes, and Amazon RDS DB instances. 
-You can also enable detailed monitoring for some resources, such as your Amazon EC2 instances, or publish your own 
-application metrics. 
 
-Amazon CloudWatch can load all the metrics in your account (both AWS resource metrics and application metrics that you provide) 
-for search, graphing, and alarms.
+You can also enable detailed monitoring for some resources, such as your Amazon EC2 instances, 
+or publish your own application metrics. 
+
+Amazon CloudWatch can load all the metrics in your account 
+(both AWS resource metrics and application metrics that you provide) for search, graphing, and alarms.
 
 
 • CloudWatch provides metrics for every services in AWS
@@ -7361,11 +7404,18 @@ CloudWatch Logs for EC2:
 	• The CloudWatch log agent can be setup on-premises too
 
 
-CloudWatch Logs enables you to centralize the logs from all of your systems, applications, and AWS services t
-hat you use, in a single, highly scalable service.
+CloudWatch Logs enables you to centralize the logs from all of your systems, applications, and AWS services 
+that you use, in a single, highly scalable service.
 
-CloudWatch Logs Insights enables you to interactively search and analyze your log data in Amazon CloudWatch Logs.
+CloudWatch Logs Insights enables you to interactively search and analyze your log data in 
+Amazon CloudWatch Logs. 
+You can perform queries to help you more efficiently 
+and effectively respond to operational issues like: Top 10 IP to make request.
+ 
+If an issue occurs, you can use 
+CloudWatch Logs Insights to identify potential causes and validate deployed fixes.
 
+Like: Top ten IP address for hit the api.
 
 Area:
 =====
@@ -7399,7 +7449,8 @@ It is a aws managed service, security is a shared responsibility.
 102
 ##CloudWatch Agent | Logs Agent
 -------------------------------------------------
-The CloudWatch Logs agent provides an automated way to send log data to CloudWatch Logs from Amazon EC2 instances. 
+The CloudWatch Logs agent provides an automated way to send log data to CloudWatch Logs 
+from Amazon EC2 instances. 
 
 The agent includes the following components:
 A plug-in to the AWS CLI that pushes log data to CloudWatch Logs.
@@ -7437,11 +7488,8 @@ Reminder: out-of-the box metrics for EC2 – disk, CPU, network (high level)
 103
 ##CloudWatch Alarms
 -------------------------------------------------
-CloudWatch alarms perform an action when a CloudWatch metric exceeds a specified value for some amount of time.
-
 An alarm watches a single metric over a specified time period, and performs one or more specified actions,
 based on the value of the metric relative to a threshold over time. 
- 
 
 You can attach multiple Alarms to each metric and each one can have multiple actions.
 A CloudWatch Alarm is always in one of three states: OK, ALARM, or INSUFFICIENT_DATA
@@ -7509,6 +7557,7 @@ applications like Auth0, Shopify, and others. You can, of course, also send your
 
 Customers can integrate their own AWS applications with microservices, SaaS applications, and custom 
 applications as event sources that publish events to an event bus. 
+
 You can define a filtering rule to filter events and route them to AWS service 
 targets and API destinations (via HTTP endpoints).
 
@@ -7572,7 +7621,8 @@ CloudWatch Container Insights:
 	• Amazon Elastic Kubernetes Services (Amazon EKS)
 	• Kubernetes platforms on EC2
 	• Fargate (both for ECS and EKS)
-• In Amazon EKS and Kubernetes, CloudWatch Insights is using a containerized version of the CloudWatch Agent to discover containers.
+In Amazon EKS and Kubernetes, CloudWatch Insights is using a containerized version 
+of the CloudWatch Agent to discover containers.
 
 
 
@@ -7594,14 +7644,17 @@ by pinpointing outliers, finding the heaviest traffic patterns, and ranking the 
 	• The total number of unique contributors, and their usage.
 	• This helps you find top talkers and understand who or what is impacting system performance.
 	• Works for any AWS-generated logs (VPC, DNS, etc..)
-	• For example, you can find bad hosts, identify the heaviest network users, or find the URLs that generate the most errors.
-	• You can build your rules from scratch, or you can also use sample rules that AWS has created – leverages your CloudWatch Logs
+	• For example, you can find bad hosts, identify the heaviest network users, or find the 
+	  URLs that generate the most errors.
+	• You can build your rules from scratch, or you can also use sample rules that AWS has 
+	  created – leverages your CloudWatch Logs
 	• CloudWatch also provides built-in rules that you can use to analyze metrics from other AWS services.
 
 
 
 CloudWatch Application Insights:
-• Provides automated dashboards that show potential problems with monitored applications, to help isolate ongoing issues
+• Provides automated dashboards that show potential problems with monitored applications, 
+  to help isolate ongoing issues.
 • Findings and alerts are sent to Amazon EventBridge and SSM OpsCenter
 
 
@@ -7609,14 +7662,14 @@ CloudWatch Application Insights:
 
 CloudWatch Insights and Operational Visibility | Summary:
 	• CloudWatch Container Insights
-	• ECS, EKS, Kubernetes on EC2, Fargate, needs agent for Kubernetes
-	• Metrics and logs
+		• ECS, EKS, Kubernetes on EC2, Fargate, needs agent for Kubernetes
+		• Metrics and logs
 	• CloudWatch Lambda Insights
-	• Detailed metrics to troubleshoot serverless applications
+		• Detailed metrics to troubleshoot serverless applications
 	• CloudWatch Contributors Insights
-	• Find “Top-N” Contributors through CloudWatch Logs
+		• Find “Top-N” Contributors through CloudWatch Logs
 	• CloudWatch Application Insights
-	• Automatic dashboard to troubleshoot your application and related AWS services
+		• Automatic dashboard to troubleshoot your application and related AWS services
 
 
 
@@ -7639,7 +7692,8 @@ Write less custom code
 BillCost:
 =========
 Free tier: All state change events published by AWS services by default are free.
-Amazon EventBridge, you pay for events published to your event bus, events ingested for Schema Discovery, and Event Replay. 
+Amazon EventBridge, you pay for events published to your event bus, events ingested for 
+Schema Discovery, and Event Replay. 
 There are no additional charges for rules or event delivery. 
 Glue
 
@@ -7669,8 +7723,11 @@ Actions taken by a user, role, or an AWS service are recorded as events in Cloud
 Events include actions taken in the AWS Management Console, AWS Command Line Interface, and AWS SDKs and APIs.
 
 
-There are two types of events that can be logged in CloudTrail: management events and data events.
-Management events provide information about management operations that are performed on resources in your AWS account.
+There are two types of events that can be logged in CloudTrail: 
+Management events and Data events.
+
+Management events provide information about management operations that are performed 
+on resources in your AWS account.
 Think of Management events as things normally done by people when they are in AWS. 
 
 
@@ -7706,7 +7763,8 @@ CloudTrail Events
 
 
 CloudTrail Insights:
-CloudTrail Insights automatically analyzes write management events from CloudTrail trails and alerts you to unusual activity.
+CloudTrail Insights automatically analyzes write management events from 
+CloudTrail trails and alerts you to unusual activity.
 
 CloudTrail Insights is designed to automatically( Amazon applying Machine Learning to your CloudTrail Events) 
 analyze management events from your CloudTrail trails to 
@@ -7730,7 +7788,8 @@ CloudTrail Events Retention:
 
 
 The difference between CloudTrail Insights and CloudTrail Events? 
-CloudTrail Events are a log of every event that takes place inside your AWS environment whereas CloudTrail Insights applies 
+CloudTrail Events are a log of every event that takes place inside your AWS environment 
+whereas CloudTrail Insights applies 
 Machine Learning to report on “insights” into groups of events that deviate from expected behavior.
 
 CloudWatch mainly monitors performance, whereas CloudTrail mainly monitors actions in your AWS environment.
@@ -7761,8 +7820,10 @@ Security:
 Track user activity and API usage
 AWS CloudTrail
 	
-By default, CloudTrail log files are encrypted using Amazon S3 Server Side Encryption (SSE) and placed into your S3 bucket. 
-You can control access to log files by applying IAM or S3 bucket policies. You can add an additional layer of security by 
+By default, CloudTrail log files are encrypted using Amazon S3 Server Side Encryption (SSE) 
+and placed into your S3 bucket. 
+You can control access to log files by applying IAM or S3 bucket policies. 
+You can add an additional layer of security by 
 enabling S3 Multi Factor Authentication (MFA) Delete on your S3 bucket.
 
 
@@ -7775,28 +7836,33 @@ enabling S3 Multi Factor Authentication (MFA) Delete on your S3 bucket.
 -------------------------------------------------
 AWS Config provides a detailed view of the configuration of AWS resources in your AWS account. 
 
-AWS Config is a service that enables you to assess, audit, and evaluate the configurations of your AWS resources. 
-Config continuously monitors and records your AWS resource configurations and allows you to automate the evaluation 
-of recorded configurations against desired configurations.
+AWS Config is a service that enables you to assess, audit, and evaluate the configurations of 
+your AWS resources. 
+Config continuously monitors and records your AWS resource configurations and allows you to 
+automate the evaluation of recorded configurations against desired configurations.
 
 • Helps with auditing and recording compliance of your AWS resources
 • Helps record configurations and changes over time
+
 • Questions that can be solved by AWS Config:
-• Is there unrestricted SSH access to my security groups?
-• Do my buckets have any public access?
-• How has my ALB configuration changed over time?
-• You can receive alerts (SNS notifications) for any changes
-• AWS Config is a per-region service
-• Can be aggregated across regions and accounts
-• Possibility of storing the configuration data into S3 (analyzed by Athena)
+	• Is there unrestricted SSH access to my security groups?
+	• Do my buckets have any public access?
+	• How has my ALB configuration changed over time?
+	• You can receive alerts (SNS notifications) for any changes
+	• AWS Config is a per-region service
+	• Can be aggregated across regions and accounts
+	• Possibility of storing the configuration data into S3 (analyzed by Athena)
 
 
 ConfigRule:
 	AWS Config rules evaluate the configuration settings of your AWS resources. 
 	A rule can run when AWS Config detects a configuration change to an AWS resource or at 
-	a periodic frequency that you choose (for example, every 24 hours). There are two types of 
-	rules: AWS Config Managed Rules and AWS Config Custom Rules. Managed rules are predefined, 
-	customizable rules created by AWS Config.
+	a periodic frequency that you choose (for example, every 24 hours). 
+	There are two types of 
+	rules: 
+	AWS Config Managed Rules and 
+	AWS Config Custom Rules. 
+	Managed rules are predefined, customizable rules created by AWS Config.
 
 After you activate a rule, AWS Config compares your resources to the conditions of the rule. 
 After this initial evaluation, AWS Config continues to run evaluations each time one is triggered.
@@ -7808,14 +7874,6 @@ You can set Remediation Retries if the resource is still non-compliant after aut
 Config Rules – Remediations:
 Automate remediation of non-compliant resources using SSM Automation Documents
 You can set Remediation Retries if the resource is still non-compliant after auto- remediation
-
-AWS Config enables you to assess, audit, and evaluate the configurations of your AWS resources. 
-AWS Config rules are evaluated when changes are made in the AWS environment. 
-By analyzing changes as they occur, you can catch compliance violations quickly and minimize the exposure to 
-your organization. When you apply a remediation action to an 
-AWS Config rule violation, automation is initiated when the rule violation is detected.
-
-
 
 
 Config Rules – Notifications:
@@ -7893,14 +7951,12 @@ It is a aws managed service, security is a shared responsibility.
 106
 ##Organizations
 -------------------------------------------------
-An organization is an entity that you create to consolidate a collection of accounts so that you can 
-administer them as a single unit.
+How do you centralize your management (billing, access control, compliance and security) 
+across multiple AWS accounts?
+Welcome AWS Organizations! administer them as a single unit.
 
-
-How do you centralize your management (billing, access control, compliance and security) across multiple AWS accounts?
-Welcome AWS Organizations!
 Organize accounts into Organizational Units (OU)
-Provides API to automate creation of new accounts
+Provides API to automate creation of new accounts.
 
 Global service
 • Allows to manage multiple AWS accounts
@@ -7955,10 +8011,13 @@ Features:
 
 
 Service Control Policies (SCP):
-Service control policies (SCPs) are a type of organization policy that you can use to manage permissions in your organization. 
+Service control policies (SCPs) are a type of organization policy that you can use to 
+manage permissions in your organization. 
+
 SCPs offer central control over the maximum available permissions for all accounts in your organization.
 
-SCPs don't affect users or roles in the management account. They affect only the member accounts in your organization.
+SCPs don't affect users or roles in the management account. 
+They affect only the member accounts in your organization.
 
 • Whitelist or blacklist IAM actions
 • Applied at the OU or Account level
@@ -8045,17 +8104,18 @@ It is a aws managed service, security is a shared responsibility.
 
 
 How to access from AccA   to AccB S3 ?
+	Way1
+	From AccA asumeRole using STS (AWS Security Token Service),the Role of AccB to Access S3 of AccB.
 
-Way1
-From AccA asumeRole using STS,the Role of AccB to Access S3 of AccB
-
-Way2
-Create a backet with the policy that allow the AccA in AccB.
+	Way2
+	Create a backet with the policy that allow the AccA in AccB.
 
 
 Example:Supose  From AccA, scan a DaynamoDB table and dump it to AccB.
 
-If you asumeRole from AccB, it not work. because you asume a role of AccB then you lost the access of you self account access.
+If you asumeRole from AccB, it not work. 
+Because you asume a role of AccB then you lost the access of you self account access.
+
 In this case you have to use resouece base policy.
 
 
@@ -8070,13 +8130,6 @@ In this case you have to use resouece base policy.
 	• IAM role: Kinesis stream, Systems Manager Run Command, ECS task…
 
 
-++SSO
--------------------------------------------------
-IAM identity center now SSO
-If multiple account if required then SSO.
-
-
-
 
 
 
@@ -8084,9 +8137,10 @@ If multiple account if required then SSO.
 ##AWS Cognito
 -------------------------------------------------
 Cognito only helps with authentication, not authorization.
-Amazon Cognito lets you add user sign-up, sign-in, and access control to your web and mobile apps quickly and easily. 
+Amazon Cognito lets you add user sign-up, sign-in, and access control to your web and mobile apps easyly.
 
-Amazon Cognito scales to millions of users and supports sign-in with social identity providers, such as Apple, Facebook, Google, and 
+Amazon Cognito scales to millions of users and supports sign-in with social identity providers, 
+such as Apple, Facebook, Google, and 
 Amazon, and enterprise identity providers via SAML 2.0 and OpenID Connect.  
 
 
@@ -8107,7 +8161,7 @@ Cognito Identity Pools (Federated Identity):appUser->CUP/ThardPartyUser->CIP->S3
       For direct access AWS resource, without ALB or API Gateway.
 	• Provide AWS credentials to users so they can access AWS resources directly
 	• Integrate with Cognito User Pools as an identity provider
-Cognito Sync:
+CognitoSync:
 	• Synchronize data from device to Cognito.
 	• May be deprecated and replaced by AppSync
 
@@ -8199,8 +8253,8 @@ Global
 
 UseCase:
 ========
-Enable multi-account access to your AWS accounts: Your users can use their directory credentials for single sign-on access to
-multiple AWS accounts.
+Enable multi-account access to your AWS accounts: 
+Your users can use their directory credentials for single sign-on access to multiple AWS accounts.
 Enable single sign-on access to your AWS applications
 Enable single sign-on access to Amazon EC2 Windows instances
 Enable single sign-on access to cloud-based applications
@@ -9893,11 +9947,13 @@ compared to regular internet-based connections.
 
 Direct Connect Gateway:
 ---------------------------------------------
+DirectConnecte->PrivateVertualInterface->VGW->VPC
+
 If you want to setup a Direct Connect to one or more VPC in many
 different regions (same account) for your on-parmiss, you must use a Direct Connect Gateway.
 
-A Direct Connect gateway is a globally available resource. You can create the Direct Connect gateway in any 
-Region and access it from all other Regions. 
+AWS Direct Connect gateway is aimed at making it easier to connect from a single 
+Direct Connect location to multiple AWS regions or VPCs.
 
 You can set up Direct Connect to bypass a parent Availability 
 Zone and connect directly to the internet or through Direct Connect points-of-presence.
@@ -9948,6 +10004,8 @@ What is the difference between Direct Connect gateway and virtual private gatewa
 The Direct Connect Gateway is connected to multiple AWS VPCs in different AWS regions via Virtual private Gateways. 
 The Direct Connect Gateway is in turn connected to the Direct Connect via a virtual private interface. 
 This allows multiple VPCs to be connected to the customer network via one virtual private interface.
+
+
 
 Area:
 =====
