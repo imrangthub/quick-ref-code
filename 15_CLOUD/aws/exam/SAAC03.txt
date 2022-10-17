@@ -4429,7 +4429,7 @@ Storage Comparison:
 
 
 
-==AWS Integration & Messaging
+==| AWS Integration & Messaging
 59
 ##Decouple your applications:
 -------------------------------------------------
@@ -5000,7 +5000,7 @@ Security is a shared responsibility.
 
 
 
-==Container Section
+==| Container Section
 65
 ##ECS
 -------------------------------------------------
@@ -5266,7 +5266,7 @@ all this without worrying about provisioning and managing the underlying infrast
 
 
 
-
+==| Serverless Overview
 67
 ##AWS Serverless
 -------------------------------------------------
@@ -5363,7 +5363,7 @@ application or backend service without provisioning or managing servers.
 You can trigger Lambda from over 200 AWS services and software as a service (SaaS) applications, 
 and only pay for what you use.
 
-WS Lambda allows you to add custom logic to AWS resources such as Amazon S3 buckets and Amazon DynamoDB tables.
+Lambda allows you to add custom logic to AWS resources such as Amazon S3 buckets and Amazon DynamoDB tables.
 
 AWS Lambda Limits to Know - per region:
 Execution:
@@ -5380,11 +5380,13 @@ Deployment:
 
 Lambda functions always operate from an AWS-owned VPC.
 You should only enable your functions for VPC access when you need to interact with a private resource 
-located in a private subnet. An RDS instance is a good example.
+located in a private subnet. 
+An RDS instance is a good example.
 
 
 Once your function is VPC-enabled, all network traffic from your function is subject 
-to the routing rules of your VPC/Subnet. If your function needs to interact with a public 
+to the routing rules of your VPC/Subnet. 
+If your function needs to interact with a public 
 resource, you will need a route through a NAT gateway in a public subnet.
 
 
@@ -5429,10 +5431,12 @@ You can use Lambda functions to change CloudFront requests and responses at the 
 	After CloudFront receives the response from the origin (origin response)
 	Before CloudFront forwards the response to the viewer (viewer response)
 
-Lambda are regional service. Lambda@Edge is a global service. 
+Lambda are regional service. 
+Lambda@Edge is a global service. 
+
 Lambda@Edge allows you to execute the logic across multiple location (Node.js and Paython only)
 
-You can use Lambda to change CloudFront requests and responses.
+You can use Lambda@Edge to change CloudFront requests and responses.
 You can also generate responses to viewers without ever sending the request to the origin.
 
 
@@ -5501,22 +5505,22 @@ Security is a shared responsibility.
 69
 ##DynamoDB
 -------------------------------------------------
-Amazon DynamoDB Fast, flexible NoSQL database service for single-digit millisecond performance at any scale.
-
 Amazon DynamoDB is a fully managed, serverless, key-value NoSQL database designed to run high-performance 
-applications at any scale. 
+applications at any scale and single-digit millisecond performance.
 DynamoDB offers built-in security, continuous backups, automated multi-Region replication, in-memory caching, 
 and data import and export tools.
 
 A key-value store holds for each key a single value. Arguably, if the value can be an entire document, 
-you can call this database a "document store". In this sense, DynamoDB is a document store.
+you can call this database a "document store". 
+In this sense, DynamoDB is a document store.
 
 
 The main components of DynamoDB are:
--a collection which serves as the foundational table
--a document which is equivalent to a row in a SQL database
--key-value pairs which are the fields within the document or row
--Maximum size of an item is 400KB
+• DynamoDB is made of Tables
+• Each table has a Primary Key (must be decided at creation time)
+• Each table can have an infinite number of items (= rows)
+• Each item has attributes (can be added over time – can be null)
+• Maximum size of an item is 400KB
 -Data types supported are:
 	• Scalar Types – String, Number, Binary, Boolean, Null
 	• Document Types – List, Map
@@ -5659,31 +5663,34 @@ DynamoDB also provides access control via AWS IAM roles.
 -------------------------------------------------
 Amazon API Gateway is a fully managed service that makes it easy for developers to 
 create, publish, maintain, monitor, and secure APIs at any scale.
+
 You can create RESTful APIs and WebSocket APIs that enable real-time two-way communication applications.
 
 API Types;
 RESTful: Build RESTful APIs optimized for serverless workloads and HTTP backends using HTTP APIs.
-WebSocket: Build real-time two-way communication applications, such as chat apps and streaming dashboards, with WebSocket APIs.
+WebSocket: Build real-time two-way communication applications, such as chat apps and streaming dashboards, 
+with WebSocket APIs.
 
 
 Features:
--Integrates with AWS Lambda, Amazon EC2, Amazon ECS or any web application
--Supports HTTP(S) and WebSockets (two way communication - chat apps and streaming dashboards)
--Serverless. Pay for use (API calls and connection duration)
--Provides API Lifecycle Management for RESTful APIs and WebSocket APIs
--You can Run multiple versions of the same API
--Supports Rate Limits(request quota limits), throttling and fine-grained access permissions using API Keys for Third-Party Developers
--Lifecycle management for REST APIs
--Versioning and multiple environments
--API keys - Generate API keys to monitor usage
--Implement plans and quota limits for external applications (or developer)
--WARNING - Do NOT use API keys for Authorization
--Enable caching for API calls with TTL
--Protect backends by throttling requests
--Integrates with
--Amazon CloudWatch - Performance metrics, API calls, latency data and error rates
--Amazon CloudWatch Logs - Debug logging
--AWS CloudTrail - Complete history of changes to your REST API
+	-Integrates with AWS Lambda, Amazon EC2, Amazon ECS or any web application
+	-Supports HTTP(S) and WebSockets (two way communication - chat apps and streaming dashboards)
+	-Serverless. Pay for use (API calls and connection duration)
+	-Provides API Lifecycle Management for RESTful APIs and WebSocket APIs
+	-You can Run multiple versions of the same API
+	-Supports Rate Limits(request quota limits), throttling and fine-grained access permissions 
+	 using API Keys for Third-Party Developers
+	-Lifecycle management for REST APIs
+	-Versioning and multiple environments
+	-API keys - Generate API keys to monitor usage
+	-Implement plans and quota limits for external applications (or developer)
+	-WARNING - Do NOT use API keys for Authorization
+	-Enable caching for API calls with TTL
+	-Protect backends by throttling requests
+	-Integrates with
+	-Amazon CloudWatch - Performance metrics, API calls, latency data and error rates
+	-Amazon CloudWatch Logs - Debug logging
+	-AWS CloudTrail - Complete history of changes to your REST API
 
 
 
@@ -5784,7 +5791,7 @@ To support custom authorization requirements, you can execute a Lambda authorize
 
 
 
-==Serverless Architectures
+==|Serverless Architectures
 72
 ##Serverless Architectures
 -------------------------------------------------
@@ -5905,9 +5912,7 @@ It is a aws managed service, security is a shared responsibility.
 76
 ##Databases in AWS
 -------------------------------------------------
-Choosing the Right Database:
-• We have a lot of managed databases on AWS to choose from
-• Questions to choose the right database based on your architecture:
+Choosing the right database based on your architecture:
 	• Read-heavy, write-heavy, or balanced workload? Throughput needs? Will it
 	  change, does it need to scale or fluctuate during the day?
 	• How much data to store and for how long? Will it grow? Average object size?
@@ -5952,7 +5957,8 @@ Amazon RDS – Summary:
 
 RDS for Solutions Architect:
 	• Operations: small downtime when failover happens, when maintenance
-	  happens, scaling in read replicas / ec2 instance / restore EBS implies manual intervention, application changes.
+	  happens, scaling in read replicas / ec2 instance / restore EBS 
+	  implies manual intervention, application changes.
 	• Security: AWS responsible for OS security, we are responsible for setting
 	  up KMS, security groups, IAM policies, authorizing users in DB, using SSL
 	• Reliability: Multi AZ feature, failover in case of failures
@@ -6009,23 +6015,9 @@ ElastiCache for Solutions Architect:
 	• Security: AWS responsible for OS security, we are responsible for setting up KMS, security groups, 
 	  IAM policies, users (Redis Auth), using SSL.
 	• Reliability: Clustering, Multi AZ
-	• Performance: Sub-millisecond performance, in memory, read replicas for sharding, very popular cache option.
+	• Performance: Sub-millisecond performance, in memory, read replicas for sharding, 
+	  very popular cache option.
 	• Cost: Pay per hour based on EC2 and storage usage
-
-
-Amazon S3 – Summary:
-	• S3 is a… key / value store for objects
-	• Great for bigger objects, not so great for many small objects
-	• Serverless, scales infinitely, max object size is 5 TB, versioning capability
-	• Tiers: S3 Standard, S3 Infrequent Access, S3 Intelligent, S3 Glacier + lifecycle policy
-	• Features: Versioning, Encryption, Replication, MFA-Delete, Access Logs…
-	• Security: IAM, Bucket Policies, ACL, Access Points, Object Lambda, CORS, Object/Vault Lock
-	• Encryption: SSE-S3, SSE-KMS, SSE-C, client-side, TLS in transit, default encryption
-	• Batch operations on objects using S3 Batch, listing files using S3 Inventory
-	• Performance: Multi-part upload, S3 Transfer Acceleration, S3 Select
-	• Automation: S3 Event Notifications (SNS, SQS, Lambda, EventBridge)
-	• Use Cases: static files, key value store for big files, website hosting
-
 
 
 DynamoDB Overview:
@@ -6047,9 +6039,10 @@ DynamoDB for Solutions Architect:
 	• Operations: no operations needed, auto scaling capability, serverless
 	• Security: full security through IAM policies, KMS encryption, SSL in flight
 	• Reliability: Multi AZ, Backups
-	• Performance: single digit millisecond performance, DAX for caching reads, performance doesn’t degrade if 
-	               your application scales.
-	• Cost: Pay per provisioned capacity and storage usage (no need to guess in advance any capacity – can use auto scaling).
+	• Performance: single digit millisecond performance, DAX for caching reads, 
+	  performance doesn’t degrade if your application scales.
+	• Cost: Pay per provisioned capacity and storage usage (no need to guess in advance any 
+	  capacity – can use auto scaling).
 
 
 S3 Overview:
@@ -6155,7 +6148,8 @@ ExamTips:Any time you see Financial transaction or Ledger, its QLDB.
 ==|Data & Analytics
 ##Athena
 -------------------------------------------------
-Amazon Athena is an interactive query service that makes it easy to analyze data directly in Amazon S3 using standard SQL.
+Amazon Athena is an interactive query service that makes it easy to analyze data 
+directly in Amazon S3 using standard SQL.
 Athena is not a database but rather a query engine.
 
 Athena cannot be used to build a REST API to consume data from the source, 
@@ -6248,7 +6242,8 @@ Security is a shared responsibility.
 Fastest, easiest, and most widely used cloud data warehouse.
 
 Redshift warehouse is a collection of computing resources known as nodes, and these nodes are organized in a 
-group known as a cluster. Each cluster runs in a Redshift Engine which contains one or more databases.
+group known as a cluster. 
+Each cluster runs in a Redshift Engine which contains one or more databases.
 
 When you launch a Redshift instance, it starts with a single node of size 160 GB. When you want to grow, 
 you can add additional nodes to take advantage of parallel processing. You have a leader node that manages 
@@ -6287,14 +6282,15 @@ Redshift – Snapshots & DR:
 	• You can restore a snapshot into a new cluster
 	• Automated: every 8 hours, every 5 GB, or on a schedule. Set retention between 1 to 35 days
 	• Manual: snapshot is retained until you delete it
-	• You can configure Amazon Redshift to automatically copy snapshots (automated or manual) of a cluster to another AWS Region
+	• You can configure Amazon Redshift to automatically copy snapshots (automated or manual) 
+	of a cluster to another AWS Region
 
 
 
 Loading data into Redshift: Large inserts are MUCH better
-	Amazon Kinesis -> Data Firehose
-	S3 using -> COPY command
-	EC2 Instance -> DBC driver
+	Amazon Kinesis -> Data Firehose->Redshift
+	S3 using -> COPY command ->Redshift
+	EC2 Instance -> JDBC driver ->Redshift
 
 
 
@@ -6304,6 +6300,7 @@ Redshift Spectrum:
 With Redshift Spectrum, an analyst can perform SQL queries on data stored in Amazon S3 buckets. 
 This can save time and money because it eliminates the need to move data from a storage service 
 to a database, and instead directly queries data inside an S3 bucket. 
+
 Redshift Spectrum also expands the scope of a given query because it 
 extends beyond a user's existing Redshift data 
 warehouse nodes and into large volumes of unstructured S3 data lakes.
@@ -6331,7 +6328,8 @@ You cannot use Redshift to capture data in key-value pairs from the IoT sources.
 
 Area:
 =====
-Redshift is not multi-AZ, if you want multi-AZ you will need to spin up a separate cluster ingesting the same input. 
+Redshift is not multi-AZ, if you want multi-AZ you will need to spin up a separate cluster 
+ingesting the same input. 
 You can also manually restore snapshots to a new AZ in the event of an outage.
 
 
@@ -6361,10 +6359,10 @@ You can also enable encryption, all the data written to disk will be encrypted.
 
 
 78
-##OpenSearch Service|ElasticSearch now Open search
+##OpenSearch Service|ElasticSearch now OpenSearch
 -------------------------------------------------
-Amazon OpenSearch Service makes it easy for you to perform interactive log analytics, real-time application monitoring, 
-website search, and more. 
+Amazon OpenSearch Service makes it easy for you to perform interactive log analytics, 
+real-time application monitoring,  website search, and more. 
 OpenSearch is an open source, distributed search and analytics suite derived from Elasticsearch.
 
 Amazon OpenSearch is successor to Amazon ElasticSearch (For licence issue ElasticSearch now Open search)
@@ -6374,6 +6372,10 @@ Amazon OpenSearch is successor to Amazon ElasticSearch (For licence issue Elasti
 	• OpenSearch also has some usage for Big Data applications
 	• You can provision a cluster of instances
 	• Built-in integrations: Amazon Kinesis Data Firehose, AWS IoT, and Amazon
+	• In DynamoDB, queries only exist by primary key or indexes…
+	• OpenSearch requires a cluster of instances (not serverless)
+	• Does not support SQL (it has its own query language)
+
 CloudWatch Logs for data ingestion
 
 
@@ -6387,21 +6389,22 @@ OpenSearch for Solutions Architect:
 
 
 CloudSearch:
-Elasticsearch and CloudSearch are Amazon’s cloud-based solutions for search. 
-Elasticsearch is an open source solution, whereas CloudSearch is a fully managed search service. 
-It is quite simple to set up, easy to, and a cost-effective search solution. 
-Amazon CloudSearch is an AWS Cloud managed service that helps users to create fast, scalable, 
-profitable, easy to setup search solutions for their applications. Amazon CloudSearch uses 
-Apache Solr as the underlying text search engine, which supports full-text search, 
-faceted search, real-time indexing, dynamic clustering, database integration, 
-NoSQL features, and productive document handling.
+	ElasticSearch and CloudSearch are Amazon’s cloud-based solutions for search. 
+	ElasticSearch is an open source solution, whereas CloudSearch is a fully managed search service. 
+	It is quite simple to set up, easy to, and a cost-effective search solution. 
+	
+	Amazon CloudSearch is an AWS Cloud managed service that helps users to create fast, scalable, 
+	profitable, easy to setup search solutions for their applications. Amazon CloudSearch uses 
+	Apache Solr as the underlying text search engine, which supports full-text search, 
+	faceted search, real-time indexing, dynamic clustering, database integration, 
+	NoSQL features, and productive document handling.
 
 
-Amazon Elasticsearch and Cloudsearch both are popular AWS-based tools that use proven technologies. 
+Amazon ElasticSearch and CloudSearch both are popular AWS-based tools that use proven technologies. 
 These tools allow users to create fast, scalable, and easily usable search solutions 
 for their applications. These can be categorized as "Search as a Service" tools.
 
-Elasticsearch Data and Index backup manual.
+ElasticSearch Data and Index backup manual.
 Cloudsearch automatically takes backup of the data. Unlike Elasticsearch.
 
 Amazon Elasticsearch offers a licensed plugin called Shield. It handles the authorization, 
@@ -6443,11 +6446,12 @@ Comes with OpenSearch Dashboards (visualization)
 
 
 79
-##EMR
+##EMR Elastic MapReduce
 -------------------------------------------------
  Amazon EMR is the industry-leading cloud big data platform for processing vast amounts of data 
  using open source tools such as Apache Spark, Apache Hive, Apache HBase, Apache Flink, 
- Apache Hudi, and Presto. Amazon EMR uses Hadoop, an open-source framework, to distribute 
+ Apache Hudi, and Presto. 
+ Amazon EMR uses Hadoop, an open-source framework, to distribute 
  your data and processing across a resizable cluster of Amazon EC2 instances. 
  
 • EMR stands for “Elastic MapReduce”
@@ -6476,7 +6480,8 @@ EMR does not offer the same storage and processing speed as FSx for Lustre.
 
 Amazon EMR is the industry-leading cloud big data platform for processing vast amounts 
 of data using open source tools such as Apache Spark, Apache Hive, Apache HBase, 
-Apache Flink, Apache Hudi, and Presto. Amazon EMR uses Hadoop, an open-source framework, 
+Apache Flink, Apache Hudi, and Presto. 
+Amazon EMR uses Hadoop, an open-source framework, 
 to distribute your data and processing across a resizable cluster of Amazon EC2 instances. 
 Using an EMR cluster would imply managing the underlying infrastructure so it’s ruled out 
 because the correct solution for the given use-case should require the least amount of 
@@ -6521,8 +6526,7 @@ AWS Glue does not offer the same storage and processing speed as FSx for Lustre.
 
 A fully managed extract, transform, and load 
 (ETL = one or more source databases into a target database or information warehouse) 
-service that makes it easy for customers to prepare and 
-load their data for analytics.
+service that makes it easy for customers to prepare and load their data for analytics.
 
 Amazon Athena and AWS Glue can be categorized as "Big Data" tools.
 
@@ -6530,11 +6534,13 @@ AWS Glue provides both visual and code-based interfaces to make data integration
 Users can easily find and access data using the AWS Glue Data Catalog.
 
 The purpose of Glue is to facilitate the construction of an enterprise-class data warehouse. 
-It can move information into the warehouse from a variety of sources, including transactional databases and the Amazon cloud.
+It can move information into the warehouse from a variety of sources, including 
+transactional databases and the Amazon cloud.
 
 
 AWS Glue Data Catalog:
-AWS Glue Data Catalog provides centralized uniform metadata storing for tracking, querying and transforming data using saved metadata.
+AWS Glue Data Catalog provides centralized uniform metadata storing for tracking, 
+querying and transforming data using saved metadata.
 
 
 
@@ -6758,7 +6764,8 @@ Improve clinical documentation
 BillCost:
 =========
 AWS Free Tier
-Amazon Transcribe API for both streaming and batch transcriptions is billed monthly based on the tiered pricing
+Amazon Transcribe API for both streaming and batch transcriptions is 
+billed monthly based on the tiered pricing.
 
 
 
