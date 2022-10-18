@@ -3561,7 +3561,7 @@ so the retrieval costs would be pretty high).
 
 
 
-==Global Infrastructure
+==| Global Infrastructure
 52
 ##CloudFront
 -------------------------------------------------
@@ -4998,8 +4998,8 @@ Security is a shared responsibility.
 65
 ##ECS
 -------------------------------------------------
-Amazon ECS is a fully managed container orchestration service that makes it easy for you to deploy, manage, and 
-scale containerized applications.
+Amazon ECS is a fully managed container orchestration service that makes it easy for you to 
+deploy, manage, and  scale containerized applications.
 
 Launch Docker containers on AWS = Launch ECS Tasks on ECS Clusters
 
@@ -5042,17 +5042,19 @@ You can define multiple containers in a task definition.
 
 
 AWS Fargate is a serverless option.
--Service: Allows you to run and maintain a specified number (the “desired count”) of tasks
--ECS cluster: Grouping of one or more container instances (EC2 instances) where you run your tasks
--Container Instance - EC2 instance in the cluster running a container agent (helps it communicate with the cluster)
--AWS provides ECS ready AMIs with container agents pre-installed.
+	-Service: Allows you to run and maintain a specified number (the “desired count”) of tasks
+	-ECS cluster: Grouping of one or more container instances (EC2 instances) where you run your tasks
+	-Container Instance - EC2 instance in the cluster running a container agent 
+	 (helps it communicate with the cluster)
+	-AWS provides ECS ready AMIs with container agents pre-installed.
 
 
 Remember:
 -AWS Fargate does NOT give you visibility into the EC2 instances in the cluster.
 -You can use On-Demand instances or Spot instances to create your cluster.
 -You can load balance using Application Load Balancers
--Two features of ALB are important for ECS:
+
+Two features of ALB are important for ECS:
 	-Dynamic host port mapping: Multiple tasks from the same service are allowed per EC2 (container) instance
 	-Path-based routing: Multiple services can use the same listener port on same ALB/NLB and be routed based 
 	 on path (www.app.com/microservice-a and www.app.com/microservice-b)
@@ -5076,13 +5078,20 @@ Recommended if you are already using Kubernetes and would want to move the workl
 
 
 Amazon ECS – Load Balancer Integrations:
-• Application Load Balancer supported and works for most use cases
-• Network Load Balancer recommended only for high throughput / high performance use cases, or to pair it with AWS Private Link
-• Elastic Load Balancer supported but not recommended (no advanced features – no Fargate)
+	• Application Load Balancer supported and works for most use cases
+	• Network Load Balancer recommended only for high throughput / high performance use cases, 
+	  or to pair it with AWS Private Link.
+	• Elastic Load Balancer supported but not recommended (no advanced features – no Fargate)
 
 ECS Service Auto Scaling
 • Automatically increase/decrease the desired number of ECS tasks
   ECS Service Auto Scaling (task level) ≠ EC2 Auto Scaling (EC2 instance level)
+
+• Target Tracking – scale based on target value for a specific CloudWatch metric
+• Step Scaling – scale based on a specified CloudWatch Alarm
+• Scheduled Scaling – scale based on a specified date/time (predictable changes)
+
+
 
 ECS Rolling Updates:
 • When updating from v1 to v2, we can control how many tasks can be started and stopped, and in which order
@@ -5108,17 +5117,17 @@ Use when your container wants to call other AWS services like S3, SQS, etc.
 
 ***
 Amazon ECS – Data Volumes (EFS):
-• Mount EFS file systems onto ECS tasks
-• Works for both EC2 and Fargate launch types
-• Tasks running in any AZ will share the same data in the EFS file system
-• Fargate + EFS = Serverless
-• Use cases: persistent multi-AZ shared storage for your containers
-• Amazon S3 cannot be mounted as a file system
+	• Mount EFS file systems onto ECS tasks
+	• Works for both EC2 and Fargate launch types
+	• Tasks running in any AZ will share the same data in the EFS file system
+	• Fargate + EFS = Serverless
+	• Use cases: persistent multi-AZ shared storage for your containers
+	• Amazon S3 cannot be mounted as a file system
 
 
-ECS tasks invoked by Event Bridge
-ECS tasks invoked by Event Bridge Schedule
-
+ECS tasks can invoked by EventBridge.
+ECS tasks can invoked by EventBridge Schedule.
+ECS task can invoke by  SQS Queue 
 
 
 Area:
@@ -5151,7 +5160,8 @@ We can add security group for ECS and ECS Task.
 
 Your EC2 instances use an IAM role to access the ECS/ECR service.
 ECS Task Role use to access services and resources.
-Security Groups and networks ACLs allow you to control inbound and outbound network access to and from your instances.
+Security Groups and networks ACLs allow you to control inbound and outbound network access to and 
+from your instances.
 
 
 
@@ -5186,7 +5196,8 @@ Manage image lifecycle policies
 BillCost:
 =========
 AWS Free Tier *
-You pay only for the amount of data you store in your public or private repositories and for data transferred to the internet.
+You pay only for the amount of data you store in your public or private repositories and 
+for data transferred to the internet.
 
 
 
@@ -5207,11 +5218,12 @@ Security is a shared responsibility.
 -------------------------------------------------
 Amazon EKS = Amazon Elastic Kubernetes Service
 • It is a way to launch managed Kubernetes clusters on AWS
-• Kubernetes is an open-source system for automatic deployment, scaling and management of containerized (usually Docker) application
+• Kubernetes is an open-source system for automatic deployment, scaling and management of 
+  containerized (usually Docker) application
 • It’s an alternative to ECS, similar goal but different API
 • EKS supports EC2 if you want to deploy worker nodes or Fargate to deploy serverless containers
-• Use case: if your company is already using Kubernetes on-premises or in another cloud, and wants to migrate to 
-  AWS using Kubernetes
+• Use case: if your company is already using Kubernetes on-premises or in another cloud, and wants 
+  to migrate to AWS using Kubernetes.
 • Kubernetes is cloud-agnostic (can be used in any cloud – Azure, GCP…)
 • For multiple regions, deploy one EKS cluster per region
 • Collect logs and metrics using CloudWatch Container Insights
@@ -5242,20 +5254,20 @@ Amazon EKS – Data Volumes:
 
 
 
-++AWS App Runner
+##AppRunner
 -------------------------------------------------
 Fully managed service that makes it easy to deploy web applications and APIs at scale
 You can choose the programming language of your choice since App Runner can deploy directly from source code 
 (in GitHub for example) or a Docker container image (from private or public repo in ECR) — 
 all this without worrying about provisioning and managing the underlying infrastructure.
 
-• No infrastructure experience required
-• Start with your source code or container image
-• Automatically builds and deploy the web app
-• Automatic scaling, highly available, load balancer, encryption
-• VPC access support
-• Connect to database, cache, and message queue services
-• Use cases: web apps, APIs, microservices, rapid production deployments 
+	• No infrastructure experience required
+	• Start with your source code or container image
+	• Automatically builds and deploy the web app
+	• Automatic scaling, highly available, load balancer, encryption
+	• VPC access support
+	• Connect to database, cache, and message queue services
+	• Use cases: web apps, APIs, microservices, rapid production deployments 
 
 
 
