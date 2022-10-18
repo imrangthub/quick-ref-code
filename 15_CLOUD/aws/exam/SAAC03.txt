@@ -4440,15 +4440,16 @@ There are two patterns of application communication:
 • Synchronous between applications can be problematic if there are sudden spikes of traffic
 • What if you need to suddenly encode 1000 videos but usually it’s 10?
 
-SQS, SNS are “cloud-native” services, and they’re using proprietary protocols from AWS.
-Traditional applications running from on-premises may use open protocols such as: MQTT, AMQP, STOMP, Openwire, WSS
 
-• SQS: queue model
-• SNS: pub/sub model
-• Kinesis: real-time streaming model
+In that case, it’s better to decouple your applications,
+	• using SQS: queue model
+	• using SNS: pub/sub model
+	• using Kinesis: real-time streaming model
 These services can scale independently from our application!
 
-
+SQS, SNS are “cloud-native” services, and they’re using proprietary protocols from AWS.
+Traditional applications running from on-premises may use open protocols such as: MQTT, AMQP, STOMP, 
+Openwire, WSS
 
 
 
@@ -4475,6 +4476,9 @@ Produced:
 
 
 Consuming:
+Consumers receive and process messages in parallel
+We can scale consumers horizontally to improve throughput of processing
+
 	• Consumers (running on EC2 instances, servers, or AWS Lambda)…
 	• Poll SQS for messages (receive up to 10 messages at a time)
 	• Process the messages (example: insert the message into an RDS database)
@@ -4522,15 +4526,9 @@ SQS – Request-Response Systems:
 
 FIFO Queue:
 • FIFO = First In First Out (ordering of messages in the queue)
-• Limited throughput: 300 msg/s without batching, 3000 msg/s with
+• Limited throughput: 300 msg/s without batching, 3000 msg/s with batching
 • Exactly-once send capability (by removing duplicates)
 • Messages are processed in order by the consumer
-
-
-
-By default, FIFO queues support up to 3,000 messages per second with batching, or up to 
-300 messages per second (300 send, receive, or delete operations per second) without batching. 
-Therefore, using batching you can meet a throughput requirement of upto 3,000 messages per second.
 
 
 You can't convert an existing standard queue into a FIFO queue.
@@ -4647,12 +4645,6 @@ Many AWS services can send data directly to SNS for notifications:
 62
 ##SNS and SQS | FanOut Pattern
 -------------------------------------------------
-Amazon Simple Notification Service (Amazon SNS) is a fully managed messaging service for both 
-application-to-application (A2A) and application-to-person (A2P) communication.
-
-The A2A pub/sub functionality provides topics for high-throughput, push-based, many-to-many messaging between 
-distributed systems,  microservices, and event-driven serverless applications. 
-
 Using Amazon SNS topics, your publisher systems can fanout messages to a 
 large number of subscriber systems, including Amazon SQS queues, AWS Lambda functions, HTTPS endpoints, and 
 Amazon Kinesis Data Firehose,  for parallel processing. 
@@ -4725,8 +4717,10 @@ Security:
 	• Useful for allowing other services ( S3…) to write to an SNS topic
 
 Amazon SNS provides encrypted topics to protect your messages from unauthorized access. 
-The encryption uses a 256-bit AES-GCM algorithm and a customer master key (CMK) issued with AWS Key Management Service (KMS). 
-Amazon SNS also supports VPC endpoints via AWS PrivateLink, so you can privately publish messages to Amazon SNS topics, from an 
+The encryption uses a 256-bit AES-GCM algorithm and a customer master key (CMK) issued 
+with AWS Key Management Service (KMS). 
+Amazon SNS also supports VPC endpoints via AWS PrivateLink, so you can privately publish messages 
+to Amazon SNS topics, from an 
 Amazon Virtual Private Cloud (VPC) subnet, without traversing the Internet.
 
 
@@ -4738,7 +4732,8 @@ Amazon Virtual Private Cloud (VPC) subnet, without traversing the Internet.
 63
 ##Kinesis
 -------------------------------------------------
-Makes it easy to collect, process, and analyze streaming data in real-time and that can be run on EC2 instances.
+Makes it easy to collect, process, and analyze streaming data in real-time and 
+that can be run on EC2 instances.Kinesis Data Streams is a serverless.
 Ingest real-time data such as: Application logs, Metrics, Website clickstreams,IoT telemetry data.
 
 • Kinesis Data Streams: capture, process, and store data streams
@@ -4747,12 +4742,9 @@ Ingest real-time data such as: Application logs, Metrics, Website clickstreams,I
 • Kinesis Video Streams: capture, process, and store video streams
 
 
-Amazon Kinesis Data Streams is a serverless streaming data service that makes it easy to capture, process, 
-and store data streams at any scale.
-
-
 The producers continually push data to Kinesis Data Streams, and the consumers process the data in real time. 
-Consumers (such as a custom application running on Amazon EC2 or an Amazon Kinesis Data Firehose delivery stream) 
+Consumers (such as a custom application running on Amazon EC2 or an Amazon 
+Kinesis Data Firehose delivery stream) 
 can store their results using an AWS service such as Amazon DynamoDB, Amazon Redshift, or Amazon S3.
 
 
@@ -4856,8 +4848,10 @@ Ordering data into Kinesis:
 
 Ordering data into SQS:
 • For SQS standard, there is no ordering.
-• For SQS FIFO, if you don’t use a Group ID, messages are consumed in the order they are sent, with only one consumer
-• You want to scale the number of consumers, but you want messages to be “grouped” when they are related to each other
+• For SQS FIFO, if you don’t use a Group ID, messages are consumed in the order they are sent, 
+  with only one consumer
+• You want to scale the number of consumers, but you want messages to be “grouped” when they 
+  are related to each other.
 • Then you use a Group ID (similar to Partition Key in Kinesis)
 
 
@@ -5557,8 +5551,25 @@ DynamoDB Accelerator (DAX):
 	• Doesn’t require application logic modification(compatible with existing DynamoDB APIs)
 	• 5 minutes TTL for cache (default)
 
+DAX fetches the key-value pair from DynamoDB.
+The key-value pair then returns the value back to the application.
+
 DynamoDB Accelerator (DAX) delivers fast response times for accessing eventually consistent data. 
 Certain usecases requires microseconds response times.
+
+DAX:
+You can't invalidate cache, it only invalidates when ttl is 
+reached or nodes memory is full and it is dropping old items.
+
+ElastiCache is not intended for use with DynamoDB.
+
+ElastiCache (available as a managed service) can cache the results from anything. 
+The difference here is that you need to manage invalidation and you must adjust your code to 
+check the cache before querying the main query store.
+
+Most fo the time, you’ll want to go w/DAX if you’re using DyanmoDB as a data store. 
+Otherwise, use ElastiCache.
+
 
 
 What are DynamoDB streams?
@@ -7285,6 +7296,14 @@ Amazon CloudWatch can load all the metrics in your account
 Option to filter metrics to only stream a subset of them.
 
 
+Dimensions are name/value pairs that categorize metric characteristics. 
+Each metric you create can have up to 10 dimensions defined. 
+You can use these dimensions to distinguish between multiple instances of the same service and to 
+filter metrics by service use. For example, you can assign InstanceId dimensions to your 
+EC2 instances to distinguish between them for monitoring.
+
+
+
 
 
 $$
@@ -7350,6 +7369,14 @@ It is a aws managed service, security is a shared responsibility.
 
 
 
+AWS CloudWatch is made up of multiple monitoring tools such as:
+	Events - You can trigger an action based on an event.
+
+	Alarms - With alarms, you need to define a threshold, a condition, and what to trigger.
+
+	Logs - CloudWatch logs allow you to store the log files for various sources such as 
+	EC2 instances, CloudTrail, and many more. You can then use these logs to detect issues, 
+	find leaks, patterns, and so on.
 
 
 101
@@ -7717,6 +7744,8 @@ It is a aws managed service, security is a shared responsibility.
 105
 ##CloudTrail
 -------------------------------------------------
+The two services, CloudWatch and CloudTrail, can be used together. 
+
 • Provides governance, compliance and audit for your AWS Account
 • CloudTrail is enabled by default!
 • Can put logs from CloudTrail into CloudWatch Logs or S3
@@ -8171,6 +8200,14 @@ Cognito Identity Pools (Federated Identity):appUser->CUP/ThardPartyUser->CIP->S3
 CognitoSync:
 	• Synchronize data from device to Cognito.
 	• May be deprecated and replaced by AppSync
+
+With Amazon Cognito, you can save user data in datasets that contain key-value pairs. 
+Amazon Cognito associates this data with an identity in your identity pool so that your 
+app can access it across logins and devices. To sync this data between the 
+Amazon Cognito service and an end user’s devices, invoke the synchronize method. 
+Each dataset can have a maximum size of 1 MB. You can associate up to 20 datasets with an identity.
+https://blog.knoldus.com/starting-with-aws-cognito-sync/
+
 
 
 Cognito User Pools (CUP):
@@ -10808,12 +10845,24 @@ S3->Amazon EventBridge -> Over 18 AWS services as destinations
 • Multiple Destinations – ex Step Functions, Kinesis Streams / Firehose…
 • EventBridge Capabilities – Archive, Replay Events, Reliable delivery
 
-
-
-
 Amazon EventBridge – Intercept API Calls
 API Gateway – AWS Service Integration Kinesis Data Streams example
 
+
+
+There are two primary methods to trigger Lambda when an object is added to an S3 bucket — 
+S3 Notifications and EventBridge.
+
+CloudTrail/EventBridge:
+	CloudTrail Data events are charged at $0.10 per 100,000 events.
+	EventBridge supports a larger number of target services.
+	EventBridge allows you to use to extract and transform part of the event to be sent to the target.
+
+
+S3 Notifications:
+	There is no pricing associated with S3 Notifications. 
+	S3 Notifications can target Lambda, SNS and SQS.
+	Object events can filter based on a prefix or suffix or both.
 
 
 166
@@ -12033,6 +12082,15 @@ control the data they get, not the server.
 207
 ##AppSync
 -------------------------------------------------
+What is AWS AppSync?
+The fundamental idea of a GraphQL API is that all API functionality is available via a 
+unified query language (the Graph Query Language) under a single endpoint. 
+Rather than making requests to various endpoints to get different parts of the data needed to 
+build a webpage, developers can issue a single request to a GraphQL API and immediately get 
+back all the data they need. 
+This model reduces the complexity of web applications and improves the experience for 
+website visitors with faster load times.
+
 AWS AppSync is a serverless GraphQL and Pub/Sub API service that simplifies building modern web and mobile applications.
 AWS AppSync GraphQL APIs simplify application development by providing a single endpoint to securely 
 query or update data from multiple databases, microservices, and APIs.
@@ -14728,6 +14786,12 @@ AWS CloudWatch Metrics
 • Up to 10 dimensions per metric
 • Metrics have timestamps
 • Can create CloudWatch dashboards of metrics
+
+Dimensions are name/value pairs that categorize metric characteristics. 
+Each metric you create can have up to 10 dimensions defined. 
+You can use these dimensions to distinguish between multiple instances of the same service and to 
+filter metrics by service use. For example, you can assign InstanceId dimensions to your 
+EC2 instances to distinguish between them for monitoring.
 
 
 EC2 Detailed monitoring
