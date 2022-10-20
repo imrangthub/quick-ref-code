@@ -2063,12 +2063,6 @@ DB Instance and synchronously replicates the data to a standby instance in a dif
 Availability Zone (AZ). Multi-AZ spans at least two Availability Zones within a single region.
 
 
-RDS Read Replicas for read scalability: 
-• Up to 5 Read Replicas
-• Within AZ, Cross AZ or Cross Region
-• Replication is ASYNC, so reads are eventually consistent
-  Read replicas are used for SELECT =read only kind of statements(not INSERT, UPDATE, DELETE)
-
 RDS – From Single-AZ to Multi-AZ, Zero downtime operation (no need to stop the DB)
 
 
@@ -2091,9 +2085,6 @@ stopping it for a long time, you should snapshot & restore instead.
 RDS– Storage Auto Scaling:
 • Helps you increase storage on your RDS DB instance dynamically
 • When RDS detects you are running out of free database storage, it scales automatically
-• Avoid manually scaling your database storage 
-• You have to set Maximum Storage Threshold (maximum limit for DB storage)
-
 
 
 RDS Read Replicas for read scalability:
@@ -2102,6 +2093,7 @@ RDS Read Replicas for read scalability:
 • Replication is ASYNC, so reads are eventually consistent
 • Replicas can be promoted to their own DB
 • Applications must update the connectionstring to leverage read replicas
+• Read replicas are used for SELECT =read only kind of statements(not INSERT, UPDATE, DELETE)
 
 
 RDS Read Replicas – Network Cost:
@@ -2121,12 +2113,7 @@ RDS Multi AZ (Disaster Recovery):
 • Note:The Read Replicas be setup as Multi AZ for Disaster Recovery (DR)
 
 
-RDS – From Single-AZ to Multi-AZ:
-• Zero downtime operation (no need to stop the DB)
-
-
-
-++RDS Custom for Oracle and Microsoft SqL Server
+++RDS Custom for Oracle and Microsoft SQL Server
 -------------------------------------------------
 • Managed Oracle and Microsoft SQL Server Database with OS and database customization
 • RDS: Automates setup, operation, and scaling of database in AWS
@@ -2183,9 +2170,10 @@ RDS for Oracle uses Oracle native network encryption with a DB instance.
 
 
 
- IAM database authentication works with MySQL and PostgreSQL.
+IAM database authentication works with MySQL and PostgreSQL.
 IAM authentication is just another way to authenticate the user's credentials while accessing 
-the database. It would not significantly enhance the security in a way that 
+the database.
+It would not significantly enhance the security in a way that 
 enabling SSL does by facilitating the in-transit encryption for the database.
 
 
@@ -2220,7 +2208,8 @@ Storage is billed per gigabyte per month, and I/O is billed per million-request.
 Provisioned IOPS (per IOPS per month) 
 Backup storage (per GiB per month) –
 
-Data transfer (per GB) – Data transfer in and out of your DB instance from or to the internet and other Amazon Regions.
+Data transfer (per GB) – Data transfer in and out of your DB instance from or to the 
+internet and other Amazon Regions.
 
 For RDS Read Replicas within the same region, you don’t pay that fee but cross - region must pay.
 
@@ -2246,9 +2235,6 @@ IAM-based authentication can be used to login into RDS MySQL & PostgreSQL
 35
 ##Aurora
 -------------------------------------------------
-Amazon Aurora Global Database is designed for globally distributed applications, allowing a single Amazon Aurora 
-database to span multiple AWS Regions.
-
 Amazon Aurora (Aurora) is a fully managed relational database engine that's compatible with MySQL and PostgreSQL.
 The underlying storage grows automatically as needed. 
 An Aurora cluster volume can grow to a maximum size of 128 tebibytes (TiB). 
@@ -2260,15 +2246,6 @@ Amazon Aurora provides built-in security, continuous backups, serverless compute
 up to 15 read replicas, automated multi-Region replication, and integrations with other AWS services.
 
 
-Custom Endpoints:
-• Define a subset of Aurora Instances as a Custom Endpoint
-• The Reader Endpoint is generally not used after defining Custom Endpoints
-
-
-Amazon Aurora and Aurora Serverless are two distinct products from AWS.
-Amazon Aurora Serverless is an on-demand, autoscaling configuration for Amazon Aurora.
-
-Aurora Multi-Master.
 
 
 • Aurora costs more than RDS (20% more) – but is more efficient
@@ -2303,6 +2280,9 @@ Aurora Serverless:
 • Pay per second, can be more cost -effective
 
 
+Amazon Aurora and Aurora Serverless are two distinct products from AWS.
+Amazon Aurora Serverless is an on-demand, autoscaling configuration for Amazon Aurora.
+
 
 
 Aurora Multi-Master:
@@ -2314,6 +2294,11 @@ Multi-master Aurora limitations.
 	Currently, all DB instances in a multi-master cluster must be in the same AWS Region.
 	You can't enable cross-Region replicas from multi-master clusters.
 	Multi-master clusters are not available in all Regions.
+
+
+Amazon Aurora Global Database is designed for globally distributed applications, 
+allowing a single Amazon Aurora database to span multiple AWS Regions.
+
 
 Global Aurora:
 Aurora Cross Region Read Replicas:
@@ -2340,21 +2325,25 @@ Aurora Machine Learning:
 • Use cases: fraud detection, ads targeting, sentiment analysis, product recommendations
 
 
-Aurora Replicas have two main purposes. You can issue queries to them to scale the read operations 
-for your application. You typically do so by connecting to the reader endpoint of the cluster. 
-That way, Aurora can spread the load for read-only connections across as many 
-Aurora Replicas as you have in the cluster. Aurora Replicas also help to increase availability. 
-If the writer instance in a cluster becomes unavailable, Aurora automatically 
-promotes one of the reader instances to take its place as the new writer. 
-Up to 15 Aurora Replicas can be distributed across the Availability 
-Zones that a DB cluster spans within an AWS Region.
+Aurora Replicas have two main purposes:
+	You can issue queries to them to scale the read operations for your application. 
+	You typically do so by connecting to the reader endpoint of the cluster. 
+	That way, Aurora can spread the load for read-only connections across as many 
+	Aurora Replicas as you have in the cluster. 
+
+	Aurora Replicas also help to increase availability. 
+	If the writer instance in a cluster becomes unavailable, Aurora automatically 
+	promotes one of the reader instances to take its place as the new writer. 
+	Up to 15 Aurora Replicas can be distributed across the Availability 
+	Zones that a DB cluster spans within an AWS Region.
 
 
 
 Failover rules priority tier:
 	Amazon Aurora features a distributed, fault-tolerant, self-healing storage system that 
-	auto-scales up to 128TB per database instance. It delivers high performance and availability with 
-	up to 15 low-latency read replicas, point-in-time recovery, continuous backup to Amazon S3, and 
+	auto-scales up to 128TB per database instance. 
+	It delivers high performance and availability with up to 15 low-latency read replicas, 
+	point-in-time recovery, continuous backup to Amazon S3, and 
 	replication across three Availability Zones (AZs).
 
 For Amazon Aurora, each Read Replica is associated with a priority tier (0-15). 
@@ -2384,7 +2373,8 @@ Aurora Cross Region Read Replicas, Useful for disaster recovery.
 BillCost:
 =========
 Prices vary according to the region.
-With Amazon Aurora Global Database, you pay for replicated write I/Os between the primary Region and each secofndary Region.
+With Amazon Aurora Global Database, you 
+pay for replicated write I/Os between the primary Region and each secofndary Region.
 
 
 
@@ -2401,19 +2391,20 @@ It is a aws managed service, security is a shared responsibility.
 
 
 
-Aurora - Backup and Monitoring
+RDS/Aurora - Backup and Monitoring
 -------------------------------------------------
+
 RDS Backups:
-• Automated backups
-• Daily full backup of the database (during the maintenance window)
-• Transaction logs are backed-up by RDS every 5 minutes
-• => ability to restore to any point in time (from oldest backup to 5 minutes ago)
-• 1 to 35 days of retention, set 0 to disable automated backups
-• Manual DB Snapshots
-• Manually triggered by the user
-• Retention of backup for as long as you want
-• Trick: in a stopped RDS database, you will still pay for storage. 
-  If you plan on stopping it for a long time, you should snapshot & restore instead
+	• Automated backups
+	• Daily full backup of the database (during the maintenance window)
+	• Transaction logs are backed-up by RDS every 5 minutes
+	• => ability to restore to any point in time (from oldest backup to 5 minutes ago)
+	• 1 to 35 days of retention, set 0 to disable automated backups
+	• Manual DB Snapshots:
+		• Manually triggered by the user
+		• Retention of backup for as long as you want
+	• Trick: in a stopped RDS database, you will still pay for storage. 
+	  If you plan on stopping it for a long time, you should snapshot & restore instead
 
 
 
@@ -2471,7 +2462,7 @@ Aurora Database Cloning:
 -------------------------------------------------
 Amazon RDS Proxy:
 	• Fully managed database proxy for RDS
-	• Allows apps to pool and share DB connections established with the database
+	• Allows apps to pool and share DB connections established with the database.
 	• Improving database efficiency by reducing the stress on database resources (e.g., CPU, RAM) and
 	  minimize open connections (and timeouts)
 	• Serverless, autoscaling, highly available (multi-AZ)
@@ -2488,6 +2479,9 @@ Amazon RDS Proxy:
 36
 ##ElastiCache
 -------------------------------------------------
+ElastiCache supports two open-source in-memory caching engines: Memcached and Redis.
+Using ElastiCache involves heavy application code changes.
+
 The same way RDS is to get managed Relational Databases.
 ElastiCache is to get managed Redis or Memcached.
 adistributed in-memory key-value environment.
@@ -2505,11 +2499,10 @@ Although you can integrate Redis with DynamoDB.
 
 • Helps reduce load off of databases for read intensive workloads
 • Helps make your application stateless
-• AWS takes care of OS maintenance / patching, optimizations, setup, configuration, monitoring, failure recovery and backups
+• AWS takes care of OS maintenance / patching, optimizations, setup, configuration, 
+  monitoring, failure recovery and backups
 • Using ElastiCache involves heavy application code changes
 
-
-ElastiCache supports two open-source in-memory caching engines: Memcached and Redis.
 
 
 REDIS:
@@ -2574,8 +2567,8 @@ BillCost:
 =========
 AWS Free Tier.
 You are charged hourly based on the number of nodes, node type, and pricing model you select. 
-ElastiCache supports both on-demand nodes, which allow you to pay by hour with no long-term commitments, and reserved 
-nodes, which offer discounts for customers who commit to either one-year or three-year terms.
+ElastiCache supports both on-demand nodes, which allow you to pay by hour with no long-term commitments, 
+and reserved nodes, which offer discounts for customers who commit to either one-year or three-year terms.
 
 
 
@@ -2656,7 +2649,7 @@ CNAME vs Alias:
 	• AWS Resources (Load Balancer, CloudFront...) expose an AWS hostname:
 	• lb1-1234.us-east-2.elb.amazonaws.com and you want myapp.mydomain.com
 	CNAME:
-		• The target is a domain name which must have an A or AAAA record
+		• The target is a domain name which must have an A or AAAA record.
 		• Points a hostname to any other hostname. (app.mydomain.com => anything.com)
 		• ONLY FOR NON ROOT DOMAIN (aka.something.mydomain.com) Destination.
 	Alias:Alias record is an Amazon Route 53-specific virtual record. 
@@ -2669,8 +2662,8 @@ CNAME vs Alias:
 		
 		
 A     = 11.221.32.143 (IP)          ->example.com      Not for www.example.com 
-CNAME =  example.com(A/AAAA)        ->www.example.com (DNS name not for A/AAAA)
-Alias =  www.example.com            ->example.com(A/AAAA)
+CNAME =  example.com(A/AAAA)        ->www.example.com or app.mydomain.com  (DNS name not for A/AAAA)
+Alias =  elb.amazonaws.com            ->example.com(A/AAAA)
 
 To simplify it we can say that example.com points to the server IP address using 
 A record, and www.example.com points to the same address via example.com using a CNAME record. 
@@ -4709,6 +4702,10 @@ CloudWatch Metric – Queue Length ApproximateNumberOfMessages and scale EC2
 Anytime multiple services need to receive the same event, you should consider SNS rather than SQS.
 
 SNS cannot directly send messages to Kinesis Data Streams.
+You would need to write a Lambda function that would send the message to a Kinesis stream.
+Lambda function will not "fetch from SNS". Rather, the Lambda function will be triggered by SNS, 
+with the message being passed as input. 
+Your Lambda function will then need to send the message to Kinesis.
 
 It provides much more functionality than just the ability to send push notifications (emails, SMS, and mobile push). 
 In fact, it’s a serverless publish-subscribe messaging system allowing to send events to multiple 
@@ -4764,7 +4761,9 @@ Amazon SNS – FIFO Topic:
 	• Deduplication using a Deduplication ID or Content Based Deduplication.
 	• Can only have SQS FIFO queues as subscribers.
 	• Limited throughput (same throughput as SQS FIFO).
-
+	
+You can use Amazon SNS FIFO (first in, first out) topics and Amazon Simple Queue Service 
+(Amazon SQS) FIFO queues together to provide strict message ordering and message deduplication.
 
 
 Message Filtering:
