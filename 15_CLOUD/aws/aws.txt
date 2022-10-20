@@ -21,8 +21,11 @@ echo "<h1>Hello World from $(hostname -f)</h1>" > /var/www/html/index.html
 #General | Basic | Info      
 ================================================= 
 
-AWS CloudFront is a globally-distributed network.
+CodeDeploy is not meant to distribute traffic across instances.
+CodeDeploy is a deployment service that automates application deployments to Amazon EC2 instances, 
+on-premises instances, serverless Lambda functions, or Amazon ECS services.
 
+AWS CodeDeploy fully automates your software deployments, allowing you to deploy reliably and rapidly.
 
 
 ConfusingTakeaLook
@@ -42,10 +45,36 @@ Two features of ALB are important for ECS:
 ECS Service Auto Scaling
 
 
+S3 Security:
+User based
+	• IAM policies - which API calls should be allowed for a specific user from IAM console(Web).
+Resource Based
+	• Bucket Policies(JSON based policies) - bucket wide rules from the S3 console - allows cross account.
+	• Object Access Control List (ACL) – finer grain
+	• Bucket Access Control List (ACL) – less common
+S3TA
+
+
+• Amazon S3 automatically scales to high request rates, latency 100-200 ms
+• Your application can achieve at least 3,500 PUT/COPY/POST/DELETE and
+  5,500 GET/HEAD requests per second per prefix in a bucket
+
+
+IAM->AccNot->UserYes
+ACL-AccYes->UserNot
+BucketPolicies->AccYes->UserYes
+
+• Alias Record is always of type A/AAAA for AWS resources (IPv4 / IPv6)
+		
+alb Fixed hostname (XXX.region.elb.amazonaws.com)
+• NLB has one static IP per AZ, and supports assigning Elastic IP(helpful for whitelisting specific IP)
+ASG cannot directly use a Cloudwatch alarm as the source for a scale-in or scale-out event.
+ 
+
 
 HandOnRemain
 ----------------------------
-
+Amazon CloudFront Hands On
 CloudFormation
 
 Video Checkout:
