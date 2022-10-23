@@ -20,6 +20,14 @@ echo "<h1>Hello World from $(hostname -f)</h1>" > /var/www/html/index.html
 =================================================
 #General | Basic | Info      
 ================================================= 
+Just think of a schema as the “structure” or a “model” of your data in your database.
+
+Remember that a relational database system does not scale well for the following reasons:
+– It normalizes data and stores it on multiple tables that require multiple queries to write to disk.
+– It generally incurs the performance costs of an ACID-compliant transaction system.
+– It uses expensive joins to reassemble required views of query results.
+
+
 
 CodeDeploy is not meant to distribute traffic across instances.
 CodeDeploy is a deployment service that automates application deployments to Amazon EC2 instances, 
@@ -27,7 +35,13 @@ on-premises instances, serverless Lambda functions, or Amazon ECS services.
 
 AWS CodeDeploy fully automates your software deployments, allowing you to deploy reliably and rapidly.
 
-
+For VPC:
+Launch the EC2 instance to a private subnet and attach an Egress-Only 
+Internet Gateway to the VPC to allow outbound IPv6 communication to the internet. 
+Use AWS Network Firewall to set up the required rules for traffic inspection and traffic filtering.
+ Internet Gateway does not limit or control any outgoing IPv6 connection.
+ NAT Gateway is only applicable for IPv4, not IPv6. 
+ 
 ConfusingTakeaLook
 ------------------
 
@@ -60,6 +74,22 @@ ASG cannot directly use a Cloudwatch alarm as the source for a scale-in or scale
 	Up to 15 Aurora Replicas can be distributed across the Availability 
 
 • 6 copies of your data across 3 AZ:
+
+
+AWS has a limit of 20 instances per region. 
+When you launch an Amazon EC2 instance, you specify an IAM role to associate with the instance 
+
+
+Policies can be attached to users, groups, or Amazon S3 buckets, enabling 
+AWS supports six types of policies: 
+
+On-Demand Capacity Reservations,
+
+Simple scaling 
+
+Determine which unprotected instances in the selected Availability Zone
+EBS is incorrect because an EBS Volume cannot be shared by multiple instances.
+
 
 
 
@@ -165,7 +195,8 @@ AWS:
   	-AvailableZone
 		-VPC +IGW+GWLB
 			-Subnet +GWLBEndPoint
-				-EC2 ++ENI++SecurityGroups
+				-EC2++SecurityGroups
+					++ENI++SecurityGroups
 				
 				
 
@@ -291,7 +322,7 @@ Network and application protection:
 	Amazon Route53 Resolver DNS Firewall
 	
 	Filter malicious web traffic
-	WAF icon AWS Web Application Firewall (WAF)
+	AWS Web Application Firewall (WAF)
 	
 	Central management of firewall rules
 	AWS Firewall Manager
@@ -405,8 +436,7 @@ BlockChain
 =================================================
 #DataTransfer
 ================================================= 
-One AWS account that want to communicate(or use) the resources in another 
-AWS account which can be achieved by using the below following features in AWS.
+One AWS account that want to communicate(or use) the resources in another account which can be achieved by:
 	Cross-Account Assume Role
 	VPC Peering
 	Resource Access Manager
@@ -417,17 +447,15 @@ AWS DataSync:Copy Data correctly.
 	AWS DataSync is a secure, online service that automates and accelerates moving data between 
 	on premises and AWS Storage services. 
 
-DataSync can copy data between Network File System (NFS) shares, 
-Server Message Block (SMB) shares, Hadoop Distributed File Systems (HDFS), self-managed object storage, 
-AWS Snowcone, Amazon Simple Storage Service (Amazon S3) buckets, Amazon Elastic File System (Amazon EFS) 
-file systems, Amazon FSx for Windows File Server file systems, Amazon FSx for Lustre file systems, 
-Amazon FSz for OpenZFS file systems, and Amazon FSx for NetApp ONTAP file systems.
+DataSync can copy data between NFS shares,SMB shares, Hadoop Distributed File Systems (HDFS), 
+self-managed object storage, 
+Snowcone, S3 buckets,EFS file systems, FSx for Windows,FSx for Lustre, FSz for OpenZFS, 
+and FSx for NetApp ONTAP file systems.
 
 
 AWS Data Migration Service:
-	AWS Data Migration Service copies data between databases, but can also send data to Amazon S3, 
-	Amazon Kinesis and Apache Kafka. It's great for data migrations between different databases and 
-	types of databases.
+	AWS Data Migration Service copies data between databases, also send data to Amazon S3, 
+	Amazon Kinesis and Apache Kafka.
 
 AWS Database Migration Service (AWS DMS) is a cloud service that makes it easy to migrate 
 relational databases, data warehouses, NoSQL databases, and other types of data stores. 

@@ -20,7 +20,7 @@ Provision:বন্দোবস্ত,ব্যবস্থা
 Consistent:সামঞ্জস্যপূর্ণ,সমান
 Retained:ধরে রাখা
 Leverage:উদ্দেশ্যসাধনের উপায়
-sole:একমাত্র
+Sole:একমাত্র
 Exploits:শোষণ
 Proprietary:মালিকানা
 Regardless:মনোযোগ বা পাত্তা না দিয়ে
@@ -40,6 +40,10 @@ Adequate:পর্যাপ্ত
 Withstand disruptions:বাধা সহ্য করা
 Ingest:গ্রহণ করা
 Sustainability:স্থায়িত্ব
+Spare: অতিরিক্ত
+prohibits:নিষেধ করে
+mitigate:নিরসন করা
+SAML:Security Assertion Markup Language 
 =================================================
 #General | Basic          
 ================================================= 
@@ -213,7 +217,7 @@ RegionalServices:https://aws.amazon.com/about-aws/global-infrastructure/regional
 
 
 
-==| IAM
+==| IAM Section
 6
 ##IAM
 -------------------------------------------------
@@ -265,6 +269,15 @@ How can users access AWS, Three options:
 • Secret Access Key ~= password
 
 
+IAM Roles for Services: Some AWS service will need to perform actions on your behalf
+
+To do so, we will assign permissions to AWS services with IAM Roles
+Common roles: 
+	• EC2 Instance Roles 
+	• Lambda Function Roles 
+	• Roles for CloudFormation 
+	
+	
 
 IAM Security Tools:
 	IAM Credentials Report (account-level)
@@ -276,6 +289,11 @@ IAM Security Tools:
 		IAM entity (e.g., user, role, or a group) accessed an AWS service.
 	• Access advisor shows the service permissions granted to a user and when those services were last accessed.
 	• You can use this information to revise your policies.
+
+When you use the AWS Management Console to create a user, you must choose to include at least a 
+console password or access keys. By default, a brand new IAM user created using the AWS CLI or 
+AWS API has no credentials of any kind. You must create the type of credentials for an IAM user 
+based on the needs of your user.
 
 
 Area:
@@ -322,8 +340,8 @@ NonOffcial:Identity and access management (IAM) is a framework and AWS manage se
 An IAM user is an entity that you create in AWS. 
 An IAM user with administrator permissions is not the same thing as the AWS account root user.
 
-A user in AWS consists of a name, a password to sign into the AWS 
-Management Console, and up to two access keys that can be used with the API or CLI. 
+A user in AWS consists of a name, a password to sign into the AWS Management Console, 
+and up to two access keys that can be used with the API or CLI. 
 
 
 Area:
@@ -334,8 +352,8 @@ Global Service.
 
 UseCase:
 ========
-You can grant other people permission to administer and use resources in your AWS account without having to share 
-your password or access key.
+You can grant other people permission to administer and use resources in your AWS account 
+without having to share your password or access key.
 
 
 
@@ -425,7 +443,7 @@ The effective permissions are the logical intersection between what is allowed b
 SCP and what is allowed by the IAM and resource-based policies.
 
 
-S3 ACL:
+S3-ACL:
 Access control lists (ACLs) – Use ACLs to control which principals in other accounts can access the 
     resource to which the ACL is attached.
 	ACLs are cross-account permissions policies that grant permissions to the specified principal. 
@@ -435,7 +453,7 @@ With ACLs, you can only grant other AWS accounts (not specific users) access to 
 Amazon S3 resources(buckets or objects).
 
 
-VPC ACL:
+VPC-ACL:
 A network access control list (ACL) allows or denies specific inbound or outbound traffic at the subnet level. 
 You can use the default network ACL for your VPC, or you can create a custom network ACL for your VPC with rules that are 
 similar to the rules for your security groups in order to add an additional layer of security to your VPC.
@@ -443,8 +461,8 @@ similar to the rules for your security groups in order to add an additional laye
 
 
 
-Session policies: Pass advanced session policies when you use the AWS CLI or AWS API to 
-    assume a role or a federated user. 
+Session policies: 
+    Pass advanced session policies when you use the AWS CLI or AWS API to assume a role or a federated user. 
 	Session policies limit the permissions that the role or user's identity-based policies grant to the session. 
 	Session policies limit permissions for a created session, but do not grant permissions.
 
@@ -592,11 +610,12 @@ It is a aws managed service, security is a shared responsibility.
 
 
 
-==| EC2
+==| EC2 Basics
 13
 ##EC2
 -------------------------------------------------
-EC2 = Elastic Compute Cloud = Infrastructure as a Service, Its provides scalable computing capacity in the  Cloud. 
+EC2 = Elastic Compute Cloud = Infrastructure as a Service.
+Its provides scalable computing capacity in the  Cloud. 
 
 EC2 sizing & configuration options: 
 • Operating System (OS): Linux, Windows or Mac OS 
@@ -626,19 +645,74 @@ TypeOfEC2:
 	-Storage optimized
 
 
- You can put an instance that is in the InService state into the Standby state, update some software or 
- troubleshoot the instance, and then return the instance to service. 
- Instances that are on standby are still part of the Auto Scaling group, 
- but they do not actively handle application traffic.
+You can put an instance that is in the InService state into the Standby state, update some software or 
+troubleshoot the instance, and then return the instance to service.
+
+Instances that are on standby are still part of the Auto Scaling group, 
+but they do not actively handle application traffic.
  
+Security Groups:
+	• Can be attached to multiple instances
+	• Locked down to a region / VPC combination
+	• Does live “outside” the EC2 – if traffic is blocked the EC2 instance won’t see it
+	• It’s good to maintain one separate security group for SSH access
+	• If your application is not accessible (time out), then it’s a security group issue
+	• If your application gives a “connection refused“ error, then it’s an application
+	error or it’s not launched
+	• All inbound traffic is blocked by default
+	• All outbound traffic is authorised by default
+
+
+
+To achieve highly available and fault-tolerant architecture for your applications, 
+you must deploy all your instances in different Availability Zones. 
+This will help you isolate your resources if an outage occurs. 
+Take note that to achieve fault tolerance, you need to have redundant resources in place to 
+avoid any system degradation in the event of a server fault or an Availability Zone outage. 
+Having a fault-tolerant architecture entails an extra cost in running additional resources 
+than what is usually needed. This is to ensure that the mission-critical workloads are processed.
+
+
+On-Demand Capacity Reservations enable you to reserve compute capacity for your 
+Amazon EC2 instances in a specific Availability Zone for any duration. 
+This gives you the ability to create and manage Capacity Reservations independently 
+from the billing discounts offered by Savings Plans or Regional Reserved Instances.
+
+
+There is a vCPU-based On-Demand Instance limit per region which is why subsequent requests failed. 
+Just submit the limit increase form to AWS and retry the failed requests once approved.
+
+
+By default, AWS allows you to provision a maximum of 20 instances per Availability Zone. 
+Select a different Availability Zone and retry the failed request is incorrect because 
+the vCPU-based On-Demand Instance limit is set per region and not per Availability Zone. 
+This can be increased after submitting a request form to AWS.
  
+By default, AWS allows you to provision a maximum of 20 instances per region. 
+Select a different region and retry the failed request is incorrect. 
+There is no need to select a different region since this limit can be increased after 
+submitting a request form to AWS.
+
+
+
+A company needs to deploy at least 2 EC2 instances to support the normal workloads of its application and 
+automatically scale up to 6 EC2 instances to handle the peak load. 
+The architecture must be highly available and fault-tolerant as it is processing mission-critical workloads.
+
+ANS:
+Create an Auto Scaling group of EC2 instances and set the 
+minimum capacity to 4 and the maximum capacity to 6. 
+Deploy 2 instances in Availability Zone A and another 2 instances in Availability Zone B.
+
+
 Area:
 =====
 Resource Identifiers – Regional
-	Each resource identifier, such as an AMI ID, instance ID, EBS volume ID, or EBS snapshot ID, is tied to its region 
-	and can be used only in the region where you created the resource.
+	Each resource identifier, such as an AMI ID, instance ID, EBS volume ID, or EBS snapshot ID, 
+	is tied to its region and can be used only in the region where you created the resource.
 Instances – Availability Zone
-	An instance is tied to the Availability Zones in which you launched it. However, note that its instance ID is tied to the region.
+	An instance is tied to the Availability Zones in which you launched it. 
+	However, note that its instance ID is tied to the region.
 EBS Volumes – Availability Zone
 	Amazon EBS volume is tied to its Availability Zone and can be attached only to instances in the same Availability Zone.
 EBS Snapshot – Regional
@@ -674,10 +748,26 @@ EC2 Instances Purchasing Options:
 • Savings Plans (1 & 3 years) –commitment to an amount of usage, long workload
 • Spot Instances – short workloads, cheap, can lose instances (less reliable)
 • Dedicated Instances – no other customers will share your hardware
+	Instances run on hardware that’s to you
+	May share hardware with otherinstances in same account
+	No control over instance placement(can move hardware after Stop / Start)\
 • Dedicated Hosts – book an entire physical server, control instance placement
 • Capacity Reservations – reserve capacity in a specific AZ for any duration
   No need for 1 or 3-year commitment, The Availability Zone in which to reserve the capacity (only one).
 
+
+Capacity Reservations:
+On-Demand Capacity Reservations enable you to reserve compute capacity for your 
+Amazon EC2 instances in a specific Availability Zone for any duration. 
+This gives you the ability to create and manage Capacity Reservations independently 
+from the billing discounts offered by Savings Plans or Regional Reserved Instances.
+
+When you create a Capacity Reservation, you specify:
+– The Availability Zone in which to reserve the capacity
+– The number of instances for which to reserve capacity
+– The instance attributes, including the instance type, tenancy, and platform/OS
+
+In addition, you can use Savings Plans and Regional Reserved Instances with your Capacity Reservations to benefit from billing discounts.
 
 
 Reserved Instances:
@@ -690,7 +780,8 @@ Keep in mind that you can always refer to On-Demand Instances to suffice any add
 Security:
 =========
 Security is a shared responsibility between AWS and you.
-Managing the guest operating system and software deployed to the guest operating system, including updates and security patches.
+Managing the guest operating system and software deployed to the guest operating system, 
+including updates and security patches.
 
 
 
@@ -730,18 +821,20 @@ Spot instances differ from the On-Demand instances:
 	they can be terminated anytime
 	price varies as per the demand and supply of spot instances
 	
-Spot instances can also be launched with a required duration (also known as Spot blocks), 
+Spot instances can also be launched with a required duration (max 6 hour) (also known as Spot blocks), 
 which are not interrupted due to changes in the Spot price.
 
 A Spot Instance request is either one-time or persistent.
 
 
 There are two types of spot requests:
--A one-time spot request stays active until Amazon EC2 runs the spot instance, you cancel the request, or it expires. 
+-A one-time spot request stays active until Amazon EC2 runs the spot instance, you cancel the request, 
+or it expires. 
 If the spot price goes above your bid or capacity is unavailable, 
 Amazon terminates the spot instance and closes the spot request.
 
--A persistent spot instance request stays active until you cancel it or until it expires—even if Amazon carried out the request. 
+-A persistent spot instance request stays active until you cancel it or until it expires—even if, 
+Amazon carried out the request. 
 If the spot price goes above your bid or capacity becomes unavailable, the spot instance is interrupted. 
 Amazon keeps the request open, and if conditions change and a spot instance does become available, it starts or 
 resumes the spot instance
@@ -757,9 +850,11 @@ of interruption. The signal provides an opportunity to proactively manage the Sp
  in advance of the two-minute Spot Instance interruption notice.
 
 		
-When an instance is interrupted, you can select one of three possible actions—terminating the 
-spot instance (default), stopping the spot instance (making it possible to restart it with the 
-same launch specifications), or hibernating the instance.
+When an instance is interrupted, you can select one of 
+	Three possible actions:
+		Terminating the spot instance (default), 
+		Stopping the spot instance (making it possible to restart it with the same launch specifications), or 
+		Hibernating the instance.
 
 Spot Instance Interruption Notice
 is a warning issued two minutes before EC2 interrupts a Spot Instance.
@@ -768,7 +863,8 @@ EC2 automatically stops or hibernates the Spot Instances on interruption, and au
 
 
 EC2 tries to maintain the target capacity, adding spot instances if available, 
-based on the request details. When spot instances are terminated, 
+based on the request details. 
+When spot instances are terminated, 
 Spot Fleet attempts to replace them using the lowest price option available.
 
 
@@ -794,7 +890,7 @@ Spot Fleet is a collection of spot instances.
 Spot Fleet requests type
 Request
 	Spot Fleet places an asynchronous one-time request for the desired capacity.
-I	f capacity is diminished because of Spot interruptions, the fleet does not attempt
+If capacity is diminished because of Spot interruptions, the fleet does not attempt
  to replenish Spot Instances, nor does it submit requests in alternative Spot capacity pools if 
  capacity is unavailable.
 Maintain
@@ -822,7 +918,8 @@ Can be attached to multiple instances.
 
 Area:
 =====
-AWS Security Groups are region specific and VPC specific. This means that if we create a security group in one region or VPC, 
+AWS Security Groups are region specific and VPC specific. This means that if we create a security group 
+in one region or VPC, 
 we can only use it in that same region or VPC.
 
 
@@ -849,26 +946,11 @@ It is a aws managed service, security is a shared responsibility.
 
 
 
-
-
-##EC2 Instance Connect
--------------------------------------------------
-Connect using the Amazon EC2 console (browser-based client), connect to your instances using Secure Shell (SSH).
-
-• No need to use your key file that was downloaded
-• The “magic” is that a temporary key is uploaded onto EC2 by AWS
-• Works only out-of-the-box with Amazon Linux 2
-• Need to make sure the port 22 is still opened!
-
-
-
-
-
-
 14
 ##EC2 Instance Role
 -------------------------------------------------
-When you launch an Amazon EC2 instance, you specify an IAM role to associate with the instance to securely access aws Resources.
+When you launch an Amazon EC2 instance, you specify an IAM role to associate with the instance 
+to securely access aws Resources.
 
 
 
@@ -897,7 +979,8 @@ Elastic IP Address – Regional
 
 UseCase:
 ========
-You can mask the failure of an instance or software by rapidly remapping the address to another instance in your account.
+You can mask the failure of an instance or software by rapidly remapping the address to another 
+instance in your account.
  
 Alternatively, you can specify the Elastic IP address in a DNS record for your domain, 
 so that your domain points to your instance.
@@ -907,7 +990,8 @@ so that your domain points to your instance.
 BillCost:
 =========
 To ensure efficient use of Elastic IP addresses, aws impose a small hourly charge if an Elastic IP address is 
-not associated with a running instance, or if it is associated with a stopped instance or an unattached network interface. 
+not associated with a running instance, or if it is associated with a stopped instance or 
+an unattached network interface. 
 
 While your instance is running, you are not charged for one Elastic IP address associated with the instance, 
 but you are charged for any additional Elastic IP addresses associated with the instance.
@@ -941,18 +1025,23 @@ Use case:
 Partition(Not Same Rack but Same AZ ) — spreads instances across many different partitions (which rely on
 	different sets of racks) within a single AZ.
 	Do not share the same rack.  
-
-Scales to 100s of EC2 instances per group (Hadoop, Cassandra, Kafka)
-Can span across multiple AZs in the same region.
-The instances in a partition do not share racks with the instances in the other partitions.
-:A partition failure can affect many EC2 but won’t affect other partitions
-
+	Can span across multiple AZs in the same region.
+	
 A partition placement group can have a maximum of seven partitions per Availability Zone. 
 Since a partition placement group can have partitions in multiple Availability Zones in the same region, 
 therefore instances will not have low-latency network performance. 
 
 
-Spread(Not Same Rack Not Same AZ ) – strictly places a small group of instances across distinct underlying hardware to reduce correlated failures.
+
+Scales to 100s of EC2 instances per group (Hadoop, Cassandra, Kafka)
+The instances in a partition do not share racks with the instances in the other partitions.
+:A partition failure can affect many EC2 but won’t affect other partitions
+
+
+
+Spread(Not Same Rack Not Same AZ ) – strictly places a small group of instances across distinct 
+underlying hardware to reduce correlated failures.
+    For Each instance each different Rack or Hardware.
 	It spread the instances across multiple AZ.
 	It reduces the risk of failure of the network since other instances are active in other zones.
 	:Limited to 7 instances per AZ per placement group
@@ -1045,8 +1134,8 @@ ENIs have security groups, just like EC2 instances, which act as a built in fire
 18
 ##EC2 Hibernate
 -------------------------------------------------
-Hibernation gives you the ability to launch EC2 instances, set them up as desired, hibernate them, and then quickly 
-bring them back to life when you need them. 
+Hibernation gives you the ability to launch EC2 instances, set them up as desired, hibernate them, 
+and then quickly  bring them back to life when you need them. 
 
 Hibernation saves the contents from the instance memory (RAM) to your Amazon EBS root volume.
 Root Volume – must be EBS, encrypted, not instance store, and large
@@ -1070,7 +1159,8 @@ Services that take time to initialize
 
 BillCost:
 =========
-While the instance is in hibernation, you pay only for the EBS storage and any Elastic IP addresses attached to the instance.
+While the instance is in hibernation, you pay only for the EBS storage and any 
+Elastic IP addresses attached to the instance.
 
 
 
@@ -1090,7 +1180,8 @@ You can use block-level storage only in combination with an EC2 instance where t
 There are two block-level storage options for EC2 instances.
 
 Instance store:
-An instance store volume is a disk that is physically attached to the host computer that runs the EC2 virtual machine (VM).
+An instance store volume is a disk that is physically attached to the host computer that runs the 
+EC2 virtual machine (VM).
 
 EBS volume:
 EBS volume, which provides off-instance storage that will persist independently from the life of the instance. 
@@ -1112,7 +1203,8 @@ instance store is reset, data loss.
 21
 ##EBS
 -------------------------------------------------
-AWS Elastic Block Store (EBS) is Amazon’s block-level storage solution used with the EC2 cloud service to store persistent data. 
+AWS Elastic Block Store (EBS) is Amazon’s block-level storage solution used with the 
+EC2 cloud service to store persistent data. 
 This means that the data is kept on the AWS EBS servers even when the EC2 instances are shutdown. 
 
 
@@ -1139,9 +1231,10 @@ Migrate mid-range, on-premises storage area network (SAN) workloads to the cloud
 BillCost:
 =========
 30 GB of storage for 12 months with the AWS Free Tier 
-Volume storage for all EBS volume types is charged by the amount of GB you provision per month until you release the storage. 
-Costs increase for EBS volumes that support additional input/output operations per second (IOPS) and throughput 
-beyond baseline performance.
+Volume storage for all EBS volume types is charged by the amount of GB you provision per month 
+until you release the storage. 
+Costs increase for EBS volumes that support additional input/output 
+operations per second (IOPS) and throughput beyond baseline performance.
 
 
 
@@ -1199,10 +1292,10 @@ An AMI includes the following:
 
 
 AMI to EC2 Instance:
-• Start an EC2 instance and customize it
-• Stop the instance (for data integrity)
-• Build an AMI – this will also create EBS snapshots
-• Launch instances from other AMIs
+	• Start an EC2 instance and customize it
+	• Stop the instance (for data integrity)
+	• Build an AMI – this will also create EBS snapshots
+	• Launch instances from other AMIs
 
 
 During the AMI-creation process, Amazon EC2 creates snapshots of your instance's root volume and any other 
@@ -1242,16 +1335,18 @@ B because AMIs are based on the underlying snapshots.
 ##EBS Volume Types | Use cases
 -------------------------------------------------
 Volume Types:
-General Purpose SSD volumes
-Provisioned IOPS SSD volumes
-Throughput Optimized HDD and Cold HDD volumes
-Previous generation Magnetic volumes
+	General Purpose SSD volumes
+	Provisioned IOPS SSD volumes
+	Throughput Optimized HDD and Cold HDD volumes
+	Previous generation Magnetic volumes
 
 • Only gp2/gp3 and io1/io2 can be used as boot volumes
 
 EBS Volumes come in 6 types:
-• gp2 / gp3 (SSD): General purpose SSD volume that balances price and performance for a wide variety of workloads
-• io1 / io2 (SSD): Highest-performance SSD volume for mission-critical low-latency or high-throughput workloads
+• gp2 / gp3 (SSD): General purpose SSD volume that balances price and performance 
+  for a wide variety of workloads.
+• io1 / io2 (SSD): Highest-performance SSD volume for mission-critical low-latency or 
+  high-throughput workloads
 • st1 (HDD): Low cost HDD volume designed for frequently accessed, throughput- intensive workloads
 • sc1 (HDD): Lowest cost HDD volume designed for less frequently accessed workloads
 
@@ -1310,6 +1405,41 @@ Encrypt an unencrypted EBS volume:
 
 
 
+Data Lifecycle Manager (Amazon DLM):
+Amazon Data Lifecycle Manager (Amazon DLM) is an automated procedure to back up the data stored on 
+your Amazon EBS volumes. Use Amazon DLM to create lifecycle policies to automate snapshot management.
+
+You can use Amazon Data Lifecycle Manager (Amazon DLM) to automate the creation, retention, and deletion of snapshots taken to back up your Amazon EBS volumes. Automating snapshot management helps you to:
+
+– Protect valuable data by enforcing a regular backup schedule.
+– Retain backups as required by auditors or internal compliance.
+– Reduce storage costs by deleting outdated backups.
+
+Combined with the monitoring features of Amazon CloudWatch Events and AWS CloudTrail,
+Amazon DLM provides a complete backup solution for EBS volumes at no additional cost.
+
+
+There is no such thing as EBS-cycle policy in Amazon S3.
+
+
+EBS volumes support live configuration changes while in production which means that you 
+can modify the volume type, volume size, and IOPS capacity without service interruptions.
+
+
+EBS Volumes:
+– When you create an EBS volume in an Availability Zone, it is automatically replicated 
+  within that zone to prevent data loss due to a 
+  failure of any single hardware component.
+– After you create a volume, you can attach it to any EC2 instance in the same Availability Zone
+– Amazon EBS Multi-Attach enables you to attach a single Provisioned IOPS SSD (io1) volume to 
+	multiple Nitro-based instances that are in the same Availability Zone. However, other 
+	EBS types are not supported.
+– An EBS volume is off-instance storage that can persist independently from the life of an instance. 
+  You can specify not to terminate the EBS volume when you terminate the EC2 instance during instance creation.
+– EBS volumes support live configuration changes while in production which means that you 
+  can modify the volume type, volume size, and IOPS capacity without service interruptions.
+– Amazon EBS encryption uses 256-bit Advanced Encryption Standard algorithms (AES-256)
+– EBS Volumes offer 99.999% SLA.
 
 
 
@@ -1344,9 +1474,22 @@ Can copy snapshots across AZ or Region.
 
 
 Amazon EFS is a regional service storing data within and across multiple Availability Zones (AZs) 
-for high availability and durability. Amazon EC2 instances can access your file system across AZs, 
+for high availability and durability. 
+Amazon EC2 instances can access your file system across AZs, 
 regions, and VPCs, while on-premises servers can access using AWS Direct Connect or AWS VPN.
 
+
+Use Amazon EFS and create a lifecycle policy that will move the objects to 
+Amazon EFS-IA after 2 years is incorrect because the maximum days for the 
+EFS lifecycle policy is only 90 days. The requirement is to move the files that are 
+older than 2 years or 730 days.
+
+
+Create an Amazon Elastic Filesystem (EFS) file system and enable encryption. 
+Configure AWS Transfer for SFTP to securely upload files to the EFS file system. 
+Apply an EFS lifecycle policy to delete files after 30 days is incorrect. 
+This may be possible, however, the EFS lifecycle management doesn’t delete objects. 
+It can only transition files in and out of the “Infrequent Access” tier.
 
 
 Area:
@@ -1360,15 +1503,16 @@ UseCase:
 ========
 Content management, web serving, data sharing, Wordpress.
 
-Share code and other files in a secure, organized way to increase DevOps agility and respond faster to customer feedback.
+Share code and other files in a secure, organized way to increase DevOps agility and 
+respond faster to customer feedback.
 Persist and share data from your AWS containers and serverless applications with zero management required.
 
 
 BillCost:
 =========
 AWS Free Tier
-You pay only for the storage you use, for read and write access to data stored in Infrequent Access storage classes, 
-and for any provisioned throughput.
+You pay only for the storage you use, for read and write access to data stored in 
+Infrequent Access storage classes, and for any provisioned throughput.
 
 
 
@@ -1377,8 +1521,8 @@ Security:
 Uses security group to control access to EFS
 Encryption at rest using KMS
 
-When using Amazon EFS, you specify Amazon EC2 security groups for your EC2 instances and security groups for the 
-EFS mount targets associated with the file system.
+When using Amazon EFS, you specify Amazon EC2 security groups for your EC2 instances and 
+security groups for the EFS mount targets associated with the file system.
 
 
 
@@ -1458,6 +1602,12 @@ Health Checks:
 • They enable the load balancer to know if instances it forwards traffic to are available to reply to requests
 • The health check is done on a port and a route (/health is common)
 • If the response is not 200 (OK), then the instance is unhealthy
+
+
+Elastic Load Balancing provides access logs that capture detailed information about requests 
+sent to your load balancer. Each log contains information such as the time the request was 
+received, the client’s IP address, latencies, request paths, and server responses. 
+You can use these access logs to analyze traffic patterns and troubleshoot issues.
 
 
 
@@ -1546,6 +1696,11 @@ Elastic Load Balancing provides a security group.
 An Application Load Balancer (ALB) only works at layer 7 (HTTP).
 A listener checks for connection requests from clients, using the protocol and port that you configure. 
 
+ALBs can also route and load balance gRPC traffic between microservices or between 
+gRPC-enabled clients and services, gRPC protocol is at Layer 7.
+Network Load Balancers do not support gRPC.
+Gateway Load Balancer operates as a Layer 3 Gateway and a Layer 4 Load Balancing service.
+
 To connect to an ALB, a client needs to resolve its DNS name, No IP address.
 
 So when you need static IP addresses for inbound traffic, the ALB is not an option. 
@@ -1600,7 +1755,14 @@ Routing different types:
 	You can route a client request based on source IP address CIDR from where the request originates.
 
 
+Host-based routing defines rules that forward requests to different target groups based on the 
+hostname in the host header instead of the URL.
 
+ALB only HTTP or HTTPS health check.
+ICMP health check and FTP health check are incorrect as these are not supported.
+A TCP health check is only offered in Network Load Balancers and Classic Load Balancers.
+ 
+ 
 Area:
 =====
 Regional scope.
@@ -1994,6 +2156,45 @@ update some software or troubleshoot the instance, and then return the instance 
 Instances that are on standby are still part of the Auto Scaling group, but they do not actively 
 handle application traffic.
 
+
+
+Step scaling policies increase or decrease the current capacity of a scalable target 
+based on a set of scaling adjustments, known as step adjustments.
+
+The option that says: create a new target group and create a new target group and 
+launch configuration are both incorrect because you only want to change the 
+AMI being used by your instances, and not the instances themselves. 
+Target groups are primarily used in ELBs and not in Auto Scaling. 
+The scenario didn’t mention that the architecture has a load balancer. 
+Therefore, you should be updating your launch configuration, not the target group.
+
+
+Deploy eight EC2 instances with Auto Scaling in one Availability Zone behind an 
+Amazon Elastic Load Balancer is incorrect because this architecture is not highly available. 
+If that Availability Zone goes down then your web application will be unreachable.
+
+T3 instances also have a Burstable Performance capability to burst or go beyond the 
+current compute capacity of the instance to higher performance as required by your workload. 
+So your 4 servers will be able to manage 110% compute capacity for a short period of time. 
+This is the power of cloud computing versus our on-premises network architecture. 
+It provides elasticity and unparalleled scalability.
+
+
+Default termination policy:
+
+1. If there are instances in multiple Availability Zones, choose the Availability Zone with the most instances and at least one instance that is not protected from scale in. If there is more than one Availability Zone with this number of instances, choose the Availability Zone with the instances that use the oldest launch configuration.
+
+2. Determine which unprotected instances in the selected Availability Zone use the oldest launch configuration. If there is one such instance, terminate it.
+
+3. If there are multiple instances to terminate based on the above criteria, determine which unprotected instances are closest to the next billing hour. (This helps you maximize the use of your EC2 instances and manage your Amazon EC2 usage costs.) If there is one such instance, terminate it.
+
+4. If there is more than one unprotected instance closest to the next billing hour, choose one of these instances at random.
+
+
+There are three main parts in a distributed messaging system: the components of your distributed 
+system which can be hosted on EC2 instance; your queue (distributed on Amazon SQS servers); 
+and the messages in the queue.
+To improve the scalability of your distributed system, you can add Auto Scaling group to your EC2 instances.
 
 Area:
 =====
@@ -3635,7 +3836,7 @@ so the retrieval costs would be pretty high).
 
 ==| Global Infrastructure
 52
-##CloudFront
+##CloudFront 
 -------------------------------------------------
 UserReq->CloudFront->EdgeLocation->WebServer
 
@@ -3740,6 +3941,23 @@ CloudFront refers to them as Signed URLs and Signed Cookies.
 -OAI prevents users from viewing your S3 files by simply using the direct URL for the file. 
  Instead, they would need to access it through a CloudFront URL.
 
+
+Lambda Http HTTP 504 errors:
+Set up an origin failover by creating an origin group with two origins. 
+Specify one as the primary origin and the other as the second origin which 
+CloudFront automatically switches to when the primary origin returns specific 
+HTTP status code failure responses.
+
+
+When you create or update Lambda functions that use environment variables, 
+AWS Lambda encrypts them using the AWS Key Management Service. 
+When your Lambda function is invoked, those values are decrypted and made available to the Lambda code.
+
+
+Although Lambda encrypts the environment variables in your function by default, 
+the sensitive information would still be visible to other users who have access to the Lambda console. 
+This is because Lambda uses a default KMS key to encrypt the variables, which is 
+usually accessible by other users. 
 
 
 Area:
@@ -5466,6 +5684,12 @@ Security is a shared responsibility.
 AWS Lambda is a serverless, event-driven compute service that lets you run code for virtually any type of 
 application or backend service without provisioning or managing servers. 
 
+The default timeout is 3 seconds, and the maximum execution duration per request in 
+AWS Lambda is 900 seconds, which is equivalent to 15 minutes.
+
+By default, the AWS Lambda limits the total 
+concurrent executions across all functions within a given region to 1000.
+
 You can trigger Lambda from over 200 AWS services and software as a service (SaaS) applications, 
 and only pay for what you use.
 
@@ -5494,6 +5718,24 @@ Once your function is VPC-enabled, all network traffic from your function is sub
 to the routing rules of your VPC/Subnet. 
 If your function needs to interact with a public 
 resource, you will need a route through a NAT gateway in a public subnet.
+
+
+Replace the Kinesis Data Streams with an Amazon SQS queue. 
+Create a Lambda function that will asynchronously process the requests.
+
+AWS Lambda function to process messages in an Amazon Simple Queue Service (Amazon SQS) queue. 
+Lambda event source mappings support standard queues and first-in, first-out (FIFO) queues.
+
+Kinesis Data Streams is a real-time data streaming service that requires the provisioning of shards. 
+Amazon SQS is a cheaper option because you only pay for what you use. 
+Since there is no requirement for real-time processing in the scenario given, replacing 
+Kinesis Data Streams with Amazon SQS would save more costs.
+
+
+For Error like EC2ThrottledException:
+Lambda function automatically scales based on the number of events it processes. 
+If your Lambda function accesses a VPC, you must make sure that your VPC has sufficient 
+ENI capacity to support the scale requirements of your Lambda function.
 
 
 Area:
@@ -5527,7 +5769,7 @@ Security and Compliance is a shared responsibility.
 
 
 68
-##Labmbda@Edge
+##Labmbda@Edge | Lambda@Edge 
 -------------------------------------------------
 The functions run in response to CloudFront events, without provisioning or managing servers. 
 You can use Lambda functions to change CloudFront requests and responses at the following points:
@@ -5546,8 +5788,43 @@ You can use Lambda@Edge to change CloudFront requests and responses.
 You can also generate responses to viewers without ever sending the request to the origin.
 
 
+Customize the content that the CloudFront web distribution delivers to your users using Lambda@Edge, 
+which allows your Lambda functions to execute the 
+authentication process in AWS locations closer to the users.
 
 
+User getting HTTP 504 errors:
+Set up an origin failover by creating an origin group with two origins. 
+Specify one as the primary origin and the other as the second origin which 
+CloudFront automatically switches to when the primary origin returns specific 
+HTTP status code failure responses.
+
+
+ Lambda@Edge to allow your Lambda functions to customize the content that 
+ CloudFront delivers and to execute the authentication process in AWS locations closer to the users. 
+ In addition, you can set up an origin failover by creating an origin group with two 
+ origins with one as the primary origin and the other as the second origin which 
+ CloudFront automatically switches to when the primary origin fails. 
+ This will alleviate the occasional HTTP 504 errors that users are experiencing.
+ 
+ 
+
+Lambda@Edge is a feature of Amazon CloudFront that lets you run code closer to users of your application, 
+which improves performance and reduces latency. With Lambda@Edge, you don’t 
+have to provision or manage infrastructure in multiple locations around the world. 
+You pay only for the compute time you consume – there is no charge when your code is not running.
+
+With Lambda@Edge, you can enrich your web applications by making them globally distributed and 
+improving their performance — all with zero server administration. 
+
+Lambda@Edge runs your code in response to events generated by the 
+Amazon CloudFront content delivery network (CDN). Just upload your code to 
+AWS Lambda, which takes care of everything required to run and scale your code with high 
+availability at an AWS location closest to your end user.
+
+By using Lambda@Edge and Kinesis together, you can process real-time streaming data 
+so that you can track and analyze globally-distributed user activity on your website and 
+mobile applications, including clickstream analysis.
 
 
 Area:
@@ -5734,6 +6011,47 @@ DynamoDB – Integration with Amazon S3:
 		• Doesn’t consume any write capacity
 		• Creates a new table
 		• Import errors are logged in CloudWatch Logs
+
+
+Enable DynamoDB Stream and create an AWS Lambda trigger, as well as the IAM role which contains 
+all of the permissions that the Lambda function will need at runtime. The data from the stream 
+record will be processed by the Lambda function which will then publish a message to SNS Topic 
+that will notify the subscribers via email.
+
+Also working with Kinesis Client Library (KCL).
+
+
+Mobile game that has a serverless backend:
+– Enable DynamoDB Accelerator (DAX) and ensure that the Auto Scaling is enabled and increase the maximum provisioned read and write capacity.
+– Use API Gateway in conjunction with Lambda and turn on the caching on frequently accessed data and enable DynamoDB global replication.
+
+Since Auto Scaling is enabled by default, the provisioned read and write capacity will adjust automatically. 
+Also enable DynamoDB Accelerator (DAX) to improve the performance 
+from milliseconds to microseconds is incorrect because by default, 
+Auto Scaling is not enabled in a DynamoDB table which is created using the AWS CLI.
+
+
+Integrate DynamoDB table with CloudFront as these two are incompatible.
+
+
+SimpleDB is incorrect. Although SimpleDB is also a highly available and scalable NoSQL database, 
+it has a limit on the request capacity or storage size for a given table, unlike DynamoDB.
+
+DynamoDB is durable, scalable, and highly available data store which can be used for 
+real-time tabulation. 
+You can also use AppSync with DynamoDB to make it easy for you to build collaborative apps that 
+keep shared data updated in real-time.
+
+
+Improve the database performance:
+Use partition keys with high-cardinality attributes, which have a large number of 
+distinct values for each item.
+
+
+Avoid using a composite primary key, which is composed of a partition key and a sort key is 
+incorrect because as mentioned, a composite primary key will provide more partition for the table 
+and in turn, improves the performance. 
+Hence, it should be used and not avoided.
 
 
 Area:
@@ -6723,8 +7041,20 @@ We provide server-side encryption for data at rest and SSL for data in motion.
 
 
 82
-++AWS Lake Formation
+++AWS Lake Formation | AWS Lake Formation 
 -------------------------------------------------
+Use AWS Lake Formation to consolidate data from multiple accounts into a single account.
+
+AWS Lake Formation is a service that makes it easy to set up a secure data lake in days. 
+A data lake is a centralized, curated, and secured repository that stores all your data, 
+both in its original form and prepared for analysis. 
+
+Amazon S3 forms the storage layer for Lake Formation. 
+If you already use S3, you typically begin by registering existing S3 buckets that contain your data. 
+Lake Formation creates new buckets for the data lake and import data into them. 
+AWS always stores this data in your account, and only you have direct access to it.
+
+
 • Data lake = central place to have all your data for analytics purposes
 • Fully managed service that makes it easy to setup a data lake in days
 • Discover, cleanse, transform, and ingest data into your Data Lake
@@ -6736,6 +7066,18 @@ We provide server-side encryption for data at rest and SSL for data in motion.
 • Built on top of AWS Glue
 
 
+
+AWS Lake Formation is integrated with AWS Glue which you can use to create a data catalog 
+that describes available datasets and their appropriate business applications. 
+Lake Formation lets you define policies and control data access with 
+simple “grant and revoke permissions to data” sets at granular levels. 
+You can assign permissions to IAM users, roles, groups, and Active Directory users using federation. 
+You specify permissions on catalog objects (like tables and columns) rather than on buckets and objects.
+
+
+Setting up a Kinesis Firehose in each and every account to move data into a single location 
+is costly and impractical. A better approach is to set up cross-account sharing which is 
+free with AWS Lake Formation.
 
 
 83
@@ -7340,6 +7682,19 @@ CloudWatch is all about performance. CloudTrail is all about auditing.
 • EC2 instance metrics have metrics “every 5 minutes”
 • With detailed monitoring (for a cost), you get data “every 1 minute”
 
+Install the CloudWatch agent to all the EC2 instances that gather the memory and disk utilization data. 
+View the custom metrics in the Amazon CloudWatch console.
+
+By default, CloudWatch does not automatically provide memory and disk utilization metrics of 
+your instances. You have to set up custom CloudWatch metrics to monitor the memory, 
+disk swap, disk space, and page file utilization of your instances.
+
+Enhanced Monitoring is a feature of Amazon RDS. 
+By default, Enhanced Monitoring metrics are stored for 30 days in the CloudWatch Logs.
+
+
+CloudWatch Alarms only monitor service metrics, not changes in DynamoDB table data.
+
 
 
 Area:
@@ -7858,6 +8213,15 @@ It is a aws managed service, security is a shared responsibility.
 -------------------------------------------------
 The two services, CloudWatch and CloudTrail, can be used together. 
 
+ CloudTrail is primarily used to monitor and record the account activity across your 
+ AWS resources and not your web applications. 
+ 
+ You cannot use CloudTrail to capture the detailed 
+ information of all HTTP requests that go through your public-facing Application Load Balancer (ALB). 
+ CloudTrail can only track the resource changes made to your ALB, 
+ but not the actual IP traffic that goes through it.
+
+
 • Provides governance, compliance and audit for your AWS Account
 • CloudTrail is enabled by default!
 • Can put logs from CloudTrail into CloudWatch Logs or S3
@@ -8059,6 +8423,19 @@ Config:
 CloudTrail:
 	• Track who made any changes to the Load Balancer with API calls
 
+
+Use the AWS Config managed rule to check if the IAM user access keys are not rotated within 90 days. 
+Create an Amazon EventBridge (Amazon CloudWatch Events) rule for the non-compliant keys, 
+and define a target to invoke a custom Lambda function to deactivate and delete the keys. 
+AWS EventBridge can check for AWS Config non-compliant events and then trigger a Lambda for remediation.
+
+Create a custom AWS Config rule to check for the max-age of IAM access keys. 
+Schedule an AWS Batch job that runs every 24 hours to delete all the non-compliant access keys is incorrect. 
+AWS Config can only use Systems Manager Automation documents as remediation actions. 
+Moreover, the AWS Batch service cannot be used for remediating non-compliant resources like IAM access keys.
+
+Amazon EventBridge cannot directly check for IAM events that contain the age of IAM access keys. 
+You have to use the AWS Config service to detect the non-compliant IAM keys.
 
 
 Area:
@@ -8380,7 +8757,7 @@ Amazon Cognito is HIPAA eligible and PCI DSS, SOC, ISO/IEC 27001, ISO/IEC 27017,
 
 
 109
-##SSO
+##IAM Identity Center | sso| Active Directory
 -------------------------------------------------
 AWS Single Sign-On (AWS SSO) is now AWS IAM Identity Center. It is where you create, or connect, 
 your workforce users once and centrally manage their access to multiple AWS accounts and applications.
@@ -8401,6 +8778,20 @@ AWS Single Sign-On (SSO):
 • Centralized auditing with CloudTrail
 
 
+AWS IAM Identity Center (successor to AWS Single Sign-On) provides single sign-on access for all of your 
+AWS accounts and cloud applications. It connects with Microsoft Active Directory through 
+AWS Directory Service to allow users in that directory to sign in to a personalized 
+AWS access portal using their existing Active Directory user names and passwords. 
+From the AWS access portal, users have access to all the AWS accounts and cloud applications 
+that they have permission for.
+
+
+Amazon Cognito is used for single sign-on in mobile and web applications. 
+You don’t have to use it if you already have an existing Directory Service to be used for authentication.
+
+
+SCPs are not necessarily needed for logging in on this scenario. 
+You can use SCP if you want to restrict or implement a policy across several accounts in the organization.
 
 Area:
 =====
@@ -8878,6 +9269,10 @@ from which AWS WAF should allow access.
 
 Geo Restriction feature of CloudFront helps in restricting traffic based on the user's geographic location. 
 But, CloudFront works from edge locations and doesn't belong to a VPC.
+
+
+AWS WAF is tightly integrated with Amazon CloudFront, the Application Load Balancer (ALB), 
+Amazon API Gateway, and AWS AppSync.
 
 
 Area:
@@ -9666,6 +10061,23 @@ NAT Gateway with High Availability:
 • Must create multiple NAT Gateways in multiple AZs for fault-tolerance
 
 
+For single point of failure:
+Create a NAT Gateway in each availability zone. Configure the route table in each private subnet 
+to ensure that instances use the NAT Gateway in the same availability zone.
+
+
+If you have resources in multiple Availability Zones and they share one NAT gateway, 
+and if the NAT gateway’s Availability Zone is down, resources in the other 
+Availability Zones lose Internet access. To create an Availability Zone-independent architecture, 
+create a NAT gateway in each Availability Zone and configure your routing to ensure 
+that resources use the NAT gateway in the same Availability Zone.
+
+You should configure the route table in the private subnet and not the public subnet to associate 
+the right instances in the private subnet.
+
+A single NAT Gateway in each availability zone is enough. 
+NAT Gateway is already redundant in nature, meaning, AWS already handles any failures that occur 
+in your NAT Gateway in an availability zone.
 
 
 Area:
@@ -11788,6 +12200,11 @@ Using federation, you don’t need to create IAM users (user management is outsi
 
 
 ExamTips: Any time you see AssumeRole or Cross account access, its STS.
+
+
+AWS STS supports open standards like Security Assertion Markup Language (SAML) 2.0, 
+with which you can use Microsoft AD FS to leverage your Microsoft Active Directory. 
+You can also use SAML 2.0 to manage your own solution for federating user identities.
 
 Area:
 =====
