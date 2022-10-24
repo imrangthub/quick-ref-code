@@ -654,6 +654,14 @@ TypeOfEC2:
 	-Accelerated Computing
 	-Storage optimized
 
+Storage optimized instances are designed for workloads that require high, sequential read and write access to very large data sets on local storage.
+
+Memory Optimized Instances is incorrect because these are designed to deliver fast performance for workloads that process large data sets in memory, which is quite different from handling high read and write capacity on local storage.
+
+Compute Optimized Instances is incorrect because these are ideal for compute-bound applications that benefit from high-performance processors, such as batch processing workloads and media transcoding.
+
+General Purpose Instances is incorrect because these are the most basic type of instances. They provide a balance of compute, memory, and networking resources, and can be used for a variety of workloads.
+
 
 You can put an instance that is in the InService state into the Standby state, update some software or 
 troubleshoot the instance, and then return the instance to service.
@@ -4069,6 +4077,18 @@ Create an Origin Access Identity (OAI) for CloudFront and grant access to the ob
 
 The Cache-Control and Expires headers control how long objects stay in the cache. The Cache-Control max-age directive lets you specify how long (in seconds) you want an object to remain in the cache before CloudFront gets the object again from the origin server. The minimum expiration time CloudFront supports is 0 seconds for web distributions and 3600 seconds for RTMP distributions.
 
+
+CloudFront Functions are just lightweight functions in JavaScript for high-scale, latency-sensitive CDN customizations and not for enforcing security. A CloudFront Function runtime environment offers submillisecond startup times which allows your application to scale immediately to handle millions of requests per second. But again, this can’t be used to restrict access to your files.
+
+
+Serve the private content via CloudFront only:
+ A better solution is to set up an origin access identity (OAI) then use Signed URL or Signed Cookies in your CloudFront web distribution.
+ 
+ 
+Amazon S3 Storage Lens feature just provides a single view of object storage usage and activity across your entire Amazon S3 storage.
+
+
+
 Area:
 =====
 Global services.
@@ -4880,6 +4900,7 @@ Openwire, WSS
 Amazon Simple Queue Service (SQS) is a fully managed message queuing service that enables you to decouple and 
 scale microservices, distributed systems, and serverless applications.
 
+You cannot set a priority to individual items in the SQS queue.
 
 Attributes:
 	• Unlimited throughput, unlimited number of messages in queue
@@ -5182,7 +5203,12 @@ Amazon Virtual Private Cloud (VPC) subnet, without traversing the Internet.
 ##Kinesis
 -------------------------------------------------
  A Kinesis data stream stores records from 24 hours by default to a maximum of 8760 hours (365 days).
- 
+
+Amazon Kinesis is the streaming data platform of AWS and has four distinct services under it: 
+Kinesis Data Firehose, Kinesis Data Streams, Kinesis Video Streams, and Amazon Kinesis Data Analytics. 
+For the specific use case, just as asked in the scenario, use Kinesis Data Firehose.
+
+
 Makes it easy to collect, process, and analyze streaming data in real-time and 
 that can be run on EC2 instances.Kinesis Data Streams is a serverless.
 Ingest real-time data such as: Application logs, Metrics, Website clickstreams,IoT telemetry data.
@@ -5414,6 +5440,8 @@ In most cases, you can simply update the endpoints of your Amazon MQ broker to c
 and start sending messages.
 
 
+
+A cluster deployment is a logical grouping of three RabbitMQ broker nodes behind a Network Load Balancer, each sharing users, queues, and a distributed state across multiple Availability Zones (AZ). In a cluster deployment, Amazon MQ automatically manages broker policies to enable classic mirroring across all nodes, ensuring high availability (HA).
 
 
 Area:
@@ -7853,6 +7881,13 @@ By default, Enhanced Monitoring metrics are stored for 30 days in the CloudWatch
 CloudWatch Alarms only monitor service metrics, not changes in DynamoDB table data.
 
 
+Custom metrics that you can set up:
+– Memory utilization
+– Disk swap utilization
+– Disk space utilization
+– Page file utilization
+– Log collection
+
 
 Area:
 =====
@@ -9813,6 +9848,7 @@ selection of a destination server.
 -------------------------------------------------
 VPC enables you to launch AWS resources into a virtual network that you've defined.
 
+When you create a VPC endpoint, you can attach an endpoint policy that controls access to the service to which you are connecting. 
 
 VPN Connections are a good solution if you have an immediate need, have low to 
 modest bandwidth requirements, and can tolerate the inherent variability in Internet-based connectivity. 
@@ -14637,6 +14673,8 @@ Eventually (if need be) we can ship back the device to AWS (for transferring dat
 
 Amazon FSx for Windows (File Server) 
 -------------------------------------------------
+Amazon FSx For Windows File Server does not have a parallel file system, unlike Lustre.
+
 • EFS is a shared POSIX system for Linux systems. 
 • FSx for Windows is a fully managed Windows file system share drive 
 • Supports SMB protocol & Windows NTFS 
