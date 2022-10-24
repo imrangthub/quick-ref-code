@@ -91,6 +91,12 @@ Determine which unprotected instances in the selected Availability Zone
 EBS is incorrect because an EBS Volume cannot be shared by multiple instances.
 
 
+You can create a VPC peering connection between your own VPCs, with a VPC in another AWS account, or with a VPC in a different AWS Region.
+
+
+AWS Proton allows you to deploy any serverless or container-based application with increased efficiency, consistency, and control. You can define infrastructure standards and effective continuous delivery pipelines for your organization. Proton breaks down the infrastructure into environment and service (“infrastructure as code” templates).
+
+Set up an AWS Control Tower Landing Zone. Enable pre-packaged guardrails to enforce policies or detect violations.
 
 
 HandOnRemain
@@ -521,7 +527,7 @@ S3 Standard storage, the pricing is $0.023 per GB per month.
 
 
 =================================================
-#Application | Environment | Status
+#Application | Environment | Status | Tips
 =================================================
 
 #Resilient:স্থিতিস্থাপক
@@ -545,7 +551,100 @@ Application Load Balancer or Network Load Balancer to manage your resources.
 
 
 
+Ensure that the database is eventually consistent and highly available:
+	Configure the Auto Scaling group to spread the Amazon EC2 instances across three Availability Zones. 
+	Use the AWS Database Migration Service (DMS) with a replication server and an ongoing replication 
+	task to migrate the embedded NoSQL database to Amazon DynamoDB.
 
+
+
+ALB prevent SQL injection attacks:
+	Use AWS WAF and set up a managed rule to block request patterns associated with the exploitation 
+	of SQL databases, like SQL injection attacks. Associate it with the Application Load Balancer. 
+	Integrate AWS WAF with AWS Firewall Manager to reuse the rules across all the AWS accounts.
+
+
+Redshift cluster as their data warehouse region outage:
+	Enable Cross-Region Snapshots Copy in your Amazon Redshift Cluster.
+
+
+Convert audio recordings into text using Amazon Transcribe. 
+Set up Amazon Translate to translate Hindi texts into English and use Amazon Comprehend for sentiment analysis.
+
+Process both mission-critical data as well as non-essential batch jobs.:
+	Use ECS as the container management service then set up a combination of Reserved and 
+	Spot EC2 Instances for processing mission-critical and non-essential batch jobs respectively.
+   Scheduled Reserved Instances (Scheduled Instances).
+
+
+S3 Select
+Amazon S3 Select is designed to help analyze and process data within an object in Amazon S3 buckets, faster and cheaper. It works by providing the ability to retrieve a subset of data from an object in Amazon S3 using simple SQL expressions.
+
+Athena
+Amazon Athena is an interactive query service that makes it easy to analyze data in Amazon S3 using standard SQL expressions.
+Simply point to your data in Amazon S3, define the schema, and start querying using standard SQL expressions.
+
+Amazon Redshift Spectrum
+Amazon Redshift also includes Redshift Spectrum, allowing you to directly run SQL queries 
+against exabytes of unstructured data in Amazon S3. No loading or transformation is required, 
+and you can use open data formats, including Avro, CSV, Grok, ORC, Parquet, RCFile, RegexSerDe, 
+SequenceFile, TextFile, and TSV. Redshift Spectrum automatically scales query compute capacity 
+based on the data being retrieved, so queries against Amazon S3 run fast, regardless of data set size.
+
+S3 retrieve the required data in under 15 minutes under all circumstances 150 MB/s of retrieval throughput:
+	Use Expedited Retrieval to access the financial data.
+	Purchase provisioned retrieval capacity.
+
+Expedited retrievals allow you to quickly access your data when occasional urgent requests 
+for a subset of archives are required. For all but the largest archives (250 MB+), data accessed 
+using Expedited retrievals are typically made available within 1–5 minutes. 
+
+Provisioned capacity ensures that your retrieval capacity for expedited retrievals 
+is available when you need it.
+
+
+Fastest storage option with high I/O performance for the temporary files:
+	Configure RAID 0 in multiple instance store volumes.
+
+RAID 0 configuration enables you to improve your storage volumes’ performance 
+by distributing the I/O across the volumes in a stripe. 
+	
+This configuration can be implemented on both EBS or instance store volumes. 
+
+RAID 1 configuration is used for data mirroring. 
+You need to configure RAID 0 to improve the performance of your storage volumes.
+
+
+
+You can attach the following resources to your transit gateway:
+	 – One or more VPCs.
+	– One or more VPN connections
+	– One or more AWS Direct Connect gateways
+	– One or more Transit Gateway Connect attachments
+	– One or more transit gateway peering connections
+AWS Network Firewall is a managed service that makes it easy to deploy essential 
+network protections for all of your VPCs.
+
+ Route 53 Resolver DNS Firewall can only filter and regulate outbound DNS traffic for your 
+ virtual private cloud (VPC). It can neither do active traffic flow inspection nor block any 
+ vulnerability exploits.
+ 
+ 
+ 
+ RDS if the primary database instance fails:
+ The canonical name record (CNAME) is switched from the primary to standby instance.
+ 
+ 
+ Collect and process the application log files:
+	Amazon S3 for storing the application log files and Amazon Elastic MapReduce for processing the log files.
+ 
+ For Single RDS security use SecurityGroup.
+ Network ACL covers the entire subnet which means that other applications that use the same 
+ subnet will also be affected.
+ 
+ 
+ A Kinesis data stream stores records from 24 hours by default to a maximum of 8760 hours (365 days).
+ 
 =================================================
 #Code | Helping Heand | Example
 =================================================

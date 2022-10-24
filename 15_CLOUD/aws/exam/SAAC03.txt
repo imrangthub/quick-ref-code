@@ -43,6 +43,10 @@ Sustainability:স্থায়িত্ব
 Spare: অতিরিক্ত
 prohibits:নিষেধ করে
 mitigate:নিরসন করা
+comply:মেনে চলা
+obsolete:অপ্রচলিত
+sophisticated :ভেজালমিশ্রিত
+circumstances:পরিস্থিতি
 SAML:Security Assertion Markup Language 
 =================================================
 #General | Basic          
@@ -616,6 +620,12 @@ It is a aws managed service, security is a shared responsibility.
 -------------------------------------------------
 EC2 = Elastic Compute Cloud = Infrastructure as a Service.
 Its provides scalable computing capacity in the  Cloud. 
+
+Launch an instance using the Amazon EC2 API or a command line tool:
+	Don’t specify a security group, the instance is automatically 
+	assigned to the default security group for the VPC.
+	Using the Amazon EC2 console, you have an option to create a new security group.
+
 
 EC2 sizing & configuration options: 
 • Operating System (OS): Linux, Windows or Mac OS 
@@ -2330,6 +2340,23 @@ RDS Multi AZ (Disaster Recovery):
 	• RDS Custom: full admin access to the underlying OS and the database
 
 
+Failover support:
+-------------------------------------------------
+Amazon RDS provides high availability and failover support for DB instances using Multi-AZ deployments. 
+Amazon RDS uses several different technologies to provide failover support. 
+Multi-AZ deployments for Oracle, PostgreSQL, MySQL, and MariaDB DB instances use Amazon’s failover technology. 
+SQL Server DB instances use SQL Server Database Mirroring (DBM).
+
+
+
+Amazon RDS automatically performs a failover in the event of any of the following:
+	Loss of availability in primary Availability Zone.
+	Loss of network connectivity to primary.
+	Compute unit failure on primary.
+	Storage failure on primary.
+
+
+
 
 
 RDS Security – Summary:
@@ -2376,6 +2403,45 @@ IAM authentication is just another way to authenticate the user's credentials wh
 the database.
 It would not significantly enhance the security in a way that 
 enabling SSL does by facilitating the in-transit encryption for the database.
+
+
+You can authenticate to your DB instance using AWS Identity and Access Management (IAM) 
+database authentication. IAM database authentication works with MySQL and PostgreSQL. 
+With this authentication method, you don’t need to use a password when you connect to a DB instance. 
+Instead, you use an authentication token.
+
+IAM database authentication provides the following benefits:
+
+Network traffic to and from the database is encrypted using Secure Sockets Layer (SSL).
+	You can use IAM to centrally manage access to your database resources, instead of managing access 
+	 individually on each DB instance.
+	For applications running on Amazon EC2, you can use profile credentials specific to your 
+	EC2 instance to access your database instead of a password, for greater security.
+
+
+
+When you create or modify your DB instance to run as a Multi-AZ deployment, 
+Amazon RDS automatically provisions and maintains a synchronous standby replica in a different 
+Availability Zone. Updates to your DB Instance are synchronously replicated across 
+Availability Zones to the standby\.
+
+
+Primary database instance fails:
+The canonical name record (CNAME) is switched from the primary to standby instance.
+
+
+Read Replicas:
+It elastically scales out beyond the capacity constraints of a single DB instance for read-heavy database workloads.
+Provides asynchronous replication and improves the performance of the primary database by taking read-heavy database workloads from it.
+
+You can also create read replicas within a Region or between Regions for your Amazon RDS for MySQL, MariaDB, PostgreSQL, and Oracle database instances encrypted at rest with AWS Key Management Service (KMS).
+
+
+There are 2 ways to use SSL to connect to your SQL Server DB instance:
+
+– Force SSL for all connections — this happens transparently to the client, and the client doesn’t have to do any work to use SSL.
+– Encrypt specific connections — this sets up an SSL connection from a specific client computer, and you must do work on the client to encrypt connections.
+
 
 
 
@@ -3250,6 +3316,24 @@ ByDefault its a period like: 1 year.
 
 
 
+Client-side encryption two way:
+– Use an AWS KMS-managed customer master key.
+– Use a client-side master key.
+
+When using an AWS KMS-managed customer master key to enable client-side data encryption, you provide an AWS KMS customer master key ID (CMK ID) to AWS. On the other hand, when you use client-side master key for client-side data encryption, your client-side master keys and your unencrypted data are never sent to AWS.
+
+
+
+Three Option for encryption keys:
+Use Server-Side Encryption with Amazon S3-Managed Keys (SSE-S3)
+Use Server-Side Encryption with AWS KMS-Managed Keys (SSE-KMS)
+Use Server-Side Encryption with Customer-Provided Keys (SSE-C)
+
+
+S3  replicating the objects to the destination bucket takes about 15 minutes. 
+Take note that the requirement in the scenario is to aggregate the data in the fastest way.
+Use Transfer Acclearation.
+
 
 Area:
 =====
@@ -3959,6 +4043,31 @@ the sensitive information would still be visible to other users who have access 
 This is because Lambda uses a default KMS key to encrypt the variables, which is 
 usually accessible by other users. 
 
+Use Signed Cookies to control who can access the private files in your CloudFront distribution by modifying your application to determine whether a user should have access to your content. For members, send the required Set-Cookie headers to the viewer which will unlock the content only to them.
+
+
+
+
+Use signed URLs for the following cases:
+
+– You want to use an RTMP distribution. Signed cookies aren’t supported for RTMP distributions.
+
+– You want to restrict access to individual files, for example, an installation download for your application.
+
+– Your users are using a client (for example, a custom HTTP client) that doesn’t support cookies.
+
+Use signed cookies for the following cases:
+
+– You want to provide access to multiple restricted files, for example, all of the files for a video in HLS format or all of the files in the subscribers’ area of a website.
+
+– You don’t want to change your current URLs.
+
+
+
+Create an Origin Access Identity (OAI) for CloudFront and grant access to the objects in your S3 bucket to that OAI.
+
+
+The Cache-Control and Expires headers control how long objects stay in the cache. The Cache-Control max-age directive lets you specify how long (in seconds) you want an object to remain in the cache before CloudFront gets the object again from the origin server. The minimum expiration time CloudFront supports is 0 seconds for web distributions and 3600 seconds for RTMP distributions.
 
 Area:
 =====
@@ -4862,6 +4971,26 @@ Amazon SQS console, which will support up to 30,000 messages per second with bat
 3,000 messages per second without batching.
 
 
+
+Amazon SQS has automatically deleted the messages that have been in a queue for more than the 
+maximum message retention period.
+Default message retention period is 4 days.
+
+
+Amazon SQS uses short polling by default.
+Short polling works for scenarios that require higher throughput. 
+However, you can also configure the queue to use Long polling instead, to reduce cost.
+
+The ReceiveMessageWaitTimeSeconds is the queue attribute that determines whether you are using 
+Short or Long polling. By default, its value is zero which means it is using Short polling. 
+If it is set to a value greater than zero, then it is Long polling.
+
+The visibility timeout is a period of time during which Amazon SQS prevents other 
+consuming components from receiving and processing a message.
+The default visibility timeout for a message is 30 seconds. The maximum is 12 hours.
+ 
+Amazon SQS doesn’t automatically delete the message
+
 Area:
 =====
 SQS is a regional service, that is highly available within a single region. 
@@ -4966,6 +5095,8 @@ large number of subscriber systems, including Amazon SQS queues, AWS Lambda func
 Amazon Kinesis Data Firehose,  for parallel processing. 
 The A2P functionality enables you to send messages to users at scale via SMS, mobile push, and email.
 
+Take note that you should use SNS instead of SES (Simple Email Service) when you want to monitor your EC2 instances.
+
 
 Fan Out:
 • Push once in SNS, receive in all SQS queues that are subscribers
@@ -5050,6 +5181,8 @@ Amazon Virtual Private Cloud (VPC) subnet, without traversing the Internet.
 63
 ##Kinesis
 -------------------------------------------------
+ A Kinesis data stream stores records from 24 hours by default to a maximum of 8760 hours (365 days).
+ 
 Makes it easy to collect, process, and analyze streaming data in real-time and 
 that can be run on EC2 instances.Kinesis Data Streams is a serverless.
 Ingest real-time data such as: Application logs, Metrics, Website clickstreams,IoT telemetry data.
@@ -5320,6 +5453,21 @@ Amazon ECS is a fully managed container orchestration service that makes it easy
 deploy, manage, and  scale containerized applications.
 
 Launch Docker containers on AWS = Launch ECS Tasks on ECS Clusters
+
+
+Amazon ECS lets you run batch workloads with managed or custom schedulers on Amazon 
+EC2 On-Demand Instances, Reserved Instances, or Spot Instances.
+
+You can launch Reserved EC2 instances to process the mission-critical data and 
+Spot EC2 instances for processing non-essential batch jobs.
+
+There are two different charge models for Amazon Elastic Container Service (ECS): 
+Fargate Launch Type Model and EC2 Launch Type Model. With Fargate, you pay for the 
+amount of vCPU and memory resources that your containerized application requests 
+while for EC2 launch type model, there is no additional charge. 
+You pay for AWS resources (e.g., EC2 instances or EBS volumes) you create to store and run your application. 
+You only pay for what you use, as you use it; there are no minimum fees and no upfront commitments.
+
 
 There are two models that you can use to run your containers:
 
@@ -6508,8 +6656,13 @@ S3 for Solutions Architect:
 
 
 
-++ Document DB
+##DocumentDB
 -------------------------------------------------
+Migrating from MongoDB to Amazon DocumentDB: offline, online, and hybrid.
+For online approach, you may use AWS DMS to minimize downtime. 
+AWS DMS continually reads from the source MongoDB oplog and applies those changes 
+in near-real time on the source Amazon DocumentDB cluster.
+
 	• Aurora is an “AWS-implementation” of PostgreSQL / MySQL …
 	• DocumentDB is the same for MongoDB (which is a NoSQL database)
 	• MongoDB is used to store, query, and index JSON data
@@ -6681,6 +6834,10 @@ Security is a shared responsibility.
 ##Redshift
 -------------------------------------------------
 Fastest, easiest, and most widely used cloud data warehouse.
+
+Redshift cluster as their data warehouse region outage:
+	Enable Cross-Region Snapshots Copy in your Amazon Redshift Cluster.
+
 
 Redshift warehouse is a collection of computing resources known as nodes, and these nodes are organized in a 
 group known as a cluster. 
@@ -9271,8 +9428,10 @@ Geo Restriction feature of CloudFront helps in restricting traffic based on the 
 But, CloudFront works from edge locations and doesn't belong to a VPC.
 
 
-AWS WAF is tightly integrated with Amazon CloudFront, the Application Load Balancer (ALB), 
-Amazon API Gateway, and AWS AppSync.
+AWS WAF is tightly integrated with (monitor the HTTP(S) requests) Amazon CloudFront, the 
+Application Load Balancer (ALB),  Amazon API Gateway, and AWS AppSync.
+
+
 
 
 Area:
@@ -9592,6 +9751,32 @@ Your responsibility:
 
 
 
+
+AWS Control Tower:
+
+AWS Control Tower provides a single location to easily set up your new well-architected 
+multi-account environment and govern your AWS workloads with rules for security, operations, 
+and internal compliance. You can automate the setup of your AWS environment with best-practices 
+blueprints for multi-account structure, identity, access management, and account provisioning workflow. 
+For ongoing governance, you can select and apply pre-packaged policies e
+nterprise-wide or to specific groups of accounts.
+
+
+AWS Control Tower provides three methods for creating member accounts:
+
+– Through the Account Factory console that is part of AWS Service Catalog.
+
+– Through the Enroll account feature within AWS Control Tower.
+
+– From your AWS Control Tower landing zone’s management account, using Lambda code and appropriate IAM roles.
+
+
+AWS Control Tower automatically implements guardrails using multiple building blocks such as AWS CloudFormation to establish a baseline, AWS Organizations service control policies (SCPs) to prevent configuration changes, and AWS Config rules to continuously detect non-conformance.
+
+
+ The AWS Resource Access Manager (RAM) service simply helps you to securely share your resources across AWS accounts or within your organization or organizational units (OUs) in AWS Organizations. It is not capable of launching new AWS accounts with preapproved configurations
+ 
+
 ==|Virtual Private Cloud (VPC)
 138
 #Internet Protocol (IP)   
@@ -9706,6 +9891,12 @@ https://docs.aws.amazon.com/vpc/latest/userguide/vpc-scenarios-intro.html
 
 
 
+To enable the connection to a service running on an instance, the associated network 
+ACL must allow both inbound traffic on the port that the service is listening on as well as 
+allow outbound traffic from ephemeral ports. When a client connects to a server, 
+a random port from the ephemeral port range (1024-65535) becomes the client’s source port.
+
+
 Area:
 =====
 VPC – Regional
@@ -9813,6 +10004,13 @@ All the rest of the IP addresses on the Internet are Public
 -------------------------------------------------
 A subnet is a range of IP addresses in your VPC. A subnet must reside in a single Availability Zone. 
 After you add subnets, you can deploy AWS resources in your VPC.
+
+Each subnet in your VPC must be associated with a route table, which controls the routing for 
+the subnet (subnet route table). You can explicitly associate a subnet with a particular route table. 
+Otherwise, the subnet is implicitly associated with the main route table.
+
+A subnet can only be associated with one route table at a time, but you can associate 
+multiple subnets with the same subnet route table.
 
 Public and private subnets:
 If a subnet is associated with a route table that has a route to an internet gateway, 
@@ -11489,6 +11687,13 @@ EC2 Enhanced Networking (SR-IOV):
 	• Option 1: Elastic Network Adapter (ENA) up to 100 Gbps
 	• Option 2: Intel 82599 VF up to 10 Gbps – LEGACY
 
+
+ParallelCluster:
+AWS ParallelCluster is just an AWS-supported open-source cluster management tool that makes 
+it easy for you to deploy and manage High-Performance Computing (HPC) clusters on AWS. 
+
+ParallelCluster uses a simple text file to model and provision all the resources needed 
+for your HPC applications in an automated and secure manner.
 
 
 
