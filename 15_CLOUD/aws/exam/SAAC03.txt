@@ -230,6 +230,8 @@ AWS resources.
 AWS IAM enables organizations with many employees to create and manage multiple users under a 
 single AWS account.
 
+You can assign an IAM Role to the users or groups from your Active Directory once it is integrated 
+with your VPC via the AWS Directory Service AD Connector.
 
 Three types of Principals — Root Users, IAM Users and Instance Principals
 IAM deals with four Principle Entities: Users, Groups, Roles and Policies.
@@ -793,6 +795,13 @@ Reserved Instances:
 Reserved Instances do not renew automatically.
 Keep in mind that you can always refer to On-Demand Instances to suffice any additional resource requirements.
 
+Reserved Instances are not physical instances, but rather a billing discount applied to the 
+use of On-Demand Instances in your account.
+
+You can also sell your unused instance for Standard RIs but 
+not Convertible RIs on the Reserved Instance Marketplace.
+
+You can reserve capacity to a specific AWS Region (regional Reserved Instance) or specific Availability Zone (zonal Reserved Instance) only. You cannot reserve capacity to multiple AWS Regions in a single RI purchase.
 
 
 Security:
@@ -1225,6 +1234,8 @@ AWS Elastic Block Store (EBS) is Amazon’s block-level storage solution used wi
 EC2 cloud service to store persistent data. 
 This means that the data is kept on the AWS EBS servers even when the EC2 instances are shutdown. 
 
+EBS volume is a storage area network (SAN) storage and not a POSIX-compliant shared file system. 
+You have to use EFS instead.
 
 • An EBS (Elastic Block Store) Volume is a network drive you can attach to your instances while they run
 • It allows your instances to persist data, even after their termination
@@ -1466,6 +1477,8 @@ EBS Volumes:
 ##EFS
 -------------------------------------------------
 Compatible with Linux based AMI (not Windows)
+Amazon EFS only supports file locking. Object lock is a feature of Amazon S3 and not Amazon EFS.
+
 
 Amazon EFS provides a simple, serverless, set-and-forget elastic file system. 
 With Amazon EFS, you can create a file system, 
@@ -2079,6 +2092,8 @@ AWS Auto Scaling monitors your applications and automatically adjusts capacity.
 If exactly 10 then desired capacity to 10.
 If Range of Instance then minMix.
 
+Amazon EC2 Auto Scaling to provision new resources takes minutes.
+Lambda within seconds.
 
 
 The goal of an Auto Scaling Group (ASG) is to:
@@ -2249,6 +2264,15 @@ It is a aws managed service, security is a shared responsibility.
 -------------------------------------------------
 As you are only increasing storage size and not changing the instance type or anything else.
 
+IAM database authentication works with MySQL and PostgreSQL. With this authentication method, you don’t need to use a password when you connect to a DB instance. Instead, you use an authentication token
+Each token has a lifetime of 15 minutes.
+
+
+RDS events only provide operational events such as DB instance events, DB parameter group events, 
+DB security group events, and DB snapshot events. What we need in the scenario is to capture 
+data-modifying events (INSERT, DELETE, UPDATE) which can be achieved thru native 
+functions or stored procedures.
+
 RDS stands for Relational Database Service
 • It’s a managed DB service for DB use SQL as a query language.
 • It allows you to create databases in the cloud that are managed by AWS
@@ -2259,7 +2283,9 @@ RDS stands for Relational Database Service
 • Microsoft SQL Server
 • Aurora (AWS Proprietary database)
 
-
+ Oracle RMAN and RAC are not supported in RDS.
+ 
+ 
 RDS is a managed service:
 • Automated provisioning, OS patching
 • Continuous backups and restore to specific timestamp (Point in Time Restore)!
@@ -2300,6 +2326,12 @@ ExamTrick: in a stopped RDS database, you will still pay for storage. If you pla
 stopping it for a long time, you should snapshot & restore instead.
 
 
+
+IAM database authentication provides the following benefits:
+	Network traffic to and from the database is encrypted using Secure Sockets Layer (SSL).
+	You can use IAM to centrally manage access to your database resources, instead of managing access individually on each DB instance.
+	For applications running on Amazon EC2, you can use profile credentials specific to your EC2 instance to access your database instead of a password, for greater security
+ Although STS is used to send temporary tokens for authentication, this is not a compatible use case for RDS.
 
 RDS– Storage Auto Scaling:
 • Helps you increase storage on your RDS DB instance dynamically
@@ -2389,6 +2421,10 @@ production database and need to move your stored procedures and secondary databa
 you must use the AWS Schema Conversion Tool.
 
 
+
+When you create or modify your DB instance to run as a Multi-AZ deployment, Amazon RDS automatically provisions and maintains a synchronous standby replica in a different Availability Zone. Updates to your DB Instance are synchronously replicated across Availability Zones to the standby in order to keep both in sync and protect your latest database updates against DB instance failure.
+
+
 Encryption of Data in Transit:
 -------------------------------------------------
 Encrypt communications between your application and your DB Instance using SSL/TLS.
@@ -2451,7 +2487,15 @@ There are 2 ways to use SSL to connect to your SQL Server DB instance:
 – Encrypt specific connections — this sets up an SSL connection from a specific client computer, and you must do work on the client to encrypt connections.
 
 
+Enhanced Monitoring is a feature of Amazon RDS. 
+By default, Enhanced Monitoring metrics are stored for 30 days in the CloudWatch Logs.
 
+Differences between CloudWatch and Enhanced Monitoring Metrics.  CloudWatch gathers metrics about CPU utilization from the hypervisor for a DB instance, and Enhanced Monitoring gathers its metrics from an agent on the instance.
+
+Why Enhanced Monitoring for RDS: 
+You do not have direct access to the instances/servers of your RDS database instance, unlike with your 
+EC2 instances where you can install a CloudWatch agent or a custom script to get 
+CPU and memory utilization of your instance.
 
 Area:
 =====
@@ -2520,6 +2564,13 @@ An Aurora cluster volume can grow to a maximum size of 128 tebibytes (TiB).
 Amazon Aurora provides built-in security, continuous backups, serverless compute, 
 up to 15 read replicas, automated multi-Region replication, and integrations with other AWS services.
 
+Non-Serverless DB cluster for Aurora is called a provisioned DB cluster. 
+Aurora Serverless clusters and provisioned clusters both have the same kind of 
+high-capacity, distributed, and highly available storage volume.
+
+When you work with Amazon Aurora without Aurora Serverless (provisioned DB clusters), you can choose your DB instance class size and create Aurora Replicas to increase read throughput. If your workload changes, you can modify the DB instance class size and change the number of Aurora Replicas. This model works well when the database workload is predictable, because you can adjust capacity manually based on the expected workload.
+
+With Aurora Serverless , you can create a database endpoint without specifying the DB instance class size. You set the minimum and maximum capacity. 
 
 
 
@@ -2629,6 +2680,8 @@ Amazon RDS promotes the replica that is largest in size.
 If two or more  Aurora Replicas share the same priority and size, then 
 Amazon Aurora promotes an arbitrary replica in the same promotion tier.
 
+
+creating a custom endpoint in Aurora based on the specified criteria for the production traffic and another custom endpoint to handle the reporting queries 
 
 
 Area:
@@ -3163,6 +3216,8 @@ security group to your environment.
 An Amazon S3 bucket is a public cloud storage.
 S3 is an object storage service. 
 
+You can only add 1 SQS or SNS at a time for Amazon S3 events notification.
+
 S3 Versioning-enabled buckets, help you to recover objects from accidental deletion or overwrite.
 
 API calls can be logged in AWS CloudTrail.
@@ -3257,6 +3312,17 @@ Client Side Encryption:
 
 
 S3 Security:
+	IAM policies                 = Manage multiple Users to do under a single AWS account about S3 bucket or objects .
+	Bucket policies,             = With Bucket policies and Access point policies, customers can define rules  which apply broadly across all requests to their Amazon S3 resources.
+	Access point policies        = Do
+	Access Control Lists         = With ACLs(our original access control method- only to other AWS accounts, not to users in your account use only for grant write permissions to the S3 Log Delivery group), customers can grant specific permissions (i.e. READ, WRITE, FULL_CONTROL) to specific users (customers who prefer to use exclusively policies for access control)for an individual bucket or object.
+	Query String Authentication  = With Query String Authentication, customers can create a URL to an Amazon S3 object which is only valid for a limited time. 
+	VPC endpoint policies,       = When customers create an Amazon VPC endpoint, they can attach an endpoint policy to it that controls access to the Amazon S3 resources to which they are connecting. Customers can also use Amazon S3 bucket policies to control access to buckets from specific endpoints or specific VPCs.
+	SCPs in AWS Organizations    = SCPs are a type of AWS Organizations policy that customers can use to manage permissions in their organization. SCPs offer central control over the maximum available permissions for all accounts in an organization.
+	S3 Block Public Access       = Amazon S3 Block Public Access provides settings for access points, buckets, and accounts to help customers manage public access to Amazon S3 resources.
+
+With MFA Delete, Encryption, Cross-Account Access, Requester Pays Buckets and Monitoring.
+
 User based
 	• IAM policies - which API calls should be allowed for a specific user from IAM console(Web).
 Resource Based
@@ -3324,19 +3390,18 @@ ByDefault its a period like: 1 year.
 
 
 
-Client-side encryption two way:
-– Use an AWS KMS-managed customer master key.
-– Use a client-side master key.
+Encryption:
+	Server-side Encryption using
+		Amazon S3-Managed Keys (SSE-S3)
+		AWS KMS-Managed Keys (SSE-KMS)
+		Customer-Provided Keys (SSE-C)
+	Client-side Encryption using
+		AWS KMS-managed customer master key
+		client-side master key
+
+
 
 When using an AWS KMS-managed customer master key to enable client-side data encryption, you provide an AWS KMS customer master key ID (CMK ID) to AWS. On the other hand, when you use client-side master key for client-side data encryption, your client-side master keys and your unencrypted data are never sent to AWS.
-
-
-
-Three Option for encryption keys:
-Use Server-Side Encryption with Amazon S3-Managed Keys (SSE-S3)
-Use Server-Side Encryption with AWS KMS-Managed Keys (SSE-KMS)
-Use Server-Side Encryption with Customer-Provided Keys (SSE-C)
-
 
 S3  replicating the objects to the destination bucket takes about 15 minutes. 
 Take note that the requirement in the scenario is to aggregate the data in the fastest way.
@@ -4254,6 +4319,12 @@ AWS Global Accelerator for availability and performance of your applications wit
 CloudFront is better for improving application resiliency to handle spikes in traffic.
 Direct Connect cannot be used to improve application resiliency to handle spikes in traffic.
  
+ 
+AWS Global Accelerator is incorrect because this service is more suitable for non-HTTP use cases, 
+such as gaming (UDP), IoT (MQTT), or Voice over IP, as well as for HTTP use cases that specifically 
+require static IP addresses or deterministic, fast regional failover. 
+Moreover, there is no direct way that you can integrate AWS Global Accelerator with Amazon S3.
+
 Area:
 =====
 Global Accelerator is a global service.
@@ -4630,6 +4701,10 @@ Used for flat files only, stored directly on S3.
 	• Transition to S3 Glacier using a Lifecycle Policy
 	• Bucket access using IAM roles for each File Gateway
 	• SMB Protocol has integration with Active Directory (AD) for user authentication
+
+You can manage your Amazon S3 data using lifecycle policies, cross-region replication, and versioning. 
+You can think of a file gateway as a file system mount on S3.
+
 
 
 
@@ -5124,6 +5199,11 @@ Fan Out:
 • Fully decoupled, no data loss
 • Make sure your SQS queue access policy allows for SNS to write
 
+By default, an Amazon SNS topic subscriber receives every message published to the topic. 
+You can use Amazon SNS message filtering to assign a filter policy to the topic subscription, 
+and the subscriber will only receive a message that they are interested in. 
+
+
 
 Amazon SNS – FIFO Topic:
 	• FIFO = First In First Out (ordering of messages in the topic).
@@ -5483,6 +5563,9 @@ deploy, manage, and  scale containerized applications.
 Launch Docker containers on AWS = Launch ECS Tasks on ECS Clusters
 
 
+You can’t directly set CloudWatch Alarms to update the ECS task count.
+
+
 Amazon ECS lets you run batch workloads with managed or custom schedulers on Amazon 
 EC2 On-Demand Instances, Reserved Instances, or Spot Instances.
 
@@ -5708,9 +5791,14 @@ Security is a shared responsibility.
 
 
 
-++Amazon EKS
+##EKS
 -------------------------------------------------
-Amazon EKS = Amazon Elastic Kubernetes Service
+Amazon EKS is integrated with many AWS services to provide scalability and security for your applications. 
+These services include Elastic Load Balancing for load distribution, IAM for authentication, 
+Amazon VPC for isolation, and AWS CloudTrail for logging.
+
+
+Amazon EKS = Amazon Elastic Kubernetes Service (cloud-agnostic and open-source platforms = EKS)
 • It is a way to launch managed Kubernetes clusters on AWS
 • Kubernetes is an open-source system for automatic deployment, scaling and management of 
   containerized (usually Docker) application
@@ -5857,6 +5945,10 @@ Security is a shared responsibility.
 67
 ##Lambda
 -------------------------------------------------
+You can invoke an AWS Lambda function from an Amazon Aurora MySQL-Compatible 
+Edition DB cluster with a native function or a stored procedure.
+
+
 AWS Lambda is a serverless, event-driven compute service that lets you run code for virtually any type of 
 application or backend service without provisioning or managing servers. 
 
@@ -5912,6 +6004,8 @@ For Error like EC2ThrottledException:
 Lambda function automatically scales based on the number of events it processes. 
 If your Lambda function accesses a VPC, you must make sure that your VPC has sufficient 
 ENI capacity to support the scale requirements of your Lambda function.
+
+
 
 
 Area:
@@ -6229,6 +6323,9 @@ incorrect because as mentioned, a composite primary key will provide more partit
 and in turn, improves the performance. 
 Hence, it should be used and not avoided.
 
+Point-in-Time Recovery (PITR) feature is not capable of restoring a DynamoDB table to a particular point in time in a different AWS account.
+DynamoDB on-demand backups are available at no additional cost beyond the normal pricing that’s associated with backup storage size. DynamoDB on-demand backups cannot be copied to a different account or Region. To create backup copies across AWS accounts and Regions and for other advanced features, you should use AWS Backup.
+
 
 Area:
 =====
@@ -6359,6 +6456,17 @@ Specifically, API Gateway sets a limit on a steady-state rate and a burst of req
 against all APIs in your account. In the token bucket algorithm, the burst is the maximum bucket size.
 
 
+Enable throttling limits and result caching in API Gateway.
+Amazon API Gateway provides throttling at multiple levels including global and by service call. 
+Throttling limits can be set for standard rates and bursts. 
+
+You can add caching to API calls by provisioning an Amazon API Gateway cache and specifying its 
+size in gigabytes. The cache is provisioned for a specific stage of your APIs. 
+This improves performance and reduces the traffic sent to your back end. 
+
+Cache settings allow you to control the way the cache key is built and the time-to-live (TTL) 
+of the data stored for each method. 
+Amazon API Gateway also exposes management APIs that help you invalidate the cache for each stage.
 
 
 Area:
@@ -7854,6 +7962,8 @@ Use a single platform for observability, Collect metrics on AWS and on premises.
 97
 ##CloudWatch 
 -------------------------------------------------
+Amazon CloudWatch cannot track the API calls to your AWS resources.
+
 Amazon CloudWatch is a monitoring and observability service built for DevOps engineers, developers, 
 site reliability engineers (SREs), IT managers, and product owners.
 
@@ -7922,6 +8032,14 @@ You simply pay for what you use and will be charged at the end of the month for 
 Security:
 =========
 It is a aws managed service, security is a shared responsibility.
+
+
+AWS X-Ray:
+AWS X-Ray is not a suitable service to use to track each API call to your AWS resources. 
+
+It just helps you debug and analyze your microservices applications with request tracing 
+so you can find the root cause of issues and performance.
+
 
 
 
@@ -8277,6 +8395,7 @@ Amazon EventBridge vs CloudWatch Events:
 • EventBridge has a different name to mark the new capabilities
 • Over time, the CloudWatch Events name will be replaced with EventBridge.
 
+You can use Amazon EventBridge to run Amazon ECS tasks when certain AWS events occur. You can set up an EventBridge rule that runs an Amazon ECS task whenever a file is uploaded to a certain Amazon S3 bucket using the Amazon S3 PUT operation.
 
 
 • Event buses can be accessed by other AWS accounts using Resource-based Policies
@@ -8413,6 +8532,7 @@ The two services, CloudWatch and CloudTrail, can be used together.
  CloudTrail can only track the resource changes made to your ALB, 
  but not the actual IP traffic that goes through it.
 
+Addition, it has the -include-global-service-events parameter enabled which will also include activity from global services such as IAM, Route 53, AWS WAF, and CloudFront
 
 • Provides governance, compliance and audit for your AWS Account
 • CloudTrail is enabled by default!
@@ -8985,6 +9105,25 @@ You don’t have to use it if you already have an existing Directory Service to 
 SCPs are not necessarily needed for logging in on this scenario. 
 You can use SCP if you want to restrict or implement a policy across several accounts in the organization.
 
+
+AWS by creating policies and attaching them to 
+IAM identities (users, group, roles) or AWS resources.
+
+A policy is an object in AWS that, when associated with an identity or resource, defines their permissions.
+
+
+AWS supports six types of policies: 
+	identity-based policies, 
+	resource-based policies, 
+	permissions boundaries, 
+	AWS Organizations SCPs, 
+	ACLs, and 
+	session policies.
+
+
+
+The AWS IAM authenticator for Kubernetes is integrated into the EKS cluster for role-based access control (RBAC) and cluster authentication.
+
 Area:
 =====
 Global
@@ -9156,6 +9295,12 @@ You can set the waiting period from a minimum of 7 days up to a maximum of 30 da
 The default waiting period is 30 days.
 
 After the waiting period ends, AWS KMS deletes the KMS key, its aliases, and all related AWS KMS metadata.
+
+
+
+Use AWS Key Management Service to create a CMK in a custom key store and store the non-extractable key material in AWS CloudHSM.
+
+
 
 Area:
 =====
@@ -9505,6 +9650,10 @@ AWS Firewall Manager
 128
 ++Firwall Manager
 -------------------------------------------------
+ AWS Network Firewall is account-specific by default and needs to be integrated with the 
+ AWS Firewall Manager to easily share the firewall across your other AWS accounts. 
+ In addition, refactoring the web application will require an immense amount of time.
+ 
 • Manage rules in all accounts of an AWS Organization
 • Security policy: common set of security rules
 	• WAF rules (Application Load Balancer, API Gateways, CloudFront)
@@ -9990,6 +10139,8 @@ Security products and features:
 140
 ##CIDR
 -------------------------------------------------
+The /32 denotes one IP address and the /0 refers to the entire network.
+
 The allowed block size is between  /16 netmask to /28 netmask.
 The CIDR block must not overlap with any existing CIDR block that's associated with the VPC.
 The CIDR block must not be the same or larger than a destination CIDR range in a route in any of the VPC route tables. 
@@ -10038,6 +10189,8 @@ All the rest of the IP addresses on the Internet are Public
 142
 ##Subnet
 -------------------------------------------------
+A subnet is a range of IP addresses in your VPC.
+
 A subnet is a range of IP addresses in your VPC. A subnet must reside in a single Availability Zone. 
 After you add subnets, you can deploy AWS resources in your VPC.
 
@@ -10548,6 +10701,25 @@ Gateway or Interface Endpoint for S3?
 
 
 
+• Use Gateway Endpoint if the AWS service is either DynamoDB or S3, VPC level 
+   and specify a route in the route table in subnet.
+   Must be inside the VPC to use.
+   Can use an IAM policies or resource policies to restrict access.
+  
+• Use Interface Endpoint for everything else, Subnet level required ip and SecurirtyGroup.
+   Available to be used outside of the VPC with VPN, Direct Connect, or VPC peering
+   Can use an IAM policies or resource policies to restrict access
+
+
+A Gateway Load Balancer endpoint is a VPC endpoint that provides private connectivity 
+between virtual appliances in the service provider VPC and application servers in the service consumer VPC. 
+You deploy the Gateway Load Balancer in the same VPC as the virtual appliances.
+
+	Enables you to intercept traffic and route .
+	Security groups and endpoint policies are not supported.
+	Endpoints support IPv4 traffic only.
+
+
 Lambda in VPC accessing DynamoDB:
 • DynamoDB is a public service from AWS
 • Option 1: Access from the public internet
@@ -10850,6 +11022,8 @@ using similar protocols like SSL, HTTPs and SSH.
 154
 ##Transit  Gateway 
 -------------------------------------------------
+It acts as a cloud router that allows you to integrate multiple networks.
+ 
 Transit Gateway is a Regional resource and can connect thousands of VPCs within the same AWS Region. 
 You can create multiple Transit Gateway instances per Region, and you can 
 connect to a maximum of three Transit Gateway instances over a single Direct Connect connection for hybrid connectivity.
@@ -11113,6 +11287,9 @@ Network Firewall – Fine Grained Controls:
   capabilities (like Gateway Load Balancer, but all managed by AWS)
 • Send logs of rule matches to Amazon S3, CloudWatch Logs, Kinesis Data Firehose
 
+AWS Network Firewall’s stateful firewall can incorporate context from traffic flows, 
+like tracking connections and protocol identification, to enforce policies such as preventing 
+your VPCs from accessing domains using an unauthorized protocol.
 
 
 
@@ -11663,6 +11840,8 @@ It is a aws managed service, security is a shared responsibility.
 167
 ##Blocking and IP address
 -------------------------------------------------
+Network ACL if it allows communication between the two subnets.
+
 To allow or block specific IP addresses for your EC2 instances, use a network Access Control List (ACL) 
 or security group rules in your VPC. 
 Network ACLs and security group rules act as firewalls allowing or blocking 
@@ -12511,6 +12690,7 @@ With AD, you can use Group Policies to manage EC2 instances and run AD-dependent
 AWS Cloud without the need to deploy your own AD infrastructure
 
 
+AWS Directory Service provides multiple directory choices for customers who want to use existing Microsoft AD or Lightweight Directory Access Protocol (LDAP)–aware applications in the cloud. It also offers those same choices to developers who need a directory to manage users, groups, devices, and access.
 	
 	
 	
@@ -12574,6 +12754,9 @@ VPC Subnets:
 	• Anything deployed in the VPC can talk to other resources in the VPC
 	• Applications are accessed easily across accounts, using private IP!
 	• Security groups from other accounts can be referenced for maximum security.
+
+
+AWS Resource Access Manager (RAM) is a service that enables you to easily and securely share AWS resources with any AWS account or within your AWS Organization. You can share AWS Transit Gateways, Subnets, AWS License Manager configurations, and Amazon Route 53 Resolver rules resources with RAM.
 
 
 
@@ -16340,6 +16523,10 @@ Customer Gateway (CGW)
 
 Site-to-Site VPN Connections:
 ----------------------------------------------
+To create a VPN connection, you must create a customer gateway resource in AWS, which provides information to AWS about your customer gateway device. Next, you have to set up an Internet-routable IP address (static) of the customer gateway’s external interface.
+don’t need a NAT instance for you to be able to create a VPN connection.
+
+
 Customer Gateway Device (On-premises)
 • What IP address to use?
 	• Public Internet-routable IP address for your Customer Gateway device
