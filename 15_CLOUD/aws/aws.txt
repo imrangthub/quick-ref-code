@@ -46,19 +46,6 @@ Use AWS Network Firewall to set up the required rules for traffic inspection and
  
 ConfusingTakeaLook
 ------------------
-Secrets Manager, AWS Systems Manager Parameter Store SecureString 
- 5 GB of ephemeral storage.
- 
-change data capture (CDC)
-
-
-AWS Amplify
-Lambda@Edge to run custom code closer to customers.
-
-• Amazon S3 automatically scales to high request rates, latency 100-200 ms
-• Your application can achieve at least 3,500 PUT/COPY/POST/DELETE and
-  5,500 GET/HEAD requests per second per prefix in a bucket
-
 
 IAM->AccNot->UserYes
 ACL-AccYes->UserNot
@@ -1223,17 +1210,102 @@ Simply point to your data in Amazon S3, define the schema, and start querying us
 Amazon Redshift also includes Redshift Spectrum, allowing you to directly run SQL queries against exabytes of unstructured data in Amazon S3. No loading or transformation is required, and you can use open data formats, including Avro, CSV, Grok, ORC, Parquet, RCFile, RegexSerDe, SequenceFile, TextFile, and TSV.
 
 
+Redshift disaster recovery:
+Enable Cross-Region Snapshots Copy in your Amazon Redshift Cluster.
+automated snapshots is not enough and will not be available in case the entire AWS region is down.
+You can configure Amazon Redshift to copy snapshots for a cluster to another region. To configure cross-region snapshot copy, you need to enable this copy feature for each cluster and configure where to copy snapshots and how long to keep copied automated snapshots in the destination region. When a cross-region copy is enabled for a cluster, all new manual and automatic snapshots are copied to the specified region.
 
 
 
+high I/O performance for the temporary files:
+Configure RAID 0 in multiple instance store volumes.
+RAID 1 configuration is used for data mirroring. You need to configure RAID 0 to improve the performance of your storage volumes.
+
+
+Create an S3 bucket policy that denies permissions to upload an object unless the request includes the s3:x-amz-server-side-encryption": "AES256" header. Enable server-side encryption with Amazon S3-managed encryption keys (SSE-S3) and rely on the built-in key rotation feature of the SSE-S3 encryption keys.
+
+deactivating and deleting any IAM user access key that is over 90 days old:
+Amazon EventBridge cannot directly check for IAM events that show the age of IAM access keys.
+Use the AWS Config managed rule to check if the IAM user access keys are not rotated within 90 days. Create an Amazon EventBridge (Amazon CloudWatch Events) rule for the non-compliant keys, and define a target to invoke a custom Lambda function to deactivate and delete the keys.
 
 
 
+AWS Health provides ongoing visibility into your resource performance and the availability of your AWS services and accounts. You can use AWS Health events to learn how service and resource changes might affect your applications running on AWS. AWS Health provides relevant and timely information to help you manage events in progress. AWS Health also helps you be aware of and to prepare for planned activities.
+Amazon EventBridge to detect and react to AWS Health events. Then, based on the rules that you create, EventBridge invokes one or more target actions 
+Your account Healt/events page shows all events from the past 90 days.
+AWS Service Health Dashboard shows public events that may affect several customers in particular regions. It doesn’t show events related to specific EC2 instances on individual AWS accounts.
+
+Use Amazon Textract to extract the text from the PDF reports. Integrate Amazon Comprehend Medical with the existing Lambda function to identify the PHI from the extracted text.
+The PII (Personally Identifiable Information) redaction feature of the Amazon Textract Medical service is not enough to identify all the Protected Health Information (PHI) in the PDF reports. Take note that PII is quite different from PHI.
 
 
 
+Max IOPS for volume is 10 GiB (50:1):Set the IOPS to 500 then maintain a low queue length.
+
+An io1 volume can range in size from 4 GiB to 16 TiB. You can provision from 100 IOPS up to 64,000 IOPS per volume on Nitro system instance families and up to 32,000 on other instance families. The maximum ratio of provisioned IOPS to the requested volume size (in GiB) is 50:1.
+For example, a 100 GiB volume can be provisioned with up to 5,000 IOPS. On a supported instance type, any volume 1,280 GiB in size or greater allows provisioning up to the 64,000 IOPS maximum (50 × 1,280 GiB = 64,000).
+
+The volume queue length is the number of pending I/O requests for a device.
 
 
+
+Multi-attach feature can only be enabled on EBS Provisioned IOPS io2 or io1 volumes. 
+In addition, multi-attach won’t offer multi-az resiliency because this feature only allows an EBS volume to be attached on multiple instances within an availability zone.
+
+Amazon EBS provides three volume types to best meet the needs of your workloads: General Purpose (SSD), Provisioned IOPS (SSD), and Magnetic.
+
+
+Configure AWS Config to trigger an evaluation that will check the compliance for a user’s password periodically.
+
+
+track and log every request access to their S3 buckets including the requester, bucket name, request time, request action, referrer, turnaround time, and error code information:
+Enable server access logging for all required Amazon S3 buckets.
+
+AWS CloudTrail logs provide a record of actions taken by a user, role, or an AWS service in Amazon S3, while Amazon S3 server access logs provide detailed records for the requests that are made to an S3 bucket.
+AWS CloudTrail alone won’t give detailed logging information for object-level access.
+
+
+
+migrate all of its VM workloads to the AWS cloud:
+Install the AWS Replication Agent on each of the on-premises VMs to continuously replicate the servers to AWS. Use AWS Migration Service (AWS MGN) to launch test instances and perform cutover once testing is completed.
+AWS MGN is the primary migration service recommended for lift-and-shift migrations to AWS.
+
+The AWS Application Discovery Service is primarily used to track the migration status, This service is not capable of doing the actual migration.
+
+
+
+Enhanced Monitoring metrics are useful when you want to see how different processes or threads on a DB instance use the CPU.
+Amazon RDS provides metrics in real-time for the operating system (OS) that your DB instance runs on. You can view the metrics for your DB instance using the console or consume the Enhanced Monitoring JSON output
+
+RDS, the Enhanced Monitoring metrics shown in the Process List:
+RDS child processes,RDS processes,OS processes.
+
+
+
+Where can you safely import the SSL/TLS certificate of your application?
+IAM certificate store, AWS Certificate Manager.
+If you got your certificate from a third-party CA, import the certificate into ACM or upload it to the IAM certificate store.
+
+ACM lets you import third-party certificates from the ACM console, as well as programmatically. If ACM is not available in your region, use AWS CLI to upload your third-party certificate to the IAM certificate store.
+
+envelope encryption, Encryption with AWS KMS-Managed Keys (SSE-KMS).
+
+Customer-Provided Keys (SSE-C),Amazon S3-Managed Keys (SSE-S3): these two do not provide you 
+with an audit trail that shows when your CMK was used and by whom, unlike Server-Side Encryption 
+with AWS KMS-Managed Keys (SSE-KMS).
+
+
+
+two AWS services for issuing and deploying X.509 certificates:>
+
+ACM Private CA—
+Certificates issued by a private CA are trusted only within your organization, not on the internet.
+With ACM Private CA, you can create your own CA hierarchy and issue certificates with it for authenticating internal users, computers, applications, services, servers, and other devices and for signing computer code.
+
+AWS Certificate Manager (ACM) — (public certificates )This service manages certificates for enterprise customers who need a publicly trusted secure web presence using TLS. You can deploy ACM certificates into AWS Elastic Load Balancing, Amazon CloudFront, Amazon API Gateway, and other integrated services. 
+AWS Certificate Manager (ACM), you can import certificates that you obtained outside of AWS.
+AWS Certificate Manager (ACM), you can import certificates that you obtained outside of AWS
+Multiple certificates with the same domain name can be imported, but they must be imported one at a time.
 
 
 
