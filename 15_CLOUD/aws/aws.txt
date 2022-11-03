@@ -46,6 +46,11 @@ Use AWS Network Firewall to set up the required rules for traffic inspection and
  
 ConfusingTakeaLook
 ------------------
+	VPC Peering can now span inter-region
+	Auto Scaling – Regional
+	
+	
+	
 Auto Scaling termination policy and no instance protection configured.
 
 
@@ -391,15 +396,16 @@ Network and Content Delivery
 	Route53 - Fast DNS service
 	AWS PrivateLink - Connect your on-prem network to AWS
 	AWS App Mesh - Monitor, control, and debug the communications between services.
-	AWS CloudMap - Resource discovery for app usage
-	AWS Direct Connect - Fast connection from your equipment to AWS
+	AWS CloudMap - Resource discovery (can define custom names for your application resources,) 
+	               Implementing lightweight on-premises API connectivity using inverting traffic proxy.
+	AWS Direct Connect - Links your network directly to AWS to deliver consistent, low-latency performance.
 	Global Accellerator - App traffic routing over the AWS network
 	AWS Transit Gateway - Centralised VPC and on prem connectivity
 	Elastic Load Balancing - Service to evenly distribute network traffic
 AWS Storage
 	S3 - Object storage service
 	EBS - Elastic Block Store, Persistent block
-	EFS - Serverless Elastic File System
+	EFS - Serverless Elastic File System(Only for Linux)
 	FSx for Lustre - High performance file storage using Lustre
 	FSx for Windows File System - AWS Windows file system
 	S3 Glacier - Durable low cost archival storage
@@ -408,12 +414,12 @@ AWS Storage
 	AWS Storage Gateway - Hybrid on prem AWS storage 
 	CloudEndure - Disaster recovery service 
 Analytics Service
-	Athena - Serverless Query S3 using SQL
+	Athena - Serverless SQL Query in S3.
 	CloudSearch - Search Solution for Websites and Apps
-	Elastic Search - Deploy and run ElasticSearch
-	EMR - Big Data Platform and Analysis
-	Kenesis - Real time streaming data capture and analysis
-	Redshift - Data Warehouse Service
+	ElasticSearch - Deploy and run ElasticSearch, commonly used for log analytics.
+	EMR(Elastic MapReduce) - Big Data Platform and Analysis, big data frameworks.
+	Kenesis - Real-time streaming data capture and analysis
+	Redshift - Data Warehouse Service (gigabytes to a petabyte)uses SQL to analyze structured and semi-structured.
 	QuickSight - Serverless ML BI Dashboards
 	Data Exchange - Subscribe to 3rd Party Data Sets
 	Data Pipeline - Transfer and process data
@@ -421,7 +427,8 @@ Analytics Service
 	AWS Lake Formation - Set up Data Lakes quickly
 Application Integration Services
 	Step Functions - Serverless Function Orchestration
-	AppFlow - Integrate 3rd party app data
+	AppFlow - Integrate 3rd party app data,  securely transfer data between SaaS applications like 
+	          Salesforce, SAP, Zendesk, Slack, and ServiceNow, and AWS services like Amazon S3 and  Redshift.
 	EventBridge - Serverless Event Bus
 	MQ - Message Broker Service for Apache/Rabbit MQ
 	SNS - Simple Notification Messaging System
@@ -442,8 +449,8 @@ BlockChain
 =================================================
 #DataTransfer
 ================================================= 
-One AWS account that want to communicate(or use) the resources in another account which can be achieved by:
-	Cross-Account Assume Role
+One AWS account(or use) that want to communicate the resources in another account which can be achieved by:
+	Cross-Account AssumeRole
 	VPC Peering
 	Resource Access Manager
 	VPC endpoint service
@@ -478,11 +485,9 @@ AWS Direct Connec:
 	AWS Direct Connect links your office or data center to AWS via fiber. It's for high-speed, 
 	permanent connectivity to the Cloud.
 
-AWS Direct Connect links your internal network to an AWS Direct Connect location over a standard 
-Ethernet fiber-optic cable. One end of the cable is connected to your router, the other to an 
-AWS Direct Connect router. With this connection, you can create virtual interfaces directly to 
-public AWS services (for example, to Amazon S3) or to Amazon VPC, bypassing internet service 
-providers in your network path.
+One end of the cable is connected to your router, the other to an AWS Direct Connect router. 
+With this connection, you can create virtual interfaces directly to 
+public AWS services S3 or to Amazon VPC, bypassing internet service providers in your network path.
 
 
 AWS Site-to-Site VPN:
@@ -491,16 +496,12 @@ AWS Site-to-Site VPN:
 	Internet fiber connection.
 
 A Site-to-Site VPN connection offers two VPN tunnels between a virtual private gateway or a 
-transit gateway on the AWS side, and a customer gateway (which represents a VPN device) on the 
-remote (on-premises) side	
+transit gateway on the AWS side, 
+and a customer gateway (which represents a VPN device) on the remote (on-premises) side.	
 
 IPSec communications to create encrypted VPN tunnels between two locations. 
 You cannot use AWS Site-to-Site VPN to integrate data files via the NFS interface.
 	
-	
-Take note that you cannot directly integrate the AWS Network Firewall with the Application Load Balancer.
-There is a straightforward way of integrating an AWS WAF with an ALB but not an AWS Network Firewall with an ALB.
-
 
 
 =================================================
@@ -510,7 +511,7 @@ There is a straightforward way of integrating an AWS WAF with an ALB but not an 
 	
 EFS:
 -------------------------------------------------
-Serverless Elastic File System.
+Serverless Elastic File System. for Linux Only.
 Amazon EFS, you pay only for the resources that you use. 
 The EFS Standard Storage pricing is $0.30 per GB per month. 
 
@@ -525,15 +526,16 @@ Provisioned storage of 100GB for this use-case, the monthly cost on EBS is $0.10
 
 S3:
 -------------------------------------------------
-S3 Standard storage, the pricing is $0.023 per GB per month.
+A serverless, S3 Standard storage, the pricing is $0.023 per GB per month.
 
 
 
 
 
 =================================================
-#Application | Environment | Status | Tips
+#Noteable | Example | Topis | Tips | VIP
 =================================================
+
 
 #Resilient:স্থিতিস্থাপক
 -------------------------------------------------
@@ -542,16 +544,19 @@ spikes in request rates.
 
 
 
+
 #Availability:প্রাপ্যতা, লভ্যতা
 -------------------------------------------------
-If you have workloads that cater to a global client base, AWS recommends that you use 
-Global Accelerator. 
+If you have workloads that global client base, AWS recommends that you use Global Accelerator. 
 
 If you have workloads hosted in a single AWS Region and used by clients in 
 and around the same Region, you can use an 
 Application Load Balancer or Network Load Balancer to manage your resources.
 
 
+
+Network Firewall cannot directly integrate with the Application Load Balancer.
+AWS WAF straightforward way of integrating with an ALB but not Network Firewall with an ALB.
 
 
 
@@ -563,38 +568,55 @@ Ensure that the database is eventually consistent and highly available:
 
 
 
-ALB prevent SQL injection attacks:
-	Use AWS WAF and set up a managed rule to block request patterns associated with the exploitation 
+How ALB prevent SQL injection attacks:
+	Use WAF and set up a managed rule to block request patterns associated with the exploitation 
 	of SQL databases, like SQL injection attacks. Associate it with the Application Load Balancer. 
 	Integrate AWS WAF with AWS Firewall Manager to reuse the rules across all the AWS accounts.
 
 
-Redshift cluster as their data warehouse region outage:
+AWS Network Firewall is a managed service that makes it easy to deploy essential 
+	network protections for all of your VPCs.
+
+Route 53 Resolver DNS Firewall can only filter and regulate outbound DNS traffic for your VPC.
+	It can neither do active traffic flow inspection nor block any vulnerability exploits.
+
+
+
+Redshift(SQL Big data analyse) cluster as their data warehouse region outage or down:
 	Enable Cross-Region Snapshots Copy in your Amazon Redshift Cluster.
 
 
 Convert audio recordings into text using Amazon Transcribe. 
 Set up Amazon Translate to translate Hindi texts into English and use Amazon Comprehend for sentiment analysis.
 
-Process both mission-critical data as well as non-essential batch jobs.:
+
+Process both mission-critical data and non-essential batch jobs:
 	Use ECS as the container management service then set up a combination of Reserved and 
 	Spot EC2 Instances for processing mission-critical and non-essential batch jobs respectively.
-   Scheduled Reserved Instances (Scheduled Instances).
+    Scheduled Reserved Instances (Scheduled Instances).
 
 
-S3 Select
-Amazon S3 Select is designed to help analyze and process data within an object in Amazon S3 buckets, faster and cheaper. It works by providing the ability to retrieve a subset of data from an object in Amazon S3 using simple SQL expressions.
+S3Select:
+	Amazon S3 Select is designed to help analyze and process data within an object in Amazon S3 buckets, 
+	faster and cheaper. 
+	It works by providing the ability to retrieve a subset of data from an object in S3 using SQL.
 
-Athena
-Amazon Athena is an interactive query service that makes it easy to analyze data in Amazon S3 using standard SQL expressions.
-Simply point to your data in Amazon S3, define the schema, and start querying using standard SQL expressions.
 
-Amazon Redshift Spectrum
-Amazon Redshift also includes Redshift Spectrum, allowing you to directly run SQL queries 
-against exabytes of unstructured data in Amazon S3. No loading or transformation is required, 
-and you can use open data formats, including Avro, CSV, Grok, ORC, Parquet, RCFile, RegexSerDe, 
-SequenceFile, TextFile, and TSV. Redshift Spectrum automatically scales query compute capacity 
-based on the data being retrieved, so queries against Amazon S3 run fast, regardless of data set size.
+Athena:
+	Amazon Athena is an interactive query service that makes it easy to analyze data in S3 using standard SQL.
+	Simply point to your data in Amazon S3, define the schema, and start querying using SQL expressions.
+
+
+
+Redshift Spectrum:
+	Amazon Redshift also includes Redshift Spectrum, allowing you to directly run SQL queries 
+	against exabytes of unstructured data in Amazon S3. 
+	No loading or transformation is required, 
+	and you can use open data formats, including Avro, CSV, Grok, ORC, Parquet, RCFile, RegexSerDe, 
+	SequenceFile, TextFile, and TSV. Redshift Spectrum automatically scales query compute capacity 
+	based on the data being retrieved, so queries against Amazon S3 run fast, regardless of data set size.
+
+
 
 S3 retrieve the required data in under 15 minutes under all circumstances 150 MB/s of retrieval throughput:
 	Use Expedited Retrieval to access the financial data.
@@ -607,8 +629,13 @@ using Expedited retrievals are typically made available within 1–5 minutes.
 Provisioned capacity ensures that your retrieval capacity for expedited retrievals 
 is available when you need it.
 
+Collect and process the application log files:
+Amazon S3 for storing the application log files and Amazon Elastic MapReduce for processing the log files.
 
-Fastest storage option with high I/O performance for the temporary files:
+
+
+
+Fastest storage option with high I/OPerformance for the temporary files:
 	Configure RAID 0 in multiple instance store volumes.
 
 RAID (Redundant Array of Independent Disks) is just a data storage virtualization technology 
@@ -617,60 +644,63 @@ that combines multiple storage devices to achieve higher performance or data dur
 RAID 0 configuration enables you to improve your storage volumes’ performance 
 by distributing the I/O across the volumes in a stripe. 
 	
-This configuration can be implemented on both EBS or instance store volumes. 
+This configuration can be implemented on both EBS or InstanceStore volumes. 
 
 RAID 1 configuration is used for data mirroring. 
 You need to configure RAID 0 to improve the performance of your storage volumes.
 
 
 
-You can attach the following resources to your transit gateway:
-	 – One or more VPCs.
+Following resources can be attach to your Transit Gateway:
+	– One or more VPCs.
 	– One or more VPN connections
 	– One or more AWS Direct Connect gateways
 	– One or more Transit Gateway Connect attachments
-	– One or more transit gateway peering connections
-AWS Network Firewall is a managed service that makes it easy to deploy essential 
-network protections for all of your VPCs.
+	– One or more Transit gateway peering connections
+	
 
- Route 53 Resolver DNS Firewall can only filter and regulate outbound DNS traffic for your 
- virtual private cloud (VPC). It can neither do active traffic flow inspection nor block any 
- vulnerability exploits.
+
  
- 
- 
- RDS if the primary database instance fails:
- The canonical name record (CNAME) is switched from the primary to standby instance.
- 
- 
- Collect and process the application log files:
-	Amazon S3 for storing the application log files and Amazon Elastic MapReduce for processing the log files.
- 
- For Single RDS security use SecurityGroup.
- Network ACL covers the entire subnet which means that other applications that use the same 
- subnet will also be affected.
- 
- 
- A Kinesis data stream stores records from 24 hours by default to a maximum of 8760 hours (365 days).
- 
- 
+RDS if the primary database instance fails:
+The canonical name record (CNAME) is switched from the primary to standby instance.
+
+
+
+For Single RDS security use SecurityGroup not Network ACL.
+	Network ACL covers the entire subnet which means that other applications that use the same 
+	subnet will also be affected.
+
+
+A Kinesis data stream stores records from 24 hours by default to a maximum of 8760 hours (365 days).
+
+
 ASG:
-With step scaling, you choose scaling metrics and threshold values for the CloudWatch alarms that 
-trigger the scaling process as well as define how your scalable target should be scaled when a 
-threshold is in breach for a specified number of evaluation periods. Step scaling policies 
-increase or decrease the current capacity of a scalable target based on a set of scaling adjustments, 
-known as step adjustments. 
+	With Step scaling, you choose scaling metrics and threshold values for the CloudWatch alarms that 
+	trigger the scaling process as well as define how your scalable target should be scaled when a 
+	threshold is in breach for a specified number of evaluation periods. Step scaling policies 
+	increase or decrease the current capacity of a scalable target based on a set of scaling adjustments, 
+	known as step adjustments. 
 
 
 CloudWatch:
-by default, CloudWatch doesn’t monitor memory usage but only the CPU utilization, Network utilization, Disk performance, and Disk Reads/Writes.
+	By default, CloudWatch doesn’t monitor memory usage but only the -
+	CPU utilization, Network utilization, Disk performance, and Disk Reads/Writes.
 
-Detailed monitoring does not provide metrics for memory usage,just provides a 
-higher frequency of metrics (1-minute frequency). 
+EC2 Detailed Monitoring does not provide metrics for memory usage,
+just provides a higher frequency of metrics (1-minute frequency). 
 
 
-Create an Amazon S3 bucket with encryption enabled. Launch an AWS Transfer for SFTP endpoint to securely upload files to the S3 bucket. Configure an S3 lifecycle rule to delete files after a month.
 
+
+AWS Transfer:
+	Create an Amazon S3 bucket with encryption enabled. 
+	Launch an AWS Transfer for SFTP endpoint to securely upload files to the S3 bucket. 
+	Configure an S3 lifecycle rule to delete files after a month.
+
+
+
+
+@@
 
 Storage optimized instances are designed for workloads that require high, sequential read and write access to very large data sets on local storage.
 Memory Optimized Instances is incorrect because these are designed to deliver fast performance for workloads that process large data sets in memory, which is quite different from handling high read and write capacity on local storage.
