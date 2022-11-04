@@ -49,6 +49,9 @@ ConfusingTakeaLook
 	VPC Peering can now span inter-region
 	Auto Scaling – Regional
 	
+AWS and On-Permiss Dedicated Conn (With multi AWS acc):
+	Create a new Direct Connect gateway and integrate it with the existing Direct Connect connection. 
+	Set up a Transit Gateway between AWS accounts and associate it with the Direct Connect gateway.
 	
 	
 Auto Scaling termination policy and no instance protection configured.
@@ -974,72 +977,94 @@ Amazon Kinesis Data Firehose is a fully managed service for delivering real-time
 Although it can stream data to an S3 bucket, it is not suitable to be used as a queue 
 for a batch application.
 
+Amazon Kinesis Data Firehose is the easiest way to load streaming data into data stores and analytics tools. 
+It can capture, transform, and load streaming data into Amazon S3, Amazon Redshift, Amazon Elasticsearch Service, 
+and Splunk, enabling near real-time analytics with existing business intelligence tools and dashboards you are already using today.
 
 
 Amazon Redshift:
-	Amazon Redshift is a fast( near real-time), scalable data warehouse that makes it simple and cost-effective to analyze all your data across your data warehouse and data lake. Redshift delivers ten times faster performance than other data warehouses by using machine learning, massively parallel query execution, and columnar storage on a high-performance disk.
+	Amazon Redshift is a fast( near real-time), scalable data warehouse that makes it simple and cost-effective 
+	to analyze all your data across your data warehouse and data lake. 
+	Redshift delivers ten times faster performance than other data warehouses by using machine learning, 
+	massively parallel query execution, and columnar storage on a high-performance disk.
 
 
+RealTime EC2 Log Processing:
+	Create a Kinesis Data Stream and use AWS Lambda to read records from the data stream.
+	
+	Kinesis Data Firehose  near RealTime.
+	Amazon Athena and Amazon Redshift(Analytics / BI / Data Warehouse) not RealTime processing.
+	
+	
 
 RDS Mysql: increase the disk space without impacting:
-Modify the DB instance settings and enable storage autoscaling.
-RDS Storage Auto Scaling automatically scales storage capacity in response to growing database workloads, with zero downtime.
+	Modify the DB instance settings and enable storage autoscaling.
+	RDS Storage Auto Scaling automatically scales storage capacity in response to growing database workloads, with zero downtime.
 
 For Modify the DB instance settings and enable storage autoscaling.
 aS Result: increasing the allocated storage might cause performance degradation during the change.
 
 
 
-ELB LogProcessing:
-Amazon S3 for storing ELB log files and Amazon EMR for analyzing the log files.
-You can also run other popular distributed frameworks such as Apache Spark, HBase, Presto, and Flink in Amazon EMR, and interact with data in other AWS data stores such as Amazon S3 and Amazon DynamoDB.
+ELB LogProcessing with EMR:
+	Amazon S3 for storing ELB log files and Amazon EMR for analyzing the log files.
+	You can also run other popular distributed frameworks such as Apache Spark, HBase, Presto, and Flink in Amazon EMR, 
+	and interact with data in other AWS data stores such as Amazon S3 and Amazon DynamoDB.
 
 
-The “trust relationship” policy simply defines which principals can assume the IAM Role and under which conditions.
+
+The “Trust Relationship” policy simply defines which Principals can Assume the IAM Role and under which conditions.
 
 
-RealTime EC2 Log Processing:
-Create a Kinesis Data Stream and use AWS Lambda to read records from the data stream.
-Kinesis Data Firehose  near RealTime.
-Amazon Athena and Amazon Redshift not RealTime processing.
+
 
 
 Error:EC2ThrottledException:
-Your Lambda function automatically scales based on the number of events it processes. If your Lambda function accesses a VPC, you must make sure that your VPC has sufficient ENI capacity to support the scale requirements of your Lambda function. 
+	Your Lambda function automatically scales based on the number of events it processes. 
+	If your Lambda function accesses a VPC, you must make sure that your VPC has sufficient ENI capacity 
+	to support the scale requirements of your Lambda function. 
 
-
-Amazon Kinesis Data Firehose is the easiest way to load streaming data into data stores and analytics tools. It can capture, transform, and load streaming data into Amazon S3, Amazon Redshift, Amazon Elasticsearch Service, and Splunk, enabling near real-time analytics with existing business intelligence tools and dashboards you are already using today.
-
-
-Aurora  Backup:
-Create an AWS Backup plan to take daily snapshots with a retention period of 90 days.
-Maximum backup retention period for automated backup is only 35 days.
 
 
 Route53:
-You can use Route 53 health checking to configure active-active and active-passive failover configurations. 
+	You can use Route 53 health checking to configure active-active and active-passive failover configurations. 
+
+
 
 Active-Active Failover:
-In active-active failover, all the records that have the same name, the same type (such as A or AAAA), and the same routing policy (such as weighted or latency) are active unless Route 53 considers them unhealthy. Route 53 can respond to a DNS query using any healthy record.
-Active-Active Failover no parimary or secondary resource.
-
+	In active-active failover, all the records that have the same name, the same type (such as A or AAAA), and the same routing policy 
+	(such as weighted or latency) are active unless Route 53 considers them unhealthy. 
+	Route 53 can respond to a DNS query using any healthy record.
+	Active-Active Failover no parimary or secondary resource.
 
 Active-Passive Failover:
-Use an active-passive failover configuration when you want a primary resource or group of resources to be available the majority of the time and you want a secondary resource or group of resources to be on standby in case all the primary resources become unavailable.
+	Use an active-passive failover configuration when you want a primary resource or group of resources to be available 
+	the majority of the time and you want a secondary resource or group of resources to be on standby in case all the 
+	primary resources become unavailable.
 
 
-Aurora Instance class to Serverless:
-Use AWS Database Migration Service (AWS DMS) to migrate to a new Aurora Serverless database.
-You can set up a DMS task for either one-time migration or ongoing replication.
+
+
+
+
+Aurora  Backup:
+	Create an AWS Backup plan to take daily snapshots with a retention period of 90 days.
+	Maximum backup retention period for automated backup is only 35 days.
+
+
+
+Aurora Instance class to Aurora Serverless:
+	Use AWS Database Migration Service (AWS DMS) to migrate to a new Aurora Serverless database.
+	You can set up a DMS task for either one-time migration or ongoing replication.
+
 
 
 
 AWS and On-Permiss Dedicated Conn (With multi AWS acc):
-Create a new Direct Connect gateway and integrate it with the existing Direct Connect connection. 
-Set up a Transit Gateway between AWS accounts and associate it with the Direct Connect gateway.
+	Create a new Direct Connect gateway and integrate it with the existing Direct Connect connection. 
+	Set up a Transit Gateway between AWS accounts and associate it with the Direct Connect gateway.
 
-VPC peering is not supported in a Direct Connect connection. VPC peering does not support 
-transitive peering relationships.
+VPC peering is not supported in a Direct Connect connection. VPC peering does not support transitive peering relationships.
  
 VPN connection traverses the public Internet and doesn’t use a dedicated connection.
 
@@ -1051,18 +1076,19 @@ CloudFront Origin Access Identity (OAI) a feature ensures that  CloudFront can s
  
  
 
+By default Network ACLs allow all inbound and outbound traffic.
+By default Security group includes an outbound rule that allows all outbound traffic, no inbound rules. 
 
-By default, Network ACLs allow all inbound and outbound traffic.
-Default Security group includes an outbound rule that allows all outbound traffic, no inbound rules. 
-Therefore, no inbound traffic is allowed until you add inbound rules to the security group.
- 
 
- Kinesis Data Streams:collect and process large streams of data records in real-time.
- The producers continually push data to Kinesis Data Streams, and the consumers process the data in real-time. 
- Consumers (such as a custom application running on Amazon EC2 or an 
- Amazon Kinesis Data Firehose delivery stream) can store their results using an AWS service 
- such as Amazon DynamoDB, Amazon Redshift, or Amazon S3.
- 
+
+
+Kinesis Data Streams:
+	Collect and process large streams of data records in real-time.
+	The producers continually push data to Kinesis Data Streams, and the consumers process the data in real-time. 
+	Consumers (such as a custom application running on Amazon EC2 or an Amazon Kinesis Data Firehose delivery stream) 
+	can store their results using an AWS service such as  DynamoDB,  Redshift,  S3.
+
+
  
 AWS Data Exchange is a data marketplace service. 
  
@@ -1071,117 +1097,163 @@ AWS Data Exchange is a data marketplace service.
  
 Need to use a service that can store and retrieve objects through 
 standard file storage protocols for quick recovery:
-  Use the AWS Storage Gateway file gateway to store all the backup data in Amazon S3.
-  You cannot directly access the volume gateway using Amazon S3 APIs.
- 
- 
+	  Use the AWS Storage Gateway file gateway to store all the backup data in Amazon S3.
+	  You cannot directly access the volume gateway using Amazon S3 APIs.
+	 
+	 
+	 
+S3:
+	Access S3 buckets file using an S3 URL or through their CloudFront distribution:
+	A better solution is to set up an origin access identity (OAI) then use Signed URL or Signed Cookies 
+	in your CloudFront web distribution for Restrict access file.
 
-Access S3 buckets file using an S3 URL or through their CloudFront distribution:
-A better solution is to set up an origin access identity (OAI) then use Signed URL or Signed Cookies 
-in your CloudFront web distribution for Restrict access file.
 
-
-S3 supports the following destinations where it can publish events:
-1. SNS topic
-2. SQS queue
-3. AWS Lambda
+S3 supports 3 destinations where it can publish events:
+	1. SNS topic
+	2. SQS queue
+	3. AWS Lambda
 
 S3 does public event messages to Amazon MQ. You should use an Amazon SQS instead.
 
 
+
+
 Retrieve a subset of data from a large CSV file stored in an S3: 
- Perform an S3 Select operation based on the bucket's name and object's key.
- 
+	Perform an S3 Select operation based on the bucket's name and object's key.
+	
 Metadata is not needed when querying subsets of data in an object using S3 Select. 
-Tags just provide additional information to your object. 
- This is not needed when querying with S3 Select although this can be useful for S3 Batch Operations. 
+Tags just provide additional information to your object, not needed when querying with S3 Select although this can be useful 
+for S3 Batch Operations. 
  
-
-Cross-account Permissions to copy objects from a source bucket in Account A to a destination bucket in Account B:
-
-– Attach a bucket policy to the source bucket in Account A.
-– Attach an AWS Identity and Access Management (IAM) policy to a user or role in Account B.
-– Use the IAM user or role in Account B to perform the cross-account copy.
  
+ 
+S3 Cross-account Permissions to copy objects from a source bucket in Account A to a destination bucket in Account B:
+	– Attach a bucket policy to the source bucket in Account A.
+	– Attach an AWS Identity and Access Management (IAM) policy to a user or role in Account B.
+	– Use the IAM user or role in Account B to perform the cross-account copy.
+	 
+	 
  
 Aurora DB cluster:
-A reader endpoint for an Aurora DB cluster provides load-balancing support for read-only 
-connections to the DB cluster.
-Cluster endpoint (also known as a writer endpoint) simply connects to the current primary DB 
-instance for that DB cluster.
+	A reader endpoint for an Aurora DB cluster provides load-balancing support for read-only connections to the DB cluster.
+	Cluster endpoint (also known as a writer endpoint) simply connects to the current primary DB instance for that DB cluster.
 
 
-Kinesis stream Retation periond:
-A Kinesis data stream stores records from 24 hours by default to a maximum of 8760 hours (365 days).
+
+Kinesis stream Retation periond(1 to 365):
+	A Kinesis data stream stores records from 24 hours (1 day ) by default to a maximum of 8760 hours (365 days).
+ 
  
  
 By default, Fargate tasks are given a minimum of 20 GiB of free ephemeral storage, 
-which meets the storage requirement in the scenario.
+	which meets the storage requirement in the scenario.
 
 
-You pay an hourly rate for every provisioned Interface endpoint.
-AWS Transit Gatewa: VPCs and on-premises networks through a central hub
+
+Interface endpoint vs Transit Gatewa:
+	You pay an hourly rate for every provisioned Interface endpoint.
+	AWS Transit Gatewa: VPCs and on-premises networks through a central hub.
+
+
 
 
 RDS read-replica:
-It elastically scales out beyond the capacity constraints of a single DB instance for read-heavy database workloads.
-Replicas provide an asynchronous type of replication and not synchronous replication.
-You can also create read replicas within a Region or between Regions.
+	RDS Replicas asynchronous replication and create read replicas within a Region or between Regions.
 
 
 
-All AWS resources be tagged with a standard naming convention:
-Use an AWS Config rule to detect non-compliant tags.
- 
 
-S3Retrival:15 minutes under all circumstances:
-if you require access to Expedited retrievals under all circumstances, you must purchase provisioned retrieval capacity.
+Tags:
+	All AWS resources be tagged with a standard naming convention:
+	Use an AWS Config rule to detect non-compliant tags.
+	 
+
+
+
+S3 Retrival within 15 minutes under all circumstances:
+	If you require access to Expedited retrievals under all circumstances, you must purchase provisioned retrieval capacity.
+
+
 
 
 ALB SSL MultipleCertificate:
-Upload all SSL certificates of the domains in the ALB using the console and bind multiple certificates to the same secure listener on your load balancer. ALB will automatically choose the optimal TLS certificate for each client using Server Name Indication (SNI).
+	Upload all SSL certificates of the domains in the ALB using the console and bind multiple certificates to the 
+	same secure listener on your load balancer. 
+	ALB will automatically choose the optimal TLS certificate for each client using Server Name Indication (SNI).
 
 Wildcard certificate can only handle multiple sub-domains but not different domains.
  
 
-S3 decrypted by the Lambda function:
-Attach the kms:decrypt permission to the Lambda function’s execution role. Add a statement to the AWS KMS key’s policy that grants the function’s execution role the kms:decrypt permission.
 
 
-The /32 denotes one IP address, and the /0 refers to the entire network
+S3 decrypted by the Lambda function call:
+	Attach the kms:decrypt permission to the Lambda function’s execution role. 
+	Add a statement to the AWS KMS key’s policy that grants the function’s execution role the kms:decrypt permission.
 
 
-AWS DataSync does not work with Amazon EBS volumes. 
-DataSync can copy data between Network File System (NFS) shares, Server Message Block (SMB) shares, self-managed object storage, AWS Snowcone, Amazon Simple Storage Service (Amazon S3) buckets, Amazon Elastic File System (Amazon EFS) file systems, and Amazon FSx for Windows File Server file systems.
+
+The /32 denotes one IP address, and the /0 refers to the entire network.
+
+
+
+AWS DataSync(moving data between on-premises and AWS storage services like S3,EFS):
+	AWS DataSync does not work with Amazon EBS volumes.
+	DataSync can copy data between Network File System (NFS) shares, Server Message Block (SMB) shares, self-managed object storage,
+	AWS Snowcone, S3 buckets,Amazon EFS file systems, and Amazon FSx for Windows File Server file systems.
+
+ 
 
 
 CloudFormation template:
-Needs to ensure that the required components are properly running before the stack creation proceeds:
-Configure a CreationPolicy attribute to the instance in the CloudFormation template. 
-Send a success signal after the applications are installed and configured using the cfn-signal helper script.
+	Needs to ensure that the required components are properly running before the stack creation proceeds:
+	Configure a CreationPolicy attribute to the instance in the CloudFormation template. 
+	Send a success signal after the applications are installed and configured using the cfn-signal helper script.
 
-UpdatePolicy attribute is primarily used for updating resources and for stack update rollback operations.
-UpdateReplacePolicy attribute is primarily used to retain or in some cases, back up the existing physical instance of a resource when it is replaced during a stack update operation.
+	UpdatePolicy attribute is primarily used for updating resources and for stack update rollback operations.
+	
+	UpdateReplacePolicy attribute is primarily used to retain or in some cases, back up the existing physical instance 
+	of a resource when it is replaced during a stack update operation.
+
 
 
 Avoid losing recently submitted requests:
-Use an Amazon SQS queue to decouple the application components and scale-out the EC2 instances based upon the ApproximateNumberOfMessages metric in Amazon CloudWatch.
+	Use an Amazon SQS queue to decouple the application components and scale-out the EC2 instances based upon the 
+	ApproximateNumberOfMessages metric in Amazon CloudWatch.
 
 
-Launch an IAM Group for each department. Create an IAM Policy that enforces MFA authentication with the least privilege permission. Attach the IAM Policy to each IAM Group.
+
+Launch an IAM Group for each department. 
+Create an IAM Policy that enforces MFA authentication with the least privilege permission. 
+Attach the IAM Policy to each IAM Group.
+
+
 
 
 SCP:
-SCP can only be attached to the organization root, to an organizational unit (OU), or directly to an account, 
-but not directly in the IAM User. 
+	SCP can only be attached to the organization root, to an organizational unit (OU), or directly to an account, 
+	but not directly in the IAM User. 
 
-IAM role Cannot directly associate with IAM user.
+	IAM role Cannot directly associate with IAM user.
+	
+You cannot attach Roles to Users and Groups, only Policies.
+
+IAM User     = Single Account with credentials for login, e.g. JohnDoe
+IAM Role     = Single Account without credentials, created for AWS Resources to "Assume".
+IAM Group    = A collection of IAM Users.
+
+IAM Policy   = Resource Access Rules.
+Policies are added to Users, Roles, or Groups, to give them the permissions specified in the policy.
 
 
 
-Store encrypted parameters on Secrets Manager there is a cost associated with using this service. 
-If you are storing mostly application parameters, then the Systems Manager Parameter Store is a better fit
-with (AWS KMS) for the encryption.
+
+Secrets Manager Parameter vs Systems Manager Parameter:
+	Secrets Manager there is a cost associated with using Store encrypted parameters. 
+	If you are storing mostly application parameters, then the Systems Manager Parameter Store is a better fit
+	with (AWS KMS) for the encryption.
+
+
+
 
 
 You can’t have an Amazon S3 managed encryption key for client-side encryption.
@@ -1189,39 +1261,57 @@ You can’t have an Amazon S3 managed encryption key for client-side encryption.
 – Set up Client-Side Encryption using a client-side master key.
 
 
+
+
 Below are the valid EC2 lifecycle instance states:
-	pending – The instance is preparing to enter the running state. An instance enters the pending state when it launches for the first time, or when it is restarted after being in the stopped state.
+	pending – The instance is preparing to enter the running state. 
+		An instance enters the pending state when it launches for the first time, or when it is restarted after being in the stopped state.
 	running – The instance is running and ready for use.
-	stopping – The instance is preparing to be stopped. Take note that you will not billed if it is preparing to stop however, you will still be billed if it is just preparing to hibernate.
+	stopping – The instance is preparing to be stopped. 
+		Take note that you will not billed if it is preparing to stop however, you will still be billed if it is just preparing to hibernate.
 	stopped – The instance is shut down and cannot be used. The instance can be restarted at any time.
 	shutting-down – The instance is preparing to be terminated.
-	terminated – The instance has been permanently deleted and cannot be restarted. Take note that Reserved Instances that applied to terminated instances are still billed until the end of their term according to their payment option.
+	terminated – The instance has been permanently deleted and cannot be restarted. 
+		Take note that Reserved Instances that applied to terminated instances are still billed until the 
+		end of their term according to their payment option.
 
 
 
-Allowed block size in VPC is between a /16 netmask (65,536 IP addresses) and /28 netmask (16 IP addresses)
+VPC IP address allowed block(16-28) size in is between a /16 netmask (65,536 IP addresses) and /28 netmask (16 IP addresses)
 
 
-Ec2Faster Boot:
-Migrate the application to an EC2 instance with hibernation enabled.
-Enable the hibernation mode on the EC2 instance is incorrect. It is not possible to enable or disable hibernation for an instance after it has been launched.
+
+
+EC2Faster Boot:
+	Migrate the application EC2 instance to an EC2 instance with hibernation enabled.
+
+Enable the hibernation mode on the EC2 instance is incorrect. 
+It is not possible to enable or disable hibernation for an instance after it has been launched.
+
 
 
 50TB data transfer from on permiss:
-Request an Import Job to Amazon S3 using a Snowball device in the AWS Snowball Console.
+	Request an Import Job to Amazon S3 using a Snowball device in the AWS Snowball Console.
 
 
 
 
 GlobalRealTimeDataProcessing:
-Integrate CloudFront with Lambda@Edge in order to process the data in close geographical proximity to users and respond to user requests at low latencies. Process real-time streaming data using Kinesis and durably store the results to an Amazon S3 bucket.
- CloudFront web distribution and Route 53 with a Geoproximity routing only not process date.
- 
-By using Lambda@Edge and Kinesis together, you can process real-time streaming data so that you can track and analyze globally-distributed user activity on your website and mobile applications, including clickstream analysis.
+	Integrate CloudFront with Lambda@Edge in order to process the data in close geographical proximity to users 
+	and respond to user requests at low latencies. 
+	Process real-time streaming data using Kinesis and durably store the results to an Amazon S3 bucket.
+
+CloudFront and Route 53 just do Geoproximity routing only not process date.
+	By using Lambda@Edge and Kinesis together, you can process real-time streaming data so that you can track and analyze 
+	globally-distributed user activity on your website and mobile applications, including clickstream analysis.
 
 
 By using a Curl or Get Command to get the latest metadata information from http://169.254.169.254/latest/meta-data/
 Like PrivatePublicIp
+
+
+
+
 
 Storage optimized instances:
 A storage optimized instance is designed for workloads that require high, sequential read and write access to very large data sets on local storage. They are optimized to deliver tens of thousands of low-latency, random I/O operations per second (IOPS) to applications. 
