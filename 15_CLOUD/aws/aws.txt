@@ -1314,103 +1314,178 @@ Like PrivatePublicIp
 
 
 Storage optimized instances:
-A storage optimized instance is designed for workloads that require high, sequential read and write access to very large data sets on local storage. They are optimized to deliver tens of thousands of low-latency, random I/O operations per second (IOPS) to applications. 
+	A storage optimized instance is designed for workloads that require high, sequential read and write access to 
+	very large data sets on local storage. 
+	They are optimized to deliver tens of thousands of low-latency, random I/O operations per second (IOPS) to applications. 
+
 Memory optimized instances:
-Although this type of instance is suitable for a NoSQL database, it is not designed for workloads that require high, sequential read and write access to very large data sets on local storage.
+	Although this type of instance is suitable for a NoSQL database, it is not designed for workloads that require high, 
+	sequential read and write access to very large data sets on local storage.
 
 
 
-Enabling DynamoDB Streams to capture table activity and automatically trigger the Lambda function.
-CloudWatch Alarms only monitor service metrics, not changes in DynamoDB table data.
+DynamoDB Streams:
+	Enabling DynamoDB Streams to capture table activity and automatically trigger the Lambda function.
+	CloudWatch Alarms only monitor service metrics, not changes in DynamoDB table data.
 
 
-Amazon S3 for storing the application log files and Amazon Elastic MapReduce for processing the log files.
+
+Log file processing:
+	Amazon S3 for storing the application log files and Amazon Elastic MapReduce(EMR) for processing the log files.
 
 
-Amazon (Default setting)SQS queue no order mentain of message as send or receive and 
- SQS does not guarantee that no duplicates will be sent.
- 
-A Kinesis data stream is a set of shards that has a sequence of data records, 
-and each data record has a sequence number.
-
-WS Data Pipeline  a cloud-based data workflow service that helps you process and move data between different AWS services and on-premises data sources. 
-It is not suitable for collecting data from distributed sources such as users, IoT devices, or clickstreams.
+SQS:
+	Amazon (Default setting)SQS queue no order mentain of message as send or receive and 
+	SQS does not guarantee that no duplicates will be sent.
+	 
+A Kinesis data stream is a set of shards that has a sequence of data records, and each data record has a sequence number 
+and guarantee no duplicates.
 
 
-Hundred EC2 instances Log Process:
-Install the unified CloudWatch Logs agent in each instance which will automatically collect and push 
-data to CloudWatch Logs. Analyze the log data with CloudWatch Logs Insights.
-CloudWatch Logs Insights enables you to interactively search and analyze your log data in Amazon CloudWatch Logs. 
+AWS Data Pipeline:
+	AWS Data Pipeline  a cloud-based data workflow service that helps you process and move data between different 
+	AWS services and on-premises data sources. 
+	It is not suitable for collecting data from distributed sources such as users, IoT devices, or clickstreams.
+
+
+
+
+Hundred of EC2 instances Log Process:
+	Install the Unified CloudWatch Logs agent in each instance which will automatically collect and push 
+	data to CloudWatch Logs. Analyze the log data with CloudWatch Logs Insights.
+	CloudWatch Logs Insights enables you to interactively search and analyze your log data in Amazon CloudWatch Logs. 
+
+
 
 
 S3StaticResourcePublicAcc:
-Grant public read access to the object when uploading it using the S3 Console.
-Configure the S3 bucket policy to set all objects to public read.
-An IAM Role, in itself, cannot directly make the S3 objects public or change the permissions 
-of each individual object.
+	Grant public read access to the object when uploading it using the S3 Console.
+	Configure the S3 bucket policy to set all objects to public read.
+	
+	An IAM Role, in itself, cannot directly make the S3 objects public or change the permissions of each individual object.
 
-differences between Fault Tolerance and High Availability is that:
- the former refers to the minimum number of running instances is Fault tolarance.like Need 4 and runing 4
- If Need 4 and runing 2 Its High available.
+
+
+
+Differences between Fault Tolerance and High Availability is that:
+	Fault tolarance refers to the minimum number of running instances is .like Need 4 and runing 4
+	If Need 4 and runing 2 Its High available.
 
 
 Dashboard for continuous detection of policy non-conformance and non-compliant 
 resources across the enterprise and AWS multi-account strategy best practices.
 
-Use AWS Control Tower to launch a landing zone to automatically provision and configure new accounts through an Account Factory. Utilize the AWS Control Tower dashboard to monitor provisioned accounts across your enterprise. Set up preventive and detective guardrails for policy enforcement.
 
-AWS Control Tower offers a straightforward way to set up and govern an AWS multi-account environment, following prescriptive best practices. AWS Control Tower orchestrates the capabilities of several other AWS services, including AWS Organizations, AWS Service Catalog, and AWS Single Sign-On, to build a landing zone in less than an hour. It offers a dashboard to see provisioned accounts across your enterprise, guardrails enabled for policy enforcement, guardrails enabled for continuous detection of policy non-conformance, and non-compliant resources organized by accounts and OUs.
-When users perform work in any AWS account in your landing zone, they’re always subject to the guardrails that are governing their account’s OU.
 
- The AWS Organizations service neither has the capability to build a landing zone nor a built-in dashboard for continuous detection of policy non-conformance and non-compliant resources across the enterprise
+AWS Control Tower:
+	Use AWS Control Tower to launch a landing zone to automatically provision and configure new accounts through an Account Factory. 
+	Utilize the AWS Control Tower dashboard to monitor provisioned accounts across your enterprise. 
+	Set up preventive and detective guardrails for policy enforcement.
+
+
+AWS Control Tower offers a straightforward way to set up and govern an AWS multi-account environment, 
+following prescriptive best practices. 
+
+AWS Control Tower orchestrates the capabilities of several other AWS services, including AWS Organizations, AWS Service Catalog, 
+and AWS Single Sign-On, to build a landing zone in less than an hour. 
+It offers a dashboard to see provisioned accounts across your enterprise, guardrails enabled for policy enforcement, 
+guardrails enabled for continuous detection of policy non-conformance, and non-compliant resources organized by accounts and OUs.
+
+When users perform work in any AWS account in your landing zone, they’re always subject to the guardrails 
+that are governing their account’s OU.
+
+
+The AWS Organizations service neither has the capability to build a landing zone nor a built-in dashboard ,
+for continuous detection of policy non-conformance and non-compliant resources across the enterprise.
+
+ElasticBeanstalk environments have limited resources; for example, ElasticBeanstalk does not create a VPC for you.
  
- Elastic Beanstalk environments have limited resources; for example, Elastic Beanstalk does not create a VPC for you.
+ 
+ 
  
 Increase acc time of Websit remove slow ness:
-– Use Amazon CloudFront with website as the custom origin.
-– Use Amazon ElastiCache for the website’s in-memory data store or cache.
+	– Use Amazon CloudFront with website as the custom origin.
+	– Use Amazon ElastiCache for the website’s in-memory data store or cache.
+
+
+
 
 Redshift is primarily used for OLAP (Online Analytical Processing).
 Amazon RDS Read Replica of OLTP (Online Transactional Processing).
 
-You must also specify an Elastic IP address to associate with the NAT gateway when you create it. The Elastic IP address cannot be changed once you associate it with the NAT Gateway.
+
+
+NAT gateway:
+	You must specify an Elastic IP address to associate with the NAT gateway when you create it. 
+	The Elastic IP address cannot be changed once you associate it with the NAT Gateway.
+
 
 
 Regional Failover and High available:
-In a secondary region, create a global table of the DynamoDB table and replicate the auto-scaling group and application load balancer. Use Route 53 DNS failover to automatically route traffic to the resources in the secondary region. Set up the AWS Well-Architected Tool to easily get recommendations for improving your workloads based on the AWS best practices
+	In a secondary region, create a global table of the DynamoDB table and replicate, auto-scaling group and application load balancer.
+	Use Route 53 DNS failover to automatically route traffic to the resources in the secondary region. 
+	Set up the AWS Well-Architected Tool to easily get recommendations for improving your workloads based on the AWS best practices.
 
- A global secondary index can only be created in the region where its parent table resides.
+A global secondary index can only be created in the region where its parent table resides.
+ 
+
+
+Amazon Managed Grafana:
+	Amazon Managed Grafana is a fully managed service with rich, interactive data visualizations to help customers analyze,
+	monitor, and alarm on metrics, logs, and traces across multiple data sources.
  
  
- Amazon Managed Grafana is a fully managed service with rich, interactive data visualizations to help customers analyze, monitor, and alarm on metrics, logs, and traces across multiple data sources.
  
+When you create or update a distribution in CloudFront, you can add an origin access identity (OAI) and automatically update 
+the bucket policy to give the origin access identity permission to access your bucket.
+
+Alternatively, you can choose to manually change the bucket policy or change ACLs, which control permissions 
+on individual objects in your bucket.
  
- When you create or update a distribution in CloudFront, you can add an origin access identity (OAI) and automatically update the bucket policy to give the origin access identity permission to access your bucket. Alternatively, you can choose to manually change the bucket policy or change ACLs, which control permissions on individual objects in your bucket.
  
  
 Online Order processing, duplicates can’t be tolerated:
-– Replace Amazon SQS and instead, use Amazon Simple Workflow service.
-– Use an Amazon SQS FIFO Queue instead.
+	– Replace Amazon SQS use Amazon Simple Workflow service.
+	– Use an Amazon SQS FIFO Queue instead of SQS default queue.
 
 SQS, there is a possibility that a message can have a duplicate in case an EC2 instance fails to delete the already processed message.
 
 
-To interconnect all of the company’s on-premises networks, VPNs, and VPCs into a single gateway, which includes support for inter-region peering across multiple AWS regions.
-Set up an AWS Transit Gateway in each region to interconnect all networks within it. Then, route traffic between the transit gateways through a peering connection.
+
+
+VPNs peering multiple regions:
+	To interconnect all of the company’s on-premises networks, VPNs, and VPCs into a single gateway, 
+	which includes support for inter-region peering across multiple AWS regions.
+
+	Set up an AWS Transit Gateway in each region to interconnect all networks within it. 
+	Then, route traffic between the Transit gateways through a peering connection.
+
 If you attach a transit gateway peering connection, the transit gateway must be in a different Region.
 
-Athena is an interactive query service that makes it easy to analyze data directly in Amazon Simple Storage Service (Amazon S3) using standard SQL.
-Athena helps you analyze unstructured, semi-structured, and structured data stored in Amazon S3. Examples include CSV, JSON, or columnar data formats such as Apache Parquet and Apache ORC. You can use Athena to run ad-hoc queries using ANSI SQL without the need to aggregate or load the data into Athena.
+
+Athena:
+	Athena is an interactive query service that makes it easy to analyze data directly in S3 using standard SQL.
+	Athena helps you analyze unstructured, semi-structured, and structured data stored in Amazon S3. 
+	Examples include CSV, JSON, or columnar data formats such as Apache Parquet and Apache ORC. 
+	You can use Athena to run ad-hoc queries using ANSI SQL without the need to aggregate or load the data into Athena.
+
 
 
 RestartEc2FromErrorLog:
-First, look at the existing CloudWatch logs for keywords related to the application error to create a custom metric. Then, create a CloudWatch alarm for that custom metric which invokes an action to restart the EC2 instance.
-You can create alarms that automatically stop, terminate, reboot, or recover your EC2 instances using Amazon CloudWatch alarm actions. 
+	First, look at the existing CloudWatch logs for keywords related to the application error to create a custom metric. 
+	Then, create a CloudWatch alarm for that custom metric which invokes an action to restart the EC2 instance.
+	
+	You can create alarms that automatically stop, terminate, reboot, or recover your EC2  using CloudWatch alarm actions. 
 
 
-A cluster deployment is a logical grouping of three RabbitMQ broker nodes behind a Network Load Balancer, each sharing users, queues, and a distributed state across multiple Availability Zones (AZ).
+RabbitMQ cluster:
+	A cluster deployment is a logical grouping of three RabbitMQ broker nodes behind a Network Load Balancer, 
+	each sharing users, queues, and a distributed state across multiple Availability Zones (AZ).
 
 
+
+
+@@@
 Use an AWS DataSync agent to rapidly move the data over a service endpoint.
 DataSync to migrate active data to AWS, transfer data to the cloud for analysis and processing, archive data to free up on-premises storage capacity, or replicate data to AWS for business continuity.
 AWS DataSync simplifies, automates, and accelerates copying large amounts of data to and from AWS storage services over the internet or AWS Direct Connect. 
