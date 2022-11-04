@@ -1483,103 +1483,178 @@ RabbitMQ cluster:
 	each sharing users, queues, and a distributed state across multiple Availability Zones (AZ).
 
 
+DataSync:
+	Use an AWS DataSync agent to rapidly move the data over a service endpoint.
+	DataSync to migrate active data to AWS, transfer data to the cloud for analysis and processing, archive data to free up 
+	on-premises storage capacity, or replicate data to AWS for business continuity.
+	
+	AWS DataSync simplifies, automates, and accelerates copying large amounts of data to and from AWS storage services 
+	over the internet or AWS Direct Connect. 
+	
+	You deploy an DataSync agent to on-premises hypervisor or in Amazon EC2. To copy data to or from an on-premises file server.
+	To set up transfers between Snowcone device and AWS storage, use the DataSync agent AMI that comes pre-installed on your device.
 
-
-@@@
-Use an AWS DataSync agent to rapidly move the data over a service endpoint.
-DataSync to migrate active data to AWS, transfer data to the cloud for analysis and processing, archive data to free up on-premises storage capacity, or replicate data to AWS for business continuity.
-AWS DataSync simplifies, automates, and accelerates copying large amounts of data to and from AWS storage services over the internet or AWS Direct Connect. 
-You deploy an AWS DataSync agent to your on-premises hypervisor or in Amazon EC2. To copy data to or from an on-premises file server,.
-To set up transfers between your AWS Snowcone device and AWS storage, use the DataSync agent AMI that comes pre-installed on your device.
 To connect programmatically to an AWS service, you will need to use an AWS Direct Connect service endpoint.
-
-
 
 No data transfer cost between S3 and EC2 in the same AWS Region.
 
 
-If your identity store is not compatible with SAML 2.0 then you can build a custom identity broker application to perform a similar function.
-Develop an on-premises custom identity broker application and use STS to issue short-lived AWS credentials.
-IAM policy is not enough to integrate your LDAP service to IAM. You need to use SAML, STS, or a custom identity broker.
 
 
-The OS-bypass capabilities of EFAs are not supported on Windows instances. If you attach an EFA to a Windows instance, the instance functions as an Elastic Network Adapter without the added EFA capabilities.
+LDAP to IAM:
+	IAM policy is not enough to integrate your LDAP service to IAM. You need to use SAML, STS, or a custom identity broker.
+	
+	If your identity store is not compatible with SAML 2.0 then you can build a custom identity broker application 
+	to perform a similar function.
+	Develop an on-premises custom identity broker application and use STS to issue short-lived AWS credentials.
+	
+
+
+Elastic Fabric Adapter EFA:
+	The OS-bypass capabilities of EFAs are not supported on Windows instances. 
+	If you attach an EFA to a Windows instance, the instance functions as an Elastic Network Adapter without the added EFA capabilities.
 
 
 
-1. S3 Select
-Amazon S3 Select is designed to help analyze and process data within an object in Amazon S3 buckets, faster and cheaper.
-2. Amazon Athena
-Amazon Athena is an interactive query service that makes it easy to analyze data in Amazon S3 using standard SQL expressions.
-Simply point to your data in Amazon S3, define the schema, and start querying using standard SQL expressions. 
-3. Amazon Redshift Spectrum
-Amazon Redshift also includes Redshift Spectrum, allowing you to directly run SQL queries against exabytes of unstructured data in Amazon S3. No loading or transformation is required, and you can use open data formats, including Avro, CSV, Grok, ORC, Parquet, RCFile, RegexSerDe, SequenceFile, TextFile, and TSV.
+
+Amazon S3 Anslysis tools:
+	S3 Select
+		Amazon S3 Select is designed to help analyze and process data within an object in Amazon S3 buckets, faster and cheaper.
+	Amazon Athena
+		Amazon Athena is an interactive query service that makes it easy to analyze data in Amazon S3 using standard SQL expressions.
+		Simply point to your data in Amazon S3, define the schema, and start querying using standard SQL expressions. 
+	Amazon Redshift Spectrum
+		Redshift also includes Redshift Spectrum, allowing you to directly run SQL queries against exabytes of unstructured 
+		data in Amazon S3. No loading or transformation is required, and you can use open data formats, 
+		including Avro, CSV, Grok, ORC, Parquet, RCFile, RegexSerDe, SequenceFile, TextFile, and TSV.
+
+
 
 
 Redshift disaster recovery:
-Enable Cross-Region Snapshots Copy in your Amazon Redshift Cluster.
-automated snapshots is not enough and will not be available in case the entire AWS region is down.
-You can configure Amazon Redshift to copy snapshots for a cluster to another region. To configure cross-region snapshot copy, you need to enable this copy feature for each cluster and configure where to copy snapshots and how long to keep copied automated snapshots in the destination region. When a cross-region copy is enabled for a cluster, all new manual and automatic snapshots are copied to the specified region.
+	Enable Cross-Region Snapshots Copy in your Amazon Redshift Cluster.
+	automated snapshots is not enough and will not be available in case the entire AWS region is down.
+	You can configure Amazon Redshift to copy snapshots for a cluster to another region. 
+	To configure cross-region snapshot copy, you need to enable this copy feature for each cluster and configure 
+	where to copy snapshots and how long to keep copied automated snapshots in the destination region. 
+
+When a cross-region copy is enabled for a cluster, all new manual and automatic snapshots are copied to the specified region.
 
 
 
-high I/O performance for the temporary files:
-Configure RAID 0 in multiple instance store volumes.
+High I/O performance for the EC2 temporary files:
+	Configure RAID 0 in multiple instance store volumes.
+
 RAID 1 configuration is used for data mirroring. You need to configure RAID 0 to improve the performance of your storage volumes.
 
 
-Create an S3 bucket policy that denies permissions to upload an object unless the request includes the s3:x-amz-server-side-encryption": "AES256" header. Enable server-side encryption with Amazon S3-managed encryption keys (SSE-S3) and rely on the built-in key rotation feature of the SSE-S3 encryption keys.
+S3 encryption:
+	Create an S3 bucket policy that denies permissions to upload an object unless the request includes 
+	the s3:x-amz-server-side-encryption": "AES256" header. 
+	
+	Enable server-side encryption with Amazon S3-managed encryption keys (SSE-S3) and rely on the built-in key rotation feature 
+	of the SSE-S3 encryption keys.
 
-deactivating and deleting any IAM user access key that is over 90 days old:
-Amazon EventBridge cannot directly check for IAM events that show the age of IAM access keys.
-Use the AWS Config managed rule to check if the IAM user access keys are not rotated within 90 days. Create an Amazon EventBridge (Amazon CloudWatch Events) rule for the non-compliant keys, and define a target to invoke a custom Lambda function to deactivate and delete the keys.
 
 
 
-AWS Health provides ongoing visibility into your resource performance and the availability of your AWS services and accounts. You can use AWS Health events to learn how service and resource changes might affect your applications running on AWS. AWS Health provides relevant and timely information to help you manage events in progress. AWS Health also helps you be aware of and to prepare for planned activities.
-Amazon EventBridge to detect and react to AWS Health events. Then, based on the rules that you create, EventBridge invokes one or more target actions 
-Your account Healt/events page shows all events from the past 90 days.
-AWS Service Health Dashboard shows public events that may affect several customers in particular regions. It doesn’t show events related to specific EC2 instances on individual AWS accounts.
+Deactivating and deleting any IAM user access key that is over 90 days old:
+	Amazon EventBridge cannot directly check for IAM events that show the age of IAM access keys.
+	
+	Use the AWS Config managed rule to check if the IAM user access keys are not rotated within 90 days. 
+	Create an Amazon EventBridge (Amazon CloudWatch Events) rule for the non-compliant keys, and define a target to invoke 
+	a custom Lambda function to deactivate and delete the keys.
 
-Use Amazon Textract to extract the text from the PDF reports. Integrate Amazon Comprehend Medical with the existing Lambda function to identify the PHI from the extracted text.
-The PII (Personally Identifiable Information) redaction feature of the Amazon Textract Medical service is not enough to identify all the Protected Health Information (PHI) in the PDF reports. Take note that PII is quite different from PHI.
+
+
+
+AWS Health:
+	AWS Health provides ongoing visibility into your resource performance and the availability of your AWS services and accounts. 
+	You can use AWS Health events to learn how service and resource changes might affect your applications running on AWS. 
+	
+	AWS Health provides relevant and timely information to help you manage events in progress. 
+	AWS Health also helps you be aware of and to prepare for planned activities.
+	
+	Use EventBridge to detect and react to AWS Health events. Then, based on the rules that you create, 
+	EventBridge invokes one or more target actions 
+	
+	
+	Your account Healt/events page shows all events from the past 90 days.
+	AWS Service Health Dashboard shows public events that may affect several customers in particular regions. 
+	It doesn’t show events related to specific EC2 instances on individual AWS accounts.
+
+
+Comprehend Medical and Textract:
+	Use Amazon Textract to extract the text from the PDF reports. Integrate Comprehend Medical with the existing Lambda function 
+	to identify the PHI from the extracted text.
+	
+	The PII (Personally Identifiable Information) redaction feature of the Amazon Textract Medical service is not enough to 
+	identify all the Protected Health Information (PHI) in the PDF reports. Take note that PII is quite different from PHI.
+
+
 
 
 
 Max IOPS for volume is 10 GiB (50:1):Set the IOPS to 500 then maintain a low queue length.
 
-An io1 volume can range in size from 4 GiB to 16 TiB. You can provision from 100 IOPS up to 64,000 IOPS per volume on Nitro system instance families and up to 32,000 on other instance families. The maximum ratio of provisioned IOPS to the requested volume size (in GiB) is 50:1.
-For example, a 100 GiB volume can be provisioned with up to 5,000 IOPS. On a supported instance type, any volume 1,280 GiB in size or greater allows provisioning up to the 64,000 IOPS maximum (50 × 1,280 GiB = 64,000).
+	An io1 volume can range in size from 4 GiB to 16 TiB. 
+	You can provision from 100 IOPS up to 64,000 IOPS per volume on Nitro system instance families and up to 32,000 on 
+	other instance families. The maximum ratio of provisioned IOPS to the requested volume size (in GiB) is 50:1.
+	
+	For example, a 100 GiB volume can be provisioned with up to 5,000 IOPS. 
+	On a supported instance type, any volume 1,280 GiB in size or greater allows provisioning up to the 64,000 IOPS 
+	maximum (50 × 1,280 GiB = 64,000).
 
 The volume queue length is the number of pending I/O requests for a device.
 
 
 
-Multi-attach feature can only be enabled on EBS Provisioned IOPS io2 or io1 volumes. 
-In addition, multi-attach won’t offer multi-az resiliency because this feature only allows an EBS volume to be attached on multiple instances within an availability zone.
 
-Amazon EBS provides three volume types to best meet the needs of your workloads: General Purpose (SSD), Provisioned IOPS (SSD), and Magnetic.
+EBS Multi-attach Not multi AZ:
+	Multi-attach feature can only be enabled on EBS Provisioned IOPS io2 or io1 volumes. 
+	In addition, multi-attach won’t offer multi-az resiliency because this feature only allows an EBS volume to be attached on 
+	multiple instances within a availability zone (AZ).
+
+EBS provides three volume types to best meet the needs of your workloads: 
+	General Purpose (SSD), 
+	Provisioned IOPS (SSD), 
+	and Magnetic.
 
 
-Configure AWS Config to trigger an evaluation that will check the compliance for a user’s password periodically.
 
 
-track and log every request access to their S3 buckets including the requester, bucket name, request time, request action, referrer, turnaround time, and error code information:
-Enable server access logging for all required Amazon S3 buckets.
+AWS Config:
+	Configure AWS Config to trigger an evaluation that will check the compliance for a user’s password periodically.
 
-AWS CloudTrail logs provide a record of actions taken by a user, role, or an AWS service in Amazon S3, while Amazon S3 server access logs provide detailed records for the requests that are made to an S3 bucket.
+
+
+Enable S3 server access logging:
+	Server access logging provides detailed records for the requests that are made to a S3 bucket.
+	
+	Track and log every request access to their S3 buckets including the requester, bucket name, request time, request action, 
+	referrer, turnaround time, and error code information, Enable server access logging for all required Amazon S3 buckets.
+
+AWS CloudTrail logs provide a record of actions taken by a user, role, or an AWS service in Amazon S3, 
+while S3 server access logs provide detailed records for the requests that are made to an S3 bucket.
+
 AWS CloudTrail alone won’t give detailed logging information for object-level access.
 
 
 
-migrate all of its VM workloads to the AWS cloud:
-Install the AWS Replication Agent on each of the on-premises VMs to continuously replicate the servers to AWS. Use AWS Migration Service (AWS MGN) to launch test instances and perform cutover once testing is completed.
+Migrate all of its VM workloads to the AWS cloud:
+	Install the AWS Replication Agent on each of the on-premises VMs to continuously replicate the servers to AWS. 
+	Use AWS Migration Service (AWS MGN) to launch test instances and perform cutover once testing is completed.
+	
 AWS MGN is the primary migration service recommended for lift-and-shift migrations to AWS.
 
-The AWS Application Discovery Service is primarily used to track the migration status, This service is not capable of doing the actual migration.
+The AWS Application Discovery Service is primarily used to track the migration status, 
+This service is not capable of doing the actual migration.
 
 
 
+
+
+@@@
 Enhanced Monitoring metrics are useful when you want to see how different processes or threads on a DB instance use the CPU.
 Amazon RDS provides metrics in real-time for the operating system (OS) that your DB instance runs on. You can view the metrics for your DB instance using the console or consume the Enhanced Monitoring JSON output
 
