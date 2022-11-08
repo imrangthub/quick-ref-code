@@ -1,11 +1,6 @@
 ##################################################
 ##               AWS | SAACO3                   ##
 ##################################################
-https://www.awsomeblog.com/category/amazon-aws/
-
-
-https://digitalcloud.training/courses/aws-csaa-practice-exams/
-https://portal.tutorialsdojo.com/product/aws-certified-solutions-architect-associate-practice-exams/
 
 
 Latency:বিলম্ব, দেরী,  বাধা, 
@@ -47,7 +42,8 @@ comply:মেনে চলা
 obsolete:অপ্রচলিত
 sophisticated :ভেজালমিশ্রিত
 circumstances:পরিস্থিতি
-SAML:Security Assertion Markup Language 
+
+
 =================================================
 #General | Basic          
 ================================================= 
@@ -63,12 +59,12 @@ Outbound network-> from the instance to other
 
 
 Classic Ports to know:
-• 22 = SSH (Secure Shell) - log into a Linux instance
-• 21 = FTP (File Transfer Protocol) – upload files into a file share
-• 22 = SFTP (Secure File Transfer Protocol) – upload files using SSH
-• 80 = HTTP – access unsecured websites
-• 443 = HTTPS – access secured websites
-• 3389 = RDP (Remote Desktop Protocol) – log into a Windows instance
+• 22 	= SSH (Secure Shell) - log into a Linux instance
+• 21 	= FTP (File Transfer Protocol) – upload files into a file share
+• 22 	= SFTP (Secure File Transfer Protocol) – upload files using SSH
+• 80 	= HTTP – access unsecured websites
+• 443 	= HTTPS – access secured websites
+• 3389  = RDP (Remote Desktop Protocol) – log into a Windows instance
 
 
 
@@ -110,7 +106,7 @@ RTO: Recovery Time Objective
 SSM: AWS Systems Manager Agent 
 SCP: Service control policies
 Route53, IAM, CloudFront, WAF are Global.
-
+SAML:Security Assertion Markup Language 
 
 
 
@@ -225,10 +221,9 @@ RegionalServices:https://aws.amazon.com/about-aws/global-infrastructure/regional
 6
 ##IAM
 -------------------------------------------------
-AWS Identity and Access Management (IAM) is a web service that helps you securely control access to 
-AWS resources. 
-AWS IAM enables organizations with many employees to create and manage multiple users under a 
-single AWS account.
+AWS Identity and Access Management (IAM) is a web service that helps you securely control access to AWS resources. 
+
+IAM enables organizations with many employees to create and manage multiple users under a single AWS account.
 
 You can assign an IAM Role to the users or groups from your Active Directory once it is integrated 
 with your VPC via the AWS Directory Service AD Connector.
@@ -238,8 +233,8 @@ IAM deals with four Principle Entities: Users, Groups, Roles and Policies.
 
 A principal is a person or application that can make a request for an action or operation on an AWS resource.
 
- IAM roles and IAM users are separate IAM entities and should not be mixed. 
- Only IAM roles can be used to access cross-account resources.
+IAM roles and IAM users are separate IAM entities and should not be mixed. 
+Only IAM roles can be used to access cross-account resources.
  
 IAM Policies Structure:
 • Version: policy language version, always include “2012-10-17”
@@ -270,13 +265,14 @@ How can users access AWS, Three options:
 	• AWS Management Console (protected by password + MFA)
 	• AWS Command Line Interface (CLI): protected by access keys
 	• AWS Software Developer Kit (SDK) - for code: protected by access keys
+	
+	
 • Access Keys are secret, just like a password. Don’t share them
 • Access Key ID ~= username
 • Secret Access Key ~= password
 
 
 IAM Roles for Services: Some AWS service will need to perform actions on your behalf
-
 To do so, we will assign permissions to AWS services with IAM Roles
 Common roles: 
 	• EC2 Instance Roles 
@@ -300,6 +296,14 @@ When you use the AWS Management Console to create a user, you must choose to inc
 console password or access keys. By default, a brand new IAM user created using the AWS CLI or 
 AWS API has no credentials of any kind. You must create the type of credentials for an IAM user 
 based on the needs of your user.
+
+
+IAM: Permissions:
+• Users or Groups can be assigned JSON documents called policies.
+• These policies define the permissions of the users.
+
+
+
 
 
 Area:
@@ -333,9 +337,6 @@ No additional charge for IAM and STS.
 Security:
 =========
 MFA + Password Policy.
-NonOffcial:Identity and access management (IAM) is a framework and AWS manage service, so Its secure.
-
-
 
 
 
@@ -416,11 +417,10 @@ It is a aws managed service, security is a shared responsibility.
 9
 ##Policy
 -------------------------------------------------
-A policy is an object in AWS that, when associated with an identity or resource, defines their permissions.
+A policy is an JSON document or object in AWS that, when associated with an identity or resource, defines their permissions.
 
 
-Policies can be attached to users, groups, or Amazon S3 buckets, enabling 
-centralized management of permissions.
+Policies can be attached to users, groups, or Amazon S3 buckets, enabling centralized management of permissions.
  
  
 
@@ -640,7 +640,7 @@ EC2 sizing & configuration options:
 • Firewall rules: security group 
 • Bootstrap script (configure at first launch): EC2 User Data
 
-AWS has a limit of 20 instances per region. 
+AWS has a limit of 20 instances per region. You can request a limit increase.
 
 
 m5.2xlarge-
@@ -656,13 +656,17 @@ TypeOfEC2:
 	-Accelerated Computing
 	-Storage optimized
 
-Storage optimized instances are designed for workloads that require high, sequential read and write access to very large data sets on local storage.
+Storage optimized instances are designed for workloads that require high, sequential read and write access to very large data sets 
+on local storage.
 
-Memory Optimized Instances is incorrect because these are designed to deliver fast performance for workloads that process large data sets in memory, which is quite different from handling high read and write capacity on local storage.
+Memory Optimized Instances is  are designed to deliver fast performance for workloads that process large data sets in memory, 
+which is quite different from handling high read and write capacity on local storage.
 
-Compute Optimized Instances is incorrect because these are ideal for compute-bound applications that benefit from high-performance processors, such as batch processing workloads and media transcoding.
+Compute Optimized Instances are ideal for compute-bound applications that benefit from high-performance processors, 
+such as batch processing workloads and media transcoding.
 
-General Purpose Instances is incorrect because these are the most basic type of instances. They provide a balance of compute, memory, and networking resources, and can be used for a variety of workloads.
+General Purpose Instances are the most basic type of instances. 
+They provide a balance of compute, memory, and networking resources, and can be used for a variety of workloads.
 
 
 You can put an instance that is in the InService state into the Standby state, update some software or 
@@ -678,14 +682,15 @@ Security Groups:
 	• It’s good to maintain one separate security group for SSH access
 	• If your application is not accessible (time out), then it’s a security group issue
 	• If your application gives a “connection refused“ error, then it’s an application
-	error or it’s not launched
-	• All inbound traffic is blocked by default
-	• All outbound traffic is authorised by default
+	  error or it’s not launched
+	• All inbound traffic is blocked by default.
+	• All outbound traffic is authorised by default.
 
 
 
 To achieve highly available and fault-tolerant architecture for your applications, 
 you must deploy all your instances in different Availability Zones. 
+
 This will help you isolate your resources if an outage occurs. 
 Take note that to achieve fault tolerance, you need to have redundant resources in place to 
 avoid any system degradation in the event of a server fault or an Availability Zone outage. 
@@ -694,7 +699,8 @@ than what is usually needed. This is to ensure that the mission-critical workloa
 
 
 On-Demand Capacity Reservations enable you to reserve compute capacity for your 
-Amazon EC2 instances in a specific Availability Zone for any duration. 
+Amazon EC2 instances in a specific Availability Zone for any duration.
+ 
 This gives you the ability to create and manage Capacity Reservations independently 
 from the billing discounts offered by Savings Plans or Regional Reserved Instances.
 
@@ -703,9 +709,7 @@ There is a vCPU-based On-Demand Instance limit per region which is why subsequen
 Just submit the limit increase form to AWS and retry the failed requests once approved.
 
 
-By default, AWS allows you to provision a maximum of 20 instances per Availability Zone. 
-Select a different Availability Zone and retry the failed request is incorrect because 
-the vCPU-based On-Demand Instance limit is set per region and not per Availability Zone. 
+By default, the vCPU-based On-Demand Instance limit is set per region and not per Availability Zone. 
 This can be increased after submitting a request form to AWS.
  
 By default, AWS allows you to provision a maximum of 20 instances per region. 
@@ -723,6 +727,7 @@ ANS:
 Create an Auto Scaling group of EC2 instances and set the 
 minimum capacity to 4 and the maximum capacity to 6. 
 Deploy 2 instances in Availability Zone A and another 2 instances in Availability Zone B.
+
 
 
 Area:
@@ -801,7 +806,8 @@ use of On-Demand Instances in your account.
 You can also sell your unused instance for Standard RIs but 
 not Convertible RIs on the Reserved Instance Marketplace.
 
-You can reserve capacity to a specific AWS Region (regional Reserved Instance) or specific Availability Zone (zonal Reserved Instance) only. You cannot reserve capacity to multiple AWS Regions in a single RI purchase.
+You can reserve capacity to a specific AWS Region (regional Reserved Instance) or specific Availability Zone (zonal Reserved Instance) 
+only. You cannot reserve capacity to multiple AWS Regions in a single RI purchase.
 
 
 Security:
@@ -856,15 +862,15 @@ A Spot Instance request is either one-time or persistent.
 
 There are two types of spot requests:
 -A one-time spot request stays active until Amazon EC2 runs the spot instance, you cancel the request, 
-or it expires. 
-If the spot price goes above your bid or capacity is unavailable, 
-Amazon terminates the spot instance and closes the spot request.
+	or it expires. 
+	If the spot price goes above your bid or capacity is unavailable, 
+	Amazon terminates the spot instance and closes the spot request.
 
 -A persistent spot instance request stays active until you cancel it or until it expires—even if, 
-Amazon carried out the request. 
-If the spot price goes above your bid or capacity becomes unavailable, the spot instance is interrupted. 
-Amazon keeps the request open, and if conditions change and a spot instance does become available, it starts or 
-resumes the spot instance
+	Amazon carried out the request. 
+	If the spot price goes above your bid or capacity becomes unavailable, the spot instance is interrupted. 
+	Amazon keeps the request open, and if conditions change and a spot instance does become available, it starts or 
+	resumes the spot instance
 
 
 What are Spot Instance Interruptions?	
@@ -883,11 +889,6 @@ When an instance is interrupted, you can select one of
 		Stopping the spot instance (making it possible to restart it with the same launch specifications), or 
 		Hibernating the instance.
 
-Spot Instance Interruption Notice
-is a warning issued two minutes before EC2 interrupts a Spot Instance.
-EC2 automatically stops or hibernates the Spot Instances on interruption, and automatically 
- the instances when we have available capacity.
-
 
 EC2 tries to maintain the target capacity, adding spot instances if available, 
 based on the request details. 
@@ -895,34 +896,21 @@ When spot instances are terminated,
 Spot Fleet attempts to replace them using the lowest price option available.
 
 
-A Spot Instance request is either:
-One-time
-	A one-time request remains active until EC2 launches the Spot Instance, the request expires, or 
-	you cancel the request.
-Persistent
-	EC2 automatically resubmits a persistent Spot request after the Spot Instance associated 
-		with the request is terminated.
-	A persistent Spot Instance request remains active until it expires or you cancel it, 
-		even if the request is fulfilled.
-	The Spot Instance request can optionally specify a duration for the Spot Instances.
-	Cancelling spot instance requests does not terminate the instances
-	Be sure to delete the spot request before you delete the instances, else they would be launched again.
-
-
-
 What is AWS Spot Fleet?
 Spot Fleet is a collection of spot instances.
 
 
-Spot Fleet requests type
+Spot Fleet requests type:
 Request
 	Spot Fleet places an asynchronous one-time request for the desired capacity.
-If capacity is diminished because of Spot interruptions, the fleet does not attempt
- to replenish Spot Instances, nor does it submit requests in alternative Spot capacity pools if 
- capacity is unavailable.
+	If capacity is diminished because of Spot interruptions, the fleet does not attempt
+	to replenish Spot Instances, nor does it submit requests in alternative Spot capacity pools if 
+	capacity is unavailable.
 Maintain
 	Spot Fleet places an asynchronous request for the desired capacity and maintains capacity 
 	by automatically replenishing any interrupted Spot Instances.
+
+
 
 
 
@@ -1222,8 +1210,8 @@ included as part of the instance's usage cost.
 The resilient architecture can adjust for the loss of any instance.
 
 If an instance reboots (intentionally or unintentionally), data in the instance store persists.
-When you stop, hibernate, or terminate an instance, every block of storage in the 
-instance store is reset, data loss.
+When you stop, hibernate, or terminate an instance, every block of storage in the instance store is reset, data loss.
+
 
 
 
@@ -1244,7 +1232,7 @@ You have to use EFS instead.
 
 
 Amazon EBS volume types:
-Solid state drives (SSD)
+	Solid state drives (SSD)
 	General Purpose SSD volumes
 	Provisioned IOPS SSD volumes
 
@@ -1324,7 +1312,7 @@ EBS Snapshots Features:
 
 An AMI includes the following:
 	One or more Amazon Elastic Block Store (Amazon EBS) snapshots, or, for instance-store-backed AMIs, 
-	     a template for the root volume of the instance 
+	a template for the root volume of the instance 
 		(for example, an operating system, an application server, and applications).
     Launch permissions that control which AWS accounts can use the AMI to launch instances.
 	A block device mapping that specifies the volumes to attach to the instance when it's launched.
@@ -1340,6 +1328,7 @@ AMI to EC2 Instance:
 
 During the AMI-creation process, Amazon EC2 creates snapshots of your instance's root volume and any other 
 EBS volumes attached to your instance. 
+
 You're charged for the snapshots until you deregister the AMI and delete the snapshots. 
 If any volumes attached to the instance are encrypted, the new AMI only launches successfully on 
 instances that support Amazon EBS encryption.
@@ -1428,8 +1417,7 @@ EBS Multi-Attach – io1/io2 family:
 
 
 
-EBS Encryption:
-• When you create an encrypted EBS volume, you get the following:
+EBS Encryption:When you create an encrypted EBS volume, you get the following:
 • Data at rest is encrypted inside the volume
 • All the data in flight moving between the instance and the volume is encrypted
 • All snapshots are encrypted
@@ -1454,11 +1442,13 @@ Data Lifecycle Manager (Amazon DLM):
 Amazon Data Lifecycle Manager (Amazon DLM) is an automated procedure to back up the data stored on 
 your Amazon EBS volumes. Use Amazon DLM to create lifecycle policies to automate snapshot management.
 
-You can use Amazon Data Lifecycle Manager (Amazon DLM) to automate the creation, retention, and deletion of snapshots taken to back up your Amazon EBS volumes. Automating snapshot management helps you to:
+You can use Amazon Data Lifecycle Manager (Amazon DLM) to automate the creation, retention, and deletion of snapshots taken 
+to back up your Amazon EBS volumes. Automating snapshot management helps you to:
 
 – Protect valuable data by enforcing a regular backup schedule.
 – Retain backups as required by auditors or internal compliance.
 – Reduce storage costs by deleting outdated backups.
+
 
 Combined with the monitoring features of Amazon CloudWatch Events and AWS CloudTrail,
 Amazon DLM provides a complete backup solution for EBS volumes at no additional cost.
@@ -1473,8 +1463,7 @@ can modify the volume type, volume size, and IOPS capacity without service inter
 
 EBS Volumes:
 – When you create an EBS volume in an Availability Zone, it is automatically replicated 
-  within that zone to prevent data loss due to a 
-  failure of any single hardware component.
+  within that zone to prevent data loss due to a failure of any single hardware component.
 – After you create a volume, you can attach it to any EC2 instance in the same Availability Zone
 – Amazon EBS Multi-Attach enables you to attach a single Provisioned IOPS SSD (io1) volume to 
 	multiple Nitro-based instances that are in the same Availability Zone. However, other 
@@ -1746,6 +1735,8 @@ A listener checks for connection requests from clients, using the protocol and p
 ALBs can also route and load balance gRPC traffic between microservices or between 
 gRPC-enabled clients and services, gRPC protocol is at Layer 7.
 Network Load Balancers do not support gRPC.
+
+
 Gateway Load Balancer operates as a Layer 3 Gateway and a Layer 4 Load Balancing service.
 
 To connect to an ALB, a client needs to resolve its DNS name, No IP address.
@@ -2108,8 +2099,7 @@ AWS Auto Scaling monitors your applications and automatically adjusts capacity.
 If exactly 10 then desired capacity to 10.
 If Range of Instance then minMix.
 
-Amazon EC2 Auto Scaling to provision new resources takes minutes.
-Lambda within seconds.
+Amazon EC2 Auto Scaling to provision new resources takes minutes. Lambda within seconds.
 
 
 The goal of an Auto Scaling Group (ASG) is to:
@@ -2187,6 +2177,7 @@ Launch Template (newer):
 
 Suspend the ReplaceUnhealthy process type for the Auto Scaling group and apply the maintenance 
 patch to the instance. 
+
 Once the instance is ready, you can manually set the instance's health status 
 back to healthy and activate the ReplaceUnhealthy process type again.
 
@@ -2231,11 +2222,16 @@ It provides elasticity and unparalleled scalability.
 
 Default termination policy:
 
-1. If there are instances in multiple Availability Zones, choose the Availability Zone with the most instances and at least one instance that is not protected from scale in. If there is more than one Availability Zone with this number of instances, choose the Availability Zone with the instances that use the oldest launch configuration.
+1. If there are instances in multiple Availability Zones, choose the Availability Zone with the most instances and at least 
+one instance that is not protected from scale in. If there is more than one Availability Zone with this number of instances, 
+choose the Availability Zone with the instances that use the oldest launch configuration.
 
-2. Determine which unprotected instances in the selected Availability Zone use the oldest launch configuration. If there is one such instance, terminate it.
+2. Determine which unprotected instances in the selected Availability Zone use the oldest launch configuration. 
+If there is one such instance, terminate it.
 
-3. If there are multiple instances to terminate based on the above criteria, determine which unprotected instances are closest to the next billing hour. (This helps you maximize the use of your EC2 instances and manage your Amazon EC2 usage costs.) If there is one such instance, terminate it.
+3. If there are multiple instances to terminate based on the above criteria, determine which unprotected instances are 
+closest to the next billing hour. (This helps you maximize the use of your EC2 instances and manage your Amazon EC2 usage costs.) 
+If there is one such instance, terminate it.
 
 4. If there is more than one unprotected instance closest to the next billing hour, choose one of these instances at random.
 
@@ -2278,16 +2274,13 @@ It is a aws managed service, security is a shared responsibility.
 34
 ##RDS 
 -------------------------------------------------
-As you are only increasing storage size and not changing the instance type or anything else.
-
-IAM database authentication works with MySQL and PostgreSQL. With this authentication method, you don’t need to use a password when you connect to a DB instance. Instead, you use an authentication token
-Each token has a lifetime of 15 minutes.
+IAM database authentication works with MySQL and PostgreSQL. With this authentication method, you don’t need to use a password 
+when you connect to a DB instance. Instead, you use an authentication token Each token has a lifetime of 15 minutes.
 
 
 RDS events only provide operational events such as DB instance events, DB parameter group events, 
 DB security group events, and DB snapshot events. What we need in the scenario is to capture 
-data-modifying events (INSERT, DELETE, UPDATE) which can be achieved thru native 
-functions or stored procedures.
+data-modifying events (INSERT, DELETE, UPDATE) which can be achieved thru native functions or stored procedures.
 
 RDS stands for Relational Database Service
 • It’s a managed DB service for DB use SQL as a query language.
@@ -2299,7 +2292,7 @@ RDS stands for Relational Database Service
 • Microsoft SQL Server
 • Aurora (AWS Proprietary database)
 
- Oracle RMAN and RAC are not supported in RDS.
+Oracle RMAN and RAC are not supported in RDS.
  
  
 RDS is a managed service:
@@ -2316,8 +2309,7 @@ RDS is a managed service:
 Supports all RDS database engines (MariaDB, MySQL,PostgreSQL, SQL Server, Oracle)
 
 Multi-AZ follows synchronous replication and spans at least two Availability Zones within a single region. 
-Read replicas follow asynchronous replication and can be within an 
-Availability Zone, Cross-AZ, or Cross-Region.
+Read replicas follow asynchronous replication and can be within an Availability Zone, Cross-AZ, or Cross-Region.
 
 When you provision a Multi-AZ DB Instance, Amazon RDS automatically creates a primary 
 DB Instance and synchronously replicates the data to a standby instance in a different 
@@ -2346,8 +2338,10 @@ stopping it for a long time, you should snapshot & restore instead.
 IAM database authentication provides the following benefits:
 	Network traffic to and from the database is encrypted using Secure Sockets Layer (SSL).
 	You can use IAM to centrally manage access to your database resources, instead of managing access individually on each DB instance.
-	For applications running on Amazon EC2, you can use profile credentials specific to your EC2 instance to access your database instead of a password, for greater security
- Although STS is used to send temporary tokens for authentication, this is not a compatible use case for RDS.
+	For applications running on Amazon EC2, you can use profile credentials specific to your EC2 instance to access your database 
+	instead of a password, for greater security.
+
+Although STS is used to send temporary tokens for authentication, this is not a compatible use case for RDS.
 
 RDS– Storage Auto Scaling:
 • Helps you increase storage on your RDS DB instance dynamically
@@ -2365,7 +2359,7 @@ RDS Read Replicas for read scalability:
 
 RDS Read Replicas – Network Cost:
 • In AWS there’s a network cost when data goes from one AZ to another
-• For RDS Read Replicas within the same region, you don’t pay that fee
+• For RDS Read Replicas within the same region, you don’t pay that fee.
 
 
 RDS Multi AZ (Disaster Recovery):
@@ -2373,7 +2367,7 @@ RDS Multi AZ (Disaster Recovery):
 • One DNS name – automatic app failover to standby
 • Increase availability
 • Failover in case of loss of AZ, loss of
-  etwork, instance or storage failure
+  network, instance or storage failure
 • No manual intervention in apps
 • Not used for scaling
 • Multi-AZ replication is free
@@ -2400,6 +2394,7 @@ Failover support:
 -------------------------------------------------
 Amazon RDS provides high availability and failover support for DB instances using Multi-AZ deployments. 
 Amazon RDS uses several different technologies to provide failover support. 
+
 Multi-AZ deployments for Oracle, PostgreSQL, MySQL, and MariaDB DB instances use Amazon’s failover technology. 
 SQL Server DB instances use SQL Server Database Mirroring (DBM).
 
@@ -2432,13 +2427,17 @@ RDS Security – Summary:
 
 
 Basic Schema Copy will not migrate secondary indexes, foreign keys or stored procedures. 
+
 When you need to use a more customizable schema migration process (e.g. when you are migrating your 
 production database and need to move your stored procedures and secondary database objects), 
 you must use the AWS Schema Conversion Tool.
 
 
 
-When you create or modify your DB instance to run as a Multi-AZ deployment, Amazon RDS automatically provisions and maintains a synchronous standby replica in a different Availability Zone. Updates to your DB Instance are synchronously replicated across Availability Zones to the standby in order to keep both in sync and protect your latest database updates against DB instance failure.
+When you create or modify your DB instance to run as a Multi-AZ deployment, Amazon RDS automatically provisions and maintains 
+a synchronous standby replica in a different Availability Zone. 
+Updates to your DB Instance are synchronously replicated across Availability Zones to the standby in order to keep both in sync 
+and protect your latest database updates against DB instance failure.
 
 
 Encryption of Data in Transit:
@@ -2461,29 +2460,11 @@ RDS for Oracle uses Oracle native network encryption with a DB instance.
 IAM database authentication works with MySQL and PostgreSQL.
 IAM authentication is just another way to authenticate the user's credentials while accessing 
 the database.
-It would not significantly enhance the security in a way that 
-enabling SSL does by facilitating the in-transit encryption for the database.
 
+It would not significantly enhance the security in a way that SSL does by   in-transit encryption for the database.
 
-You can authenticate to your DB instance using AWS Identity and Access Management (IAM) 
-database authentication. IAM database authentication works with MySQL and PostgreSQL. 
 With this authentication method, you don’t need to use a password when you connect to a DB instance. 
 Instead, you use an authentication token.
-
-IAM database authentication provides the following benefits:
-
-Network traffic to and from the database is encrypted using Secure Sockets Layer (SSL).
-	You can use IAM to centrally manage access to your database resources, instead of managing access 
-	 individually on each DB instance.
-	For applications running on Amazon EC2, you can use profile credentials specific to your 
-	EC2 instance to access your database instead of a password, for greater security.
-
-
-
-When you create or modify your DB instance to run as a Multi-AZ deployment, 
-Amazon RDS automatically provisions and maintains a synchronous standby replica in a different 
-Availability Zone. Updates to your DB Instance are synchronously replicated across 
-Availability Zones to the standby\.
 
 
 Primary database instance fails:
@@ -2494,19 +2475,22 @@ Read Replicas:
 It elastically scales out beyond the capacity constraints of a single DB instance for read-heavy database workloads.
 Provides asynchronous replication and improves the performance of the primary database by taking read-heavy database workloads from it.
 
-You can also create read replicas within a Region or between Regions for your Amazon RDS for MySQL, MariaDB, PostgreSQL, and Oracle database instances encrypted at rest with AWS Key Management Service (KMS).
+You can also create read replicas within a Region or between Regions for your Amazon RDS for MySQL, MariaDB, PostgreSQL, and 
+Oracle database instances encrypted at rest with AWS Key Management Service (KMS).
 
 
 There are 2 ways to use SSL to connect to your SQL Server DB instance:
-
 – Force SSL for all connections — this happens transparently to the client, and the client doesn’t have to do any work to use SSL.
-– Encrypt specific connections — this sets up an SSL connection from a specific client computer, and you must do work on the client to encrypt connections.
+– Encrypt specific connections — this sets up an SSL connection from a specific client computer, and you must do work on the 
+  client to encrypt connections.
 
 
 Enhanced Monitoring is a feature of Amazon RDS. 
 By default, Enhanced Monitoring metrics are stored for 30 days in the CloudWatch Logs.
 
-Differences between CloudWatch and Enhanced Monitoring Metrics.  CloudWatch gathers metrics about CPU utilization from the hypervisor for a DB instance, and Enhanced Monitoring gathers its metrics from an agent on the instance.
+Differences between CloudWatch and Enhanced Monitoring Metrics:  
+	CloudWatch gathers metrics about CPU utilization from the hypervisor for a DB instance, and 
+	Enhanced Monitoring gathers its metrics from an agent on the instance.
 
 Why Enhanced Monitoring for RDS: 
 You do not have direct access to the instances/servers of your RDS database instance, unlike with your 
@@ -2517,9 +2501,9 @@ CPU and memory utilization of your instance.
 
 
 Amazon RDS supports change data capture (CDC) for your DB instances running Microsoft SQL Server. 
-CDC captures changes that are made to the data in your tables. 
-It stores metadata about each change, which you can access later.
-After CDC is enabled on the database, you can start tracking specific tables. 
+	CDC captures changes that are made to the data in your tables. 
+	It stores metadata about each change, which you can access later.
+	After CDC is enabled on the database, you can start tracking specific tables. 
 
 
 Area:
@@ -2593,9 +2577,13 @@ Non-Serverless DB cluster for Aurora is called a provisioned DB cluster.
 Aurora Serverless clusters and provisioned clusters both have the same kind of 
 high-capacity, distributed, and highly available storage volume.
 
-When you work with Amazon Aurora without Aurora Serverless (provisioned DB clusters), you can choose your DB instance class size and create Aurora Replicas to increase read throughput. If your workload changes, you can modify the DB instance class size and change the number of Aurora Replicas. This model works well when the database workload is predictable, because you can adjust capacity manually based on the expected workload.
+When you work with Amazon Aurora without Aurora Serverless (provisioned DB clusters), you can choose your DB instance class 
+size and create Aurora Replicas to increase read throughput. 
+If your workload changes, you can modify the DB instance class size and change the number of Aurora Replicas. 
+This model works well when the database workload is predictable, because you can adjust capacity manually based on the expected workload.
 
-With Aurora Serverless , you can create a database endpoint without specifying the DB instance class size. You set the minimum and maximum capacity. 
+With Aurora Serverless , you can create a database endpoint without specifying the DB instance class size. 
+You set the minimum and maximum capacity. 
 
 
 
@@ -2677,9 +2665,8 @@ Aurora Machine Learning:
 
 
 Aurora Replicas have two main purposes:
-	You can issue queries to them to scale the read operations for your application. 
-	You typically do so by connecting to the reader endpoint of the cluster. 
-	That way, Aurora can spread the load for read-only connections across as many 
+	for read operations for your application. 
+    Aurora can spread the load for read-only connections across as many 
 	Aurora Replicas as you have in the cluster. 
 
 	Aurora Replicas also help to increase availability. 
@@ -2703,10 +2690,11 @@ In the event of a failover, Amazon Aurora will promote the Read Replica that has
 Amazon RDS promotes the replica that is largest in size.
  
 If two or more  Aurora Replicas share the same priority and size, then 
-Amazon Aurora promotes an arbitrary replica in the same promotion tier.
+Amazon Aurora promotes an ramdomly replica in the same promotion tier.
 
 
-creating a custom endpoint in Aurora based on the specified criteria for the production traffic and another custom endpoint to handle the reporting queries 
+creating a custom endpoint in Aurora based on the specified criteria for the production traffic and 
+another custom endpoint to handle the reporting queries.
 
 
 Area:
@@ -2727,7 +2715,7 @@ BillCost:
 =========
 Prices vary according to the region.
 With Amazon Aurora Global Database, you 
-pay for replicated write I/Os between the primary Region and each secofndary Region.
+pay for replicated write I/Os between the primary Region and each secondary Region.
 
 
 
@@ -2735,7 +2723,7 @@ Security:
 =========
 It is a aws managed service, security is a shared responsibility.
 
-• Encryption at rest using KMS
+• Encryption at rest using 
 • Automated backups, snapshots and replicas are also encrypted
 • Encryption in flight using SSL (same process as MySQL or Postgres)
 • Possibility to authenticate using IAM token (same method as RDS)
@@ -2794,6 +2782,7 @@ Aurora Database Cloning:
 
 
 
+
 ++RDS & Aurora Security:
 -------------------------------------------------
 • At-rest encryption:
@@ -2835,17 +2824,15 @@ Amazon RDS Proxy:
 ElastiCache supports two open-source in-memory caching engines: Memcached and Redis.
 Using ElastiCache involves heavy application code changes.
 
-The same way RDS is to get managed Relational Databases.
-ElastiCache is to get managed Redis or Memcached.
-adistributed in-memory key-value environment.
+ElastiCache is to get managed Redis or Memcached as RDS for other enign lke MySQL.
+Distributed in-memory key-value environment.
 
 Amazon ElastiCache for Redis is a great choice for real-time transactional and analytical 
 processing use cases such as caching, chat/messaging, gaming leaderboards, geospatial, machine learning, 
 media streaming, queues, real-time analytics, and session store.
 
 Amazon ElastiCache for Memcached is a great choice for implementing an in-memory 
-cache to decrease access latency, 
-increase throughput, and ease the load off your relational or NoSQL database.
+cache to decrease access latency, increase throughput, and ease the load off your relational or NoSQL database.
 ElastiCache Memcached cannot be used as a cache to serve static content from S3.
 
 Although you can integrate Redis with DynamoDB.
@@ -2992,7 +2979,7 @@ A Record:
 	should not change frequently. For example, Elastic IPs in AWS are static IPs.
 
 CNAME Record:
-	CNAME record maps a name to another name. It can never be an IP address. 
+	CNAME record maps a name/ to another name value. It can never be an IP address. 
 
 An A record for example.com (i.e. root/naked domain) points to the server IP address
 A CNAME record for www.example.com points to example.com(A or AAAA). 
@@ -3001,11 +2988,12 @@ A CNAME record for www.example.com points to example.com(A or AAAA).
 CNAME vs Alias:
 	• AWS Resources (Load Balancer, CloudFront...) expose an AWS hostname:
 	• lb1-1234.us-east-2.elb.amazonaws.com and you want myapp.mydomain.com
-	CNAME:
-		• The target is a domain name which must have an A or AAAA record.
+CNAME:
+		• The target or value is a domain name which must have an A or AAAA record.
 		• Points a hostname to any other hostname. (app.mydomain.com => anything.com)
 		• ONLY FOR NON ROOT DOMAIN (aka.something.mydomain.com) Destination.
-	Alias:Alias record is an Amazon Route 53-specific virtual record. 
+		
+Alias   : Alias record is an Amazon Route 53-specific virtual record. 
 		• Maps a hostname to an AWS resource
 		• An extension to DNS functionality
 		• Automatically recognizes changes in the resource’s IP addresses
@@ -3014,13 +3002,12 @@ CNAME vs Alias:
 		• You can’t set the TTL
 		
 		
-A     = 11.221.32.143 (IP)          ->example.com      Not for www.example.com 
-CNAME =  example.com(A/AAAA)        ->www.example.com or app.mydomain.com  (DNS name not for A/AAAA)
-Alias =  elb.amazonaws.com            ->example.com(A/AAAA)
+A     =  11.221.32.143 (IP)             ->example.com      Not for www.example.com 
+CNAME =  example.com(A/AAAA)           ->www.example.com or app.mydomain.com  (DNS name not for A/AAAA)
+Alias =  elb.amazonaws.com            ->example.com(ROOT DOMAIN ) or myapp.mydomain.com(NON ROOT DOMAIN )
 
 To simplify it we can say that example.com points to the server IP address using 
-A record, and www.example.com points to the same address via example.com using a CNAME record. 
-(Read Now – CNAME vs Alias)
+A record, and www.example.com points to the same address via example.com using a CNAME record. (Read Now – CNAME vs Alias)
 
 
 Now a AWS service • lb1-1234.us-east-2.elb.amazonaws.com and you want myapp.mydomain.com, how ?
@@ -3307,6 +3294,7 @@ There are 4 methods of encrypting objects in S3:
 	• SSE-KMS: AWS Key Management Service to manage encryption keys
 	• SSE-C: when you want to manage your own encryption keys
 	• Client Side Encryption
+	
 EmaxTips:It’s important to understand which ones are adapted to which situation for the exam
 
 
