@@ -3305,19 +3305,22 @@ SSE-S3:
 	• Must set header: “x-amz-server-side-encryption": "AES256"
 
 SSE-KMS:
-	• SSE-KMS: encryption using keys handled & managed by KMS
+	• SSE-KMS: everage AWS Key Management Service to manage encryption keys
 	• KMS Advantages: user control + Audit trail
 	• Object is encrypted server side
 	• Must set header: “x-amz-server-side-encryption": ”aws:kms"
 
 SSE-C:
+	• SSE-C: when you want to manage your own encryption keys
 	• SSE-C: server-side encryption using data keys fully managed by the customer outside of AWS
 	• Amazon S3 does not store the encryption key you provide
 	• HTTPS is mandatory for SSE-C
 	• Encryption key must provided in HTTP headers, for every HTTP request made
 
 Client Side Encryption:
-	• Client library such as the Amazon S3 Encryption Client
+	• Client library such as the Amazon S3 Encryption Client 
+	• Clients must encrypt data themselves before sending to S3 
+	• Clients must decrypt data themselves when retrieving from S3 
 	• Customer fully manages the keys and encryption cycle
 
 
@@ -3326,13 +3329,13 @@ Client Side Encryption:
 
 S3 Security:
 	IAM policies                 = Manage multiple Users to do under a single AWS account about S3 bucket or objects .
-	Bucket policies,             = With Bucket policies and Access point policies, customers can define rules  which apply broadly across all requests to their Amazon S3 resources.
+	Bucket policies,             = With Bucket policies and Access point policies, define rules  which apply all requests to S3 resources.
 	Access point policies        = Do
-	Access Control Lists         = With ACLs(our original access control method- only to other AWS accounts, not to users in your account use only for grant write permissions to the S3 Log Delivery group), customers can grant specific permissions (i.e. READ, WRITE, FULL_CONTROL) to specific users (customers who prefer to use exclusively policies for access control)for an individual bucket or object.
-	Query String Authentication  = With Query String Authentication, customers can create a URL to an Amazon S3 object which is only valid for a limited time. 
-	VPC endpoint policies,       = When customers create an Amazon VPC endpoint, they can attach an endpoint policy to it that controls access to the Amazon S3 resources to which they are connecting. Customers can also use Amazon S3 bucket policies to control access to buckets from specific endpoints or specific VPCs.
+	Access Control Lists         = With ACLs only to other AWS accounts, not to users in your account. grant specific permissions (i.e. READ, WRITE, FULL_CONTROL) to specific users (customers who prefer to use exclusively policies for access control)for an individual bucket or object.
+	Query String Authentication  = With Query String Authentication, create a URL to an S3 object which is only valid for a limited time. 
+	VPC endpoint policies,       = withh VPC endpoint, they can attach an endpoint policy to it that controls access to the S3 resources to which will are connecting. Also S3 bucket policies to control access to buckets from specific endpoints or specific VPCs.
 	SCPs in AWS Organizations    = SCPs are a type of AWS Organizations policy that customers can use to manage permissions in their organization. SCPs offer central control over the maximum available permissions for all accounts in an organization.
-	S3 Block Public Access       = Amazon S3 Block Public Access provides settings for access points, buckets, and accounts to help customers manage public access to Amazon S3 resources.
+	S3 Block Public Access       = S3 Block Public Access provides settings for- access points, buckets, and accounts to  manage public access to  S3 resources.
 
 With MFA Delete, Encryption, Cross-Account Access, Requester Pays Buckets and Monitoring.
 
@@ -3353,6 +3356,19 @@ Use S3 bucket policy to:-
 	• Force objects to be encrypted at upload 
 	• Grant access to another account (Cross Account)
 
+
+
+S3 Bucket Policies: 
+	• JSON based policies 
+	• Resources: buckets and objects 
+	• Actions: Set of API to Allow or Deny 
+	• Effect: Allow / Deny 
+	• Principal: The account or user to apply the policy to
+
+Use S3 bucket for policy to: 
+	• Grant public access to the bucket 
+	• Force objects to be encrypted at upload 
+	• Grant access to another account (CrossAccount)
 
 
 
@@ -3395,18 +3411,19 @@ performance to 55,000 read requests per second.
 
 When you use bucket default settings, you don't specify a Retain Until Date. 
 Instead, you specify a duration, in either days or years.
+ByDefault its a period like: 1 year.
 
 When you apply a retention period to an object version explicitly, you specify a Retain Until Date 
 for the object version.
-ByDefault its a period like: 1 year.
+
 
 
 
 
 Encryption:
 	Server-side Encryption using
-		Amazon S3-Managed Keys (SSE-S3)
-		AWS KMS-Managed Keys (SSE-KMS)
+		Amazon S3-Managed Keys (SSE-S3 with AES-256)
+		AWS KMS-Managed Keys (SSE-KMS with Audit-trails)
 		Customer-Provided Keys (SSE-C)
 	Client-side Encryption using
 		AWS KMS-managed customer master key
@@ -3414,7 +3431,12 @@ Encryption:
 
 
 
-When using an AWS KMS-managed customer master key to enable client-side data encryption, you provide an AWS KMS customer master key ID (CMK ID) to AWS. On the other hand, when you use client-side master key for client-side data encryption, your client-side master keys and your unencrypted data are never sent to AWS.
+When using an AWS KMS-Managed customer master key to enable client-side data encryption, you provide an 
+AWS KMS customer master key ID (CMK ID) to AWS. 
+
+On the other hand, when you use client-side master key for client-side data encryption, your client-side master keys 
+and your unencrypted data are never sent to AWS.
+
 
 S3  replicating the objects to the destination bucket takes about 15 minutes. 
 Take note that the requirement in the scenario is to aggregate the data in the fastest way.
@@ -3467,6 +3489,8 @@ Networking:
 Logging and Audit:
 	• S3 Access Logs can be stored in other S3 bucket
 	• API calls can be logged in AWS CloudTrail
+	• GuardDuty monitors threats against your Amazon S3 resources by analyzing AWS CloudTrail management events and 
+	  CloudTrail S3 data events.
 User Security:
 	• MFA Delete: MFA can be required in versioned buckets to delete objects.
 	• Pre-Signed URLs: URLs that are valid only for a limited time 
@@ -3482,9 +3506,9 @@ Encryption in-flight is also called SSL / TLS.
 
 ==Developing on AWS
 40
-##EAWS EC2 Instance Metadata
+##Instance Metadata
 -------------------------------------------------
-Instance metadata is data about your instance that you can use to configure or manage the running instance. 
+EC2 Instance metadata is data about your instance that you can use to configure or manage the running instance. 
 AWS EC2 Instance Metadata is powerful but one of the least known features to developers.
 
 • It allows AWS EC2 instances to ”learn about themselves” without using an IAM Role for that purpose.
@@ -3497,8 +3521,7 @@ Userdata = launch script of the EC2 instance
 
 
 
-AWS SDK: Good to know: if you don’t specify or configure a default region, then
-us-east-1 will be chosen by default.
+AWS SDK: Good to know: if you don’t specify or configure a default region, then us-east-1 will be chosen by default.
 
 
 
@@ -3532,6 +3555,7 @@ MFA (multi factor authentication) forces user to generate a code on a device
 S3 Access Logs provides detailed records for the requests that are made to an Amazon S3 bucket. 
 Provide the name of the target bucket. 
 This bucket is where you want Amazon S3 to save the access logs as objects. 
+
 Both the source and target buckets must be in the same AWS Region and owned by the same account.
 That data can be analyzed using data analysis tools.
 
@@ -3565,8 +3589,7 @@ S3 Replication supports two-way replication between two or more buckets in the s
 
 
 • CRR(Cross Region Replication) - Use cases: compliance, lower latency access, replication across accounts
-• SRR(Same Region Replication) – Use cases: log aggregation, live replication 
-  between production and test .
+• SRR(Same Region Replication)  – Use cases: log aggregation, live replication between production and test.
 
 
 After activating, only new objects are replicated
@@ -3622,9 +3645,7 @@ UseCase :
 ##S3 Storage Class
 -------------------------------------------------
 
-S3 Storage Classes can be configured at the object level, and a single bucket can contain objects 
-stored across S3 Standard, S3 Intelligent-Tiering, S3 Standard-IA, and S3 One Zone-IA.
-
+S3 Storage Classes can be configured at the object level, and a single bucket can contain all Class type object.
 
 Amazon S3 Storage Classes:
 	S3 Standard
@@ -3702,9 +3723,8 @@ No retraival free for S3Standerd and InteletencyTaring
 45
 ##S3 Lifecycle | Rule
 -------------------------------------------------
-An S3 Lifecycle configuration is a set of rules that define actions that Amazon S3 applies to 
-a group of objects. 
-Can move between classes manually or using S3 Lifecycle configurations
+An S3 Lifecycle configuration is a set of rules that define actions that S3 applies to a group of objects. 
+S3 Object Can move between classes manually or using S3 Lifecycle configurations
 
 Transition actions: It defines when objects are transitioned to another storage class.
 	• Move objects to Standard IA class 60 days after creation
@@ -3733,8 +3753,7 @@ Unsupported lifecycle:
 	Any storage class to the S3 Standard storage class.
 	Any storage class to the Reduced Redundancy Storage (RRS) class.
 	The S3 Intelligent-Tiering storage class to the S3 Standard-IA storage class.
-	The S3 One Zone-IA storage class to the S3 Intelligent-Tiering, S3 Standard-IA, 
-	and  S3 Glacier Instant Retrieval storage classes.
+	The S3 One Zone-IA storage class to the S3 Intelligent-Tiering, S3 Standard-IA, and  S3 Glacier Instant Retrieval storage classes.
 	
 https://docs.aws.amazon.com/AmazonS3/latest/userguide/lifecycle-transition-general-considerations.html
 
@@ -3764,7 +3783,8 @@ S3 – Baseline Performance
 3500 and 5500 for Each S3 prefix can support these request rates, making it simple to increase 
 performance significantly. 
   
-Performance scales per prefix, so you can use as many prefixes as you need in parallel to achieve the required throughput. There are no limits to the number of prefixes.
+Performance scales per prefix, so you can use as many prefixes as you need in parallel to achieve the required throughput. 
+There are no limits to the number of prefixes.
 
 
 
@@ -3785,7 +3805,7 @@ S3 Transfer Acceleration:
 
 
 
-• There are no limits to the number of prefixes in a bucket. 
+There are no limits to the number of prefixes in a bucket. 
 
 If you spread reads across all four prefixes evenly, you can achieve 22,000
 requests per second for GET and HEAD
@@ -3799,6 +3819,7 @@ S3 – KMS Limitation:
 47
 ##S3 Select & Glacier Select
 -------------------------------------------------
+Retrive subset of object date. Get Data in a object by object key.
 • Retrieve less data using SQL by performing server side filtering
 • Can filter by rows & columns (simple SQL statements)
 • Less network transfer, less CPU cost client-side
@@ -3835,6 +3856,7 @@ Amazon S3 supports For Event:Amazon SNS, Amazon SQS, Lambda.
 
 S3 cannot directly write data into SNS, although it can certainly use S3 event notifications to 
 send an event to SNS.
+
 
 
 49
@@ -3945,32 +3967,13 @@ centralized management of permissions.
 With bucket policies, you can grant users within your 
 AWS Account or other AWS Accounts access to your Amazon S3 resources.
 
-IAM->AccNot->UserYes
-ACL-AccYes->UserNot
-BucketPolicies->AccYes->UserYes
+IAM				->AccNot->UserYes
+ACL				->AccYes->UserNot
+BucketPolicies	->AccYes->UserYes
 
-With IAM policies, you can only grant users within your own AWS account permission to access your 
-Amazon S3 resources.
+With IAM policies, you can only grant users within your own AWS account permission to access your Amazon S3 resources.
 With ACLs, you can only grant other AWS accounts (not specific users) access to your Amazon S3 resources. 
 
-Area:
-=====
-Global but Data is Regional.
-
-
-UseCase:
-========
-S3 Glacier Vault Lock helps you to easily deploy and enforce compliance controls for individual 
-S3 Glacier vaults with a Vault Lock policy.
-
-
-BillCost:
-=========
-No aditional cost.
-
-Security:
-=========
-Security is a shared responsibility.
 
 
 
@@ -4068,13 +4071,13 @@ Custom Origin (HTTP)
 
 
 CloudFront Geo Restriction:
-• You can restrict who can access your distribution
-• Whitelist: Allow your users to access your content only if they're in one of the 
-  countries on a list of approved countries.
-• Blacklist: Prevent your users from accessing your content if they're in one of the countries on a 
-  blacklist of banned countries.
-• The “country” is determined using a 3rd party Geo-IP database
-• Use case: Copyright Laws to control access to content
+	• You can restrict who can access your distribution
+	• Whitelist: Allow your users to access your content only if they're in one of the 
+	  countries on a list of approved countries.
+	• Blacklist: Prevent your users from accessing your content if they're in one of the countries on a 
+	  blacklist of banned countries.
+	• The “country” is determined using a 3rd party Geo-IP database
+	• Use case: Copyright Laws to control access to content
 
 
 CloudFront vs S3 Cross Region Replication:
@@ -4118,7 +4121,7 @@ CloudFront refers to them as Signed URLs and Signed Cookies.
  Instead, they would need to access it through a CloudFront URL.
 
 
-Lambda Http HTTP 504 errors:
+Lambda Http HTTP  errors:
 Set up an origin failover by creating an origin group with two origins. 
 Specify one as the primary origin and the other as the second origin which 
 CloudFront automatically switches to when the primary origin returns specific 
@@ -4135,23 +4138,21 @@ the sensitive information would still be visible to other users who have access 
 This is because Lambda uses a default KMS key to encrypt the variables, which is 
 usually accessible by other users. 
 
-Use Signed Cookies to control who can access the private files in your CloudFront distribution by modifying your application to determine whether a user should have access to your content. For members, send the required Set-Cookie headers to the viewer which will unlock the content only to them.
+Use Signed Cookies to control who can access the private files in your CloudFront distribution by modifying your application to 
+determine whether a user should have access to your content. 
+For members, send the required Set-Cookie headers to the viewer which will unlock the content only to them.
 
 
 
 
 Use signed URLs for the following cases:
-
 – You want to use an RTMP distribution. Signed cookies aren’t supported for RTMP distributions.
-
 – You want to restrict access to individual files, for example, an installation download for your application.
-
 – Your users are using a client (for example, a custom HTTP client) that doesn’t support cookies.
 
 Use signed cookies for the following cases:
-
-– You want to provide access to multiple restricted files, for example, all of the files for a video in HLS format or all of the files in the subscribers’ area of a website.
-
+– You want to provide access to multiple restricted files, for example, all of the files for a video in HLS format or 
+  all of the files in the subscribers’ area of a website.
 – You don’t want to change your current URLs.
 
 
@@ -4159,17 +4160,27 @@ Use signed cookies for the following cases:
 Create an Origin Access Identity (OAI) for CloudFront and grant access to the objects in your S3 bucket to that OAI.
 
 
-The Cache-Control and Expires headers control how long objects stay in the cache. The Cache-Control max-age directive lets you specify how long (in seconds) you want an object to remain in the cache before CloudFront gets the object again from the origin server. The minimum expiration time CloudFront supports is 0 seconds for web distributions and 3600 seconds for RTMP distributions.
+The Cache-Control and Expires headers control how long objects stay in the cache. 
+The Cache-Control max-age directive lets you specify how long (in seconds) you want an object to remain in the cache before 
+CloudFront gets the object again from the origin server. 
+The minimum expiration time CloudFront supports is 0 seconds for web distributions and 3600 (60 mm or 1har) seconds for RTMP distributions.
 
 
-CloudFront Functions are just lightweight functions in JavaScript for high-scale, latency-sensitive CDN customizations and not for enforcing security. A CloudFront Function runtime environment offers submillisecond startup times which allows your application to scale immediately to handle millions of requests per second. But again, this can’t be used to restrict access to your files.
+CloudFront Functions are just lightweight functions in JavaScript for high-scale, latency-sensitive CDN customizations and 
+not for enforcing security. 
+
+A CloudFront Function runtime environment offers submillisecond startup times which allows your application to scale 
+immediately to handle millions of requests per second. But again, this can’t be used to restrict access to your files.
 
 
 Serve the private content via CloudFront only:
- A better solution is to set up an origin access identity (OAI) then use Signed URL or Signed Cookies in your CloudFront web distribution.
+	A better solution is to set up an origin access identity (OAI) then use Signed URL or Signed Cookies in your 
+	CloudFront web distribution.
  
- 
+
 Amazon S3 Storage Lens feature just provides a single view of object storage usage and activity across your entire Amazon S3 storage.
+S3 Storage Lens is the first cloud storage analytics solution to provide a single view of object storage usage and activity across hundreds, or even thousands, of accounts in an organization, with drill-downs to generate insights at the account, bucket, or even prefix level.
+
 
 
 
@@ -4313,7 +4324,6 @@ AWS Global Accelerator vs CloudFront:
 • CloudFront
 	• Improves performance for both cacheable content (such as images and videos)
 	• Dynamic content (such as API acceleration and dynamic site delivery)
-	• Content is served at the edge
 • Global Accelerator
 	• Improves performance for a wide range of applications over TCP or UDP
 	• Proxying packets at the edge to applications running in one or more AWS Regions.
@@ -4336,12 +4346,14 @@ resolvers, traffic dials and endpoint weights changes are effective within secon
 
 AWS Global Accelerator for availability and performance of your applications with local or global users.
 CloudFront is better for improving application resiliency to handle spikes in traffic.
+
 Direct Connect cannot be used to improve application resiliency to handle spikes in traffic.
  
  
 AWS Global Accelerator is incorrect because this service is more suitable for non-HTTP use cases, 
 such as gaming (UDP), IoT (MQTT), or Voice over IP, as well as for HTTP use cases that specifically 
-require static IP addresses or deterministic, fast regional failover. 
+require static IP addresses or deterministic, fast regional failover.
+ 
 Moreover, there is no direct way that you can integrate AWS Global Accelerator with Amazon S3.
 
 Area:
@@ -4366,7 +4378,7 @@ direction that flows through the accelerator.
 Security:
 =========
 only 2 external IP need to be whitelisted
-DDoS protection  AWS Shield
+DDoS protection  AWS Shield.
 
 
 
@@ -4374,7 +4386,7 @@ DDoS protection  AWS Shield
 
 
 
-
+==| Advanced Storage on AWS
 55
 ##Snow Family
 -------------------------------------------------
@@ -4388,7 +4400,6 @@ Highly-secure, portable devices to collect and process data at the edge, and mig
 It is a cost-effective way to transfer data offline. 
 
 
-
 AWS snow family service model is of three types: 
 
 AWS snow cone: 
@@ -4396,6 +4407,7 @@ AWS snow cone:
 	It is available in HDD and SDD options. Snowcone is ruggedized, secure, and purpose-built for use outside of a 
 	traditional data centre. 
 	Can be sent back to AWS offline, or connect it to internet and use AWS DataSync to send data.
+
 
 AWS snowball: 
 	Snowball is available as compute optimized device and storage optimized device. 
@@ -4551,9 +4563,7 @@ Amazon FSx for Lustre:
 	• Storage Options:
 		• SSD – low-latency, IOPS intensive workloads, small & random file operations
 		• HDD – throughput-intensive workloads, large & sequential file operations
-		• Seamless integration with S3
-		• Can “read S3” as a file system (through FSx)
-		• Can write the output of the computations back to S3 (through FSx)
+		• Seamless integration with S3, r/w (through FSx)
 		• Can be used from on-premises servers (VPN or Direct Connect)
 
 FSx Lustre - File System Deployment Options:
@@ -4566,17 +4576,11 @@ FSx Lustre - File System Deployment Options:
 	• Long-term storage
 	• Data is replicated within same AZ
 	• Replace failed files within minutes
-	• Usage: long-term processing, sensitive data
+	• Usage: long-term processing, sensitive data.
 
 FSx for Lustre integrates with Amazon S3.
 FSx for Lustre provides the ability to both process the 'hot data' in a parallel and distributed fashion 
 as well as easily store the 'cold data' on Amazon S3.
-
-FSx for Lustre integrates with Amazon S3, making it easy to process data sets with the Lustre file system. 
-When linked to an S3 bucket, an FSx for Lustre file system transparently presents 
-S3 objects as files and allows you to write changed data back to S3.
-
-
 
 
 Amazon FSx for NetApp ONTAP:
@@ -4682,27 +4686,13 @@ File gateway offers SMB or NFS-based access to data in Amazon S3 with local cach
 
 Use cases: disaster recovery, backup & restore, tiered storage.
 
-
-
-Hybrid Cloud for Storage:
-• AWS is pushing for ”hybrid cloud”
-	• Part of your infrastructure is on the cloud
-	• Part of your infrastructure is on-premises
-• This can be due to
-	• Long cloud migrations
-	• Security requirements
-	• Compliance requirements
-	• IT strategy
-
-S3 is a proprietary storage technology (unlike EFS / NFS), so how do you expose the S3 data on-premises?
-  AWS Storage Gateway!
-
-
 3 types of Storage Gateway:
 	• File Gateway
 	• Volume Gateway
 	• Tape Gateway
+	
 Exam Tip: You need to know the differences between all 3!
+AWS Storage Gateway doesn’t support EFS.
 
 ++
 • S3 File Gateway
@@ -4727,14 +4717,14 @@ You can think of a file gateway as a file system mount on S3.
 
 
 
-Amazon FSx File Gateway:
-File Gateway synchronizes changed data to FSx for Windows File Server in the background. 
-With these capabilities, you can consolidate all of your on-premises file share data in AWS on FSx for 
-Windows File Server and benefit from protected, resilient, fully managed file systems.
-	• Native access to Amazon FSx for Windows File Server
-	• Local cache for frequently accessed data
-	• Windows native compatibility (SMB, NTFS, Active Directory...)
-	• Useful for group file shares and home directories
+FSx File Gateway:
+	File Gateway synchronizes changed data to FSx for Windows File Server in the background. 
+	With these capabilities, you can consolidate all of your on-premises file share data in AWS on FSx for 
+	Windows File Server and benefit from protected, resilient, fully managed file systems.
+		• Native access to Amazon FSx for Windows File Server
+		• Local cache for frequently accessed data
+		• Windows native compatibility (SMB, NTFS, Active Directory...)
+		• Useful for group file shares and home directories
 
 
 
@@ -4762,10 +4752,6 @@ Tape Gateway:
 It is supported by NetBackup, Backup Exec, Veeam, etc. 
 Instead of using physical tape, they are using virtual tape,  and these virtual tapes are 
 further stored in Amazon S3.
-
-• Some companies have backup processes using physical tapes (!)
-• With Tape Gateway, companies use the same processes but, in the cloud
-• Virtual Tape Library (VTL) backed by Amazon S3 and Glacier
 
 
 Storage Gateway – Hardware appliance:
@@ -4827,6 +4813,7 @@ A fully-managed service for file transfers into and out of Amazon S3 or Amazon E
 
 The data transfer between AWS Transfer Family servers and Amazon S3 happens over internal AWS networks and doesn’t 
 traverse the public internet. 
+
 Because of this, you do not need to use AWS PrivateLink for data transfered from the 
 AWS Transfer Family server to Amazon S3.
 
@@ -4891,6 +4878,8 @@ Security is a shared responsibility.
 
 
 
+
+
 ##DataSync
 -------------------------------------------------
 Schedule data sync from on-premises to AWS, or AWS to AWS.
@@ -4926,11 +4915,8 @@ transfer within cloud.
 If you want to transfer on-premises block/tapes to AWS, then AWS Storage Gateway is the option to go with.
 
  When the requirement is to transfer files from on premises to AWS EFS (elastic file system) 
- then AWS Datasync is the option as AWS Storage Gateway doesn’t support EFS
+ then AWS Datasync is the option as AWS Storage Gateway doesn’t support EFS.
 
-
-Datasync can send data to AWS Glacier.
-Datasync can seamlessly move data between multiple on-premise file systems and AWS.
 
 Datasync can also be used to move or sync data between AWS storage services like S3, 
 EFS or FSx in the same or different accounts.
@@ -4969,8 +4955,8 @@ Storage Comparison:
 ##Decouple your applications:
 -------------------------------------------------
 There are two patterns of application communication:
-	1) Synchronous communications (application to application)
-	2) Asynchronous / Event based (application to queue to application)
+	1) Synchronous communications (application-application)
+	2) Asynchronous / Event based (application-queue-application)
 	
 • Synchronous between applications can be problematic if there are sudden spikes of traffic
 • What if you need to suddenly encode 1000 videos but usually it’s 10?
@@ -5061,10 +5047,10 @@ SQS – Request-Response Systems:
 
 
 FIFO Queue:
-• FIFO = First In First Out (ordering of messages in the queue)
-• Limited throughput: 300 msg/s without batching, 3000 msg/s with batching
-• Exactly-once send capability (by removing duplicates)
-• Messages are processed in order by the consumer
+	• FIFO = First In First Out (ordering of messages in the queue)
+	• Limited throughput: 300 msg/s without batching, 3000 msg/s with batching
+	• Exactly-once send capability (by removing duplicates)
+	• Messages are processed in order by the consumer
 
 
 You can't convert an existing standard queue into a FIFO queue.
@@ -5075,8 +5061,8 @@ By default 300 Opration per second, if a 4 msg can process per operation then it
  
 
 
-By default, FIFO queues support up to 300 messages per second (300 send, receive, or delete operations 
-per second). 
+By default, FIFO queues support up to 300 messages per second (300 send, receive, or delete operations per second). 
+
 When you batch 10 messages per operation (maximum), FIFO queues can support up to 
 3,000 messages per second. Therefore you need to process 4 messages per operation so that the 
 FIFO queue can support up to 1200 messages per second, which is well within the peak rate.
@@ -5087,8 +5073,7 @@ Amazon SQS console, which will support up to 30,000 messages per second with bat
 
 
 
-Amazon SQS has automatically deleted the messages that have been in a queue for more than the 
-maximum message retention period.
+Amazon SQS has automatically deleted the messages that have been in a queue for more than the maximum message retention period.
 Default message retention period is 4 days.
 
 
@@ -5164,6 +5149,8 @@ CloudWatch Metric – Queue Length ApproximateNumberOfMessages and scale EC2
 Anytime multiple services need to receive the same event, you should consider SNS rather than SQS.
 
 SNS cannot directly send messages to Kinesis Data Streams.
+You can use to deliver messages to Amazon Kinesis Data Firehose. 
+
 You would need to write a Lambda function that would send the message to a Kinesis stream.
 Lambda function will not "fetch from SNS". Rather, the Lambda function will be triggered by SNS, 
 with the message being passed as input. 
@@ -5241,8 +5228,6 @@ Message Filtering:
 
 
 
-SNS can send to Kinesis and therefore we can have the following solutions architecture.
-
 
 
 Area:
@@ -5301,15 +5286,15 @@ Amazon Virtual Private Cloud (VPC) subnet, without traversing the Internet.
 63
 ##Kinesis
 -------------------------------------------------
- A Kinesis data stream stores records from 24 hours by default to a maximum of 8760 hours (365 days).
+A Kinesis data stream stores records from 24 hours by default to a maximum of 8760 hours (365 days).
 
 Amazon Kinesis is the streaming data platform of AWS and has four distinct services under it: 
 Kinesis Data Firehose, Kinesis Data Streams, Kinesis Video Streams, and Amazon Kinesis Data Analytics. 
 For the specific use case, just as asked in the scenario, use Kinesis Data Firehose.
 
 
-Makes it easy to collect, process, and analyze streaming data in real-time and 
-that can be run on EC2 instances.Kinesis Data Streams is a serverless.
+Makes it easy to collect, process, and analyze streaming data in real-time and that can be run on EC2 instances.
+Kinesis Data Streams is a serverless.
 Ingest real-time data such as: Application logs, Metrics, Website clickstreams,IoT telemetry data.
 
 • Kinesis Data Streams: capture, process, and store data streams
@@ -5383,7 +5368,7 @@ Load streaming data into S3 / Redshift / ElasticSearch / 3rd party / custom HTTP
 
 Kinesis Data Firehose can only write to S3, Redshift, ElasticSearch or Splunk. 
 You can't have applications consuming data streams from Kinesis Data Firehose, 
-that's the job of Kinesis Data Streams.
+that's the job of Kinesis Data Streams (Write your own: Kinesis Client Library (KCL), AWS SDK).
 
 Pay for data going through Firehose
 Perform real-time analytics on Kinesis Streams using SQL
@@ -5403,6 +5388,7 @@ Kinesis Data Analytics (SQL application):
 	• Time-series analytics
 	• Real-time dashboards
 	• Real-time metrics
+	
 Kinesis Data Analytics cannot directly ingest data from the source as it ingests data either from 
 Kinesis Data Streams or Kinesis Data Firehose.
 
@@ -5540,7 +5526,10 @@ and start sending messages.
 
 
 
-A cluster deployment is a logical grouping of three RabbitMQ broker nodes behind a Network Load Balancer, each sharing users, queues, and a distributed state across multiple Availability Zones (AZ). In a cluster deployment, Amazon MQ automatically manages broker policies to enable classic mirroring across all nodes, ensuring high availability (HA).
+A cluster deployment is a logical grouping of three RabbitMQ broker nodes behind a Network Load Balancer, 
+each sharing users, queues, and a distributed state across multiple Availability Zones (AZ). 
+In a cluster deployment, Amazon MQ automatically manages broker policies to enable classic mirroring across all nodes, 
+ensuring high availability (HA).
 
 
 Area:
