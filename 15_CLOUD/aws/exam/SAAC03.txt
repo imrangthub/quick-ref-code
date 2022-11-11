@@ -420,7 +420,7 @@ It is a aws managed service, security is a shared responsibility.
 A policy is an JSON document or object in AWS that, when associated with an identity or resource, defines their permissions.
 
 
-Policies can be attached to users, groups, or Amazon S3 buckets, enabling centralized management of permissions.
+For Centralized management of permissions Policies can be attached to users, groups, or Amazon S3 buckets.
  
  
 
@@ -967,6 +967,9 @@ It is a aws managed service, security is a shared responsibility.
 When you launch an Amazon EC2 instance, you specify an IAM role to associate with the instance 
 to securely access aws Resources.
 
+Use an instance profile to pass an IAM role to an EC2 instance.
+An instance profile can contain only one IAM role, although a role can be included in multiple instance profiles. 
+This limit of one role per instance profile cannot be increased.
 
 
 
@@ -1414,6 +1417,10 @@ EBS Multi-Attach – io1/io2 family:
 	• Must use a file system that’s cluster-aware (not XFS, EX4, etc…) 
 
 
+You can attach multiple EBS volumes to a single instance. The volume and instance must be in the same Availability Zone. 
+Depending on the volume and instance types, you can use Multi-Attach to mount a volume to multiple instances at the same time.
+
+Amazon EBS Multi-Attach enables you to attach a single Provisioned IOPS SSD ( io1 or io2 ) volume to multiple instances that are in the same Availability Zone.
 
 
 
@@ -2185,8 +2192,7 @@ Taking the snapshot of the existing instance to create a new AMI and then creati
 in order to apply the maintenance patch, is not time/resource optimal.
 
 
-ASG cannot directly use a Cloudwatch alarm as the source for a scale-in or scale-out event.
-	  Based on the alarm:
+ASG cannot directly use a Cloudwatch alarm as the source for a scale-in or scale-out event. Based on the alarm:
 	• We can create scale-out policies (increase the number of instances)
 	• We can create scale-in policies (decrease the number of instances)
 
@@ -2674,6 +2680,11 @@ Aurora Replicas have two main purposes:
 	promotes one of the reader instances to take its place as the new writer. 
 	Up to 15 Aurora Replicas can be distributed across the Availability 
 	Zones that a DB cluster spans within an AWS Region.
+
+Amazon RDS for MySQL, MariaDB and PostgreSQL allow you to add up to 15 read replicas to each DB Instance. 
+Amazon RDS for Oracle and SQL Server allow you to add up to 5 read replicas to each DB Instance.
+An Aurora DB cluster can contain up to 15 Aurora Replicas. The Aurora Replicas can be distributed across the Availability Zones 
+that a DB cluster spans within an AWS Region.
 
 
 
@@ -5358,7 +5369,10 @@ Kinesis Data Streams Security:
 Kinesis Data Firehose:
 	 Amazon Kinesis Data Firehose is the easiest way to reliably load streaming data into data lakes, 
 	 data stores, and analytics tools, Not application.
- 
+
+Amazon Kinesis Data Firehose captures and loads data in near real time. It loads new data into Amazon S3, 
+Amazon Redshift, and Amazon OpenSearch Service within 60 seconds after the data is sent to the service. 
+
 Load streaming data into S3 / Redshift / ElasticSearch / 3rd party / custom HTTP.
 	• Fully managed
 	• Near real-time (buffer time min. 60 sec)
@@ -5574,21 +5588,19 @@ Launch Docker containers on AWS = Launch ECS Tasks on ECS Clusters
 You can’t directly set CloudWatch Alarms to update the ECS task count.
 
 
-Amazon ECS lets you run batch workloads with managed or custom schedulers on Amazon 
+Amazon ECS lets you run batch workloads with managed or custom schedulers on  
 EC2 On-Demand Instances, Reserved Instances, or Spot Instances.
 
 You can launch Reserved EC2 instances to process the mission-critical data and 
 Spot EC2 instances for processing non-essential batch jobs.
 
 There are two different charge models for Amazon Elastic Container Service (ECS): 
-Fargate Launch Type Model and EC2 Launch Type Model. With Fargate, you pay for the 
-amount of vCPU and memory resources that your containerized application requests 
-while for EC2 launch type model, there is no additional charge. 
-You pay for AWS resources (e.g., EC2 instances or EBS volumes) you create to store and run your application. 
-You only pay for what you use, as you use it; there are no minimum fees and no upfront commitments.
+Fargate Launch Type Model and EC2 Launch Type Model. 
+	With Fargate, you pay for the amount of vCPU and memory resources that your containerized application requests.
+	EC2 launch type model, there is no additional charge. 
+	You pay for AWS resources (e.g., EC2 instances or EBS volumes) you create to store and run your application. 
+	You only pay for what you use, as you use it; there are no minimum fees and no upfront commitments.
 
-
-There are two models that you can use to run your containers:
 
 	EC2 Launch Type: you must provision & maintain the infrastructure (the EC2 instances)
 		• Each EC2 Instance must run the ECS Agent to register in the ECS Cluster
@@ -5618,8 +5630,7 @@ The Fargate suitable:
 
 
 TaskDefinition:
-	TaskDefinition resource describes the container and volume definitions of an 
-	Amazon Elastic Container Service (Amazon ECS) task. You can specify which Docker images to use, 
+	TaskDefinition resource describes the container and volume definitions of an  ECS task. You can specify which Docker images to use, 
 	the required resources, and other configurations related to launching the task 
 	definition through an Amazon ECS service or task.
 You can define multiple containers in a task definition.
@@ -5679,7 +5690,7 @@ ECS Service Auto Scaling
 
 
 ECS Rolling Updates:
-• When updating from v1 to v2, we can control how many tasks can be started and stopped, and in which order
+• When updating from v1 to v2, we can control how many tasks can be started and stopped, and in which order.
 
 
 Amazon ECS – IAM Roles for ECS:
@@ -5728,7 +5739,8 @@ later receive a minimum of 20 GiB of ephemeral storage.
 
 Fargate tasks using Linux platform version 1.3.0 or earlier
 10 GB of Docker layer storage
-An additional 4 GB for volume mounts. This can be mounted and shared among containers using the volumes, mountPoints, and volumesFrom parameters in the task definition.
+An additional 4 GB for volume mounts. This can be mounted and shared among containers using the volumes, mountPoints, 
+and volumesFrom parameters in the task definition.
 
 
 
@@ -5738,7 +5750,8 @@ or later receive a minimum of 20 GiB of ephemeral storage. The total amount of
 ephemeral storage can be increased, up to a maximum of 200 GiB.
 
 
-20 GB of ephemeral storage is available for all Fargate Tasks and Pods by default—you only pay for any additional storage that you configure.
+20 GB of ephemeral storage is available for all Fargate Tasks and Pods by default—you only pay for any additional storage 
+that you configure.
 
 
 
@@ -5839,7 +5852,7 @@ Amazon EKS = Amazon Elastic Kubernetes Service (cloud-agnostic and open-source p
 • Kubernetes is an open-source system for automatic deployment, scaling and management of 
   containerized (usually Docker) application
 • It’s an alternative to ECS, similar goal but different API
-• EKS supports EC2 if you want to deploy worker nodes or Fargate to deploy serverless containers
+• EKS supports EC2 if you want to deploy worker nodes, or Fargate to deploy serverless containers
 • Use case: if your company is already using Kubernetes on-premises or in another cloud, and wants 
   to migrate to AWS using Kubernetes.
 • Kubernetes is cloud-agnostic (can be used in any cloud – Azure, GCP…)
@@ -5914,40 +5927,38 @@ Compute:
 	AWS Lambda:AWS Lambda is an event-driven, pay-as-you-go compute service that lets you run code without 
 	provisioning or managing servers.
 
-	AWS Fargate:AWS Fargate is a serverless compute engine that works with Amazon 
-	Elastic Container Service (ECS) and Amazon Elastic Kubernetes Service (EKS).
+	AWS Fargate:AWS Fargate is a serverless compute engine that works with ECS and EKS.
 
 Application integration:
-	Amazon EventBridge: Amazon EventBridge is a serverless event bus that lets you build event-driven applications at scale 
+	EventBridge: Amazon EventBridge is a serverless event bus that lets you build event-driven applications at scale 
 	across AWS and existing systems.
 
-	AWS Step Functions: AWS Step Functions is a visual workflow orchestrator that makes it easy to sequence multiple
+	Step Functions: AWS Step Functions is a visual workflow orchestrator that makes it easy to sequence multiple
 	AWS services into business-critical applications.
 	 
-	Amazon SQS: Amazon Simple Queue Service (SQS) is a message queuing service enabling you to decouple and scale 
+	SQS: Amazon Simple Queue Service (SQS) is a message queuing service enabling you to decouple and scale 
 	microservices, distributed systems, and serverless applications.
 
-	Amazon SNS: Amazon Simple Notification Service (SNS) is a fully managed messaging service for both ]
+	SNS: Amazon SNS is a fully managed messaging service for both ]
 	application-to-application (A2A) and application-to-person (A2P) communication.
 
-Amazon API Gateway: 
+API Gateway: 
 	Amazon API Gateway is a fully managed service that makes it easy to create and publish APIs at any scale.
 
-AWS AppSync: 
+AppSync: 
 	AWS AppSync is a fully managed service that accelerates application development with scalable GraphQL APIs.
 
 
 Data store:
-	Amazon S3: Amazon Simple Storage Service (Amazon S3) is an object storage service designed to store and 
-	protect any amount of data.
+	S3: Amazon S3 is an object storage service designed to store and protect any amount of data.
 
-	Amazon DynamoDB:Amazon DynamoDB is a key-value and document database service, delivering single-digit millisecond 
+	DynamoDB: Amazon DynamoDB is a key-value and document database service, delivering single-digit millisecond 
 	performance at any scale.
 
-	Amazon RDS Proxy: Amazon RDS Proxy is a managed database proxy for Amazon Relational Database Service (RDS) 
+	RDS Proxy: Amazon RDS Proxy is a managed database proxy for Amazon Relational Database Service (RDS) 
 	that makes applications more scalable and secure.
 
-	Amazon Aurora Serverless: Amazon Aurora Serverless is a MySQL and PostgreSQL-compatible relational database that automatically scales 
+	Aurora Serverless: Amazon Aurora Serverless is a MySQL and PostgreSQL-compatible relational database that automatically scales 
 	capacity based on your application's needs.
 
 
@@ -5981,8 +5992,7 @@ Security is a shared responsibility.
 67
 ##Lambda
 -------------------------------------------------
-You can invoke an AWS Lambda function from an Amazon Aurora MySQL-Compatible 
-Edition DB cluster with a native function or a stored procedure.
+You can invoke an AWS Lambda function from an Aurora MySQL DB cluster with a native function or a stored procedure.
 
 
 AWS Lambda is a serverless, event-driven compute service that lets you run code for virtually any type of 
@@ -6019,7 +6029,8 @@ An RDS instance is a good example.
 
 
 Once your function is VPC-enabled, all network traffic from your function is subject 
-to the routing rules of your VPC/Subnet. 
+to the routing rules of your VPC/Subnet.
+ 
 If your function needs to interact with a public 
 resource, you will need a route through a NAT gateway in a public subnet.
 
@@ -6027,7 +6038,7 @@ resource, you will need a route through a NAT gateway in a public subnet.
 Replace the Kinesis Data Streams with an Amazon SQS queue. 
 Create a Lambda function that will asynchronously process the requests.
 
-AWS Lambda function to process messages in an Amazon Simple Queue Service (Amazon SQS) queue. 
+AWS Lambda function use to process messages in  SQS queue. 
 Lambda event source mappings support standard queues and first-in, first-out (FIFO) queues.
 
 Kinesis Data Streams is a real-time data streaming service that requires the provisioning of shards. 
@@ -6084,9 +6095,8 @@ which improves performance and reduces latency.
 With Lambda@Edge, you can enrich your web applications by making them globally distributed and 
 improving their performance — all with zero server administration. 
 
-Lambda@Edge runs your code in response to events generated by the 
-Amazon CloudFront content delivery network (CDN). Just upload your code to 
-AWS Lambda, which takes care of everything required to run and scale your code with high 
+Lambda@Edge runs your code in response to events generated by the CloudFront.
+Just upload your code to AWS Lambda, which takes care of everything required to run and scale your code with high 
 availability at an AWS location closest to your end user.
 
 
@@ -6104,9 +6114,8 @@ You can use Lambda@Edge to change CloudFront requests and responses.
 You can also generate responses to viewers without ever sending the request to the origin.
 
 
-Customize the content that the CloudFront web distribution delivers to your users using Lambda@Edge, 
-which allows your Lambda functions to execute the 
-authentication process in AWS locations closer to the users.
+Customize the content that the CloudFront  delivers to your users using Lambda@Edge, 
+which allows your Lambda functions to execute the authentication process in AWS locations closer to the users.
 
 
 User getting HTTP 504 errors:
@@ -6130,7 +6139,9 @@ User Prioritization
 User Tracking and Analytics
 
 
-By using Lambda@Edge to dynamically route requests to different origins based on different viewer characteristics, you can balance the load on your origins, while improving the performance for your users. For example, you can route requests to origins within a home region, based on a viewer's location.
+By using Lambda@Edge to dynamically route requests to different origins based on different viewer characteristics, 
+you can balance the load on your origins, while improving the performance for your users. 
+For example, you can route requests to origins within a home region, based on a viewer's location.
 
 
 
@@ -6201,8 +6212,7 @@ DynamoDB offers built-in security, continuous backups, automated multi-Region re
 and data import and export tools.
 
 A key-value store holds for each key a single value. Arguably, if the value can be an entire document, 
-you can call this database a "document store". 
-In this sense, DynamoDB is a document store.
+you can call this database a "document store". In this sense, DynamoDB is a document store.
 
 
 The main components of DynamoDB are:
@@ -6263,7 +6273,7 @@ ElastiCache (available as a managed service) can cache the results from anything
 The difference here is that you need to manage invalidation and you must adjust your code to 
 check the cache before querying the main query store.
 
-Most fo the time, you’ll want to go w/DAX if you’re using DyanmoDB as a data store. 
+Most fo the time, you’ll want to go DAX if you’re using DyanmoDB as a data store. 
 Otherwise, use ElastiCache.
 
 
@@ -6320,6 +6330,14 @@ DynamoDB – Integration with Amazon S3:
 		• Import errors are logged in CloudWatch Logs
 
 
+DynamoDB Global Tables:(two-way-replication)
+	• Make a DynamoDB table accessible with low latency in multiple-regions
+	• Active-Active replication
+	• Applications can READ and WRITE to the table in any region
+	• Must enable DynamoDB Streams as a pre-requisite
+
+
+
 Enable DynamoDB Stream and create an AWS Lambda trigger, as well as the IAM role which contains 
 all of the permissions that the Lambda function will need at runtime. The data from the stream 
 record will be processed by the Lambda function which will then publish a message to SNS Topic 
@@ -6329,13 +6347,14 @@ Also working with Kinesis Client Library (KCL).
 
 
 Mobile game that has a serverless backend:
-– Enable DynamoDB Accelerator (DAX) and ensure that the Auto Scaling is enabled and increase the maximum provisioned read and write capacity.
+– Enable DAX and ensure that the Auto Scaling is enabled and increase the maximum provisioned read and write capacity.
 – Use API Gateway in conjunction with Lambda and turn on the caching on frequently accessed data and enable DynamoDB global replication.
 
 Since Auto Scaling is enabled by default, the provisioned read and write capacity will adjust automatically. 
 Also enable DynamoDB Accelerator (DAX) to improve the performance 
 from milliseconds to microseconds is incorrect because by default, 
 Auto Scaling is not enabled in a DynamoDB table which is created using the AWS CLI.
+
 
 
 Integrate DynamoDB table with CloudFront as these two are incompatible.
@@ -6351,8 +6370,7 @@ keep shared data updated in real-time.
 
 
 Improve the database performance:
-Use partition keys with high-cardinality attributes, which have a large number of 
-distinct values for each item.
+Use partition keys with high-cardinality attributes, which have a large number of distinct values for each item.
 
 
 Avoid using a composite primary key, which is composed of a partition key and a sort key is 
@@ -6360,8 +6378,12 @@ incorrect because as mentioned, a composite primary key will provide more partit
 and in turn, improves the performance. 
 Hence, it should be used and not avoided.
 
-Point-in-Time Recovery (PITR) feature is not capable of restoring a DynamoDB table to a particular point in time in a different AWS account.
-DynamoDB on-demand backups are available at no additional cost beyond the normal pricing that’s associated with backup storage size. DynamoDB on-demand backups cannot be copied to a different account or Region. To create backup copies across AWS accounts and Regions and for other advanced features, you should use AWS Backup.
+Point-in-Time Recovery (PITR) feature is not capable of restoring a DynamoDB table to a particular 
+point in time in a different AWS account.
+
+DynamoDB on-demand backups are available at no additional cost beyond the normal pricing that’s associated with backup storage size. 
+DynamoDB on-demand backups cannot be copied to a different account or Region. 
+To create backup copies across AWS accounts and Regions and for other advanced features, you should use AWS Backup.
 
 
 Area:
