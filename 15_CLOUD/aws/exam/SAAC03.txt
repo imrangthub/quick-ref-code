@@ -6211,6 +6211,8 @@ applications at any scale and single-digit millisecond performance.
 DynamoDB offers built-in security, continuous backups, automated multi-Region replication, in-memory caching, 
 and data import and export tools.
 
+In DynamoDB, you can only find by primary key or indexes.
+
 A key-value store holds for each key a single value. Arguably, if the value can be an entire document, 
 you can call this database a "document store". In this sense, DynamoDB is a document store.
 
@@ -7026,7 +7028,7 @@ Security is a shared responsibility.
 
 
 77
-##Redshift
+##Redshift ( Data Warehouse)
 -------------------------------------------------
 Fastest, easiest, and most widely used cloud data warehouse.
 
@@ -7061,7 +7063,7 @@ Redshift for Solutions Architect:
 	• Columnar storage of data (instead of row based) & parallel query engine
 	• Pay as you go based on the instances provisioned
 	• Has a SQL interface for performing the queries
-	• BI tools such as Amazon Quicksight or Tableau integrate with it
+	• BI tools such as Amazon QuickSight or Tableau integrate with it
 	• vs Athena: faster queries / joins / aggregations thanks to indexes
 
 Remember: Redshift = Analytics / BI / Data Warehouse
@@ -7081,7 +7083,7 @@ Redshift – Snapshots & DR:
 
 
 Loading data into Redshift: Large inserts are MUCH better
-	Amazon Kinesis -> Data Firehose->Redshift
+	Amazon Kinesis -> Kinesis Firehose->Redshift
 	S3 using -> COPY command ->Redshift
 	EC2 Instance -> JDBC driver ->Redshift
 
@@ -7105,10 +7107,11 @@ warehouse nodes and into large volumes of unstructured S3 data lakes.
 
 ***
 Today, there are three primary ways to access and analyze data in S3:
-	Amazon Elastic MapReduce (EMR): EMR uses Hadoop-style queries to access and process large data sets in S3.
-	Amazon Athena: Athena offers a console to query S3 data with standard SQL and no infrastructure to manage. 
+	Elastic MapReduce (EMR): EMR uses Hadoop-style queries to access and process large data sets in S3.
+	Athena: Athena offers a console to query S3 data with standard SQL and no infrastructure to manage. 
 	Athena also has an API.
-	Amazon Redshift: You can load data from S3 into an Amazon Redshift cluster for analysis.
+	Redshift: You can load data from S3 into an Amazon Redshift cluster for analysis.
+	
 Redshift Spectrum is a logical extension of Redshift to query the data from Redshift as well as 
 Amazon S3 data lakes whereas Athena is an exclusive tool to query data from Amazon S3 only.
 
@@ -7154,6 +7157,7 @@ You can also enable encryption, all the data written to disk will be encrypted.
 78
 ##OpenSearch Service|ElasticSearch now OpenSearch
 -------------------------------------------------
+
 Amazon OpenSearch Service makes it easy for you to perform interactive log analytics, 
 real-time application monitoring,  website search, and more. 
 OpenSearch is an open source, distributed search and analytics suite derived from Elasticsearch.
@@ -7192,10 +7196,7 @@ CloudSearch:
 	faceted search, real-time indexing, dynamic clustering, database integration, 
 	NoSQL features, and productive document handling.
 
-
-Amazon ElasticSearch and CloudSearch both are popular AWS-based tools that use proven technologies. 
-These tools allow users to create fast, scalable, and easily usable search solutions 
-for their applications. These can be categorized as "Search as a Service" tools.
+OpenSearch and CloudSearch can be categorized as "Search as a Service" tools.
 
 ElasticSearch Data and Index backup manual.
 Cloudsearch automatically takes backup of the data. Unlike Elasticsearch.
@@ -7237,6 +7238,19 @@ Comes with OpenSearch Dashboards (visualization)
 
 
 
+Kinesis Data Analytics (SQL application)
+-------------------------------------------------
+• Real-time analytics on Kinesis Data Streams & Firehose using SQL
+• Add reference data from Amazon S3 to enrich streaming data
+• Fully managed, no servers to provision
+
+Output:
+• Kinesis Data Streams: create streams out of the real-time analytics queries
+• Kinesis Data Firehose: send analytics query results to destinations
+
+• Use Flink (Java, Scala or SQL) to process and analyze streaming data
+
+
 
 79
 ##EMR Elastic MapReduce
@@ -7273,12 +7287,23 @@ EMR does not offer the same storage and processing speed as FSx for Lustre.
 
 Amazon EMR is the industry-leading cloud big data platform for processing vast amounts 
 of data using open source tools such as Apache Spark, Apache Hive, Apache HBase, 
-Apache Flink, Apache Hudi, and Presto. 
+Apache Flink, Apache Hudi, and Presto.
+ 
 Amazon EMR uses Hadoop, an open-source framework, 
 to distribute your data and processing across a resizable cluster of Amazon EC2 instances. 
+
 Using an EMR cluster would imply managing the underlying infrastructure so it’s ruled out 
 because the correct solution for the given use-case should require the least amount of 
 infrastructure maintenance.
+
+Athena		 ->Serverless sql analytic services.
+ReadShift 	 ->Redshift is a managed petabyte-scale data warehouse that is accessed via SQL. 
+EMR          ->Open Serach service with full text search services, No SQL.
+
+
+If you want to use SQL and you have structured data (eg CSV files), then Redshift is the simplest solution.
+If you want to process unstructured data (eg in strange formats rather than structured CSV files), Amazon EMR can provide a Hadoop system that is very capable.
+
 
 
 
@@ -7315,10 +7340,8 @@ QuickSight – Dashboard & Analysis:
 81
 ##Glue
 -------------------------------------------------
-AWS Glue does not offer the same storage and processing speed as FSx for Lustre.
-
 A fully managed extract, transform, and load 
-(ETL = one or more source databases into a target database or information warehouse) 
+	(ETL = one or more source databases into a target database or information warehouse) 
 service that makes it easy for customers to prepare and load their data for analytics.
 
 Amazon Athena and AWS Glue can be categorized as "Big Data" tools.
@@ -7332,8 +7355,7 @@ transactional databases and the Amazon cloud.
 
 
 AWS Glue Data Catalog:
-AWS Glue Data Catalog provides centralized uniform metadata storing for tracking, 
-querying and transforming data using saved metadata.
+	Glue Data Catalog provides centralized uniform metadata storing for tracking, querying and transforming data using saved metadata.
 
 
 
@@ -7402,9 +7424,7 @@ A data lake is a centralized, curated, and secured repository that stores all yo
 both in its original form and prepared for analysis. 
 
 Amazon S3 forms the storage layer for Lake Formation. 
-If you already use S3, you typically begin by registering existing S3 buckets that contain your data. 
-Lake Formation creates new buckets for the data lake and import data into them. 
-AWS always stores this data in your account, and only you have direct access to it.
+
 
 
 • Data lake = central place to have all your data for analytics purposes
@@ -7414,15 +7434,14 @@ AWS always stores this data in your account, and only you have direct access to 
   and de-duplicate (using ML Transforms)
 • Combine structured and unstructured data in the data lake
 • Out-of-the-box source blueprints: S3, RDS, Relational & NoSQL DB…
-• Fing-grained Access Control for your applications (row and column-level)
-• Built on top of AWS Glue
+• Fing-grained Access Control for your applications (row and column-level).
+• Built on top of AWS Glue.
 
 
 
 AWS Lake Formation is integrated with AWS Glue which you can use to create a data catalog 
 that describes available datasets and their appropriate business applications. 
-Lake Formation lets you define policies and control data access with 
-simple “grant and revoke permissions to data” sets at granular levels. 
+ 
 You can assign permissions to IAM users, roles, groups, and Active Directory users using federation. 
 You specify permissions on catalog objects (like tables and columns) rather than on buckets and objects.
 
@@ -7430,6 +7449,8 @@ You specify permissions on catalog objects (like tables and columns) rather than
 Setting up a Kinesis Firehose in each and every account to move data into a single location 
 is costly and impractical. A better approach is to set up cross-account sharing which is 
 free with AWS Lake Formation.
+
+
 
 
 83
@@ -7493,6 +7514,20 @@ Big Data Ingestion Pipeline discussion
 	• The reporting bucket contains analyzed data and can be used by
 	  reporting tool such as AWS QuickSight, Redshift, etc.
 
+
+
+
+AWS Analytics Services:
+	Athena
+	EMR
+	CloudSearch
+	Elasticsearch Service
+	Kinesis
+	Redshift
+	Data Pipeline
+	QuickSight
+	Glue
+	Lake Formation
 
 
 
@@ -7651,8 +7686,7 @@ It is a aws managed service, security is a shared responsibility.
 87
 ##Translate
 -------------------------------------------------
-Amazon Translate is a neural machine translation service that delivers fast, high-quality, affordable, and customizable 
-language translation.
+Amazon Translate is a text translation service, to translate text between languages.
 
 • Natural and accurate language translation
 • Amazon Translate allows you to localize content - such as websites and applications - 
@@ -8008,8 +8042,7 @@ AWS Machine Learning- Summary:
 96
 ##AWS Monitoring 
 -------------------------------------------------
-AWS monitoring is a set of practices you can use to verify the security and performance of your 
-AWS resources and data.
+AWS monitoring is a set of practices you can use to verify the security and performance of your AWS resources and data.
 
 Use a single platform for observability, Collect metrics on AWS and on premises.
 
@@ -8021,16 +8054,23 @@ Use a single platform for observability, Collect metrics on AWS and on premises.
 97
 ##CloudWatch 
 -------------------------------------------------
-Amazon CloudWatch cannot track the API calls to your AWS resources.
-
-Amazon CloudWatch is a monitoring and observability service built for DevOps engineers, developers, 
-site reliability engineers (SREs), IT managers, and product owners.
-
 CloudWatch enables you to monitor your complete stack (applications, infrastructure, and services) 
 and use alarms, logs, and events data to take automated actions and reduce mean time to resolution (MTTR). 
 
 
-CloudWatch is all about performance. CloudTrail is all about auditing.
+CloudWatch is basically a metrics repository. EC2—puts metrics into the repository, and you retrieve statistics based on those metrics. 
+If you put your own custom metrics into the repository, you can retrieve statistics on these metrics as well.
+
+Metrics are data about the performance of your systems. 
+CloudWatch alarms perform an action when a CloudWatch metric exceeds a specified value for some amount of time.
+
+Amazon CloudWatch can load all the metrics in your account 
+(both AWS resource metrics and application metrics that you provide) for search, graphing, and alarms.
+
+
+
+Amazon CloudWatch cannot track the API calls to your AWS resources.
+CloudWatch is all about performance. CloudTrail is all about auditing also API call.
 
 
 • EC2 instance metrics have metrics “every 5 minutes”
@@ -8040,7 +8080,8 @@ Install the CloudWatch agent to all the EC2 instances that gather the memory and
 View the custom metrics in the Amazon CloudWatch console.
 
 By default, CloudWatch does not automatically provide memory and disk utilization metrics of 
-your instances. You have to set up custom CloudWatch metrics to monitor the memory, 
+your instances. 
+You have to set up custom CloudWatch metrics to monitor the memory, 
 disk swap, disk space, and page file utilization of your instances.
 
 Enhanced Monitoring is a feature of Amazon RDS. 
@@ -8093,7 +8134,11 @@ Security:
 It is a aws managed service, security is a shared responsibility.
 
 
+
+
+
 AWS X-Ray:
+-------------------------------------------------
 AWS X-Ray is not a suitable service to use to track each API call to your AWS resources. 
 
 It just helps you debug and analyze your microservices applications with request tracing 
@@ -8157,7 +8202,7 @@ Possibility to define and send your own custom metrics to CloudWatch
 • Use API call PutMetricData
 
 
-Important: Accepts metric data points two weeks in the past and two hours in the
+Important: Accepts metric data points is two weeks in the past and two hours in the
            future (make sure to configure your EC2 instance time correctly)
 
 
@@ -8218,8 +8263,8 @@ AWS CloudWatch is made up of multiple monitoring tools such as:
 101
 ##CloudWatch Logs
 -------------------------------------------------
-You can use Amazon CloudWatch Logs to monitor, store, and access your log files from 
-Amazon Elastic Compute Cloud (Amazon EC2) instances, AWS CloudTrail, Route 53, and other sources.
+You can use Amazon CloudWatch Logs to monitor, store, and access your log files from  EC2 instances, AWS CloudTrail, Route 53, 
+and other sources.
 
 CloudWatch Logs enables you to centralize the logs from all of your systems, applications, and 
 AWS services that you use, in a single, highly scalable service.
@@ -8228,7 +8273,7 @@ AWS services that you use, in a single, highly scalable service.
 CloudWatch Logs - Sources:
 • EC2
 • SDK, CloudWatch Logs Agent, CloudWatch Unified Agent 
-• Elastic Beanstalk: collection of logs from application 
+• ElasticBeanstalk: collection of logs from application 
 • ECS: collection from containers 
 • AWS Lambda: collection from function logs 
 • VPC Flow Logs: VPC specific logs 
@@ -8438,7 +8483,7 @@ matched events to the number of times a target is invoked by a rule.
 In EventBridge, there are three types of event buses:
 	Default event bus: Every account has a default bus, which accepts events emitted by AWS services.
 	Partner event bus: This can receive events from applications hosted at AWS SaaS partners. 
-	For each SaaS partner, a separate event bus needs to be created.
+		For each SaaS partner, a separate event bus needs to be created.
 	Custom event bus: This type can receive events from custom applications and services.
 
 
@@ -8454,7 +8499,9 @@ Amazon EventBridge vs CloudWatch Events:
 • EventBridge has a different name to mark the new capabilities
 • Over time, the CloudWatch Events name will be replaced with EventBridge.
 
-You can use Amazon EventBridge to run Amazon ECS tasks when certain AWS events occur. You can set up an EventBridge rule that runs an Amazon ECS task whenever a file is uploaded to a certain Amazon S3 bucket using the Amazon S3 PUT operation.
+You can use Amazon EventBridge to run Amazon ECS tasks when certain AWS events occur. 
+You can set up an EventBridge rule that runs an Amazon ECS task whenever a file is uploaded to a certain Amazon S3 bucket using 
+the Amazon S3 PUT operation.
 
 
 • Event buses can be accessed by other AWS accounts using Resource-based Policies
@@ -8463,16 +8510,14 @@ You can use Amazon EventBridge to run Amazon ECS tasks when certain AWS events o
 
 
 
-
-The Schema Registry:
-The registry also enables you to generate code bindings for programming languages like Java, Python, 
-or TypeScript directly in your IDE, allowing you to use the event as an object in your code.
-
-
-
 What is a schema?
 A schema represents the structure of an event, and commonly includes information such as the title and type 
 of each piece of data. Schema can be versioned.
+
+The Schema Registry:
+	The registry also enables you to generate code bindings for programming languages like Java, Python, 
+	or TypeScript directly in your IDE, allowing you to use the event as an object in your code.
+
 
 
 Whatever the event type you're acting upon, your application will need to know the basic structure of the event. 
@@ -8524,9 +8569,9 @@ by pinpointing outliers, finding the heaviest traffic patterns, and ranking the 
 
 
 CloudWatch Application Insights:
-• Provides automated dashboards that show potential problems with monitored applications, 
-  to help isolate ongoing issues.
-• Findings and alerts are sent to Amazon EventBridge and SSM OpsCenter
+	• Provides automated dashboards that show potential problems with monitored applications, 
+	  to help isolate ongoing issues.
+	• Findings and alerts are sent to Amazon EventBridge and SSM OpsCenter
 
 
 
@@ -8578,20 +8623,20 @@ It is a aws managed service, security is a shared responsibility.
 
 
 
+
 105
 ##CloudTrail
 -------------------------------------------------
 The two services, CloudWatch and CloudTrail, can be used together. 
 
- CloudTrail is primarily used to monitor and record the account activity across your 
- AWS resources and not your web applications. 
+CloudTrail is primarily used to monitor and record the account activity across your 
+AWS resources and not your web applications. 
  
- You cannot use CloudTrail to capture the detailed 
- information of all HTTP requests that go through your public-facing Application Load Balancer (ALB). 
- CloudTrail can only track the resource changes made to your ALB, 
- but not the actual IP traffic that goes through it.
+You cannot use CloudTrail to capture the detailed 
+information of all HTTP requests that go through your public-facing Application Load Balancer (ALB). 
+ 
+CloudTrail can only track the resource changes made to your ALB, but not the actual IP traffic that goes through it.
 
-Addition, it has the -include-global-service-events parameter enabled which will also include activity from global services such as IAM, Route 53, AWS WAF, and CloudFront
 
 • Provides governance, compliance and audit for your AWS Account
 • CloudTrail is enabled by default!
@@ -8609,10 +8654,8 @@ Events include actions taken in the AWS Management Console, AWS Command Line Int
 There are two types of events that can be logged in CloudTrail: 
 Management events and Data events.
 
-Management events provide information about management operations that are performed 
-on resources in your AWS account.
+Management events provide information about management operations that are performed on resources in your AWS account.
 Think of Management events as things normally done by people when they are in AWS. 
-
 
 Examples:
 a user sign in
@@ -8700,8 +8743,7 @@ Choose which data to analyze, and pay as you go.
 
 Security:
 =========
-Track user activity and API usage
-AWS CloudTrail
+Track user activity and API usage AWS CloudTrail.
 	
 By default, CloudTrail log files are encrypted using Amazon S3 Server Side Encryption (SSE) 
 and placed into your S3 bucket. 
@@ -8721,6 +8763,7 @@ AWS Config provides a detailed view of the configuration of AWS resources in you
 
 AWS Config is a service that enables you to assess, audit, and evaluate the configurations of 
 your AWS resources. 
+
 Config continuously monitors and records your AWS resource configurations and allows you to 
 automate the evaluation of recorded configurations against desired configurations.
 
@@ -8741,10 +8784,9 @@ ConfigRule:
 	AWS Config rules evaluate the configuration settings of your AWS resources. 
 	A rule can run when AWS Config detects a configuration change to an AWS resource or at 
 	a periodic frequency that you choose (for example, every 24 hours). 
-	There are two types of 
-	rules: 
-	AWS Config Managed Rules and 
-	AWS Config Custom Rules. 
+	There are two types of rules: 
+		AWS Config Managed Rules and 
+		AWS Config Custom Rules. 
 	Managed rules are predefined, customizable rules created by AWS Config.
 
 After you activate a rule, AWS Config compares your resources to the conditions of the rule. 
@@ -8802,6 +8844,7 @@ AWS EventBridge can check for AWS Config non-compliant events and then trigger a
 
 Create a custom AWS Config rule to check for the max-age of IAM access keys. 
 Schedule an AWS Batch job that runs every 24 hours to delete all the non-compliant access keys is incorrect. 
+
 AWS Config can only use Systems Manager Automation documents as remediation actions. 
 Moreover, the AWS Batch service cannot be used for remediating non-compliant resources like IAM access keys.
 
@@ -8834,8 +8877,7 @@ $0.001 per config rule evaluation per region
 
 Security:
 =========
-Record and evaluate configurations of your AWS resources
-AWS Config
+Record and evaluate configurations of your AWS resources AWS Config
 It is a aws managed service, security is a shared responsibility.
 
 
@@ -8847,12 +8889,10 @@ It is a aws managed service, security is a shared responsibility.
 106
 ##Organizations
 -------------------------------------------------
-How do you centralize your management (billing, access control, compliance and security) 
-across multiple AWS accounts?
+How do you centralize your management (billing, access control, compliance and security) across multiple AWS accounts?
 Welcome AWS Organizations! administer them as a single unit.
 
-Organize accounts into Organizational Units (OU)
-Provides API to automate creation of new accounts.
+Organize accounts into Organizational Units (OU) Provides API to automate creation of new accounts.
 
 Global service
 • Allows to manage multiple AWS accounts
@@ -8907,8 +8947,7 @@ Features:
 
 
 Service Control Policies (SCP):
-Service control policies (SCPs) are a type of organization policy that you can use to 
-manage permissions in your organization. 
+	SCPs are a type of organization policy that you can use to manage permissions in your organization. 
 
 SCPs offer central control over the maximum available permissions for all accounts in your organization.
 
@@ -9036,27 +9075,29 @@ Cognito only helps with authentication, not authorization.
 Amazon Cognito lets you add user sign-up, sign-in, and access control to your web and mobile apps easyly.
 
 Amazon Cognito scales to millions of users and supports sign-in with social identity providers, 
-such as Apple, Facebook, Google, and 
-Amazon, and enterprise identity providers via SAML 2.0 and OpenID Connect.  
+such as Apple, Facebook, Google, and Amazon, and enterprise identity providers via SAML 2.0 and OpenID Connect.  
 
 
 
 The two main components of Amazon Cognito are User pools and Identity pools. 
 	User pools are user directories that provide sign-up and sign-in options for your app users. 
-	With an identity pool, your users can obtain temporary Amazon credentials to access Amazon services, 
+	With an Identity pool, your users can obtain temporary Amazon credentials to access Amazon services, 
 	such as Amazon S3 and DynamoDB. 
-You can use identity pools and user pools separately or together.
+	
+You can use Identity pools and user User separately or together.
 
 
 AWS Cognito:
 • We want to give our users an identity so that they can interact with our application.
-Cognito User Pools: appUser->CUP->ALBOrAPIGateway->LambdaOrOtherBackend
+Cognito UserPools: appUser->CUP->ALBOrAPIGateway->LambdaOrOtherBackend
+
 	• Sign in functionality for app users
 	• Integrate with API Gateway
 Cognito Identity Pools (Federated Identity):appUser->CUP/ThardPartyUser->CIP->S3OrDaynamoDB.
       For direct access AWS resource, without ALB or API Gateway.
 	• Provide AWS credentials to users so they can access AWS resources directly
-	• Integrate with Cognito User Pools as an identity provider
+	• Integrate with Cognito User Pools as an identity provider.
+	
 CognitoSync:
 	• Synchronize data from device to Cognito.
 	• May be deprecated and replaced by AppSync
@@ -9077,6 +9118,7 @@ Cognito User Pools (CUP):
 	• Can enable Federated Identities (Facebook, Google, SAML…)
 	• Sends back a JSON Web Tokens (JWT)
 	• Can be integrated with API Gateway for authentication
+Users can then access AWS services directly or through API Gateway.
 
 
 Cognito Identity Pools (Federated Identities):
@@ -9160,16 +9202,11 @@ that they have permission for.
 Amazon Cognito is used for single sign-on in mobile and web applications. 
 You don’t have to use it if you already have an existing Directory Service to be used for authentication.
 
-
-SCPs are not necessarily needed for logging in on this scenario. 
 You can use SCP if you want to restrict or implement a policy across several accounts in the organization.
 
 
-AWS by creating policies and attaching them to 
-IAM identities (users, group, roles) or AWS resources.
-
+AWS by creating policies and attaching them to IAM identities (users, group, roles) or AWS resources.
 A policy is an object in AWS that, when associated with an identity or resource, defines their permissions.
-
 
 AWS supports six types of policies: 
 	identity-based policies, 
@@ -9181,7 +9218,8 @@ AWS supports six types of policies:
 
 
 
-The AWS IAM authenticator for Kubernetes is integrated into the EKS cluster for role-based access control (RBAC) and cluster authentication.
+The AWS IAM authenticator for Kubernetes is integrated into the EKS cluster for role-based access control (RBAC) and 
+cluster authentication.
 
 Area:
 =====
@@ -9259,6 +9297,7 @@ Client side encryption:
 ------------------------------------------------- 
 KMS is a managed service that makes it easy for you to create and control the encryption 
 keys used to encrypt your data. 
+
 AWS also KMS uses Hardware Security Modules (HSMs) to protect the security of your keys. 
 You can use AWS KMS to protect your data in AWS services and in your applications.
 
@@ -9392,6 +9431,7 @@ of being validated, to protect the confidentiality and integrity of your keys.
 
 
 
+
 116
 ++KMS Multi-Region Keys
 -------------------------------------------------
@@ -9405,6 +9445,7 @@ of being validated, to protect the confidentiality and integrity of your keys.
 • Each Multi-Region key is managed independently
 
 • Use cases: global client-side encryption, encryption on Global DynamoDB, Global Aurora
+
 
 
 117
@@ -9468,7 +9509,7 @@ Client-Side encryption
 
 
 121
-##SSM Parameter Store
+##SSM Parameter Store | AWS Systems Manager
 -------------------------------------------------
 Parameter Store, a capability of AWS Systems Manager,  configuration data  management and secrets management. 
 You can store data such as passwords, database strings, 
@@ -9546,6 +9587,9 @@ AWS Certificate Manager
 
 Rotate, manage, and retrieve secrets
 AWS Secrets Manager
+
+
+Need to pay for it $$$.
 	
 
 
@@ -9628,6 +9672,7 @@ Easily provision, manage, and deploy TLS Certificates
 -------------------------------------------------
 AWS WAF is a web application firewall service that lets you monitor web requests and protect 
 your web applications from malicious requests. 
+
 Use AWS WAF to block or allow requests based on conditions that you specify, such as the IP addresses. 
 You can also use AWS WAF preconfigured protections to block common attacks like 
 SQL injection or cross-site scripting.
@@ -9721,7 +9766,7 @@ AWS Firewall Manager
 	• AWS Network Firewall (VPC Level)
 	• Amazon Route 53 Resolver DNS Firewall
 	• Policies are created at the region level
-• Rules are applied to new resources as they are created (good for compliance) across all and future accounts in your Organization
+• Rules are applied to new resources as they are created (good for compliance) across all and future accounts in your Organization.
 
 
 
@@ -9729,7 +9774,7 @@ AWS Firewall Manager
 129
 ++WAF vs. Firewall Manager vs. Shield
 -------------------------------------------------
-• WAF, Shield and Firewall Manager are used together for comprehensive protection
+• WAF, Shield and Firewall Manager are used together for comprehensive/complate protection.
 • Define your Web ACL rules in WAF
 • For granular protection of your resources, WAF alone is the correct choice
 • If you want to use AWS WAF across accounts, accelerate WAF configuration,
@@ -9752,14 +9797,14 @@ There are 7 best practices identified by AWS that can be leveraged to mitigate s
 Based on its DDoS-resilient reference architecture, AWS separates its network components into two categories:
 
 1)AWS Edge Location	
-	BP1 = Amazon CloudFront	
-	BP2 = AWS WAF	
-	BP3 = AWS Route 53	
-	BP4 = Amazon API Gateway
+	BP1 = CloudFront	
+	BP2 = WAF	
+	BP3 = Route53	
+	BP4 = API Gateway
 2)AWS Regions
-	BP5 = Amazon VPCs
-	BP6 = Elastic Load Balancing
-	BP7 = Amazon EC2 with Auto Scaling
+	BP5 = VPCs
+	BP6 = ELB
+	BP7 = EC2 with Auto Scaling
 
 
 130
@@ -9996,33 +10041,39 @@ Your responsibility:
 
 
 AWS Control Tower:
+	AWS Control Tower provides a single location to easily set up your new well-architected multi-account environment 
+	and govern your AWS workloads with rules for security, operations, and internal compliance. 
 
-AWS Control Tower provides a single location to easily set up your new well-architected 
-multi-account environment and govern your AWS workloads with rules for security, operations, 
-and internal compliance. You can automate the setup of your AWS environment with best-practices 
+You can automate the setup of your AWS environment with best-practices 
 blueprints for multi-account structure, identity, access management, and account provisioning workflow. 
-For ongoing governance, you can select and apply pre-packaged policies e
-nterprise-wide or to specific groups of accounts.
+For ongoing governance, you can select and apply pre-packaged policies enterprise-wide or to specific groups of accounts.
 
 
 AWS Control Tower provides three methods for creating member accounts:
-
-– Through the Account Factory console that is part of AWS Service Catalog.
-
-– Through the Enroll account feature within AWS Control Tower.
-
-– From your AWS Control Tower landing zone’s management account, using Lambda code and appropriate IAM roles.
+	– Through the Account Factory console that is part of AWS Service Catalog.
+	– Through the Enroll account feature within AWS Control Tower.
+	– From your AWS Control Tower landing zone’s management account, using Lambda code and appropriate IAM roles.
 
 
-AWS Control Tower automatically implements guardrails using multiple building blocks such as AWS CloudFormation to establish a baseline, AWS Organizations service control policies (SCPs) to prevent configuration changes, and AWS Config rules to continuously detect non-conformance.
+AWS Control Tower automatically implements guardrails using multiple building blocks such as 
+AWS CloudFormation to establish a baseline, SCPs to prevent configuration changes, 
+and AWS Config rules to continuously detect non-conformance.
 
 
- The AWS Resource Access Manager (RAM) service simply helps you to securely share your resources across AWS accounts or within your organization or organizational units (OUs) in AWS Organizations. It is not capable of launching new AWS accounts with preapproved configurations
+AWS Service Catalog:
+	AWS Service Catalog is a service that allows Organizations and Teams to create and manage catalogs of IT services 
+	that can be used on AWS.
+	
+Although Service Catalog is built on top of CloudFormation, unlike CloudFormation it's designed for sharing commonly deployed 
+applications to promote collaboration. 
+This means you can share the service catalog across multiple accounts and have the same constraints copy over.
+
+
  
 
 ==|Virtual Private Cloud (VPC)
 138
-#Internet Protocol (IP)   
+##VPC | Internet Protocol (IP)   
 -------------------------------------------------
 The Internet Protocol (IP) uses Three types of addressing schemes: 
 Unicast, Multicast, and Anycast.
@@ -10032,16 +10083,16 @@ A Unicast address is used to identify a single unique host.
 
 
 Multicast:
-A Multicast address is used to deliver data to a group of destinations (a one-to-many transmission). 
-IP multicast group addresses are represented by class-D IP addresses reserved specifically for multicast 
-communications, ranging from 224.0.0.0 through 239.255.255.255. 
+	A Multicast address is used to deliver data to a group of destinations (a one-to-many transmission). 
+	IP multicast group addresses are represented by class-D IP addresses reserved specifically for multicast 
+	communications, ranging from 224.0.0.0 through 239.255.255.255. 
 IPv6 multicast replaces broadcast addresses that were supported in IPv4. 
 
 
 Anycast:
-Anycast,  is an IP network addressing scheme that allows multiple servers to share the same 
-IP address, allowing for multiple physical destination servers to be logically identified 
-by a single IP address. 
+	Anycast,  is an IP network addressing scheme that allows multiple servers to share the same 
+	IP address, allowing for multiple physical destination servers to be logically identified 
+	by a single IP address. 
 Based on the location of the user request, the anycast routers send it to the server in the 
 network based on a least-cost analysis  that includes assessing the number of hops, 
 shortest distance, lowest transit cost, and minimum latency measurements to optimize the 
@@ -10063,8 +10114,7 @@ modest bandwidth requirements, and can tolerate the inherent variability in Inte
 
 However, Site-to-site VPN cannot provide low latency and high throughput connection as DirectConnect.
 
-The CIDR block for the default VPC is it's 172.31.0.0/16. 
-It means this VPC can provide up to 65,536 IP addresses.
+The CIDR block for the default VPC is it's 172.31.0.0/16. It means this VPC can provide up to 65,536 IP addresses.
 
 - It is logical Isolated from Other virtual Network in the AWS.
 - Max 5 VPC can be created and 200 subnet in 1 VPC.
@@ -10072,7 +10122,7 @@ It means this VPC can provide up to 65,536 IP addresses.
 - Once a VPC created DHCP, NACL and Sucurity Group will be created automatically.
 - A VPC is confied to on AWS Region and dos not extend between Region.
 
-- Onece the VPC is created, Its CIDR block range cant change.
+- Onece the VPC is created, Its CIDR block range can NOT change.
   (You can create another CIDR make it primary and older one will be Secondary then you can delete fitst one)
 - If you need a diffenent CIDR size, create a new VPC.
 - The different subnets wihtin a VPC cannot overlap.
@@ -10112,6 +10162,8 @@ Using VPC sharing, an account that owns the VPC (owner) shares one or more subne
 accounts (participants) that belong to the same organization from AWS Organizations. 
 The owner account cannot share the VPC itself. 
 
+You must enable resource sharing from the management account for your organization.
+
 You can share Amazon VPCs to leverage the implicit routing within a VPC for applications that 
 require a high degree of interconnectivity and are within the same trust boundaries.
 
@@ -10120,6 +10172,12 @@ route traffic between them using private IPv4 addresses or IPv6 addresses. Insta
 VPC can communicate with each other as if they are within the same network. 
 VPC peering does not facilitate centrally managed VPCs.
 
+
+Things to know:
+	VPC sharing is only available within the same AWS Organization.
+	Sharing of default VPCs/subnets is not possible.
+	Participants can’t launch resources using security groups that are owned by other participants or the owner.
+	Participants can’t launch resources using the default security group for the VPC because it belongs to the owner.
 
 AWS owner account cannot share the VPC itself with another AWS account.
 
@@ -10185,7 +10243,7 @@ Default VPC has default CIDR, Security Group, NACL and Route table setting.
 
 Security products and features:
 -Security groups - This acts as a firewall for the EC2 instances, controlling inbound and outbound traffic at the instance level.
--Network access control lists - It acts as a firewall for the subnets, controlling inbound and outbound traffic at the subnet level.
+-Network access control lists (ACLs)- It acts as a firewall for the subnets, controlling inbound/outbound traffic at the subnet level.
 -Flow logs - These capture the inbound and outbound traffic from the network interfaces in your VPC.
 
 
@@ -10226,7 +10284,7 @@ All the rest of the IP addresses on the Internet are Public
 141
 ##Default VPC Walkthrough
 -------------------------------------------------
-• All new AWS accounts have a default VPC
+• All AWS accounts have a default VPC
 • New EC2 instances are launched into the default VPC if no subnet is specified
 • Default VPC has Internet connectivity and all EC2 instances inside it have public IPv4 addresses
 • We also get a public and a private IPv4 DNS names
@@ -10248,8 +10306,6 @@ All the rest of the IP addresses on the Internet are Public
 142
 ##Subnet
 -------------------------------------------------
-A subnet is a range of IP addresses in your VPC.
-
 A subnet is a range of IP addresses in your VPC. A subnet must reside in a single Availability Zone. 
 After you add subnets, you can deploy AWS resources in your VPC.
 
@@ -10512,12 +10568,6 @@ Create a NAT Gateway in each availability zone. Configure the route table in eac
 to ensure that instances use the NAT Gateway in the same availability zone.
 
 
-If you have resources in multiple Availability Zones and they share one NAT gateway, 
-and if the NAT gateway’s Availability Zone is down, resources in the other 
-Availability Zones lose Internet access. To create an Availability Zone-independent architecture, 
-create a NAT gateway in each Availability Zone and configure your routing to ensure 
-that resources use the NAT gateway in the same Availability Zone.
-
 You should configure the route table in the private subnet and not the public subnet to associate 
 the right instances in the private subnet.
 
@@ -10525,6 +10575,7 @@ A single NAT Gateway in each availability zone is enough.
 NAT Gateway is already redundant in nature, meaning, AWS already handles any failures that occur 
 in your NAT Gateway in an availability zone.
 
+But Use a script to manage failover between instances.
 
 Area:
 =====
@@ -10701,7 +10752,7 @@ It is a aws managed service, security is a shared responsibility.
 
 
 
-AWS PrivateLink
+##PrivateLink
 -------------------------------------------------
 AWS PrivateLink connects your AWS services with other AWS services through a non-public tunnel.
 
@@ -10720,8 +10771,7 @@ simplify your network architecture.
 A VPC endpoint enables you to privately connect your VPC to supported AWS services and VPC endpoint services 
 powered by PrivateLink without requiring an internet gateway, NAT device, VPN connection, or AWS Direct Connect connection.
 
-When you use VPC endpoint, the traffic between your VPC and the other AWS service does not 
-leave the Amazon network.
+When you use VPC endpoint, the traffic between your VPC and the other AWS service does not leave the Amazon network.
 
 VPC Endpoints (AWS PrivateLink)
 • Every AWS service is publicly exposed (public URL)
@@ -10745,10 +10795,11 @@ VPC resources to  AWS services, such as CloudFormation,Elastic Load Balancers (E
 	
 Gateway Endpoints:
 	• Provisions a gateway and must be used as a target in a route table (does not use security groups)
-	• Supports both S3 and DynamoDB
+	• Supports both S3 and DynamoDB(Only)
 	• Free 
-	In contrast, a gateway endpoint is a target for a route in a route table to connect VPC resources to S3 or DynamoDB. 
-	Traffic is then routed from instances in a subnet to one of these two services.
+	
+In contrast, a gateway endpoint is a target for a route in a route table to connect VPC resources to S3 or DynamoDB. 
+Traffic is then routed from instances in a subnet to one of these two services.
 
 
 
@@ -10848,7 +10899,7 @@ It is a aws managed service, security is a shared responsibility.
 VPC Flow Logs is a feature that enables you to capture information about the IP traffic going to and from network 
 interfaces in your VPC. 
 
-Flow log data can be published to Amazon CloudWatch Logs or Amazon S3. 
+Flow log data can be published to CloudWatch Logs ors S3. 
 
 After you create a flow log, you can retrieve and view its data in the chosen destination.
 
@@ -10932,6 +10983,7 @@ UseCase:
 ========
 Application Migration: Moving applications to the cloud is easier with a Site-to-site 
 VPN connection between your network and the AWS cloud. 
+
 You can host Amazon VPCs behind your corporate firewall and seamlessly move your IT resources, without 
 changing the way your users access these applications.
 You can use AWS Site-to-Site VPN connections to securely communicate between remote sites.
@@ -10964,13 +11016,10 @@ and one of the AWS Direct Connect locations.
 
 
 
-
-
 • Provides a dedicated private connection from a remote network to your VPC
 • Dedicated connection must be setup between your DC and AWS Direct Connect locations
 • You need to setup a Virtual Private Gateway on your VPC
-• Access public resources (S3) and private (EC2) on same connection
-Supports both IPv4 and IPv6
+• Access public resources (S3) and private (EC2) on same connection Supports both IPv4 and IPv6.
 
 
 You can create this private connectivity to reduce network costs, increase bandwidth, and provide more consistent network experience 
@@ -11000,6 +11049,7 @@ A Direct Connect gateway does not allow gateway associations that are on the sam
 gateway to send traffic to each other (for example, a virtual private gateway to another virtual private gateway).
 
 A virtual interface (VIF) is necessary to access AWS services, and is either public or private. 
+
 A public virtual interface enables access to public services, such as Amazon S3. 
 A private virtual interface enables access to your VPC.
 
@@ -11034,9 +11084,9 @@ Site-to-Site VPN connection as a backup
 
 
 What is the difference between Direct Connect gateway and virtual private gateway?
-The Direct Connect Gateway is connected to multiple AWS VPCs in different AWS regions via Virtual private Gateways. 
-The Direct Connect Gateway is in turn connected to the Direct Connect via a virtual private interface. 
-This allows multiple VPCs to be connected to the customer network via one virtual private interface.
+	The Direct Connect Gateway is connected to multiple AWS VPCs in different AWS regions via Virtual private Gateways. 
+	The Direct Connect Gateway is in turn connected to the Direct Connect via a virtual private interface. 
+	This allows multiple VPCs to be connected to the customer network via one virtual private interface.
 
 
 
@@ -11089,6 +11139,12 @@ connect to a maximum of three Transit Gateway instances over a single Direct Con
 
 Traffic between VPC and Transit Gateway remains on the AWS global private network and is not exposed to the public internet. 
 
+Transit Gateway Peering:
+AWS Transit Gateway supports the ability to establish peering connections between Transit Gateways in the same and different  Regions. 
+Inter-region peering enables customers to extend this connectivity and build global networks spanning multiple AWS Regions.
+
+This means that all the Amazon VPCs, Site-to-Site VPN connections, and Direct Connect gateways attached to an 
+Transit Gateway hosted in one AWS Region can exchange traffic with resources deployed in other AWS Regions.
 
 • For having transitive peering between thousands of VPC and on-premises, hub-and-spoke (star) connection
 • Regional resource, can work cross-region
@@ -11198,7 +11254,7 @@ IPv4 and IPv6 communication are independent of each other.
 • IPv4 cannot be disabled for your VPC and subnets,this is the default IP addressing system for Amazon VPC.
 • You can enable IPv6 (they’re public IP addresses) to operate in dual-stack mode
 • Your EC2 instances will get at least a private internal IPv4 and a public IPv6
-• They can communicate using either IPv4 or IPv6 to the internet through an Internet Gateway
+• They can communicate using either IPv4 or IPv6 to the internet through an Internet Gateway.
 
 
 
@@ -11209,22 +11265,13 @@ IPv4 and IPv6 communication are independent of each other.
 An egress-only internet gateway is used to enable outbound communication over IPv6 from instances in your VPC to the internet, 
 and prevents hosts outside of your VPC from initiating an IPv6 connection with your instance.
 
-Used for IPv6 only (similar to a NAT Gateway but for IPv6)
-You must update the Route Tables
+Used for IPv6 only (similar to a NAT Gateway but for IPv6) You must update the Route Tables.
 
 Minimizing egress traffic network cost
 • Try to keep as much internet traffic within AWS to minimize costs
 • Direct Connect location that are co-located in the same AWS Region result in lower cost for egress network
 
 
-Area:
-=====
-UseCase:
-========
-BillCost:
-=========
-Security:
-=========
 
 
 
@@ -11249,9 +11296,9 @@ Security:
 • VPC Flow Logs – can be setup at the VPC / Subnet / ENI Level, for ACCEPT and REJECT traffic, helps identifying attacks, 
   analyze using Athena or CloudWatch Logs Insights
 • Site-to-Site VPN – setup a Customer Gateway on DC, a Virtual Private Gateway on VPC, and site-to-site VPN over public Internet
-• AWS VPN CloudHub – hub-and-spoke VPN model to connect your sites
+• VPN CloudHub – hub-and-spoke VPN model to connect your sites.
 • Direct Connect – setup a Virtual Private Gateway on VPC, and establish a direct private connection to an AWS Direct Connect Location
-• Direct Connect Gateway – setup a Direct Connect to many VPCs in different AWS regions
+• Direct Connect Gateway – setup a Direct Connect to many VPCs in different AWS regions.
 
 AWS PrivateLink / VPC Endpoint Services:
 	• Connect services privately from your service VPC to customers VPC
@@ -11318,19 +11365,6 @@ Minimizing egress traffic network cost:
 	• Outbound to internet
 	• Inbound from internet
 	• To / from Direct Connect & Site-to-Site VPN
-• Internally, the AWS Network Firewall uses the AWS Gateway Load Balancer
-• Rules can be centrally managed cross- account by AWS Firewall Manager to apply to many VPCs
-
-
-
-AWS Network Firewall:
-• Protect your entire Amazon VPC
-• From Layer 3 to Layer 7 protection
-• Any direction, you can inspect
-• VPC to VPC traffic
-• Outbound to internet
-• Inbound from internet
-• To / from Direct Connect & Site-to-Site VPN
 • Internally, the AWS Network Firewall uses the AWS Gateway Load Balancer
 • Rules can be centrally managed cross- account by AWS Firewall Manager to apply to many VPCs
 
@@ -12864,6 +12898,9 @@ VPC Subnets:
 AWS Resource Access Manager (RAM) is a service that enables you to easily and securely share AWS resources with any AWS account or within your AWS Organization. You can share AWS Transit Gateways, Subnets, AWS License Manager configurations, and Amazon Route 53 Resolver rules resources with RAM.
 
 
+The AWS Resource Access Manager (RAM) service simply helps you to securely share your resources across AWS accounts 
+or within your organization or organizational units (OUs) in AWS Organizations. 
+It is not capable of launching new AWS accounts with preapproved configurations.
 
 195
 ##CloudHSM
