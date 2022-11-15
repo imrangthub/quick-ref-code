@@ -496,10 +496,11 @@ AWS CodeDeploy:
 	You can deploy to many services including AWS services such as AWS Elastic Beanstalk, AWS Lambda, and AWS Fargate. 
 	AWS CodeDeploy can be used independently or in a pipeline with AWS CodePipeline.
 
-
 CodeDeploy is not meant to distribute traffic across instances.
 CodeDeploy is a deployment service that automates application deployments to Amazon EC2 instances, 
 on-premises instances, serverless Lambda functions, or Amazon ECS services.
+
+
 
 
 
@@ -508,28 +509,30 @@ VPC Egress-Only  for IPv6:
 	Internet Gateway to the VPC to allow outbound IPv6 communication to the internet. 
 	Use AWS Network Firewall to set up the required rules for traffic inspection and traffic filtering.
 	
+	
+	
 Internet Gateway does not limit or control any outgoing IPv6 connection.
 NAT Gateway is only applicable for IPv4, not IPv6. 
 
 
-AWS Proton:
-	AWS Proton is the first fully managed application deployment service for Container and Serverless Applications. 
-	We can use AWS Proton to connect and coordinate all the different tools needed for infrastructure provisioning, 
-	code deployments, monitoring, and updates.
 
-AWS Proton allows you to deploy any serverless or container-based application with increased efficiency, consistency, and control. 
-You can define infrastructure standards and effective continuous delivery pipelines for your organization. 
-Proton breaks down the infrastructure into environment and service (“infrastructure as code” templates).
+
+AWS Proton:
+	AWS Proton allows you to deploy any serverless or container-based application with increased efficiency, consistency, and control. 
+	You can define infrastructure standards and effective continuous delivery pipelines for your organization. 
+	Proton breaks down the infrastructure into environment and service (“infrastructure as code” templates).
 
 AWS Proton allows customers to define application components as a stack, which creates everything needed to provision, 
 deploy, and monitor an application, including compute, networking, code pipeline, security, and monitoring. 
-
 
 AWS Proton associated with:
 	Platform Team
 	Developers
 	Environment Templates
 	Service Templates
+
+
+
 
 
 
@@ -541,43 +544,48 @@ The Amazon Managed Service for Prometheus is only a Prometheus-compatible monito
 to monitor containerized applications and infrastructure at scale.
 
 
+
 Amazon Managed Service for Grafana (AMG):
 	Amazon Managed Service for Grafana is a fully managed service with rich, interactive data visualizations to help 
 	customers analyze, monitor, and alarm on metrics, logs, and traces across multiple data sources.
 	
-WorkDocs is simply a fully managed, secure content creation, storage, and collaboration service. 
-It is not a suitable service for storing static content. 
+	
+	
+
 Amazon WorkDocs is more often used to easily create, edit, and share documents for collaboration and 
 not for serving object data like Amazon S3.
 	
  
 
 
-##RDS
+
 Ensure that the database is eventually consistent and highly available:
 	Configure the Auto Scaling group to spread the Amazon EC2 instances across three Availability Zones. 
 	Use the AWS Database Migration Service (DMS) with a replication server and an ongoing replication 
 	task to migrate the embedded NoSQL database to Amazon DynamoDB.
 
 
-##WAF
+
+
 How ALB prevent SQL injection attacks:
 	Use WAF and set up a managed rule to block request patterns associated with the exploitation 
 	of SQL databases, like SQL injection attacks. Associate it with the Application Load Balancer. 
 	Integrate AWS WAF with AWS Firewall Manager to reuse the rules across all the AWS accounts.
 
 
-##Network Firswall
+
+
 AWS Network Firewall is a managed service that makes it easy to deploy essential 
 	network protections for all of your VPCs.
 
 
-##Route53
+
+
 Route 53 Resolver DNS Firewall can only filter and regulate outbound DNS traffic from your VPC.
 	It can neither do active traffic flow inspection nor block any vulnerability exploits.
 
 
-##ReadShift
+
 Redshift(SQL Big data analyse) cluster as their data warehouse region outage or down:
 	Enable Cross-Region Snapshots Copy in your Amazon Redshift Cluster.
 
@@ -593,23 +601,6 @@ Process both mission-critical data and non-essential batch jobs:
     Scheduled Reserved Instances (Scheduled Instances).
 
 
-S3Select:
-	Amazon S3 Select is designed to help analyze and process data within an object in Amazon S3 buckets, 
-	faster and cheaper. 
-	It works by providing the ability to retrieve a subset of data from an object in S3 using SQL.
-	
-Athena:
-	Amazon Athena is an interactive query service that makes it easy to analyze data in S3 using standard SQL.
-	Simply point to your data in Amazon S3, define the schema, and start querying using SQL expressions.
-
-Redshift Spectrum:
-	Amazon Redshift also includes Redshift Spectrum, allowing you to directly run SQL queries 
-	against exabytes of unstructured data in Amazon S3. 
-	No loading or transformation is required, 
-	and you can use open data formats, including Avro, CSV, Grok, ORC, Parquet, RCFile, RegexSerDe, 
-	SequenceFile, TextFile, and TSV. Redshift Spectrum automatically scales query compute capacity 
-	based on the data being retrieved, so queries against Amazon S3 run fast, regardless of data set size.
-
 
 
 S3 retrieve the required data in under 15 minutes under all circumstances 150 MB/s of retrieval throughput:
@@ -620,8 +611,10 @@ Expedited retrievals allow you to quickly access your data when occasional urgen
 for a subset of archives are required. For all but the largest archives (250 MB+), data accessed 
 using Expedited retrievals are typically made available within 1–5 minutes. 
 
-Provisioned capacity ensures that your retrieval capacity for expedited retrievals 
-is available when you need it.
+Provisioned capacity ensures that your retrieval capacity for expedited retrievals is available when you need it.
+
+
+
 
 Collect and process the application log files:
 Amazon S3 for storing the application log files and Amazon Elastic MapReduce for processing the log files.
@@ -657,7 +650,7 @@ Following resources can be attach to your Transit Gateway:
 
  
 RDS if the primary database instance fails:
-The canonical name record (CNAME) is switched from the primary to standby instance.
+	The canonical name record (CNAME) is switched from the primary to standby instance.
 
 
 
@@ -762,7 +755,7 @@ DataSync:
 
 
 
-Amazon EFS only supports file locking. Object lock is a feature of Amazon S3 and not Amazon EFS.
+Amazon EFS only supports file locking, Object lock is a feature of Amazon S3.
 
 
 
@@ -770,6 +763,8 @@ RDS Notification:
 	Create a native function or a stored procedure that invokes a Lambda function. 
 	Configure the Lambda function to send event notifications to an Amazon SQS queue for the 
 	processing system to consume.
+
+
 
 
 
@@ -855,6 +850,7 @@ DynamoDB and AWS Backup: @(backups to another AWS account for disaster recovery)
 DynamoDB on-demand backups cannot be copied to a different account or Region. 
 
 To create backup copies across AWS accounts and Regions and for other advanced features, use AWS Backup.
+
 Auto Scaling is not enabled in a DynamoDB table which is created using the AWS CLI.
 
 
@@ -929,11 +925,15 @@ Detected Unauthorized person using Cameras, security team alerted via SMS:
 
  
  
+ 
+ 
 Amazon Fraud Detector:
 	Amazon Fraud Detector is a fully managed service that identifies potentially fraudulent online activities 
 	such as online payment fraud and fake account creation.
 
 AWS Trusted Advisor only provides best practice recommendations. It cannot define rules for your AWS resources.
+
+
 
 
 
@@ -947,17 +947,13 @@ EBS volumes live configuration Change:
  
 SQS and Amazon Simple Workflow Service (SWF) services for decoupled architecture in AWS. 
 
-
-
 You can’t create a VPC peering for your on-premises network and AWS VPC.
 
 
 
+
+
 AWS Control Tower:
-    AWS Control Tower allows your team to quickly provision and to set up and govern a secure, multi-account AWS environment, 
-	known as a landing zone.
-	Set up an AWS Control Tower Landing Zone. Enable pre-packaged guardrails to enforce policies or 
-	detect violations.
 	AWS Control Tower provides a single location to easily set up your new well-architected multi-account 
 	environment and govern your AWS workloads with rules for security, operations, and internal compliance.
 	
@@ -973,6 +969,8 @@ to prevent configuration changes, and AWS Config rules to continuously detect no
 
 
 
+
+
 Systems Manager Parameter:
 	Systems Manager Parameter Store doesn’t rotate its parameters by default.
 	Use AWS Secrets Manager to store and encrypt the database credentials, API keys, and other secrets. 
@@ -982,18 +980,25 @@ KMS is primarily used for encryption and not for hosting your credentials.
 
 
 
+
+
 SQS @(retention period ):
 	In Amazon SQS, you can configure the message retention period to a value from 1 minute to 14 days. 
 	Default is 4 days. Once the message retention limit is reached, messages are automatically deleted.
 
 
+
+
+
 Amazon Kinesis Data Firehose is a fully managed service for delivering real-time streaming data. 
-Although it can stream data to an S3 bucket, it is not suitable to be used as a queue 
-for a batch application.
+Although it can stream data to an S3 bucket, it is not suitable to be used as a queue for a batch application.
 
 Amazon Kinesis Data Firehose is the easiest way to load streaming data into data stores and analytics tools. 
 It can capture, transform, and load streaming data into Amazon S3, Amazon Redshift, Amazon Elasticsearch Service, 
 and Splunk, enabling near real-time analytics with existing business intelligence tools and dashboards you are already using today.
+
+
+
 
 
 Amazon Redshift(data warehouse):
@@ -1003,13 +1008,17 @@ Amazon Redshift(data warehouse):
 	massively parallel query execution, and columnar storage on a high-performance disk.
 
 
+
 RealTime EC2 Log Processing:
 	Create a Kinesis Data Stream and use AWS Lambda to read records from the data stream real-time.
 	
-	Kinesis Data Firehose  near RealTime.
+Kinesis Data Firehose  near RealTime.
 	Amazon Athena and Amazon Redshift(Analytics / BI / Data Warehouse) not RealTime processing.
 Redshift is a relational database and best suited for tabular data; Athena is better for semi-structured and unstructured data.	
 	
+
+
+
 
 RDS Mysql: increase the disk space without impacting:
 	Modify the DB instance settings and enable storage autoscaling.
@@ -1017,6 +1026,8 @@ RDS Mysql: increase the disk space without impacting:
 
 For Modify the DB instance settings and enable storage autoscaling.
 aS Result: increasing the allocated storage might cause performance degradation during the change.
+
+
 
 
 
@@ -1040,10 +1051,10 @@ Error:EC2ThrottledException:
 
 
 
+
+
 Route53:
 	You can use Route 53 health checking to configure active-active and active-passive failover configurations. 
-
-
 
 Active-Active Failover:
 	In active-active failover, all the records that have the same name, the same type (such as A or AAAA), and the same routing policy 
@@ -1121,7 +1132,6 @@ S3:
 	A better solution is to set up an origin access identity (OAI) then use Signed URL or Signed Cookies 
 	in your CloudFront web distribution for Restrict access file.
 
-
 S3 does not public event messages to Amazon MQ. You should use an Amazon SQS instead.
 
 S3 supports 3 destinations where it can publish events:
@@ -1140,6 +1150,8 @@ Retrieve a subset of data from a large CSV file stored in an S3:
 Metadata is not needed when querying subsets of data in an object using S3 Select. 
 Tags just provide additional information to your object, not needed when querying with S3 Select although this can be useful 
 for S3 Batch Operations. 
+ 
+ 
  
  
  
@@ -1214,6 +1226,7 @@ The /32 denotes one IP address, and the /0 refers to the entire network.
 
 AWS DataSync(moving data between on-premises and AWS storage services like S3,EFS):
 	AWS DataSync does not work with Amazon EBS volumes.
+	
 	DataSync can copy data between Network File System (NFS) shares, Server Message Block (SMB) shares, self-managed object storage,
 	AWS Snowcone, S3 buckets,Amazon EFS file systems, and Amazon FSx for Windows File Server file systems.
 
@@ -1222,6 +1235,7 @@ AWS DataSync(moving data between on-premises and AWS storage services like S3,EF
 
 CloudFormation template:
 	Needs to ensure that the required components are properly running before the stack creation proceeds:
+	
 	Configure a CreationPolicy attribute to the instance in the CloudFormation template. 
 	Send a success signal after the applications are installed and configured using the cfn-signal helper script.
 
@@ -1234,7 +1248,7 @@ CloudFormation template:
 
 Avoid losing recently submitted requests:
 	Use an Amazon SQS queue to decouple the application components and scale-out the EC2 instances based upon the 
-	ApproximateNumberOfMessages metric in Amazon CloudWatch.
+	SqS ApproximateNumberOfMessages metric in Amazon CloudWatch.
 
 
 
@@ -1250,8 +1264,9 @@ SCP:
 	but not directly in the IAM User. 
 
 	IAM role Cannot directly associate with IAM user.
+An IAM role is an IAM identity that you can create in your account that has specific permissions. An IAM role is similar to an IAM user.
 	
-You cannot attach Roles to Users and Groups, only Policies.
+Users and Groups use only Policies, You cannot attach Roles to it.
 
 IAM User     = Single Account with credentials for login, e.g. JohnDoe
 IAM Role     = Single Account without credentials, created for AWS Resources to "Assume".
@@ -1264,7 +1279,7 @@ Policies are added to Users, Roles, or Groups, to give them the permissions spec
 
 
 Secrets Manager Parameter vs Systems Manager Parameter:
-	Secrets Manager there is a cost associated with using Store encrypted parameters. 
+	Secrets Manager there is a cost associated with using Store encrypted parameters with rotation. 
 	If you are storing mostly application parameters, then the Systems Manager Parameter Store is a better fit
 	with (AWS KMS) for the encryption.
 
@@ -1304,6 +1319,7 @@ It is not possible to enable or disable hibernation for an instance after it has
 
 
 
+
 50TB data transfer from on permiss:
 	Request an Import Job to Amazon S3 using a Snowball device in the AWS Snowball Console.
 
@@ -1318,6 +1334,9 @@ GlobalRealTimeDataProcessing:
 CloudFront and Route 53 just do Geoproximity routing only not process date.
 	By using Lambda@Edge and Kinesis together, you can process real-time streaming data so that you can track and analyze 
 	globally-distributed user activity on your website and mobile applications, including clickstream analysis.
+
+
+
 
 
 By using a Curl or Get Command to get the latest metadata information from http://169.254.169.254/latest/meta-data/
@@ -1340,12 +1359,13 @@ Memory optimized instances:
 
 DynamoDB Streams:
 	Enabling DynamoDB Streams to capture table activity and automatically trigger the Lambda function.
-	CloudWatch Alarms only monitor service metrics, not changes in DynamoDB table data.
+
+CloudWatch Alarms only monitor service metrics, not changes in DynamoDB table data.
 
 
 
 Log file processing:
-	Amazon S3 for storing the application log files and Amazon Elastic MapReduce(EMR) for processing the log files.
+	S3 for storing the application log files and Amazon Elastic MapReduce(EMR | big data frameworks) for processing the log files.
 
 
 
@@ -1358,17 +1378,19 @@ and guarantee no duplicates.
 
 
 
+
 AWS Data Pipeline:
-	AWS Data Pipeline  a cloud-based data workflow service that helps you process and move data between different 
+	AWS Data Pipeline a cloud-based data workflow service that helps you process and move data between different 
 	AWS services and on-premises data sources. 
-	It is not suitable for collecting data from distributed sources such as users, IoT devices, or clickstreams.
+
+It is not suitable for collecting data from distributed sources such as users, IoT devices, or clickstreams.
 
 
 
 
 Hundred of EC2 instances Log Process:
 	Install the Unified CloudWatch Logs agent in each instance which will automatically collect and push 
-	data to CloudWatch Logs. Analyze the log data with CloudWatch Logs Insights.
+	data to CloudWatch Logs. Analyze the log data using CloudWatch Logs Insights.
 	CloudWatch Logs Insights enables you to interactively search and analyze your log data in Amazon CloudWatch Logs. 
 
 
@@ -1378,7 +1400,8 @@ S3StaticResourcePublicAcc:
 	Grant public read access to the object when uploading it using the S3 Console.
 	Configure the S3 bucket policy to set all objects to public read.
 	
-	An IAM Role, in itself, cannot directly make the S3 objects public or change the permissions of each individual object.
+An IAM Role, in itself, cannot directly make the S3 objects public or change the permissions of each individual object.
+
 
 
 
@@ -1388,10 +1411,11 @@ Differences between Fault Tolerance and High Availability is that:
 	If Need 4 and runing 2 Its High available.
 
 
+
+
+
 Dashboard for continuous detection of policy non-conformance and non-compliant 
-resources across the enterprise and AWS multi-account strategy best practices.
-
-
+resources across the enterprise and AWS multi-account strategy best practices ?
 
 AWS Control Tower:
 	Use AWS Control Tower to launch a landing zone to automatically provision and configure new accounts through an Account Factory. 
@@ -1410,9 +1434,11 @@ guardrails enabled for continuous detection of policy non-conformance, and non-c
 When users perform work in any AWS account in your landing zone, they’re always subject to the guardrails 
 that are governing their account’s OU.
 
-
 The AWS Organizations service neither has the capability to build a landing zone nor a built-in dashboard ,
 for continuous detection of policy non-conformance and non-compliant resources across the enterprise.
+
+
+
 
 
 
@@ -1448,9 +1474,12 @@ A global secondary index can only be created in the region where its parent tabl
  
 
 
+
+
 Amazon Managed Grafana:
 	Amazon Managed Grafana is a fully managed service with rich, interactive data visualizations to help customers analyze,
 	monitor, and alarm on metrics, logs, and traces across multiple data sources.
+ 
  
  
  
@@ -1462,11 +1491,15 @@ on individual objects in your bucket.
  
  
  
+ 
+ 
 Online Order processing, duplicates can’t be tolerated:
 	– Replace Amazon SQS use Amazon Simple Workflow service.
 	– Use an Amazon SQS FIFO Queue instead of SQS default queue.
 
 SQS, there is a possibility that a message can have a duplicate in case an EC2 instance fails to delete the already processed message.
+
+
 
 
 
@@ -1482,11 +1515,13 @@ If you attach a transit gateway peering connection, the transit gateway must be 
 
 
 
+
 Athena:
 	Athena is an interactive query service that makes it easy to analyze data directly in S3 using standard SQL.
 	Athena helps you analyze unstructured, semi-structured, and structured data stored in Amazon S3. 
 	Examples include CSV, JSON, or columnar data formats such as Apache Parquet and Apache ORC. 
 	You can use Athena to run ad-hoc queries using ANSI SQL without the need to aggregate or load the data into Athena.
+
 
 
 
@@ -1497,9 +1532,12 @@ RestartEc2FromErrorLog:
 	You can create alarms that automatically stop, terminate, reboot, or recover your EC2  using CloudWatch alarm actions. 
 
 
+
+
 RabbitMQ cluster:
 	A cluster deployment is a logical grouping of three RabbitMQ broker nodes behind a Network Load Balancer, 
 	each sharing users, queues, and a distributed state across multiple Availability Zones (AZ).
+
 
 
 DataSync:
@@ -1517,7 +1555,6 @@ To set up transfers between Snowcone device and AWS storage, use the DataSync ag
 
 
 To connect programmatically to an AWS service, you will need to use an AWS Direct Connect service endpoint.
-
 No data transfer cost between S3 and EC2 in the same AWS Region.
 
 
@@ -1564,8 +1601,11 @@ When a cross-region copy is enabled for a cluster, all new manual and automatic 
 
 
 
+
+
 High I/O performance for the EC2 temporary files:
 	Configure RAID 0 in multiple instance store volumes. RAID 1 configuration is used for data mirroring. 
+
 
 
 
@@ -1579,12 +1619,14 @@ S3 upload encryption obj:
 
 
 
+
 Deactivating and deleting any IAM user access key that is over 90 days old:
 	Amazon EventBridge cannot directly check for IAM events that show the age of IAM access keys.
 	
 	Use the AWS Config managed rule to check if the IAM user access keys are not rotated within 90 days. 
 	Create an Amazon EventBridge (Amazon CloudWatch Events) rule for the non-compliant keys, and define a target to invoke 
 	a custom Lambda function to deactivate and delete the keys.
+
 
 
 
@@ -1603,6 +1645,8 @@ AWS Health:
 Your account Healt/events page shows all events from the past 90 days.
 AWS Service Health Dashboard shows public events that may affect several customers in particular regions. 
 It doesn’t show events related to specific EC2 instances on individual AWS accounts.
+
+
 
 
 
@@ -1633,6 +1677,8 @@ The volume queue length is the number of pending I/O requests for a device.
 
 
 
+
+
 EBS Multi-attach Not multi AZ:
 	Multi-attach feature can only be enabled on EBS Provisioned IOPS io2 or io1 volumes. 
 	In addition, multi-attach won’t offer multi-az resiliency because this feature only allows an EBS volume to be attached on 
@@ -1646,14 +1692,19 @@ EBS provides three volume types to best meet the needs of your workloads:
 
 
 
+
 AWS Config:
 	Configure AWS Config to trigger an evaluation that will check the compliance for a user’s password periodically.
-
 
 AWS Control Tower is used to simplify the creation of new accounts with preconfigured constraints. 
 It isn’t used to automate application deployments. Moreover, AWS Config is commonly used for 
 monitoring the changes of AWS resources and not the custom resources for serverless or 
 container-based applications in AWS.
+
+
+
+
+
 
 Enable S3 server access logging:
 	Server access logging provides detailed records for the requests that are made to a S3 bucket.
@@ -1665,6 +1716,9 @@ AWS CloudTrail logs provide a record of actions taken by a user, role, or an AWS
 while S3 server access logs provide detailed records for the requests that are made to an S3 bucket.
 
 AWS CloudTrail alone won’t give detailed logging information for object-level access.
+
+
+
 
 
 
@@ -1682,14 +1736,17 @@ This service is not capable of doing the actual migration.
 
 
 
+
 Enhanced Monitoring:
 	RDS Enhanced Monitoring metrics shown in the Process List:
-	RDS processes,RDS child processes,OS processes.
+	RDS Process,RDS child Process,OS Process.
 
 Enhanced Monitoring metrics are useful when you want to see how different processes or threads on a DB instance use the CPU.
 
 RDS provides metrics in real-time for the operating system (OS) that your DB instance runs on. 
 You can view the metrics for your DB instance using the console or consume the Enhanced Monitoring JSON output
+
+
 
 
 
@@ -1704,8 +1761,6 @@ ACM lets you import third-party certificates from the ACM console, as well as pr
 If ACM is not available in your region, use AWS CLI to upload your third-party certificate to the IAM Certificate store.
 
 
-
-
 Audit Trail for SSE-KMS Key Uses:
 	Envelope encryption, Encryption with AWS KMS-Managed Keys (SSE-KMS).
 
@@ -1717,8 +1772,7 @@ Audit Trail for SSE-KMS Key Uses:
 
 
 
-Two AWS services for issuing and deploying X.509 Certificates:
-
+Two AWS services are issuing and deploying X.509 Certificates:
 ACM Private CA—
 	Certificates issued by a private CA are trusted only within your organization, not on the internet.
 	With ACM Private CA, you can create your own CA hierarchy and issue certificates with it for authenticating internal users, 
@@ -1734,11 +1788,13 @@ ACM Public CA—
 
 
 
+
 Secure Connected RDS for MySQ:
 	Use IAM DB Authentication and create database accounts using the AWS-provided AWSAuthenticationPlugin plugin in MySQL.
 
 You can authenticate DB instance using IAM database authentication. IAM database authentication works with MySQL and PostgreSQL. 
 AWS-provided plugin that works seamlessly with IAM to authenticate your IAM users. 
+
 
 
 
@@ -1768,6 +1824,7 @@ You can’t configure a geo match condition in an Application Load Balancer.
 
 
 
+
 AWS Trusted Advisor:
 	AWS Trusted Advisor is an online tool that provides real-time guidance and resources best practices. 
 	It inspects your AWS environment and makes recommendations for saving money, improving system performance and reliability, 
@@ -1779,12 +1836,15 @@ AWS Cost Explorer:
 
 
 
+
+
 SimpleDB vs DynamoDB:
 	SimpleDB is a highly available and scalable NoSQL database, it has a limit on the request capacity or storage size 
 	for a given table, unlike DynamoDB.
 
 	DynamoDB is use this to have an ACID-compliant database, it is not capable of handling complex queries and highly 
 	transactional (OLTP) workloads.
+
 
 
 
@@ -1802,6 +1862,9 @@ Virtual Desktops:
 	Amazon Workspace to create the needed virtual desktops in your VPC.
 
 
+
+
+
 Enhanced Networking vs ParallelCluster:
 	Enable Enhanced Networking with Elastic Network Adapter (ENA) on the Windows EC2 Instances.
 	Enhanced networking provides higher bandwidth, higher packet per second (PPS) performance, and consistently lower 
@@ -1811,12 +1874,15 @@ ParallelCluster:
 	AWS ParallelCluster is just an AWS-supported open-source cluster management tool that makes it easy for you to deploy and manage 
 	High-Performance Computing (HPC) clusters on AWS. 
 
-	It not provide higher bandwidth, higher packet per second (PPS) performance, and lower inter-instance latencies, unlike ENA or EFA.
+It not provide higher bandwidth, higher packet per second (PPS) performance, and lower inter-instance latencies, unlike ENA or EFA.
+
+
 
 
 
 ALB  health check with HTTP and HTTPS.
 NLB and CLB health check with TCP is only.
+
 
 
 
@@ -1826,9 +1892,15 @@ IAM roles are global:
 
 
 
+
 Block the IP addresses at subnet layer using Network Access Control List (ACLs):
 	You can associate a network ACL with multiple subnets; however, a subnet can be associated with only one network ACL at a time. 
 	When you associate a network ACL with a subnet, the previous association is removed.
+
+Create a Web ACL rule in AWS WAF to block the specified country. Associate this rule to the Application Load Balancers. 
+
+
+
 
 
 
@@ -1836,7 +1908,7 @@ A static Anycast IP address is primarily used by AWS Global Accelerator to enabl
 to multiple regions and improve availability and performance for their end-users.
 
 
-Create a Web ACL rule in AWS WAF to block the specified country. Associate this rule to the Application Load Balancers. 
+
 
 
 
@@ -1848,10 +1920,12 @@ AppSync:
 Develop the application using the AWS AppSync service and use its built-in custom domain feature. 
 Associate an SSL certificate to the AWS AppSync API using the AWS Certificate Manager (ACM) service to enable HTTPS communication.
 
-
 When you configure an AWS AppSync API, Its provisioned two endpoints:
 	AWS AppSync GraphQL endpoint:
 	AWS AppSync real-time endpoint:
+
+
+
 
 
 SQS Short or Long polling:
@@ -1863,6 +1937,7 @@ The default visibility timeout for a message is 30 seconds. The maximum is 12 ho
 
 
 
+
 Step scaling:
 	With step scaling, you choose scaling metrics and threshold values for the CloudWatch alarms that trigger the scaling process 
 	as well as define how scalable target should be scaled when a threshold is in breach for a specified number of evaluation periods. 
@@ -1870,9 +1945,10 @@ Step scaling:
 Step scaling policies increase or decrease the current capacity of a scalable target based on a set of scaling adjustments, 
 known as step adjustments. 
  
- 
 Scaling up and down multiple times:
 	Change the cooldown period of the Auto Scaling group and set the CloudWatch metric to a higher threshold.
+ 
+ 
  
  
  
@@ -1880,15 +1956,12 @@ Aurora failure on the primary database instance for failover:
 	Aurora will attempt to create a new DB Instance in the same Availability Zone as the original instance 
 	and is done on a best-effort basis.
 
- 
  If you have an Amazon Aurora Replica in the same or a different Availability Zone, when failing over, 
  Amazon Aurora flips the canonical name record (CNAME) for your DB Instance to point at the healthy replica, 
  which in turn is promoted to become the new primary. Start-to-finish failover typically completes within 30 seconds.
  
- 
  If you are running Aurora Serverless and the DB instance or AZ becomes unavailable, 
  Aurora will automatically recreate the DB instance in a different AZ.
-
 
  If you do not have an Amazon Aurora Replica (i.e., single instance) and are not running Aurora Serverless, 
  Aurora will attempt to create a new DB Instance in the same Availability Zone as the original instance. 
@@ -1905,9 +1978,8 @@ Aurora failure on the primary database instance for failover:
 Test new version of Application with  50/50 request:
 	Use an Application Elastic Load balancer with Weighted Target Groups to divert and proportion the traffic between the 
 	on-premises and AWS-hosted application.
-	
+	OR
 	Use Route 53 with Weighted routing policy to divert the traffic between the on-premises and AWS-hosted application. 
-
 
 Network Load balancer doesn’t have Weighted Target Groups.
  
@@ -1920,6 +1992,7 @@ IP addresses from one of the following CIDR blocks:
 – 172.16.0.0/12 (RFC 1918)
 – 192.168.0.0/16 (RFC 1918)
 
+
  
  
 Heterogeneous migrations a two step process.:
@@ -1927,6 +2000,8 @@ Heterogeneous migrations a two step process.:
 	
 	First, use the AWS Schema Conversion Tool to convert the source schema and application code to match that of the target database, 
 	and then use the AWS Database Migration Service to migrate data from the source database to the target database.
+
+
 
  
 Route53:
@@ -1945,7 +2020,7 @@ that routes traffic to www.tutorialsdojo.com.
 
 
 
-Most AWS services use VPC Interface Endpoint, VPC Gateway Endpoint for S3 and DynamoDB.
+Most AWS services use VPC Interface Endpoint, VPC Gateway Endpoint only for S3 and DynamoDB.
   
   
  
@@ -1958,10 +2033,20 @@ Launch a new Amazon S3 bucket to store existing and new records.
 
 Enable AWS CloudTrail with Data Events and Amazon S3 Object Lock in the bucket.
 
+Amazon Storage Gateway:
+	File Gateway (NFS)
+	Volume Gateway (iSCSI)
+	Tape Gateway (VTL)
+
+A File Gateway is a type of Storage Gateway used to integrate your existing on-premise application with the Amazon S3. 
+It provides NFS (Network File System) and SMB (Server Message Block) access to data in S3.
 
 
 Archive on S3 and frequently accessed data locally on their on-premises server:
 Use the Amazon Storage Gateway – Cached Volumes.
+
+Volume Gateway stores and manages on-premises data in Amazon S3  either cache mode or stored mode.
+Point-in-time backups of your volumes stored as EBS snapshots and come in two different operational modes: stored and cached.
 
 
 
@@ -1972,10 +2057,10 @@ SQS:
 
 
 
+
 S3 Time Constraint Transitioning:
 	Set a lifecycle policy in the bucket to transition to S3 – Standard IA after 30 days
 	Set a lifecycle policy in the bucket to transition the data from Standard storage class to Glacier after one week (7 days).
-
 
 Only change the storage class of your objects 
 	From S3 Standard storage class to STANDARD_IA or ONEZONE_IA storage after 30 days. 
@@ -1985,6 +2070,7 @@ The following constraints apply from Standard storage class to STANDARD_IA or ON
 	1)not transition objects that are smaller than 128 KB to the STANDARD_IA or ONEZONE_IA.
 	2)Objects must be stored for at least 30 days in the current storage class before you can transition them to STANDARD_IA or ONEZONE_IA.
 	3)(in versioned buckets), you can transition only objects that are at least 30 days noncurrent to STANDARD_IA or ONEZONE_IA storage.
+
 
 
 
@@ -2000,6 +2086,7 @@ Step scaling:
 	depending on the size of the alarm breach. 
 	
 When you create a step scaling policy, you can also specify the number of seconds that it takes for a newly launched instance to warm up.
+
 
 
 
@@ -2060,9 +2147,13 @@ You can also define Amazon S3 lifecycle rules to archive or delete log files aut
 If you want notifications about log file delivery and validation, you can set up Amazon SNS notifications.
  
  
+ 
+ 
 CloudHSM:
 	Amazon strongly recommends that you use two or more HSMs, in separate Availability Zones, 
 	in any production CloudHSM Cluster to avoid loss of cryptographic keys.
+
+
 
 
 
@@ -2074,26 +2165,26 @@ Access logs on the Application Load Balancer:
 
 
 
+
 Amazon FSx Windows File Server can scale out storage to hundreds of petabytes of data with tens of GB/s of throughput performance 
 and millions of IOPS. 
-
 Amazon EFS can only handle Linux workloads.
+
+
+
 
 
 EKS cluster authentication:
 	Kubernetes cluster and have role-based access control (RBAC) access to IAM users and roles for cluster authentication.
 	single-digit millisecond latency:
 
-
 Launch the application to an Amazon Elastic Kubernetes Service (Amazon EKS) cluster. 
 Create node groups in Wavelength Zones for the Amazon EKS cluster via the AWS Wavelength service. 
 Apply the AWS authenticator configuration map (aws-auth ConfigMap) to your cluster.
 
-
 AWS Wavelength:
 	AWS Wavelength combines the high bandwidth and ultralow latency of 5G networks with AWS compute and storage services 
 	so that developers can innovate and build a new class of applications.
-
 
 An Amazon EKS connector agent is only used to connect your externally hosted Kubernetes clusters and to allow them to be 
 viewed in your AWS Management Console.
@@ -2106,7 +2197,8 @@ Network Firewall:
 	ingress and egress traffic. Update the necessary VPC route tables.
 	
 Firewall must be created at the VPC level and not at the subnet level.
-	 
+Network ACLs to control access to your subnets.
+Security group acts as a virtual firewall for your EC2.	 
  
  
 EC2 Terminating log save:
@@ -2118,22 +2210,30 @@ Trigger the CloudWatch agent to push the application logs and then resume the in
 to CloudWatch Logs.
 
 
-Using CloudWatch agent is the most suitable tool to use to collect the logs. 
-The unified CloudWatch agent enables you to do the following.
+
+To collect logs from your Amazon EC2 instances and on-premises servers into CloudWatch Logs, AWS offers two options:
+	Recommended – The unified CloudWatch agent.
+	Supported, but deprecation – The older CloudWatch Logs agent(only servers running Linux).
+	
+Using  CloudWatch agent to collect metrics and logs from Amazon EC2 instances and on-premises servers.
+Unified CloudWatch agent enables you to: 
+	Collect internal system-level metrics from Amazon EC2 instances across operating systems also EC2 logs.
+	
+CloudWatch Agent enables you to collect and export host-level metrics and logs on instances running Linux or Windows server.
 
 
 
 Dedicated physical server that doesn’t use virtualization,NFS protocol:
 	Use an AWS Storage Gateway hardware appliance for your compute resources. 
-	Configure File Gateway to store the application data and create an Amazon S3 bucket to store a backup of your data.
+	Configure File Gateway to store the application data and create an S3 bucket to store a backup of your data.
 
-Among the AWS Storage Gateway storage solutions, only File Gateway can store and retrieve objects in 
-Amazon S3 using the protocols NFS and SMB.
+Among the AWS Storage Gateway storage solutions, only File Gateway can store and retrieve objects in S3 using the protocols NFS and SMB.
 
 File Gateway is used to store and retrieve Amazon S3 objects through NFS and SMB protocols.
 
 
-EFS rapidly changing data and 1000 Linux servers.
+
+EFS for rapidly changing data and 1000 Linux servers.
 
 
 
@@ -2150,19 +2250,23 @@ To allow IAM users to create or modify resources and perform tasks, you must cre
 
 
 
+
+
 EC2DataSendWithInTwoVPC within Same Region:
 	Set up a VPC peering connection between the VPCs.
 	Re-configure the route table’s target and destination of the instances’ subnet.
 
-VPC endpoints are region-specific only,  do not support inter-region communication.
+VPC endpoints are region-specific only, You cannot create an endpoint between a VPC and a service in a different Region.
+
+VPC endpoints support IPv4 traffic only. 
+Endpoints can't be transferred from one VPC or service to another, VPC endpoint and service must be in the same region.
+
 
 
 
 Messages are processed within a specific time period:
-	Create an AMI of the backend application’s EC2 instance. 
-	Use the image to set up an Auto Scaling group and configure a target tracking scaling policy based on the
+	Use a AMI to set up an Auto Scaling group and configure a target tracking scaling policy based on the
 	SQS ApproximateAgeOfOldestMessage metric.
-
 
 CPUUtilization metric is not meant for time-sensitive messages where you need to ensure that the messages are processed 
 within a specific time period.
@@ -2173,17 +2277,17 @@ that messages are processed within a specific time period.
 
 
 
-Due to the data volume, most queries take a long time to complete:
+
+Due to S3 data volume, most queries take a long time to complete:
 	Transform the JSON data into Apache Parque format. 
 	Ensure that the user has an lakeformation:GetDataAccess IAM permission for underlying data access control.
+
 
 
 
 ECS service’s memory and CPU utilization:
 	Create an AWS Auto Scaling policy that scales out the ECS service when the service’s memory utilization is too high.
 	Create an AWS Auto Scaling policy that scales out the ECS cluster when the cluster’s CPU utilization is too high.
-
-
 
 ECS service and ECS container instance  metric are:
 
@@ -2205,6 +2309,7 @@ ECS Service Metric:
 	
 	
 	
+	
 ALBRequestCountPerTarget—Number of requests completed per target in an Application Load Balancer target group.
 
 
@@ -2223,7 +2328,7 @@ CloudFront app Hig availability:The scenario uses an EC2 instance as an origin o
 	You also need to configure the instances to be part of the origin group to ensure that the application is highly available.
 
 
-S3 File Gateway presents  NFS and SMB file protocols.
+S3 File Gateway presents  NFS and SMB protocols.
 	Use an AWS Storage File gateway with enough storage to keep data from the last 48 hours. 
 	Send the backups to an SMB share mounted as a local disk.
 
@@ -2275,7 +2380,7 @@ Similarly, merging reduces the number of shards in your stream and therefore dec
 
 
 
-ssh expiring certificates Tow way:
+SSH expiring certificates Tow way:
 	– Create an Amazon EventBridge (Amazon CloudWatch Events) rule that will check AWS Health or ACM expiration events related 
 	to ACM certificates. Send an alert notification to an Amazon Simple Notification Service (Amazon SNS) topic 
 	when a certificate is going to expire in 30 days.
@@ -2301,7 +2406,9 @@ When you create a Capacity Reservation, you specify:
 On-Demand instances cannot reserve compute capacity at all.
 
 
-capacity error placement group :
+
+
+Capacity error placement group :
 	It is recommended that you launch the number of instances that you need in the placement group in a single launch request 
 	and that you use the same instance type for all instances in the placement group.
 
@@ -2312,7 +2419,9 @@ Restarting the instances may migrate them to hardware that has capacity for all 
 
 
 
-AWS Organization allows you to create SCPs that centrally control AWS service use across multiple AWS accounts.
+
+AWS Organization allows you to create SCPs that centrally control AWS service across multiple AWS accounts.
+
 
 
 
@@ -2323,13 +2432,15 @@ Resuce Cost:
 
 Instead of using the public network to transfer the data, you can use the private network to reduce the overall data transfer costs.
 
-
-Region, they could still be charged with inter-Availability Zone data transfers if the instances are distributed across 
+Could be charged with inter-Availability Zone data transfers if the instances are distributed across 
 different availability zones.
 
-you won’t be able to connect to your Amazon S3 bucket if you are using a private subnet unless you have a VPC Endpoint.
 
+
+You won’t be able to connect to your Amazon S3 bucket if you are using a private subnet unless you have a VPC Endpoint.
 Private subnet connect S3 using vpc Endpoint.
+
+
 
 
 Authenticate the users using Redis AUTH by creating a new Redis Cluster with both the 
@@ -2338,13 +2449,12 @@ Authenticate the users using Redis AUTH by creating a new Redis Cluster with bot
 
 
 
-in-flight data between your web servers and RDS should be secured:
+In-flight data between your web servers and RDS should be secured:
 	Force all connections to your DB instance to use SSL by setting the rds.force_ssl parameter to true. 
 	Once done, reboot your DB instance.
 	
 	Download the Amazon RDS Root CA certificate. Import the certificate to your servers and configure your application to 
 	use SSL to encrypt the connection to RDS.
-
 
 There are 2 ways to use SSL to connect to your SQL Server DB instance:
 	– Force SSL for all connections.
@@ -2352,15 +2462,19 @@ There are 2 ways to use SSL to connect to your SQL Server DB instance:
 
 
 
+
+
 RDS multiAZL:
 – Increased database availability in the case of system upgrades like OS patching or DB Instance scaling.
 – Provides enhanced database durability in the event of a DB instance component failure or an Availability Zone outage.
 
-
-
 RDS synchronously replicates within same regin:
 	RDS synchronously replicates the data to a standby instance in a different Availability Zone (AZ) that is in the same region 
 	and not in a different one.
+
+RDS Read Replica may be in a different AWS Region than the primary DB instance region.
+
+
 
 
 
@@ -2368,7 +2482,8 @@ Amazon Elastic File System=requires a scalable, POSIX-compliant storage service.
 “allows concurrent connections from multiple EC2 instances”
 
 
-cross-account access to S3 objects:
+
+Cross-account access to S3 objects:
 	– IAM policies and resource-based bucket policies             for programmatic-only access to S3 bucket objects.
 	– IAM policies and resource-based Access Control Lists (ACLs) for programmatic-only access to S3 bucket objects.
 	– Cross-account IAM roles                                     for programmatic and console access to S3 bucket objects.
@@ -2376,6 +2491,7 @@ cross-account access to S3 objects:
 Not all AWS services support resource-based policies. 
 Therefore, you can use cross-account IAM roles to centralize permission management when providing cross-account access 
 to multiple services.
+
 
 
 
@@ -2390,8 +2506,7 @@ by an Amazon OpenSearch cluster.
 
 
 To enable the cross-region replication feature in S3, the following items should be met:
-	The source and destination buckets must have versioning enabled.
-	The source and destination buckets must be in different AWS Regions.
+	The source and destination buckets must have versioning enabled and must be in different AWS Regions.
 	Amazon S3 must have permission to replicate objects from that source bucket to the destination bucket on your behalf.
 
 
@@ -2401,20 +2516,21 @@ Deploy a conversational chatbot using Amazon Lex.
 Define conversation flow for specific user intentions. Integrate AWS Lambda functions as code hooks to perform actions 
 based on user requests.
 
-
 Comprehend is a natural language processing (NLP) service that uses machine learning to find insights and relationships in texts. 
 It is not used to build chatbot applications.
 
 
 
 
-Ingest the data using Amazon Kinesis Data Streams and create an AWS Lambda function to store the data in Amazon DynamoDB.
+Ingest/Consume the data using Amazon Kinesis Data Streams and create an AWS Lambda function to store the data in Amazon DynamoDB.
 
-
-Amazon Redshift only delivers sub-second response times. 
-Amazon DynamoDB Accelerator (DAX), can deliver microsecond response times.
+Amazon Redshift only  sub-second response times. 
+Amazon DynamoDB Accelerator (DAX), microsecond response times.
 
 Amazon Kinesis Data Firehose only supports  S3,  Redshift,  Elasticsearch, and an HTTP endpoint as the destination.
+
+
+
 
 
 CloudFront Cache-Control:
@@ -2422,7 +2538,7 @@ CloudFront Cache-Control:
 	The Cache-Control max-age directive lets you specify how long (in seconds) you want an object to remain in the cache before 
 	CloudFront gets the object again from the origin server. 
 
-The minimum expiration time CloudFront supports is 0 seconds for web distributions and 3600 seconds for RTMP distributions.
+The minimum expiration time CloudFront supports is 0 seconds for web distributions and 3600 seconds (1Hr) for RTMP distributions.
 
 
 
@@ -2432,6 +2548,8 @@ By setting up cross-account access in this way, you don’t need to create indiv
 
 In addition, users don’t have to sign out of one account and sign into another in order to access resources that are 
 in different AWS accounts.
+
+
 
 
 AWS Consolidated Billing:
@@ -2447,32 +2565,29 @@ Tag Editor simply allows you to add, edit, and delete tags to multiple AWS resou
 
 
 
+
 Amazon Aurora replicas vs RDS replicas:
 	The read replication latency of less than 1 second is only possible if you would use Amazon Aurora replicas.
-Aurora replicas are independent endpoints in an Aurora DB cluster, best used for scaling read operations and increasing availability. 
 
+Aurora replicas are independent endpoints in an Aurora DB cluster, best used for scaling read operations and increasing availability. 
 You can create up to 15 replicas within an AWS Region.
 
 RDS Read Replicas can only provide asynchronous replication in seconds and not in milliseconds.
 
 
 
-high-frequency read and write operations handrad of ECS:
+
+High-frequency read and write operations handrad of ECS:
 	ECS to access file system data across your fleet of Amazon ECS tasks.
 	Amazon Elastic File System (Amazon EFS) provides simple, scalable file storage for use with your Amazon ECS tasks. 
 	Launch an Amazon Elastic File System (Amazon EFS) with Provisioned Throughput mode and set the performance mode to Max I/O. 
 	
 	Configure the EFS file system as the container mount point in the ECS task definition of the Amazon ECS cluster.
-	
-	
 
-Amazon EFS offers two performance modes:
+EFS offers two performance modes:
 	– General Purpose mode
 	– Max I/O mode.
 	
-	
-	
-
 There are two throughput modes to choose from for your file system:
 	– Bursting Throughput
 	– Provisioned Throughput
@@ -2481,15 +2596,19 @@ Bursting Throughput mode won’t be able to sustain the constant demand of the g
 Need  Provisioned Throughput mode.
 
 
-
-
+	
+	
+	
+	
 Cannot directly set a DynamoDB table as a container mount point:
 	In the first place, DynamoDB is a database and not a file system which means that it can’t be “mounted” to a server.
  
  
+ 
+ 
+ 
 Enable the EBS Encryption By Default feature for the AWS Region.
 	Encryption By Default feature is a Region-specific setting and thus, you can’t enable it to selected EBS volumes only.
-
 
 EBS encryption:
 	– Encryption by default is a Region-specific setting. If you enable it for a Region, you cannot disable it for individual 
@@ -2502,15 +2621,20 @@ Amazon EBS does not support asymmetric CMKs. To encrypt an EBS snapshot, you nee
 
 
 
+
+
 Amazon Elastic File System (EFS) doesn’t natively work with Amazon S3.
 Amazon FSx for Lustre works natively with Amazon S3, a high-performance POSIX interface. 
  
 
 
 
+
 Global Accelerator:
-	Use AWS Global Accelerator and create an endpoint group for each AWS Region. 
-	Associate the Application Load Balancer from each region to the corresponding endpoint group.
+User->AWSEdgeNet->GlobalAcc->NLB/ALB/EC2
+
+	Use AWS Global Accelerator create an endpoint with static IP for User and connect each AWS Region, then 
+	Associate the Elastic Load Balancer from each region.
 	
 AWS Global Accelerator is a service that improves the availability and performance of your applications with local or global users. 
 It provides static IP addresses that act as a fixed entry point to your application endpoints in a single or multiple AWS Regions, 
@@ -2523,6 +2647,9 @@ If you have multiple resources in multiple regions, you can use AWS Global Accel
 
 
 Enhanced Networking:
+	EC2 provides enhanced networking capabilities through the Elastic Network Adapter (ENA). 
+	To use enhanced networking, you must install the required ENA module and enable ENA support.
+
 	When you need a consistently lower inter-instance latencies.
 	When you need a higher packet per second (PPS) performance.
 	

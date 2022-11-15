@@ -28,11 +28,17 @@ Server Deployment
 --spring.profiles.active=dev-bl
 --spring.cloud.config.uri=192.168.1.2:9091 
 --CONFIG_SERVER=configserver:http://172.16.8.132:7085
+--spring.cloud.config.uri=http://localhost:7185
 --eureka.client.serviceUrl.defaultZone=http://192.168.1.2:7082/eureka/
 
 http://172.16.8.132:7085/
 
-keycloak Server run
+
+
+
+
+=================================================
+#  keycloak Server run
 ==========================================
 =>./standalone.sh
 Test from the keycloak app bin folder
@@ -128,6 +134,70 @@ Max RTT
 
 
 
+By ImV:
+=================================================
+Avg. RTT: 
+	tail -10000 /app/apihub/Nginx_LB/logs/access.log | grep prepaid|awk '{ total += $14; count++ } END { print total/count }'
+
+
+Max RTT:  
+	tail -100000 ../logs/access.log | grep prepaid|awk '{ if (max<$14){ max=$14 }}END {print max}'
+
+
+Min. wise Transactions:
+	for i in `grep "26/Jul/2022:11:4[0-9]" /app/apihub/Nginx_LB/logs/access.log |grep available-product|cut -d "[" -f 2|cut -d ":" -f 1,2,3|awk '{print $1}'|sort|uniq`; do a=`grep $i /app/apihub/Nginx_LB/logs/access.log |grep available-product|cut -d "[" -f 2|awk '{print $1}'|wc -l`; echo $i,$a; done
+
+TPS at certain Hours:
+	for i in `grep "26/Jul/2022:11:4[0-9]" /app/apihub/Nginx_LB/logs/access.log |grep available-product|cut -d "[" -f 2|awk '{print $1}'|sort|uniq`; do a=`grep $i /app/apihub/Nginx_LB/logs/access.log |grep available-product|cut -d "[" -f 2|awk '{print $1}'|wc -l`; echo $i,$a; done
+
+
+No. of High RTT Request Counts:
+	  cat ../logs/access.log | grep prepaid|awk '{ if ( $14 > .750 ) print $0 }'|wc -l
+
+	  grep prepaid access.log|awk '{ if ( $14 > .750 ) print $0 }'|wc -l
+
+
+Overall RTT: 
+	tail -100000 /app/apihub/Nginx_LB/logs/access.log|awk '{ total += $14; count++ } END { print total/count }'
+
+
+Error Rate:
+	tail -100000 ../logs/access.log | awk '{ print $8}'|sort |uniq --repeated --count
+
+
+
+Actual Error Count:  
+	tail -10000 ../logs/access.log |awk '{if ( $8 == 500 ) print $0}' |wc -l
+
+
+
+Last % mins Log status:
+
+	for (( i = 5; i >=0; i-- )) ; do grep $(date +%d/%b/%Y:%R -d "-$i  min")  /app/apihub/Nginx_LB/logs/access.log; done|wc -l 
+
+	for (( i = 5; i >=0; i-- )) ; do grep $(date +%d/%b/%Y:%R -d "-$i  min")  /app/apihub/Nginx_LB/logs/access.log; done| awk '{ print $8}'|sort |uniq --repeated --count
+
+
+Minwise Max TPS:
+	for i in `grep available-product access.log.280722|awk '{ print $3}'|cut -d ":" -f 1,2,3|cut -d "[" -f 2|sort|uniq`; do a=`grep $i access.log.280722 |grep available-product|cut -d "[" -f 2|awk '{print $1}'| sort|uniq --repeated --count|awk '{ if (max<$1){ max=$1 }}END {print max}'`; echo $i,$a; done
+
+
+10 min wise Max TPS:
+
+	 for y in `grep available-product access.log | awk '{ print $3}' | cut -d ":" -f 1,2,3 | cut -d "[" -f 2 | cut --complement -c 17 | sort | uniq`; 
+                do 
+                        a=`grep $y $i |grep available-product|cut -d "[" -f 2|awk '{print $1}'| sort|uniq --repeated --count|awk '{ if (max<$1){ max=$1 }}END {print max}'`; 
+                       
+			echo $y,$a  ;
+                        
+                done
+
+Minwise RTT @ Specific Hours:
+	for i in `grep product-offer access.log.030922|grep "03/Sep/2022:1[8-9]"| awk '{ print $3}'|cut -d ":" -f 1,2,3|cut -d "[" -f 2|sort|uniq`; do a=`grep $i access.log.030922 |grep product-offer|cut -d "[" -f 2|awk '{print $1}'| sort|uniq --repeated --count|awk '{ total += $14; count++ } END { print total/count }'`; echo $i,$a; done
+
+To Get Max TPS @Specific Second:
+	 grep "2022:17" /app/apihub/Nginx_LB/logs/logarchive/access.log.141122| awk '{print $3}'|cut -d "[" -f 2|awk '{print $1}'|sort|uniq --repeated --count|awk '{ if (max<$1){ max=$1; tm=$2 }}END {print max,tm}'
+
 
 
 =================================================
@@ -151,7 +221,7 @@ SBU sheet filap
 ----------------------------------------------
 Ticket: 10 Nov, 2022
 1)Technical discussion              5hr   ->8
-2)Feature Delivery                  80%   ->85%
+2)Feature Delivery                  80%   ->80%
 3)Code Review                       4hr   ->4
 4)UAT & QA feedback                 16hr   ->12
 5)Operational and DevOps Activity   8hr   ->8
