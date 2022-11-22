@@ -2685,7 +2685,8 @@ In CloudFormation, a template is a JSON or a YAML-formatted text file that descr
 	
 
 
-
+EBS:
+lessthen 1 minute.
 What are types of EBS?
 	General Purpose SSD.                =>Small to Medium db, boot volume, brodrang of work load.
 	Provisioned IOPS SSD.               =>Consistent, low-letency performance and I/O Intensive app like Large Relationa or NoSQL DB.
@@ -2693,10 +2694,32 @@ What are types of EBS?
 	 ThroughputOptimized HDD/Cold HDD. (Latest low-cost Magnetic Storage)
      Previous generation Magnetic. (Old)
 
- 
+
+Amazon EBS Volume Types lists:
+	General Purpose SSD: Maximum 10,000 IOPS/Volume
+	Provisioned IOPS SSD: Maximum 20,000 IOPS/Volume
+	Throughput Optimized HDD: Maximum throughput 500 MiB/s (Optimized for throughput rather than IOPS, good for large, contiguous reads)
+
+
+Amazon EBS offers three types of Provisioned IOPS SSD volumes:
+	Provisioned IOPS SSD (io2) volumes
+	Provisioned IOPS SSD (io2) Block Express volumes
+	Provisioned IOPS SSD (io1) volumes
+
+IO2 volumes can deliver maximum of 500 IOPS per 1 GB where as IO1 volumes can deliver maximum of 50 IOPS per 1GB.
+	io1 volume 1,280 GiB in size or greater (50 × 1,280 GiB = 64,000 IOPS)
+	io2 volume 128 GiB in size or greater (500 × 128 GiB = 64,000 IOPS)
+	
+	50:1 for io1
+	500:1 for io2
+	
+i2 instances=>deliver 350,000 random read IOPS and 320,000 random write IOPS.
+i3 instances=>can deliver up to 3.3 million IOPS at a 4 KB block and up to 16 GB/second of sequential disk throughput.
+
+	
+	 
 EBS Multi-attach only be enable on EBS Provisioned IOPS io1/io2 volumes not General purpose SSD.
 EBS Multi-attach won’t offer Multi-AZ resiliency, this only allow EBS volume to be attached on Multiple intance within a single AZ.
- 
  
 
 
@@ -2711,11 +2734,341 @@ Data of Instance store volumes persist only dureing the life of the instance.
 
 
 
+EC2 instances support two types for block level storage: EC2 Instances can be launched using either EBS or 
+Instance Store volume as root volumes and additional volumes.
+
+EC2 instances can be launched by choosing between AMIs backed by EC2 instance store and AMIs backed by EBS.
+
+
+
+Key points for Instance store backed Instance
+	Boot time is slower then EBS backed volumes and usually less then 5 min.
+	
+	
+InstanceStore:
+Lessthen 5 minute.
+	There are three types of instance store volumes: ephemeral, non-volatile memory (NVMe) SSD, and TRIM
+
+	
+
+
+
+Network load balancer support Layer 4 traffic, and TCP,UDP,TLS protocol, ALB not support UDP.
+
+
+
+Restart EC2 for error:
+	 Look at CloudWatch logs for keywork or error, create a custom metric.
+	 Then Create a CloudWatch alarm for that custom metric which invokes an action to restart the EC2.
+You can create alarms that auto stop,terminate,reboot or recover EC2 instance using CloudWatch alarms action.
+
+Flow logs are using VPC, not on specific EC2 instance.
 
 
 
 
 
+
+AWS Server-Side Encryption:
+	SSE-s3			=> Auto key rotates, No Audit trails show.
+	SSE-KMS(CMKs)   => Auto key rotates, Protecton access, Audit trails show.
+	SSE-C           => Auto key rotates, No Audit trails show.
+	
+	
+	
+	
+Queue Message cant be duplicates tolerate:
+	Use SQS FIFO or SWF (Simple Work Flow Services)
+Altering Visibility timeout of SQS not guarantee message duplication.
+
+
+
+
+Highly Scalable system with cost-effective:
+	use AutoScaling SQS and EC2 for highly scalable distrubute system.
+	
+	
+	
+	
+Get notify before 30 of expration of SSL Certificates:
+Two Way:
+	First One: AWS ACM built-in certificate expiration event,which is raised throw Amazon EventBridge, to invoke a Lambda function.
+	The funcation now can send notification using SQS or Security hub.
+	
+	Second one: Recent Lunch DaysToExpiry metric to schedule abatch search to expiring certificats and to log all finding.
+	And Send Notification on SQS.
+	
+CloudWatch Event are truned into action using Amazon Eventbridge.
+AWS health event are generated for ACM certificates that are eligibnle for renwwal.
+
+EventProducer=>Event=>EventBridge=>rule=>ActionOnAWSServices(Lambda, Kisinsis, SQS)
+
+AWS Ceritficate manager automatically generated AWS Health events. manually crateing a custom AWS Config rule to check
+for SSL exprie is unnecessary. 
+also AWS Config already provide a built-in acm-certiticate-expriration-check manage rule that can used, not need manually cration.
+
+
+
+
+
+AutoScaling provides scaling plans for : EC2, SpotFleets,ECS Tasks (ECS Services or ECS Containers Instance), DynamoDB table and Index, Aurora Replics.
+
+ECS Instance metrics:
+	CPU Utilization
+	DiskRead/Writes
+	Network In/Out etc.
+	
+ECS  Services metrics:
+	ECSServiceAvaragesCPUUtilization
+	ECSServicAvarageMemoryUtilization
+	ALBRequestCoountPerTarget
+	
+AutoScaling not support any metrics from ALB.
+
+
+
+
+
+RDS Mult-AZ deployment provide enhanced availability and durability for DB instance.
+In case of Infrastructure failure or AZ fail:
+	RDS perform an automatic failover to the standby Instance(Read Replica for Aurora).Endpoint remains same after failover.
+
+RDS synchronously replicates the data to a standby instance in different AZ in same region not in a different region.
+
+
+
+
+
+HPC, Natively workign with S3, POSIX interface: FSx for Luster.
+EFS, EBS, FSx for Windows: Not working with S3 easy way.
+
+
+EFS=>NFS
+FSx for Win=>SMB
+
+
+
+
+
+AWS  resource access share  to different AWS account using cross-account acccess.
+No need individual IAM user in each account.
+
+AWS Organization Consolidate bill feature allow payment for multiple aws account or multiple AISPL acc.
+Its for combined view of aws charge all account also get cost report for each member.
+
+AWS Trusted advisor is an provides real-time guidance for best practices. Its not assist in maintaining goverence
+over  AWS account.
+
+
+
+Company Need to resuce IP address that need to regularly whitelist on corporate firewal:
+	Use AWS Global A,cclerator and Create and endpoint group for each AWS Region. Associate the ALB for each region to 
+	the corresponding endpoin group.
+
+Global Acclerator inporove application availabilithy and performance for local or global user.
+It provide static IP that act as a fixed entry point to application endpoint in a single or multiple AWS Region
+which application may backend by ALB,NLB or EC2.
+
+For multiple resources in multiple region, use AWS Global Acclerator to reduce the number of IP address.
+By Creating and endpoint group, you can add all of EC2 from a single region in that group.
+
+
+No multiple endpoint for all the available AWS Region, better create one endpoint group for all region.
+
+If multiple region rsourc then not use ALB for route traffic to multiple region Instead use AWS Global Acclearator.
+
+
+
+Inspect Traffic In/Out of VPC: Use Network Firewall and add custom rule groups for inspecting traffic.
+
+Only Traffic Mirroring filters can not inspect the actual packet within traffic, Its just copy network traffic
+From and ENI.
+
+
+
+
+
+Multiple Site-to-Site VPN connection slow for VPC and remote Network suring peak hours:
+	Associate VPCs to and Equal Cost Multipath Routing ECMR-enable TransitGateway and attach additional VPN tunnels.
+AWS transit Gateway enable you to scale the IPsec VPN throughput with equal-cost multi-pah ECMP routing support over 
+multple VPN Tunnels.
+
+
+Ata a time A VPC can only have have a single virtual private gateway attached to it, No multiple VPG not allow.
+Maximum tunnel for a VPC connection is two by limit.
+
+
+
+
+Collect Log from EC2 before ASG mark as Unhealth:
+	Add a lifecycle hook to ASG to move instance Terminating stat to Termination:Wait state to delay Termination.
+	Config a CloudWatch Event rule for EC2 Instance-terminate Lifecycle Action Auto Scaling Event with a Lambda.
+	Trigger a CloudWatch agent to push the logs and then resume the instance termination once logs sent to CloudWatch Logs.
+	
+	
+ASG Lifecycle hook:
+	EC2 instance in an AutoScaling group have path or lifecycle, that differs from of other EC2 Instance.
+	Lifecycle start when the ASG group launches an instance and puts it in services to terminate the instance.
+
+Using CloudWatch agent is most suitable tools to use collect system level metrics and logs then push to CloudWathc Log.
+	
+	
+
+	
+Amazon web services have mainly two dedicated managed services for workflow implementation.
+	Simple Workflow Service (SWF)
+	Step Functions
+
+
+Amazon Simple Workflow Service (Amazon SWF) is a web service that makes it easy to coordinate work across distributed application components.
+Amazon SWF, on the other hand, is a cloud-based service, allows common programming languages to be used, and lets developers control where tasks are processed.
+
+A task is an invocation of a logical step in an Amazon SWF application. Amazon SWF interacts with workers which are programs 
+that retrieve, process, and return tasks.
+
+
+AWS Step Functions is a visual workflow service that helps developers use AWS services to build distributed applications, automate processes, orchestrate 
+microservices, and create data and machine learning (ML) pipelines.
+Your workflow can be visualized by state machines describing steps, their relationships, and their inputs and outputs.
+
+Step Functions is a managed service, so users don't have to deploy or maintain any infrastructure for either the workflow management 
+or the tasks themselves. 
+
+SWF also manages workflow state in the cloud. However, unlike Step Functions, a user has to manage the infrastructure 
+that runs the workflow logic and tasks.
+
+
+
+VPC Inter-region private communication (VPC peering):
+	Setup a VPC peering connection between VPCs.
+	Re-config the route table targete and destination of the instance subnet.
+	
+VPC endpoint not needed becos VPCEndpoint are region specific only. Not support inter-region communicaton.
+
+In VPC peering enables route traffic between them using private IPv4 or IPv6 like there in a single private network.
+VPC peering cand own VPC, other account VPC, VPC can be different region.
+Inter-region vpc peering encryps traffic, never travel public network.
+
+
+
+
+
+Low inter-instance latencies with Windows server (SR-IOV):
+	Enable Enhanced Netwoiking with ElasticNetwork Adapter (ENA) on the Windows EC2 instance.
+
+Enhanced Netwoiking privides high bandwdith, higher packet per second (PPS) performance and consistently lower inter-instance latencies.
+With No cost. using single root I/O vertulazation (SR-IOV), 100Gbps.
+
+Elastic Fabric Adapter EFA  not support OS-bypass capabilitess for Windows Instance it will work as ENA.
+
+AWS ParalledClusterr just a AWS-support open-source cluster management tools, Its for deploy manage HPC.
+Its not provided high branwith,PPS and lower inter-instance latencies as ENA or EFA.
+
+
+
+
+Config DNS zone apex record to point load balancer:
+	Create and A record aliesed to the load balancer DNS name.
+
+Use and Alias record pointing to the DNS name of Loadbalancer not IP, since the IP address of the Load balancer cahn change at any time.
+
+CNAME record cannot be creaed for your zone apex, create alies record at the top node of DNS as zone apex.
+
+
+
+
+
+Track AWS resources uses for quotas unexpectdly:
+	Writge and Lambda function that refreshs tha AWS Trusted Advisor Service Limits checks and set it to run every 24 houts.
+	Capture the events using Amazon EventBridge (CloudWatch Event) and use an SNS topic as the target for notifications.
+	
+	
+AWS Trusted Advisor provide best practices from hundreds of thousands of AWS customer.
+Trusted Advisor inspects your AWS environment make recommendatins for save money, inprove system availability, security Gap.
+
+AWS has and example of the implemenation of Quota Monitoring CloudFormaton template that cand deploy on AWS account.
+The Template uses a Lambda funcaton that runs onece every 24 hour and refresh Trusted advisor service Limits check quota throw API call.
+CloudWatch event capture the status events from Trusted advisor, send status to targets SQS, SNS, lambda for Slack notification.
+Trusted advisor services limit publish services limit metric to CloudWatch, config alarm and send notification to SNS or Lembda.
+
+Trusted dAdvisor APIs are only available for Business, Enterprise On-Ramp or Support plans. (DescribeTrustedAdvisorChecks API)
+Its Return all avalilable Trusted advisor check info, so its will be dificult to extract only "service limits" info from thsi api.
+
+
+
+
+
+
+From S3 to Standard IA and OneZone IA need to stay data in current class more 30 days, not for Intelligence,Glacier or DepArch.
+For surprice check for audit then need to with in 1 minute then use Glaicer. Ite  provide quick acc (1-5mm).
+Deep Archive need several hours.
+
+If you dont know the acccess time schedule or frequently change then use Intelligence class for save cost.
+
+S3 proivides 3500(PUT) request per second to add data and 5500 read data (GET) default. Per prefix.
+For parallel permormance to scale more request use prefix, S3 scale performance per prix.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+ 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+	 
+	 
+	 
+
+	 
+	 
 
 
 
