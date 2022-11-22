@@ -3011,6 +3011,109 @@ For parallel permormance to scale more request use prefix, S3 scale performance 
 
 
 
+Encrypted at rest, full control over the encryption key, immedit remove material from the AWS KMS, audit using CloudTrails:
+	use Aws key Management Service to Create a CMK in a custom key store and store the non-extractable key material in CloudHSM.
+
+A Custom key (KMS) store CloudHSM. For immeditely remove the key meterial from AWS KMS use a custom key Store.
+
+Use Custom key Store (CloudHSM) for:
+	Direct control.
+	Immediatly remove key metatial from KMS and independently.
+	Audit all use of keys independently from of KMS and CloudTrail.
+	
+AWS-owned CMK and AWS-manageed CMK are manage by AWS.
+
+
+
+
+Many Employee need to granted to a S3 for there personal document:
+	Config and IAM role and IAM Policy to access S3 Bucket.
+	Setup a Federation proxy or and Identity provider and use AWS Security Token Service to generate Temp Token.
+	
+	
+	
+
+
+Prevent use S3 photo link by other company:
+	Config S3 to remove public read access and use pre-signed URLs with expriy dates.
+	
+
+
+
+
+Prevent backend system from traffic spikes:
+	Enable throttling limits and result caching in API Gateway.
+API Gateway provide throttling (rate limit 1000 request per second), and caching to API call by TTL also invalid the cache.
+
+	
+	
+	
+
+A logging system for all change madb to AWS resource in all Region also provide and event history of api calls in MConsole and CLI:
+	Setup CloudTrail trail in S3 using cli and pass --is-multi-region-trail and --include-global-service-event parameter.
+	With KMS encryption MFA and bucket policy.
+Not CloudWatch use CloudTrails.
+
+
+CloudTrails record all activity of and account by MConsole, SDK,CLI and other AWS Services by user,role and services.
+ClousTrails trails all region by default when create trail using MConsole, but in CLI need to pass parameter  --is-multi-region-trail.
+
+
+By Default CloudTrails cover the activities of regional services(EC2,S3,RDS etc) not for global services.
+For Global services (IAM CloudFront,WAF, Route53) in CLI mode add parameter --include-global-service-event parameter.
+
+
+
+
+
+
+A Custome endpoint For different purpose (Read Only or read-write ) you can map each connect to a specific instance or a Group of Instance.
+Base on usecase, of your requirment.
+Autora Cluster endpoint (also call writer endpoint) made from primary DB instance what is best for product traffic not for Repoting.
+Use Custome endpoint for Repoting.
+
+Create a custome endpoint in Autora base on the specified criteria for product traffic and another custome end point for repoting.
+Autora involved cluster of DB Instance not single instance.Each conn is handled by specific DB Instance.
+
+
+
+
+
+Availabel in case of Oracle Database failure in future:
+	Create Oracle database in RDS with Multi-AZ deployment.
+
+Oracle RMAN and RAC are not supported in RDS.
+
+
+
+
+
+
+Linux and Windows EC2 monitor for memory and disk Utilization metrics:
+	Install CloudWatch agent to all EC2, View the custome metrics in CloudWatch console.
+	
+Enhanced Monitoring is a feature of RDS and By Default stored metrics for 30 days in CloudWatch logs.
+And 
+Detailed Monitoring for EC2. Detailed monitoring delivers metrics in 1-minute intervals, rather than 5-minute intervals.	
+
+
+
+
+
+
+Handel Unpredictable transactional workload and autoscales capacity and peak load scales DB:
+	Lunch and Autora Serverless DB cluster then set the minumum and maximum capacity for the cluster.
+	
+Aurora Serverless is and on-demand, auto-scaling configuration for Aurora.
+Non-Serverless DB cluster of Autora called provisioned DB Cluster.
+
+Both Provision DB and Serverless carry same of feature like: scale, permormance dustributed all two are same.
+	But Provisioning DB cluster for where you can predicatable workload and you cand adjust the capacity manually base on workload.
+	Where Serverless for un-predicatable workload.
+
+
+
+	
 
 
 
