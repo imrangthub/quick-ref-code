@@ -3110,37 +3110,168 @@ Non-Serverless DB cluster of Autora called provisioned DB Cluster.
 Both Provision DB and Serverless carry same of feature like: scale, permormance dustributed all two are same.
 	But Provisioning DB cluster for where you can predicatable workload and you cand adjust the capacity manually base on workload.
 	Where Serverless for un-predicatable workload.
+	
+	
+	
+	
+
+Both historical record and frequently data are store on on-permises storage system what is going low capacity Need to move Historical data:
+	Use AWS DataSync to move historical data to AWS, choose S3Glacier Deep Archive to destination.
+
+Storage Gateway mainly prividing low-latency access to data by caching frequently acc data on-premises and Archive data on Cloud Storage.
+Storage Gateway optimizes data transfer to AWS by sending only change data and compressing data.
 
 
 
+
+
+What needs outside of VPC for site-to-site VPN Conn:
+	An Inter-routeable IP(Public IP/Static) of the customer gateway external interface for on-permises network.
+	
+Required For communication with own network using VPN:
+	Attach a VPG virtual private gateway to VPC
+	Create a custom route table
+	Update SecurityGroup
+	A public IP on-permises side
+	A Customer Gateway on on-permise side(physical or software)
+	
+	
+	
+	
+	
+IPv6 not support by EC2 classic.
+
+Fault tolerance for DirectConnectConnection to VPC:
+	Establish a hardware VPN over Internet bwtween VPC and on-permises.
+	Establish another DirectConnectConnection and Private Virtual Interface in same AWS region as VPC1.
+	
+CustomerNetwork=>DirectConnectConnection=>VIF=>DirectConnectGateway=>VGW=>VPC.
+
+A virtual interface (VIF) is necessary to access AWS services, either public or private. 
+	A public virtual interface enables access to public services, such as Amazon S3. 
+	A private virtual interface enables access to your VPC.
 	
 
 
 
 
+A large portion of traffice from Philipnd and Indai will be route to resourde ap-northest-1 region:
+	Use Reoute53 Geoproximity Routing.
+	
+Route53 Routing:
+	Latency Routing:      Provide lowest latenct for resources, not guarantee user and resource will be same location.
+	Geoproximity Routing: Route traffic using user and resource GeoLocation also with a Bias value for more/less traffic to a resource.
+	Geolocation Routing:  GeoLocation of user base routing. Serve resource from the DNS queres origin from.
+	Weighted Routing:     Multi resource associat with single domain name and set how much traffic to go each resource.
+	
+	
+	
+
+Publish events when an object is deleted or a versioned object is permanently deleted:
+	Create a SNS topic and SQS. add and S3 Event notification confg on bucket to publish S3:ObjectCreated:* and 
+	S3:ObjectRemoved:Delete event type to SQS and SNS.
+	
+	
+s3:ObjectRemoved:Delete event for send nofification for version/non version permanently deleted.
+ObjectRemoved:DeleteMarkerCreated: a new version created.
+
+For a Single non-versioned object deliver for first time write event. enable versoning on bucket, with version 
+Every Success write will create a new version of obj and will send event.
+
+
+S3 can publish notifications for the following events:
+	1. New object created events
+	2. Object removal events
+	3. Restore object events
+	4. Reduced Redundancy Storage (RRS) object lost events
+	5. Replication events
+
+S3 supports the following destinations where it can publish events:
+	1. SNS topic
+	2. SQS queue
+	3. Lambda
+S3 does support Amazon MQ as a destination to publish events.
+
+To avoid loging loop, use two buckets, or configure the trigger to only apply to a prefix used for incoming objects.
 
 
 
 
 
 
+Route53 Fault-tolerant routing configuration for region outage multi region resource for Global user:
+	Configure an Active-Active Failover with Weighted routing policy.
+	
+If all of your resources should be available all the time as much as possible  use an Active-Active Failover.
+Active-Active Failover uses all available resources all the time without a primary nor a secondary resource.
+
+Route 53 health checking to configure active-active and active-passive failover configurations:
+	Active-Active Failover:
+		Use this failover configuration when you want all of your resources to be available the majority of the time. 
+		When a resource becomes unavailable, Route 53 can detect that it's unhealthy and stop including it when responding 
+		to queries.
+		
+		In active-active failover, all the records that have the same name, the same type (such as A or AAAA), and the same 
+		routing policy (such as weighted or latency) are active unless Route 53 considers them unhealthy. 
+		Route 53 can respond to a DNS query using any healthy record.
+
+	Active-Passive Failover:
+		Active-Passive Failover is mainly used when you want a primary resource or group of resources to be available most 
+		of the time and you want a secondary resource or group of resources to be on standby in case all the primary 
+		resources become unavailable.
 
 
 
 
 
+S3 protecting data at rest:
+	Server-Side Encryption – You request Amazon S3 to encrypt your object before saving it on disks in its data centers and 
+	decrypt it when you download the objects.
+		Use Server-Side Encryption with Amazon S3-Managed Keys (SSE-S3)
+		Use Server-Side Encryption with AWS KMS-Managed Keys (SSE-KMS)
+		Use Server-Side Encryption with Customer-Provided Keys (SSE-C)
+		
+	Client-Side Encryption – You can encrypt data client-side and upload the encrypted data to Amazon S3. 
+	In this case, you manage the encryption process, the encryption keys, and related tools.
+		Use Client-Side Encryption with AWS KMS–Managed Customer Master Key (CMK)
+		Use Client-Side Encryption Using a Client-Side Master Key
+
+
+
+SSE-S3 is S3 managed key is fully managed by AWS and also rotates the key automatically and 
+Customer master key (CMK) in AWS KMS that you can manage, rotate, and audit or alternatively, use a client-side master key 
+that you manually maintain.
 
 
 
 
 
+Concerned about the over-provisioning of the resources by ASG:
+	Use target tracking scaling.
+	
+With a target tracking scaling policy, you can increase or decrease the current capacity of the group based on a 
+target value for a specific metric. This policy will help resolve the over-provisioning of your resources.
+	
+
+Simple scaling: 
+	Need to wait for the cooldown period to complete before initiating additional scaling activities. 
+	Target tracking or step scaling policies can trigger a scaling activity immediately without waiting for the 
+	cooldown period to expire.
+
+Scheduled scalingis: 
+	Mainly used for predictable traffic patterns. You need to use the target tracking scaling policy to optimize the 
+	cost of your infrastructure without affecting the performance.
 
 
 
 
 
+For Role-based access control. Currently, the roles are already assigned using groups in the corporate Active Directory:
+	 AWS Directory Service AD Connector
+	 IAM Roles
 
-
+Take note that you can assign an IAM Role to the users or groups from your Active Directory once it is integrated with your 
+VPC via the AWS Directory Service AD Connector.
 
 
 
