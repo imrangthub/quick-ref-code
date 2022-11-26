@@ -4038,6 +4038,95 @@ you can select and apply pre-packaged policies enterprise-wide or to specific gr
 
 
 
+application takes several minutes to become fully operational:
+	Migrate the application to an EC2 instance with hibernation enabled.
+
+Instead of having to rebuild the memory footprint, hibernation allows applications to pick up exactly where they left off.
+While the instance is in hibernation, you pay only for the EBS volumes and Elastic IP Addresses attached to it; there are 
+no other hourly charges (just like any other stopped instance).
+
+
+CloudEndure Migration is just a highly automated lift-and-shift (rehost) solution that simplifies, expedites, 
+and reduces the cost of migrating applications to AWS. 
+
+
+
+
+
+
+The company has new AWS accounts that will also require consistent and dedicated access to these network:
+	Create a new Direct Connect gateway and integrate it with the existing Direct Connect connection. Set up a Transit Gateway between AWS accounts and associate it with the Direct Connect gateway.
+	
+AWS Transit Gateway provides a hub and spoke design for connecting VPCs and on-premises networks. You can attach all your hybrid connectivity (VPN and Direct Connect connections) to a single Transit Gateway consolidating and controlling your organization's.
+
+By attaching a transit gateway to a Direct Connect gateway using a transit virtual interface, you can manage a single connection for multiple VPCs or VPNs that are in the same AWS Region.
+
+
+
+
+
+What service must be used to easily capture, transform, and load streaming data into Amazon S3, Amazon Elasticsearch Service, and Splunk?
+	Amazon Kinesis Data Firehose
+
+Amazon Kinesis Data Firehose is the easiest way to load streaming data into data stores and analytics tools. It can capture, transform, and load streaming data into Amazon S3, Amazon Redshift, Amazon Elasticsearch Service, and Splunk, enabling near real-time analytics with existing business intelligence tools and dashboards you are already using today.
+
+Amazon SQS lets you easily move data between distributed application components and helps you build applications in which messages are processed independently (with message-level ack/fail semantics), such as automated workflows. Amazon Kinesis Data Firehose is primarily used to load streaming data into data stores and analytics tools.
+SQS can't capture, transform, and load streaming data into Amazon S3,
+
+AWS Data Exchange is  is just a data marketplace service.
+
+
+
+
+
+
+To save costs, Reserved instances as soon as possible:
+Go to the AWS Reserved Instance Marketplace and sell the Reserved instances.
+Terminate the Reserved instances as soon as possible to avoid getting billed at the on-demand price when it expires.
+ 
+Stopping the Reserved instances as soon as possible if false because It is also possible that there are associated 
+Elastic IP addresses, which will incur charges. You have to terminate.
+
+
+
+
+
+S3 Transfer Acceleration enables fast, easy, and secure transfers of files over long distances between your client and your Amazon S3 bucket. Transfer Acceleration leverages Amazon CloudFront’s globally distributed AWS Edge Locations. As data arrives at an AWS Edge Location, data is routed to your Amazon S3 bucket over an optimized network path.
+
+
+
+
+
+
+AWS Fargate is a serverless compute engine for containers that works with both Amazon Elastic Container Service (ECS) and Amazon Elastic Kubernetes Service (EKS).
+
+Amazon EKS is more suitable to run the Kubernetes management infrastructure and not Docker. 
+It does not remove the need to provision and manage servers nor let you specify and pay for resources per application, unlike AWS Fargate.
+
+
+
+
+can be used together to collect logs and then easily perform log analysis:
+	 Amazon S3 for storing ELB log files and Amazon EMR for analyzing the log files.
+	 
+	 
+Amazon EMR provides a managed Hadoop framework that makes it easy, fast, and cost-effective to process vast amounts of data,
+It securely and reliably handles a broad set of big data use cases, including log analysis, web indexing, data transformations (ETL), machine learning, financial analysis, scientific simulation, and bioinformatics.
+
+
+
+
+launch a real-time analytics service:
+	Create a Kinesis Data Stream and use AWS Lambda to read records from the data stream.
+
+Although Amazon Kinesis Data Firehose captures and loads data in near real-time, AWS Lambda can't be set as its destination.
+
+
+
+
+
+
+You can also create read replicas within a Region or between Regions for your Amazon RDS for MySQL, MariaDB, PostgreSQL, and Oracle database instances encrypted at rest with AWS Key Management Service (KMS).
 
 
 
@@ -4045,6 +4134,139 @@ you can select and apply pre-packaged policies enterprise-wide or to specific gr
 
 
 
+Amazon S3 is composed of buckets, object keys, object metadata, object tags, and many other components as shown below:
+	An Amazon S3 bucket name is globally unique, and the namespace is shared by all AWS accounts.
+	An Amazon S3 object key refers to the key name, which uniquely identifies the object in the bucket.
+	An Amazon S3 object metadata is a name-value pair that provides information about the object.
+	An Amazon S3 object tag is a key-pair value used for object tagging to categorize storage.
+	 
+ 
+ 
+
+
+
+	 
+to ensure that the required components are properly running before the stack creation proceeds:
+	Configure a CreationPolicy attribute to the instance in the CloudFormation template. Send a success signal after the applications are installed and configured using the cfn-signal helper script.
+	
+In CloudFormation template Use the CreationPolicy attribute when you want to wait on resource configuration actions before stack creation proceeds. For example, if you install and configure software applications on an EC2 instance, you might want those applications to be running before proceeding. In such cases, you can add a CreationPolicy attribute to the instance and then send a success signal to the instance after the applications are installed and configured.
+
+
+
+
+Docker It is compulsory that the application has access to 5 GB of ephemeral storage:
+	Deploy the application to an Amazon ECS cluster that uses Fargate tasks.
+By default, Fargate tasks are given a minimum of 20 GiB of free ephemeral storage. 
+	
+	 
+
+
+
+A VPC peering connection is a networking connection between two VPCs that enables you to route traffic between them privately. Instances in either VPC can communicate with each other as if they are within the same network. You can create a VPC peering connection between your own VPCs, with a VPC in another AWS account, or with a VPC in a different AWS Region.
+
+
+
+Amazon Aurora DB cluster to Autora serverless:
+	Use AWS Database Migration Service (AWS DMS) to migrate to a new Aurora Serverless database.
+AWS Database Migration Service helps you migrate your databases to AWS with virtually no downtime. 
+You can set up a DMS task for either one-time migration or ongoing replication. 
+
+Changing the instance class from Provisioned to Serverless is not possible.
+Take a snapshot involves a long period of downtime since you have to stop the application until the new cluster is created.
+Add an Aurora Replica to the cluster and set its instance class to Serverless,While this method is valid, the database becomes unavailable for writing for a short period of time during failover.
+
+
+
+
+
+
+S3:
+	Expedited retrievals allow you to quickly access your data when occasional urgent requests for a subset of archives are required. 
+	For all but the largest archives (250 MB+), data accessed using Expedited retrievals are typically made available within 1–5 minutes. 
+	Provisioned Capacity ensures that retrieval capacity for Expedited retrievals is available when you need it.
+
+
+
+
+
+An Existing ASG, A new AMI now needs to be used for launching a fleet of EC2 instances:
+	Create a new launch configuration.
+
+
+
+
+
+You can launch an EBS-backed EC2 instance and attach several Instance Store volumes but remember that there are some 
+EC2 Instance types that don't support this kind of setup.
+
+ENI will stay attached even if you stopped your EC2 instance.
+EIP will actually remain associated with your instance even after stopping it.
+
+
+Since only EBS-backed instances can be stopped and restarted, it is implied that the instance is EBS-backed. 
+Remember that an instance store-backed instance can only be rebooted or terminated, and its data will be erased if the 
+EC2 instance is either stopped or terminated.
+
+If you stopped an EBS-backed EC2 instance, the volume is preserved, but the data in any attached instance store volume will be erased. 
+Keep in mind that an EC2 instance has an underlying physical host computer. 
+If the instance is stopped, AWS usually moves the instance to a new host computer. 
+Your instance may stay on the same host computer if there are no problems with the host computer.
+ 
+In addition, its Elastic IP address is disassociated from the instance if it is an EC2-Classic instance. 
+Otherwise, if it is an EC2-VPC instance, the Elastic IP address remains associated.
+
+
+
+
+
+MySQL database hosted on Amazon RDS is running out of disk storage. :
+	Modify the DB instance settings and enable storage autoscaling.
+
+
+Aurora as the Amazon RDS database need 90-day backup retention:
+	Create an AWS Backup plan to take daily snapshots with a retention period of 90 days.
+
+Aurora maximum backup retention period for automated backup is only 35 days.
+
+ AWS Backup makes protecting your AWS storage volumes, databases, and file systems simple by providing a central place where you 
+ can configure and audit the AWS resources you want to backup, automate backup scheduling, set retention policies, 
+ and monitor all recent backup and restore activity.
+ 
+ 
+
+
+
+You are limited to running AWS allows you to provision a maximum of 20 instances per region or 
+On-Demand Instances per your vCPU-based On-Demand Instance limit, 
+purchasing 20 Reserved Instances, and requesting Spot Instances per your dynamic Spot limit per region. 
+New AWS accounts may start with limits that are lower than the limits described here.
+
+vCPU-based On-Demand Instance limit is set per region and not per Availability Zone. 
+
+
+
+
+The company’s solutions architect must implement a solution that checks for untagged AWS resources.
+	Use an AWS Config rule to detect non-compliant tags.
+	
+	
+	
+Developers are unable to remove or modify any rules in AWS Config.
+	 Add the developers' AWS account to an organization unit (OU). Attach a service control policy (SCP) to the OU that 
+	 restricts access to AWS Config.
+	 
+SCPs alone is not sufficient to grant permissions to the accounts in your organization. No permissions are granted by an SCP. 
+An SCP defines a guardrail or sets limits on the actions that the account's administrator can delegate to the IAM users and roles 
+in the affected accounts.
+
+In the scenario, even if a developer has admin privileges, he/she will be unable to modify Config rules if an SCP does not permit it.
+
+Configure an AWS Config rule This solution just monitors changes on AWS Config rules; 
+it does not restrict permissions, which is what's needed in the scenario.
+
+
+The AWS Control Tower service is commonly used to set up and govern a secure multi-account AWS environment. 
+This service is not used to restrict access from invoking an action to a specific resource, such as AWS Config.
 
 
 
@@ -4052,8 +4274,8 @@ you can select and apply pre-packaged policies enterprise-wide or to specific gr
 
 
 
-
-
+	 
+	 
 
 
 
