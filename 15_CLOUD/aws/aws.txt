@@ -4382,48 +4382,241 @@ Therefore, you should use a Network Load Balancer.
 
 
 deactivating and deleting any IAM user access key that is over 90 days:
-	Use the AWS Config managed rule to check if the IAM user access keys are not rotated within 90 days. Create an Amazon EventBridge (Amazon CloudWatch Events) rule for the non-compliant keys, and define a target to invoke a custom Lambda function to deactivate and delete the keys.
+	Use the AWS Config managed rule to check if the IAM user access keys are not rotated within 90 days. 
+	Create an Amazon EventBridge (Amazon CloudWatch Events) rule for the non-compliant keys, and define a target to 
+	invoke a custom Lambda function to deactivate and delete the keys.
+	
+	
+	
+	
+AWS resources in Amazon VPC don’t go beyond their respective service limits,rovides real-time guidance:
+	AWS Trusted Advisor.
+	
+AWS Trusted Advisor is an online tool that provides you with real-time guidance to help you provision your resources following 
+AWS best practices. It inspects your AWS environment and makes recommendations for saving money, improving 
+system performance and reliability, or closing security gaps.
+
+	
+
+	 
+	 
+development of its GraphQL APIs, custom domain feature and https:
+	Develop the application using the AWS AppSync service and use its built-in custom domain feature. Associate an SSL certificate to the AWS AppSync API using the AWS Certificate Manager (ACM) service to enable HTTPS communication.
+
+With AWS AppSync, you can use custom domain names to configure a single, memorable domain that works for both your GraphQL and real-time APIs.
+	
+	
+	
+	
+	 
+	 
+	 
+multiple AWS Site-to-Site VPN,slow connectivity issues:
+	Associate the VPCs to an Equal Cost Multipath Routing (ECMR)-enabled transit gateway and attach additional VPN tunnels.
+	 
+	 
+AWS Transit Gateway also enables you to scale the IPsec VPN throughput with equal-cost multi-path (ECMP) routing support over 
+multiple VPN tunnels. A single VPN tunnel still has a maximum throughput of 1.25 Gbps. 
+If you establish multiple VPN tunnels to an ECMP-enabled transit gateway, it can scale beyond the default limit of 1.25 Gbps.
+
+	 
+	 
+	 
+For provides higher bandwidth, higher packet per second (PPS) performance, and consistently lower inter-instance latencies: 
+	Enable Enhanced Networking with Elastic Network Adapter (ENA) on the Windows EC2 Instances. 
+	 
+	 
+	 
+	 
+	 
+SQS the number of messages is constantly growing:	 
+		Create an AMI of the backend application's EC2 instance. Use the image to set up an Auto Scaling group and configure a 
+		target tracking scaling policy based on the ApproximateAgeOfOldestMessage metric.
+		
+The ApproximateAgeOfOldestMessage metric is useful when applications have time-sensitive messages and you need to ensure that messages are processed within a specific time period.
+
+
+
+
+
+
+Receives a burst of traffic,instance takes 1 minute to boot up before it can respond to user requests:
+		Create a step scaling policy and configure an instance warm-up time condition.
+	 
+	 
+	 
+	 
+	 
+
+telecommunication carriers' 5G networks:	 
+		Launch the application to an Amazon Elastic Kubernetes Service (Amazon EKS) cluster. Create node groups in 
+		Wavelength Zones for the Amazon EKS cluster via the AWS Wavelength service. 
+		Apply the AWS authenticator configuration map (aws-auth ConfigMap) to your cluster.
+		
+	AWS Wavelength combines the high bandwidth and ultralow latency of 5G networks with AWS compute and storage services so that 
+	developers can innovate and build a new class of applications.
+	
+	
+	
+	 
+	 
+In the event of system failure on the primary database instance, what happens to Amazon Aurora during the failover?
+	Aurora will attempt to create a new DB Instance in the same Availability Zone as the original instance and is done on a best-effort basis.
+
+
+If you do not have an Amazon Aurora Replica (i.e., single instance) and are not running Aurora Serverless, 
+Aurora will attempt to create a new DB Instance in the same Availability Zone as the original instance.
+
+If you are running Aurora Serverless and the DB instance or AZ becomes unavailable, Aurora will automatically recreate the 
+DB instance in a different AZ.
+
+
+If you have an Amazon Aurora Replica in the same or a different Availability Zone, when failing over, 
+Amazon Aurora flips the canonical name record (CNAME) for your DB Instance to point at the healthy replica, 
+which in turn is promoted to become the new primary. 
+
+
+
+
+
+
+The Volume Gateway is a cloud-based iSCSI block storage volume for your on-premises applications.
+
+There are two options for Volume Gateway:
+	Cached Volumes - you store volume data in AWS, with a small portion of recently accessed data in the cache on-premises.
+	Stored Volumes - you store the entire set of volume data on-premises and store periodic point-in-time backups (snapshots) in AWS.
+
+			
+			
+	 
+	 
+	 
+You can create a load balancer that listens to both the HTTP (80) and HTTPS (443) ports WTIH Application Load Balancer. 
+A TCP health check is only offered in Network Load Balancers and Classic Load Balancers.
+
+
+	 
+
+
+
+Security groups stateful
+AWS Network Firewall is a stateful, supports both stateless and stateful rules. 
+Network ACLs are stateless.
+ 
+ 
+IAM roles are global services that are available to all regions hence, all you have to do is assign the existing IAM role to the instance in the new region.
+
+
+
+Multi Region Vpc transfer data between the instances without traversing the public internet.:
+	Set up a VPC peering connection between the VPCs.
+	Re-configure the route table’s target and destination of the instances’ subnet.
+
+VPC endpoints are region-specific only and do not support inter-region communication.
+ 
+
+
+
+
+generated log files should be encrypted to avoid any security issues.:
+	Use CloudTrail with its default settings.
+	
+By default, CloudTrail event log files are encrypted using Amazon S3 server-side encryption (SSE). You can also choose to encrypt your log files with an AWS Key Management Service (AWS KMS) key. 
+
+
+
+
+In EBS encryption, what service does AWS use to secure the volume's data at rest? 
+	By using your own keys in AWS Key Management Service (KMS).
+	By using Amazon-managed keys in AWS Key Management Service (KMS).
+
+
+
+
+
+Needs to suggest a solution that will enable the security team to inspect traffic entering and exiting their VPC.:
+	Create a firewall using the AWS Network Firewall service at the VPC level then add custom rule groups for inspecting ingress 
+	and egress traffic. Update the necessary VPC route tables.
+
+Traffic Mirroring is simply an Amazon VPC feature that you can use to copy network traffic from an elastic network interface. 
+Traffic mirror filters can't inspect the actual packet of the incoming and outgoing traffic.
+
+
+
+
+
+processing should not be delayed or interrupted:
+	Use On-Demand Capacity Reservations, which provide compute capacity that is always available on the specified recurring schedule.
+
+On-Demand Capacity Reservations enable you to reserve compute capacity for your Amazon EC2 instances in a specific Availability Zone for any duration
+
+
+
+
+
+
+Performance Issue of the Kinesis Data Streams is causing this problem:
+	Increase the number of shards of the Kinesis stream by using the UpdateShardCount command.	
+
+
+
+
+highly scalable, yet still cost-effective:
+	Launch an Auto-Scaling group of EC2 instances to host your application services and an SQS queue. Include an Auto Scaling trigger to watch the SQS queue size which will either scale in or scale out the number of EC2 instances based on the queue.
+	
+	
+	
+	
+extracting and visualizing sentiments from the transcribed files:
+	Create an Amazon Comprehend analysis job. Index the sentiment along with the transcript to an Amazon OpenSearch cluster. Visualize the results using the OpenSearch Dashboard.
 	
 	
 	
 	
 
+EFS offers two performance modes:
+- General Purpose mode
+- Max I/O mode
 
-	 
-	 
-	 
-	 
-	 
-	 
-	 
-	 
-	 
-	 
-	 
-	 
-	 
-	 
-	 
-	 
-	 
-	 
-	 
-	 
-	 
-	 
-	 
-	 
-	 
-	 
-	 
-	 
-	 
-	 
-	 
-	 
-	 
-	 
-	 
+
+EFS  are two throughput modes to choose from for your file system:
+- Bursting Throughput
+- Provisioned Throughput
+
+With Bursting Throughput mode, Amazon EFS is designed to burst to high throughput levels for periods of time.
+Provisioned Throughput mode is available for applications with high throughput to storage (MiB/s per TiB) ratios, or with requirements greater than those allowed by the Bursting Throughput mode.
+
+
+
+
+
+
+
+Lambda execution The default timeout is 3 seconds, and the maximum execution duration per request in 
+AWS Lambda is 900 seconds, which is equivalent to 15 minutes.
+
+
+
+
+set up the multi-account AWS environment of the company:
+	Use AWS Organizations and Service Control Policies to control services on each account.
+
+AWS Organizations offers policy-based management for multiple AWS accounts. With Organizations, you can create groups of accounts, automate account creation, apply and manage policies for those groups.
+Organizations enable you to centrally manage policies across multiple accounts without requiring custom scripts and manual processes. It allows you to create Service Control Policies (SCPs) that centrally control AWS service use across multiple AWS accounts.
+
+
+
+
+Microsoft SQL Server on Amazon RDS. There is a requirement that all in-flight data between your web servers and RDS should be secured.:
+	 Force all connections to your DB instance to use SSL by setting the rds.force_ssl parameter to true. Once done, reboot your DB instance.
+	 Download the Amazon RDS Root CA certificate. Import the certificate to your servers and configure your application to use SSL to encrypt the connection to RDS.
+ 
+ 
+ 
+ 
+ 
+
+
 
 
 
