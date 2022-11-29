@@ -3011,6 +3011,8 @@ For parallel permormance to scale more request use prefix, S3 scale performance 
 
 
 
+
+
 Encrypted at rest, full control over the encryption key, immedit remove material from the AWS KMS, audit using CloudTrails:
 	use Aws key Management Service to Create a CMK in a custom key store and store the non-extractable key material in CloudHSM.
 
@@ -3026,6 +3028,7 @@ AWS-owned CMK and AWS-manageed CMK are manage by AWS.
 
 
 
+
 Many Employee need to granted to a S3 for there personal document:
 	Config and IAM role and IAM Policy to access S3 Bucket.
 	Setup a Federation proxy or and Identity provider and use AWS Security Token Service to generate Temp Token.
@@ -3034,8 +3037,8 @@ Many Employee need to granted to a S3 for there personal document:
 	
 
 
-Prevent use S3 photo link by other company:
-	Config S3 to remove public read access and use pre-signed URLs with expriy dates.
+Prevent S3 photo link used by other company:
+	Remove S3 public read access and use pre-signed URLs with expriy dates.
 	
 
 
@@ -3045,6 +3048,7 @@ Prevent backend system from traffic spikes:
 	Enable throttling limits and result caching in API Gateway.
 API Gateway provide throttling (rate limit 1000 request per second), and caching to API call by TTL also invalid the cache.
 
+	
 	
 	
 	
@@ -3058,7 +3062,6 @@ Not CloudWatch use CloudTrails.
 CloudTrails record all activity of and account by MConsole, SDK,CLI and other AWS Services by user,role and services.
 ClousTrails trails all region by default when create trail using MConsole, but in CLI need to pass parameter  --is-multi-region-trail.
 
-
 By Default CloudTrails cover the activities of regional services(EC2,S3,RDS etc) not for global services.
 For Global services (IAM CloudFront,WAF, Route53) in CLI mode add parameter --include-global-service-event parameter.
 
@@ -3067,13 +3070,16 @@ For Global services (IAM CloudFront,WAF, Route53) in CLI mode add parameter --in
 
 
 
-A Custome endpoint For different purpose (Read Only or read-write ) you can map each connect to a specific instance or a Group of Instance.
-Base on usecase, of your requirment.
-Autora Cluster endpoint (also call writer endpoint) made from primary DB instance what is best for product traffic not for Repoting.
+
+Aurora Custome endpoint:
+	A Custome endpoint For different purpose (Read Only or read-write ) you can map each connect to a specific instance or a 
+	Group of Instance.Base on usecase, of your requirment.
+
+Aurora Cluster endpoint (also call writer endpoint) made from primary DB instance what is best for product traffic not for Repoting.
 Use Custome endpoint for Repoting.
 
-Create a custome endpoint in Autora base on the specified criteria for product traffic and another custome end point for repoting.
-Autora involved cluster of DB Instance not single instance.Each conn is handled by specific DB Instance.
+Create a custome endpoint in Aurora base on the specified criteria for product traffic and another custome end point for repoting.
+Aurora involved a cluster of DB Instance not single instance. Each conn is handled by specific DB Instance.
 
 
 
@@ -3108,18 +3114,24 @@ Aurora Serverless is and on-demand, auto-scaling configuration for Aurora.
 Non-Serverless DB cluster of Autora called provisioned DB Cluster.
 
 Both Provision DB and Serverless carry same of feature like: scale, permormance dustributed all two are same.
-	But Provisioning DB cluster for where you can predicatable workload and you cand adjust the capacity manually base on workload.
-	Where Serverless for un-predicatable workload.
+
+But Provisioning DB cluster for where you can predicatable workload and you cand adjust the capacity manually base on workload.
+Where Serverless for un-predicatable workload.
+
 	
 	
 	
 	
 
-Both historical record and frequently data are store on on-permises storage system what is going low capacity Need to move Historical data:
+Both historical record and frequently data are store on on-permises storage system what is going low capacity 
+	Need to move Historical data:
 	Use AWS DataSync to move historical data to AWS, choose S3Glacier Deep Archive to destination.
 
 Storage Gateway mainly prividing low-latency access to data by caching frequently acc data on-premises and Archive data on Cloud Storage.
 Storage Gateway optimizes data transfer to AWS by sending only change data and compressing data.
+
+
+
 
 
 
@@ -3134,10 +3146,7 @@ Required For communication with own network using VPN:
 	Update SecurityGroup
 	A public IP on-permises side
 	A Customer Gateway on on-permise side(physical or software)
-	
-	
-	
-	
+
 	
 IPv6 not support by EC2 classic.
 
@@ -3151,6 +3160,9 @@ A virtual interface (VIF) is necessary to access AWS services, either public or 
 	A public virtual interface enables access to public services, such as Amazon S3. 
 	A private virtual interface enables access to your VPC.
 	
+	
+	
+
 
 
 
@@ -3166,18 +3178,14 @@ Route53 Routing:
 	
 	
 	
+	
 
 Publish events when an object is deleted or a versioned object is permanently deleted:
 	Create a SNS topic and SQS. add and S3 Event notification confg on bucket to publish S3:ObjectCreated:* and 
 	S3:ObjectRemoved:Delete event type to SQS and SNS.
 	
-	
 s3:ObjectRemoved:Delete event for send nofification for version/non version permanently deleted.
 ObjectRemoved:DeleteMarkerCreated: a new version created.
-
-For a Single non-versioned object deliver for first time write event. enable versoning on bucket, with version 
-Every Success write will create a new version of obj and will send event.
-
 
 S3 can publish notifications for the following events:
 	1. New object created events
@@ -3224,6 +3232,8 @@ Route 53 health checking to configure active-active and active-passive failover 
 
 
 
+
+
 S3 protecting data at rest:
 	Server-Side Encryption – You request Amazon S3 to encrypt your object before saving it on disks in its data centers and 
 	decrypt it when you download the objects.
@@ -3236,11 +3246,12 @@ S3 protecting data at rest:
 		Use Client-Side Encryption with AWS KMS–Managed Customer Master Key (CMK)
 		Use Client-Side Encryption Using a Client-Side Master Key
 
-
-
 SSE-S3 is S3 managed key is fully managed by AWS and also rotates the key automatically and 
 Customer master key (CMK) in AWS KMS that you can manage, rotate, and audit or alternatively, use a client-side master key 
 that you manually maintain.
+
+
+
 
 
 
@@ -3253,16 +3264,16 @@ With a target tracking scaling policy, you can increase or decrease the current 
 target value for a specific metric. This policy will help resolve the over-provisioning of your resources.
 	
 
-
-
 Simple scaling: 
-	Need to wait for the cooldown period to complete before initiating additional scaling activities. 
-	Target tracking or step scaling policies can trigger a scaling activity immediately without waiting for the 
-	cooldown period to expire.
+	Need to wait for the cooldown period to complete before initiating additional scaling activities. \
+	
+Target tracking or step scaling policies can trigger a scaling activity immediately without waiting for the 
+cooldown period to expire.
 
 Scheduled scalingis: 
 	Mainly used for predictable traffic patterns. You need to use the target tracking scaling policy to optimize the 
 	cost of your infrastructure without affecting the performance.
+
 
 
 
@@ -3278,9 +3289,11 @@ VPC via the AWS Directory Service AD Connector.
 
 
 
+
+
+
 AWS Fargate to run a batch job whenever an object is uploaded to S3:
 	 Set up EventBridge rule to detect S3 object PUT operations and set the target to the ECS cluster to run a new ECS task.
-
 
 EventBridge rule for detect all services level event.
 It uses data from your own applications, integrated SaaS applications, and AWS services. 
@@ -3289,17 +3302,20 @@ EventBridge rule can runs an Amazon ECS task against a event, ECS tasks directly
 
 
 
+
+
  
 Application is slow during the start of the day but then works normally after a couple of hours:
 	Configure a Scheduled scaling policy for the Auto Scaling group to launch new instances before the start of the day.
 
 The scheduled action tells Amazon EC2 Auto Scaling to perform a scaling action at specified times.
- To create a scheduled scaling action, you specify the start time when the scaling action should take effect, and the new 
- minimum, maximum, and desired sizes for the scaling action. 
+To create a scheduled scaling action, you specify the start time when the scaling action should take effect, and the new 
+minimum, maximum, and desired sizes for the scaling action. 
+
+At the specified time, Amazon EC2 Auto Scaling updates the group with the values for minimum, maximum, and desired size 
+specified by the scaling action. 
  
- At the specified time, Amazon EC2 Auto Scaling updates the group with the values for minimum, maximum, and desired size 
- specified by the scaling action. 
- 
+
 
 
 
@@ -3310,6 +3326,9 @@ Notify the development and operations team about the created or deleted S3 objec
 Take note that Amazon S3 event notifications are designed to be delivered at least once and to one destination only. 
 You cannot attach two or more SNS topics or SQS queues for S3 event notification. 
 Therefore, you must send the event notification to Amazon SNS.
+
+
+
 
 
 
@@ -3332,7 +3351,6 @@ Windows NTFS, Microsoft Active Directory (AD) Integration.
 
 Amazon Elastic File System is a fully-managed file storage service that makes it easy to set up and scale file storage in 
 the Amazon Cloud. 
-
 
 Amazon S3 is an object storage service that offers industry-leading scalability, data availability, security, and performance.
 
@@ -3369,7 +3387,7 @@ There are three main parts in a distributed messaging system:
 
 
 EBS:
-	Although an EBS Volume can be attached to multiple EC2 instances, you can only do so on instances within an availability zone. 
+	Although an EBS Volume can be attached to multiple EC2 instances, Instance and EBS must be in same AZ. 
 	What we need is high-available storage that can span multiple availability zones.
 
 EFS:
@@ -3378,14 +3396,11 @@ EFS:
 EFS only supports Linux workloads.
 
 Amazon EFS provides two modes of throughput: Provisioned and Bursting. 
-EFS provides two classes of storage for files—One Zone and Standard. These classes are intended to manage the least often and 
-most often retrieved data. EFS Lifecycle.
+EFS provides two classes of storage: One Zone and Standard. EFS Lifecycle.
 
 EFS file systems can be accessed by Amazon EC2 Linux instances, Amazon ECS, Amazon EKS, AWS Fargate, 
 and AWS Lambda functions via a file system interface such as NFS protocol.
 Mult-AZ
-
-
 
 FSx for Lustre: 
 	For machine learning model, Which scales to hundreds of gigabytes every second and sub-millisecond latencies.
@@ -3420,6 +3435,8 @@ Remember that the DynamoDB Stream feature is not enabled by default.
 
 
 
+
+
 Wants a high-performing solution to migrate this workload to the AWS cloud to take advantage of the cloud’s high availability:
 	 Migrate the Oracle database to Amazon RDS for Oracle in a Multi-AZ deployment by using AWS Database Migration Service (AWS DMS).
 	 Rehost the on-premises .NET application to an AWS Elastic Beanstalk Multi-AZ environment which runs in multiple Availability Zones.
@@ -3433,7 +3450,7 @@ With AWS DMS, you can perform one-time migrations, and you can replicate ongoing
 Migrate to a different database engine use Schema Conversion Tool (AWS SCT).
 
 
-AWS Elastic Beanstalk reduces management complexity without restricting choice or control. 
+AWS ElasticBeanstalk reduces management complexity without restricting choice or control. 
 	You simply upload your application, and Elastic Beanstalk automatically handles the details of capacity provisioning, 
 	load balancing, scaling, and application health monitoring.
 	Elastic Beanstalk supports applications developed in Go, Java, .NET, Node.js, PHP, Python, and Ruby.
@@ -3446,9 +3463,12 @@ Amazon RDS supports standard Oracle databases so it would be better to use AWS D
 
 
 
+
+
 Users take a lot of time to log into their website and HTTP 504 errors:
 	Customize the content that the CloudFront web distribution delivers to your users using Lambda@Edge, which allows your 
 	Lambda functions to execute the authentication process in AWS locations closer to the users.
+	
 	Set up an origin failover by creating an origin group with two origins. Specify one as the primary origin and the other 
 	as the second origin which CloudFront automatically switches to when the primary origin returns specific HTTP status code 
 	failure responses.
@@ -3473,7 +3493,8 @@ AWS resources centrally manage and share with multiple account:
 	Use the AWS Resource Access Manager (RAM) service to easily and securely share your resources with your AWS accounts. 
 	Consolidate all of the company's accounts using AWS Organizations.
 
-AWS Organizations is an account management service that lets you consolidate multiple AWS accounts into an organization that you create and centrally manage.
+AWS Organizations is an account management service that lets you consolidate multiple AWS accounts into an organization that you 
+create and centrally manage.
 
 AWS Control Tower simply offers the easiest way to set up and govern a new, secure, multi-account AWS environment. 
 This is not the most suitable service to use to securely share your resources across AWS accounts or within your Organization. 
@@ -3483,7 +3504,7 @@ You have to use AWS Resources Access Manager (RAM) instead.
 
 
 
-From Aurora database forwarded to a distributed processing system data data-modifying info:
+Aurora data-modifying info forwarded to a distributed processing system:
 	Create a native function or a stored procedure that invokes a Lambda function. Configure the Lambda function to send event 
 	notifications to an Amazon SQS queue for the processing system to consume.
 
@@ -3491,6 +3512,7 @@ From Aurora database forwarded to a distributed processing system data data-modi
 RDS events only provide operational events such as DB instance events, DB parameter group events, DB security group events, and 
 DB snapshot events. 
 What we need  data-modifying events (INSERT, DELETE, UPDATE) which can be achieved thru native functions or stored procedures.
+
 
 
 
@@ -3507,8 +3529,9 @@ It acts as a cloud router that allows you to integrate multiple networks.
 
 RDS automatically provisions and maintains a synchronous standby replica in a different Availability Zone.
 RDS Read Replica provides an asynchronous replication instead of synchronous.
-DynamoDB do not have a Read Replica feature.
 
+DynamoDB do not have a Read Replica approach.
+Global tables replicate your DynamoDB tables automatically across  Regions.
 
 
 
@@ -3518,21 +3541,24 @@ Monitor how the different processes or threads on a DB instance use the CPU, inc
 CPU bandwidth and total memory consumed by each proces:
 	Enable Enhanced Monitoring in RDS.
 
- By default, Enhanced Monitoring metrics are stored in the CloudWatch Logs for 30 days. To modify the amount of time the 
- metrics are stored in the CloudWatch Logs, change the retention for the RDSOSMetrics log group in the CloudWatch console.
- 
- Differences between CloudWatch and Enhanced Monitoring Metrics:  
+By default, Enhanced Monitoring metrics are stored in the CloudWatch Logs for 30 days. To modify the amount of time the 
+metrics are stored in the CloudWatch Logs, change the retention for the RDSOSMetrics log group in the CloudWatch console.
+
+Differences between CloudWatch and Enhanced Monitoring Metrics:  
 	CloudWatch gathers metrics about CPU utilization from the hypervisor for a DB instance, and 
 	Enhanced Monitoring gathers its metrics from an agent on the instance. 
- 
+
 To get the specific percentage of the CPU bandwidth and total memory consumed by each database processes:
 	Use Enhanced Monitoring metrics.
  
  
  
+ 
+ 
 Move the files that are older than 2 years to a more cost-effective and scalable solution:
-	Maximum days for the EFS lifecycle policy is only 90 days. 
 	The requirement is to move the files that are older than 2 years or 730 days, use  S3 Glacier after 2 years or S3 Standard-IA.
+	
+Maximum days for the EFS lifecycle policy is only 90 days. 
 
 
 
@@ -3540,7 +3566,9 @@ Move the files that are older than 2 years to a more cost-effective and scalable
 
 You can also sell your unused instance for Standard RIs but not Convertible RIs on the Reserved Instance Marketplace.
 You can reserve capacity to a specific AWS Region (regional Reserved Instance) or specific 
-Availability Zone (zonal Reserved Instance) only. You cannot reserve capacity to multiple AWS Regions in a single RI purchase.
+Availability Zone (zonal Reserved Instance) only. 
+You cannot reserve capacity to multiple AWS Regions in a single RI purchase.
+
 
 
 
@@ -3567,18 +3595,19 @@ RDS Multi-AZ deployment is only applicable inside a single region and not in a m
 
 
 
- Launch a new file gateway that connects to your on-premises data center using AWS Storage Gateway. 
- Upload the documents to the file gateway and set up a lifecycle policy to move the data into Glacier for data archival.
- 
- 
+Launch a new file gateway that connects to your on-premises data center using AWS Storage Gateway. 
+Upload the documents to the file gateway and set up a lifecycle policy to move the data into Glacier for data archival.
+
 File gateway provides access to objects in S3 as files or file share mount points. With a file gateway, you can do the following:
 	- You can store and retrieve files directly using the NFS version 3 or 4.1 protocol.
 	- You can store and retrieve files directly using the SMB file system version, 2 and 3 protocol.
 	- You can access your data directly in Amazon S3 from any AWS Cloud application or service.
 	- You can manage your Amazon S3 data using lifecycle policies, cross-region replication, and versioning. 
-	You can think of a file gateway as a file system mount on S3.
 
-AWS Storage Gateway supports the Amazon S3 Standard, Amazon S3 Standard-Infrequent Access, Amazon S3 One Zone-Infrequent Access and Amazon Glacier storage classes.
+You can think of a file gateway as a file system mount on S3.
+
+AWS Storage Gateway supports S3 Standard, S3 Standard-IA, S3 One Zone-IA and Amazon Glacier storage classes.
+
 
 
 
@@ -3611,6 +3640,7 @@ are never sent to AWS.
 
 
 
+
 Enable Cross-origin resource sharing (CORS) configuration in the bucket.
 	Cross-origin resource sharing (CORS) defines a way for client web applications that are loaded in one domain to interact 
 	with resources in a different domain.
@@ -3618,68 +3648,73 @@ Enable Cross-origin resource sharing (CORS) configuration in the bucket.
 
 
 
-
 Secure the session data in the portal by requiring them to enter a password before they are granted permission to execute Redis commands:
 	 Authenticate the users using Redis AUTH by creating a new Redis Cluster with both the 
-		 --transit-encryption-enabled and 
-		 --auth-token parameters enabled.
+	 --transit-encryption-enabled and 
+	 --auth-token parameters enabled.
+	 
 	 
 	 
 	 
 
-Database hostname, username, and password, API credentials that prevent other developers access DEV, SIT, UAT, and PROD environments:
+Database hostname-credentials, API credentials that prevent other developers access DEV, SIT, UAT, and PROD environments:
 	Create a new KMS key and use it to enable encryption helpers that leverage on AWS Key Management Service to store and 
 	encrypt the sensitive information.
 	
 Although Lambda encrypts the environment variables in your function by default, the sensitive information would still be 
 visible to other users who have access to the Lambda console. This is because Lambda uses a default KMS key to encrypt 
-the variables, which is usually accessible by other users. The best option in this scenario is to use encryption helpers to 
-secure your environment variables.
+the variables, which is usually accessible by other users. 
+
+The best option in this scenario is to use encryption helpers to secure your environment variables.
 
 
 
 
 
- Use the AWS Systems Manager Parameter Store to keep the database credentials and then encrypt them using AWS KMS. 
- Create an IAM Role for your Amazon ECS task execution role (taskRoleArn) and reference it with your task definition, 
- which allows access to both KMS and the Parameter Store. 
- Within your container definition, specify secrets with the name of the environment variable to set in the container 
- and the full ARN of the Systems Manager Parameter Store parameter containing the sensitive data to present to the container.
+Use the AWS Systems Manager Parameter Store to keep the database credentials and then encrypt using AWS KMS. 
+	Create an IAM Role for your Amazon ECS task execution role (taskRoleArn) and reference it with your task definition, 
+	which allows access to both KMS and the Parameter Store. 
+
+Within your container definition, specify secrets with the name of the environment variable to set in the container 
+and the full ARN of the Systems Manager Parameter Store parameter containing the sensitive data to present to the container.
+
+Amazon Elastic Container Service (ECS) Anywhere is just a feature of Amazon ECS that enables you to easily run and manage 
+container workloads on customer-managed infrastructure.
+
+
+
+
+A report of all compliance-related documents for their account:
+	Use AWS Artifact to view the security reports as well as other AWS compliance-related information.
  
- Amazon Elastic Container Service (ECS) Anywhere is just a feature of Amazon ECS that enables you to easily run and manage 
- container workloads on customer-managed infrastructure.
- 
- 
- 
- 
- A report of all compliance-related documents for their account:
-	 Use AWS Artifact to view the security reports as well as other AWS compliance-related information.
-	 
 
 AWS Artifact is your go-to, central resource for compliance-related information that matters to you. 
 It provides on-demand access to AWS’ security and compliance reports and select online agreements. 
+
 Reports available in AWS Artifact include our Service Organization Control (SOC) reports, Payment Card Industry (PCI) reports,
 Business Associate Addendum (BAA) and the Nondisclosure Agreement (NDA).
 
 	 
 	 
 	 
+	 
+	 
 Even though AWS WAF can help you block common attack patterns to your VPC such as SQL injection or cross-site scripting, this is 
-still not enough to withstand DDoS attacks. It is better to use AWS Shield .
+still not enough to withstand DDoS attacks. It is better to use AWS Shield.
+
 Create a rate-based rule in AWS WAF and associate the web ACL to an Application Load Balancer.
- a regular rule only matches the statement defined in the rule. If you need to add a rate limit to your rule, you should create a 
- rate-based rule.
- 
- 
- 
+a regular rule only matches the statement defined in the rule. If you need to add a rate limit to your rule, you should create a 
+rate-based rule.
 
-AWS Network Firewall is a managed service that is primarily used to deploy essential network protections for all of your 
-Amazon Virtual Private Clouds (VPCs) and not particularly to your Application Load Balancers.
+AWS Network Firewall is a managed service that is primarily used to deploy essential network protections for all of your VPCs 
+and not particularly to your Application Load Balancers.
 
 
 
 
-storage solution to a specific Amazon VPC only:
+
+
+Storage solution to a specific Amazon VPC only:
 	Configure an Amazon S3 Access Point for the S3 bucket to restrict data access to a particular Amazon VPC only.
 	Create a new Amazon S3 bucket with the S3 Object Lock feature enabled. Store the documents in the bucket and set the 
 	Legal Hold option for object retention.
@@ -3688,34 +3723,30 @@ S3 Multi-Region Access Points to provide a global endpoint that applications.
 
 Before you lock any objects, you have to enable a bucket to use S3 Object Lock. 
 When you create a bucket with Object Lock enabled, you can't disable Object Lock or suspend versioning for that bucket.
- Object Versioning feature must also be enabled too in order for this to work. 
- In fact, you cannot manually disable the Object Versioning feature if you have already selected the Object Lock option.
  
+Object Versioning feature must also be enabled too in order for this to work. 
+In fact, you cannot manually disable the Object Versioning feature if you have already selected the Object Lock option.
+
+
+
+
+
  
- 
- Amazon Macie generates two categories of findings: policy findings and sensitive data findings. 
-  A policy finding is a detailed report of a potential policy violation or issue with the security or privacy of an Amazon S3 bucket.
-  A sensitive data finding is a detailed report of sensitive data in an S3 object.
+Amazon Macie generates two categories of findings: policy findings and sensitive data findings. 
+	A policy finding is a detailed report of a potential policy violation or issue with the security or privacy of an  S3 bucket.
+	A sensitive data finding is a detailed report of sensitive data in an S3 object.
+
+Amazon Macie is an ML-powered security service that helps you prevent data loss by automatically discovering, classifying, 
+and protecting sensitive data stored in Amazon S3. Amazon Macie uses machine learning to recognize sensitive data such as 
+personally identifiable information (PII) 
   
- Amazon Macie is an ML-powered security service that helps you prevent data loss by automatically discovering, classifying, 
- and protecting sensitive data stored in Amazon S3. Amazon Macie uses machine learning to recognize sensitive data such as 
- personally identifiable information (PII) 
-  
- 
- 
- 
- Amazon Kendra is just an enterprise search service that allows developers to add search capabilities to their applications. 
- This enables their end users to discover information stored within the vast amount of content spread across their company.
- 
- 
- 
+Amazon Kendra is just an enterprise search service that allows developers to add search capabilities to their applications. 
 
-“too many connections” error:
-	Provision an RDS Proxy between the Lambda function and RDS database instance
+
+
 
  
-
-asynchronously process the request:
+Asynchronously process the request:
 	Replace the Kinesis Data Streams with an Amazon SQS queue. Create a Lambda function that will asynchronously process the requests.
 
 AWS Lambda supports the synchronous and asynchronous invocation of a Lambda function. 
@@ -3724,8 +3755,18 @@ Kinesis Data Streams is a real-time data streaming service that requires the pro
 because you only pay for what you use. Since there is no requirement for real-time processing in the scenario given, replacing 
 Kinesis Data Streams with Amazon SQS would save more costs.
 
-The AWS Step Functions service lets you coordinate multiple AWS services into serverless workflows so you can build and update 
-apps quickly
+
+AWS Step Functions is a serverless orchestration service that lets developers create and manage multi-step application workflows 
+in the cloud.
+AWS Step Functions is a visual workflow service.
+Step F.unctions is a managed service, so users don't have to deploy or maintain any infrastructure
+
+Amazon SWF is a fully managed workflow service for building scalable, resilient applications.
+User has to manage the infrastructure that runs the workflow logic and tasks.
+
+If you require external signals (deciders) to intervene in your processes, or you would like to launch child processes that 
+return a result to a parent, then you should consider Amazon SWF.
+
 
 
 
@@ -3736,10 +3777,9 @@ apps quickly
 A report that summarizes the total billing accrued by each department:
 	Tag resources with the department name and enable cost allocation tags.
 
-After you or AWS applies tags to your AWS resources (such as Amazon EC2 instances or Amazon S3 buckets) and you activate the 
+After you or AWS applies tags to your AWS resources (such as  EC2  or  S3 buckets) and you activate the 
 tags in the Billing and Cost Management console, AWS generates a cost allocation report as a comma-separated value (CSV file) 
 with your usage and costs grouped by your active tags.
-
 
 AWS Budgets only allows you to be alerted and run custom actions if your budget thresholds are exceeded.
 
@@ -3750,30 +3790,14 @@ Cost and Usage Report (CUR) provid cost by AWS services.
 
 
 
-Upload the HTML, CSS, Javascript, and the images in a single bucket. Then enable website hosting. 
-Create a CloudFront distribution and point the domain on the S3 website endpoint.
-
-
-
-
-
 Architect has decided to move the historical records to AWS :
 	Use AWS DataSync to move the historical records from on-premises to AWS. Choose Amazon S3 Glacier Deep Archive to be the 
 	destination for the data.
-	
 
-DataSync can transfer hundreds of terabytes and millions of files at speeds up to 10 times faster than open-source tools, over the 
-Internet or AWS Direct Connect links. You can use DataSync to migrate active data sets or archives to AWS, transfer data to the 
-cloud for timely analysis and processing, or replicate data to AWS for business continuity. 
 
 Getting started with DataSync is easy: deploy the DataSync agent, connect it to your file system, select your AWS storage resources, 
 and start moving data between them. You pay only for the data you move(online).
-
-
-Although you can copy data from on-premises to AWS with Storage Gateway, it is not suitable for transferring large sets of data to AWS. 
-Storage Gateway is mainly used in providing low-latency access to data by caching frequently accessed data on-premises 
-while storing archive data securely and durably in Amazon cloud storage services. Storage Gateway optimizes data transfer to 
-AWS by sending only changed data and compressing data.
+You can use DataSync to migrate active data sets or archives to AWS.
 
 
 Amazon Managed Service for Prometheus is a Prometheus-compatible monitoring and alerting service. 
@@ -3783,8 +3807,10 @@ This service makes it easy for you to monitor containerized applications and inf
 
 
 
-Set up AWS Proton for deploying container applications and serverless solutions. Create components from the AWS Proton console and 
-attach them to their respective service instance.
+
+
+Set up AWS Proton for deploying container applications and serverless solutions. 
+Create components from the AWS Proton console and attach them to their respective service instance.
 
 AWS Proton allows you to deploy any serverless or container-based application with increased efficiency, consistency, and control. 
 You can define infrastructure standards and effective continuous delivery pipelines for your organization. 
@@ -3798,8 +3824,8 @@ SQS and  SWF are the services that you can use for creating a decoupled architec
 
 
 
-Create an Amazon EMR cluster and store the processed data in Amazon Redshift.
-	Amazon EMR (previously known as Amazon Elastic MapReduce) is an Amazon Web Services (AWS) tool for big data processing and analysis.
+Create an Amazon EMR cluster and store the processed data in Amazon RedShift.
+	Amazon EMR (previously known as Amazon Elastic MapReduce) is an Amazon Web Services big data tool for processing and analysis.
 
 	Amazon EMR is a managed cluster platform that simplifies running big data frameworks, such as Apache Hadoop and Apache Spark, on 
 	AWS to process and analyze vast amounts of data. 
