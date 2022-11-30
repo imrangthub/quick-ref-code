@@ -592,7 +592,7 @@ Redshift(SQL Big data analyse) cluster as their data warehouse region outage or 
 
 
 Convert audio recordings into text using Amazon Transcribe. 
-Set up Amazon Translate to translate Hindi texts into English and use Amazon Comprehend for sentiment analysis.
+	Set up Amazon Translate to translate Hindi texts into English and use Amazon Comprehend for sentiment analysis.
 
 
 Process both mission-critical data and non-essential batch jobs:
@@ -704,18 +704,18 @@ Memory Optimized Instances:
 
 
 
-EMR(Big Data Frameworks) previously called Amazon Elastic MapReduce :
+EMR(Big Data Frameworks) previously called Amazon Elastic MapReduce:
 	Amazon EMR is a managed cluster platform that simplifies running big data frameworks, such as 
 	Apache Hadoop and Apache Spark, on AWS to process and analyze vast amounts of data. 
-	By using these frameworks and related open-source projects, such as Apache Hive and Apache Pig, 
-	you can process data for analytics purposes and business intelligence workloads. 
-	Additionally, you can use Amazon EMR to transform and move large amounts of data into and out 
-	of other AWS data stores and databases.
+By using these frameworks and related open-source projects, such as Apache Hive and Apache Pig, 
+you can process data for analytics purposes and business intelligence workloads. 
+Additionally, you can use Amazon EMR to transform and move large amounts of data into and out 
+of other AWS data stores and databases.
 
 
 
 
-Amazon Redshift is the most widely used cloud data warehouse:I
+Amazon Redshift is the most widely used cloud data warehouse:
 	analyze all your data using standard SQL and your existing Business Intelligence (BI) tools. 
 	It allows you to run complex analytic queries against terabytes to petabytes of 
 	structured and semi-structured data, using sophisticated query optimization, columnar storage 
@@ -946,7 +946,6 @@ EBS volumes live configuration Change:
 
  
 SQS and Amazon Simple Workflow Service (SWF) services for decoupled architecture in AWS. 
-
 You can’t create a VPC peering for your on-premises network and AWS VPC.
 
 
@@ -1246,6 +1245,8 @@ CloudFormation template:
 
 
 
+ 
+
 Avoid losing recently submitted requests:
 	Use an Amazon SQS queue to decouple the application components and scale-out the EC2 instances based upon the 
 	SqS ApproximateNumberOfMessages metric in Amazon CloudWatch.
@@ -1357,6 +1358,7 @@ Memory optimized instances:
 
 
 
+
 DynamoDB Streams:
 	Enabling DynamoDB Streams to capture table activity and automatically trigger the Lambda function.
 
@@ -1364,8 +1366,11 @@ CloudWatch Alarms only monitor service metrics, not changes in DynamoDB table da
 
 
 
+
+
 Log file processing:
 	S3 for storing the application log files and Amazon Elastic MapReduce(EMR | big data frameworks) for processing the log files.
+
 
 
 
@@ -1427,7 +1432,8 @@ AWS Control Tower offers a straightforward way to set up and govern an AWS multi
 following prescriptive best practices. 
 
 AWS Control Tower orchestrates the capabilities of several other AWS services, including AWS Organizations, AWS Service Catalog, 
-and AWS Single Sign-On, to build a landing zone in less than an hour. 
+and AWS Single Sign-On, to build a landing zone in less than an hour.
+ 
 It offers a dashboard to see provisioned accounts across your enterprise, guardrails enabled for policy enforcement, 
 guardrails enabled for continuous detection of policy non-conformance, and non-compliant resources organized by accounts and OUs.
 
@@ -1491,16 +1497,6 @@ on individual objects in your bucket.
  
  
  
- 
- 
-Online Order processing, duplicates can’t be tolerated:
-	– Replace Amazon SQS use Amazon Simple Workflow service.
-	– Use an Amazon SQS FIFO Queue instead of SQS default queue.
-
-SQS, there is a possibility that a message can have a duplicate in case an EC2 instance fails to delete the already processed message.
-
-
-
 
 
 
@@ -1525,14 +1521,6 @@ Athena:
 
 
 
-RestartEc2FromErrorLog:
-	First, look at the existing CloudWatch logs for keywords related to the application error to create a custom metric. 
-	Then, create a CloudWatch alarm for that custom metric which invokes an action to restart the EC2 instance.
-	
-	You can create alarms that automatically stop, terminate, reboot, or recover your EC2  using CloudWatch alarm actions. 
-
-
-
 
 RabbitMQ cluster:
 	A cluster deployment is a logical grouping of three RabbitMQ broker nodes behind a Network Load Balancer, 
@@ -1541,10 +1529,6 @@ RabbitMQ cluster:
 
 
 DataSync:
-	Use an AWS DataSync agent to rapidly move the data over a service endpoint.
-	DataSync to migrate active data to AWS, transfer data to the cloud for analysis and processing, archive data to free up 
-	on-premises storage capacity, or replicate data to AWS for business continuity.
-	
 	AWS DataSync simplifies, automates, and accelerates copying large amounts of data to and from AWS storage services 
 	over the internet or AWS Direct Connect. 
 	
@@ -1569,7 +1553,7 @@ LDAP to IAM:
 	
 
 
-Elastic Fabric Adapter EFA:
+Elastic Fabric Adapter EFA not work for Windows:
 	The OS-bypass capabilities of EFAs are not supported on Windows instances. 
 	If you attach an EFA to a Windows instance, the instance functions as an Elastic Network Adapter without the added EFA capabilities.
 
@@ -1639,7 +1623,7 @@ AWS Health:
 	AWS Health also helps you be aware of and to prepare for planned activities.
 	
 	Use EventBridge to detect and react to AWS Health events. Then, based on the rules that you create, 
-	EventBridge invokes one or more target actions 
+	EventBridge invokes one or more target actions. 
 	
 	
 Your account Healt/events page shows all events from the past 90 days.
@@ -1825,6 +1809,8 @@ You can’t configure a geo match condition in an Application Load Balancer.
 
 
 
+
+
 AWS Trusted Advisor:
 	AWS Trusted Advisor is an online tool that provides real-time guidance and resources best practices. 
 	It inspects your AWS environment and makes recommendations for saving money, improving system performance and reliability, 
@@ -1938,6 +1924,8 @@ The default visibility timeout for a message is 30 seconds. The maximum is 12 ho
 
 
 
+
+
 Step scaling:
 	With step scaling, you choose scaling metrics and threshold values for the CloudWatch alarms that trigger the scaling process 
 	as well as define how scalable target should be scaled when a threshold is in breach for a specified number of evaluation periods. 
@@ -1956,19 +1944,19 @@ Aurora failure on the primary database instance for failover:
 	Aurora will attempt to create a new DB Instance in the same Availability Zone as the original instance 
 	and is done on a best-effort basis.
 
- If you have an Amazon Aurora Replica in the same or a different Availability Zone, when failing over, 
- Amazon Aurora flips the canonical name record (CNAME) for your DB Instance to point at the healthy replica, 
- which in turn is promoted to become the new primary. Start-to-finish failover typically completes within 30 seconds.
- 
- If you are running Aurora Serverless and the DB instance or AZ becomes unavailable, 
- Aurora will automatically recreate the DB instance in a different AZ.
+If you have an Amazon Aurora Replica in the same or a different Availability Zone, when failing over, 
+Amazon Aurora flips the canonical name record (CNAME) for your DB Instance to point at the healthy replica, 
+which in turn is promoted to become the new primary. Start-to-finish failover typically completes within 30 seconds.
 
- If you do not have an Amazon Aurora Replica (i.e., single instance) and are not running Aurora Serverless, 
- Aurora will attempt to create a new DB Instance in the same Availability Zone as the original instance. 
- 
- For Single instance, no read repllica, Aurora will first attempt to create a new DB Instance in the same Availability Zone 
- as the original instance. If unable to do so, Aurora will attempt to create a new DB Instance in a 
- different Availability Zone and not the other way around.
+If you are running Aurora Serverless and the DB instance or AZ becomes unavailable, 
+Aurora will automatically recreate the DB instance in a different AZ.
+
+If you do not have an Amazon Aurora Replica (i.e., single instance) and are not running Aurora Serverless, 
+Aurora will attempt to create a new DB Instance in the same Availability Zone as the original instance. 
+
+For Single instance, no read repllica, Aurora will first attempt to create a new DB Instance in the same Availability Zone 
+as the original instance. If unable to do so, Aurora will attempt to create a new DB Instance in a 
+different Availability Zone and not the other way around.
  
  
  
@@ -1993,6 +1981,11 @@ IP addresses from one of the following CIDR blocks:
 – 192.168.0.0/16 (RFC 1918)
 
 
+ 
+ 
+ 
+ 
+ 
  
  
 Heterogeneous migrations a two step process.:
@@ -2050,6 +2043,8 @@ Point-in-time backups of your volumes stored as EBS snapshots and come in two di
 
 
 
+
+
 SQS:
 	SQS has automatically deleted the messages that have been in a queue for more than the maximum message retention period.
 	The default message retention period is 4 days max 14 days.
@@ -2090,6 +2085,8 @@ When you create a step scaling policy, you can also specify the number of second
 
 
 
+
+
 AWS Systems Manager Run Command:
 	AWS Systems Manager is a useful and powerful tool that allows organizations to operate complex infrastructure at scale, 
 	both safely and securely.
@@ -2105,9 +2102,14 @@ Run Command is offered at no additional cost.
 
 
 
+
+
  
 AWS has an example of the implementation of Quota Monitor CloudFormation template that you can deploy on your AWS account. 
 The template uses an AWS Lambda function that runs once every 24 hours.
+
+
+
 
 
 
@@ -2135,8 +2137,6 @@ During peak hours, many employees are experiencing slow connectivity issues:
  
  
 
-Upload the data to S3 and set a lifecycle policy to transition data to Glacier after 0 days.
-
 
 
 CloudTrail log processing:
@@ -2145,6 +2145,9 @@ CloudTrail log processing:
 
 You can also define Amazon S3 lifecycle rules to archive or delete log files automatically. 
 If you want notifications about log file delivery and validation, you can set up Amazon SNS notifications.
+
+Upload the data to S3 and set a lifecycle policy to transition data to Glacier after 0 days.
+ 
  
  
  
@@ -2160,7 +2163,8 @@ CloudHSM:
 Access logs on the Application Load Balancer:
 	Elastic Load Balancing provides access logs that capture detailed information about requests sent to your load balancer.
 	Enable access logs on the Application Load Balancer. 
-	Integrate the ECS cluster with Amazon CloudWatch Application Insights to analyze traffic patterns and simplify troubleshooting.
+
+Integrate the ECS cluster with Amazon CloudWatch Application Insights to analyze traffic patterns and simplify troubleshooting.
 
 
 
@@ -2192,13 +2196,17 @@ viewed in your AWS Management Console.
  
  
  
+ 
+ 
 Network Firewall:
 	Create a firewall using the AWS Network Firewall service at the VPC level then add custom rule groups for inspecting 
 	ingress and egress traffic. Update the necessary VPC route tables.
 	
 Firewall must be created at the VPC level and not at the subnet level.
 Network ACLs to control access to your subnets.
-Security group acts as a virtual firewall for your EC2.	 
+Security group for your EC2.	 
+ 
+ 
  
  
 EC2 Terminating log save:
@@ -2211,15 +2219,19 @@ to CloudWatch Logs.
 
 
 
+
+
 To collect logs from your Amazon EC2 instances and on-premises servers into CloudWatch Logs, AWS offers two options:
 	Recommended – The unified CloudWatch agent.
-	Supported, but deprecation – The older CloudWatch Logs agent(only servers running Linux).
+	Supported, but deprecation – The older CloudWatch Logs agent(only Linux servers ).
 	
 Using  CloudWatch agent to collect metrics and logs from Amazon EC2 instances and on-premises servers.
 Unified CloudWatch agent enables you to: 
 	Collect internal system-level metrics from Amazon EC2 instances across operating systems also EC2 logs.
 	
 CloudWatch Agent enables you to collect and export host-level metrics and logs on instances running Linux or Windows server.
+
+
 
 
 
@@ -2231,9 +2243,10 @@ Among the AWS Storage Gateway storage solutions, only File Gateway can store and
 
 File Gateway is used to store and retrieve Amazon S3 objects through NFS and SMB protocols.
 
-
-
 EFS for rapidly changing data and 1000 Linux servers.
+
+
+
 
 
 
@@ -2249,17 +2262,6 @@ By default, IAM users don’t have permission to create or modify Amazon EC2 res
 To allow IAM users to create or modify resources and perform tasks, you must create IAM policies that grant IAM users.
 
 
-
-
-
-EC2DataSendWithInTwoVPC within Same Region:
-	Set up a VPC peering connection between the VPCs.
-	Re-configure the route table’s target and destination of the instances’ subnet.
-
-VPC endpoints are region-specific only, You cannot create an endpoint between a VPC and a service in a different Region.
-
-VPC endpoints support IPv4 traffic only. 
-Endpoints can't be transferred from one VPC or service to another, VPC endpoint and service must be in the same region.
 
 
 
@@ -2281,6 +2283,8 @@ that messages are processed within a specific time period.
 Due to S3 data volume, most queries take a long time to complete:
 	Transform the JSON data into Apache Parque format. 
 	Ensure that the user has an lakeformation:GetDataAccess IAM permission for underlying data access control.
+
+
 
 
 
@@ -2311,10 +2315,9 @@ ECS Service Metric:
 	
 	
 ALBRequestCountPerTarget—Number of requests completed per target in an Application Load Balancer target group.
-
-
-
 By default, data records in Kinesis are only accessible for 24 hours from the time they are added to a stream.
+
+
 
 
 ElasticBeanstalk, where does it store the application files and server log files?
@@ -2328,14 +2331,15 @@ CloudFront app Hig availability:The scenario uses an EC2 instance as an origin o
 	You also need to configure the instances to be part of the origin group to ensure that the application is highly available.
 
 
+
 S3 File Gateway presents  NFS and SMB protocols.
 	Use an AWS Storage File gateway with enough storage to keep data from the last 48 hours. 
 	Send the backups to an SMB share mounted as a local disk.
 
-
-
 Owner full access to all uploaded objects in the S3 bucket by oterh user:
 	Create a bucket policy that will require the users to set the object’s ACL to bucket-owner-full-control.
+
+
 
 
 
@@ -2368,29 +2372,6 @@ With the AWS Management Console, the option to enable cross-zone load balancing 
 
 
 
-Kinesis Data Streams Slow:
-	Kinesis data stream is designed to scale without limits via increasing the number of shards within a data stream.
-	To update permormance
-	Increase the number of shards of the Kinesis stream by using the UpdateShardCount command.
-	Splitting increases the number of shards in your stream and therefore increases the data capacity of the stream. 
-	Because you are charged on a per-shard basis, splitting increases the cost of your stream. 
-
-Similarly, merging reduces the number of shards in your stream and therefore decreases the data capacity—and cost—of the stream.
-
-
-
-
-SSH expiring certificates Tow way:
-	– Create an Amazon EventBridge (Amazon CloudWatch Events) rule that will check AWS Health or ACM expiration events related 
-	to ACM certificates. Send an alert notification to an Amazon Simple Notification Service (Amazon SNS) topic 
-	when a certificate is going to expire in 30 days.
-	
-	– Create an Amazon EventBridge (Amazon CloudWatch Events) rule and schedule it to run every day to identify 
-	the expiring ACM certificates. 
-	Configure to rule to check the DaysToExpiry metric of all ACM certificates in Amazon CloudWatch. 
-	Send an alert notification to an Amazon Simple Notification Service (Amazon SNS) topic when a certificate is 
-	going to expire in 30 days.
-
 
 
 
@@ -2420,21 +2401,21 @@ Restarting the instances may migrate them to hardware that has capacity for all 
 
 
 
+
 AWS Organization allows you to create SCPs that centrally control AWS service across multiple AWS accounts.
 
 
 
 
-Resuce Cost:
+
+Reduce Cost:
 	Deploy all the EC2 instances in the same Availability Zone. If you recall, data transferred between 
-	Amazon EC2, Amazon RDS, Amazon Redshift, Amazon ElastiCache instances, and Elastic Network Interfaces 
-	in the same Availability Zone is free. 
+	EC2,  RDS,  Redshift,  ElastiCache instances, and Elastic Network Interfaces in the same Availability Zone is free. 
 
 Instead of using the public network to transfer the data, you can use the private network to reduce the overall data transfer costs.
 
 Could be charged with inter-Availability Zone data transfers if the instances are distributed across 
 different availability zones.
-
 
 
 You won’t be able to connect to your Amazon S3 bucket if you are using a private subnet unless you have a VPC Endpoint.
@@ -2443,8 +2424,10 @@ Private subnet connect S3 using vpc Endpoint.
 
 
 
+
+
 Authenticate the users using Redis AUTH by creating a new Redis Cluster with both the 
---transit-encryption-enabled and --auth-token parameters enabled.
+	--transit-encryption-enabled and --auth-token parameters enabled.
 
 
 
@@ -2469,17 +2452,13 @@ RDS multiAZL:
 – Provides enhanced database durability in the event of a DB instance component failure or an Availability Zone outage.
 
 RDS synchronously replicates within same regin:
-	RDS synchronously replicates the data to a standby instance in a different Availability Zone (AZ) that is in the same region 
-	and not in a different one.
+	RDS synchronously replicates the data to a standby instance in a different Availability Zone (AZ) that is in the same region.
 
-RDS Read Replica may be in a different AWS Region than the primary DB instance region.
-
-
+By using cross-Region read replicas in Amazon RDS, you can create 
+MariaDB, MySQL, Oracle, PostgreSQL, or SQL Server read replica in a different Region. (asynchronous replication)
 
 
 
-Amazon Elastic File System=requires a scalable, POSIX-compliant storage service.
-“allows concurrent connections from multiple EC2 instances”
 
 
 
@@ -2495,12 +2474,14 @@ to multiple services.
 
 
 
+
 OpenSearch:
 	Create an Amazon Comprehend analysis job. Index the sentiment along with the transcript to an Amazon OpenSearch cluster. 
 	Visualize the results using the OpenSearch Dashboard.
 
 The Amazon OpenSearch dashboard is a more suitable service to use than Grafana since the sentiment data is already processed 
 by an Amazon OpenSearch cluster.
+
 
 
 
@@ -2512,12 +2493,14 @@ To enable the cross-region replication feature in S3, the following items should
 
 
 
+
 Deploy a conversational chatbot using Amazon Lex. 
 Define conversation flow for specific user intentions. Integrate AWS Lambda functions as code hooks to perform actions 
 based on user requests.
 
 Comprehend is a natural language processing (NLP) service that uses machine learning to find insights and relationships in texts. 
 It is not used to build chatbot applications.
+
 
 
 
@@ -2533,12 +2516,15 @@ Amazon Kinesis Data Firehose only supports  S3,  Redshift,  Elasticsearch, and a
 
 
 
+
 CloudFront Cache-Control:
 	The Cache-Control and Expires headers control how long objects stay in the cache. 
 	The Cache-Control max-age directive lets you specify how long (in seconds) you want an object to remain in the cache before 
 	CloudFront gets the object again from the origin server. 
 
 The minimum expiration time CloudFront supports is 0 seconds for web distributions and 3600 seconds (1Hr) for RTMP distributions.
+
+
 
 
 
@@ -2552,16 +2538,18 @@ in different AWS accounts.
 
 
 
+
 AWS Consolidated Billing:
 	Use AWS Consolidated Billing by creating AWS Organizations to link the divisions’ accounts to a parent corporate account.
 
 You can use the consolidated billing feature in AWS Organizations to consolidate payment for multiple AWS accounts or
- multiple AISPL accounts. With consolidated billing, you can see a combined view of AWS charges incurred by all of your accounts.
-
-
+multiple AISPL accounts. 
+With consolidated billing, you can see a combined view of AWS charges incurred by all of your accounts.
 
 
 Tag Editor simply allows you to add, edit, and delete tags to multiple AWS resources at once for easier identification and monitoring.
+
+
 
 
 
@@ -2619,12 +2607,9 @@ EBS encryption:
 
 Amazon EBS does not support asymmetric CMKs. To encrypt an EBS snapshot, you need to use symmetric CMK.
 
-
-
-
-
 Amazon Elastic File System (EFS) doesn’t natively work with Amazon S3.
 Amazon FSx for Lustre works natively with Amazon S3, a high-performance POSIX interface. 
+
  
 
 
@@ -2646,26 +2631,17 @@ without needing to update the IP addresses in your client applications.
 If you have multiple resources in multiple regions, you can use AWS Global Accelerator to reduce the number of IP addresses. 
 
 
+
+
+
 Enhanced Networking:
 	EC2 provides enhanced networking capabilities through the Elastic Network Adapter (ENA). 
 	To use enhanced networking, you must install the required ENA module and enable ENA support.
 
 	When you need a consistently lower inter-instance latencies.
-	When you need a higher packet per second (PPS) performance.
-	
-Enhanced networking uses single root I/O virtualization (SR-IOV) to provide high-performance networking.
-Enhanced networking provides higher bandwidth, higher packet per second (PPS) performance, and consistently lower inter-instance 
-latencies. There is no additional charge for using enhanced networkin.
+	When you need a higher packet per second (PPS) performance and single root I/O virtualization (SR-IOV).
 
 
-
-
-Elastic Beanstalk:	
-	By using Docker with Elastic Beanstalk, you have an infrastructure that automatically handles the details of 
-	capacity provisioning, load balancing, scaling, and application health monitoring. 
-
-You can manage your web application in an environment that supports the range of services that are integrated with Elastic Beanstalk, 
-including but not limited to VPC, RDS, and IAM.
 
 
 
@@ -2716,12 +2692,11 @@ IO2 volumes can deliver maximum of 500 IOPS per 1 GB where as IO1 volumes can de
 i2 instances=>deliver 350,000 random read IOPS and 320,000 random write IOPS.
 i3 instances=>can deliver up to 3.3 million IOPS at a 4 KB block and up to 16 GB/second of sequential disk throughput.
 
-	
+
 	 
 EBS Multi-attach only be enable on EBS Provisioned IOPS io1/io2 volumes not General purpose SSD.
 EBS Multi-attach won’t offer Multi-AZ resiliency, this only allow EBS volume to be attached on Multiple intance within a single AZ.
  
-
 
 AMI are categorized two type storage backed by(Store-Backed AMI):
 	1) EBS.
@@ -2733,18 +2708,15 @@ AMI is and Instance-Store volume, created from and template stored in Amazon S3.
 Data of Instance store volumes persist only dureing the life of the instance.
 
 
-
 EC2 instances support two types for block level storage: EC2 Instances can be launched using either EBS or 
 Instance Store volume as root volumes and additional volumes.
 
 EC2 instances can be launched by choosing between AMIs backed by EC2 instance store and AMIs backed by EBS.
 
-
-
 Key points for Instance store backed Instance
 	Boot time is slower then EBS backed volumes and usually less then 5 min.
-	
-	
+
+EBS lessthen 1 minute.	
 InstanceStore:
 Lessthen 5 minute.
 	There are three types of instance store volumes: ephemeral, non-volatile memory (NVMe) SSD, and TRIM
@@ -2790,12 +2762,15 @@ Highly Scalable system with cost-effective:
 	
 	
 	
-Get notify before 30 of expration of SSL Certificates:
+	
+	
+	
+Get notify before 30 days of expration of SSL Certificates:
 Two Way:
 	First One: AWS ACM built-in certificate expiration event,which is raised throw Amazon EventBridge, to invoke a Lambda function.
 	The funcation now can send notification using SQS or Security hub.
 	
-	Second one: Recent Lunch DaysToExpiry metric to schedule abatch search to expiring certificats and to log all finding.
+	Second one: Recent Lunch DaysToExpiry metric to schedule a batch search to expiring certificats and to log all finding.
 	And Send Notification on SQS.
 	
 CloudWatch Event are truned into action using Amazon Eventbridge.
@@ -2811,14 +2786,15 @@ also AWS Config already provide a built-in acm-certiticate-expriration-check man
 
 
 
-AutoScaling provides scaling plans for : EC2, SpotFleets,ECS Tasks (ECS Services or ECS Containers Instance), DynamoDB table and Index, Aurora Replics.
 
+AutoScaling provides scaling plans for : EC2, SpotFleets,ECS Tasks (ECS Services or ECS Containers Instance), 
+										 DynamoDB table and Index, Aurora Replics.
 ECS Instance metrics:
 	CPU Utilization
 	DiskRead/Writes
 	Network In/Out etc.
 	
-ECS  Services metrics:
+ECS Services metrics:
 	ECSServiceAvaragesCPUUtilization
 	ECSServicAvarageMemoryUtilization
 	ALBRequestCoountPerTarget
@@ -2829,9 +2805,10 @@ AutoScaling not support any metrics from ALB.
 
 
 
+
 RDS Mult-AZ deployment provide enhanced availability and durability for DB instance.
 In case of Infrastructure failure or AZ fail:
-	RDS perform an automatic failover to the standby Instance(Read Replica for Aurora).Endpoint remains same after failover.
+	RDS perform an automatic failover to the standby Instance(Read Replica for Aurora. Endpoint remains same after failover.
 
 RDS synchronously replicates the data to a standby instance in different AZ in same region not in a different region.
 
@@ -2839,9 +2816,8 @@ RDS synchronously replicates the data to a standby instance in different AZ in s
 
 
 
-HPC, Natively workign with S3, POSIX interface: FSx for Luster.
+HPC, Natively workign with S3, POSIX interface=>FSx for Luster.
 EFS, EBS, FSx for Windows: Not working with S3 easy way.
-
 
 EFS=>NFS
 FSx for Win=>SMB
@@ -2850,7 +2826,8 @@ FSx for Win=>SMB
 
 
 
-AWS  resource access share  to different AWS account using cross-account acccess.
+
+AWS resource access share to different AWS account using cross-account acccess.
 No need individual IAM user in each account.
 
 AWS Organization Consolidate bill feature allow payment for multiple aws account or multiple AISPL acc.
@@ -2861,8 +2838,11 @@ over  AWS account.
 
 
 
+
+
+
 Company Need to resuce IP address that need to regularly whitelist on corporate firewal:
-	Use AWS Global A,cclerator and Create and endpoint group for each AWS Region. Associate the ALB for each region to 
+	Use AWS Global Acclerator and Create and endpoint group for each AWS Region. Associate the ALB for each region to 
 	the corresponding endpoin group.
 
 Global Acclerator inporove application availabilithy and performance for local or global user.
@@ -2872,10 +2852,12 @@ which application may backend by ALB,NLB or EC2.
 For multiple resources in multiple region, use AWS Global Acclerator to reduce the number of IP address.
 By Creating and endpoint group, you can add all of EC2 from a single region in that group.
 
-
 No multiple endpoint for all the available AWS Region, better create one endpoint group for all region.
 
 If multiple region rsourc then not use ALB for route traffic to multiple region Instead use AWS Global Acclearator.
+
+
+
 
 
 
@@ -2888,14 +2870,16 @@ From and ENI.
 
 
 
+
 Multiple Site-to-Site VPN connection slow for VPC and remote Network suring peak hours:
 	Associate VPCs to and Equal Cost Multipath Routing ECMR-enable TransitGateway and attach additional VPN tunnels.
 AWS transit Gateway enable you to scale the IPsec VPN throughput with equal-cost multi-pah ECMP routing support over 
 multple VPN Tunnels.
 
 
-Ata a time A VPC can only have have a single virtual private gateway attached to it, No multiple VPG not allow.
+Ata a time A VPC can only have have a single virtual private gateway attached to it, No multiple VPG not allow. 1 VPC = 1VPG
 Maximum tunnel for a VPC connection is two by limit.
+
 
 
 
@@ -2904,13 +2888,15 @@ Collect Log from EC2 before ASG mark as Unhealth:
 	Add a lifecycle hook to ASG to move instance Terminating stat to Termination:Wait state to delay Termination.
 	Config a CloudWatch Event rule for EC2 Instance-terminate Lifecycle Action Auto Scaling Event with a Lambda.
 	Trigger a CloudWatch agent to push the logs and then resume the instance termination once logs sent to CloudWatch Logs.
-	
-	
+
 ASG Lifecycle hook:
 	EC2 instance in an AutoScaling group have path or lifecycle, that differs from of other EC2 Instance.
 	Lifecycle start when the ASG group launches an instance and puts it in services to terminate the instance.
 
 Using CloudWatch agent is most suitable tools to use collect system level metrics and logs then push to CloudWathc Log.
+	
+	
+	
 	
 	
 
@@ -2920,15 +2906,16 @@ Amazon web services have mainly two dedicated managed services for workflow impl
 	Step Functions
 
 
-Amazon Simple Workflow Service (Amazon SWF) is a web service that makes it easy to coordinate work across distributed application components.
-Amazon SWF, on the other hand, is a cloud-based service, allows common programming languages to be used, and lets developers control where tasks are processed.
+Simple Workflow Service (Amazon SWF) is a web service that makes it easy to coordinate work across distributed application components.
+Amazon SWF, on the other hand, is a cloud-based service, allows common programming languages to be used, and lets developers 
+control where tasks are processed.
 
 A task is an invocation of a logical step in an Amazon SWF application. Amazon SWF interacts with workers which are programs 
 that retrieve, process, and return tasks.
 
 
-AWS Step Functions is a visual workflow service that helps developers use AWS services to build distributed applications, automate processes, orchestrate 
-microservices, and create data and machine learning (ML) pipelines.
+AWS Step Functions is a visual workflow service that helps developers use AWS services to build distributed applications, 
+automate processes, orchestrate microservices, and create data and machine learning (ML) pipelines.
 Your workflow can be visualized by state machines describing steps, their relationships, and their inputs and outputs.
 
 Step Functions is a managed service, so users don't have to deploy or maintain any infrastructure for either the workflow management 
@@ -2936,6 +2923,8 @@ or the tasks themselves.
 
 SWF also manages workflow state in the cloud. However, unlike Step Functions, a user has to manage the infrastructure 
 that runs the workflow logic and tasks.
+
+
 
 
 
@@ -2970,7 +2959,7 @@ Its not provided high branwith,PPS and lower inter-instance latencies as ENA or 
 Config DNS zone apex record to point load balancer:
 	Create and A record aliesed to the load balancer DNS name.
 
-Use and Alias record pointing to the DNS name of Loadbalancer not IP, since the IP address of the Load balancer cahn change at any time.
+Use and Alias record pointing to the DNS name of Loadbalancer not IP, since the IP address of the Load balancer can change at any time.
 
 CNAME record cannot be creaed for your zone apex, create alies record at the top node of DNS as zone apex.
 
