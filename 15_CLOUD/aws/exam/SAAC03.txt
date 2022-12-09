@@ -118,8 +118,8 @@ Cloud computing is a pay-as-you-go model for delivering IT resources.
    
 
 
-Throttling is the process of limiting the number of requests an authorized program can 
-submit to a given operation in a given amount of time.
+Throttling is the process of limiting the number of requests an authorized program can submit to a given operation in a given amount 
+of time.
 
 
 2
@@ -186,6 +186,7 @@ Each availability zone (AZ) is one or more discrete data centers with redundant 
 -------------------------------------------------
 Edge locations are AWS data centers designed to deliver services with the lowest latency possible.
 Edge location is a physical location where AWS has its servers that are used to stores cdn caching.
+
 CloudFront delivers your content through a worldwide network of data centers called edge locations.
 
 An edge location is the nearest point to the consumer(user) who is consuming the AWS service. 
@@ -217,6 +218,7 @@ RegionalServices:https://aws.amazon.com/about-aws/global-infrastructure/regional
 
 
 
+
 ==| IAM Section
 6
 ##IAM
@@ -224,9 +226,6 @@ RegionalServices:https://aws.amazon.com/about-aws/global-infrastructure/regional
 AWS Identity and Access Management (IAM) is a web service that helps you securely control access to AWS resources. 
 
 IAM enables organizations with many employees to create and manage multiple users under a single AWS account.
-
-You can assign an IAM Role to the users or groups from your Active Directory once it is integrated 
-with your VPC via the AWS Directory Service AD Connector.
 
 Three types of Principals — Root Users, IAM Users and Instance Principals
 IAM deals with four Principle Entities: Users, Groups, Roles and Policies.
@@ -261,15 +260,15 @@ Main benefit of MFA: if a password is stolen or hacked, the account is not compr
 
 
 
-How can users access AWS, Three options:
+How can access AWS, Three options:
 	• AWS Management Console (protected by password + MFA)
 	• AWS Command Line Interface (CLI): protected by access keys
 	• AWS Software Developer Kit (SDK) - for code: protected by access keys
 	
 	
 • Access Keys are secret, just like a password. Don’t share them
-• Access Key ID ~= username
-• Secret Access Key ~= password
+	• Access Key ID ~= username
+	• Secret Access Key ~= password
 
 
 IAM Roles for Services: Some AWS service will need to perform actions on your behalf
@@ -293,9 +292,9 @@ IAM Security Tools:
 	• You can use this information to revise your policies.
 
 When you use the AWS Management Console to create a user, you must choose to include at least a 
-console password or access keys. By default, a brand new IAM user created using the AWS CLI or 
-AWS API has no credentials of any kind. You must create the type of credentials for an IAM user 
-based on the needs of your user.
+console password or access keys. 
+By default, a brand new IAM user created using the AWS CLI or AWS API has no credentials of any kind. 
+You must create the type of credentials for an IAM user based on the needs of your user.
 
 
 IAM: Permissions:
@@ -303,7 +302,8 @@ IAM: Permissions:
 • These policies define the permissions of the users.
 
 
-
+You can assign an IAM Role to the users or groups from your Active Directory once it is integrated 
+with your VPC via the AWS Directory Service AD Connector.
 
 
 Area:
@@ -351,31 +351,6 @@ A user in AWS consists of a name, a password to sign into the AWS Management Con
 and up to two access keys that can be used with the API or CLI. 
 
 
-Area:
-=====
-Global Service.
-
-
-
-UseCase:
-========
-You can grant other people permission to administer and use resources in your AWS account 
-without having to share your password or access key.
-
-
-
-BillCost:
-=========
-IAM User is offered at no additional charge.
-
-
-
-Security:
-=========
-It is a aws managed service, security is a shared responsibility.
-
-
-
 
 
 
@@ -387,29 +362,11 @@ You can use user groups to specify permissions for a collection of users, which 
 easier to manage for those users. 
 
 
-Area:
-=====
-Global Service.
-
-
 UseCase:
 ========
 A user group is a way to attach policies to multiple users at one time. 
 When you attach an identity-based policy to a user group, all of the users in the user group receive the 
 permissions from the user group.
-
-
-BillCost:
-=========
-IAM is offered at no additional charge.
-
-
-
-Security:
-=========
-It is a aws managed service, security is a shared responsibility.
-
-
 
 
 
@@ -419,9 +376,7 @@ It is a aws managed service, security is a shared responsibility.
 -------------------------------------------------
 A policy is an JSON document or object in AWS that, when associated with an identity or resource, defines their permissions.
 
-
 For Centralized management of permissions Policies can be attached to users, groups, or Amazon S3 buckets.
- 
  
 
 AWS supports six types of policies: 
@@ -489,22 +444,6 @@ AWS evaluates these policies when an IAM principal makes a request, such as uplo
 
 
 
-BillCost:
-=========
-IAM is offered at no additional charge.
-
-
-
-Security:
-=========
-It is a aws managed service, security is a shared responsibility.
-
-
-
-
-
-
-
 10
 ##IAM Role
 -------------------------------------------------
@@ -531,21 +470,6 @@ Ex. EC2 of  needs access to S3.
 
 2)Giving permissions to federated/outside users & groups.
 An IAM user can assume a role to temporarily take on different permissions for a specific task.
-
-
-
-BillCost:
-=========
-IAM is offered at no additional charge.
-
-
-
-
-Security:
-=========
-It is a aws managed service, security is a shared responsibility.
-
-
 
 
 
@@ -576,40 +500,21 @@ Embedded within your application.
 
 
 AWS CloudShell:
-AWS CloudShell is a browser-based shell that makes it easy to securely manage, explore, and interact with your AWS resources. 
-CloudShell is pre-authenticated with your console credentials.
-Common development and operations tools are pre-installed, so no local installation or configuration is required.
+	AWS CloudShell is a browser-based shell that makes it easy to securely manage, explore, and interact with your AWS resources. 
+	CloudShell is pre-authenticated with your console credentials.
+	Common development and operations tools are pre-installed, so no local installation or configuration is required.
 
 
-AccessKey:Access keys consist of an access key ID and secret access key, which are used to sign programmatic 
-requests that you make to AWS. 
+AccessKey:
+	Access keys consist of an access key ID and secret access key, which are used to sign programmatic 
+	requests that you make to AWS. 
 
 
 Programmatic access:
-You must provide your AWS access keys to make programmatic calls to AWS or to use the 
-AWS Command Line Interface or AWS Tools for PowerShell.
+	You must provide your AWS access keys to make programmatic calls to AWS or to use the 
+	AWS Command Line Interface or AWS Tools for PowerShell.
 
 
-
-Area:
-=====
-IAM, Gloabl.
-
-
-UseCase:
-========
-User/Object access.
-CloudShell, you can quickly run scripts with the AWS Command Line Interface (AWS CLI).
-
-
-BillCost:
-=========
-No additional charge.
-
-
-Security:
-=========
-It is a aws managed service, security is a shared responsibility.
 
 
 
@@ -623,10 +528,11 @@ It is a aws managed service, security is a shared responsibility.
 EC2 = Elastic Compute Cloud = Infrastructure as a Service.
 Its provides scalable computing capacity in the  Cloud. 
 
-Launch an instance using the Amazon EC2 API or a command line tool:
+When Launch an instance using the Amazon EC2 API or a command line tool:
 	Don’t specify a security group, the instance is automatically 
 	assigned to the default security group for the VPC.
-	Using the Amazon EC2 console, you have an option to create a new security group.
+
+Using the Amazon EC2 console, you have an option to create a new security group.
 
 
 EC2 sizing & configuration options: 
@@ -653,14 +559,16 @@ TypeOfEC2:
 	-General purpose
 	-Compute optimized
 	-Memory-optimized
-	-Accelerated Computing
 	-Storage optimized
+	-Accelerated Computing
 
 Storage optimized instances are designed for workloads that require high, sequential read and write access to very large data sets 
 on local storage.
 
 Memory Optimized Instances is  are designed to deliver fast performance for workloads that process large data sets in memory, 
 which is quite different from handling high read and write capacity on local storage.
+These instances are well suited for the following: High-performance, relational (MySQL) and NoSQL (MongoDB, Cassandra) databases.
+
 
 Compute Optimized Instances are ideal for compute-bound applications that benefit from high-performance processors, 
 such as batch processing workloads and media transcoding.
@@ -688,14 +596,7 @@ Security Groups:
 
 
 
-To achieve highly available and fault-tolerant architecture for your applications, 
-you must deploy all your instances in different Availability Zones. 
 
-This will help you isolate your resources if an outage occurs. 
-Take note that to achieve fault tolerance, you need to have redundant resources in place to 
-avoid any system degradation in the event of a server fault or an Availability Zone outage. 
-Having a fault-tolerant architecture entails an extra cost in running additional resources 
-than what is usually needed. This is to ensure that the mission-critical workloads are processed.
 
 
 On-Demand Capacity Reservations enable you to reserve compute capacity for your 
@@ -781,19 +682,6 @@ EC2 Instances Purchasing Options:
   No need for 1 or 3-year commitment, The Availability Zone in which to reserve the capacity (only one).
 
 
-Capacity Reservations:
-On-Demand Capacity Reservations enable you to reserve compute capacity for your 
-Amazon EC2 instances in a specific Availability Zone for any duration. 
-This gives you the ability to create and manage Capacity Reservations independently 
-from the billing discounts offered by Savings Plans or Regional Reserved Instances.
-
-When you create a Capacity Reservation, you specify:
-– The Availability Zone in which to reserve the capacity
-– The number of instances for which to reserve capacity
-– The instance attributes, including the instance type, tenancy, and platform/OS
-
-In addition, you can use Savings Plans and Regional Reserved Instances with your Capacity Reservations to benefit from billing discounts.
-
 
 Reserved Instances:
 -------------------------------------------------
@@ -808,6 +696,22 @@ not Convertible RIs on the Reserved Instance Marketplace.
 
 You can reserve capacity to a specific AWS Region (regional Reserved Instance) or specific Availability Zone (zonal Reserved Instance) 
 only. You cannot reserve capacity to multiple AWS Regions in a single RI purchase.
+
+
+Capacity Reservations:
+On-Demand Capacity Reservations enable you to reserve compute capacity for your 
+Amazon EC2 instances in a specific Availability Zone for any duration. 
+This gives you the ability to create and manage Capacity Reservations independently 
+from the billing discounts offered by Savings Plans or Regional Reserved Instances.
+
+When you create a Capacity Reservation, you specify:
+– The Availability Zone in which to reserve the capacity
+– The number of instances for which to reserve capacity
+– The instance attributes, including the instance type, tenancy, and platform/OS
+
+In addition, you can use Savings Plans and Regional Reserved Instances with your Capacity Reservations to benefit from billing discounts.
+
+
 
 
 Security:
@@ -861,8 +765,7 @@ A Spot Instance request is either one-time or persistent.
 
 
 There are two types of spot requests:
--A one-time spot request stays active until Amazon EC2 runs the spot instance, you cancel the request, 
-	or it expires. 
+-A one-time spot request stays active until  EC2 runs the spot instance, you cancel the request, or it expires. 
 	If the spot price goes above your bid or capacity is unavailable, 
 	Amazon terminates the spot instance and closes the spot request.
 
@@ -880,7 +783,7 @@ What are Spot Instance Interruptions?
 
 EC2 Instance Rebalance Recommendation: is a signal that notifies when a Spot Instance is at elevated risk 
 of interruption. The signal provides an opportunity to proactively manage the Spot Instance
- in advance of the two-minute Spot Instance interruption notice.
+in advance of the two-minute Spot Instance interruption notice.
 
 		
 When an instance is interrupted, you can select one of 
@@ -930,44 +833,13 @@ Can be attached to multiple instances.
 
 
 
-
-Area:
-=====
-AWS Security Groups are region specific and VPC specific. This means that if we create a security group 
-in one region or VPC, 
-we can only use it in that same region or VPC.
-
-
-
-UseCase:
-========
-They regulate: 
-• Access to Ports 
-• Authorised IP ranges – IPv4 and IPv6 
-• Control of inbound network (from other to the instance) 
-• Control of outbound network (from the instance to other
-
-
-BillCost:
-=========
-There is no charge applicable to Security Groups in Amazon EC2/Amazon VPC. 
-
-
-
-Security:
-=========
-It is a aws managed service, security is a shared responsibility.
-
-
-
-
 14
 ##EC2 Instance Role
 -------------------------------------------------
 When you launch an Amazon EC2 instance, you specify an IAM role to associate with the instance 
 to securely access aws Resources.
 
-Use an instance profile to pass an IAM role to an EC2 instance.
+Use an instance profile to pass an IAM role to EC2 instance.
 An instance profile can contain only one IAM role, although a role can be included in multiple instance profiles. 
 This limit of one role per instance profile cannot be increased.
 
@@ -1016,13 +888,6 @@ but you are charged for any additional Elastic IP addresses associated with the 
 
 
 
-Security:
-=========
-It is a aws managed service, security is a shared responsibility.
-
-
-
-
 
 16
 ##Placement Group
@@ -1040,6 +905,7 @@ Use case:
 • Application that needs extremely low latency and high network throughput.
 
 
+
 Partition(Not Same Rack but Same AZ ) — spreads instances across many different partitions (which rely on
 	different sets of racks) within a single AZ.
 	Do not share the same rack.  
@@ -1049,11 +915,10 @@ A partition placement group can have a maximum of seven partitions per Availabil
 Since a partition placement group can have partitions in multiple Availability Zones in the same region, 
 therefore instances will not have low-latency network performance. 
 
-
-
 Scales to 100s of EC2 instances per group (Hadoop, Cassandra, Kafka)
 The instances in a partition do not share racks with the instances in the other partitions.
-:A partition failure can affect many EC2 but won’t affect other partitions
+:A partition failure can affect many EC2 but won’t affect other partitions.
+
 
 
 
@@ -1067,30 +932,6 @@ underlying hardware to reduce correlated failures.
 Use case:
 • Application that needs to maximize high availability.
 • Critical Applications where each instance must be isolated from failure from each other.
-
-
-
-Area:
-=====
-Cluster Placement Groups – Availability Zone
-
-
-
-UseCase:
-========
-Different latency and high network throughput cases.
-
-
-
-BillCost:
-=========
-There is no charge for creating a placement group.
-
-
-
-Security:
-=========
-It is a aws managed service, security is a shared responsibility.
 
 
 
@@ -1160,13 +1001,6 @@ Root Volume – must be EBS, encrypted, not instance store, and large
 An instance can NOT be hibernated more than 60 day
 
 
-
-Area:
-=====
-Some of region not all.
-
-
-
 UseCase:
 ========
 Long-running processing
@@ -1194,7 +1028,7 @@ It is a aws managed service, security is a shared responsibility.
 19
 ##EC2 Instance Storage Section
 -------------------------------------------------
-You can use block-level storage only in combination with an EC2 instance where the OS runs.
+You can only use block-level storage with an EC2 instance where the OS runs.
 There are two block-level storage options for EC2 instances.
 
 Instance store:
@@ -1205,12 +1039,9 @@ EBS volume:
 EBS volume, which provides off-instance storage that will persist independently from the life of the instance. 
 
 
-
 Instance store is ideal for the temporary storage of information that changes frequently such as buffers, 
-caches, scratch data, and other temporary content, or for data that is replicated across a 
-fleet of instances, such as a load-balanced pool of web servers. Instance store volumes are 
-included as part of the instance's usage cost.
-The resilient architecture can adjust for the loss of any instance.
+	caches, scratch data, and other temporary content, or for data that is replicated across a 
+	fleet of instances, such as a load-balanced pool of web servers.
 
 If an instance reboots (intentionally or unintentionally), data in the instance store persists.
 When you stop, hibernate, or terminate an instance, every block of storage in the instance store is reset, data loss.
@@ -1293,7 +1124,7 @@ EBS Snapshots Features:
 	• Setup rules to retain deleted snapshots so you can recover them after an accidental deletion
 	• Specify retention (from 1 day to 1 year)
 • Fast Snapshot Restore (FSR)
-	• Force full initialization of snap
+	• Force full initialization of snapshots.
 
 
 
@@ -1341,11 +1172,11 @@ instances that support Amazon EBS encryption.
 AMIs – Regional
 AMI provides templates to launch EC2 instances
 
-
- 
- 
 When the new AMI is copied from region A into region B, it also creates a snapshot in region 
 B because AMIs are based on the underlying snapshots. 
+
+
+
 
  
 24
@@ -1420,7 +1251,8 @@ EBS Multi-Attach – io1/io2 family:
 You can attach multiple EBS volumes to a single instance. The volume and instance must be in the same Availability Zone. 
 Depending on the volume and instance types, you can use Multi-Attach to mount a volume to multiple instances at the same time.
 
-Amazon EBS Multi-Attach enables you to attach a single Provisioned IOPS SSD ( io1 or io2 ) volume to multiple instances that are in the same Availability Zone.
+Amazon EBS Multi-Attach enables you to attach a single Provisioned IOPS SSD ( io1 or io2 ) volume to multiple instances that 
+are in the same Availability Zone.
 
 
 
@@ -1530,6 +1362,7 @@ older than 2 years or 730 days.
 
 Create an Amazon Elastic Filesystem (EFS) file system and enable encryption. 
 Configure AWS Transfer for SFTP to securely upload files to the EFS file system. 
+
 Apply an EFS lifecycle policy to delete files after 30 days is incorrect. 
 This may be possible, however, the EFS lifecycle management doesn’t delete objects. 
 It can only transition files in and out of the “Infrequent Access” tier.
@@ -1768,8 +1601,8 @@ Target Groups:
 • ECS tasks (managed by ECS itself) – HTTP
 • Lambda functions – HTTP request is translated into a JSON event
 • IP Addresses – must be private IPs
-• ALB can route to multiple target groups
-• Health checks are at the target group leve
+• ALB can route to multiple target groups.
+• Health checks are at the target group leve.
 
 
 • Fixed hostname (XXX.region.elb.amazonaws.com)
@@ -2103,7 +1936,7 @@ Feature naming (Call same feature different way ! ):
 -------------------------------------------------
 AWS Auto Scaling monitors your applications and automatically adjusts capacity.
 
-If exactly 10 then desired capacity to 10.
+If exactly 10, then desired capacity to 10.
 If Range of Instance then minMix.
 
 Amazon EC2 Auto Scaling to provision new resources takes minutes. Lambda within seconds.
@@ -2247,6 +2080,8 @@ system which can be hosted on EC2 instance; your queue (distributed on Amazon SQ
 and the messages in the queue.
 To improve the scalability of your distributed system, you can add Auto Scaling group to your EC2 instances.
 
+
+
 Area:
 =====
 Auto Scaling – Regional
@@ -2276,17 +2111,11 @@ It is a aws managed service, security is a shared responsibility.
 
 
 
+
 ==| RDS, Aurora & ElastiCache
 34
 ##RDS 
 -------------------------------------------------
-IAM database authentication works with MySQL and PostgreSQL. With this authentication method, you don’t need to use a password 
-when you connect to a DB instance. Instead, you use an authentication token Each token has a lifetime of 15 minutes.
-
-
-RDS events only provide operational events such as DB instance events, DB parameter group events, 
-DB security group events, and DB snapshot events. What we need in the scenario is to capture 
-data-modifying events (INSERT, DELETE, UPDATE) which can be achieved thru native functions or stored procedures.
 
 RDS stands for Relational Database Service
 • It’s a managed DB service for DB use SQL as a query language.
@@ -2359,7 +2188,7 @@ RDS Read Replicas for read scalability:
 • Within AZ, Cross AZ or Cross Region
 • Replication is ASYNC, so reads are eventually consistent
 • Replicas can be promoted to their own DB
-• Applications must update the connectionstring to leverage read replicas
+• Applications must update the connection string to leverage read replicas
 • Read replicas are used for SELECT =read only kind of statements(not INSERT, UPDATE, DELETE)
 
 
@@ -2372,8 +2201,7 @@ RDS Multi AZ (Disaster Recovery):
 • SYNC replication
 • One DNS name – automatic app failover to standby
 • Increase availability
-• Failover in case of loss of AZ, loss of
-  network, instance or storage failure
+• Failover in case of loss of AZ, loss of network, instance or storage failure
 • No manual intervention in apps
 • Not used for scaling
 • Multi-AZ replication is free
@@ -2403,7 +2231,7 @@ Amazon RDS uses several different technologies to provide failover support.
 
 Multi-AZ deployments for Oracle, PostgreSQL, MySQL, and MariaDB DB instances use Amazon’s failover technology. 
 SQL Server DB instances use SQL Server Database Mirroring (DBM).
-
+Multi-AZ deployments for Microsoft SQL Server by using either Database Mirroring (DBM) or Always On Availability Groups (AGs). 
 
 
 Amazon RDS automatically performs a failover in the event of any of the following:
@@ -2439,11 +2267,11 @@ production database and need to move your stored procedures and secondary databa
 you must use the AWS Schema Conversion Tool.
 
 
-
 When you create or modify your DB instance to run as a Multi-AZ deployment, Amazon RDS automatically provisions and maintains 
 a synchronous standby replica in a different Availability Zone. 
 Updates to your DB Instance are synchronously replicated across Availability Zones to the standby in order to keep both in sync 
 and protect your latest database updates against DB instance failure.
+
 
 
 Encryption of Data in Transit:
@@ -2452,6 +2280,7 @@ Encrypt communications between your application and your DB Instance using SSL/T
 
 Amazon RDS creates an SSL certificate and installs the certificate on the DB instance 
 when the instance is provisioned. 
+
 
 For MySQL, you launch the mysql client using the --ssl_ca parameter 
 to reference the public key in order to encrypt connections. 
@@ -2512,9 +2341,21 @@ Amazon RDS supports change data capture (CDC) for your DB instances running Micr
 	After CDC is enabled on the database, you can start tracking specific tables. 
 
 
+
+
+IAM database authentication works with MySQL and PostgreSQL. With this authentication method, you don’t need to use a password 
+when you connect to a DB instance. Instead, you use an authentication token Each token has a lifetime of 15 minutes.
+
+
+RDS events only provide operational events such as DB instance events, DB parameter group events, 
+DB security group events, and DB snapshot events. What we need in the scenario is to capture 
+data-modifying events (INSERT, DELETE, UPDATE) which can be achieved thru native functions or stored procedures.
+
+
+
 Area:
 =====
-Amazon RDS for SQL Server provides a Multi-AZ deployment, which replicates data synchronously across AZs.
+Multi-AZ deployment, which replicates data synchronously across AZs.
 By default, the Multi-AZ feature is not enabled for the RDS instance.
 
 In an Amazon RDS Multi-AZ deployment, Amazon RDS automatically creates a primary database (DB) instance and 
@@ -2542,8 +2383,7 @@ Storage is billed per gigabyte per month, and I/O is billed per million-request.
 Provisioned IOPS (per IOPS per month) 
 Backup storage (per GiB per month) –
 
-Data transfer (per GB) – Data transfer in and out of your DB instance from or to the 
-internet and other Amazon Regions.
+Data transfer (per GB) – Data transfer in and out of your DB instance from or to the internet and other Regions.
 
 For RDS Read Replicas within the same region, you don’t pay that fee but cross - region must pay.
 
@@ -2757,19 +2597,7 @@ RDS Backups:
 		• Retention of backup for as long as you want
 	• Trick: in a stopped RDS database, you will still pay for storage. 
 	  If you plan on stopping it for a long time, you should snapshot & restore instead
-
-
-
-Aurora Backups:
-• Automated backups:
-	• 1 to 35 days (cannot be disabled) 
-	• point-in-time recovery in that timeframe 
-• Manual DB Snapshots:
-	• Manually triggered by the user 
-	• Retention of backup for as long as you want
-
-
-
+	  
 
 RDS & Aurora Restore options:
 • Restoring a RDS / Aurora backup or a snapshot creates a new database
@@ -3173,7 +3001,7 @@ Amazon Route 53 supports DNSSEC signing as well as DNSSEC for domain registratio
 38
 ##AWS Elastic Beanstalk 
 -------------------------------------------------
-Beanstalk is PaaS (platform as a service) while CloudFormation,EC2 is IaC (infrastructure as code).
+ElasticBeanstalk  is PaaS (platform as a service) while CloudFormation,EC2 is IaC (infrastructure as code).
 
 AWS Elastic Beanstalk is an easy-to-use service for deploying and scaling web applications and services developed with 
 Java, .NET, PHP, Node.js, Python, Ruby, Go, and 
@@ -3246,7 +3074,7 @@ S3 Versioning-enabled buckets, help you to recover objects from accidental delet
 API calls can be logged in AWS CloudTrail.
 S3 can host static websites and have them accessible on the www.
 
-S3 in Amazon has two entities called buckets and objects. 
+S3 in Amazon has two entities- called buckets and objects. 
 Objects are stored inside buckets.
 By default, the maximum number of buckets that can be created per account is 100.
 
@@ -3616,12 +3444,14 @@ For DELETE operations:
 
 S3 Transfer Acceleration is a bucket-level feature that enables fast, easy, and secure 
 transfers of files over long distances between your client and an S3 bucket. 
+
 You cannot use Transfer Acceleration to copy objects across S3 buckets in different Regions using S3 console.
 
 
 
 UseCase:
 ========
+S3 Replication for:
 Data redundancy – If you need to maintain multiple copies of your data in the same, 
 or different AWS Regions, with different encryption types, or across different accounts.
 Replicate objects to more cost-effective storage classes.
@@ -3819,7 +3649,7 @@ S3 Transfer Acceleration:
 There are no limits to the number of prefixes in a bucket. 
 
 If you spread reads across all four prefixes evenly, you can achieve 22,000
-requests per second for GET and HEAD
+requests per second for GET and HEAD (4*5500)
 
 S3 – KMS Limitation:
 • Count towards the KMS quota per second (5500, 10000, 30000 req/s based on region)
@@ -3972,8 +3802,7 @@ Bucket Policies:
 -------------------------------------------------
 Bucket policies in Amazon S3 can be used to add or deny permissions across some or all of the objects 
 within a single bucket. 
-Policies can be attached to users, groups, or Amazon S3 buckets, enabling 
-centralized management of permissions. 
+Policies can be attached to users, groups, or Amazon S3 buckets, enabling centralized management of permissions. 
 
 With bucket policies, you can grant users within your 
 AWS Account or other AWS Accounts access to your Amazon S3 resources.
@@ -4006,8 +3835,7 @@ Use multipart uploads for faster file uploads into the destination S3 bucket.
 
 
 
-You can place a retention period on an object version either explicitly or through a 
-bucket default setting. 
+You can place a retention period on an object version either explicitly or through a bucket default setting. 
 
 When you apply a retention period to an object version explicitly, 
 you specify a Retain Until Date for the object version.
@@ -4190,7 +4018,9 @@ Serve the private content via CloudFront only:
  
 
 Amazon S3 Storage Lens feature just provides a single view of object storage usage and activity across your entire Amazon S3 storage.
-S3 Storage Lens is the first cloud storage analytics solution to provide a single view of object storage usage and activity across hundreds, or even thousands, of accounts in an organization, with drill-downs to generate insights at the account, bucket, or even prefix level.
+S3 Storage Lens is the first cloud storage analytics solution to provide a single view of object storage usage and 
+activity across hundreds, or even thousands, of accounts in an organization, with drill-downs to generate insights 
+at the account, bucket, or even prefix level.
 
 
 
@@ -4489,17 +4319,8 @@ Global.
 
 UseCase:
 ========
-The AWS Snow Family helps customers that need to run operations in austere, non-data center environments, 
-and in locations where there's lack of consistent network connectivity. 
-
-Migrate data at petabyte-scale: In particular, when network circumstances are constrained, 
-it moves databases, backups, archives, healthcare records, analytics datasets, IoT sensor data, 
-and media assets to the cloud.
-
 Process and analyze data locally: Run Amazon Machine Images (AMIs) on Amazon EC2 and distribute 
 AWS Lambda code using machine learning (ML) or other applications on Snowball Edge devices.
-
-
 
 
 BillCost:
@@ -4535,7 +4356,7 @@ Four widely-used file systems:
  
 
 FSx for Windows(Service Message Block (SMB) protocol):
-'FSx for Window Supports Microsoft's Distributed File System (DFS).
+FSx for Window Supports Microsoft's Distributed File System (DFS).
 AWS Managed Microsoft AD does not support Microsoft’s Distributed File System (DFS).
 Microsoft SQL Server on AWS does not support Microsoft’s Distributed File System (DFS).
 
@@ -4703,7 +4524,7 @@ Use cases: disaster recovery, backup & restore, tiered storage.
 	• Tape Gateway
 	
 Exam Tip: You need to know the differences between all 3!
-AWS Storage Gateway doesn’t support EFS.
+AWS Storage Gateway doesn’t support EFS filesystem.
 
 ++
 • S3 File Gateway
@@ -5066,11 +4887,7 @@ FIFO Queue:
 
 You can't convert an existing standard queue into a FIFO queue.
  
- 
- 
 By default 300 Opration per second, if a 4 msg can process per operation then its will be 1200 Op per second !
- 
-
 
 By default, FIFO queues support up to 300 messages per second (300 send, receive, or delete operations per second). 
 
@@ -5155,7 +4972,7 @@ CloudWatch Metric – Queue Length ApproximateNumberOfMessages and scale EC2
 
 
 61
-##AWS SNS(Simple Notification Service)
+##SNS (Simple Notification Service)
 --------------------------------------------------
 Anytime multiple services need to receive the same event, you should consider SNS rather than SQS.
 
@@ -5222,7 +5039,7 @@ and the subscriber will only receive a message that they are interested in.
 
 
 
-Amazon SNS – FIFO Topic:
+SNS – FIFO Topic:
 	• FIFO = First In First Out (ordering of messages in the topic).
 	• Ordering by Message Group ID (all messages in the same group are ordered).
 	• Deduplication using a Deduplication ID or Content Based Deduplication.
@@ -5272,14 +5089,6 @@ Delivery pricing varies by endpoint type.
 
 Security:
 =========
-• Encryption:
-	• In-flight encryption using HTTPS API
-	• At-rest encryption using KMS keys
-	• Client-side encryption if the client wants to perform encryption/decryption itself
-• Access Controls: IAM policies to regulate access to the SNS API
-• SNS Access Policies (similar to S3 bucket policies)
-	• Useful for cross-account access to SNS topics
-	• Useful for allowing other services ( S3…) to write to an SNS topic
 
 Amazon SNS provides encrypted topics to protect your messages from unauthorized access. 
 The encryption uses a 256-bit AES-GCM algorithm and a customer master key (CMK) issued 
@@ -5301,7 +5110,6 @@ A Kinesis data stream stores records from 24 hours by default to a maximum of 87
 
 Amazon Kinesis is the streaming data platform of AWS and has four distinct services under it: 
 Kinesis Data Firehose, Kinesis Data Streams, Kinesis Video Streams, and Amazon Kinesis Data Analytics. 
-For the specific use case, just as asked in the scenario, use Kinesis Data Firehose.
 
 
 Makes it easy to collect, process, and analyze streaming data in real-time and that can be run on EC2 instances.
@@ -5367,7 +5175,7 @@ Kinesis Data Streams Security:
 
 
 Kinesis Data Firehose:
-	 Amazon Kinesis Data Firehose is the easiest way to reliably load streaming data into data lakes, 
+	 Kinesis Data Firehose is the easiest way to reliably load streaming data into data lakes, 
 	 data stores, and analytics tools, Not application.
 
 Amazon Kinesis Data Firehose captures and loads data in near real time. It loads new data into Amazon S3, 
@@ -5403,7 +5211,7 @@ Kinesis Data Analytics (SQL application):
 	• Real-time dashboards
 	• Real-time metrics
 	
-Kinesis Data Analytics cannot directly ingest data from the source as it ingests data either from 
+Kinesis Data Analytics cannot directly ingest data from the source, as it ingests data either from 
 Kinesis Data Streams or Kinesis Data Firehose.
 
 The four most common use cases are streaming 
@@ -5474,7 +5282,7 @@ Kinesis:
 	• Meant for real-time big data, analytics and ETL
 	• Ordering at the shard level
 	• Data expires after X days
-	• Provisioned mode or ondemand capacity mode
+	• Provisioned mode or on-demand capacity mode
 
 
 
@@ -6442,7 +6250,7 @@ create, publish, maintain, monitor, and secure APIs at any scale.
 You can create RESTful APIs and WebSocket APIs that enable real-time two-way communication applications.
 
 API Types;
-RESTful: Build RESTful APIs optimized for serverless workloads and HTTP backends using HTTP APIs.
+RESTful:   Build RESTful APIs optimized for serverless workloads and HTTP backends using HTTP APIs.
 WebSocket: Build real-time two-way communication applications, such as chat apps and streaming dashboards, 
 with WebSocket APIs.
 
@@ -6984,8 +6792,7 @@ Serverless query service to analyze data stored in Amazon S3
 • Uses standard SQL language to query the files (built on Presto)
 • Supports CSV, JSON, ORC, Avro, and Parquet
 • Pricing: $5.00 per TB of data scanned
-• Commonly used with Amazon Quicksight for
-  reporting/dashboards
+• Commonly used with Amazon Quicksight for reporting/dashboards
 • Use cases: Business intelligence / analytics / reporting, analyze &
   query VPC Flow Logs, ELB Logs, CloudTrail trails, etc...
 
@@ -7036,7 +6843,7 @@ Redshift cluster as their data warehouse region outage:
 	Enable Cross-Region Snapshots Copy in your Amazon Redshift Cluster.
 
 
-Redshift warehouse is a collection of computing resources known as nodes, and these nodes are organized in a 
+Redshift data-warehouse is a collection of computing resources known as nodes, and these nodes are organized in a 
 group known as a cluster. 
 Each cluster runs in a Redshift Engine which contains one or more databases.
 
@@ -7302,13 +7109,14 @@ EMR          ->Open Serach service with full text search services, No SQL.
 
 
 If you want to use SQL and you have structured data (eg CSV files), then Redshift is the simplest solution.
-If you want to process unstructured data (eg in strange formats rather than structured CSV files), Amazon EMR can provide a Hadoop system that is very capable.
+If you want to process unstructured data (eg in strange formats rather than structured CSV files), 
+Amazon EMR can provide a Hadoop system that is very capable.
 
 
 
 
 80
-++QuickSight
+++QuickSight (ML dashboards)
 -------------------------------------------------
 • Serverless machine learning-powered business intelligence service to create interactive dashboards
 • Fast, automatically scalable, embeddable, with per-session pricing
@@ -8140,10 +7948,11 @@ You simply pay for what you use and will be charged at the end of the month for 
 
 AWS X-Ray:
 -------------------------------------------------
-AWS X-Ray is not a suitable service to use to track each API call to your AWS resources. 
-
-It just helps you debug and analyze your microservices applications with request tracing 
+It helps you debug and analyze your microservices applications with request tracing 
 so you can find the root cause of issues and performance.
+
+AWS X-Ray is NOT a suitable service to use to track each API call to your AWS resources. 
+
 
 
 
@@ -9051,7 +8860,7 @@ In this case you have to use resouece base policy.
 
 ++Amazon EventBridge – Security
 -------------------------------------------------
-• When a rule runs, it needs permissions from the target.
+When a rule runs, it needs permissions from the target.
 	• Resource-based policy: Lambda, SNS, SQS, CloudWatch Logs, API Gateway…
 	• IAM role: Kinesis stream, Systems Manager Run Command, ECS task…
 
@@ -9081,7 +8890,6 @@ You can use Identity pools and  User pools separately or together.
 AWS Cognito:
 • We want to give our users an identity so that they can interact with our application.
 Cognito UserPools: appUser->CUP->ALBOrAPIGateway->LambdaOrOtherBackend
-
 	• Sign in functionality for app users
 	• Integrate with API Gateway
 Cognito Identity Pools (Federated Identity):appUser->CUP/ThardPartyUser->CIP->S3OrDaynamoDB.
@@ -9122,7 +8930,7 @@ Cognito Identity Pools (Federated Identities):
 
 
 
-Cognito: “hundreds of users”, ”mobile users”, “authenticate with SAML”
+Cognito= “hundreds of users”, ”mobile users”, “authenticate with SAML”
 
 Area:
 =====
@@ -9336,7 +9144,7 @@ Three types of KMS Keys:
 	• Customer Managed Keys imported (must be 256-bit symmetric key): $1 / month
 • + pay for API call to KMS ($0.03 / 10000 calls)
 
-• Automatic Key rotation:
+Automatic Key rotation:
 	• AWS-managed KMS Key: automatic every 1 year
 	• Customer-managed KMS Key: (must be enabled) automatic every 1 year
 	• Imported KMS Key: only manual rotation possible using alias
@@ -10058,7 +9866,7 @@ This means you can share the service catalog across multiple accounts and have t
 
  
 
-==|Virtual Private Cloud (VPC)
+==| Virtual Private Cloud (VPC)
 138
 ##VPC | Internet Protocol (IP)   
 -------------------------------------------------
@@ -10287,7 +10095,7 @@ All the rest of the IP addresses on the Internet are Public
 172.31.0.0/16	local
 0.0.0.0/0	internet_gateway_id
 
-• Because VPC is private, only the Private IPv4 ranges are allowed:
+Because VPC is private, only the Private IPv4 ranges are allowed:
 • 10.0.0.0 – 10.255.255.255 (10.0.0.0/8)
 • 172.16.0.0 – 172.31.255.255 (172.16.0.0/12)
 • 192.168.0.0 – 192.168.255.255 (192.168.0.0/16)
@@ -10371,30 +10179,14 @@ communication between your  VPC and the internet. It supports IPv4 and IPv6 traf
 • Route tables must also be edited!
 
 
-
-Area:
-=====
-MayRegional.
-
-
-
 UseCase:
 ========
 An internet gateway enables resources in your public subnets (such as EC2 instances) to connect to the internet 
 if the resource has a public IPv4 address or an IPv6 address.
 
-
-
 BillCost:
 =========
 There's no additional charge for creating an internet gateway.
-
-
-Security:
-=========
-Security is a shared responsibility
-
-
 
 
 
@@ -10411,7 +10203,7 @@ Main route table:
 Custom route table: A route table that you create for your VPC.
 
 
-Destination: The range of IP addresses(subnet) where from you want traffic to go (destination CIDR). 
+Destination: The range of IP addresses(subnet)  from where your  traffic to go (destination CIDR). 
 For example, an external corporate network with the CIDR 172.16.0.0/12.
 
 Target: The gateway, network interface, or connection through which to send the destination traffic; 
@@ -12394,6 +12186,17 @@ Recommendations for cost optimization, performance, security and fault tolerance
 
 
 
+AWS Amplify:
+-------------------------------------------------
+AWS Amplify is a complete solution that lets frontend web and mobile developers easily build, ship, 
+and host full-stack applications on AWS, with the flexibility to leverage the breadth of 
+AWS services as use cases evolve. No cloud expertise needed.
+
+AWS is a full-suite platform developed to aid web and mobile developers in building full-stack 
+and scalable applications operated by AWS.
+
+
+
 
 ##END
 =================================================
@@ -12408,15 +12211,6 @@ Recommendations for cost optimization, performance, security and fault tolerance
 • If a solution seems feasible but highly complicated, it’s probably wrong
 
 
-
-AWS Amplify:
--------------------------------------------------
-AWS Amplify is a complete solution that lets frontend web and mobile developers easily build, ship, 
-and host full-stack applications on AWS, with the flexibility to leverage the breadth of 
-AWS services as use cases evolve. No cloud expertise needed.
-
-AWS is a full-suite platform developed to aid web and mobile developers in building full-stack 
-and scalable applications operated by AWS.
 
 
 

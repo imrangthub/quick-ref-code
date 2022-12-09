@@ -25,9 +25,6 @@ echo "<h1>Hello World from $(hostname -f)</h1>" > /var/www/html/index.html
 ConfusingTakeaLook
 ------------------
 
-NLB has one static IP per AZ, and supports assigning Elastic IP(helpful for whitelisting specific IP) Check Video
-
-
 
 HandOnRemain
 ----------------------------
@@ -537,11 +534,8 @@ AWS Proton associated with:
 
 
 Amazon Managed Service for Prometheus (AMP):
-	Amazon Managed Service for Prometheus is a monitoring service for metrics compatible with the open source Prometheus project, 
-	making it easier for you to securely monitor container environments. 
-
-The Amazon Managed Service for Prometheus is only a Prometheus-compatible monitoring and alerting service that makes it easy 
-to monitor containerized applications and infrastructure at scale.
+	 The Amazon Managed Service for Prometheus is only a Prometheus-compatible monitoring and alerting service that makes it easy 
+	 to monitor containerized applications and infrastructure at scale.
 
 
 
@@ -617,12 +611,12 @@ Provisioned capacity ensures that your retrieval capacity for expedited retrieva
 
 
 Collect and process the application log files:
-Amazon S3 for storing the application log files and Amazon Elastic MapReduce for processing the log files.
+Amazon S3 for storing the application log files and Elastic MapReduce(EMR) for processing the log files.
 
 
 
 
-Fastest storage option with high I/OPerformance for the temporary files:
+Fastest storage option with high I/O Performance for the temporary files:
 	Configure RAID 0 in multiple instance store volumes.
 
 RAID (Redundant Array of Independent Disks) is just a data storage virtualization technology 
@@ -706,7 +700,8 @@ Memory Optimized Instances:
 
 EMR(Big Data Frameworks) previously called Amazon Elastic MapReduce:
 	Amazon EMR is a managed cluster platform that simplifies running big data frameworks, such as 
-	Apache Hadoop and Apache Spark, on AWS to process and analyze vast amounts of data. 
+	Apache Hadoop and Apache Spark, on AWS to process and analyze vast amounts of data.
+	
 By using these frameworks and related open-source projects, such as Apache Hive and Apache Pig, 
 you can process data for analytics purposes and business intelligence workloads. 
 Additionally, you can use Amazon EMR to transform and move large amounts of data into and out 
@@ -734,7 +729,7 @@ DynamoDB:
 Virtual Desktops:
 	First, you need a VPN connection to connect the VPC and your on-premises network. 
 	Second, you need AWS Directory Services to integrate with your on-premises Active Directory 
-	and lastly, you need to use Amazon Workspace to create the needed Virtual Desktops in your VPC.
+	and lastly, you need to use Amazon WorkSpace to create the needed Virtual Desktops in your VPC.
 
 
 
@@ -1023,10 +1018,6 @@ RDS Mysql: increase the disk space without impacting:
 	Modify the DB instance settings and enable storage autoscaling.
 	RDS Storage Auto Scaling automatically scales storage capacity in response to growing database workloads, with zero downtime.
 
-For Modify the DB instance settings and enable storage autoscaling.
-aS Result: increasing the allocated storage might cause performance degradation during the change.
-
-
 
 
 
@@ -1253,9 +1244,9 @@ Avoid losing recently submitted requests:
 
 
 
-Launch an IAM Group for each department. 
+Launch an  Group for each department. 
 Create an IAM Policy that enforces MFA authentication with the least privilege permission. 
-Attach the IAM Policy to each IAM Group.
+Attach the IAM Policy to each Group.
 
 
 
@@ -1314,7 +1305,7 @@ VPC IP address allowed block(16-28) size in is between a /16 netmask (65,536 IP 
 
 
 
-EC2Faster Boot:
+EC2 Faster Boot:
 	Migrate the application EC2 instance to an EC2 instance with hibernation enabled.
 It is not possible to enable or disable hibernation for an instance after it has been launched.
 
@@ -1343,18 +1334,6 @@ CloudFront and Route 53 just do Geoproximity routing only not process date.
 By using a Curl or Get Command to get the latest metadata information from http://169.254.169.254/latest/meta-data/
 Like PrivatePublicIp
 
-
-
-
-
-Storage optimized instances:
-	A storage optimized instance is designed for workloads that require high, sequential read and write access to 
-	very large data sets on local storage. 
-	They are optimized to deliver tens of thousands of low-latency, random I/O operations per second (IOPS) to applications. 
-
-Memory optimized instances:
-	Although this type of instance is suitable for a NoSQL database, it is not designed for workloads that require high, 
-	sequential read and write access to very large data sets on local storage.
 
 
 
@@ -1459,7 +1438,6 @@ Increase acc time of Websit remove slow ness:
 
 
 
-
 Redshift is primarily used for OLAP (Online Analytical Processing).
 Amazon RDS Read Replica of OLTP (Online Transactional Processing).
 
@@ -1481,13 +1459,6 @@ A global secondary index can only be created in the region where its parent tabl
 
 
 
-
-Amazon Managed Grafana:
-	Amazon Managed Grafana is a fully managed service with rich, interactive data visualizations to help customers analyze,
-	monitor, and alarm on metrics, logs, and traces across multiple data sources.
- 
- 
- 
  
 When you create or update a distribution in CloudFront, you can add an origin access identity (OAI) and automatically update 
 the bucket policy to give the origin access identity permission to access your bucket.
@@ -2131,7 +2102,7 @@ mission-critical and non-essential batch jobs respectively.
 
 During peak hours, many employees are experiencing slow connectivity issues:
 	Associate the VPCs to an Equal Cost Multipath Routing (ECMR)-enabled Transit gateway and attach additional VPN tunnels.
-	The maximum tunnel for a VPN connection is two.
+	The maximum tunnel for a VPN connection is 2-two.
 	 
 	 
  
@@ -2877,30 +2848,12 @@ AWS transit Gateway enable you to scale the IPsec VPN throughput with equal-cost
 multple VPN Tunnels.
 
 
-Ata a time A VPC can only have have a single virtual private gateway attached to it, No multiple VPG not allow. 1 VPC = 1VPG
+At a time A VPC can only have have a single virtual private gateway attached to it, No multiple VPG not allow. 1 VPC = 1VPG
 Maximum tunnel for a VPC connection is two by limit.
 
 
 
 
-
-Collect Log from EC2 before ASG mark as Unhealth:
-	Add a lifecycle hook to ASG to move instance Terminating stat to Termination:Wait state to delay Termination.
-	Config a CloudWatch Event rule for EC2 Instance-terminate Lifecycle Action Auto Scaling Event with a Lambda.
-	Trigger a CloudWatch agent to push the logs and then resume the instance termination once logs sent to CloudWatch Logs.
-
-ASG Lifecycle hook:
-	EC2 instance in an AutoScaling group have path or lifecycle, that differs from of other EC2 Instance.
-	Lifecycle start when the ASG group launches an instance and puts it in services to terminate the instance.
-
-Using CloudWatch agent is most suitable tools to use collect system level metrics and logs then push to CloudWathc Log.
-	
-	
-	
-	
-	
-
-	
 Amazon web services have mainly two dedicated managed services for workflow implementation.
 	Simple Workflow Service (SWF)
 	Step Functions
@@ -3194,35 +3147,6 @@ To avoid loging loop, use two buckets, or configure the trigger to only apply to
 
 
 
-
-
-Route53 Fault-tolerant routing configuration for region outage multi region resource for Global user:
-	Configure an Active-Active Failover with Weighted routing policy.
-	
-If all of your resources should be available all the time as much as possible  use an Active-Active Failover.
-Active-Active Failover uses all available resources all the time without a primary nor a secondary resource.
-
-Route 53 health checking to configure active-active and active-passive failover configurations:
-	Active-Active Failover:
-		Use this failover configuration when you want all of your resources to be available the majority of the time. 
-		When a resource becomes unavailable, Route 53 can detect that it's unhealthy and stop including it when responding 
-		to queries.
-		
-		In active-active failover, all the records that have the same name, the same type (such as A or AAAA), and the same 
-		routing policy (such as weighted or latency) are active unless Route 53 considers them unhealthy. 
-		Route 53 can respond to a DNS query using any healthy record.
-
-	Active-Passive Failover:
-		Active-Passive Failover is mainly used when you want a primary resource or group of resources to be available most 
-		of the time and you want a secondary resource or group of resources to be on standby in case all the primary 
-		resources become unavailable.
-
-
-
-
-
-
-
 S3 protecting data at rest:
 	Server-Side Encryption – You request Amazon S3 to encrypt your object before saving it on disks in its data centers and 
 	decrypt it when you download the objects.
@@ -3254,7 +3178,7 @@ target value for a specific metric. This policy will help resolve the over-provi
 	
 
 Simple scaling: 
-	Need to wait for the cooldown period to complete before initiating additional scaling activities. \
+	Need to wait for the cooldown period to complete before initiating additional scaling activities. 
 	
 Target tracking or step scaling policies can trigger a scaling activity immediately without waiting for the 
 cooldown period to expire.
@@ -4238,19 +4162,6 @@ the database becomes unavailable for writing for a short period of time during f
 
 
 
-
-
-S3:
-	Expedited retrievals: allow you to quickly access your data when occasional urgent requests for a subset of archives are required. 
-	For all but the largest archives (250 MB+), data accessed using Expedited retrievals are typically made available within 1–5 minutes. 
-	
-	Provisioned Capacity: ensures that retrieval capacity for Expedited retrievals is available when you need it.
-
-
-
-
-
-
 You can launch an EBS-backed EC2 instance and attach several Instance Store volumes but remember that there are some 
 EC2 Instance types that don't support this kind of setup.
 
@@ -4444,15 +4355,6 @@ EC2 Instance types can be broadly classified into five:
 
 
 UDP is not supported in Application Load Balancer. UDP is a Layer 4 traffic, use a Network Load Balancer.
-
-
-
-
-Deactivating and deleting any IAM user access key that is over 90 days:
-	Use the AWS Config managed rule to check if the IAM user access keys are not rotated within 90 days. 
-	Create an Amazon EventBridge (CloudWatch Events) rule for the non-compliant keys, and define a target to 
-	invoke a custom Lambda function to deactivate and delete the keys.
-	
 	
 	
 	
@@ -4528,24 +4430,6 @@ AWS Wavelength combines the high bandwidth and ultralow latency of 5G networks w
 developers can innovate and build a new class of applications.
 	
 	
-	
-	 
-	 
-In the event of system failure on the primary database instance, what happens to Amazon Aurora during the failover?
-	Aurora will attempt to create a new DB Instance in the same AZ as the original instance and is done on a best-effort basis.
-
-If you do not have an Amazon Aurora Replica (i.e., single instance) and are not running Aurora Serverless, 
-Aurora will attempt to create a new DB Instance in the same Availability Zone as the original instance.
-
-If you are running Aurora Serverless and the DB instance or AZ becomes unavailable, Aurora will automatically recreate the 
-DB instance in a different AZ.
-
-If you have an Amazon Aurora Replica in the same or a different Availability Zone, when failing over, 
-Amazon Aurora flips the canonical name record (CNAME) for your DB Instance to point at the healthy replica, 
-which in turn is promoted to become the new primary. 
-
-
-
 
 
 
@@ -4654,24 +4538,6 @@ Extracting and visualizing sentiments from the transcribed files:
 	Visualize the results using the OpenSearch Dashboard.
 	
 	
-	
-	
-
-EFS offers two performance modes:
-- General Purpose mode    35,000 IOPS (Default)  | it provides the lowest latency for most use cases.
-- Max I/O mode | Max I/O  500,000+ IOPS mode provides higher IOPS.
-
-EFS  offers two throughput modes:
-- Bursting Throughput (Default) |  it also you to burst above the baseline for relatively short periods of time.
-- Provisioned Throughput  | If your application consistently requires throughput above the baseline level.
-
-With Bursting Throughput mode, Amazon EFS is designed to burst to high throughput levels for periods of time.
-Provisioned Throughput mode is available for applications with high throughput to storage (MiB/s per TiB) ratios, 
-or with requirements greater than those allowed by the Bursting Throughput mode.
-
-
-
-
 
 
 Lambda execution The default timeout is 3 seconds, and minumum 1 second up to a maximum value of 15 minutes.
@@ -4688,21 +4554,6 @@ With Organizations, you can create groups of accounts, automate account creation
 Organizations enable you to centrally manage policies across multiple accounts without requiring custom scripts and manual processes. 
 It allows you to create Service Control Policies (SCPs) that centrally control AWS service use across multiple AWS accounts.
 
-
-
-
-
-
-Microsoft SQL Server RDS in-flight data between your web servers and RDS should be secured:
-	 Force all connections to your DB instance to use SSL by setting the rds.force_ssl parameter to true. 
-	 Once done, reboot your DB instance.
-	 
-	 Download the Amazon RDS Root CA certificate. Import the certificate to your servers and configure your application 
-	 to use SSL to encrypt the connection to RDS.
- 
- 
- 
- 
  
 
 
