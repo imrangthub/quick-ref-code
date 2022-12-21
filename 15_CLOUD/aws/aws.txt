@@ -5949,6 +5949,67 @@ Can be used as a boot volume:
 	
 	
 
+Permissions to list an S3 bucket and delete objects from that bucket:
+{
+    "Action": [
+        "s3:DeleteObject"
+    ],
+    "Resource": [
+        "arn:aws:s3:::example-bucket/*"
+    ],
+    "Effect": "Allow"
+}
+
+
+
+
+
+
+does not want to provide its own encryption keys but still wants to maintain an audit trail and key use by whom:
+	Use SSE-KMS to encrypt the user data on S3.
+	
+
+
+
+API Gateway creates RESTful APIs that enable stateless client-server communication and API Gateway also creates WebSocket APIs 
+that adhere to the WebSocket protocol, which enables stateful, full-duplex communication between client and server.
+
+
+
+
+Resilient architecture can adjust for the loss of any instance, therefore you should use Instance Store based EC2
+
+
+
+block access from two countries and allow access only from the home country:
+	Configure AWS WAF on the Application Load Balancer in a VPC.
+	
+ 
+ 
+RDS:
+	Multi-AZ follows synchronous replication and spans at least two Availability Zones within a single region. 
+	Read replicas follow asynchronous replication and can be within an Availability Zone, Cross-AZ, or Cross-Region.
+	
+	
+	
+
+
+
+Amazon API Gateway, Amazon SQS and Amazon Kinesis:
+	API Gateway sets a limit on a steady-state rate and a burst of request.
+	Amazon SQS offers buffer capabilities to smooth out temporary volume spikes without losing messages or increasing latency.
+	Amazon Kinesis is a fully managed, scalable service that can ingest, buffer, and process streaming data in real-time.
+	
+	
+	
+	
+
+
+Spreadsheet is saved on an EFS file system created in us-east-1 region:
+	The spreadsheet on the EFS file system can be accessed in other AWS regions by using an inter-region VPC peering connection.
+ 
+You can connect to Amazon EFS file systems from EC2 instances in other AWS regions using an inter-region VPC peering connection, 
+and from on-premises servers using an AWS VPN connection. 
 
 
 
@@ -5957,12 +6018,27 @@ Can be used as a boot volume:
 
 
 
+Regular request 100 spike touches about 5000 requests per second:
+	Amazon SNS message deliveries to AWS Lambda have crossed the account concurrency quota for Lambda, so the team needs to contact 
+	AWS support to raise the account limit.
+	
+AWS Lambda currently supports 1000 concurrent executions per AWS account per region.
+For more You need to contact AWS support to raise the account limit.
 
 
+	
+	
+
+In Order 1000 messages per second to be processed via SQS:
+	Use Amazon SQS FIFO queue in batch mode of 4 messages per operation to process the messages at the peak rate.
+	
+By default, FIFO queues support up to 300 messages per second (300 send, receive, or delete operations per second).
+4 messages per operation so that the FIFO queue can support up to 1200, max 10 for FIFO.
 
 
-
-
+	
+	
+	
 
 
 
