@@ -5798,19 +5798,199 @@ For each VPC that you want to associate with the Route 53 hosted zone, change th
 
 
 
+Users from other countries denied access to these live-streamed:
+
+Route 53 based geolocation routing policy:
+		Geolocation routing lets you choose the resources that serve your traffic based on the geographic location of your users, 
+		meaning the location that DNS queries originate from.
+		
+CloudFront web distribution:		
+		You can use georestriction, also known as geo-blocking, to prevent users in specific geographic locations from accessing 
+		content that you're distributing through a CloudFront web distribution.(whitelist /blacklist)
+		
+		
 
 
+UDP protocol and needs to support fast regional failover:
+	Global Accelerator is a good fit for non-HTTP use cases, such as gaming (UDP), IoT (MQTT), or Voice over IP, as well as for 
+	HTTP use cases that specifically require static IP addresses or deterministic, fast regional failover.
+
+Route 53 is ruled out as the company wants to continue using its own custom DNS service.
+
+
+ELB Regional, if user Global then AWS Global Accelerator, if user in same region use ALB or NLB.
+
+
+		
+		
+		
+It needs the games table to be accessible globally but needs the users and games_played tables to be regional only:		
+	For the given use-case, need to have two Aurora clusters, one for the global table (games table) 
+	and the other one for the local tables (users and games_played tables).
+
+
+
+		
+		
+		
+Need to process hot data and clod data:		
+	FSx for Lustre provides the ability to both process the 'hot data' in a parallel and distributed fashion as well as easily 
+	store the 'cold data' on Amazon S3.
+
+
+
+NFS interface=AWS Storage Gateway - File Gateway
+Lambda integrates natively with Kinesis Data Streams.
+
+		
+
+AWS KMS enforces a waiting period for delete kms key:
+	You can set the waiting period from a minimum of 7 days up to a maximum of 30 days. The default waiting period is 30 days. 
+
+
+
+
+
+
+ECS with EC2 launch type is charged based on EC2 instances and EBS volumes used. 
+ECS with Fargate launch type is charged based on vCPU and memory resources that the containerized application requests.
+
+
+
+
+
+dynamic website is hosted using on-premises servers, and its slow:
+	Use Amazon CloudFront with a custom origin pointing to the on-premises servers.
+You can use different origins for different types of content on a single site – e.g. 
+Amazon S3 for static objects, Amazon EC2 for dynamic content, and custom origins for third-party content.
+
+
+
+
+GuardDuty analyzes tens of billions of events across multiple AWS data sources, such as 
+	AWS CloudTrail events, Amazon VPC Flow Logs, and DNS logs.
+
+
+
+
+NLB is unable to detect HTTP errors for the application:
+	Replace the Network Load Balancer (NLB) with an Application Load Balancer (ALB) and configure HTTP health checks on the 
+	ALB by pointing to the URL of the application. Leverage the Auto Scaling group to replace unhealthy instances.
+
+Network Load Balancers use active and passive health checks to determine whether a target is available to handle requests. 
+With active health checks, the load balancer periodically sends a request to each registered target to check its status.
+
+By default, each load balancer node routes requests only to the healthy targets in its Availability Zone.
+
+
+
+
+
+
+S3 Standard-IA ideal for long-term storage, backups, and as a data store for disaster recovery files. 
+But, it costs more than S3 One Zone-IA because of the redundant storage across availability zones. 
+As the data is re-creatable, so you don't need to incur this additional cost.
+
+
+
+
+
+Cost of test file storage on S3 Standard < Cost of test file storage on EFS < Cost of test file storage on EBS.
+
+
+
+
+AWS Shield Advanced across multiple AWS accounts too much bill:
+	Consolidated billing has not been enabled. All the AWS accounts should fall under a single consolidated billing for 
+	the monthly fee to be charged only once.
+
+
+
+
+
+S3 Versioning:
+Once you version-enable a bucket, it can never return to an unversioned state. 
+Versioning can only be suspended once it has been enabled.
+
+
+
+hybrid cloud environment and run data-intensive analytics workloads that support DFS:
+	Amazon FSx for Windows File Server:
+	Amazon FSx supports the use of Microsoft’s Distributed File System (DFS) to organize shares into a single folder 
+	structure up to hundreds of PB in size. 
+ 
+FSx for Lustre does not support Microsoft’s Distributed File System (DFS).
+AWS Managed Microsoft AD does not support Microsoft’s Distributed File System (DFS).
+ 
+ 
+
+
+
+ElastiCache - Amazon ElastiCache for Memcached is an ideal front-end for data stores like Amazon RDS or Amazon DynamoDB, 
+providing a high-performance middle tier for applications with extremely high request rates and/or low latency requirements.
+
+
+
+
+
+Wants to delegate access to a set of users from another AWS account:
+	Create a new IAM role with the required permissions to access the resources in the production environment. 
+	The users can then assume this IAM role while accessing the resources from the production environment.
 	
 
-		
-		
-		
-		
-		
-		
-		
-		
-		
+
+
+Can be used as a boot volume:
+	General Purpose SSD (gp2)
+	Provisioned IOPS SSD (io1)
+	Instance Store
+	
+	
+	
+	
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
