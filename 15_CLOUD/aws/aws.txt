@@ -6037,11 +6037,260 @@ By default, FIFO queues support up to 300 messages per second (300 send, receive
 
 
 	
+		
+Enable storage auto-scaling for RDS MySQL
+	If your workload is unpredictable, you can enable storage autoscaling for an Amazon RDS DB instance.
+
+
+
+
+Lambda function in AWS account A that accesses an Amazon S3 bucket in AWS account B:
+	Create an IAM role for the Lambda function that grants access to the S3 bucket. 
+	Set the IAM role as the Lambda function's execution role. 
+	Make sure that the bucket policy also grants access to the Lambda function's execution role.
+	
+bucket are in different accounts, then you need to grant Amazon S3 permissions on both the IAM role and the bucket policy.
+
+
+
+	
+	
+
+replacement for the DFSR:
+	FSx for Windows
 	
 	
 
 
 
+"Statement":[
+	{
+		"Effect":"Deny",
+		"Action":"ec2:*",
+		"Resource":"*",
+		"Condition":{
+			"StringNotEquals":{
+				"ec2:Region":"us-west-1"
+			}
+		}
+	},
+	{
+		"Effect":"Allow",
+		"Action":"ec2:TerminateInstances",
+		"Resource":"*",
+		"Condition":{
+			"IpAddress":{
+				"aws:SourceIp":"10.200.200.0/24"
+			}
+		}
+	}
+]
+Users belonging to the IAM group can terminate an EC2 instance in the us-west-1 region when the user's source IP is 10.200.200.200
+
+
+
+
+
+
+Encryption key usage must be logged for auditing purposes
+Encryption Keys must be rotated every year
+The data must be encrypted at rest:
+	Server-side encryption with AWS KMS (SSE-KMS) customer master keys (CMKs) with automatic key rotation.
+	
+	
+
+
+
+EC2 instances need to access  S3 and DynamoDB:
+	Attach the appropriate IAM role to the EC2 instance profile so that the instance can access S3 and DynamoDB
+	
+	
+	
+
+Static website  scalable serverless solution:
+	Build the website as a static website hosted on Amazon S3. Create a CloudFront distribution with Amazon S3 as the origin. 
+	Use Amazon Route 53 to create an alias record that points to your CloudFront distribution.
+	
+You can't host a website on Lambda. Also, you can't have CloudFront in front of Lambda. 	
+	
+	 
+	
+
+
+
+
+
+failover environment on AWS in case the on-premises data center fails:
+	Set up a Route 53 failover record. 
+	Run application servers on EC2 instances behind an Application Load Balancer in an Auto Scaling group. 
+	Set up AWS Storage Gateway with stored volumes to back up data to S3.
+	
+	
+Storage Gateway also integrates natively with Amazon S3 cloud storage which makes your data available for in-cloud processing.
+
+
+
+
+	
+	
+Leverage Amazon Aurora MySQL with Multi-AZ Aurora Replicas and create the dev database by restoring from the 
+automated backups of Amazon Aurora.
+No performance impact or interruption of database service occurs as backup data is being written.
+
+
+
+
+
+improve the performance of its big data processing workflows running on Amazon EFS:
+	Max I/O
+Max I/O performance mode is used to scale to higher levels of aggregate throughput and operations per second. 
+Highly parallelized applications and workloads, big data analysis, media processing, and genomic analysis
+ 
+ 
+Provisioned Throughput
+Bursting Throughput
+This two throughput mode of EFS and not the performance mode.
+
+
+
+
+
+Multiple AWS accounts VPCs have been provisioned across these AWS accounts(hub-and-spoke styl):
+	Build a shared services VPC
+	
+Sharing resources from a central location instead of building them in each VPC may reduce administrative overhead and cost.	
+	
+	
+
+
+Hadoop cluster deployed in the on-premises data center highly available with about 50 EC2 instances per Availability Zone:
+	Partition placement group
+This strategy is typically used by large distributed and replicated workloads, such as Hadoop, Cassandra, and Kafka. 
+
+Cluster placement group
+low-latency network performance necessary for tightly-coupled node-to-node communication that is typical of HPC applications. 
+This is not suited for distributed and replicated workloads such as Hadoop.
+
+Spread placement group
+Spread – strictly places a small group of instances across distinct underlying hardware to reduce correlated failures. 
+This is not suited for distributed and replicated workloads such as Hadoop.
+
+
+
+
+
+User loging see different file on there upload file:
+Write a one time job to copy the videos from all EBS volumes to S3 and then modify the application to use Amazon S3 standard for storing the videos
+Mount EFS on all EC2 instances. Write a one time job to copy the videos from all EBS volumes to EFS. Modify the application to use EFS for storing the videos
+
+
+
+
+
+it needs 80 instances 80% of the time and spike need 300 ec2:
+Purchase 80 reserved instances. Provision additional on-demand and spot instances per the workload demand (Use Auto Scaling Group with launch template to provision the mix of on-demand and spot instances)
+
+
+
+user level as well as account-level access permissions for the data stored in S3 buckets:
+	Use Amazon S3 Bucket Policies
+	
+Bucket policies in Amazon S3 can be used to add or deny permissions across some or all of the objects within a single bucket. 
+Policies can be attached to users, groups, or Amazon S3 buckets, enabling centralized management of permissions. 
+With bucket policies, you can grant users within your AWS Account or other AWS Accounts access to your Amazon S3 resources.
+
+
+	
+	
+minimize the application boostrap time whenever the system needs to be stopped and then started:
+	Use EC2 Instance Hibernate
+	
+Creating an AMI may help with all the system dependencies, but it won't help us with speeding up the application start time.
+
+
+
+
+Prevent granting themselves the AdministratorAccess:	
+	For each developer, define an IAM permission boundary that will restrict the managed policies they can attach to themselves.
+If you consider this option, since AWS Organizations is not mentioned in this question, so we can't apply an SCP.
+
+
+
+
+	
+	
+S3 Data encrypted and decrypted using the same key in both AWS regions:
+	Create a new S3 bucket in the us-east-1 region with replication enabled from this new bucket into another bucket in us-west-1 region. 
+	Enable SSE-KMS encryption on the new bucket in us-east-1 region by using an AWS KMS multi-region key. 
+	Copy the existing data from the current S3 bucket in us-east-1 region into this new S3 bucket in us-east-1 region.
+	
+	
+	
+	
+
+You can use CloudWatch Alarms to send an email via SNS whenever any of the EC2 instances breaches a certain threshold.
+
+
+
+
+RDS read replicas data transfer charge:
+	There are no data transfer charges for replicating data within the same Availability Zone
+	There are no data transfer charges for replicating data within the same AWS Region
+	There are a data transfer charges for replicating data across AWS Regions
+
+
+
+
+
+
+less frequently accessed files on AWS that can be concurrently accessed by hundreds of EC2 instances:
+	Amazon Elastic File System (EFS) Standard–IA storage class 
+The EFS Standard storage class is used for frequently accessed files.
+	
+	
+	
+	
+
+decouple the user authentication process for the application:
+	Use Cognito Authentication via Cognito User Pools for your Application Load Balancer.
+Amazon Cognito identity pools provide temporary AWS credentials for users who are guests (unauthenticated) and for users 
+who have been authenticated and received a token.
+	
+You cannot directly integrate Cognito User Pools with CloudFront distribution as you have to create a separate Lambda@Edge 
+function to accomplish the authentication via Cognito User Pools. This involves additional development effort, 
+so this option is not the best fit for the given use-case.
+
+
+
+
+
+
+2 Hour The solution for the workload should be able to withstand server failures:
+	Run the workload on a Spot Fleet
+	
+Only spot fleets can maintain target capacity by launching replacement instances after Spot Instances in the fleet are terminated, 
+so spot instances, by themselves, are not the right fit for this use-case.
+
+
+
+	
+	
+App slow down for loading on another region(eu-west-1):
+	Setup another fleet of EC2 instances for the web tier in the eu-west-1 region. Enable latency routing policy in Route 53. 
+	Create Amazon Aurora read replicas in the eu-west-1 region 
+	
+	
+
+
+
+The auditor has its own AWS account and needs its own copy of the RDS:
+	Create an encrypted snapshot of the database, share the snapshot, and allow access to the AWS Key Management Service (AWS KMS) encryption key
+	
+You can share AWS KMS CMKs with another AWS account by adding the other account to the AWS KMS key policy.
+
+
+
+Configure an AWS DataSync agent on the on-premises server that has access to the NFS file system. Transfer data over the Direct Connect connection to an AWS PrivateLink interface VPC endpoint for Amazon EFS by using a private VIF. Set up a DataSync scheduled task to send the video files to the EFS file system every 24 hours
 
 
 
@@ -6049,6 +6298,11 @@ By default, FIFO queues support up to 300 messages per second (300 send, receive
 
 
 
+DNS queries for the private hosted zone remain unresolved:
+	Enable DNS hostnames and DNS resolution for private hosted zones.
+	
+DNS hostnames: For non-default virtual private clouds that aren't created using the Amazon VPC wizard, this option is disabled by default. 	
+DNS resolution: Private hosted zones accept DNS queries only from a VPC DNS server.	
 
 
 
@@ -6056,8 +6310,56 @@ By default, FIFO queues support up to 300 messages per second (300 send, receive
 
 
 
+Linux iles will be stored and accessed frequently at first, and then infrequently:
+	EFS IA
+EFS IA for the file that not accessed every day, with storage prices up to 92% lower compared to Amazon EFS Standard.
 
 
+
+
+
+
+Aurora multi-master DB cluster:
+	For applications where you can't afford even brief downtime for database write operations, a multi-master cluster can help to 
+	avoid an outage when a writer instance becomes unavailable.
+
+	
+	
+	
+
+
+EBS change this default behavior to ensure that the volume persists even after the instance terminates:
+Set the DeleteOnTermination attribute to false
+
+
+
+
+
+
+
+Server-Side Encryption with Amazon S3-Managed Keys (SSE-S3) - 
+	When you use Server-Side Encryption with Amazon S3-Managed Keys (SSE-S3), each object is encrypted with a unique key. 
+	As an additional safeguard, it encrypts the key itself with a master key that it regularly rotates.
+
+	
+Server-Side Encryption with Customer-Provided Keys (SSE-C)-	
+	For the given use-case, the company wants to manage the encryption keys via its custom application and let S3 manage the encryption, 
+	therefore you must use Server-Side Encryption with Customer-Provided Keys (SSE-C)
+
+Server-Side Encryption with Customer Master Keys (CMKs) Stored in AWS Key Management Service (SSE-KMS) -
+	Server-Side Encryption with Customer Master Keys (CMKs) stored in AWS Key Management Service (SSE-KMS) is similar to SSE-S3. 
+	SSE-KMS provides you with an audit trail that shows when your CMK was used and by whom. 
+	Additionally, you can create and manage customer-managed CMKs or use AWS managed CMKs that are unique to you, your service, 
+	and your Region.
+
+
+Client-Side Encryption with data encryption is done on the client-side before sending it to Amazon S3 - 
+	You can encrypt the data client-side and upload the encrypted data to Amazon S3. In this case, you manage the encryption process, 
+	the encryption keys, and related tools.
+
+
+
+ 
 
 
 
