@@ -6361,12 +6361,344 @@ Client-Side Encryption with data encryption is done on the client-side before se
 
  
 
+CORRECT for AMIs:
+	You can copy an AMI across AWS Regions.
+	You can share an AMI with another AWS account.
+	Copying an AMI backed by an encrypted snapshot cannot result in an unencrypted target snapshot.(encrypted-to-unencrypted = NO)
+
+
+
+
+For AWS Managed IPSec VPN Connection between:
+	Create a Virtual Private Gateway on the AWS side of the VPN and a Customer Gateway on the on-premises side of the VPN.
+	
+	
+	
+AWS DataSync fully automates and accelerates moving large active datasets to AWS, up to 10 times faster than command-line tools. 
+It is natively integrated with Amazon S3, Amazon EFS, Amazon FSx for Windows File Server, Amazon CloudWatch, and AWS CloudTrail.
+	
+The AWS Transfer Family provides fully managed support for file transfers directly into and out of Amazon S3 and Amazon EFS. 
+Therefore, it cannot support migration into the other AWS storage services mentioned in the given use-case 
+(Amazon FSx for Windows File Server).
+
+
+
+RDS  read replicas should lag no more than 1 second behind the primary instance to provide the best possible user experience:
+	Set up database migration from RDS MySQL to Aurora MySQL. Swap out the MySQL read replicas with Aurora Replicas. 
+	Configure Aurora Auto Scaling.
+
+Auror The replica lag times are in the 10s of milliseconds.
+
+
+
+
+
+For multiple High Performance Computing (HPC) workflows:
+	Elastic Fabric Adapter (EFA)
+An Elastic Fabric Adapter (EFA) is a network device that you can attach to your Amazon EC2 instance to accelerate 
+High Performance Computing (HPC) and machine learning applications.
+
+Elastic Network Interface - An Elastic Network Interface (ENI) is a logical networking component in a 
+VPC that represents a virtual network card,insufficient for HPC workflows.
+
+Elastic Network Adapter - Elastic Network Adapter (ENA) devices support enhanced networking via single root I/O virtualization 
+(SR-IOV) to provide high-performance networking capabilities.
+Still EFA is a better fit for the given use-case because the EFA device provides all the functionality of an ENA device, plus OS bypass.
+
+Enable enhanced networking with the Elastic Network Adapter (ENA) on Windows.
 
 
 
 
 
 
+
+Network Load Balancer (NLB) to handle millions of requests per second, instances in a public subnet and IDs as the targets for the NLB:
+	Traffic is routed to instances using the primary private IP address specified in the primary network interface for the instance.
+So elastic IP address or public IP address cannot be used to route the traffic to the instance.
+
+
+
+
+
+
+VPC peering facilitates a connection between two VPCs within the AWS network, therefore this option cannot be used to 
+send and receive data between the remote branch offices of the company.
+Use VPN CloudHub for connect multiple remote office branch.
+
+
+
+
+
+
+Three AZ with public and provate subnet:
+	Set up three NAT gateways, one in each public subnet in each AZ. Create a custom route table for each AZ that 
+	forwards non-local traffic to the NAT gateway in its AZ.
+	
+	
+
+
+Real-time processing with manage service:
+Use Amazon Kinesis Data Streams to ingest the data, process it using AWS Lambda or run analytics using Kinesis Data Analytics.
+
+
+
+
+
+ElastiCache:
+	Use ElastiCache to improve latency and throughput for read-heavy application workloads.
+	Use ElastiCache to improve the performance of compute-intensive workloads.
+
+Amazon ElastiCache can be used to significantly improve latency and throughput for many read-heavy application workloads 
+(such as social networking, gaming, media sharing, leaderboard, and Q&A portals) or 
+compute-intensive workloads (such as a recommendation engine) by allowing you to store the objects that are often read in the cache.
+
+
+
+
+
+The database rollover will archive:
+	Schedule a weekly EventBridge event cron expression to invoke a Lambda function that runs the database rollover job.
+	
+	
+	
+
+
+NAT instance supports port forwarding.
+NAT instance can be used as a bastion server.
+Security Groups can be associated with a NAT instance.
+
+
+
+
+SQS FIFO queue:
+	Delete the existing standard queue and recreate it as a FIFO queue
+	Make sure that the name of the FIFO queue ends with the .fifo suffix
+	Make sure that the throughput for the target FIFO queue does not exceed 3,000 messages per second
+
+
+
+
+DynamoDB table. As soon as the issue is detected, the team needs to remove the corrupted:
+	Use DynamoDB point in time recovery to restore the table to the state just before corrupted data was written.
+	
+	
+	
+
+
+complex with too many ALBs in multiple AWS Regions firewall need to reduce IP:
+	Launch AWS Global Accelerator and create endpoints for all the Regions. 
+	Register the ALBs of each Region to the corresponding endpoints.
+	
+	
+	
+	
+EBS:
+	Provisioned IOPS SSD (io1)
+	50 IOPS/GB to a maximum of 64,000 IOPS and provide up to 1,000 MB/s of throughput per volume.
+
+	General Purpose SSD (gp2) -
+	 It supports max IOPS/Volume of 16,000.
+
+	Cold HDD (sc1) IOPS/Volume of 250.
+
+	Throughput Optimized HDD (st1) It supports max IOPS/Volume of 500.
+
+
+
+
+Therefore, you cannot use an Internet Gateway ID as the custom source for the inbound rule.
+
+
+
+
+
+
+Amazon FSx for Windows File Server - Amazon FSx for Windows File Server is a fully managed, highly reliable file storage 
+that is accessible over the industry-standard Server Message Block (SMB) protocol.
+
+File Gateway Configuration of AWS Storage Gateway - Depending on the use case, Storage Gateway provides 3 types of storage 
+interfaces for on-premises applications: File, Volume, and Tape. 
+The File Gateway enables you to store and retrieve objects in Amazon S3 using file protocols such as Network 
+File System (NFS) and Server Message Block (SMB).
+
+
+
+
+wants a solution that can handle complex database configurations such as secondary indexes, foreign keys, and stored procedures:
+	AWS Schema Conversion Tool
+	AWS Database Migration Service
+
+
+
+
+
+Use Amazon GuardDuty to monitor any malicious activity on data stored in S3. 
+Use Amazon Macie to identify any sensitive data stored on S3.
+
+
+
+
+
+
+
+Use AZ ID to uniquely identify the Availability Zones across the two AWS Accounts:
+if you share a subnet in the Availability Zone with the AZ ID usw2-az2 with another account, this subnet is available to 
+that account in the Availability Zone whose AZ ID is also usw2-az2.
+
+
+
+
+application will be accessed by users from different geographic regions of the world,  latency for a great user experience:
+Use Amazon S3 for hosting the web application and use S3 Transfer Acceleration to reduce the latency that geographically 
+dispersed users might face.
+
+
+
+
+
+
+
+
+Single AWS Acc multiple VPC need to connect:
+	VPc Peering.
+You can create a VPC peering connection between your own VPCs, or with a VPC in another AWS account. 
+The VPCs can be in different regions (also known as an inter-region VPC peering connection). VPC Peering helps connect two VPC.
+
+
+
+
+
+
+Kinesis will be great for event streaming from the IoT devices, for sending notifications SNS.
+
+
+
+
+CloudFront:
+	CloudFront can route to multiple origins based on the content type
+	Use an origin group with primary and secondary origins to configure CloudFront for high availability and failover.
+	Use field level encryption in CloudFront to protect sensitive data for specific content.
+	
+	
+	
+	
+	
+	
+	
+You can host multiple TLS secured applications, each with its own TLS certificate, behind a single load balancer. 
+Use SSL certificates with SNI	
+	
+	
+	
+
+maximum possible availability for the database layer while minimizing operational and management overhead:	
+Migrate the data to Amazon RDS for SQL Server database in a Multi-AZ deployment
+Amazon RDS supports Multi-AZ deployments for Microsoft SQL Server by using either SQL Server Database Mirroring (DBM) or Always On Availability Groups (AGs). 
+	
+	
+	
+	
+	
+	
+For dister recovery currently takes over 45 minutes to install on a Linux system:
+		Create an AMI after installing the software and copy the AMI across all Regions. 
+		Use this Region-specific AMI to run the recovery process in the respective Regions.
+		
+		
+AWS does not copy launch permissions, user-defined tags, or Amazon S3 bucket permissions from the source AMI to the new AMI. 
+After the copy operation is complete, you can apply launch permissions, user-defined tags, and Amazon S3 bucket
+ permissions to the new AMI.
+
+
+
+
+Check S3 buckets settings being changed regularly:
+	Use CloudTrail to analyze API calls
+	
+	
+	
+	
+Improve the VPN throughpu:
+	Create a transit gateway with equal cost multipath routing and add additional VPN tunnels.
+ 
+ 
+ 
+		
+RDS specific best practices are incorporated into a reusable infrastructure template to be used by all your AWS users:
+	Use CloudFormation to manage RDS databases.
+	
+ AWS CloudFormation allows you to use programming languages or a simple text file to model and provision, 
+ in an automated and secure manner, all the resources needed for your applications across all regions and accounts. 
+
+
+
+ 
+	
+highly available cost-effect:
+	Set the minimum capacity to 2
+	Use Reserved Instances for the minimum capacity
+	
+	
+	
+	
+Leverage Amazon Kinesis Data Streams to capture the data from the website and feed it into Amazon Kinesis Data Analytics which can query the data in real time. Lastly, the analyzed feed is output into Kinesis Data Firehose to persist the data on Amazon S3
+
+
+
+
+EC2 instance and the EBS volume are under-utilized:	
+		Convert the Amazon EC2 instance EBS volume to gp2 .
+
+Therefore, gp2 is the right choice as it is more cost-effective than io1, and it also allows a burst in performance when needed.
+
+
+
+
+Amazon EventBridge is recommended when you want to build an application that reacts to events from SaaS applications and/or AWS services. 
+Amazon EventBridge is the only event-based service that integrates directly with third-party SaaS partners.
+SNS also even driven but does not support third-party (SaaS) services integration.
+
+
+
+	
+The IAM service supports only one type of resource-based policy called a role Trust policy, which is attached to an IAM role.
+
+
+
+
+
+dynamically alter the size of a geographic area from which traffic is routed to a specific server resource:	
+	Geoproximity routing - Geoproximity routing lets Amazon Route 53 route traffic to your resources based on the geographic location of your users and your resources. You can also optionally choose to route more traffic or less to a given resource by specifying a value, known as a bias.
+	
+	
+	
+	
+	
+	
+EC2 take huse time to run, make it lessthen 2 miute:
+		Create a Golden AMI with the static installation components already setup
+	    Use EC2 user data to customize the dynamic installation parts at boot time
+	
+	
+	
+	
+Opt for Multi-AZ configuration with automatic failover functionality to help mitigate failure - Multi-AZ is the best option when data retention, minimal downtime, and application performance are a priority.
+
+Data-loss potential - Low. Multi-AZ provides fault tolerance for every scenario, including hardware-related issues.
+
+
+
+
+VPCs and on-premises networks through a central hub:	
+	Use AWS Transit Gateway to connect the Amazon VPCs to the on-premises networks .
+	
+	
+	
+	
+	
+	
+	
 
 
 
