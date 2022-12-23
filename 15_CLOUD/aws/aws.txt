@@ -6695,10 +6695,269 @@ VPCs and on-premises networks through a central hub:
 	
 	
 	
+
+(ELB) in a Region malfunctioned:
+	Set up AWS Global Accelerator and add endpoints to cater to users in different geographic locations.
+	
+	
+	
+
+HIPAA compliant in-memory database that supports SQL query:
+	ElastiCache for Redis/Memcached
+Both ElastiCache for Redis and ElastiCache for Memcached are HIPAA Eligible.	
 	
 	
 	
 	
+No IAM user with AdministratorAccess:
+	Some of the AWS tasks that only a root account user can do are as follows: change account name or 
+	root password or root email address, change AWS support plan, close AWS account, enable MFA on S3 bucket delete, 
+	create Cloudfront key pair, register for GovCloud. 
+
+
+	
+RDS primary instance of the Multi-AZ configuration goes down:	
+		When failing over, Amazon RDS simply flips the canonical name record (CNAME) for your DB instance to point at the standby, 
+		which is in turn promoted to become the new primary. 
+	
+Amazon RDS uses several different technologies to provide failover support. 
+Multi-AZ deployments for MariaDB, MySQL, Oracle, and PostgreSQL DB instances use Amazon's failover technology. 
+SQL Server DB instances use SQL Server Database Mirroring (DBM) or Always On Availability Groups (AGs).
+
+
+	
+	
+Then, the instance has to be manually restarted, for auto:
+		Setup a CloudWatch alarm to monitor the health status of the instance. In case of an Instance Health Check failure, 
+		an EC2 Reboot CloudWatch Alarm Action can be used to reboot the instance.
+		
+Using Amazon CloudWatch alarm actions, you can create alarms that automatically stop, terminate, reboot, or recover your EC2 instances. 		
+		
+		
+		
+historical data (any data older than a year) into S3, as the daily analytical reports:	
+		Use Redshift Spectrum to create Redshift cluster tables pointing to the underlying historical data in S3. 
+		The analytics team can then query this historical data to cross-reference with the daily reports from Redshift.
+		
+		
+		
+Ultiple test databases that must be re-created from production Aurora data.		
+		Use database cloning to create multiple clones of the production DB and use each clone as a test DB.
+		
+		
+		
+high IOPS. The team wants to install the database on an EC2 instance with the optimal storage type:		
+Amazon EC2 with EBS volume of Provisioned IOPS SSD (io1) type
+
+
+
+S3 low transfrer speed offices in remote location:
+			Use Amazon CloudFront distribution with origin as the S3 bucket. 
+			This would speed up uploads as well as downloads for the video files.
+			Enable Amazon S3 Transfer Acceleration for the S3 bucket. This would speed up uploads as well as downloads for the video files.
+			
+			
+A process replaces an existing object and immediately tries to read it. Amazon S3 always returns the latest version of the object.
+
+
+directed to a static error page, configured as a backup, in case of unavailability of the primary website:
+Set up a Route 53 active-passive type of failover routing policy. If Route 53 health check determines the ALB endpoint as unhealthy, the traffic will be diverted to a static error page, hosted on Amazon S3 bucket
+
+Metadata, which can be included with the object, is not encrypted while being stored on Amazon S3. Therefore, AWS recommends that customers not place sensitive information in Amazon S3 metadata.
+
+
+
+wants to continue using their existing encryption key generation mechanism:
+	SSE-C - With Server-Side Encryption with Customer-Provided Keys (SSE-C), you manage the encryption keys and Amazon 
+	S3 manages the encryption.
+	
+Only Standard SQS queue is allowed as an Amazon S3 event notification destination, whereas FIFO SQS queue is not allowed.	
+	
+	
+
+
+implement a distributed in-memory cache-based session management solution:
+	Amazon ElastiCache can be used as a distributed in-memory cache for session management. 
+	
+	
+	
+high-performance IOPS when doing file processing in a temporary storag:
+	Use EC2 instances with Instance Store as the storage type
+	
+	
+	
+best practices on cost optimization, performance, and security for their system:	
+	AWS Trusted Advisor
+	
+	
+VPCs in a hub and spoke model:	
+		Use a transit gateway to interconnect the VPCs.
+		
+		
+DynamoDB encryption details are nowhere in CloudTrails:
+	By default, all DynamoDB tables are encrypted under an AWS owned customer master key (CMK), 
+	which do not write to CloudTrail logs.All DynamoDB tables are encrypted. There is no option to enable or disable encryption for new or existing tables.
+	
+	
+	
+flexible nightly process which runs for 1 hour using Python:
+	Run on a Spot Instance with Spot Block
+
+Spot Instances with a defined duration (also known as Spot blocks) are designed not to be interrupted and will run continuously 
+for the duration you select. This makes them ideal for jobs that take a finite time to complete, 
+such as batch processing, encoding and rendering, modeling and analysis, and continuous integration.
+
+
+
+ELB cannot distribute incoming traffic for targets deployed in different regions. 
+
+
+ 
+Create an S3 Event Notification that sends a message to an SQS queue. Make the EC2 instances read from the SQS queue.
+
+ 
+		
+EFs access control such that only the permitted EC2:	
+	Use VPC security groups to control the network traffic to and from your file system
+	Use an IAM policy to control access for clients who can mount your file system with the required permissions
+You control which EC2 instances can access your EFS file system by using VPC security group rules and AWS Identity and 
+Access Management (IAM) policies. Use VPC security groups to control the network traffic to and from your file system. 
+
+
+
+Set up an on-premises file gateway. Configure data sources to write the .json files to the file gateway. 
+Point the legacy analytics application to the file gateway. The file gateway should replicate the .json files to Amazon S3.
+
+When you stop, hibernate, or terminate an instance, every block of storage in the instance store is reset.
+
+
+
+automatically recover from the failure of an AZ:
+	Create an auto-scaling group that spans across 2 AZ, which min=1, max=1, desired=1
+	Assign an EC2 Instance Role to perform the necessary API calls
+	Create an Elastic IP and use the EC2 user-data script to attach it	
+	
+So we have an ASG with desired=1, across two AZ, so that if an instance goes down, it is automatically recreated in another AZ.
+
+
+
+Dynamic port mapping with an Application Load Balancer makes it easier to run multiple tasks on the same 
+Amazon ECS service on an Amazon ECS cluster.
+
+
+encrypted using the company's proprietary algorithm:
+	Client Side Encryption
+
+
+
+Provisioned IOPS SSD EBS volumes - Amazon EBS Multi-Attach enables you to attach a single Provisioned IOPS SSD (io1 or io2) 
+volume to multiple instances that are in the same Availability Zone. 
+
+General-purpose SSD-based EBS volumes not supported for Multi-Attach functionality.
+
+
+
+
+ElastiCache for Redis supports replication and archival snapshots right out of the box. 
+ElastiCache for Memcached does not support replication and archival snapshots, so this option is ruled out.	
+	
+	
+	
+Not able to modify AWS CloudTrail configuration:	
+		Set up a service control policy (SCP) that prohibits changes to CloudTrail, and attach it to the developer accounts.
+		
+		
+IOPS on the EBS volume is maxing out. The disk size of the database must not change because of a licensing issue:		
+		Convert the gp2 volume to an io1
+The only solution is to convert the volume into an io1 volume. 
+This will allow us to keep the same disk size while independently increasing the IOPS for that volume.
+		
+		
+		
+	
+	
+Using SQS as a middleware will help us sustain the write throughput scale infinitely.	
+Kinesis Data Streams cannot scale infinitely and we may have the same throughput issues. 	
+	
+	
+	
+	
+S3 bucket through CloudFront and not directly:	
+	Create an origin access identity (OAI) and update the S3 Bucket Policy
+	
+	
+High levels of inter-node communications and HPC:
+	Deploy EC2 instances with Elastic Fabric Adapter
+	Deploy EC2 instances in a cluster placement group
+	
+	
+When you modify the database engine for your DB instance in a Multi-AZ deployment, then Amazon RDS upgrades both the primary and secondary DB instances at the same time. In this case, the database engine for the entire Multi-AZ deployment is shut down during the upgrade.
+
+
+Create a separate gateway endpoint for S3 and DynamoDB each. Add two new target entries for these two gateway endpoints in the route table of the custom VPC
+
+
+
+Create two SQS standard queues: one for pro and one for lite. 
+Set up EC2 instances to prioritize polling for the pro queue over the lite queue.
+
+
+
+Aurora Serverless is the perfect way to create a database that can scale down to 0 servers, 
+and scale up to many servers, as an OLTP database.
+
+
+
+
+
+	
+archive the on-premises data into a POSIX and accessed for just about a week in a year.:
+	EFS Infrequent Access
+S3 not POSIX compliant file storage solution. 	
+	
+
+
+required application response times while accounting for any traffic spikes:
+	Leverage horizontal scaling for the web and application tiers by using Auto Scaling groups and Application Load Balancer.
+	
+	
+	
+
+EC2 instance needs to access a DynamoDB table in the same AWS account:
+	Set up an IAM service role with the appropriate permissions to allow access to the DynamoDB table. Configure an instance profile to assign this IAM role to the EC2 instance
+	
+	
+	
+high-frequency reading and writing:
+	Use Amazon EFS with Provisioned Throughput mode
+	
+	
+	
+
+A Big Data company wants to optimize its daily Extract-Transform-Load (ETL) process serverless:
+	AWS Glue - AWS Glue provides a managed ETL service that runs on a serverless Apache Spark environment.
+	
+	
+	
+	
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
