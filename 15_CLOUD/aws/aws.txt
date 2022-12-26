@@ -1,13 +1,20 @@
 #################################################
 #                 AWS                          #
 #################################################
-https://twitter.com/i/status/1576389331484545024
+
 =>sudo chmod 777 -R destinationFolder/*
 Allow ec2 file permission
 
 =>/mnt/efs/fs1
 MetadataURL is http://169.254.169.254/latest/meta-data
   
+SSM
+================================================
+=>aws ssm get-parameters-by-path --path /myapp/prod/ --recursive
+=>aws ssm get-parameters-by-path --path /myapp/prod/ 
+=>aws ssm get-parameters --name /myapp/prod/db-url /myapp/prod/db-pass
+=>aws ssm get-parameters --name /myapp/prod/db-url /myapp/prod/db-pass --with-decryption
+
 	  
 #!/bin/bash
 yum update -y
@@ -62,13 +69,6 @@ Amongst the new topics you'll learn about in this update:
 -Many AWS Machine Learning services
 
 
-
-SSM
-================================================
-=>aws ssm get-parameters-by-path --path /myapp/prod/ --recursive
-=>aws ssm get-parameters-by-path --path /myapp/prod/ 
-=>aws ssm get-parameters --name /myapp/prod/db-url /myapp/prod/db-pass
-=>aws ssm get-parameters --name /myapp/prod/db-url /myapp/prod/db-pass --with-decryption
 
 
 =================================================
@@ -348,7 +348,7 @@ Analytics Service
 	AWS Lake Formation - Set up Data Lakes quickly
 Application Integration Services
 	Step Functions - Serverless Function Orchestration
-	AppFlow - Integrate 3rd party app data,  securely transfer data between SaaS applications like 
+	AppFlow - Integrate 3rd party app data and aws,  securely transfer data between SaaS applications like 
 	          Salesforce, SAP, Zendesk, Slack, and ServiceNow, and AWS services like Amazon S3 and  Redshift.
 	EventBridge - Serverless Event Bus
 	MQ - Message Broker Service for Apache/Rabbit MQ
@@ -377,12 +377,11 @@ One AWS account(or use) that want to communicate the resources in another accoun
 	VPC endpoint service
 	Transit Gateway
 	
-AWS DataSync:Copy Data correctly(Move data at onech).
+AWS DataSync:Copy Data correctly(Move data at onces).
 	AWS DataSync is a secure, online service that automates and accelerates moving data between 
-	on premises and AWS Storage services. 
+	on premises and AWS Storage services or aws service to aws service. 
 
-DataSync can copy data between NFS shares,SMB shares, Hadoop Distributed File Systems (HDFS), 
-self-managed object storage, 
+DataSync can copy data between NFS shares,SMB shares, Hadoop Distributed File Systems (HDFS), self-managed object storage, 
 Snowcone, S3 buckets,EFS file systems, FSx for Windows,FSx for Lustre, FSz for OpenZFS, 
 and FSx for NetApp ONTAP file systems.
 
@@ -400,7 +399,6 @@ cloud and on-premises setups.
 AWS Storage Gateway:
 	AWS Storage Gateway provides a virtual storage device that stores data in the cloud 
 	(on S3, Glacier, FSx, etc). Think of it as a cloud-backed H: drive with unlimited storage.
-
 
 AWS Direct Connec:
 	AWS Direct Connect links your office or data center to AWS via fiber. It's for high-speed, 
@@ -429,20 +427,18 @@ You cannot use AWS Site-to-Site VPN to integrate data files via the NFS interfac
 #Storage pricing | cost 
 =================================================
 
-	
-EFS:
--------------------------------------------------
-Serverless Elastic File System. for Linux Only.
-Amazon EFS, you pay only for the resources that you use. 
-The EFS Standard Storage pricing is $0.30 per GB per month. 
-
-
 
 EBS:
 -------------------------------------------------
 EBS General Purpose SSD (gp2) volumes, the charges are $0.10 per GB-month of provisioned storage. 
 Provisioned storage of 100GB for this use-case, the monthly cost on EBS is $0.10*100 = $10. 
 
+	
+EFS:
+-------------------------------------------------
+Serverless Elastic File System. for Linux Only.
+Amazon EFS, you pay only for the resources that you use. 
+The EFS Standard Storage pricing is $0.30 per GB per month. 
 
 
 S3:
@@ -479,7 +475,8 @@ Application Load Balancer or Network Load Balancer to manage your resources.
 You can't enable termination protection for Spot Instances.
 
 
-Network Firewall cannot directly integrate with the Application Load Balancer.
+Network Firewall cannot directly integrate with the Application Load Balancer, it working on VPC.
+You can filter network traffic at the perimeter of your VPC using AWS Network Firewall.
 AWS WAF straightforward way of integrating with an ALB but not Network Firewall with an ALB.
 
 
@@ -505,8 +502,6 @@ VPC Egress-Only  for IPv6:
 	Launch the EC2 instance to a private subnet and attach an Egress-Only 
 	Internet Gateway to the VPC to allow outbound IPv6 communication to the internet. 
 	Use AWS Network Firewall to set up the required rules for traffic inspection and traffic filtering.
-	
-	
 	
 Internet Gateway does not limit or control any outgoing IPv6 connection.
 NAT Gateway is only applicable for IPv4, not IPv6. 
@@ -569,8 +564,7 @@ How ALB prevent SQL injection attacks:
 
 
 
-AWS Network Firewall is a managed service that makes it easy to deploy essential 
-	network protections for all of your VPCs.
+AWS Network Firewall is a managed service that makes it easy to deploy essential network protections for all of your VPCs.
 
 
 
@@ -611,7 +605,7 @@ Provisioned capacity ensures that your retrieval capacity for expedited retrieva
 
 
 Collect and process the application log files:
-Amazon S3 for storing the application log files and Elastic MapReduce(EMR) for processing the log files.
+	Amazon S3 for storing the application log files and Elastic MapReduce(EMR) for processing the log files.
 
 
 
@@ -621,9 +615,6 @@ Fastest storage option with high I/O Performance for the temporary files:
 
 RAID (Redundant Array of Independent Disks) is just a data storage virtualization technology 
 that combines multiple storage devices to achieve higher performance or data durability.
-
-RAID 0 configuration enables you to improve your storage volumes’ performance 
-by distributing the I/O across the volumes in a stripe. 
 	
 This configuration can be implemented on both EBS or InstanceStore volumes. 
 
@@ -700,10 +691,7 @@ Memory Optimized Instances:
 
 EMR(Big Data Frameworks) previously called Amazon Elastic MapReduce:
 	Amazon EMR is a managed cluster platform that simplifies running big data frameworks, such as 
-	Apache Hadoop and Apache Spark, on AWS to process and analyze vast amounts of data.
-	
-By using these frameworks and related open-source projects, such as Apache Hive and Apache Pig, 
-you can process data for analytics purposes and business intelligence workloads. 
+	Apache Hadoop and Apache Spark, on AWS to process and analyze vast amounts of data. 
 Additionally, you can use Amazon EMR to transform and move large amounts of data into and out 
 of other AWS data stores and databases.
 
@@ -765,7 +753,6 @@ RDS Notification:
 
 AWS Artifact:
 	Use AWS Artifact to view the security reports as well as other AWS compliance-related information.
-	AWS Artifact is your go-to, central resource for compliance-related information that matters to you. 
 	It provides on-demand access to AWS’ security and compliance reports and select online agreements. 
 	
 Reports available in AWS Artifact include our Service Organization Control (SOC) reports, 
@@ -781,7 +768,7 @@ Nondisclosure Agreement (NDA).
 Create an Amazon S3 bucket with encryption enabled:
 	Launch an AWS Transfer for SFTP endpoint to securely upload files to the S3 bucket. 
 	Configure an S3 lifecycle rule to delete files after a month.
-	There is no retention policy option on AWS Transfer for SFTP.
+There is no retention policy option on AWS Transfer for SFTP.
 
 
 
@@ -794,21 +781,14 @@ AWS Control Tower (Multiple AWS accounts):
 
 
 
-ParallelCluster @(open-source cluster management tool):
+ParallelCluster (open-source cluster management tool):
 	AWS ParallelCluster is simply an AWS-supported open-source cluster management tool that makes it easy 
 	for you to deploy and manage High-Performance Computing (HPC) clusters on AWS.
 
 
 
-AWS Proton @(“infrastructure as code” templates):
-	AWS Proton allows you to deploy any serverless or container-based application with 
-	increased efficiency, consistency, and control. 
-	You can define infrastructure standards and effective continuous delivery pipelines for your organization. 
-	Proton breaks down the infrastructure into environment and service.
 
-
-
-Filter policies in SNS @(SNS Queue Filter):
+Filter policies in SNS (SNS Queue Filter):
 	Create one Amazon SNS topic and configure the Amazon SQS queues to subscribe to the SNS topic. 
 	Set the filter policies in the SNS subscriptions to publish the message to the 
 	designated SQS queue based on its quote request type.
@@ -816,8 +796,7 @@ Filter policies in SNS @(SNS Queue Filter):
 
 
 
-
-AWS Organizations and AD @(IAMIdentityCenter):
+AWS Organizations and ADConnector (IAMIdentityCenter):
 	On the master account, use AWS Organizations to create a new organization with all features turned on. 
 	Invite the child accounts to this new organization.
 	Configure AWS IAM Identity Center (AWS Single Sign-On) for the organization 
@@ -835,7 +814,7 @@ User->OnPermDirectoryService(MS AD)->ActiveDirectoryConnector(ADTrust)->AWS IAMI
 
 
 
-DynamoDB and AWS Backup: @(backups to another AWS account for disaster recovery):
+DynamoDB and AWS Backup: (backups to another AWS account for disaster recovery):
 	Create a DynamoDB gateway endpoint. Associate the endpoint to the appropriate route table. 
 	Use AWS Backup to automatically copy the on-demand DynamoDB backups to another AWS account for disaster recovery.
 
@@ -843,9 +822,7 @@ DynamoDB and AWS Backup: @(backups to another AWS account for disaster recovery)
 	particular point in time in a different AWS account.
 
 DynamoDB on-demand backups cannot be copied to a different account or Region. 
-
 To create backup copies across AWS accounts and Regions and for other advanced features, use AWS Backup.
-
 Auto Scaling is not enabled in a DynamoDB table which is created using the AWS CLI.
 
 
@@ -941,8 +918,6 @@ EBS volumes live configuration Change:
 
  
 SQS and Amazon Simple Workflow Service (SWF) services for decoupled architecture in AWS. 
-You can’t create a VPC peering for your on-premises network and AWS VPC.
-
 
 
 
@@ -976,10 +951,9 @@ KMS is primarily used for encryption and not for hosting your credentials.
 
 
 
-SQS @(retention period ):
+SQS (retention period ):
 	In Amazon SQS, you can configure the message retention period to a value from 1 minute to 14 days. 
 	Default is 4 days. Once the message retention limit is reached, messages are automatically deleted.
-
 
 
 
@@ -991,15 +965,6 @@ Amazon Kinesis Data Firehose is the easiest way to load streaming data into data
 It can capture, transform, and load streaming data into Amazon S3, Amazon Redshift, Amazon Elasticsearch Service, 
 and Splunk, enabling near real-time analytics with existing business intelligence tools and dashboards you are already using today.
 
-
-
-
-
-Amazon Redshift(data warehouse):
-	Amazon Redshift is a fast( near real-time), scalable data warehouse that makes it simple and cost-effective 
-	to analyze all your data across your data warehouse and data lake. 
-	Redshift delivers ten times faster performance than other data warehouses by using machine learning, 
-	massively parallel query execution, and columnar storage on a high-performance disk.
 
 
 
@@ -1029,7 +994,6 @@ ELB LogProcessing with EMR:
 
 
 The “Trust Relationship” policy simply defines which Principals can Assume the IAM Role and under which conditions.
-
 
 
 

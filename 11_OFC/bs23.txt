@@ -17,23 +17,6 @@ Skype:mdimran.bs23@gmail.com
 https://bs23.talentlms.com
 
 
-Server Deployment
-==========================================
-=>ps -fC java
-=>netstat -tulpn
-=>kill -9 34071
-=>tail -f nohup.out
-
---server.port=8888
---spring.profiles.active=dev-bl
---spring.cloud.config.uri=192.168.1.2:9091 
---CONFIG_SERVER=configserver:http://172.16.8.132:7085
---spring.cloud.config.uri=http://localhost:7185
---eureka.client.serviceUrl.defaultZone=http://192.168.1.2:7082/eureka/
-
-http://172.16.8.132:7085/
-
-
 
 
 
@@ -68,8 +51,8 @@ Ticket: 20 Nov, 2022
 1)Technical discussion              5hr   ->8
 2)Feature Delivery                  80%   ->85%
 3)Code Review                       4hr   ->6
-4)UAT & QA feedback                 16hr   ->24
-5)Operational and DevOps Activity   8hr   ->8
+4)UAT & QA feedback                 16hr   ->10
+5)Operational and DevOps Activity   8hr   ->16
 
 
 
@@ -77,21 +60,24 @@ Ticket: 20 Nov, 2022
 
 
 
+=================================================
+#APIHUB | Banglalink                                 
+================================================= 
 
-Problem Solving Mode (1 Hour)	
+Server Deployment
+==========================================
+=>ps -fC java
+=>ps -ef | grep otp
+=>netstat -tulpn
+=>kill -9 34071
+=>tail -f nohup.out
 
-	1)Unsettled inquiry for development status, repoting.
-	2)Instant feature development result. 	
-	3)Rush development requirment.
-
-
-Problem cultural:
-	1)Breaking sprint planning for high priority requirment.
-	2)DevOps issue, Server Paching and Deployment activity (Weekday or day after another)
- 
-
-
-
+--server.port=8888
+--spring.profiles.active=dev-bl
+--spring.cloud.config.uri=192.168.1.2:9091 
+--CONFIG_SERVER=configserver:http://172.16.8.132:7085
+--spring.cloud.config.uri=http://localhost:7185
+--eureka.client.serviceUrl.defaultZone=http://192.168.1.2:7082/eureka/
 
 
 
@@ -107,16 +93,13 @@ neir-zipkin-server
 
 OPENAPI- SERVICES
 -------------------
-openapi-otp
-openapi-iris
 openapi-edge-gateway
 openapi-discovery-eureka
+
+openapi-otp
+openapi-iris
 openapi-provisioning
 openapi-evservice
-
-Token base security implement for all business services, Both openapi and neir. 
-Technology uses: Spring Boot, Spring Security,OAuth2, JWT and Keycloak as IDP server.  
-
 
 
 
@@ -132,19 +115,6 @@ Technology uses: Spring Boot, Spring Security,OAuth2, JWT and Keycloak as IDP se
 =>./standalone.sh
 Test from the keycloak app bin folder
 => nohup ./standalone.sh -b=0.0.0.0 &
-
-
-
-=================================================
-#    PROJECT |  BANK | UCBL                                          
-================================================= 
-
-Add Jar to Class Pom:
------------------------------------------------
-mvn install:install-file -Dfile=ojdbc6-11.2.0.4.jar -DgroupId=com.oracle -DartifactId=ojdbc6 -Dversion=11.2.0.4 -Dpackaging=jar
-mvn install:install-file -Dfile=ojdbc6-11.2.0.jar -DgroupId=com.oracle -DartifactId=ojdbc6 -Dversion=11.2.0 -Dpackaging=jar
-
-
 
 
 =================================================
@@ -286,4 +256,33 @@ Minwise RTT @ Specific Hours:
 
 To Get Max TPS @Specific Second:
 	 grep "2022:17" /app/apihub/Nginx_LB/logs/logarchive/access.log.141122| awk '{print $3}'|cut -d "[" -f 2|awk '{print $1}'|sort|uniq --repeated --count|awk '{ if (max<$1){ max=$1; tm=$2 }}END {print max,tm}'
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+=================================================
+#    PROJECT |  BANK | UCBL                                          
+================================================= 
+
+Add Jar to Class Pom:
+-----------------------------------------------
+mvn install:install-file -Dfile=ojdbc6-11.2.0.4.jar -DgroupId=com.oracle -DartifactId=ojdbc6 -Dversion=11.2.0.4 -Dpackaging=jar
+mvn install:install-file -Dfile=ojdbc6-11.2.0.jar -DgroupId=com.oracle -DartifactId=ojdbc6 -Dversion=11.2.0 -Dpackaging=jar
+
+
 
