@@ -1044,16 +1044,10 @@ AWS and On-Permiss Dedicated connection (With multi AWS acc):
 	Set up a Transit Gateway between AWS accounts and associate it with the Direct Connect gateway.
 
 VPC peering is not supported in a Direct Connect connection. VPC peering does not support transitive peering relationships.
- 
 VPN connection traverses the public Internet and doesn’t use a dedicated connection.
 
 
 
-
-CloudFront Origin Access Identity (OAI) a feature ensures that  CloudFront can serve S3 content.
- 
- 
- 
 
 By default Network ACLs allow all inbound and outbound traffic.
 By default Security group includes an outbound rule that allows all outbound traffic, no inbound rules. 
@@ -1092,7 +1086,8 @@ S3 supports 3 destinations where it can publish events:
 	1. SNS topic
 	2. SQS queue
 	3. AWS Lambda
-
+CloudFront Origin Access Identity (OAI) a feature ensures that  CloudFront can serve S3 content.
+ 
 
 
 
@@ -1174,7 +1169,7 @@ S3 decrypted by the Lambda function call:
 
 
 
-The /32 denotes one IP address, and the /0 refers to the entire network.
+The /32 denotes one IP address, and the /0 refers to the entire subnet network.
 
 
 
@@ -1193,10 +1188,9 @@ CloudFormation template:
 	Configure a CreationPolicy attribute to the instance in the CloudFormation template. 
 	Send a success signal after the applications are installed and configured using the cfn-signal helper script.
 
-	UpdatePolicy attribute is primarily used for updating resources and for stack update rollback operations.
-	
-	UpdateReplacePolicy attribute is primarily used to retain or in some cases, back up the existing physical instance 
-	of a resource when it is replaced during a stack update operation.
+UpdatePolicy attribute is primarily used for updating resources and for stack update rollback operations.
+UpdateReplacePolicy attribute is primarily used to retain or in some cases, back up the existing physical instance 
+of a resource when it is replaced during a stack update operation.
 
 
 
@@ -1244,8 +1238,8 @@ Secrets Manager Parameter vs Systems Manager Parameter:
 
 
 You can’t have an Amazon S3 managed encryption key(SSE-S3) for client-side encryption.
-– Set up Client-Side Encryption with a customer master key stored in AWS Key Management Service (AWS KMS).
-– Set up Client-Side Encryption using a client-side master key.
+	– Set up Client-Side Encryption with a customer master key stored in AWS Key Management Service (AWS KMS).
+	– Set up Client-Side Encryption using a client-side master key.
 
 
 
@@ -1311,12 +1305,6 @@ CloudWatch Alarms only monitor service metrics, not changes in DynamoDB table da
 
 
 
-Log file processing:
-	S3 for storing the application log files and Amazon Elastic MapReduce(EMR | big data frameworks) for processing the log files.
-
-
-
-
 SQS:
 	Amazon (Default setting)SQS queue no order mentain of message as send or receive and 
 	SQS does not guarantee that no duplicates will be sent.
@@ -1339,7 +1327,7 @@ It is not suitable for collecting data from distributed sources such as users, I
 Hundred of EC2 instances Log Process:
 	Install the Unified CloudWatch Logs agent in each instance which will automatically collect and push 
 	data to CloudWatch Logs. Analyze the log data using CloudWatch Logs Insights.
-	CloudWatch Logs Insights enables you to interactively search and analyze your log data in Amazon CloudWatch Logs. 
+CloudWatch Logs Insights enables you to interactively search and analyze your log data in Amazon CloudWatch Logs. 
 
 
 
@@ -1683,11 +1671,7 @@ If ACM is not available in your region, use AWS CLI to upload your third-party c
 Audit Trail for SSE-KMS Key Uses:
 	Envelope encryption, Encryption with AWS KMS-Managed Keys (SSE-KMS).
 
-	Customer-Provided Keys (SSE-C),Amazon S3-Managed Keys (SSE-S3): these two do not provide you with an audit trail 
-	that shows when your CMK was used and by whom, unlike Server-Side Encryption with AWS KMS-Managed Keys (SSE-KMS).
-
-
-
+	Customer-Provided Keys (SSE-C),Amazon S3-Managed Keys (SSE-S3): these two do not provide you with an audit trail.
 
 
 
@@ -1780,7 +1764,7 @@ RDS vs Aurora:
 Virtual Desktops:
 	VPN connection to connect the VPC and your on-premises network. 
 	Second, you need AWS Directory Services to integrate with your on-premises Active Directory and a
-	Amazon Workspace to create the needed virtual desktops in your VPC.
+	Amazon WorkSpace to create the needed virtual desktops in your VPC.
 
 
 
@@ -1889,6 +1873,7 @@ Aurora will automatically recreate the DB instance in a different AZ.
 If you do not have an Amazon Aurora Replica (i.e., single instance) and are not running Aurora Serverless, 
 Aurora will attempt to create a new DB Instance in the same Availability Zone as the original instance. 
 
+
 For Single instance, no read repllica, Aurora will first attempt to create a new DB Instance in the same Availability Zone 
 as the original instance. If unable to do so, Aurora will attempt to create a new DB Instance in a 
 different Availability Zone and not the other way around.
@@ -1962,7 +1947,7 @@ Launch a new Amazon S3 bucket to store existing and new records.
 Enable AWS CloudTrail with Data Events and Amazon S3 Object Lock in the bucket.
 
 Amazon Storage Gateway:
-	File Gateway (NFS)
+	File Gateway (NFS/SMB)
 	Volume Gateway (iSCSI)
 	Tape Gateway (VTL)
 
@@ -2049,11 +2034,11 @@ The template uses an AWS Lambda function that runs once every 24 hours.
 
 
 Trusted Advisor:
-	The AWS Trusted Advisor Service limit publishes- service limits metric to CloudWatch; 
+	The AWS Trusted Advisor Service limit publishes service limits metric to CloudWatch; 
 	thus, you can configure an alarm and send a notification to Amazon SNS. 
 
-	You can also create an AWS Lambda function to read data from specific Trusted Advisor checks. 
-	A Lambda function invocation can be scheduled using AWS EventBridge (Amazon CloudWatch Events) to automated the process.
+You can also create an AWS Lambda function to read data from specific Trusted Advisor checks. 
+A Lambda function invocation can be scheduled using AWS EventBridge (Amazon CloudWatch Events) to automated the process.
 
 
 
@@ -2205,9 +2190,6 @@ Messages are processed within a specific time period:
 	Use a AMI to set up an Auto Scaling group and configure a target tracking scaling policy based on the
 	SQS ApproximateAgeOfOldestMessage metric.
 
-CPUUtilization metric is not meant for time-sensitive messages where you need to ensure that the messages are processed 
-within a specific time period.
-
 The ApproximateAgeOfOldestMessage metric is useful when applications have time-sensitive messages and you need to ensure 
 that messages are processed within a specific time period. 
 
@@ -2218,7 +2200,6 @@ that messages are processed within a specific time period.
 Due to S3 data volume, most queries take a long time to complete:
 	Transform the JSON data into Apache Parque format. 
 	Ensure that the user has an lakeformation:GetDataAccess IAM permission for underlying data access control.
-
 
 
 
@@ -2262,8 +2243,9 @@ ElasticBeanstalk, where does it store the application files and server log files
 
 CloudFront app Hig availability:The scenario uses an EC2 instance as an origin or CloudFront. 
 	Provision two EC2 instances deployed in different Availability Zones and configure them to be part of an origin group.
-	To achieve high availability in an EC2 instance, we need to deploy the instances in two or more Availability Zones. 
-	You also need to configure the instances to be part of the origin group to ensure that the application is highly available.
+To achieve high availability in an EC2 instance, we need to deploy the instances in two or more Availability Zones. 
+You also need to configure the instances to be part of the origin group to ensure that the application is highly available.
+
 
 
 
@@ -2517,11 +2499,6 @@ There are two throughput modes to choose from for your file system:
 
 Bursting Throughput mode won’t be able to sustain the constant demand of the global application. 
 Need  Provisioned Throughput mode.
-
-
-	
-	
-	
 	
 Cannot directly set a DynamoDB table as a container mount point:
 	In the first place, DynamoDB is a database and not a file system which means that it can’t be “mounted” to a server.
@@ -2677,23 +2654,23 @@ Flow logs are using VPC, not on specific EC2 instance.
 
 
 AWS Server-Side Encryption:
-	SSE-s3			=> Auto key rotates, No Audit trails show.
+	SSE-S3			=> Auto key rotates, No Audit trails show.
 	SSE-KMS(CMKs)   => Auto key rotates, Protecton access, Audit trails show.
 	SSE-C           => Auto key rotates, No Audit trails show.
 	
 	
 	
 	
-Queue Message cant be duplicates tolerate:
+Queue Message can not duplicates tolerate:
 	Use SQS FIFO or SWF (Simple Work Flow Services)
+	
 Altering Visibility timeout of SQS not guarantee message duplication.
 
 
 
 
 Highly Scalable system with cost-effective:
-	use AutoScaling SQS and EC2 for highly scalable distrubute system.
-	
+	AutoScaling SQS and EC2 for highly scalable distrubute system.
 	
 	
 	
@@ -2754,7 +2731,7 @@ RDS synchronously replicates the data to a standby instance in different AZ in s
 HPC, Natively workign with S3, POSIX interface=>FSx for Luster.
 EFS, EBS, FSx for Windows: Not working with S3 easy way.
 
-EFS=>NFS
+EFS=>NFS/SMB
 FSx for Win=>SMB
 
 
@@ -2811,10 +2788,15 @@ Multiple Site-to-Site VPN connection slow for VPC and remote Network suring peak
 AWS transit Gateway enable you to scale the IPsec VPN throughput with equal-cost multi-pah ECMP routing support over 
 multple VPN Tunnels.
 
+A virtual private gateway is the VPN endpoint on the Amazon side of your Site-to-Site VPN connection 
+that can be attached to a single VPC at a time.
 
-At a time A VPC can only have have a single virtual private gateway attached to it, No multiple VPG not allow. 1 VPC = 1VPG
+At a time A VPC can only have a single virtual private gateway attached to it, No multiple VPG not allow. 1 VPC = 1VPG
 Maximum tunnel for a VPC connection is two by limit.
 
+
+ 
+ 
 
 
 
@@ -3013,6 +2995,7 @@ Detailed Monitoring for EC2. Detailed monitoring delivers metrics in 1-minute in
 
 
 
+
 Handel Unpredictable transactional workload and autoscales capacity and peak load scales DB:
 	Lunch and Autora Serverless DB cluster then set the minumum and maximum capacity for the cluster.
 	
@@ -3035,9 +3018,6 @@ Both historical record and frequently data are store on on-permises storage syst
 
 Storage Gateway mainly prividing low-latency access to data by caching frequently acc data on-premises and Archive data on Cloud Storage.
 Storage Gateway optimizes data transfer to AWS by sending only change data and compressing data.
-
-
-
 
 
 
@@ -3270,8 +3250,8 @@ EBS:
 EFS:
 	Multiple Amazon EC2 instances can access an Amazon EFS file system at the same time, allowing Amazon EFS to provide a common 
 	data source for workloads and applications running on more than one Amazon EC2 instance.
-EFS only supports Linux workloads.
 
+EFS only supports Linux workloads.
 Amazon EFS provides two modes of throughput: Provisioned and Bursting. 
 EFS provides two classes of storage: One Zone and Standard. EFS Lifecycle.
 
@@ -3485,7 +3465,7 @@ You can think of a file gateway as a file system mount on S3.
 
 AWS Storage Gateway supports S3 Standard, S3 Standard-IA, S3 One Zone-IA and Amazon Glacier storage classes.
 
-
+AWS Storage Gateway File Gateway offers SMB or NFS-based access to data in Amazon S3 with local caching.
 
 
 
@@ -3643,6 +3623,7 @@ User has to manage the infrastructure that runs the workflow logic and tasks.
 
 If you require external signals (deciders) to intervene in your processes, or you would like to launch child processes that 
 return a result to a parent, then you should consider Amazon SWF.
+Need to manager underline infrastructure.
 
 
 
@@ -3671,11 +3652,9 @@ Architect has decided to move the historical records to AWS :
 	Use AWS DataSync to move the historical records from on-premises to AWS. Choose Amazon S3 Glacier Deep Archive to be the 
 	destination for the data.
 
-
 Getting started with DataSync is easy: deploy the DataSync agent, connect it to your file system, select your AWS storage resources, 
 and start moving data between them. You pay only for the data you move(online).
 You can use DataSync to migrate active data sets or archives to AWS.
-
 
 Amazon Managed Service for Prometheus is a Prometheus-compatible monitoring and alerting service. 
 This service makes it easy for you to monitor containerized applications and infrastructure at scale but not stream live feeds.
@@ -3707,7 +3686,6 @@ Create an Amazon EMR cluster and store the processed data in Amazon RedShift.
 	Amazon EMR is a managed cluster platform that simplifies running big data frameworks, such as Apache Hadoop and Apache Spark, on 
 	AWS to process and analyze vast amounts of data. 
 
-
 	Amazon Redshift is the most widely used cloud data warehouse. 
 	It makes it fast, simple and cost-effective to analyze all your data using standard SQL and your existing 
 	Business Intelligence (BI) tools.
@@ -3734,9 +3712,6 @@ MySQL database that needs to be replicated in Amazon S3 as CSV file:
 Compliance requirements in these two locations, you want the Japanese users to connect to the servers in the 
 ap-northeast-1 Asia Pacific (Tokyo) region, while the Swedish users should be connected to the servers in the eu-west-1 EU (Ireland).
 	Use Route 53 Geolocation Routing policy.
-	
-
-
 
 Route 53 Weighted Routing policy:
 		It just lets you associate multiple resources with a single domain name (tutorialsdojo.com) or 
@@ -3778,7 +3753,7 @@ AWS account.
 
 
 
-(Simple Email Service) SES is a cloud-based email sending service designed to send notifications and transactional emails.
+Simple Email Service- SES is a cloud-based email sending service designed to send notifications and transactional emails.
 Use SNS instead of SES  when you want to monitor your EC2 instances.	
 	
 	
@@ -3822,6 +3797,7 @@ DNS failover to a static website:
 
 
 
+
 Automated backup of all of the EBS Volumes for your EC2:
 	 Use Amazon Data Lifecycle Manager (Amazon DLM) to automate the creation of EBS snapshots.
 
@@ -3846,9 +3822,7 @@ A Gateway Load Balancer operates as a Layer 3 Gateway and a Layer 4 Load Balanci
 
 Huge amounts of data and perform quick and flexible queries on it:
 	Amazon RedShift
-
 You can use Redshift to analyze all your data using standard SQL and your existing Business Intelligence (BI) tools. 
-
 
 Amazon Athena can be used to access the information from the file resided over S3 by creating a table on top of it.
 
@@ -3941,7 +3915,6 @@ comply with your desired configurations and learn which specific resources are n
 
 AWS Trusted Advisor only provides best practice recommendations. It cannot define rules for your AWS resources.
 
-
 CloudTrail can track changes and store a history of what happened to your resources, this service still cannot enforce rules 
 to comply with your organization's policies.
 
@@ -3967,7 +3940,6 @@ Application takes several minutes to become fully operational:
 
 While the instance is in hibernation, you pay only for the EBS volumes and Elastic IP Addresses attached to it; there are 
 no other hourly charges (just like any other stopped instance).
-
 
 CloudEndure Migration is just a highly automated lift-and-shift (rehost) solution that simplifies, expedites, 
 and reduces the cost of migrating applications to AWS. 
@@ -4078,8 +4050,6 @@ S3 is composed of buckets, object keys, object metadata, object tags, and many o
  
 
 
-
-	 
 Ensure that the required components are properly running before the CloudFormation stack creation proceeds:
 	Configure a CreationPolicy attribute to the instance in the CloudFormation template. 
 	Send a success signal after the applications are installed and configured using the cfn-signal helper script.
@@ -4117,11 +4087,11 @@ Amazon Aurora DB cluster to Autora serverless:
 AWS Database Migration Service helps you migrate your databases to AWS with virtually no downtime. 
 You can set up a DMS task for either one-time migration or ongoing replication. 
 
-
 Take a snapshot involves a long period of downtime since you have to stop the application until the new cluster is created.
 
 Add an Aurora Replica to the cluster and set its instance class to Serverless,While this method is valid, 
 the database becomes unavailable for writing for a short period of time during failover.
+
 
 
 
@@ -4225,8 +4195,7 @@ Use Server-Side Encryption with Customer-Provided Keys (SSE-C):
 	You manage the encryption keys and Amazon S3 manages the encryption, as it writes to disks, and decryption when you access 
 	your objects.
 
-
-SSE-S3 and SSE	-C do not provide  audit trail that shows when your Key was used and by whom,unlike SSE-KMS.
+SSE-S3 and SSE-C do not provide  audit trail that shows when your Key was used and by whom,unlike SSE-KMS.
 	 
 	 
 	 
@@ -4517,6 +4486,10 @@ With Organizations, you can create groups of accounts, automate account creation
 
 Organizations enable you to centrally manage policies across multiple accounts without requiring custom scripts and manual processes. 
 It allows you to create Service Control Policies (SCPs) that centrally control AWS service use across multiple AWS accounts.
+
+
+
+
 
 
 
