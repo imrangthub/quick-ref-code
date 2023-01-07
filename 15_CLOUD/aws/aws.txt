@@ -7018,6 +7018,65 @@ Track the migration of each application to the cloud:
 
 
 
+you cannot set a priority to individual items in the SQS queue.
+	Create an SQS queue for free members and another one for premium members. Configure your EC2 instances to consume messages from the premium queue first and if it is empty, poll from the free members' SQS queue.
+
+
+
+unable to remove or modify any rules in AWS Config:
+	This solution just monitors changes on AWS Config rules; it does not restrict permissions,  use SCP.
+	
+
+SCP can only be attached to the organization root, to an organizational unit (OU), or directly to an account, but not directly in the IAM User. Take note that the scenario explicitly mentioned that the company is using a single AWS account and not multiple AWS Accounts under a single AWS Organization.
+
+
+
+DynamoDB Auto Scaling uses the AWS Application Auto Scaling service to dynamically adjust provisioned throughput capacity on your behalf.
+
+
+“ingest and analyze the data in real-time” and “millisecond response times”:
+	Amazon Kinesis Data Streams and DynamoDB, Amazon DynamoDB since it supports single-digit millisecond response times at any scale.
+Redshift only delivers sub-second response times.
+
+
+
+By using Docker with Elastic Beanstalk, you have an infrastructure that automatically handles the details of capacity provisioning, load balancing, scaling, and application health monitoring. You can manage your web application in an environment that supports the range of services that are integrated with Elastic Beanstalk, including but not limited to VPC, RDS, and IAM.
+
+CloudFormation templates, you will be the one responsible for connecting the AWS resources needed to build your application environment. With ElasticBeanstalk, all you have to do is upload your code; ElasticBeanstalk will automatically set up the environment for your application.
+
+
+Use On-Demand Capacity Reservations, which provide compute capacity that is always available on the specified recurring schedule.
+
+
+reduce the number of IP addresses:
+	Use AWS Global Accelerator and create an endpoint group for each AWS Region. Associate the Application Load Balancer from each region to the corresponding endpoint group.
+
+
+
+
+RDS Read Replicas can only provide asynchronous replication in seconds and not in milliseconds. You have to use Amazon Aurora replicas in this scenario
+
+
+
+S3 Glacier Bulk retrievals typically complete within 5 – 12 hours. 
+
+
+developers won’t be able to launch new instances once the licenses are exhausted:
+	Define licensing rules on AWS License Manager to track and control license usage. Enable the option to “Enforce license limit” to prevent going over the number of allocated licenses. Add an Amazon SNS topic to send notifications and alerts.
+
+AWS License Manager is a service that makes it easier for you to manage your software licenses from software vendors (for example, Microsoft, SAP, Oracle, and IBM) centrally across AWS and your on-premises environments. This provides control and visibility into the usage of your licenses, enabling you to limit licensing overages and reduce the risk of non-compliance and misreporting.
+
+
+The AWS Organizations service neither has the capability to build a landing zone nor a built-in dashboard for continuous detection of policy non-conformance and non-compliant resources across the enterprise. se AWS Control Tower.
+
+
+
+
+Configuring Server-Side Encryption with Customer-Provided Keys (SSE-C) and configuring Server-Side Encryption with Amazon S3-Managed Keys (SSE-S3) are both incorrect. Although you can configure automatic key rotation, these two do not provide you with an audit trail that shows when your CMK was used and by whom, unlike Server-Side Encryption with AWS KMS-Managed Keys (SSE-KMS).
+
+
+
+
 
 
 
