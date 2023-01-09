@@ -7078,6 +7078,298 @@ Configuring Server-Side Encryption with Customer-Provided Keys (SSE-C) and confi
 
 
 
+CloudFront You can use different origins for different types of content on a single site – e.g. Amazon S3 for static objects, Amazon EC2 for dynamic content, and custom origins for third-party conten.
+
+
+
+
+Faster Regional Failover:
+	Global Accelerator improves performance for a wide range of applications over TCP or UDP by proxying packets at the edge to applications running in one or more AWS Regions.
+
+Route 53 is ruled out as the company wants to continue using its own custom DNS service.
+
+
+
+
+Use an Amazon Aurora Global Database for the games table and use Amazon Aurora for the users and games_played tables
+Amazon Aurora Global Database is designed for globally distributed applications, allowing a single Amazon Aurora database to span multiple AWS regions. 
+
+
+Aurora Global Database:
+	Global Database allows a single Amazon Aurora database to span multiple AWS regions, enabling high performance of globally distributed applications.
+	
+	RDS, Multi region, single master, promary +cross region read replica.
+	Active-Passive, Replica can promoted to primary wihtin 1 munute.
+	 
+DynamoDB global table:
+	When you create a DynamoDB global table, it consists of multiple replica tables (one per AWS Region) that DynamoDB treats as a single unit. Every replica has the same table name and the same primary key schema. When an application writes data to a replica table in one Region, DynamoDB propagates the write to the other replica tables in the other AWS Regions automatically.
+    
+	NoSQL, Mult-region, .Mult-master.
+	Active-Active, High availability, sub-millisecond.
+	
+	
+
+
+GuardDuty service:
+	Disable the service in the general settings, to delete all data.
+	Suspend the service in the general settings stop emediat services.
+
+
+
+
+Ingest the data in Kinesis Data Firehose and use an intermediary Lambda function to filter and transform the incoming stream before the output is dumped on S3.
+	Kinesis Data Streams cannot directly write the output to S3. Unlike Firehose.
+	Kinesis Data Analytics cannot directly ingest data from the source as it ingests data either from Kinesis Data Streams or Kinesis Data Firehose.
+
+ 
+Firehose cannot directly write into a DynamoDB table, so this option is incorrect.
+
+
+FSx for Lustre provides the ability to both process the 'hot data' in a parallel and distributed fashion as well as easily store the 'cold data' on Amazon S3. 
+
+
+
+
+EC2 with ALB and CloudFront decouple the user authentication process :
+	Use Cognito Authentication via Cognito User Pools for your Application Load Balancer.
+	
+Application-specific user authentication can be provided via Cognito User Pools. Amazon Cognito identity pools provide temporary AWS credentials for users who are guests (unauthenticated) and for users who have been authenticated and received a token.
+
+You cannot directly integrate Cognito User Pools with CloudFront distribution as you have to create a separate Lambda@Edge function to accomplish the authentication via Cognito User Pools. This involves additional development effort.
+
+You cannot use Cognito Identity Pools for managing user authentication, so this option is not correct.
+
+
+
+
+workload, running for about 2 hours,  should be able to withstand server failures:
+ Only spot fleets can maintain target capacity by launching replacement instances after Spot Instances in the fleet are terminated, so spot instances, by themselves, are not the right fit for this use-case.
+
+
+Amazon Elastic File System (Amazon EFS) provides a simple, scalable, fully managed elastic NFS file system for use with AWS Cloud services and on-premises resources.
+
+
+
+
+{
+   "Version":"2012-10-17",
+   "Statement":[
+      {
+         "Effect":"Allow",
+         "Action":[
+            "s3:ListBucket"
+         ],
+         "Resource":"arn:aws:s3:::mybucket"
+      },
+      {
+         "Effect":"Allow",
+         "Action":[
+            "s3:GetObject"
+         ],
+         "Resource":"arn:aws:s3:::mybucket/*"
+      }
+   ]
+}
+IAM policies provides read-only access to the S3 bucket mybucket and its content:
+
+
+
+
+Notify 30 days before the certificate expiration (least amount of scripting and maintenance effort):
+	Leverage AWS Config managed rule to check if any third-party SSL/TLS certificates imported into ACM are marked for expiration within 30 days. Configure the rule to trigger an SNS notification to the security team if any certificate expires within 30 days
+
+AWS Config managed rule can check if any ACM certificates in your account are marked for expiration within the specified number of days.
+
+Amazon CloudWatch metrics and Amazon EventBridge events are enabled for all certificates that are managed by ACM.
+EventBridge expiry event is published for any certificate that is at least 45 days away from expiry by default. 
+
+It is certainly possible to use the days to expiry CloudWatch metric to build a CloudWatch alarm to monitor the imported ACM certificates. The alarm will, in turn, trigger a notification to the security team. But this option needs more configuration effort than directly using the AWS Config managed rule that is available off-the-shelf.
+
+SSL/TLS certificates created via ACM do not need any monitoring/intervention for expiration. ACM automatically renews such certificates. 
+
+
+
+
+Write a one time job to copy the videos from all EBS volumes to S3 and then modify the application to use Amazon S3 standard for storing the videos.
+
+Mount EFS on all EC2 instances. Write a one time job to copy the videos from all EBS volumes to EFS. Modify the application to use EFS for storing the videos.
+
+
+
+
+DB cannot afford any downtime:
+	Set up an Aurora multi-master DB cluster.
+For applications where you can't afford even brief downtime for database write operations, a multi-master cluster can help to avoid an outage when a writer instance becomes unavailable. The multi-master cluster doesn't use the failover mechanism, because it doesn't need to promote another DB instance to have read/write capability.	
+	
+
+Aurora serverless DB cluster
+Aurora provisioned DB cluster
+Aurora Global Database cluster
+These three options represent Aurora single-master clusters, there is a brief downtime during this failover.
+
+
+
+
+Log processed in a serverless fashion and then durably stored:
+	Kinesis Data Firehose
+
+Using an EMR cluster would imply managing the underlying infrastructure so it’s ruled out.
+Amazon Kinesis Data Streams, As it requires manual administration of shards.
+
+
+
+
+Multiple account in a single region all EC2 instances in all these accounts can communicate privately:
+	Create a VPC in an account and share one or more of its subnets with the other accounts using Resource Access Manager.
+	
+You can share AWS Transit Gateways, Subnets, AWS License Manager configurations, and Amazon Route 53 Resolver rules resources with RAM. RAM eliminates the need to create duplicate resources in multiple accounts.
+
+With Multple Account VPC peering connections will work, but won't efficiently scale if you add more accounts (you'll have to create many connections).
+Transit Gateway is a service that enables customers to connect their Amazon Virtual Private Clouds (VPCs) and their on-premises networks to a single gateway. A Transit Gateway will work but will be an expensive solution	
+
+
+
+
+SCP:
+	If a user or role has an IAM permission policy that grants access to an action that is either not allowed or explicitly denied by the applicable SCPs, the user or role can't perform that action.
+
+	SCPs affect all users and roles in attached accounts, including the root user.
+
+	SCPs do not affect service-linked role.
+
+SCP can restrictions even override the administrators of member accounts and all user and role in the organization.
+
+
+
+
+CNAME:
+	app.covid19survey.com to app.covid19survey.net
+	
+ALIES: 
+	covid19survey.com to www.covid19survey.com
+	
+	
+	
+DNS queries for any resources in the on-premises network from the AWS VPC:
+	Create an inbound endpoint on Route 53 Resolver and then DNS resolvers on the on-premises network can forward DNS queries to Route 53 Resolver via this endpoint.
+
+	Create an outbound endpoint on Route 53 Resolver and then Route 53 Resolver can conditionally forward queries to resolvers on the on-premises network via this endpoint.
+	
+	
+
+Continuously replicate this data to ReadShift without Manage Infrastructure:
+	Use AWS Database Migration Service to replicate the data from different databases into Amazon Redshift.
+
+	AWS Glue involves significant development efforts.	
+	Using EMR involves significant infrastructure management efforts.	
+
+
+
+
+WAF can apply to protect http and https req:
+
+Application Load Balancer
+Amazon CloudFront distribution
+Amazon API Gateway REST API
+AWS AppSync GraphQL API
+Amazon Cognito user pool
+
+Security Group cannot be associated with a CloudFront distribution, use AWS WAF ACL and use an IP match condition.
+
+
+
+
+
+RDS for MySQL and PostgreSQL For a failover, read replicas have to be manually promoted to a standalone database instance since the process is not automatic. Hence, the RTO will be quite high
+
+DynamoDB global tables provide cross-region active-active capabilities with high performance no failover concept.
+DynamoDB global tables is a much costlier solution than Aurora Global Database.
+
+
+Database rollovers for a MySQL database server using a serverless cron job:
+Weekly database rollovers for a MySQL database, Python script take 5mm:
+	Schedule a weekly EventBridge event cron expression to invoke a Lambda function that runs the database rollover job.
+	
+
+
+
+Use VPC sharing to share one or more subnets with other AWS accounts belonging to the same parent organization from AWS Organizations.
+
+VPC sharing (part of Resource Access Manager) allows multiple AWS accounts to create their application resources such as EC2 instances, RDS databases, Redshift clusters, and Lambda functions, into shared and centrally-managed Amazon Virtual Private Clouds (VPCs).
+
+account that owns the VPC (owner) shares one or more subnets with other accounts (participants) that belong to the same organization from AWS Organizations. After a subnet is shared, the participants can view, create, modify, and delete their application resources in the subnets shared with them.
+
+AWS owner account cannot share the VPC itself with another AWS account
+
+
+
+
+Storage Gateway provides 3 types of storage interfaces for on-premises applications: 
+	File, Volume, and Tape. 
+The File Gateway enables you to store and retrieve objects in Amazon S3 using file protocols such as Network File System (NFS) and Server Message Block (SMB).
+
+EBS does not support SMB protocol.
+S3 does not support SMB protocol.
+EFS uses the Network File System protocol. EFS does not support SMB protocol.
+
+
+
+Spot Instances with a defined duration (also known as Spot blocks) are designed not to be interrupted 
+duration of 1, 2, 3, 4, 5, or 6 hours.
+
+
+
+
+Capture the clickstream events from the source and then provide a concurrent feed of the data stream to the downstream applications:
+	AWS Kinesis Data Streams
+	
+Amazon Kinesis Data Streams is recommended when you need the ability for multiple applications to consume the same stream concurrently. For example, you have one application that updates a real-time dashboard and another application that archives data to Amazon Redshift. You want both applications to consume data from the same stream concurrently and independently.	
+
+KDS provides the ability for multiple applications to consume the same stream concurrently.
+
+Kinesis Data Firehose is used to load streaming data into data stores, therefore this option is incorrect.
+Kinesis Data Analytics is used to build SQL queries and sophisticated Java applications, therefore this option is incorrect.
+SQS, you cannot have the same message being consumed by multiple consumers at the same time.
+
+
+
+AWS DataSync is an online data transfer service that simplifies, automates, and accelerates copying large amounts of data to and from AWS storage services over the internet or AWS Direct Connect.
+(natively integrated with Amazon S3, Amazon EFS, Amazon FSx for Windows File Server, Amazon CloudWatch, and AWS CloudTrail)
+as well as detailed monitoring of the transfer.
+
+AWS Transfer Family provides fully managed support for file transfers directly into and out of Amazon S3 and Amazon EFS only. 
+
+
+
+users from different geographic regions:
+	Use Amazon S3 for hosting the web application and use S3 Transfer Acceleration to reduce the latency that geographically dispersed users.
+	
+If you have objects that are smaller than 1GB or if the data set is less than 1GB in size, you should consider using Amazon CloudFront's PUT/POST commands for optimal performance. The given use case has data larger than 1GB and hence S3 Transfer Acceleration is a better option.
+
+
+
+A recovered instance is identical to the original instance, including the instance ID, private IP addresses, Elastic IP addresses, and all instance metadata.
+
+If your instance has a public IPv4 address, it retains the public IPv4 address after recovery.and same palacement group.
+
+During instance recovery, the instance is migrated during an instance reboot, and any data that is in-memory is lost.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
