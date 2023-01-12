@@ -4498,8 +4498,7 @@ It allows you to create Service Control Policies (SCPs) that centrally control A
 
 
 
-@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
-
+@@@@
 10 applications with an on-premises 70TB data for each application, two weeks to migration:
 	Order 10 Snowball Edge Storage Optimized devices to complete the one-time data transfer.
 	Setup Site-to-Site VPN to establish on-going connectivity between the on-premises data center and AWS Cloud.
@@ -5666,7 +5665,7 @@ For each VPC that you want to associate with the Route 53 hosted zone, change th
 
 
 non-incurrect
-@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+@@@
 
 Users from other countries denied access to these live-streamed:
 
@@ -6692,7 +6691,7 @@ AWS Lambda default currently supports 1000  executions per AWS account per regio
 
 
 NewAr
-@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@222222
+@@@
 
 
 Files that are older than 2 years must be stored in a different storage class:
@@ -7357,14 +7356,338 @@ During instance recovery, the instance is migrated during an instance reboot, an
 
 
 
+Tape Gateway stores your virtual tapes in S3 buckets managed by the AWS Storage Gateway service, so you don’t have to manage your own Amazon S3 storage.
+
+DataSync supports only NFS and SMB file types and hence is not woking with Tap backup, use Tape Gatewa.
+
+
+
+RDS PostgreSQL DB uses AWS KMS for encrypting data at rest required, transit secure:
+IAM authentication is just another way to authenticate the user's credentials while accessing the database. It would not significantly enhance the security in a way that enabling SSL does by facilitating the in-transit encryption for the database.
+	Configure RDS to use SSL for data in transit.
+	
+For MySQL, you launch the MySQL client using the --ssl_ca parameter to reference the public key to encrypt connections.
+Using SSL, you can encrypt a PostgreSQL connection between your applications and your PostgreSQL DB instances. 
+You can also force all connections to your PostgreSQL DB instance to use SSL.
+
+
+
+SNS can be used for event-based services. But, our use case needs integration with third-party SaaS services, hence EventBridge is the right choice, as SNS does not support third-party services integration.
+
+SQS It does not directly integrate with third-party SaaS services.
+
+
+Network Load Balancers expose a fixed IP to the public web, therefore allowing your application to be predictably reached using these IPs, while allowing you to scale your application behind the Network Load Balancer using an ASG.
+
+
+
+Network Load Balancers don't support security groups.
+Application and Classic Load Balancers expose a fixed DNS (=URL) rather than the IP address.
+Network Load Balancers expose a fixed IP to the public web.
+
+
+
+Requst unpredictable during day hours and traffic spikes occur:
+	Set up a DynamoDB table in the on-demand capacity mode.
+DynamoDB on-demand is a flexible billing option capable of serving thousands of requests per second without capacity planning.
+If you choose provisioned mode, you specify the number of reads and writes per second that you require for your application. 	
+	
+
+
+
+CloudFront can route to multiple origins based on the content type.
+Use an origin group with primary and secondary origins to configure CloudFront for high availability and failover.
+Use field level encryption in CloudFront to protect sensitive data for specific content.
+
+
+installation and contains both static as well as dynamic files:
+	Create a Golden AMI with the static installation components already setup 
+	se EC2 user data to customize the dynamic installation parts at boot time
+
+
+Trust policy:
+	IAM service supports only one type of resource-based policy called a role Trust policy, which is attached to an IAM role.
+
+
+
+Maximize the VPN throughput:
+	Create a transit gateway with equal cost multipath routing and add additional VPN tunnels.
+	
+Transfer Acceleration is an Amazon S3 bucket-level feature that enables fast, easy, and secure transfers of files over long distances between your client and an S3 bucket,It not relevant to AWS VPN connections.
+
+A virtual private gateway does not support equal cost multi-path (ECMP) routing, so this option is incorrect.
+
+
+
+Snow Family service offers the feature of storage clustering:
+Both AWS Snowball Edge Storage Optimized and AWS Snowball Edge Compute Optimized offer the storage clustering feature.
+
+
+
+Copy data from the source bucket to the destination bucket using the aws S3 sync command
+Set up S3 batch replication to copy objects across S3 buckets in different Regions using S3 console
+
+You cannot use Transfer Acceleration to copy objects across S3 buckets in different Regions using S3 console.
+
+
+
+AWS Secrets Manager enables you to easily rotate, manage, and retrieve database credentials, API keys, and other secrets throughout their lifecycle. 
+	SSM Parameter Store cannot be used to automatically rotate the database credentials.
+	Systems Manager cannot be used to store your secrets securely and automatically rotate the database credentials.
+
+
+As discussed above, AMIs are Region-specific and need to be copied to all Regions they are intended to be used in.
 
 
 
 
+EC2  manually restarted via the AWS management console:
+	Setup a CloudWatch alarm to monitor the health status of the instance. In case of an Instance Health Check failure, an EC2 Reboot CloudWatch Alarm Action can be used to reboot the instance
+You should just use the EC2 Reboot CloudWatch Alarm Action to reboot the instance.	
+Using Amazon CloudWatch alarm actions, you can create alarms that automatically stop, terminate, reboot, or recover your EC2 instances. 
+
+
+
+Traffic spike during the upcoming Thanksgiving sale:
+	Auto Scaling group scheduled action.
+On Sheduled scaling, you specify the start time when the scaling action should take effect, and the new minimum, maximum, and desired sizes for the scaling action. 
+	
+Both the target tracking as well as Step scaling policies depend on a Target value or threshold wherein the instances will be provisioned only when the underlying CloudWatch alarms go off. 	
+
+
+
+The Auto Scaling group is using EC2 based health check and the ALB is using ALB based (in-built)health check.
+ALB cannot use EC2 based health checks.
+
+It is recommended to use ALB based health checks for both ASG and ALB. then you will be able to avoid the scenario.
 
 
 
 
+Create a replica Aurora instance in another Availability Zone to improve the availability as the replica can serve as a failover target.
+There are no standby instances in Aurora. Aurora performs an automatic failover to a read replica when a problem is detected.
+
+
+
+All DynamoDB tables are encrypted. There is no option to enable or disable encryption for new or existing tables. By default, all tables are encrypted under an AWS owned customer master key (CMK) in the DynamoDB service account. However, you can select an option to encrypt some or all of your tables under a customer-managed CMK or the AWS managed CMK for DynamoDB in your account.
+
+
+Use S3 Glacier vault to store the sensitive archived data and then use a vault lock policy to enforce compliance controls.
+Amazon S3 access control lists (ACLs) enable you to manage access to buckets and objects. It cannot be used to enforce compliance controls. User S3 Glacier Volt Lick. 
+
+
+
+Using Route 53 DNS Failover, you can run your primary application simultaneously in multiple AWS regions around the world and failover across regions.
+
+
+
+EBS Encryption:
+	Data at rest inside the volume is encrypted
+	Any snapshot created from the volume is encrypted
+	Data moving between the volume and the instance is encrypted
+
+
+
+Use Amazon S3 to host the static website and Amazon CloudFront to distribute the content for low latency access.
+
+
+
+An IAM user with full administrator access can not:
+	change account name or root password or root email address, change AWS support plan, close AWS account, enable MFA on S3 bucket delete, create Cloudfront key pair, register for GovCloud, close the company's AWS account.
+
+
+RDS for the PostgreSQL DB digister recovery:
+	Use cross-Region Read Replicas
+	Enable the automated backup feature of Amazon RDS in a multi-AZ deployment that creates backups across multiple Regions.
+	
+Automated backups can be created across AWS Regions not same region.
+Database cloning is only available for Aurora and not for RDS.
+
+
+
+Use Amazon Transcribe to convert audio files to text and Amazon Athena to understand the underlying customer sentiments using SQL.
+
+Amazon Quicksight is for the visual representation of data through Dashboards, graphs and various other modes. It has a rich feature set that helps analyze data and the complex relationships that exist between different data features. 
+However, it is not an SQL query based analysis tool like Amazon Athena.
+
+
+
+Feed the streaming transactions into Amazon Kinesis Data Streams. Leverage Amazon Lambda integration to remove sensitive data from every transaction and then store the cleansed transactions in DynamoDB. The internal applications can consume the raw transactions off the Kinesis Data Stream.
+
+You cannot set up multiple consumers for Kinesis Data Firehose delivery streams as it can dump data in a single data repository at a time.
+Amazon Kinesis Data Firehose is an extract, transform, and load (ETL) service that reliably captures, transforms, and delivers streaming data to data lakes, data stores, and analytics services.
+
+
+
+performance lag for the data delivery speed between producers and consumers:
+Use Enhanced Fanout feature of Kinesis Data Streams
+
+
+As multiple applications are consuming the same stream concurrently, both SQS Standard and SQS FIFO are not the right fit for the given use-case.
+
+Currently, the Standard SQS queue is only allowed as an Amazon S3 event notification destination, whereas the FIFO SQS queue is not allowed.
+
+
+
+
+Company has its proprietary encryption algorithm, you have to leverage client-side encryption.	
+	Use a customer master key (CMK) stored in AWS Key Management Service (AWS KMS).
+	Use a master key you store within your application.
+Customer has the complate algorithm not only Key so It will be client side encription.
+
+SSE-KMS: SSE-KMS provides you with an audit trail that shows when your CMK was used and by whom.	
+SSE-C:  Customer-Provided Keys (SSE-C), you manage the encryption keys and Amazon S3 manages the encryption.
+SSE-S3: S3-Managed Keys (SSE-S3), each object is encrypted with a unique key.
+
+
+
+RDS MySQ analytics reporting process slow:
+	Create a read-replica with the same compute capacity and the same storage capacity as the primary. Point the reporting queries to run against the read replica.
+
+You can create up to five RDS read replicas from one DB instance. 
+For replication to operate effectively, each read replica should have the same amount of compute and storage resources as the source DB instance. If you scale the source DB instance, also scale the read replicas.
+
+Multi-AZ deployments are not a read scaling solution, so you cannot use a standby to serve read traffic. The standby is there just for failover. 
+
+
+
+Rebalancing:
+	Amazon EC2 Auto Scaling launches new instances before terminating the old ones, so that rebalancing does not compromise the performance or availability of your application
+
+Unhealthy instanc: 
+	Auto Scaling creates a new scaling activity for terminating the unhealthy instance and then terminates it. 
+	Later, another scaling activity launches a new instance to replace the terminated instance.
+
+
+
+
+Big Data analysis job, read from  S3 and output to S3:
+
+EMR is industry-leading cloud big data platform. Hadoop, an open-source framework/tools, to distribute your data and processing across a resizable cluster of Amazon EC2 instances.
+
+Glue Big Data analysis jobs, extract data, transform it, and load the resulting data back to S3, data stores in a VPC, or on-premises JDBC data stores as a target.
+
+Redshift - Amazon Redshift is a fully-managed petabyte-scale cloud-based data warehouse
+Redshift cluster consists of nodes. Not a Big data analysis tools.
+
+
+
+
+monolith application  automatically recover from the failure of an AZ:
+Assign an EC2 Instance Role to perform the necessary API calls
+Create an Elastic IP and use the EC2 user-data script to attach it
+Create an auto-scaling group that spans across 2 AZ, which min=1, max=1, desired=1
+
+With an Elastic IP address, you can mask the failure of an instance or software by rapidly remapping the address to another instance in your account.
+
+Now, between the ALB and the Elastic IP. If we use an ALB, things will still work, but we will have to pay for the provisioned ALB which sends traffic to only one EC2 instance. Instead, to minimize costs, we must use an Elastic IP.
+
+
+
+private hosted zones feature of Route 53:
+	enableDnsHostnames
+	enableDnsSupport
+
+
+RDS Multi AZ:
+RDS applies OS updates by performing maintenance on the standby, then promoting the standby to primary, and finally performing maintenance on the old primary, which becomes the new standby.
+
+In this case, the database engine for the entire Multi-AZ deployment is shut down during the upgrade.
+
+
+
+
+characteristics of the Instance Store:
+	You can't detach an instance store volume from one instance and attach it to a different instance .
+	If you create an AMI from an instance, the data on its instance store volumes isn't preserved 
+    and isn't present on the instance store volumes of the instances that you launch from the AMI.
+	
+When you stop, hibernate, or terminate an instance, every block of storage in the instance store is reset. 
+Only Reboot can preserved data.
+You can specify instance store volumes for an instance only when you launch it not on Restart.
+
+
+
+near-real-time data querying that is scalable with minimal data loss:
+	Capture data in Amazon Kinesis Data Firehose with Amazon Redshift as the destination. Use Amazon Redshift to query the data.
+It can capture, transform, and deliver streaming data to Amazon S3, Amazon Redshift, Amazon Elasticsearch Service, generic HTTP endpoints, and service providers like Datadog, New Relic, MongoDB, and Splunk.
+Amazon Kinesis Data Firehose is the easiest way to capture, transform, and load streaming data into Redshift for near real-time analytics.
+
+Kinesis Data Streams, you have to manually allocate the shards for scaling the data ingestion process. Kinesis Data Streams (KDS) and Kinesis Data Analytics are for real-time processing of data and cannot provide long-term storage of data unlike a database or a data warehouse.
+
+
+
+
+Highly available architecture for a bastion host solution:
+	Create a public Network Load Balancer that links to EC2 instances that are bastion hosts managed by an ASG.
+You need to remember that Bastion Hosts are using the SSH protocol, which is a TCP based protocol on port 22. They must be publicly accessible.	
+	
+Elastic IP can only be attached to one EC2 instance at a time, so it won't provide you a highly available setup on its own. 
+An ALB only supports HTTP traffic, which is layer 7, while the SSH protocol is based on TCP and is layer 4. So, the Application Load Balancer doesn't work.
+
+
+
+AWS Firewall Manager not support this three reosurce:
+	Amazon GuardDuty 
+	Amazon Inspector for EC2.
+	Network Access Control Lists (NACLs) = optional layer of security for your VPC that acts as a firewall for controlling traffic in and out of one or more subnets.
+
+Amazon GuardDuty:
+	Amazon GuardDuty offers threat detection that enables you to continuously monitor and protect your AWS accounts, workloads, and data stored in Amazon S3. GuardDuty analyzes continuous streams of meta-data generated from your account and network activity found in AWS CloudTrail Events, Amazon VPC Flow Logs, and DNS Logs.
+
+
+When you provision a Multi-AZ DB Instance, Amazon RDS automatically creates a primary DB Instance and synchronously replicates the data to a standby instance in a different Availability Zone (AZ). Multi-AZ spans at least two Availability Zones within a single region.
+
+Enabling Multi-AZ helps make our database highly-available, but the standby database is not accessible and cannot be used for reads or write.Until primary instance failed, Its for failover.
+
+
+
+Cluster placement groups:
+	A cluster placement group is a logical grouping of instances within a single Availability Zone.
+	 A cluster placement group can span peered VPCs in the same Region.
+	 
+partition placement group:
+	A partition placement group can multiple AZ in the same Region. 
+	A partition placement group can have a maximum of seven partitions per Availability Zone. 
+	The number of instances that can be launched into a partition placement group is limited only by the limits of your account.
+
+
+
+permitted EC2 instances can read from the EFS:
+	Use VPC security(Normal Security Group) groups to control the network traffic to and from your file system
+	Use an IAM policy to control access for clients who can mount your file system with the required permissions
+
+
+Amazon GuardDuty - Amazon GuardDuty continuously monitors for malicious or unauthorized behavior to help protect your AWS resources, including your AWS accounts and access keys. GuardDuty identifies any unusual or unauthorized activity, like cryptocurrency mining or infrastructure deployments in a region that has never been used. Powered by threat intelligence and machine learning, GuardDuty is continuously evolving to help you protect your AWS environment.
+
+
+Upgrades to the database engine level require downtime. Even if your RDS DB instance uses a Multi-AZ deployment, both the primary and standby DB instances are upgraded at the same time.
+
+
+
+
+Relational Database use a caching service that supports multi-threading.:
+	Amazon ElastiCache for Memcached 
+You need to run large nodes with multiple cores or threads (support for multi-threading).
+You need the ability to scale out and in, adding and removing nodes as demand on your system increases and decreases.
+
+Redis does not support multi-threading, so this option is not the right fit for the given use case.
+
+
+
+Spot blocks allow you to request Amazon EC2 Spot instances for 1 to 6 hours at a time to avoid being interrupted
+A Spot Fleet is a set of Spot Instances and optionally On-Demand Instances that are launched to meet your target capacity
+
+
+
+The NLB has to be accessible over the internet and hence has to be in a public subnet and will act as a single point-of-contact for all incoming traffic. NLB will forward the incoming traffic to the EC2 instances managed by the ASG in the private subnet.
+
+NLB also supports TLS offloading.
+ALB also supports TLS offloading.
+Classic Load Balancer supports SSL offloading.
+
+
+AWS Shield Advanced will give you DDoS protection overall, and you cannot set up rate-based rules in Shield.
 
 
 
