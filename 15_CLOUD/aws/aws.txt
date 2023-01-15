@@ -29,38 +29,8 @@ echo "<h1>Hello World from $(hostname -f)</h1>" > /var/www/html/index.html
 ================================================= 
 
 
-ConfusingTakeaLook
-------------------
-
-
-HandOnRemain
-----------------------------
-Amazon CloudFront Hands On
-CloudFormation
-
-Video Checkout:
-2)Giving permissions to federated/outside users & groups.
-You can't assign role to user.
-
-AWS Best Practices for DDoS Resiliency Application Layer Defense
-
-Ephemeral Ports
-
-Before->Amazon GuardDuty
-
-S3 Bucket Policies
-S3 CORS
-S3 Select
-
-DynamoDB provisoning model
-
-Amazon Aurora Serverless
-
-
-
-
 Amongst the new topics you'll learn about in this update:
-================================================
+-------------------------------------------------
 -RDS Custom for Oracle and Microsoft SQL Server, RDS & Aurora Backup and Monitoring, RDS Proxy
 -S3 Object Lambda, S3 Batch Operations
 -Amazon EKS, AWS App Runner, DocumentDB, Neptune, Keyspaces (for Apache Cassandra), QLDB, Timestream, 
@@ -410,9 +380,8 @@ public AWS services S3 or to Amazon VPC, bypassing internet service providers in
 
 
 AWS Site-to-Site VPN:
-	AWS Site-to-Site VPN creates a VPN connection between your office or data center and 
-	AWS via existing data connections. For example, it can create a VPN connection across your existing 
-	Internet fiber connection.
+	AWS Site-to-Site VPN creates a VPN connection between your office/data center and AWS via existing data connections. 
+	For example, it can create a VPN connection across your existing Internet fiber connection.
 
 A Site-to-Site VPN connection offers two VPN tunnels between a virtual private gateway or a 
 transit gateway on the AWS side, 
@@ -454,21 +423,17 @@ A serverless, S3 Standard storage, the pricing is $0.023 per GB per month.
 =================================================
 
 
-#Resilient:স্থিতিস্থাপক
--------------------------------------------------
-You can use Aurora replicas and CloudFront distribution to make the application more resilient to 
-spikes in request rates.
+Resilient:
+	You can use Aurora replicas and CloudFront distribution to make the application more resilient to 
+	spikes in request rates.
 
 
 
 
-#Availability:প্রাপ্যতা, লভ্যতা
--------------------------------------------------
-If you have workloads that global client base, AWS recommends that you use Global Accelerator. 
-
-If you have workloads hosted in a single AWS Region and used by clients in 
-and around the same Region, you can use an 
-Application Load Balancer or Network Load Balancer to manage your resources.
+Availability:
+	If you have workloads that global client base, AWS recommends that you use Global Accelerator. 
+	If you have workloads hosted in a single AWS Region and used by clients in and around the same Region, you can use an 
+	ALB or NLB to manage your resources.
 
 
 
@@ -476,16 +441,14 @@ You can't enable termination protection for Spot Instances.
 
 
 Network Firewall cannot directly integrate with the Application Load Balancer, it working on VPC.
-You can filter network traffic at the perimeter of your VPC using AWS Network Firewall.
-AWS WAF straightforward way of integrating with an ALB but not Network Firewall with an ALB.
+You can filter network traffic of your VPC using AWS Network Firewall.
+AWS WAF straightforward way of integrating with an ALB but not Network Firewall.
 
 
 
 
 AWS CodeDeploy:
-	AWS CodeDeploy fully automates your software deployments, allowing you to deploy reliably and rapidly.
-
-	AWS CodeDeploy is a fully managed developer tool that is used for deploying code from a code repository such as 
+	AWS CodeDeploy is a fully managed developer tool that is used for rapidly deploying code from a code repository such as 
 	GitHub or AWS CodeCommit. 
 	You can deploy to many services including AWS services such as AWS Elastic Beanstalk, AWS Lambda, and AWS Fargate. 
 	AWS CodeDeploy can be used independently or in a pipeline with AWS CodePipeline.
@@ -503,9 +466,8 @@ VPC Egress-Only  for IPv6:
 	Internet Gateway to the VPC to allow outbound IPv6 communication to the internet. 
 	Use AWS Network Firewall to set up the required rules for traffic inspection and traffic filtering.
 	
-Internet Gateway does not limit or control any outgoing IPv6 connection.
-NAT Gateway is only applicable for IPv4, not IPv6. 
-
+Internet Gateway support both public IPv4 address or an IPv6 address connect to internet.
+NAT Gateway is only applicable for IPv4 for Outbound traffic only, not IPv6. 
 
 
 
@@ -574,7 +536,7 @@ Route 53 Resolver DNS Firewall can only filter and regulate outbound DNS traffic
 
 
 
-Redshift(SQL Big data analyse) cluster as their data warehouse region outage or down:
+Redshift(SQL analyse data warehouse) cluster as their data warehouse region outage or down:
 	Enable Cross-Region Snapshots Copy in your Amazon Redshift Cluster.
 
 
@@ -673,7 +635,9 @@ AWS Transfer:
 	Create an Amazon S3 bucket with encryption enabled. 
 	Launch an AWS Transfer for SFTP endpoint to securely upload files to the S3 bucket. 
 	Configure an S3 lifecycle rule to delete files after a month.
-
+	
+AWS Transfer Family is a secure transfer service that enables you to transfer files into and out of AWS storage services like S3. 
+using SFTP, FTPS, FTP, and AS2 protocols.
 
 
 
@@ -885,7 +849,7 @@ WorkDocs simply enables you to share content, provide rich feedback, and collabo
 
 ENI:
 	If the instance fails, you (or more likely, the code running on your behalf) can attach 
-	the network interface to a hot standby instance.
+	the network interface to a another hot standby instance.
  
  
  
@@ -972,7 +936,7 @@ RealTime EC2 Log Processing:
 	Create a Kinesis Data Stream and use AWS Lambda to read records from the data stream real-time.
 	
 Kinesis Data Firehose  near RealTime.
-	Amazon Athena and Amazon Redshift(Analytics / BI / Data Warehouse) not RealTime processing.
+Amazon Athena and Amazon Redshift(Analytics / BI / Data Warehouse) not RealTime processing.
 Redshift is a relational database and best suited for tabular data; Athena is better for semi-structured and unstructured data.	
 	
 
@@ -981,7 +945,7 @@ Redshift is a relational database and best suited for tabular data; Athena is be
 
 RDS Mysql: increase the disk space without impacting:
 	Modify the DB instance settings and enable storage autoscaling.
-	RDS Storage Auto Scaling automatically scales storage capacity in response to growing database workloads, with zero downtime.
+RDS Storage Auto Scaling automatically scales storage capacity in response to growing database workloads, with zero downtime.
 
 
 
@@ -1000,8 +964,7 @@ The “Trust Relationship” policy simply defines which Principals can Assume t
 
 Error:EC2ThrottledException:
 	Your Lambda function automatically scales based on the number of events it processes. 
-	If your Lambda function accesses a VPC, you must make sure that your VPC has sufficient ENI capacity 
-	to support the scale requirements of your Lambda function. 
+	If your Lambda function accesses a VPC, and  your VPC does not have sufficient ENIs or subnet IPs. 
 
 
 
@@ -1068,8 +1031,7 @@ AWS Data Exchange is on a mission to increase speed to value for third-party dat
  
  
  
-Need to use a service that can store and retrieve objects through 
-standard file storage protocols for quick recovery:
+Need to use a service that can store and retrieve objects through standard file storage protocols for quick recovery:
 	  Use the AWS Storage Gateway file gateway to store all the backup data in Amazon S3.
 	  You cannot directly access the volume gateway using Amazon S3 APIs.
 	 
@@ -1122,8 +1084,7 @@ Kinesis stream Retation periond(1 to 365):
  
  
  
-By default, Fargate tasks are given a minimum of 20 GiB of free ephemeral storage, 
-	which meets the storage requirement in the scenario.
+By default, Fargate tasks are given a minimum of 20 GiB of free ephemeral storage,which meets the storage requirement in the scenario.
 
 
 
@@ -1276,7 +1237,7 @@ It is not possible to enable or disable hibernation for an instance after it has
 
 
 
-GlobalRealTimeDataProcessing:
+Distributed real-time Data Processing:
 	Integrate CloudFront with Lambda@Edge in order to process the data in close geographical proximity to users 
 	and respond to user requests at low latencies. 
 	Process real-time streaming data using Kinesis and durably store the results to an Amazon S3 bucket.
@@ -1321,6 +1282,7 @@ AWS Data Pipeline:
 
 It is not suitable for collecting data from distributed sources such as users, IoT devices, or clickstreams.
 
+Glue is more of a managed ETL service, and Data Pipeline is more of a managed workflow service.
 
 
 
@@ -1631,7 +1593,7 @@ AWS CloudTrail alone won’t give detailed logging information for object-level 
 
 Migrate all of its VM workloads to the AWS cloud:
 	Install the AWS Replication Agent on each of the on-premises VMs to continuously replicate the servers to AWS. 
-	Use AWS Migration Service (AWS MGN) to launch test instances and perform cutover once testing is completed.
+	Use AWS Application Migration Service (AWS MGN) to launch test instances and perform cutover once testing is completed.
 	
 AWS MGN(Application Migration Service)is the primary migration service recommended for lift-and-shift migrations to AWS.
 
@@ -2022,12 +1984,9 @@ Run Command is offered at no additional cost.
 
 
 
-
-
  
 AWS has an example of the implementation of Quota Monitor CloudFormation template that you can deploy on your AWS account. 
 The template uses an AWS Lambda function that runs once every 24 hours.
-
 
 
 
@@ -7162,7 +7121,7 @@ Multiple account in a single region all EC2 instances in all these accounts can 
 You can share AWS Transit Gateways, Subnets, AWS License Manager configurations, and Amazon Route 53 Resolver rules resources with RAM. RAM eliminates the need to create duplicate resources in multiple accounts.
 
 With Multple Account VPC peering connections will work, but won't efficiently scale if you add more accounts (you'll have to create many connections).
-Transit Gateway is a service that enables customers to connect their Amazon Virtual Private Clouds (VPCs) and their on-premises networks to a single gateway. A Transit Gateway will work but will be an expensive solution	
+Transit Gateway is a service that enables customers to connect their Amazon Virtual Private Clouds (VPCs) and their on-premises networks to a single gateway. A Transit Gateway will work but will be an expensive solution.
 
 
 
@@ -7260,9 +7219,7 @@ duration of 1, 2, 3, 4, 5, or 6 hours.
 Capture the clickstream events from the source and then provide a concurrent feed of the data stream to the downstream applications:
 	AWS Kinesis Data Streams
 	
-Amazon Kinesis Data Streams is recommended when you need the ability for multiple applications to consume the same stream concurrently. For example, you have one application that updates a real-time dashboard and another application that archives data to Amazon Redshift. You want both applications to consume data from the same stream concurrently and independently.	
-
-KDS provides the ability for multiple applications to consume the same stream concurrently.
+Amazon Kinesis Data Streams is recommended when you need the ability for multiple applications to consume the same stream concurrently. 
 
 Kinesis Data Firehose is used to load streaming data into data stores, therefore this option is incorrect.
 Kinesis Data Analytics is used to build SQL queries and sophisticated Java applications, therefore this option is incorrect.
@@ -7379,10 +7336,8 @@ AMIs are Region-specific and need to be copied to all Regions they are intended 
 
 
 EC2  manually restarted via the AWS management console:
-	Setup a CloudWatch alarm to monitor the health status of the instance. In case of an Instance Health Check failure, an EC2 Reboot CloudWatch Alarm Action can be used to reboot the instance
-You should just use the EC2 Reboot CloudWatch Alarm Action to reboot the instance.	
-Using Amazon CloudWatch alarm actions, you can create alarms that automatically stop, terminate, reboot, or recover your EC2 instances. 
-
+	Setup a CloudWatch alarm to monitor the health status of the instance. In case of an Instance Health Check failure, an EC2 Reboot CloudWatch Alarm Action can be used to reboot the instance.
+EventBridge event for ECS task count update.
 
 
 Traffic spike during the upcoming Thanksgiving sale:
@@ -7403,6 +7358,8 @@ It is recommended to use ALB based health checks for both ASG and ALB. then you 
 Create a replica Aurora instance in another Availability Zone to improve the availability as the replica can serve as a failover target.
 There are no standby instances in Aurora. 
 Aurora performs an automatic failover to a read replica when a problem is detected.
+
+You can also make an existing Aurora cluster into a Multi-AZ cluster by adding a new reader instance and specifying a different Availability Zone.
 
 
 
@@ -7593,9 +7550,6 @@ Powered by threat intelligence and machine learning, GuardDuty is continuously e
 
 
 
-Upgrades to the database engine level require downtime. Even if your RDS DB instance uses a Multi-AZ deployment, both the primary and standby DB instances are upgraded at the same time.
-
-
 
 
 Relational Database use a caching service that supports multi-threading.:
@@ -7620,10 +7574,59 @@ ALB also supports TLS offloading.
 Classic Load Balancer supports SSL offloading.
 
 
-AWS Shield Advanced will give you DDoS protection overall, and you cannot set up rate-based rules in Shield.
+
+
+AWS Shield Advanced will give you DDoS protection overall, and you cannot set up rate-based rules in Shield, use WAF.
 
 
 
+
+
+
+
+
+
+A) Configure a NAT gateway in a public subnet
+B) Define a custom route table with a route to the NAT gateway for internet traffic and associate it with the
+private subnets for the application tier.
+
+
+C) Run the applications on EC2 instances enabled for hibernation. Hibernate the instances before the 2-
+week company shutdown.
+
+C) Attach a secondary elastic network interface to the EC2 instance configured with the private IP address.
+Move the network interface to the standby EC2 instance if the primary EC2 instance becomes
+unreachable. 
+
+A) Enable cross-origin resource sharing (CORS) on the S3 bucket.
+
+
+C) Use server-side encryption with customer-provided encryption keys (SSE-C).
+D) Use client-side encryption to provide at-rest encryption.
+
+
+A) Deploy On-Demand Instances during periods of high demand.
+
+
+
+C) Configure the front-end application to send votes to an Amazon Simple Queue Service (Amazon SQS)
+queue. Provision worker instances to read the SQS queue and write the vote information to the database.
+
+
+
+
+B) Create an Amazon EC2 Auto Scaling group and Application Load Balancer spanning multiple AZs for the
+web application instances.
+E) Create new public and private subnets in the same VPC, each in a new AZ. Create an Amazon RDS
+Multi-AZ DB instance in the private subnets. Migrate the old database contents to the new DB instance.
+
+
+
+C) Configure an Auto Scaling step scaling policy with an EC2 instance warmup condition.
+
+
+
+C) Create an Aurora replica and modify the application to use the appropriate endpoints.
 
 
 
@@ -7660,3 +7663,4 @@ def lambda_handler(event, context):
     }
 	
 	
+accessCode=690-846-845 locale=en-US
