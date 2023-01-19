@@ -2020,15 +2020,12 @@ During peak hours, many employees are experiencing slow connectivity issues:
 
 CloudTrail log processing:
 	CloudTrail stores the log files to S3 and not in Glacier.
-	By default, CloudTrail event log files are encrypted using Amazon S3 server-side encryption (SSE). 
+	By default, CloudTrail event log files are encrypted using Amazon S3 server-side encryption (SSE-S3). 
 
 You can also define Amazon S3 lifecycle rules to archive or delete log files automatically. 
 If you want notifications about log file delivery and validation, you can set up Amazon SNS notifications.
 
-Upload the data to S3 and set a lifecycle policy to transition data to Glacier after 0 days.
- 
- 
- 
+
  
  
 CloudHSM:
@@ -2323,6 +2320,8 @@ There are 2 ways to use SSL to connect to your SQL Server DB instance:
 
 
 
+A Service that Automated the creation of EBS snapshot on Regular basis = (DLM) Amazon Data Lifecycle Manager.
+
 RDS multiAZL:
 – Increased database availability in the case of system upgrades like OS patching or DB Instance scaling.
 – Provides enhanced database durability in the event of a DB instance component failure or an Availability Zone outage.
@@ -2481,7 +2480,11 @@ Amazon EBS does not support asymmetric CMKs. To encrypt an EBS snapshot, you nee
 Amazon Elastic File System (EFS) doesn’t natively work with Amazon S3.
 Amazon FSx for Lustre works natively with Amazon S3, a high-performance POSIX interface. 
 
- 
+
+AWS File Gateway lets you store local files as objects in an S3 bucket, creating an S3 storage gateway.
+File gateway offers SMB or NFS-based access to data in Amazon S3 with local caching.
+
+
 
 
 
@@ -2579,8 +2582,8 @@ AMI is and Instance-Store volume, created from and template stored in Amazon S3.
 Data of Instance store volumes persist only dureing the life of the instance.
 
 
-EC2 instances support two types for block level storage: EC2 Instances can be launched using either EBS or 
-Instance Store volume as root volumes and additional volumes.
+EC2 instances support two types for block level storage: 
+	EC2 Instances can be launched using either EBS or Instance Store volume as root volumes and additional volumes.
 
 EC2 instances can be launched by choosing between AMIs backed by EC2 instance store and AMIs backed by EBS.
 
@@ -2800,20 +2803,6 @@ Inter-region vpc peering encryps traffic, never travel public network.
 
 
 
-Low inter-instance latencies with Windows server (SR-IOV):
-	Enable Enhanced Netwoiking with ElasticNetwork Adapter (ENA) on the Windows EC2 instance.
-
-Enhanced Netwoiking privides high bandwdith, higher packet per second (PPS) performance and consistently lower inter-instance latencies.
-With No cost. using single root I/O vertulazation (SR-IOV), 100Gbps.
-
-Elastic Fabric Adapter EFA  not support OS-bypass capabilitess for Windows Instance it will work as ENA.
-
-AWS ParalledClusterr just a AWS-support open-source cluster management tools, Its for deploy manage HPC.
-Its not provided high branwith,PPS and lower inter-instance latencies as ENA or EFA.
-
-
-
-
 Config DNS zone apex record to point load balancer:
 	Create and A record aliesed to the load balancer DNS name.
 
@@ -2847,7 +2836,7 @@ Its Return all avalilable Trusted advisor check info, so its will be dificult to
 
 
 From S3 to Standard IA and OneZone IA need to stay data in current class more 30 days, not for Intelligence,Glacier or DepArch.
-For surprice check for audit then need to with in 1 minute then use Glaicer. Ite  provide quick acc (1-5mm).
+For surprice check for audit then need to with in 1 minute then use Glaicer. (S3 Glacier Flexible Retrieval)Ite  provide quick acc (1-5mm).
 Deep Archive need several hours.
 
 If you dont know the acccess time schedule or frequently change then use Intelligence class for save cost.
@@ -2900,7 +2889,7 @@ API Gateway provide throttling (rate limit 1000 request per second), and caching
 	
 	
 
-A logging system for all change madb to AWS resource in all Region also provide and event history of api calls in MConsole and CLI:
+A logging system for all change made to AWS resource in all Region also provide and event history of api calls in MConsole and CLI:
 	Setup CloudTrail trail in S3 using cli and pass --is-multi-region-trail and --include-global-service-event parameter.
 	With KMS encryption MFA and bucket policy.
 Not CloudWatch use CloudTrails.
@@ -2932,7 +2921,7 @@ Aurora involved a cluster of DB Instance not single instance. Each conn is handl
 
 
 
-Availabel in case of Oracle Database failure in future:
+Availabel in case of Oracle Database failure in future: 
 	Create Oracle database in RDS with Multi-AZ deployment.
 
 Oracle RMAN and RAC are not supported in RDS.
@@ -3019,9 +3008,7 @@ Route53 Routing:
 	Latency Routing:      Provide lowest latenct for resources, not guarantee user and resource will be same location.
 	Geoproximity Routing: Route traffic using user and resource GeoLocation also with a Bias value for more/less traffic to a resource.
 	Geolocation Routing:  GeoLocation of user base routing. Serve resource from the DNS queres origin from.
-	Weighted Routing:     Multi resource associat with single domain name and set how much traffic to go each resource.
-	
-	
+	Weighted Routing:     Multi resource associat with single domain name and set how much traffic to go each resource by percentage %.
 	
 	
 
@@ -3212,7 +3199,11 @@ EFS:
 
 EFS only supports Linux workloads.
 Amazon EFS provides two modes of throughput: Provisioned and Bursting. 
-EFS provides two classes of storage: One Zone and Standard. EFS Lifecycle.
+
+Amazon EFS offers four storage classes: 
+	two regional storage classes, Amazon EFS Standard, and Amazon EFS Standard-Infrequent Access (EFS Standard-IA), and 
+	two One Zone storage classes, Amazon EFS One Zone, and Amazon EFS One Zone-Infrequent Access (EFS One Zone-IA). 
+
 
 EFS file systems can be accessed by Amazon EC2 Linux instances, Amazon ECS, Amazon EKS, AWS Fargate, 
 and AWS Lambda functions via a file system interface such as NFS protocol.
@@ -3344,7 +3335,7 @@ It acts as a cloud router that allows you to integrate multiple networks.
 
 
 RDS automatically provisions and maintains a synchronous standby replica in a different Availability Zone.
-RDS Read Replica provides an asynchronous replication instead of synchronous.
+RDS Read Replica provides an asynchronous replication.
 
 DynamoDB do not have a Read Replica approach.
 Global tables replicate your DynamoDB tables automatically across  Regions.
@@ -3653,7 +3644,8 @@ To leverage big data processing frameworks, you need to use Amazon EMR. The clus
 and load the processed data into Amazon Redshift for analytic and business intelligence applications.
  
 Glue is just a serverless ETL service that crawls your data, builds a data catalog, performs data preparation, data transformation, 
-and data ingestion. It won't allow you to utilize different big data frameworks effectively, unlike Amazon EMR.
+and data ingestion. 
+It won't allow you to utilize different big data frameworks effectively, unlike Amazon EMR.
   
 
 
@@ -4096,6 +4088,8 @@ can configure and audit the AWS resources you want to backup, automate backup sc
 and monitor all recent backup and restore activity.
 
 
+Amazon Data Lifecycle Manager DLM for EBS Snapshots can schedule the back up Amazon EBS volumes into EBS Snapshots.
+AWS Backup to manage backups of Amazon Aurora DB clusters.
 
 
 
@@ -4516,7 +4510,10 @@ Amazon Storage Gateway’s File Gateway:
 	File Gateway does not support file shares for native Windows workloads, for that use Amazon FSx File Gateway.
 
 Different types of gateways:
-	Tape Gateway, Amazon S3 File Gateway, Amazon FSx File Gateway, and Volume Gateway.
+	Tape Gateway, 
+	S3 File Gateway,
+	FSx File Gateway,
+	Volume Gateway.
 
 
 
@@ -5799,7 +5796,7 @@ Bucket are in different accounts, then you need to grant Amazon S3 permissions o
 
 	
 
-Replacement for the DFSR:=FSx for Windows.
+Replacement for the DFS:=FSx for Windows.
 	
 	
 	
@@ -5877,7 +5874,7 @@ Highly parallelized applications and workloads, big data analysis, media process
  
 Provisioned Throughput
 Bursting Throughput
-This two throughput mode of EFS and not the performance mode.
+This two are Throughput mode of EFS and not the performance mode.
 
 
 
@@ -5955,6 +5952,8 @@ The EFS Standard storage class is used for frequently accessed files.
 Only spot fleets can maintain target capacity by launching replacement instances after Spot Instances in the fleet are terminated, 
 so spot instances, by themselves, are not the right fit for this use-case.
 
+The Spot Fleet attempts to launch the number of Spot Instances and On-Demand Instances to meet the target capacity that you specified in the Spot Fleet request.
+
 
 
 App slow down for loading on another region(eu-west-1):
@@ -6007,7 +6006,7 @@ Set the DeleteOnTermination attribute to false
 
 Server-Side Encryption with Amazon S3-Managed Keys (SSE-S3) - 
 	When you use Server-Side Encryption with Amazon S3-Managed Keys (SSE-S3), each object is encrypted with a unique key. 
-	As kewy regularly rotates.
+	As key regularly rotates.
 	
 Server-Side Encryption with Customer-Provided Keys (SSE-C)-	
 	For the given use-case, the company wants to manage the encryption keys via its custom application and let S3 manage the encryption, 
@@ -6101,16 +6100,6 @@ Real-time processing with manage service:
 
 
 
-ElastiCache:
-	Use ElastiCache to improve latency and throughput for read-heavy application workloads.
-	Use ElastiCache to improve the performance of compute-intensive workloads.
-
-Amazon ElastiCache can be used to significantly improve latency and throughput for many read-heavy application workloads 
-(such as social networking, gaming, media sharing, leaderboard, and Q&A portals) or 
-compute-intensive workloads (such as a recommendation engine) by allowing you to store the objects that are often read in the cache.
-
-
-
 
 The database rollover will archive:
 	Schedule a weekly EventBridge event cron expression to invoke a Lambda function that runs the database rollover job.
@@ -6123,12 +6112,6 @@ NAT instance can be used as a bastion server.
 Security Groups can be associated with a NAT instance.
 
 
-
-
-SQS FIFO queue:
-	Delete the existing standard queue and recreate it as a FIFO queue
-	Make sure that the name of the FIFO queue ends with the .fifo suffix
-	Make sure that the throughput for the target FIFO queue does not exceed 3,000 messages per second
 
 
 
@@ -6161,9 +6144,8 @@ EBS:
 Amazon FSx for Windows File Server - Amazon FSx for Windows File Server is a fully managed, highly reliable file storage 
 that is accessible over the industry-standard Server Message Block (SMB) protocol.
 
-Storage Gateway provides 3 types of storage interfaces: File, Volume, and Tape. 
-The File Gateway enables you to store and retrieve objects in Amazon S3 using file protocols such as Network 
-File System (NFS) and Server Message Block (SMB).
+Storage Gateway provides 4 types of storage interfaces: File, Volume, and Tape and FSx For Windows
+The File Gateway enables you to store and retrieve objects in Amazon S3 using file protocols NFS and SMB.
 
 
 
@@ -6316,8 +6298,7 @@ VPCs and on-premises networks through a central hub:
 ELB in a Region malfunctioned:
 	Set up AWS Global Accelerator and add endpoints to cater to users in different geographic locations.
 	
-	
-	
+
 
 HIPAA compliant in-memory database that supports SQL query:
 	ElastiCache for Redis/Memcached
@@ -6535,8 +6516,8 @@ S3 not POSIX compliant file storage solution.
 	
 
 
-Required application response times while accounting for any traffic spikes:
-	Leverage horizontal scaling for the web and application tiers by using ASG and ALB.
+
+Leverage horizontal scaling for the web and application tiers by using ASG and ALB.
 	
 	
 	
@@ -6599,8 +6580,8 @@ NewErr
 Files that are older than 2 years must be stored in a different storage class:
 	Use Amazon S3 and create a lifecycle policy that will move the objects to Amazon S3 Standard-IA or S3 Glacier after 2 years.
 	
-Not Amazon EFS-IA after 2 years, 
-the maximum days for the EFS lifecycle policy is only 90 days. The requirement is to move the files that are older than 2 years or 730 days.
+Not Amazon EFS-IA after 2 years, the maximum days for the EFS lifecycle policy is only 90 days. 
+The requirement is to move the files that are older than 2 years or 730 days.
 
 
 Although CloudFront delivers content faster to your users using edge locations, you still cannot integrate DynamoDB table with CloudFront as these two are incompatible.
@@ -6657,7 +6638,8 @@ Setting up SAML 2.0-Based Federation by using a Web Identity Federation is incor
 
 
 
-Amazon Cognito is used for single sign-on in mobile and web applications. You don’t have to use it if you already have an existing Directory Service to be used for authentication.
+Amazon Cognito is used for single sign-on in mobile and web applications. 
+You don’t have to use it if you already have an existing Directory Service to be used for authentication.
 
 
 
@@ -6740,7 +6722,7 @@ Use AWS Lake Formation to consolidate data from multiple accounts into a single 
 
 
 
-uploaded to an Amazon S3 bucket. The minimum ECS task count is initially set to 1:
+Uploaded to an Amazon S3 bucket. The minimum ECS task count is initially set to 1:
 Set up an Amazon EventBridge rule to detect S3 object PUT operations and set the target to the ECS cluster to run a new ECS task.
 
 You can use Amazon EventBridge to run Amazon ECS tasks when certain AWS events occur. 
@@ -6752,7 +6734,7 @@ you can’t directly set CloudWatch Alarms to update the ECS task count.
 Authenticate the users using Redis AUTH by creating a new Redis Cluster with both the --transit-encryption-enabled and --auth-token parameters enabled.
 
 
-ability to immediately remove the key material from AWS KMS. The solution should also be able to audit the key usage:
+Ability to immediately remove the key material from AWS KMS. The solution should also be able to audit the key usage:
 	Use AWS Key Management Service to create a CMK in a custom key store and store the non-extractable key material in AWS CloudHSM.
 	
 To immediately remove the key material from AWS KMS, you can use a custom key store.
@@ -6795,8 +6777,7 @@ The company has new AWS accounts that will also require consistent and dedicated
 	Create a new Direct Connect gateway and integrate it with the existing Direct Connect connection. Set up a Transit Gateway between AWS accounts and associate it with the Direct Connect gateway.
 
 
-
-You can create alarms that automatically stop, terminate, reboot, or recover your EC2 instances using Amazon CloudWatch alarm actions.
+Create CloudWatch alarms that automatically stop, terminate, reboot, or recover your EC2 instances using Amazon CloudWatch alarm actions.
 
 Take note that FTP uses TCP and not UDP.
 UDP is not supported in Application Load Balancer. Remember that UDP is a Layer 4 traffic. Therefore, you should use a Network Load Balancer.
@@ -6836,6 +6817,7 @@ Enhanced networking uses single root I/O virtualization (SR-IOV) to provide high
 Enhanced networking provides higher bandwidth, higher packet per second (PPS) performance, and consistently lower inter-instance latencies.
 Amazon EC2 provides enhanced networking capabilities through the Elastic Network Adapter (ENA).
 
+RDS: Enhanced Monitoring metrics are useful when you want to see how different processes or threads on a DB instance use the CPU and OS.
 
 
 Authenticate the users using Redis AUTH by creating a new Redis Cluster with both the --transit-encryption-enabled and --auth-token parameters enabled.
@@ -6886,7 +6868,7 @@ Notified  before 30 days the expiration of the SSL certificates:
 
 
 
-AWS Backup only works on AWS resources.
+AWS Backup only works for AWS resources, not with on-permise.
 
 
 ElasticBeanstalk:
@@ -6964,13 +6946,6 @@ AWS License Manager is a service that makes it easier for you to manage your sof
 
 
 The AWS Organizations service neither has the capability to build a landing zone nor a built-in dashboard for continuous detection of policy non-conformance and non-compliant resources across the enterprise. Use AWS Control Tower.
-
-
-
-
-Configuring Server-Side Encryption with Customer-Provided Keys (SSE-C) and configuring Server-Side Encryption with Amazon S3-Managed Keys (SSE-S3) are both incorrect. 
-Although you can configure automatic key rotation, these two do not provide you with an audit trail that shows when your CMK was used and by whom, unlike Server-Side Encryption with AWS KMS-Managed Keys (SSE-KMS).
-
 
 
 
@@ -7087,7 +7062,6 @@ SSL/TLS certificates created via ACM do not need any monitoring/intervention for
 
 
 Write a one time job to copy the videos from all EBS volumes to S3 and then modify the application to use Amazon S3 standard for storing the videos.
-
 Mount EFS on all EC2 instances. Write a one time job to copy the videos from all EBS volumes to EFS. Modify the application to use EFS for storing the videos.
 
 
@@ -7162,13 +7136,12 @@ Continuously replicate this data to ReadShift without Manage Infrastructure:
 
 
 
-WAF can apply to protect http and https req:
-
-Application Load Balancer
-Amazon CloudFront distribution
-Amazon API Gateway REST API
-AWS AppSync GraphQL API
-Amazon Cognito user pool
+WAF can apply to protect http and https req for:
+	Application Load Balancer
+	Amazon CloudFront distribution
+	Amazon API Gateway REST API
+	AWS AppSync GraphQL API
+	Amazon Cognito user pool
 
 Security Group cannot be associated with a CloudFront distribution, use AWS WAF ACL and use an IP match condition.
 
@@ -7200,8 +7173,8 @@ AWS owner account cannot share the VPC itself with another AWS account
 
 
 
-Storage Gateway provides 3 types of storage interfaces for on-premises applications: 
-	File, Volume, and Tape. 
+Storage Gateway provides 4 types of storage interfaces for on-premises applications: 
+	File,FSx File Gateway(Windows), Volume, and Tape. 
 The File Gateway enables you to store and retrieve objects in Amazon S3 using file protocols such as Network File System (NFS) and Server Message Block (SMB).
 
 EBS does not support SMB protocol.
@@ -7367,7 +7340,8 @@ All DynamoDB tables are encrypted. There is no option to enable or disable encry
 
 
 Use S3 Glacier vault to store the sensitive archived data and then use a vault lock policy to enforce compliance controls.
-Amazon S3 access control lists (ACLs) enable you to manage access to buckets and objects. It cannot be used to enforce compliance controls. User S3 Glacier Volt Lick. 
+Amazon S3 access control lists (ACLs) enable you to manage access to buckets and objects. 
+It cannot be used to enforce compliance controls. User S3 Glacier Volt Lick. 
 
 
 
@@ -7536,6 +7510,12 @@ Partition placement group:
 	A partition placement group can have a maximum of seven partitions per Availability Zone. 
 	The number of instances that can be launched into a partition placement group is limited only by the limits of your account.
 
+Spread Placement Groups:
+	Instances are located on different hardware racks in a single availability zone. Each rack is isolated from others.
+	A spread placement group can span multiple Availability Zones in the same Region. 
+	You can have a maximum of seven running instances per Availability Zone per group.
+
+
 
 
 Permitted EC2 instances can read from the EFS:
@@ -7569,10 +7549,8 @@ A Spot Fleet is a set of Spot Instances and optionally On-Demand Instances that 
 The NLB has to be accessible over the internet and hence has to be in a public subnet and will act as a single point-of-contact for all incoming traffic. 
 NLB will forward the incoming traffic to the EC2 instances managed by the ASG in the private subnet.
 
-NLB also supports TLS offloading.
-ALB also supports TLS offloading.
+ALB/NLB also supports TLS offloading.
 Classic Load Balancer supports SSL offloading.
-
 
 
 
@@ -7581,18 +7559,11 @@ AWS Shield Advanced will give you DDoS protection overall, and you cannot set up
 
 
 
-
-
-
-
-
 A) Configure a NAT gateway in a public subnet
 B) Define a custom route table with a route to the NAT gateway for internet traffic and associate it with the
-private subnets for the application tier.
+   private subnets for the application tier.
 
-
-C) Run the applications on EC2 instances enabled for hibernation. Hibernate the instances before the 2-
-week company shutdown.
+C) Run the applications on EC2 instances enabled for hibernation. Hibernate the instances before the 2-week company shutdown.
 
 C) Attach a secondary elastic network interface to the EC2 instance configured with the private IP address.
 Move the network interface to the standby EC2 instance if the primary EC2 instance becomes
@@ -7600,33 +7571,112 @@ unreachable.
 
 A) Enable cross-origin resource sharing (CORS) on the S3 bucket.
 
-
 C) Use server-side encryption with customer-provided encryption keys (SSE-C).
 D) Use client-side encryption to provide at-rest encryption.
 
-
 A) Deploy On-Demand Instances during periods of high demand.
 
-
-
-C) Configure the front-end application to send votes to an Amazon Simple Queue Service (Amazon SQS)
-queue. Provision worker instances to read the SQS queue and write the vote information to the database.
-
-
-
+C) Configure the front-end application to send votes to an Amazon Simple Queue Service (Amazon SQS)queue. 
+   Provision worker instances to read the SQS queue and write the vote information to the database.
 
 B) Create an Amazon EC2 Auto Scaling group and Application Load Balancer spanning multiple AZs for the
-web application instances.
+   web application instances.
 E) Create new public and private subnets in the same VPC, each in a new AZ. Create an Amazon RDS
-Multi-AZ DB instance in the private subnets. Migrate the old database contents to the new DB instance.
-
-
+   Multi-AZ DB instance in the private subnets. Migrate the old database contents to the new DB instance.
 
 C) Configure an Auto Scaling step scaling policy with an EC2 instance warmup condition.
 
-
-
 C) Create an Aurora replica and modify the application to use the appropriate endpoints.
+
+
+
+
+The bucket default settings will override any explicit retention mode or period you request on an object version.
+	If your request to set an object version in a bucket contains an explicit retention mode and period, those settings override all bucket default settings for that object version.
+
+
+
+VPC Peeringn vs VPN CloudHub:
+	VPNCloudHub:
+		Useful when you have multiple Brach Offices.
+		Hub&Spoke topology
+	VPCPeering:
+		There is no single point of failure for communication or bandwidth bottleneck
+		Use AWS backbone. Traffic is not encrypted.
+		Cross Account
+		Both VPC must be in the same Network
+		Avoid VPC CIDR overlapping
+		Transit VPC peering is not allowed.
+		Inter-Region VPC Peering Availability
+	TransitGateway:
+		A transit gateway is a transit hub that can be used to interconnect VPCs and on-premises networks.
+
+
+
+DataSync vs DMS vs StorageGateway:
+	DataSync vs StorageGateway:
+		DataSync connects to existing storage systems protocols (NFS, SMB), or using the Amazon S3 API. 
+		Storage Gateway provides protocols such as iSCSI, SMB, and NFS.
+	DMS:
+		On-premises and EC2 databases to Amazon RDS or Amazon Aurora.
+		Homogeneous migrations such as Oracle to Oracle.
+		Heterogeneous migrations between different database platforms, such as Oracle or Microsoft SQL Server to Amazon Aurora.
+
+
+CloudFormation vs ElasticBeanstalk:
+	Beanstalk: The starting point is the code. I have a NodeJs code I want to upload & run it; please provision Platform for me. (PaaS) Platform as a Service.
+	Gives the developer the ability to manage only code and not systems.
+
+	CloudFormation: The starting point is the infrastructure. Please create an EC2 instance, with one LoadBalancer, Security Group etc so that I can uploaded my NodeJs code to it. Infrastructure as Code (IaC).
+
+
+
+"Effect": "Allow",
+  "Resource": "*",
+  "Condition": {
+	"StringEquals": {
+	  "aws:RequestedRegion": "eu-west-1"
+	}
+So we can only launch EC2 instances in api call from eu-west-1.
+
+
+
+On the function’s resource-based policy, add a permission that includes the lambda:InvokeFunction as action and arn:aws:iam::[DEV AWSAccount Number]:root as principal.
+	AWS Lambda supports resource-based permissions policies for Lambda functions and layers. 
+	You also use a resource-based policy to allow an AWS service to invoke your function on your behalf.
+
+
+
+Run analysis on sales records stored in AmazonS3 and visualize the results of queries:
+	Use AWS Glue crawler to build tables in AWS Glue Data Catalog. 
+	Run queries using Amazon Athena. Use Amazon QuickSight for visualization.
+	
+You can use AWS Glue crawlers to automatically infer database and table schema from your data in Amazon S3 and store the associated metadata in the AWS Glue Data Catalog.
+Athena uses the AWS Glue Data Catalog to store and retrieve table metadata for the Amazon S3 data in your AWS account. 
+Finally, you can then visualize your Athena SQL queries in Amazon QuickSight.
+
+
+S3 Object Lock provides two retention modes:
+	-Governance mode
+		In governance mode, users can’t overwrite or delete an object version or alter its lock settings unless they have special permissions. but you can still grant some users permission to alter the retention settings or delete the object if necessary. 
+	-Compliance mode
+		In compliance mode, a protected object version can’t be overwritten or deleted by any user, including the root user in your AWS account. 
+
+Legal Hold vs. Retention Period modes.
+	With Object Lock, you can also place a legal hold on an object version. Like a retention period, a legal hold prevents an object version from being overwritten or deleted. 
+	However, a legal hold doesn’t have an associated retention period and remains in effect until removed. 
+	Legal holds can be freely placed and removed by any user who has the s3:PutObjectLegalHold permission.
+Legal holds are independent from retention periods.
+
+
+Rehosting all on-premises applications, data, and operating systems to AWS:
+	Create a replication task using AWS Application Migration Service (MGN).
+	
+	
+	
+
+
+
 
 
 

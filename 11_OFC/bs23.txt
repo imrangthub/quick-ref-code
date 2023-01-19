@@ -17,8 +17,6 @@ Skype:mdimran.bs23@gmail.com
 https://bs23.talentlms.com
 
 
-imranbs23@
-
 
 =================================================
 #SBU TELCO MEETING |  2:30PM-4:00PM       
@@ -76,40 +74,32 @@ Server Deployment
 
 
 
-NEIR-SERVICES
---------------
-config
-config-server
-neir-edge-gateway
-neir-discovery-eureka
-neir-identity-register
-neir-zipkin-server
-
-
-OPENAPI- SERVICES
--------------------
-openapi-edge-gateway
-openapi-discovery-eureka
-
-openapi-otp
-openapi-iris
-openapi-provisioning
-openapi-evservice
-
-
-
-
-
-
-
-
-
 =================================================
 #  keycloak Server run
 ==========================================
 =>./standalone.sh
 Test from the keycloak app bin folder
 => nohup ./standalone.sh -b=0.0.0.0 &
+
+
+
+Config:
+------------------------------------------------
+Step 1: Create a database in MySQL
+  =>CREATE DATABASE keycloakdb CHARACTER SET utf8 COLLATE utf8_unicode_ci;
+
+Step 2: Create a database user for Keycloak
+  =>CREATE USER 'keycloakadmin'@'%' IDENTIFIED WITH mysql_native_password BY 'keycloak123';
+  
+Step 3: Grant all privileges
+  GRANT ALL PRIVILEGES ON keycloakdb.* TO 'keycloakadmin'@'%';
+  FLUSH PRIVILEGES; 
+  
+  
+
+IDP URL: 
+http://172.16.8.132:8080/auth/realms/banglalink/.well-known/openid-configuration
+
 
 
 =================================================
