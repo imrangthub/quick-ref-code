@@ -6606,10 +6606,6 @@ Configure the Auto Scaling group to spread the Amazon EC2 instances across three
 
 
 
-But instead of storing the volume to Amazon RDS, the EBS Volume snapshots are actually sent to Amazon S3.
-
-
-
 
 Although an active/standby Amazon MQ setup provides better availability than a single-instance deployment, it still takes a short time to take the inactive instance out of service and replace it with the standby instance. 
 In Amazon MQ for RabbitMQ, a cluster broker deployment setup is recommended to ensure high availability. 
@@ -6619,6 +6615,7 @@ The active/standby architecture is commonly used for Amazon MQ for the ActiveMQ 
 
 
 EBS volume is a storage area network (SAN) storage and not a POSIX-compliant shared file system. You have to use EFS instead.
+EBS Volume snapshots are actually sent to Amazon S3.
 
 hTTP AND hTTPS FOR ALB
 A TCP,UDP health check is only offered in Network Load Balancers and Classic Load Balancers.
@@ -6666,9 +6663,8 @@ You can’t assign an Elastic IP address to an Application Load Balancer.
 
 
 
-EC2 detailed monitoring does not provide metrics for memory usage. 
-CloudWatch does not monitor memory usage, detailed monitoring just provides a higher frequency of metrics (1-minute frequency). 
-
+EC2 detailed monitoring does not provide metrics for memory usage, detailed monitoring just provides a higher frequency of metrics (1-minute frequency). 
+CloudWatch does not monitor memory usage.
 Install the CloudWatch unified agent to the EC2 instances. Set up a custom parameter in AWS Systems Manager Parameter Store with the CloudWatch agent configuration to create an aggregated metric on memory usage percentage. 
 Scale the Auto Scaling group based on the aggregated metri.
 
@@ -6754,7 +6750,8 @@ EventBridge can directly target an ECS task on the Targets section when you crea
 
 
 AWS Global Accelerator is incorrect because this service is more suitable for non-HTTP use cases, such as gaming (UDP), IoT (MQTT), or Voice over IP, as well as for HTTP use cases that specifically require static IP addresses and fast regional failover. 
-Moreover, there is no direct way that you can integrate AWS Global Accelerator with Amazon S3. It’s more suitable to use Amazon CloudFront instead in this scenario.
+Moreover, there is no direct way that you can integrate AWS Global Accelerator with Amazon S3. 
+It’s more suitable to use Amazon CloudFront instead in this scenario.
 
 
 
@@ -6811,10 +6808,7 @@ EC2 instance takes 1 minute to boot up before it can respond to user requests:
 
 
 
-
-Enhanced networking uses single root I/O virtualization (SR-IOV) to provide high-performance networking capabilities on supported instance types. SR-IOV is a method of device virtualization that provides higher I/O.
-
-Enhanced networking provides higher bandwidth, higher packet per second (PPS) performance, and consistently lower inter-instance latencies.
+Enhanced networking provides higher bandwidth, higher packet per second (PPS) performance, and consistently lower inter-instance latencies.Enhanced networking uses single root I/O virtualization (SR-IOV).
 Amazon EC2 provides enhanced networking capabilities through the Elastic Network Adapter (ENA).
 
 RDS: Enhanced Monitoring metrics are useful when you want to see how different processes or threads on a DB instance use the CPU and OS.
@@ -6844,8 +6838,8 @@ S3 improve the query performance while ensuring data security:
 	
 	
 
-ALB target group’s CPU utilization is too high is incorrect. AWS Auto Scaling does not support this metric for ALB.
-You cannot track nor view the CPU utilization of an ALB.
+ALB target group’s CPU utilization is too high is incorrect. 
+AWS Auto Scaling does not support this metric for ALB. You cannot track nor view the CPU utilization of an ALB.
 
 
 
@@ -6858,11 +6852,11 @@ Amazon Redshift only delivers sub-second response times.
 
 
 
+
 Notified  before 30 days the expiration of the SSL certificates:
 	Create an Amazon EventBridge (Amazon CloudWatch Events) rule and schedule it to run every day to identify the expiring ACM certificates. Configure to rule to check the DaysToExpiry metric of all ACM certificates in Amazon CloudWatch. Send an alert notification to an Amazon Simple Notification Service (Amazon SNS) topic when a certificate is going to expire in 30 days.
 	
 	Create an Amazon EventBridge (Amazon CloudWatch Events) rule that will check AWS Health or ACM expiration events related to ACM certificates. Send an alert notification to an Amazon Simple Notification Service (Amazon SNS) topic when a certificate is going to expire in 30 days.
-
 
 
 
@@ -6893,8 +6887,7 @@ To determine whether a log file was modified, deleted, or unchanged after CloudT
 Prometheus is used to collect container metrics. Grafana uses Prometheus for its data queries to generate visualizations of the collected metrics.
 
 
-Enable AWS Compute Optimizer to see recommendations on optimal sizing of compute-related resources. Implement changes based on the recommendations. 
-AWS Compute Optimizer can give recommendations if specific instances are under-provisioned, optimal, or over-provisioned.
+Enable AWS Compute Optimizer to see recommendations on optimal sizing of compute-related resources. 
 
 
 Track the migration of each application to the cloud:
@@ -6920,7 +6913,7 @@ DynamoDB Auto Scaling uses the AWS Application Auto Scaling service to dynamical
 
 
 
-By using Docker with Elastic Beanstalk, you have an infrastructure that automatically handles the details of capacity provisioning, load balancing, scaling, and application health monitoring. You can manage your web application in an environment that supports the range of services that are integrated with Elastic Beanstalk, including but not limited to VPC, RDS, and IAM.
+Elastic Beanstalk,  not for  VPC, RDS, and IAM.
 
 
 Use On-Demand Capacity Reservations, which provide compute capacity that is always available on the specified recurring schedule.
@@ -6932,7 +6925,8 @@ Reduce the number of IP addresses:
 
 
 
-RDS Read Replicas can only provide asynchronous replication in seconds and not in milliseconds. You have to use Amazon Aurora replicas in this scenario
+RDS Read Replicas can only provide asynchronous replication in seconds and not in milliseconds. 
+You have to use Amazon Aurora replicas for less then a second.
 
 
 
@@ -7168,7 +7162,7 @@ Use VPC sharing to share one or more subnets with other AWS accounts belonging t
 VPC sharing (part of Resource Access Manager) allows multiple AWS accounts to create their application resources such as EC2 instances, RDS databases, Redshift clusters, and Lambda functions, into shared and centrally-managed Amazon Virtual Private Clouds (VPCs).
 
 account that owns the VPC (owner) shares one or more subnets with other accounts (participants) that belong to the same organization from AWS Organizations. After a subnet is shared, the participants can view, create, modify, and delete their application resources in the subnets shared with them.
-AWS owner account cannot share the VPC itself with another AWS account
+AWS owner account cannot share the VPC itself with another AWS account.
 
 
 
@@ -7553,8 +7547,8 @@ ALB/NLB also supports TLS offloading.
 Classic Load Balancer supports SSL offloading.
 
 
-
 AWS Shield Advanced will give you DDoS protection overall, and you cannot set up rate-based rules in Shield, use WAF.
+
 
 
 
@@ -7674,6 +7668,52 @@ Rehosting all on-premises applications, data, and operating systems to AWS:
 	
 	
 	
+
+EFS has a higher throughput than EBS.
+
+AWS recommends that you should use AWS DataSync to migrate existing data to Amazon S3, and subsequently use the File Gateway configuration of AWS Storage Gateway to retain access.
+
+
+EFS uses the Network File System protocol. EFS does not support SMB protocol.
+
+
+Interconnect all VPCs together (AWS Transit Gateway):
+AWS Transit Gateway that acts as a network transit hub, to interconnect your VPCs or connect your VPCs with on-premises networks.
+A VPC peering connection is a networking connection between two VPCs .
+Establishing VPC peering between all VPCs is an inelegant and clumsy way.	
+
+
+
+Using Amazon Redshift Spectrum, you can efficiently query and retrieve structured and semistructured data from files in Amazon S3 without having to load the data into Amazon Redshift tables.
+Loading S3 historical data into Redshift via COPY command or Glue ETL job would cost heavy for a one-time ad-hoc process. 
+The same result can be achieved more cost-efficiently by using Redshift Spectrum.
+
+
+
+AWS Lambda can be combined with DynamoDB to process and capture the key-value data from the IoT sources.
+You cannot use Redshift to capture data in key-value pairs from the IoT.
+
+
+
+Configure an AWS DataSync agent on the on-premises server that has access to the NFS file system. Transfer data over the Direct Connect connection to an AWS PrivateLink interface VPC endpoint for Amazon EFS by using a private VIF. 
+Set up a DataSync scheduled task to send the video files to the EFS file system every 24 hours.
+S3 access from VPC user GateWatyEndpoint/ not VPC EndPiint.
+
+
+
+Create a VPC in an account and share one or more of its subnets with the other accounts using Resource Access Manager.
+	VPC Peering in this case complax.
+	Transit Gateway will be Expensive, as the solution need cost optimize.
+
+
+
+
+
+
+
+
+
+
 
 
 
