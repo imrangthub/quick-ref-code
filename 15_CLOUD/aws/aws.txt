@@ -7711,6 +7711,180 @@ Create a VPC in an account and share one or more of its subnets with the other a
 
 
 
+Athena cannot be used to analyze data in real-time.
+Kinesis Data Analytics is real-time analytic tools.
+
+Both ElastiCache for Redis and ElastiCache for Memcached are HIPAA Eligible.
+DynamoDB is not an in-memory database, so this option is incorrect.
+
+
+"Statement":[
+	{
+		"Effect":"Deny",
+		"Action":"ec2:*",
+		"Resource":"*",
+		"Condition":{
+			"StringNotEquals":{
+				"ec2:Region":"us-west-1"
+			}
+		}
+	},
+	{
+		"Effect":"Allow",
+		"Action":"ec2:TerminateInstances",
+		"Resource":"*",
+		"Condition":{
+			"IpAddress":{
+				"aws:SourceIp":"10.200.200.0/24"
+			}
+		}
+	}
+]
+Users belonging to the IAM group can terminate an EC2 instance in the us-west-1 region when the user's source IP is 10.200.200.200
+
+
+"Statement": [
+{
+  "Sid": "Mystery Policy",
+  "Action": [
+	"ec2:RunInstances"
+  ],
+  "Effect": "Allow",
+  "Resource": "*",
+  "Condition": {
+	"StringEquals": {
+	  "aws:RequestedRegion": "eu-west-1"
+	}
+  }
+}
+]	
+It allows running EC2 instances only in the eu-west-1 region, and the API call can be made from anywhere in the world
+
+
+
+
+IAM permission boundary can only be applied to roles or users, not IAM groups.
+
+Use Cognito Authentication via Cognito User Pools for your Application Load Balancer, not Cognito Identity pools.
+
+Kinesis Data Streams cannot directly write the output to S3. 
+Kinesis Data Firehose cannot directly write into a DynamoDB table.
+
+
+
+
+Access EFS file systems from other AWS regions using an inter-region VPC peering and from on-premises servers using an AWS VPN. 
+
+
+Amazon FSx for Windows File Server Support: AD, SMB, DFS.
+AWS Managed Microsoft AD does not support Microsoft’s Distributed File System (DFS).
+
+
+SQS FIFO queue with Group ID for multiple consumer. scale the number of consumers with GroupId.
+
+
+Partition placement group:
+This strategy is typically used by large distributed and replicated workloads, such as Hadoop, Cassandra, and Kafka. 
+
+
+Elastic Load Balancing does not work across regions.
+Enable DNS hostnames and DNS resolution for private hosted zones.
+
+
+
+IAM policies:
+	You can only grant users within your own AWS account permission to access your Amazon S3
+Use Access Control Lists (ACLs):
+	Only for Other Account.
+Use Security Groups:
+	S3 Doenot support SecurityGroup.
+	
+Use Amazon S3 Bucket Policies:
+	For user level as well as account-level access.
+	
+
+
+
+EBS base Instance recover by Amazon CloudWatch alarm, Instance store volumes are not supported for  recovery by CloudWatch alarms.
+
+
+In SecurityGroup You can not use Internet Gateway ID as the custom source for the inbound rule.
+InternetGateway for VPC with Reoute Table.
+
+
+The File Gateway enables you to store and retrieve objects in Amazon S3 using file protocols NFS and SMB.
+Amazon FSx for Windows File Server can be access by SMB protocol.
+
+
+NAT instance support bastion server     |  NAT Gateway not support
+NAT instance support Security Groups    |  NAT Gateway not support
+NAT instance supports port forwarding   |  NAT Gateway not support
+
+
+Adding the entire CIDR of the ALB would work, but wouldn't guarantee that only the ALB can access the EC2 instances
+may other devece on the CIDR cand access EC2. User ALB SecurityGroup ID.
+
+
+RDS Read Replica:
+Read replicas are used to enhance the read scalability of a database. 
+You cannot use read replicas to improve the availability of a database. 
+
+RDS Multi-AZ deployment in a single region not for cress-region.
+
+
+
+Multi-Region applications using Global Accelerator: 
+AWS Global Accelerator to regional AWS resources or endpoints, such as Network Load Balancers, Application Load Balancers, EC2 Instances, and Elastic IP addresses.
+NLB is a Regional services. If NLB then requeris multiple NLB IP registred to on-permis firewal.
+
+
+
+
+
+Amazon EMR not serverless, need to manage underlying EC2.
+Glue is Manage services and serverless.
+
+
+ 
+EFS use POSIX compliant and NFS file storage system .
+S3 File Gateway user NFS and SMB.
+FSx for Windows File Server user SMB. 
+ 
+ 
+A byte-range request is a perfect way to get the beginning of a file.
+
+
+Memcached is designed for simplicity while Redis offers a rich set of features. 
+Memcached does not offer support for geospatial data.
+Both Redis and  Memcached are HIPAA Eligible.
+
+
+
+Kinisis Data Stream ProvisionedThroughputExceededException: Use batch messages
+
+
+Reduce internet latency and add automatic regional failover: GlobaAccelerator
+
+
+Use AWS Artifact to view the security reports as well as other AWS compliance-related information.
+
+Set up an Amazon EventBridge rule to detect S3 object PUT operations and set the target to the ECS cluster to run a new ECS task.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
