@@ -1,55 +1,72 @@
 #################################################
 #                 LINUX-OS                      #
 #################################################
-=>hostname -I 
-=>uname -a
+=>hostname -I/f 
+=>printenv
+
 =>cat /proc/version
 =>cat /etc/*-release
-=>cat /etc/os-release | grep name -i
+=>lscpu | egrep 'Model name|Socket|Thread|NUMA|CPU\(s\)'
+=>lscpu | egrep 'Model name|CPU MHz|Thread|CPU\(s\)'
 Kernel Version
 
 => ./startup.sh 
-=>shutdown
-=>shutdown -h now
-=>shutdown +10
-=>shutdown -c
-=>su - root
+=>shutdown / -h now / +10
 
-=>uptime
 =>netstat -tulpn
 =>netstat -an | grep 80
 
 =>curl -v telnet://172.16.191.16:3000
-Telnet 
-
-sudo apt autoremove
-sudo apt autoclean
+=>su - root
+=>sudo apt update && sudo apt upgrade
 =================================================
 #                  Basic                                          
 ================================================= 
-=>who 
-=>tty
-=>uptime
-=>wathc uptime
+=>ps -ef
+=>ps -ef | grep sys-log
+=>ps -ef |grep nginx
+Find runing process
 
+
+=>uptime
+=>uname -a
 =>which ifconfig
 Where from run this ifconfig
 
-=>whoami
-=>hostname
-=>printenv
+=>tty
+Terminal type
+sudo apt autoremove
+sudo apt autoclean
 =>sudo nano /etc/sudoers
 
-=>ps -ef
-=>ps -ef | grep sys-log
-Find all runing process
 
-=>ps -ef|grep nginx
-Find how many process runing
+=================================================
+#    Find | search    |    look up      
+================================================= 
+=>which java
+=>ls *someFolder*
+
+=>grep -rnw '/etc/nginx/conf.d' -e '9940'
+FindKeywordInFiles:
+
+=>find . -name myFileName
+Search file in the folder
+
+=>locate filName
+=>locate -i filName
+=>locate *myFile*Name*
+Search file in the entire system
+
+=>locate *.conf*
+find all file with .conf
+
+=>grep fWord myTextFile.txt
+=>grep 'Please find my sentence' myTextFile.txt
+Search word in text file
+
 
 =>cat RELEASE-NOTES | grep "Apache Tomcat Version"
 Tomcat version check
-
 =>sudo find / -name "version.sh"
 If you are not sure where is the version.sh file
 then
@@ -57,10 +74,49 @@ then
 systemctl status nginx
 
 
+
+=================================================
+# System  |  CTL                         
+================================================= 
+=>init 3 // Text mode
+=>startx 
+=>init 0 shatdown
+=>init 6 or =>reboot
+=>who 
+Current log in user
+
+
+=>history 
+Show uses caommand from start to at now
+
+=>history -c
+Clear command history
+
+
+=>dpkg --list
+Currently installed programs
+
+=>sudo apt-get remove packagName
+=>sudo apt-get --purge remove packagName
+=>sudo aptitude remove packagName
+Uninstalling Programs with Terminal
+
+=>sudo apt-get dist-upgrade
+
+=>sudo apt-get autoremove
+
+=>sudo systemctl daemon-reload 
+Reload the systemd daemon service to load newly create files.
+
+=>sudo apt update
+Syncs your local copy of available packages and their versions against the current-state index with the repositories
+
+=>sudo updatedb
+
+
 =================================================
 #    File or Directory  | Operation    | Copy                                     
 ================================================= 
-
 =>nano simpleFile.txt
 =>scp simpleFile.txt remoateUser@remoteHost:/app/remoteMachin/filePath/
 Copy file to remote server
@@ -132,8 +188,6 @@ Copy all file to another folder
 Sharing file for all user
 
 
-
-
 #TAR |  ZIP
 -------------------------------------------
 =>tar -cvf myTarFile.tar *
@@ -153,36 +207,6 @@ Add/emit a file to exists tar
 Zip/Unzip file
 
 
-
-=================================================
-#    Find | search    |    look up      
-================================================= 
-
-
-#locate
--------------------------------------------
-=>updatedb
-Before serching update ths system
-=>which skype
-=>ls *searchKeyword*
-=>find . -name myFileName
-Search file in the folder
-
-=>locate filName
-=>locate -i filName
-=>locate *myFile*Name*
-Search file in the system
-
-=>locate *.conf*
-find all file with .conf
-
-=>grep fWord myTextFile.txt
-=>grep 'Please find my sentence' myTextFile.txt
-Search word in text file
-
-
-#find
--------------------------------------------
 
 
 =================================================
@@ -794,48 +818,6 @@ save the file
 
 
 
-
-=================================================
-# System  |  Update | Upgrade                        
-================================================= 
-
-=>init 3 // Text mode
-=>startx 
-=>init 0 shatdown
-=>init 6 or =>reboot
-=>who 
-Current log in user
-
-
-=>history 
-Show uses caommand from start to at now
-
-=>history -c
-Clear command history
-
-
-=>dpkg --list
-Currently installed programs
-
-=>sudo apt-get remove packagName
-=>sudo apt-get --purge remove packagName
-=>sudo aptitude remove packagName
-Uninstalling Programs with Terminal
-
-=>sudo apt-get dist-upgrade
-
-=>sudo apt-get autoremove
-
-=>sudo systemctl daemon-reload 
-Reload the systemd daemon service to load newly create files.
-
-=>sudo apt update
-Syncs your local copy of available packages and their versions against the current-state index with the repositories
-
-=>sudo updatedb
-
-
-
 =================================================
 # MySQL                  
 ================================================= 
@@ -898,6 +880,22 @@ Access denied for user 'root'@'localhost'
 #Linux | Info | Desc | documentation                            
 =================================================
 
+#APT
+--------------------------------------------------
+APT is the default package-management framework for Ubuntu and several other popular distributions.
+
+=>apt-get upgrade 
+Updates the package but does not, by default, delete other packages or add new ones. 
+Instead, the upgrade will fail if it requires added or deleted dependencies.
+=>apt-get dist-upgrade
+Updates and deletes prior versions of the package, including dependencies.
+apt upgrade: 
+Functions like apt-get upgrade --with-new-packages, which is a fancy way of saying that it updates, 
+but does not delete prior versions, yet it does install new packages (but won't delete them) if doing so is required to satisfy dependencies.
+
+
+
+
 #Tidying Up Packages
 -------------------------------------------------
 apt reinstall: Reinstalls the package from the repository source, useful if you think you've broken a program that you like.
@@ -922,21 +920,6 @@ Some packages require specific other packages as well as their own; others requi
 
 The files for installing software is usually called a package and packages come in many different flavors. 
 Ubuntu packages end in .DEB.
-
-
-#APT
---------------------------------------------------
-APT is the default package-management framework for Ubuntu and several other popular distributions.
-
-
-apt-get upgrade: 
-Updates the package but does not, by default, delete other packages or add new ones. 
-Instead, the upgrade will fail if it requires added or deleted dependencies.
-apt-get dist-upgrade: 
-Updates and deletes prior versions of the package, including dependencies.
-apt upgrade: 
-Functions like apt-get upgrade --with-new-packages, which is a fancy way of saying that it updates, 
-but does not delete prior versions, yet it does install new packages (but won't delete them) if doing so is required to satisfy dependencies.
 
 
 
