@@ -25,6 +25,19 @@ systemctl enable httpd
 echo "<h1>Hello World from $(hostname -f)</h1>" > /var/www/html/index.html
 
 
+=>ssh -i Myec2key.pem ec2-user@65.2.191.189
+=================================================
+#EC2 | Helping Heand | Example
+=================================================
+
+=>sudo chown -R ec2-user /var/www/html
+=>sudo chmod -R 755 /var/www/html
+For EC2 httpd permission error
+
+
+
+
+
 
 =================================================
 #Code | Helping Heand | Example
@@ -56,3 +69,21 @@ def lambda_handler(event, context):
 	
 	
 accessCode=690-846-845 locale=en-US
+
+
+
+=================================================
+#S3 | 
+=================================================
+S3 Public access
+{
+    "Version": "2012-10-17",
+    "Statement": [
+        {
+            "Effect": "Allow",
+            "Principal": "*",
+            "Action": "s3:GetObject",
+            "Resource": "arn:aws:s3:::simpel-web-client/*"
+        }
+    ]
+}

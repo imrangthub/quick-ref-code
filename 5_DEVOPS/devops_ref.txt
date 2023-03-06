@@ -3,6 +3,7 @@
 #################################################
 
 
+select * from information_schema.processlist where Command='Sleep'
 =================================================
 #                  Basic                                          
 ================================================= 
@@ -64,7 +65,52 @@ ALTER TABLE openapi_otp_service MODIFY COLUMN otp_sms VARCHAR(255)
 
 
 
-#
+=================================================
+# WiFi                              
+================================================= 
+List all wireless network profiles: 
+=>netsh wlan show profiles
+=>netsh wlan show profile name="Profile_Name" key=clear
+=>netsh wlan show profile "Sales Dept Network" key=clear | findstr Key
+
+
+
+
+
+=================================================
+# Nexus | Sonatype Nexus Repository Manager                            
+================================================= 
+.\nexus.exe /run
+
+
+Upload artifact to nexus:
+-------------------------------------------------
+Modify pom.xml with repo location
+Modify setting.xml with permission
+=>mvn deploy
+
+Dwonload artifact to nexus:
+-------------------------------------------------
+Modify pom.xml with dependent lib which you want to download
+Modify setting.xml with mirrors
+=>mvn compile | test | install
+
+
+
+https://repo.maven.apache.org/maven2/
+
+Create repository with Maven hosted
+=>http://localhost:8081/repository/imranmadbar/
+Create repository with Maven shapshort
+=>http://localhost:8081/repository/imranmadbar-snapshot/
+Create repository with Maven proxy
+=>http://localhost:8081/repository/imranmadbar-proxy/
+Create repository with Maven group
+=>http://localhost:8081/repository/imran-group/
+
+
+
+
 =================================================
 # SSH | SHALL | cmd                            
 ================================================= 
@@ -237,7 +283,7 @@ History check
 
 
 =================================================
-#  Tomcat                                          
+#Tomcat                                          
 ================================================= 
 
 #Killing Port:
