@@ -1,33 +1,35 @@
 #################################################
 #                 LINUX-OS                      #
 #################################################
-=>hostname -I/f 
+=>uptime
 =>printenv
-
+=>su - root
+=>hostname -I/f 
 =>cat /proc/version
 =>cat /etc/*-release
-=>lscpu | egrep 'Model name|Socket|Thread|NUMA|CPU\(s\)'
 =>lscpu | egrep 'Model name|CPU MHz|Thread|CPU\(s\)'
-Kernel Version
-
-=> ./startup.sh 
-=>shutdown / -h now / +10
 
 =>netstat -tulpn
 =>netstat -an | grep 80
-
 =>curl -v telnet://172.16.191.16:3000
-=>su - root
+
+=>sudo apt autoremove
+=>sudo apt autoclean
 =>sudo apt update && sudo apt upgrade
-=>uptime
+
+=> ./startup.sh 
 =>du -sh fileNameForShoSize
+
+=>sudo nano /etc/sudoers
+
+=>shutdown / -h now / +10
 =================================================
 #                  Basic                                          
 ================================================= 
+=>apt list
+Show list of package
 =>ps -eaf
-=>ps -ef
-=>ps -ef | grep sys-log
-=>ps -ef |grep nginx
+=>ps -ef | grep nginx
 Find runing process
 
 =>uname -a
@@ -36,22 +38,12 @@ Where from run this ifconfig
 
 =>tty
 Terminal type
-sudo apt autoremove
-sudo apt autoclean
-=>sudo nano /etc/sudoers
 
 =>free -g
 =>df -H
 =>sudo lshw -class memory
-Ram Details
-
->lsblk -d
 =>lshw -class disk -short
-Hard disk size
-
-=>apt list
-Show list of package
-
+Ram Details and Hard disk size
 
 =>more /someFile
 =>less /someFile
@@ -59,9 +51,6 @@ Show list of package
 =>tail -n 5 /someFile
 Show taxt file with number of line and end/start
 
-
-	- grep  
-	- find
 	- xargs
 =>ls *.txt | xargs rm
 executes a command for each item, like: list of files that you want to delete:
@@ -99,9 +88,6 @@ a command-line utility that is used to edit the sudoers file
 reads through the file file.txt and prints the first field of each line
 curly braces {} enclose the command to be executed for each line of the file, and $1 specifies the first field of the line.
 utility for processing and manipulating text files
-	
-	
-	
 
 =================================================
 #    Find | search    |    look up      
@@ -136,7 +122,7 @@ systemctl status nginx
 
 
 =================================================
-# Editor                          
+# Editor   | vi | vim                       
 ================================================= 
 VIM:
 
@@ -436,6 +422,15 @@ Exmp2
 
 #Memory
 -------------------------------------------------
+=>free -g
+=>df -H
+=>sudo lshw -class memory
+Ram Details
+
+>lsblk -d
+=>lshw -class disk -short
+Hard disk size
+
 =>df
 =>free -m
 =>df -kh .
