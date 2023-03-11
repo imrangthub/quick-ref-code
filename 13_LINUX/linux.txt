@@ -1,6 +1,7 @@
 #################################################
 #                 LINUX                        #
 #################################################
+MRP-imran
 =>uptime
 =>printenv
 =>su - root
@@ -29,6 +30,12 @@
 =================================================
 #                  Basic                                          
 ================================================= 
+=>id userName
+=>chage -l imran
+
+=>cat /etc/passwd
+=>cat /etc/group
+DB of user and group
 
 =>cp /etc/passwd .
 
@@ -45,6 +52,8 @@ Show list of package
 Find runing process
 
 
+=>sudo fdisk -l
+All hard device for storage
 =>free -g
 =>df -H
 =>sudo lshw -class memory
@@ -95,6 +104,7 @@ reads through the file file.txt and prints the first field of each line
 curly braces {} enclose the command to be executed for each line of the file, and $1 specifies the first field of the line.
 utility for processing and manipulating text files
 
+
 =================================================
 #    Find | search    |    look up      
 ================================================= 
@@ -125,6 +135,419 @@ If you are not sure where is the version.sh file
 then
 =>/app/archive/artifactory-oss-6.12.0/tomcat/bin/version.sh
 systemctl status nginx
+
+
+
+
+=================================================
+# Security | Permissions  | access                                
+================================================= 
+
+=>tail -f /var/log/auth.log
+Show login information
+
+=>chmod go=- two-simple.txt
+=>chmod ugo=- *
+Remoce all permission from group and other
+
+
+=>chmod u=rwx perm_test
+
+
+=>chmod u/g/o +/- file/folder
+Permissions Syntax
+
+=>chmod u+w myFileName
+=>chmod u+w,g+r,o+r myFileName
+=>chmod 777 myFileName
+Add file permission
+
+
+=>chown imranUser myFolder
+=>chmod .empGroup myFolder
+=>chmod imranUser.empGroup myFolder
+
+=>chown imranUser:empGroup myFolder
+Add Owner permission
+
+
+=>sudo su
+Log in as root
+
+=>sudo passwd root
+For Change password
+
+=>runlevel
+Show current runlevel id
+
+=>su - imran
+Change system user
+
+
+=>sudo chown userName:groudName fileName
+Change Owner/Group of a File
+
+=>sudo chown -R userName:groudName /path/to/directory/*
+Change Owner/Group of All Files/Directories
+
+
+=>sudo chmod a+rwx /szDirectoryName
+=>sudo chmod -R 700 folder3
+
+
+
+Id From 0 to 499 System generated and Other user generated
+
+
+chmod a-w file (removes all writing permissions)
+chmod o+x file (sets execute permissions for other (public permissions))
+chmod u=rx file        (Give the owner rx permissions, not w)
+chmod go-rwx file      (Deny rwx permission for group, others)
+chmod g+w file         (Give write permission to the group)
+chmod a+x file1 file2  (Give execute permission to everybody)
+chmod g+rx,o+x file    (OK to combine like this with a comma)
+
+u = user that owns the file
+g = group that owns the file
+o = other (everyone else)
+a = all (everybody)
+
+r = read aces to the file
+w = write access
+x = execute (run) access
+
+
+#root
+------------------------------------------------------------------------------------------
+=>sudo -i
+=>passwd
+Set root password
+
+
+
+=================================================
+#Networking | Net                                           
+================================================= 
+=>ip a
+=>ip addr show
+=>ip -s link showonfig
+
+=>nmcli con show
+Show current activeconn
+=>nmcli con up id ethernet-eno1
+Reload network card
+
+
+=>host google.combine
+
+=>netstat -tulpn
+=>netstat -an | grep 80
+
+=>ip addr add 192.168.1.11/24 broadcast 192.168.1.255 dev eno1
+Add secondary IP
+
+
+=>sudo route
+=>suod route add default gw 192.168.1.1
+=>suod route del default gw 192.168.1.1
+
+=>sudo apt-get install traceroute
+=>traceroute google.com
+
+ 
+=>sudo apt install net-tools
+
+=>ip route add default via 10.21.29.11
+Set default getway
+
+=>ip route show
+Show how to reach internet and default getway 
+
+
+
+=>systemctl status NetworkManger
+Check net manager status
+
+=>cd /etc/NetworkManger/system-connections
+System net conn list
+
+
+#SSH
+------------------------------------------------
+
+=>echo $SHELL 
+Show alll shele list
+=>sudo apt install openssh-server
+
+
+
+=>ssh imran@192.168.1.514
+
+=>mv pappjar pappjar_23032022
+=>scp papp.jar imran@192.168.1.514:/home/imran
+
+
+=>scp -r /home/imran/blPROJECT/deploymentProcess  imran@192.168.1.514:/home/imran/mySimpleFolder
+Copying Directories to remote machine
+
+=>scp  -r imran@192.168.1.514:/home/imran/mySimpleFolder /home/imran/blPROJECT/deploymentProcess
+Copying directories from remote machine to local machine
+
+
+
+
+#Namespace
+-------------------------------------------------
+=>ip netns
+=>ls /var/run/netns
+List of namespace
+
+=>ip netns add nameOfNamespace
+
+
+=>ip netns add net1
+Add name space
+
+=>ip netns exec net1 ip link
+=>ip netns exec net1 ip addr
+
+=>ip netns exec net1 ip link set dev lo update
+
+
+
+=================================================
+#Firewall | Ufw | FIREWALL                 
+=================================================
+
+=>systemctl status firewalld.status
+
+=>firewall-cmd --get-zones
+=>firewall-cmd --get-default-zone
+=>firewall-cmd --get-active-zone
+=>firewall-cmd --set-default-zone=home
+Show fw zone
+
+
+=>firewall-cmd --zone=public --list-all
+List of active services
+
+
+=>firewall-cmd  --get-services
+List of all services available
+
+=>firewall-cmd --permanent --zone=public --add-service=http
+=>firewall-cmd --permanent --zone=public --remove-service=http
+=>firewall-cmd -reload
+Add services permanent
+
+=>ls /usr/lib/firewalld/services/
+Service config file list
+
+
+
+=>sudo apt install ufw
+=>sudo ufw status
+Check the allow app list
+=>sudo ufw allow ssh
+
+=>sudo ufw delete allow ssh
+=>sudo ufw delete allow 22/tcp
+
+
+=>sudo ufw status numbered
+
+=>sudo ufw status
+=>sudo ufw disable
+
+=>vim /etc/default/ufw 
+
+=>sudo ufw reset
+Reset current rule
+
+
+
+=================================================
+# System  |  CTL                         
+================================================= 
+=>init 3 // Text mode
+=>startx 
+=>init 0 shatdown
+=>init 6 or =>reboot
+=>who 
+Current log in user
+
+
+=>history 
+Show uses caommand from start to at now
+
+=>history -c
+Clear command history
+
+
+#Process | PS | process
+-------------------------------------------------
+=>ps aux
+=>ps -fax | less
+Show all process and with chile proc
+
+
+
+=>dpkg --list
+Currently installed programs
+
+=>sudo apt-get remove packagName
+=>sudo apt-get --purge remove packagName
+=>sudo aptitude remove packagName
+Uninstalling Programs with Terminal
+
+=>sudo apt-get dist-upgrade
+
+=>sudo apt-get autoremove
+
+=>sudo systemctl daemon-reload 
+Reload the systemd daemon service to load newly create files.
+
+=>sudo apt update
+Syncs your local copy of available packages and their versions against the current-state index with the repositories
+
+=>sudo updatedb
+
+
+
+=================================================
+# Monitoring | CUP  | memory | storage                               
+================================================= 
+
+=>top
+
+=>man 7 signal
+Show all single list
+
+=>dd if=/div/zero of=/dev/null &
+Simple process
+
+
+=>ls /var/log/
+Show all system logs file
+
+#Memory
+-------------------------------------------------
+
+=>lsblk
+Show all memory/block device and partation attatch to the machine 
+
+
+=>sudo umount /devic/nameOrPath
+Un-mount a partation 
+
+
+#Mounting a new device
+-------------------------------------------------
+Step1: Create a mount point to a device path
+=>sudo fdisk /dev/sdb
+	->p			# Show all disk partation
+	->n			# Create new Partation
+	->w			# Finalize write
+	
+Step1: Create file System
+=>sudo apt install exfat-utils exfat-fuse
+=>sudo mkfs.exfat /dev/sdb1
+
+
+
+
+
+
+=>free -g
+=>df -H
+=>sudo lshw -class memory
+Ram Details
+
+>lsblk -d
+=>lshw -class disk -short
+Hard disk size
+
+=>df
+=>free -m
+=>df -kh .
+=>df -T -h /myDir/
+
+=>cat /proc/meminfo
+=>grep MemTotal /proc/meminfo
+Ram size check
+
+=>dmesg | grep blocks
+=>sudo fdisk -l | grep Disk
+=>sudo fdisk -l | grep "^Disk /" | gawk '{print $3,$4}'
+Total disk Size
+
+#Cpu
+-------------------------------------------------
+=>lscpu
+
+=>lscpu
+=>lscpu | egrep 'Model name|Socket|Thread|NUMA|CPU\(s\)'
+=>cat /proc/cpuinfo
+=> grep 'cpu cores' /proc/cpuinfo | uniq
+
+
+
+=================================================
+#SH | sh | shall script| cmd                                  
+================================================= 
+=>nohup sh my-syslog.sh &
+=>nohup sh my-syslog.sh > sys-log.txt &
+
+
+Exmp1
+=====
+while true
+do
+        echo "System is runing $(date) !"
+        sleep 1
+done
+
+
+
+Exmp2
+=====
+while true
+do
+        echo "System is runing !    Date: $(date)     User: $USER" 
+        sleep 1
+done
+
+
+=================================================
+#   CRON | crontab                                     
+================================================= 
+=>less /etc/anacrontab
+=>ls -l /etc/cron.daily/
+Show daly default cron 
+
+
+crontab -e
+CreateACronEverySec:
+*/1 * * * * echo 'This is from Cron Job v2.......'>> /home/imran/imranMadbar/myPROJECT/linuxScript/cronLog.txt
+
+Check if cron package is installed:
+=>dpkg -l cron 
+=>apt-get install cron
+=>systemctl status cron
+
+crontab -l : List the all your cron jobs.
+crontab -r : Delete the current cron jobs.
+
+
+Syntax:
+* * * * * /path/to/command arg1 arg2
+OR
+* * * * * /root/backup.sh
+
+
+=>less /etc/crontab
+Show all cron systex
+
 
 
 =================================================
@@ -196,70 +619,6 @@ Replace all
 
 
 
-
-=================================================
-# System  |  CTL                         
-================================================= 
-=>init 3 // Text mode
-=>startx 
-=>init 0 shatdown
-=>init 6 or =>reboot
-=>who 
-Current log in user
-
-
-=>history 
-Show uses caommand from start to at now
-
-=>history -c
-Clear command history
-
-
-=>dpkg --list
-Currently installed programs
-
-=>sudo apt-get remove packagName
-=>sudo apt-get --purge remove packagName
-=>sudo aptitude remove packagName
-Uninstalling Programs with Terminal
-
-=>sudo apt-get dist-upgrade
-
-=>sudo apt-get autoremove
-
-=>sudo systemctl daemon-reload 
-Reload the systemd daemon service to load newly create files.
-
-=>sudo apt update
-Syncs your local copy of available packages and their versions against the current-state index with the repositories
-
-=>sudo updatedb
-
-
-=================================================
-#   CRON | crontab                                     
-================================================= 
-crontab -e
-CreateACronEverySec:
-*/1 * * * * echo 'This is from Cron Job v2.......'>> /home/imran/imranMadbar/myPROJECT/linuxScript/cronLog.txt
-
-Check if cron package is installed:
-=>dpkg -l cron 
-=>apt-get install cron
-=>systemctl status cron
-
-crontab -l : List the all your cron jobs.
-crontab -r : Delete the current cron jobs.
-
-
-Syntax:
-* * * * * /path/to/command arg1 arg2
-OR
-* * * * * /root/backup.sh
-
-
-=>less /etc/crontab
-Show all cron systex
 
 =================================================
 #    File or Directory  | Operation    | Copy                                     
@@ -483,74 +842,6 @@ Exmp2
 
 
 =================================================
-# Monitoring | CUP  | memory | storage                               
-================================================= 
-
-=>top
-
-#Memory
--------------------------------------------------
-=>free -g
-=>df -H
-=>sudo lshw -class memory
-Ram Details
-
->lsblk -d
-=>lshw -class disk -short
-Hard disk size
-
-=>df
-=>free -m
-=>df -kh .
-=>df -T -h /myDir/
-
-=>cat /proc/meminfo
-=>grep MemTotal /proc/meminfo
-Ram size check
-
-=>dmesg | grep blocks
-=>sudo fdisk -l | grep Disk
-=>sudo fdisk -l | grep "^Disk /" | gawk '{print $3,$4}'
-Total disk Size
-
-#Cpu
--------------------------------------------------
-=>lscpu
-
-=>lscpu
-=>lscpu | egrep 'Model name|Socket|Thread|NUMA|CPU\(s\)'
-=>cat /proc/cpuinfo
-=> grep 'cpu cores' /proc/cpuinfo | uniq
-
-
-
-=================================================
-#SH | sh | shall script| cmd                                  
-================================================= 
-=>nohup sh my-syslog.sh &
-=>nohup sh my-syslog.sh > sys-log.txt &
-
-
-Exmp1
-=====
-while true
-do
-        echo "System is runing $(date) !"
-        sleep 1
-done
-
-
-
-Exmp2
-=====
-while true
-do
-        echo "System is runing !    Date: $(date)     User: $USER" 
-        sleep 1
-done
-
-
-=================================================
 #apache2                               
 ================================================= 
 
@@ -576,178 +867,8 @@ Change port
 =>/etc/apache2/ports.conf
  
 
-
-=================================================
-# Security | Permissions  | access                                
-================================================= 
-
-=>tail -f /var/log/auth.log
-Show login information
-
-=>chmod go=- two-simple.txt
-=>chmod ugo=- *
-Remoce all permission from group and other
-
-
-=>chmod u=rwx perm_test
-
-
-=>chmod u/g/o +/- file/folder
-Permissions Syntax
-
-=>chmod u+w myFileName
-=>chmod u+w,g+r,o+r myFileName
-=>chmod 777 myFileName
-Add file permission
-
-
-=>chown imranUser myFolder
-=>chmod .empGroup myFolder
-=>chmod imranUser.empGroup myFolder
-
-=>chown imranUser:empGroup myFolder
-Add Owner permission
-
-
-=>sudo su
-Log in as root
-
-=>sudo passwd root
-For Change password
-
-=>runlevel
-Show current runlevel id
-
-=>su - imran
-Change system user
-
-
-=>sudo chown userName:groudName fileName
-Change Owner/Group of a File
-
-=>sudo chown -R userName:groudName /path/to/directory/*
-Change Owner/Group of All Files/Directories
-
-
-=>sudo chmod a+rwx /szDirectoryName
-=>sudo chmod -R 700 folder3
-
-
-
-Id From 0 to 499 System generated and Other user generated
-
-
-chmod a-w file (removes all writing permissions)
-chmod o+x file (sets execute permissions for other (public permissions))
-chmod u=rx file        (Give the owner rx permissions, not w)
-chmod go-rwx file      (Deny rwx permission for group, others)
-chmod g+w file         (Give write permission to the group)
-chmod a+x file1 file2  (Give execute permission to everybody)
-chmod g+rx,o+x file    (OK to combine like this with a comma)
-
-u = user that owns the file
-g = group that owns the file
-o = other (everyone else)
-a = all (everybody)
-
-r = read aces to the file
-w = write access
-x = execute (run) access
-
-
-#root
-------------------------------------------------------------------------------------------
-=>sudo -i
-=>passwd
-Set root password
-
-
-=================================================
-#Networking | Net                                           
-================================================= 
-
-=>ip a
-=>ip addr show
-=>ifconfig
-
-=>hostname -i 
-
-=>nmcli con up id ethernet-eno1
-Reload network card
-
-
-=>host google.combine
-
-=>netstat -tulpn
-=>netstat -an | grep 80
-
-=>sudo route
-=>suod route add default gw 192.168.1.1
-=>suod route del default gw 192.168.1.1
-
-=>sudo apt-get install traceroute
-=>traceroute google.com
-
  
-=>sudo apt install net-tools
-
-=>ip route add default via 10.21.29.11
-Set default getway
-
-=>ip route show
-Show default getway 
-
-
-
-=>systemctl status NetworkManger
-Check net manager status
-
-=>cd /etc/NetworkManger/system-connections
-System net conn list
-
-
-#SSH
-------------------------------------------------
-
-=>echo $SHELL 
-Show alll shele list
-=>sudo apt install openssh-server
-
-
-
-=>ssh imran@192.168.1.514
-
-=>mv pappjar pappjar_23032022
-=>scp papp.jar imran@192.168.1.514:/home/imran
-
-
-=>scp -r /home/imran/blPROJECT/deploymentProcess  imran@192.168.1.514:/home/imran/mySimpleFolder
-Copying Directories to remote machine
-
-=>scp  -r imran@192.168.1.514:/home/imran/mySimpleFolder /home/imran/blPROJECT/deploymentProcess
-Copying directories from remote machine to local machine
-
-
-
-
-#Namespace
--------------------------------------------------
-=>ip netns
-=>ls /var/run/netns
-List of namespace
-
-=>ip netns add nameOfNamespace
-
-
-=>ip netns add net1
-Add name space
-
-=>ip netns exec net1 ip link
-=>ip netns exec net1 ip addr
-
-=>ip netns exec net1 ip link set dev lo update
-
-
+ 
 =================================================
 #    Storage |   
 ================================================= 
@@ -864,32 +985,6 @@ Process signal
 
 
 
-
-=================================================
-#Ufw Firewall                  
-================================================= 
-
-=>sudo ufw status
-=>sudo ufw disable
-
-=>vim /etc/default/ufw 
-
-=>sudo ufw reset
-Reset current rule
-
-
-
-=>sudo apt install ufw
-=>sudo ufw status
-Check the allow app list
-=>sudo ufw allow ssh
-
-=>sudo ufw delete allow ssh
-=>sudo ufw delete allow 22/tcp
-
-
-=>sudo ufw status numbered
- 
 
 =================================================
 #Software|repositories|packages|install|Tools                  
