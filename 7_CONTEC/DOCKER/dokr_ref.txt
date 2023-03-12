@@ -2,46 +2,43 @@
 #                 DOCKER                        #
 #################################################
 Human->DockerClient->RestServer->DockerDeamon->ContainerD->RunC->Kernal
-https://www.youtube.com/watch?v=wtKef83kmUA&list=PL0hSJrxggIQoKLETBSmgbbvE4FO_eEgoB
-=>docker info
-=>docker help run
-
 
 =>docker --version
 =>docker info
-=>docker logs 96
 =>docker login
 =>docker logout
 
 =>systemctl start docker
-=>sudo systemctl stop docker
-=>sudo systemctl stop docker.socket
-
-=>sudo systemctl status docker
+=>systemctl stop docker
+=>systemctl stop docker.socket
+=>systemctl status docker
 
 =>docker run imranmadbar/hello-world-java
 =>docker run --name containerName -p 8080:8080 -d imageName:tagName
 =>docker run --name SpringBootWebApp -p 8080:8080 -d imranmadbar/hello-world-java-maven-web-spring-boot
 
+=>docker logs conId
 =>docker stop containerId
 
 
-=>docker cp e029d15afdfc:/etc/cassandra/cassandra.yaml C:/Z_MY_COMPUTER
-=>docker cp C:/Z_MY_COMPUTER/1MD_IMRAN_HOSSAIN/JAVA/SimpleJavaApplicatio.java 7a35bd9a6eb4:/home
+=>docker cp contId:/etc/cassandra/cassandra.yaml C:/Z_MY_COMPUTER
+=>docker cp C:/Z_MY_COMPUTER/1MD_IMRAN_HOSSAIN/JAVA/SimpleJavaApplicatio.java contId:/home
 
 =>ps -eaf | grep 8080
 =>ps -eaf | grep docker
-=>docker exec containerId ls
-=>docker stats
 =>docker top containerId
-=>docker events
+=>docker exec containerId ls
 =>docker exec -it containerId sh
-=>docker container stats --all
+
+=>docker stop $(docker ps -a -q)
+=>docker rm $(docker ps -a -q)
 =>docker container rm -f $(docker container ls -aq)
 =>docker image rm -f $(docker image ls -q)
+
 =================================================
 #                  Basic                                          
 ================================================= 
+=>cat /etc/hosts
 =>docker history imageName
 Show image layers
 
@@ -49,55 +46,23 @@ Show image layers
 =>docker top contId
 Show host machine pId
 
-
 =>docker ps 
 =>docker ps -a
 =>docker images
-=>docker rm contId
-=>docker rmi img
-
-=>docker run -it someimages
-Run container Attatch and Interactive mode.
-
-
-=>docker run –p 80:5000 imranmadbar/arif-travel-agency-app
-PORT mapping
-
-
-=>cat /etc/hosts
-=>docker stop $(docker ps -a -q)
-=>docker rm $(docker ps -a -q)
-=>docker run --rm debian echo 'HelloMsImran'
-=>docker service scale SpringBootWebApp=5
-
-
-
-
-=>printenv
-=>cat /etc/os-release
-
-=>docker images
 =>docker container ls
 
-=> docker container ls -aq
+=>docker container ls -aq
 List of container id
 
-=>docker ps
-Lists all the docker containers are running with container details.
-
-=>docker ps -a
-List all the docker containers running/exited/stopped with container details.
-
+=>docker rm contId
+=>docker rmi img
+=>docker system prune --all
+Delete all image
 
 =>docker search hadoop
 Search for a docker image on dockerhub with the name mentioned in the command.
 
-=>docker system prune --all
-Delete all image
-
-
 =>docker inspect containerId
-
 =>docker -f logs 09ca6feb6efc
 
 
@@ -112,18 +77,20 @@ Check the different history in container
 
 
 =================================================
-#Docker Image 
+#Image | image | docker image
 =================================================
+
+=>docker rmi fce289e99eb9
+Remove the docker image with the docker image id mentioned in the command
+
 
 =>docker commit -m "commitMsg" -a "authorName" containerId newImageName
 
 
 
-# Build Images
+#Build Images
 -------------------------------------------------
 =>docker build -t myubunty:v1 .
-
-
 =>docker image build -t imranmadbar/bas-config-server .
 
 
@@ -132,30 +99,19 @@ Check the different history in container
 List all the docker images pulled on the system with image details such as TAG/IMAGE ID/SIZE etc.
 
 Retag the image with a version number:
-=>docker image build -t imranmadbar/docker-spring-security-mysql-mvc-prod:1.0.1.RELEASE .
-=>docker image build -t imranmadbar/docker-spring-security-mysql-mvc-prod:2.0.0.RELEASE .
-=>docker image build -t imranmadbar/docker-spring-security-mysql-mvc-prod:3.0.0.RELEASE .
+=>docker image build -t imranmadbar/docker-spring-security-mysql-mvc-prod:1.0.0.RELEASE .
 
-
-=>docker image build -t imranmadbar/oauth2-resource-server-api:1.0.0.RELEASE .
-=>docker image build -t imranmadbar/oauth2-authorization-server-api:1.0.0.RELEASE .
-
-=>docker image build -t imranmadbar/arif-travel-agency-app:1.0.0.RELEASE .
-
-=>docker image build -t imranmadbar/hello-world-java-maven-web-spring-boot
 
 # Pull Images | download Images
 -------------------------------------------------
 =>docker pull imranmadbar/docker-spring-boot-mysql
 
 Pull image with a version number:
-=>docker pull imranmadbar/docker-spring-security-mysql-mvc-prod:1.0.1.RELEASE
 =>docker pull imranmadbar/docker-spring-security-mysql-mvc-prod:2.0.0.RELEASE
 
 
 # Run Images as container
 -------------------------------------------------
-=>cqlsh localhost -u imran -p 123456
 =>docker run imranmadbar/hello-world-java
 =>docker run --name containerName -p 8080:8080 -d imageName:tagName
 =>docker run --name cassandradb -d -p 9042:9042 cassandra:3.11
@@ -165,62 +121,37 @@ Pull image with a version number:
 
 =>docker container run --name producer -p 8080:8080 -d employee-producer
 =>docker run --name docker-spring-boot-mysql -t --link mysql-dkr-contr-db:mysql-dkr-contr-db -d -p 8080:8181 imranmadbar/docker-spring-boot-mysql
+=>docker run -d -p 3306:3306 --name=spring-boot-mysql-oauth2-db --env="MYSQL_ROOT_PASSWORD=root" --env="MYSQL_DATABASE=mysqloauth2db" -it mysql:5.7
 =>docker run --name docker-spring-security-mysql-mvc-prod -t --link mysql-dkr-contr-db:mysql-dkr-contr-db -d -p 8080:8181 imranmadbar/docker-spring-security-mysql-mvc-prod:3.0.0.RELEASE
 =>docker container run --network consumer-producer-net --name docker-spring-boot-restcall-producer -p 8080:8080 -d imranmadbar/docker-spring-boot-restcall-producer
 =>docker container run --network consumer-producer-net --name docker-spring-boot-restcall-consumer -p 8282:8282 -d imranmadbar/docker-spring-boot-restcall-consumer
 
-
-
-# Run Images as container
--------------------------------------------------
-=>docker run -d -p 9042:9042 cassandra:3.11
-=>docker run -d -p 3306:3306 --name=spring-boot-mysql-oauth2-db --env="MYSQL_ROOT_PASSWORD=root" --env="MYSQL_DATABASE=mysqloauth2db" -it mysql:5.7
-
-=>docker run --name oauth2-authorization-server-api -t --link spring-boot-mysql-oauth2-db:spring-boot-mysql-oauth2-db -p 8181:8081 imranmadbar/oauth2-authorization-server-api:1.0.0.RELEASE
-=>docker run --name oauth2-resource-server-api -t --link spring-boot-mysql-oauth2-db:spring-boot-mysql-oauth2-db -p 8282:8082 imranmadbar/oauth2-resource-server-api:1.0.0.RELEASE
-
-
 =>docker run --name arif-travel-agency-app --link mysqlschema:mysqlschema -t -p 8080:8080 imranmadbar/arif-travel-agency-app:1.0.0.RELEASE
 =>docker run --name arif-travel-agency-app --link mysqlschema:mysqlschema -e MYSQL_HOST=mysqlschema -t -p 8080:8080 imranmadbar/arif-travel-agency-app:1.0.0.RELEASE
-
-=>docker run --name SpringBootWebApp -m 250m -p 8080:8080 -d imranmadbar/hello-world-java-maven-web-spring-boot
 
 =>docker run --name SpringBootWebApp --cpus 3 -m 100m -p 8080:8080 -d imranmadbar/hello-world-java-maven-web-spring-boot
 =>docker run --name SpringBootWebApp --cpus 3 --cpuset-cpus 1 -m 100m -p 8080:8080 -d imranmadbar/hello-world-java-maven-web-spring-boot
 =>docker run --name SpringBootWebApp --cpus 0.2 --cpuset-cpus 1 -m 100m -p 8080:8080 -d imranmadbar/hello-world-java-maven-web-spring-boot
 
 
-#Removing Images
--------------------------------------------------
-=>docker rmi fce289e99eb9
-Remove the docker image with the docker image id mentioned in the command
-
-
 
 #Upload a docker Images 
--------------------------------------------------
-=>docker push imranmadbar/docker-swarm-spring-boot-consumer-api
-Upload a docker Images with the image name mentioned in the command on the dockerhub.
-
-With Version
-=>docker push abiodunjames/example-node-app:v1
-=>docker push imranmadbar/docker-spring-security-mysql-mvc-prod:1.0.1.RELEASE
-=>docker push imranmadbar/docker-spring-security-mysql-mvc-prod:2.0.0.RELEASE
-
-
-#Update a docker Images 
 -------------------------------------------------
 =>docker push geekflare/httpd_image
 Just make change, re-build image and push !
 
+=>docker push imranmadbar/docker-swarm-spring-boot-consumer-api
 
-
-
+With Version
+=>docker push abiodunjames/example-node-app:v1
+=>docker push imranmadbar/docker-spring-security-mysql-mvc-prod:1.0.1.RELEASE
 
 
 =================================================
 #Docker Container   
 =================================================
+=>docker exec -it 583c72a9b5e5 sh
+Open Bash | CMD of Containers
 
 =>docker start 09ca6feb6efc
 =>docker rm 9b6343d3b5a0
@@ -228,19 +159,12 @@ Just make change, re-build image and push !
 =>docker stop 09ca6feb6efc
 =>docker container prune
 
-
-=>docker cp e029d15afdfc:/etc/cassandra/cassandra.yaml C:/Z_MY_COMPUTER
-=>docker cp C:/Z_MY_COMPUTER/MD_IMRAN_HOSSAIN/DB/CASSANDRA/cassandra.yaml e029d15afdfc:/etc/cassandra
-Copy File From/To Container/Desktop
-
-
-=>docker exec -it 583c72a9b5e5 sh
-Open Bash | CMD of Containers
-
-
 => docker kill 09ca6feb6efc
 Stop the docker container immediately. Docker stop command stops the container gracefully, that’s the difference between a kill and stop commands.
 
+=>docker cp contId:/etc/cassandra/cassandra.yaml C:/Z_MY_COMPUTER
+=>docker cp C:/Z_MY_COMPUTER/MD_IMRAN_HOSSAIN/DB/CASSANDRA/cassandra.yaml contId:/etc/cassandra
+Copy File From/To Container/Desktop
 
 
  
