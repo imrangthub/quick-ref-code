@@ -909,7 +909,7 @@ Show process run by user
 
 
 
-#service
+#service | .service
 -------------------------------------------------
 =>nano /etc/systemd/system/my_simple_service.service
 Create a services with below script
@@ -929,7 +929,7 @@ To enable/disable your service on every reboot
 
 
 
-SimpleSerEx1
+Service1
 ============
 [Unit]
 Description=My Simple Custome Service
@@ -1089,9 +1089,22 @@ save the file
 #InstallMySql
 --------------------------------------------------------------------------------------------------
 =>sudo apt install mysql-server
-=>sudo mysql_secure_installation
+=>sudo mysql
+=>ALTER USER 'root'@'localhost' IDENTIFIED WITH mysql_native_password BY 'root';
+=>ALTER USER 'root'@'localhost' IDENTIFIED BY 'root';
+=>ALTER USER 'root'@'localhost' IDENTIFIED WITH auth_socket;
+=>systemctl is-active mysql
+
 Security configuration
 
+sudo apt-get remove --purge mysql*
+sudo apt-get purge mysql*
+sudo apt-get autoremove
+sudo apt-get autoclean
+sudo apt-get remove dbconfig-mysql
+sudo apt-get dist-upgrade
+
+Uninstall mysql server
 
 
 =>sudo apt install ./mysql-workbench-community_8.0.20-1ubuntu20.04_amd64.deb
@@ -1103,6 +1116,17 @@ mysql>update mysql.user set plugin = 'mysql_native_password' where User='root';
 mysql>FLUSH PRIVILEGES;
 mysql>exit;
 Access denied for user 'root'@'localhost'
+
+
+create table std_tbl(
+   id INT NOT NULL AUTO_INCREMENT,
+   name VARCHAR(100) NOT NULL,
+   gender VARCHAR(40) NOT NULL,
+   PRIMARY KEY ( id )
+);
+=>INSERT INTO std_tbl VALUES (1, 'IMRAN', 'MALE');
+
+
 
 
 =================================================
