@@ -589,9 +589,6 @@ Check class path dependencies
 
 Check Gradle dependencies jar version
 
-
-
-<<<<<<< HEAD
 # /etc/profile.d/gradle.sh
 # export PATH=$PATH:/opt/gradle/gradle-7.4.2/bin
 
@@ -618,21 +615,13 @@ Now load the environment variables as follows:
 =>gradle -v
 
 
-=======
+
 Wapper
 --------------------------------------------------
 =>gradlew --version
 =>gradlew init
 =>gradlew.bat clean
 
-
-
-implementation("org.springframework.boot:spring-boot-starter-web"){
-	exclude group: 'com.fasterxml.jackson.core'
-	exclude group: 'com.fasterxml.jackson.datatype'
-	exclude group: 'com.fasterxml.jackson.module'
-}
->>>>>>> 772383c1b636a083a7076735c8a615c7c9f73d05
 
 =================================================
 #  JENKING                                          
@@ -653,6 +642,30 @@ exit
 #  PYTHON                                          
 ================================================= 
 =>python --version
+
+FlaskServer:
+
+import os
+from flask import Flask
+app = Flask(__name__)
+
+@app.route('/home are you')
+def hello():
+		return 'I am good, how about you'
+	
+if __name__=="__main__":
+	app.run()
+
+
+Dockerfile:
+FROM ubuntu:20.04
+RUN apt-get update && apt-get install -y python-pip
+RUN pip install flask
+COPY myapp.py /app/
+ENTRYPOINT FLASK_APP=/app/myapp.py flask run --host=0.0.0.0
+
+
+
 
 
 
