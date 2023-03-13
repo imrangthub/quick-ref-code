@@ -13,8 +13,8 @@ Human->DockerClient->RestServer->DockerDeamon->ContainerD->RunC->Kernal
 =>systemctl stop docker.socket
 =>systemctl status docker
 
-=>docker run -it ubuntu bash
 =>docker run -d ubuntu sleep 100
+=>sudo docker run -ti --rm ubuntu /bin/bash
 =>docker run imranmadbar/hello-world-java
 =>docker run --name containerName -p 8080:8080 -d imageName:tagName
 =>docker run --name SpringBootWebApp -p 8080:8080 -d imranmadbar/hello-world-java-maven-web-spring-boot
@@ -102,6 +102,19 @@ List all the docker images pulled on the system with image details such as TAG/I
 Retag the image with a version number:
 =>docker image build -t imranmadbar/docker-spring-security-mysql-mvc-prod:1.0.0.RELEASE .
 =>docker image build -t imranmadbar/hello-world-java-maven-web-spring-boot:1.0.0.RELEASE .
+
+
+Create a ubuntu
+-------------------------------------------------
+#syntax=docker/dockerfile:1
+FROM ubuntu:20.04
+MAINTAINER madbarsoft.com
+COPY system-status-and-time-logs.sh /app/myscript.sh
+WORKDIR /app
+RUN chmod +x myscript.sh
+ENTRYPOINT ["/bin/bash", "myscript.sh"]
+
+
 
 # Pull Images | download Images
 -------------------------------------------------
@@ -447,6 +460,8 @@ create table std_tbl(
 =>docker exec -it contId bash
 =>mysql -uroot -proot
 =>show databases/tables;
+
+=>docker run --name mysqldb -d -e MYSQL_ROOT_PASSWORD=root --env="MYSQL_DATABASE=simpledb" -v /home/imran/imranMadbar/dockerPROD/mySqlRef:/var/lib/mysql mysql
 
 =>docker run --network=wp-mysql-network -e DB_Host=mysql-db -e DB_Password=db_pass123 -p 38080:8080 --name webapp --link mysql-db:mysql-db -d kodekloud/simple-webapp-mysql
 Deploy a web application named webapp using the kodekloud/simple-webapp-mysql image. Expose the port to 38080 on the host.
