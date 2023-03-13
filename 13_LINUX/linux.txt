@@ -929,6 +929,20 @@ To enable/disable your service on every reboot
 
 
 
+=>sudo systemctl disable mysql.service
+
+# Output all active services:
+systemctl -t service --state=active --no-pager --no-legend
+# Count of all active services:
+systemctl -t service --state=active --no-pager --no-legend | grep -c -
+# Output all running services:
+systemctl -t service --state=active --no-pager --no-legend | egrep '^*\.service.*running'
+# Count of all running services:
+systemctl -t service --state=active --no-pager --no-legend | egrep '^*\.service.*running' -c -
+
+
+
+
 Service1
 ============
 [Unit]
