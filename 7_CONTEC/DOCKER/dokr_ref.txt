@@ -13,22 +13,24 @@ Human->DockerClient->RestServer->DockerDeamon->ContainerD->RunC->Kernal
 =>systemctl stop docker.socket
 =>systemctl status docker
 
+=>docker run -it ubuntu bash
+=>docker run -d ubuntu sleep 100
 =>docker run imranmadbar/hello-world-java
 =>docker run --name containerName -p 8080:8080 -d imageName:tagName
 =>docker run --name SpringBootWebApp -p 8080:8080 -d imranmadbar/hello-world-java-maven-web-spring-boot
 
-=>docker logs conId
-=>docker stop containerId
+=>docker stop conId
+=>docker start contId
 
-
-=>docker cp contId:/etc/cassandra/cassandra.yaml C:/Z_MY_COMPUTER
-=>docker cp C:/Z_MY_COMPUTER/1MD_IMRAN_HOSSAIN/JAVA/SimpleJavaApplicatio.java contId:/home
-
+=>docker logs -f conId
 =>ps -eaf | grep 8080
 =>ps -eaf | grep docker
 =>docker top containerId
 =>docker exec containerId ls
 =>docker exec -it containerId sh
+
+=>docker cp contId:/etc/cassandra/cassandra.yaml C:/Z_MY_COMPUTER
+=>docker cp C:/Z_MY_COMPUTER/1MD_IMRAN_HOSSAIN/JAVA/SimpleJavaApplicatio.java contId:/home
 
 =>docker stop $(docker ps -a -q)
 =>docker rm $(docker ps -a -q)
@@ -93,14 +95,13 @@ Remove the docker image with the docker image id mentioned in the command
 =>docker build -t myubunty:v1 .
 =>docker image build -t imranmadbar/bas-config-server .
 
-
 =>docker image build -t imranmadbar/docker-spring-boot-restcall-consumer .
 =>docker image build -t imranmadbar/docker-spring-boot-restcall-producer .
 List all the docker images pulled on the system with image details such as TAG/IMAGE ID/SIZE etc.
 
 Retag the image with a version number:
 =>docker image build -t imranmadbar/docker-spring-security-mysql-mvc-prod:1.0.0.RELEASE .
-
+=>docker image build -t imranmadbar/hello-world-java-maven-web-spring-boot:1.0.0.RELEASE .
 
 # Pull Images | download Images
 -------------------------------------------------
@@ -417,22 +418,35 @@ Install a docker plugin vieux/sshfs with debug environment set to 1.
 
 
 
+=================================================
+#Jenkins | jenkins 
+=================================================
+=>docker pull jenkins/jenkins
+=>docker run -p 8080:8080 -p 50000:50000 --restart=on-failure jenkins/jenkins:lts-jdk11
+=>docker run -d -v jenkins_home:/var/jenkins_home -p 8080:8080 -p 50000:50000 --restart=on-failure jenkins/jenkins:lts-jdk11
+
+
 
 
 
 =================================================
 #MySQL | Sql 
 =================================================
+=>netstat -tulpn
+Check host machine running port
 
-create table student_tbl(
+create table std_tbl(
    id INT NOT NULL AUTO_INCREMENT,
    name VARCHAR(100) NOT NULL,
    gender VARCHAR(40) NOT NULL,
    PRIMARY KEY ( id )
 );
+=>INSERT INTO std_tbl VALUES (1, 'IMRAN', 'MALE');
 
-=>docker run -d -p 3306:3306 --name=mysqlschema --env="MYSQL_ROOT_PASSWORD=root" --env="MYSQL_DATABASE=arif_travel_agencydb" -it mysql:5.7.18
-
+=>docker run -d -p 3306:3306 --name=mysqlschema --env="MYSQL_ROOT_PASSWORD=root" --env="MYSQL_DATABASE=simpledb" -it mysql:5.7.18
+=>docker exec -it contId bash
+=>mysql -uroot -proot
+=>show databases/tables;
 
 =>docker run --network=wp-mysql-network -e DB_Host=mysql-db -e DB_Password=db_pass123 -p 38080:8080 --name webapp --link mysql-db:mysql-db -d kodekloud/simple-webapp-mysql
 Deploy a web application named webapp using the kodekloud/simple-webapp-mysql image. Expose the port to 38080 on the host.

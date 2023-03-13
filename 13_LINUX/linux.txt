@@ -15,17 +15,19 @@ MRP-imran
 =>netstat -an | grep 80
 =>curl -v telnet://172.16.191.16:3000
 
-=>sudo apt autoremove
-=>sudo apt autoclean
-=>sudo apt update && sudo apt upgrade
+
+=>sudo apt update && sudo apt upgrade -y
+=>sudo apt autoremove && sudo apt autoclean -y
+
 
 => ./startup.sh 
-=>du -sh fileNameForShoSize
+=>du -hs fileNameForShoSize
 
 =>echo $SHELL
 =>cat /etc/shells
 =>sudo nano /etc/sudoers
 
+=>systemctl list-unit-files | grep enabled
 =>shutdown / -h now / +10
 =================================================
 #                  Basic                                          
@@ -38,7 +40,8 @@ MRP-imran
 DB of user and group
 
 =>cp /etc/passwd .
-
+=>awk -F':' '{print $1}' passwd 
+Get first column
 
 =>tty
 =>uname -a
@@ -367,7 +370,7 @@ Reset current rule
 
 
 =================================================
-# System  |  CTL                         
+#System | systemctl | CTL                         
 ================================================= 
 =>init 3 // Text mode
 =>startx 
@@ -376,6 +379,8 @@ Reset current rule
 =>who 
 Current log in user
 
+=>systemctl list-unit-files | grep enabled
+List of all shstemctl enable services
 
 =>history 
 Show uses caommand from start to at now
