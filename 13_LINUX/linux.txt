@@ -1009,6 +1009,28 @@ Install  Net tools
 =>sudo apt install net-tools
 
 
+#httpd
+--------------------------------------------------
+#!/bin/bash
+yum update -y
+yum install -y httpd
+systemctl start httpd
+systemctl enable httpd
+echo "<h1>Hello World from $(hostname -f)</h1>" > /var/www/html/index.html
+
+For Ubuntu:
+sudo apt update
+sudo apt install apache2 -y
+sudo systemctl status apache2
+sudo chmod -R 777 /var/www/html
+echo "<h1 style='text-align:center'>This msg from server one</h1>" > /var/www/html/index.html
+
+
+=>ssh -i ssh-key.pem ubuntu@yourIpAdress
+=>ssh -i ssh-key.pem ec2-user@yourIpAdress
+
+
+
 =================================================
 #   PYTHON | PY  | py
 =================================================  
@@ -1040,7 +1062,7 @@ find out which process is listing upon a port
 
 
 #Install JAVA 
-------------------------------------------------------------------------------------------
+--------------------------------------------------
 
 =>sudo mkdir  -p /opt/jdk
 =>sudo cp -rf /home/sivasai/jdk-8u251-linux-x64.tar.gz /opt/jdk/
