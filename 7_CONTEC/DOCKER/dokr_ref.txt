@@ -2,22 +2,19 @@
 #                 DOCKER                        #
 #################################################
 Human->DockerClient->RestServer->DockerDeamon->ContainerD->RunC->Kernal
+=>docker container run --help | grep rm
 
 =>docker --version
 =>docker info
 =>docker login
 =>docker logout
 
-=>systemctl start docker
-=>systemctl stop docker
-=>systemctl stop docker.socket
-=>systemctl status docker
-
 =>docker run -d ubuntu sleep 100
 =>sudo docker run -ti --rm ubuntu /bin/bash
 =>docker run imranmadbar/hello-world-java
 =>docker run --name containerName -p 8080:8080 -d imageName:tagName
 =>docker run --name SpringBootWebApp -p 8080:8080 -d imranmadbar/hello-world-java-maven-web-spring-boot
+=>docker run -d --rm busybox ping -c10 google.com
 
 =>docker stop conId
 =>docker start contId
@@ -102,6 +99,34 @@ List all the docker images pulled on the system with image details such as TAG/I
 Retag the image with a version number:
 =>docker image build -t imranmadbar/docker-spring-security-mysql-mvc-prod:1.0.0.RELEASE .
 =>docker image build -t imranmadbar/hello-world-java-maven-web-spring-boot:1.0.0.RELEASE .
+
+
+Create a Image by docker file
+-------------------------------------------------
+Img1:
+FROM ubuntu
+RUN apt-get update
+run apt-get -y install nginx
+COPY index.html /var/www/html
+EXPOSE 80
+CMD ["nginx", "-g", "daemon off;"]
+
+
+COPY vs ADD 
+Copy for add file src of host and destination for docker container
+ADD dos same and more like add file from any url or .tar file to unzip and send to destination
+
+=>tar -czvf simpleFile.tar.gz simoleFile.txt
+	    =ADD index.tar.gz /var/www/html
+
+Img2:
+FROM busybox
+RUN mkdir -p /root/myDir
+WORKDIR /root/myDir
+RUN touch simpelFile.txt
+RUN echo hello>simpelFile.txt
+CMD ["/bin/sh"]
+
 
 
 Create a ubuntu
@@ -413,11 +438,19 @@ All dockerStack and dockerService commands must be run from a manager node.
 
 =>scp some-service.zip ip172-180-11-b2dfdf.play.with.docker.com:~
 Copy file to play with docker node
-=================================================
-#Docker Daemons 
-=================================================
 
+
+=================================================
+#daemons | Docker Daemons 
+=================================================
 =>docker --version
+
+=>systemctl start docker
+=>systemctl stop docker
+=>systemctl stop docker.socket
+=>systemctl status docker
+=>systemctl restart docker
+
 
 
 #Windows issue
@@ -437,14 +470,43 @@ Open cmd as administrator
 Launch command: "C:\Program Files\Docker\Docker\DockerCli.exe" -SwitchDaemon
 
 
-
-
 #Installing plugin
 -------------------------------------------------
 => docker plugin install vieux/sshfs D
 Install a docker plugin vieux/sshfs with debug environment set to 1.
 
 
+
+
+=================================================
+#Monitoring | momitoring | 
+=================================================
+=>docker system df
+=>docker system df -v
+Memory consume by docker component
+
+
+
+=>dd if=/dev/zero of=bigfile.txt bs=1M count=500
+=>du -sh bigfile.txt
+Create a file with size of 5MB
+
+
+Container with HealtCheck
+=>docker run -dt --name tmp  --health-cmd "curl --fail http://localhost" --health-interval=5s busybox sh
+=>docker run -dt --name tmp2 --health-cmd "curl -f http://localhost" --health-interval=5s --health-retries=1 busybox sh
+
+
+=================================================
+#Nginx | nginx 
+=================================================
+=>docker container run --name myNginx -d -p80:80 nginx
+=>docker container exec -it myNginx bash
+    =/etc/init.d/nginx status
+    =apt-get update
+    =apt-get install net-tools
+    =netstat -ntlp
+=>docker container exec -it 2c netstat -ntlp
 
 =================================================
 #Jenkins | jenkins 
