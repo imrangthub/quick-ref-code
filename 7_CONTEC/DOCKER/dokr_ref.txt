@@ -79,12 +79,14 @@ Check the different history in container
 #Image | image | docker image
 =================================================
 
-=>docker rmi fce289e99eb9
-Remove the docker image with the docker image id mentioned in the command
+=>docker save imageName > myArchImg.tar
+=>docker load<myArchImg.tar
+Save and load image as tar file
 
-
+=>docker container commit containerId newImageName
+=>docker container commit --change='CMD ["/bin/bahs"]' contName
 =>docker commit -m "commitMsg" -a "authorName" containerId newImageName
-
+Create image from container
 
 
 #Build Images
@@ -221,6 +223,12 @@ Copy File From/To Container/Desktop
 #Mounting  | Volumes |  Bind mounts                                       
 =================================================
 
+=>route -n 
+Check the route path
+
+=>apt-get install iputils-ping
+Install ping
+
 =>docker volume create MyDataVol
 =>docker volume ls
 =>docker volume ls -f name=data
@@ -262,31 +270,23 @@ Bind mounts will mount a file or directory on to your container from your host m
 
 =>docker network ls
 =>docker inspect bridge
-
-
 =>docker exec 484bc9a71fea  ifconfig
 =>docker network inspect netName
-
-
-
 
 
 #Create network (type Bridge)
 -------------------------------------------------
 =>docker network create consumer-producer-net
-=>docker network create spring-security-mvc-net
+=>docker network create --driver bridge --subnet 193.0.0.0/24 --gateway 193.0.0.1 mybridge-net
 
-
-#Run Container with a Network
---------------------------------------------------
-=>docker run --name SpringBootWebApp --network host -d imranmadbar/hello-world-java-maven-web-spring-boot
 =>docker container run --network employee-mysql --name employee-jdbc-container -p 8080:8080 -d employee-jdbc
+=>docker run --name SpringBootWebApp --network host -d imranmadbar/hello-world-java-maven-web-spring-boot
+Run Container with a Network
+
 
 #Run Container with a database
 --------------------------------------------------
 =>docker run --name docker-spring-security-mysql-mvc-prod3 -t --link mysql-dkr-contr-db:mysql-dkr-contr-db -d -p 8181:8181 imranmadbar/docker-spring-security-mysql-mvc-prod:3.0.0.RELEASE
-
-
 
 
 #Create network (type Overlay)
@@ -301,7 +301,6 @@ Bind mounts will mount a file or directory on to your container from your host m
 #Delete docker network
 -------------------------------------------------
 =>docker network rm networkId
-
 
 
 =>docker network create --driver bridge --subnet 182.18.0.1/24 --gateway 182.18.0.1 wp-mysql-network
@@ -403,6 +402,7 @@ this time the network will be of type Overlay.
 
 #Create docker service
 -------------------------------------------------
+=>docker service create --name my-services --replicas 1 nginx
 =>docker service create --network producer-consumer-net --name docker-swarm-spring-boot-consumer-api -p 8282:8282 imranmadbar/docker-swarm-spring-boot-consumer-api
 =>docker service create --network producer-consumer-net --name docker-swarm-spring-boot-producer-api -p 8181:8181 imranmadbar/docker-swarm-spring-boot-producer-api
 
@@ -423,6 +423,70 @@ Will remove all running instances but still keep the service object alive.
 
 
 =>docker stack rm bahsSwarmStack
+
+
+==-------------====
+Multiple Approaches for Scaling
+=>docker service scale service01=1
+=>docker service update --replicas 1 service02
+Scaling Multiple Services Together, it is not possible by service update
+=>docker service scale service01=3 service02=3
+
+
+
+Global Service
+=>docker service create --name antivirus --mode global -dt ubuntu
+
+
+Change the Node Availability to Drain
+=>docker node update --availability drain swarm03
+
+Inspecting a Service
+
+docker service inspect demotroubleshoot
+docker service inspect demotroubleshoot --pretty
+Inspecting a Node
+
+docker node inspect swarm01 
+docker node inspect swarm01 -pretty
+
+
+Create a Service by Publishing port
+docker service create --name mywebserver --replicas 1 --publish 8080:80 nginx
+
+
+
+Docker Stack
+-----------------------------------------------------
+docker-compose.yml
+version: '3'
+services:
+  webserver:
+    image: nginx
+    ports:
+       - "8080:80"
+  database:
+    image: redis
+
+
+=>docker stack deploy --compose-file docker-compose.yml mydemo
+Deploy Stack:
+
+
+
+
+=>docker service create --name myservice --mount type=volume,source=myvolume,target=/mypath nginx
+Mount Volumes with Swarm
+
+
+
+Setting Constraints
+Creating Service with Node Label Constraints
+docker service create --name myconstraint --constraint node.labels.region==blr --replicas 3 nginx
+Add a Label to Node:
+docker node update --label-add region=mumbai swarm03
+Running Nodes in Mumbai Region
+docker service create --name myconstraint --constraint node.labels.region==mumbai --replicas 3 nginx
 
 
 
@@ -702,3 +766,24 @@ With Compose, we can create a YAML file to define the services and with a single
 
 Service:A Docker "service" is one or more containers with the same configuration running
 under Docker’s swarm mode.
+
+
+
+
+=================================================
+#Install Docker  
+=================================================
+Installing Doeckr for CentOS 7
+
+Create a script within the text file and save it
+
+#!/bin/bash
+yum-config-manager --add-repo https://download.docker.com/linux/centos/docker-ce.repo
+yum -y install docker-ce
+systemctl start docker
+systemctl enable docker
+Step 3: Make the script executable:
+
+=>chmod +x docker-install.sh
+=>./docker-install.sh
+Run the script:
