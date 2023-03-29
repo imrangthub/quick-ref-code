@@ -140,6 +140,9 @@ Morshed Alam
 
 Server Deployment
 =================================================
+
+172.16.254.193 = SLB | NGINX
+
 =>ps -fC java
 =>ps -ef | grep otp
 =>netstat -tulpn
@@ -153,8 +156,12 @@ Server Deployment
 --spring.cloud.config.uri=http://localhost:7185
 --eureka.client.serviceUrl.defaultZone=http://192.168.1.2:7082/eureka/
 
-#distributionUrl=http\://172.16.254.122\:8081/repository/maven-public/gradle/gradle-wrapper/7.4.1/gradle-wrapper-7.4.1-bin.zip
 
+
+=>tail -f /app/apihub/Nginx_LB/logs/access.log | egrep -i '172.16.254.209'
+=>tail -f /app/apihub/Nginx_LB/logs/access.log | egrep -i '172.16.8.181'
+=>tail -f /app/apihub/Nginx_LB/logs/access.log | egrep -i '172.16.11.132'
+=>tail -f /app/apihub/Nginx_LB/logs/access.log | egrep -i '172.16.11.35'
 
 
 =================================================
@@ -162,6 +169,8 @@ Server Deployment
 =================================================
 =>nginx -t
 Check configuration is ok
+
+
 =>tail -1000 /app/apihub/Nginx_LB/logs/access.log | egrep -i '172.16.254.194' | awk '{print $8}' | sort | uniq --repeated --count
 Check the request status of specific server
 
@@ -193,7 +202,6 @@ Step 3: Grant all privileges
 
 IDP URL: 
 http://172.16.8.132:8080/auth/realms/banglalink/.well-known/openid-configuration
-
 
 
 =================================================
