@@ -34,6 +34,7 @@ Human->DockerClient->RestServer->DockerDeamon->ContainerD->RunC->Kernal
 =>docker container rm -f $(docker container ls -aq)
 =>docker image rm -f $(docker image ls -q)
 
+=>sudo systemctl restart docker
 =================================================
 #                  Basic                                          
 ================================================= 
@@ -49,6 +50,10 @@ Show host machine pId
 =>docker ps -a
 =>docker images
 =>docker container ls
+
+=>apt-get update && apt-get install procps -y 
+Install ps
+
 
 =>docker container ls -aq
 List of container id
@@ -163,6 +168,8 @@ Pull image with a version number:
 
 #Run Images as container
 -------------------------------------------------
+=>docker container run --name producer -p 8080:8080 -d employee-producer
+
 =>docker run imranmadbar/hello-world-java
 =>docker run --name containerName -p 8080:8080 -d imageName:tagName
 =>docker run --name cassandradb -d -p 9042:9042 cassandra:3.11
@@ -170,10 +177,14 @@ Pull image with a version number:
 =>docker run --name oauth2-authorization-server-api -p 8081:8081 imranmadbar/oauth2-authorization-server-api:1.0.0.RELEASE
 =>docker run --name docker-spring-security-mysql-mvc-prod -p 8181:8181 imranmadbar/docker-spring-security-mysql-mvc-prod:2.0.0.RELEASE
 
-=>docker container run --name producer -p 8080:8080 -d employee-producer
-=>docker run --name docker-spring-boot-mysql -t --link mysql-dkr-contr-db:mysql-dkr-contr-db -d -p 8080:8181 imranmadbar/docker-spring-boot-mysql
+
 =>docker run -d -p 3306:3306 --name=spring-boot-mysql-oauth2-db --env="MYSQL_ROOT_PASSWORD=root" --env="MYSQL_DATABASE=mysqloauth2db" -it mysql:5.7
-=>docker run --name docker-spring-security-mysql-mvc-prod -t --link mysql-dkr-contr-db:mysql-dkr-contr-db -d -p 8080:8181 imranmadbar/docker-spring-security-mysql-mvc-prod:3.0.0.RELEASE
+=>docker run --name docker-spring-boot-mysql --link mysql-dkr-contr-db:mysql-dkr-contr-db -d -p 8080:8181 imranmadbar/docker-spring-boot-mysql
+=>docker run --name spring-security-prod --link mysql-dkr-contr-db -d -p 8080:8181 imranmadbar/docker-spring-security-mysql-mvc-prod:3.0.0.RELEASE
+
+=>docker run --name book1 --link diff-mysqldb-contid:mysql-dkr-contr-db  -d -p 8181:8181 imranmadbar/docker-spring-boot-mysql
+
+
 =>docker container run --network consumer-producer-net --name docker-spring-boot-restcall-producer -p 8080:8080 -d imranmadbar/docker-spring-boot-restcall-producer
 =>docker container run --network consumer-producer-net --name docker-spring-boot-restcall-consumer -p 8282:8282 -d imranmadbar/docker-spring-boot-restcall-consumer
 
@@ -313,26 +324,122 @@ Create a new network named wp-mysql-network using the bridge driver. Allocate su
 #Docker Compose  
 =================================================
 =>docker-compose --version
+=> docker compose version
 
 
 
 
 #Run Compose |  Up Compose
 -------------------------------------------------
-=>docker-compose up
-=>docker-compose down
-=>docker-compose up -d 
+=>docker compose up
+=>docker compose down
+=>docker compose up -d 
+=>docker compose up -d --no-recreate
+
+=>docker compose logs
+=>docker compose ps
+
+=>docker compose images
+List of docker composer build
+
+=>docker compose ps
+List of container
+
+=>docker compose top
+
+=>docker compose stop serviceName
+=>docker compose start serviceName
+=>docker compose kill db
+=>docker compose rm serviceName
+
+=>docker-compose config
+Valid compose file
+
+=>docker compose pause serviceName
+=>docker compose unpause serviceName
+
+#compose1:
+version: "3.9"
+name: simple-composer-prod
+services:
+  mysqldb-services:
+    image: mysql
+    container_name: mysqldb
+    restart: always
+    environment:
+      MYSQL_DATABASE: 'docker_spring_boot_mysql_db'
+      MYSQL_ROOT_PASSWORD: 'root'
+    ports:
+      - '3306:3306'
+    volumes:
+      - my-db:/var/lib/mysql
+volumes:
+  my-db:
+
+#compose2:
+version: "3.9"
+name: simple-composer-prod
+services:
+  mysqldb-service:
+    image: mysql
+    container_name: mysqldb
+    restart: always
+    environment:
+      MYSQL_DATABASE: 'docker_spring_boot_mysql_db'
+      MYSQL_ROOT_PASSWORD: 'root'
+    ports:
+      - '3306:3306'
+    volumes:
+      - mydb-vlm:/var/lib/mysql
+  app-service:
+    image: imranmadbar/docker-spring-boot-mysql
+    container_name: book-app
+    restart: on-failure
+    links:
+      - mysqldb-service:mysql-dkr-contr-db 
+    depends_on:
+      - mysqldb-service
+    ports:
+      - "8181:8181" 
+volumes:
+  mydb-vlm:
+    name: mydb-vlm
+    
+#compose3:
+version: "3.9"
+name: simple-composer-prod
+services:
+  mysqldb-service:
+    image: mysql
+    container_name: mysqldb
+    restart: always
+    environment:
+      MYSQL_DATABASE: 'docker_spring_boot_mysql_db'
+      MYSQL_ROOT_PASSWORD: 'root'
+    ports:
+      - '3306:3306'
+    volumes:
+      - mydb-vlm:/var/lib/mysql
+  app-service:
+    image: imranmadbar/docker-spring-boot-mysql
+    restart: on-failure
+    deploy:
+      mode: replicated
+      replicas: 3
+    links:
+      - mysqldb-service:mysql-dkr-contr-db 
+    depends_on:
+      - mysqldb-service
+    ports:
+      - 8181 
+volumes:
+  mydb-vlm:
+    name: mydb-vlm
 
 =>docker-compose up -d --no-recreate
-
-
-
-=>docker-compose up -d --no-recreate
-
 When you use docker-compose up, if there are any changes in the docker-compose.yml file that affects the containers, they will stopped and recreated.
-But, you can force docker-compose not to stop and recreate the containers, you can use –no-recreate option as shown below during the docker-compose up. In other words, if the container already exits, this will not recreate it.
-
-
+But, you can force docker-compose not to stop and recreate the containers, you can use –no-recreate option as shown below during 
+the docker-compose up. In other words, if the container already exits, this will not recreate it.
 You also can do the opposite. The following will forcefully recreate the containers even if nothing in the docker-compose.yml is changed.
 
 
@@ -351,13 +458,6 @@ Default value is 10 seconds, but the following command will use the time-out val
 –no-build This will not build the image, even when the image is missing
 –abort-on-container-exit This will stop all the containers if any container was stopped. You cannot use this option with -d, you have to use this option by itself.
 –no-color In the output, this will not show any color. This will display the monochrome output on screen.
-
-
-#Set Container Name
----------------------------------------------------
-mysql:
-    image: mysql
-    container_name: sf4_mysql
 
 
 
