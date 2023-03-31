@@ -463,7 +463,7 @@ Default value is 10 seconds, but the following command will use the time-out val
 
 
 =================================================
-#Docker Swarm  
+#Swarm | swarm
 =================================================
 
 =>docker swarm init --advertise-addr 192.168.8.11
@@ -873,12 +873,13 @@ under Docker’s swarm mode.
 =================================================
 #Install Docker  
 =================================================
-Installing Doeckr for CentOS 7
 
+Installing Doeckr for CentOS 7
+---------------------------------------------------
 Create a script within the text file and save it
 
 #!/bin/bash
-yum-config-manager --add-repo https://download.docker.com/linux/centos/docker-ce.repo
+yum -config-manager --add-repo https://download.docker.com/linux/centos/docker-ce.repo
 yum -y install docker-ce
 systemctl start docker
 systemctl enable docker
@@ -887,3 +888,49 @@ Step 3: Make the script executable:
 =>chmod +x docker-install.sh
 =>./docker-install.sh
 Run the script:
+
+
+Ubuntu
+---------------------------------------------------
+=>sudo apt-get update
+=>sudo apt install docker.io
+=>sudo snap install docker
+
+ =>sudo apt-get purge docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin docker-ce-rootless-extras
+Uninstall
+
+Offcial by Script:
+=>sudo apt-get remove docker docker-engine docker.io containerd runc
+apt-get update
+curl -fsSL https://get.docker.com -o get-docker.sh
+sudo sh get-docker.sh
+
+
+ =>sudo systemctl start docker
+
+
+
+Ec2UserData:
+#!/bin/bash
+# by:imranmadbar@gmail.com
+# Install docker
+apt-get update
+apt-get install -y cloud-utils apt-transport-https ca-certificates curl software-properties-common
+curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo apt-key add -
+add-apt-repository \
+  "deb [arch=amd64] https://download.docker.com/linux/ubuntu \
+  $(lsb_release -cs) \
+  stable"
+apt-get update
+apt-get install -y docker-ce
+usermod -aG docker ubuntu
+# Install docker-compose
+sudo apt-get update
+sudo chmod a+r /etc/apt/keyrings/docker.gpg
+sudo apt-get update
+sudo apt-get install docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin
+
+
+
+Installing Docker on Amazon Linux 2
+---------------------------------------------------
