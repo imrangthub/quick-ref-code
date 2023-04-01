@@ -465,15 +465,30 @@ Default value is 10 seconds, but the following command will use the time-out val
 =================================================
 #Swarm | swarm
 =================================================
-
-=>docker swarm init --advertise-addr 192.168.8.11
+=>docker swarm init --advertise-addr 172.31.17.62
+=>docker swarm join --token xxxxxxxxxxxxxxx 172.31.25.249:2377
 =>docker swarm join-token worker
 =>docker swarm join-token manager
 
 =>docker node ls
 
-=>docker service create --replicas 2 --name mynginx -p 8080:80 nginx
+=>docker swarm leave
+
+Inspecting a Service
+docker service inspect demotroubleshoot
+docker service inspect demotroubleshoot --pretty
+
+Inspecting a Node
+docker node inspect swarm01 
+docker node inspect swarm01 -pretty
+
+
+
+=>docker service create --replicas 2 --name mynginx -p 80:80 nginx
 =>docker service create --replicas 2 --name SpringBootWebApp -p 8080:8080 -d imranmadbar/hello-world-java-maven-web-spring-boot
+=>docker service create --network producer-consumer-net --name docker-swarm-spring-boot-consumer-api -p 8282:8282 imranmadbar/docker-swarm-spring-boot-consumer-api
+=>docker service create --network producer-consumer-net --name docker-swarm-spring-boot-producer-api -p 8181:8181 imranmadbar/docker-swarm-spring-boot-producer-api
+
 
 =>docker service ls
 =>docker service logs -f serviceId
@@ -483,34 +498,34 @@ Default value is 10 seconds, but the following command will use the time-out val
 =>docker service ps serviceId
 see which nodes are running the service:
 
-
-=>docker service scale serviceId=5
-=>docker service rm serviceId
-
-
-#Check Docker node-service
--------------------------------------------------
-=>docker node ls
-
-#Create a network of type overlay
--------------------------------------------------
-=>docker network create --driver overlay producer-consumer-net
-
-When using services in a swarm,need a network so that multiple docker instances can interact with each other. 
-this time the network will be of type Overlay.
-
-
-#Create docker service
--------------------------------------------------
-=>docker service create --name my-services --replicas 1 nginx
-=>docker service create --network producer-consumer-net --name docker-swarm-spring-boot-consumer-api -p 8282:8282 imranmadbar/docker-swarm-spring-boot-consumer-api
-=>docker service create --network producer-consumer-net --name docker-swarm-spring-boot-producer-api -p 8181:8181 imranmadbar/docker-swarm-spring-boot-producer-api
-
 #Stop a docker service
 -------------------------------------------------
 =>docker service scale [serviceName]=0
 =>docker service scale docker-swarm-consumer-service=0
 Will remove all running instances but still keep the service object alive.
+
+=>docker service rm serviceId
+
+
+Global Service
+=>docker service create --name antivirus --mode global -dt ubuntu
+
+
+Change the Node Availability to Drain
+=>docker node update --availability drain swarm03
+
+
+Create a Service by Publishing port
+=>docker service create --name mywebserver --replicas 1 --publish 8080:80 nginx
+
+
+#Create a network of type overlay
+-------------------------------------------------
+=>docker service create --name myoverlay --network mynetwork --replicas 3 nginx
+=>docker network create --driver overlay producer-consumer-net
+When using services in a swarm,need a network so that multiple docker instances can interact with each other. 
+this time the network will be of type Overlay.
+
 
 
 #Deploy the stack to the swarm
@@ -525,34 +540,7 @@ Will remove all running instances but still keep the service object alive.
 =>docker stack rm bahsSwarmStack
 
 
-==-------------====
-Multiple Approaches for Scaling
-=>docker service scale service01=1
-=>docker service update --replicas 1 service02
-Scaling Multiple Services Together, it is not possible by service update
-=>docker service scale service01=3 service02=3
 
-
-
-Global Service
-=>docker service create --name antivirus --mode global -dt ubuntu
-
-
-Change the Node Availability to Drain
-=>docker node update --availability drain swarm03
-
-Inspecting a Service
-
-docker service inspect demotroubleshoot
-docker service inspect demotroubleshoot --pretty
-Inspecting a Node
-
-docker node inspect swarm01 
-docker node inspect swarm01 -pretty
-
-
-Create a Service by Publishing port
-docker service create --name mywebserver --replicas 1 --publish 8080:80 nginx
 
 
 
@@ -929,6 +917,9 @@ sudo apt-get update
 sudo chmod a+r /etc/apt/keyrings/docker.gpg
 sudo apt-get update
 sudo apt-get install docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin
+#Optional for net-tools and ping
+apt-get install iputils-ping
+sudo apt install net-tools
 
 
 
