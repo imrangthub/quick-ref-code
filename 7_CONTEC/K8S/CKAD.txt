@@ -35,6 +35,7 @@ https://kodekloud.com/lessons/recap-core-concepts/
 
 =>kubectl run nginx --image=nginx --dry-run=client
 =>kubectl run nginx --image=nginx --dry-run=client -o yaml
+=>kubectl run myng --image=nginx --dry-run=client -o yaml>labelpod.yaml
 =>kubectl create deployment --image=nginx nginx --dry-run=client -o yaml
 
 =>kubectl run mynginx --image=nginx
@@ -56,8 +57,10 @@ https://kodekloud.com/lessons/recap-core-concepts/
 =>kubectl describe pod mynginx
 
 
-D1:CoreConcept
+
 =================================================
+#D1:CoreConcept               
+================================================= 
 pod1:
 apiVersion: v1
 kind: Pod
@@ -117,20 +120,184 @@ spec:
     args: [ "while true; do sleep 30; done;"]
 
 
+pod6:
+kind: Pod
+metadata:
+  name: nginx-ports
+spec:
+  containers:
+  - image: nginx
+    name: nginx-ports
+    ports:
+    - containerPort: 80
+
 
 =>kubectl apply -f myfile.yml
 =>kubectl get pods
 =>kubectl exec -it my-pod1 sh
 
 
+PracticeDomain1:
+-----------------------------------------------------
+Q1:
+apiVersion: v1
+kind: Pod
+metadata:
+  name: kplabs-ports
+spec:
+  containers:
+    - name: nginx
+      image: nginx
+      command: ["sleep"]
+      args: ["3500"]
+Q2:
+apiVersion: v1
+kind: Pod
+metadata:
+  name: log-ng
+spec:
+  containers:
+    - name: log-ngcont
+      image: nginx
+      args:
+       - /bin/sh
+       - -c
+       - >
+         i=0;
+         while true;
+         do
+          echo "$i: $(date)" >> /var/log/1.log;
+          echo "$(date) INFO $i" >> /var/log/2.log;
+          i=$((i+1));
+          sleep 1;
+         done
+
+
+=================================================
+#D2:PodDesign               
+================================================= 
+
+
+#Label and Selectors:
+-------------------------------------------------
+=>kubectl run pod1 --image=nginx
+=>kubectl get pods --show-labels
+Show Labels
+
+=>kubectl label pod pod1 env=prod
+=>kubectl label  pods --all status=runing
+=>kubectl get pods -l env=prod
+
+=>kubectl label pod pod2 env-
+Delete label
 
 
 
+#ReplicaSet:
+-------------------------------------------------
+
+=>kubectl get rs
+=>kubectl get replicaset
+=>kubectl apply -f rpset.yaml
+
+=>kubectl get pods --show-labels
+=>kubectl delete rs myrpset
+
+
+repliSet1:
+apiVersion: apps/v1
+kind: ReplicaSet
+metadata:
+  name: myrpset
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      tier: myrpset
+  template:
+    metadata:
+      labels:
+        tier: myrpset
+    spec:
+      containers:
+      - name: myng
+        image: nginx
 
 
 
+#Deployment:
+-------------------------------------------------
+=>kubectl create deployment --help
+
+deployment1:
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: mydeployment
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      tier: myproj
+  template:
+    metadata:
+      labels:
+        tier: myproj
+    spec:
+      containers:
+      - name: myng
+        image: nginx
 
 
+=>kubectl apply -f mydeploy.yaml
+=>kubectl create deployment mydeployment --image=nginx --replicas 3
+=>kubectl get deployment
+=>kubectl describe deployment mydeployment
+
+=>kubectl create deployment mydeployment --image=nginx --replicas 3 --dry-run=client -o yaml
+Generate deployment yaml file
+
+=>kubectl delete deployment mydeployment
+Delete deployment
+
+
+=>kubectl rollout history deployment.v1.apps/mydeployment
+=>kubectl rollout history deployment.v1.apps/mydeployment --revision 2
+Get Rollout history and check revision details
+
+=>kubectl describe deployment mydeployment
+Check which revision version currently runing 
+
+=>kubectl rollout history deployment.v1.apps/mydeployment
+=>kubectl rollout undo deployment.v1.apps/mydeployment --to-revision=2
+Deployment rolback
+
+
+
+Form axSurge and maxUnavailable:
+=>kubectl create deployment mydeploy --images=nginx --replica 3
+=>kubectl get deployment mydeploy -o yaml
+
+=>kubectl create deployment mydeploy --image=nginx --replicas 3
+=>kubectl get deployment mydeploy -o yaml
+Showo details info of deployemnt
+
+
+=>kubectl set image deployment mydeploy nginx=httpd
+Change deployemnt
+=>kubectl edit deployment mydeploy
+Edit deoloyement
+
+
+
+=>kubectl set image deployment mydeploy nginx=httpd
+=>kubectl set image deployment mydeploy nginx=httpd --record
+=>kubectl rollout history deployment mydeploy
+=>kubectl rollout undo deployment/mydeploy
+Roolout/Undo the deployemnt last deployment
+
+=>kubectl scale deployment mydeploy --replicas 1
+Scele up/down deployemnt
 
 
 
