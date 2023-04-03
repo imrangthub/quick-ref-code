@@ -301,6 +301,58 @@ Scele up/down deployemnt
 
 
 
+#Batch Job:
+-------------------------------------------------
+simpldJob:
+apiVersion: batch/v1
+kind: Job
+metadata: 
+  name: myjob
+spec:
+  template:
+    spec:
+      containers:
+        - name: myjoncont
+          image: busybox
+          command: ["/bin/sh"]
+          args: ["-c","echo Hello Imran"]
+      restartPolicy: Never
+
+
+=>kubectl apply -f myjob.yml
+=>kubectl logs myjob-qd2jr 
+After complate the job task pod are not exit, stay with complate Status.
+
+=>kubectl get jobs
+=>kubectl delete job myjob
+When delete the job all related pos will be delete
+
+cronJob:
+apiVersion: batch/v1beta1
+kind: CronJob
+metadata:
+  name: mycronjob
+spec:
+  schedule: "*/1 * * * *"
+  jonTemplate:
+    spec:
+      template:
+        spec:
+          containers:
+            - name: mycronjob-pod
+              image: busybox
+              args: 
+              - /bin/sh
+              - -c
+              - date; echo Hello Imran, This is from CronJob.
+          restartPolicy: OnFailure
+
+
+=>kubectl get cronjob
+=>kubectl get job
+=>kubectl get job -w
+=>kubectl delete cronjob mycronjob
+
 
 
 
