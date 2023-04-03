@@ -20,6 +20,9 @@ https://kodekloud.com/lessons/recap-core-concepts/
 #General                                
 =================================================
 
+=>kubectl explain pod
+=>kubectl api-resources
+
 =>kubectl version
 =>kubectl version --short
 =>kubectl get nodes
@@ -28,7 +31,97 @@ https://kodekloud.com/lessons/recap-core-concepts/
 =>kubectl get pods -o wide
 =>kubectl get -o json pod prodName
 
-=>kubectl api-resources
+=kubectl logs myPod
+
+=>kubectl run nginx --image=nginx --dry-run=client
+=>kubectl run nginx --image=nginx --dry-run=client -o yaml
+=>kubectl create deployment --image=nginx nginx --dry-run=client -o yaml
+
+=>kubectl run mynginx --image=nginx
+=>kubectl run  bu1 --image=busybox -- sh  -c "hostname -i"
+=>kubectl run logpod --image=busybox -- sh -c "ping google.com"
+
+=>kubectl run -it ubuntu1 --image=ubuntu --restart=Never -- bash -ec "apt update; apt install mysql-server; bash"
+          =while true; do echo "infinity"; sleep 1; done
+
+=>kubectl exec -it ub1 -- bash
+=>kubectl exec -it mynginx -- bash
+=>kubectl exec -it mynginx -- ls -l
+
+
+=>kubectl apply -f sample.yaml
+=>kubectl delete -f sample.yaml
+=>kubectl delete pod my-pod1 
+
+=>kubectl describe pod mynginx
+
+
+D1:CoreConcept
+=================================================
+pod1:
+apiVersion: v1
+kind: Pod
+metadata:
+  name: my-webserver-pod
+spec:
+  containers:
+    - name: mynginx
+      image: nginx
+
+pod2:
+apiVersion: v1
+kind: Pod
+metadata:
+  name: my-pod1
+spec:
+  containers:
+    - name: mycont1
+      image: busybox
+      command: ["sleep","3360"]
+   or args: ["3600"]
+   or args: ["sleep","3360"]
+
+pod3:
+apiVersion: v1
+kind: Pod
+metadata:
+  name: busybox
+spec:
+  containers:
+  - name: busybox
+    image: busybox
+    command: ["/bin/sh"]
+
+pod4:
+apiVersion: v1 
+kind: Pod 
+metadata: 
+  name: bu1 
+spec: 
+  containers: 
+  - name: busybox 
+    image: busybox 
+    command: ["sh","-ec","ping google.com"] 
+
+pod5:
+apiVersion: v1
+kind: Pod
+metadata:
+  name: ubuntu
+spec:
+  containers:
+  - name: ubuntu
+    image: ubuntu:latest
+    # Just spin & wait forever
+    command: [ "/bin/bash", "-c", "--" ]
+    args: [ "while true; do sleep 30; done;"]
+
+
+
+=>kubectl apply -f myfile.yml
+=>kubectl get pods
+=>kubectl exec -it my-pod1 sh
+
 
 
 
