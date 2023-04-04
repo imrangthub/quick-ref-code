@@ -177,7 +177,6 @@ spec:
 #D2:PodDesign               
 ================================================= 
 
-
 #Label and Selectors:
 -------------------------------------------------
 =>kubectl run pod1 --image=nginx
@@ -195,7 +194,7 @@ Delete label
 
 #ReplicaSet:
 -------------------------------------------------
-
+=>kubectl create deployment mydeploy --image=nginx --replicas 3 --dry-run=client -o yaml
 =>kubectl get rs
 =>kubectl get replicaset
 =>kubectl apply -f rpset.yaml
@@ -352,6 +351,136 @@ spec:
 =>kubectl get job
 =>kubectl get job -w
 =>kubectl delete cronjob mycronjob
+
+
+
+
+
+=================================================
+#D3:Service and Networking               
+================================================= 
+
+Services act as a Gateway of variable amount services in different node.
+
+ServiceType:
+  NodePort
+  ClusterIP
+  LoadBalancer
+  ExternalName
+
+
+serviceExample1:
+Step 1: Creating Backend and Frontend PODS
+=>kubectl run bkpod1 --image=nginx
+=>kubectl run bkpod1 --image=nginx
+=>kubectl run fndpod --image=ubuntu --command -- sleep 3600
+
+Step 2: Test the Connection between Frontend and Backend PODs
+=>kubectl get pods -o wide
+=>kubectl exec -it fndpod -- bash
+=>apt-get update && apt-get -y install curl
+Curl to backend IP
+
+Step 3: Create a new Service
+vi myservice.yaml
+
+apiVersion: v1
+kind: Service
+metadata:
+   name: app-service
+spec:
+   ports:
+   - port: 8181
+     targetPort: 80
+
+=>kubectl apply -f myservice.yaml
+=>kubectl get service
+=>kubectl describe service app-service
+
+Step 4: Associate Endpoints with Service
+vi myendpoint.yaml
+apiVersion: v1
+kind: Endpoints
+metadata:
+  name: app-service
+subsets:
+  - addresses:
+      - ip: 10.244.0.3
+      - ip: 10.244.0.2
+    ports:
+      - port: 80
+
+=>kubectl apply -f myendpoint.yaml
+
+Step 5: Test the Connection
+=>kubectl exec -it fndpod -- bash
+curl to service IP with port
+
+
+Create Service with Selector:
+-------------------------------------------------
+Step 1: Creating Deployments
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: mydeployment
+  labels:
+    env: backend-service
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      env: backend-service
+  template:
+    metadata:
+      labels:
+        env: backend-service
+    spec:
+      containers:
+      - name: ngpod
+        image: nginx
+        ports:
+        - containerPort: 80
+
+=>kubectl apply -f mydeployment.yaml
+=>kubectl get pods --show-labels
+
+Step 2: Creating Service
+apiVersion: v1
+kind: Service
+metadata:
+   name: myselector-service
+spec:
+   selector:
+     env: backend-service
+   ports:
+   - port: 80
+     targetPort: 80
+
+=>kubectl apply -f myselector-service.yaml
+=>kubectl describe service myselector-service
+
+=>kubectl scale deployment/mydeployment --replicas=5
+=>kubectl describe service myselector-service
+
+=>kubectl run manual-added-pod --image=nginx
+=>kubectl label pods manual-added-pod  env=backend-service
+
+=>kubectl describe service myselector-service
+=>kubectl describe endpoints kplabs-service-selector
+
+=>kubectl get endpoints
+=>kubectl describe endpoints myselector-service
+
+
+
+
+
+
+
+
+
+
 
 
 
