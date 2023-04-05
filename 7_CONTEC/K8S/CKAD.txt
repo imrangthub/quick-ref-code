@@ -477,6 +477,7 @@ spec:
 
 #NodePort Service
 -------------------------------------------------
+=>kubectl create service nodeport --help
 Step 1: Create Sample POD with Label
 =>kubectl run nppod --labels="type=publicpod" --image=nginx
 =>kubectl get pods --show-labels
@@ -547,6 +548,546 @@ Step 3: Verify Service Logs
 =>kubectl get service
 =>kubectl expose deployment mydeployment --name nginx-deployment-service --port=80 --target-port=8000
 =>kubectl describe service nginx-deployment-service
+
+
+
+
+#Name Space
+-------------------------------------------------
+=>kubectl get namespace
+=>kubectl get pod --namespace kube-system
+=>kubectl create namespace prod-namespace
+
+=>kubectl run prod-ng --image=nginx --namespace prod-namespace
+
+
+
+#Service Account
+-------------------------------------------------
+=>kubectl get sa
+=>kubectl get serviceaccount
+=>kubectl get serviceaccount -n prod-namespace
+=>kubectl get secret -n prod-namespace
+
+=>kubectl get secrets -n prod-namespace 
+=>kubectl get sa default -o yaml
+
+=>kubectl get pod myng -o yaml
+
+=>kubectl create sa my-saacc
+=>kubectl get secret
+=>kubectl run myng-sa --image=nginx --serviceaccount="mysaacc"
+=>kubectl get pod
+=>kubectl get pod myng-sa -o yaml
+
+=>kubectl get pod deployment-sa-8585d89b57-46rtb -o yaml
+
+
+#Network Security Policies
+-------------------------------------------------
+policy1:
+apiVersion: networking.k8s.io/vi
+kind: NetworkPolicy
+metadata: 
+  name: my-net-policy1
+  namespace: default
+spec:
+  podSelector:
+    matchLabels:
+      run: pod1
+  policyTypes:
+    - Ingress
+    - Egress
+
+=>kubectl apply -f my-net-poilicy
+
+
+
+
+
+
+
+#PracticeDomain3:
+-----------------------------------------------------
+
+Q1: Create a deployment named kplabs-service. The deployment should have three replicas and the image should be based on nginx. Create a service based on NodePort. T
+he service port should be 8080. The website should be accessible from port 32001 from all hosts.
+
+=>kubectl create deployment kplabs-service --image=nginx --replicas=1 --dry-run=client -o yaml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: kplabs-service
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: kplabs-service
+  template:
+    metadata:
+      labels:
+        app: kplabs-service
+    spec:
+      containers:
+      - image: nginx
+        name: nginx
+
+
+=>kubectl create service nodeport --help
+=>kubectl create service nodeport my-ns --tcp=32001:8080 --node-port=32001 --dry-run=client -o yaml
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: myservice
+  labels:
+    run: myservice
+spec:
+  type: NodePort
+  ports:
+  - port: 8080
+    targetPort: 80
+    nodePort: 32001
+    protocol: TCP
+  selector:
+    run: kplabs-service
+
+
+Q2: Rung this services and access nginx from service IP
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    run: kplabs-service
+  name: kplabs-fix
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      run: kplabs-fix
+  template:
+    metadata:
+      labels:
+        run: kplabs-fix
+    spec:
+      containers:
+      - image: nginx
+        name: kplabs-service
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: fix-service
+  labels:
+    run: fix-service
+spec:
+  ports:
+  - port: 8080
+    targetPort: 80
+    protocol: TCP
+  selector:
+    run: kplabs-fix
+
+Question 3: Namespace
+Create a pod named redis-pod . The pod should be part of the namespace my-namespace.
+The pod should make use of redis image. Expose port 6379.
+
+=>kubectl create namespace --help
+=>kubectl create namespace my-namespace
+
+=>kubectl run pod --help
+=>kubectl run redis-pod --image=redis --port=6379 -n my-namespace
+
+
+
+Question 4: Service Account
+Create a new service account named kplabs. Launch a new pod named kplabs-sa from nginx image. The pod should be launched from the kplabs service account. Verify whether the token has been mounted inside the pod.
+
+=>kubectl create serviceaccount myseracc
+=>kubectl get sa
+=>kubectl run kplabs-sa --image=nginx --serviceaccount "kplabs"
+
+
+Question 5: Deployments and Service Account
+Create a deployment named deployment-sa. The deployment should have 2 replicas of nginx image. After the deployment has been created, check the service account associated with the pods. Modify the deployment so that all pods shall use the service account of kplabs.
+
+=>kubectl create deployment --help
+=>kubectl create deployment deployment-sa  --image=nginx --replicas=3
+=>kubectl edit deployment deployment-sa
+
+Add this two property below  securityContext: {}
+      serviceAccount: kplabs
+      serviceAccountName: kplabs
+
+=>kubectl get pod deployment-sa-75dd877cbf-ddjjd -o yaml
+Check updated service acc
+
+
+
+Q6:
+=>kubectl apply -f troubleshoot-deployment.yaml
+
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: newkplabs
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    run: troubleshoot-deployment
+  name: troubleshoot-deployment
+  namespace: newkplabs
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      run: troubleshoot-deployment
+  template:
+    metadata:
+      labels:
+        run: troubleshoot-deployment
+    spec:
+      containers:
+      - image: ninx
+        name: troubleshoot-deployment
+
+=>kubectl get deployment --all-namespaces
+=>kubectl get pod -n newkplabs
+=>kubectl edit deployment troubleshoot-deployment  -n newkplabs
+
+
+
+================================================= 
+Section 5: Domain 4 - Configuration
+================================================= 
+Three Secret type:
+  1)Generic
+    File, directory, literal value
+  2)Docker Registry
+  3)TLS
+
+
+=>kubectl get secret
+
+GenericType:
+=>kubectl create secret generic mysec --from-literal=dbpass=dbpass12345
+=>kubectl describe secret mysec
+
+=>kubectl get secret mysec -o yaml
+=>echo ZGJwYXNzMTIzNDU= | base64 -d
+
+
+FileType:
+=>echo dbpass321>dbpass.txt
+=>kubectl create secret generic mysec2 --from-file=./dbpass.txt
+=>kubectl get secret
+=>kubectl describe secret mysec2
+
+
+YamlType:
+apiVersion: v1
+kind: Secret
+metadata:
+  name: mysec3
+type: Opaque
+data:
+  #username: root
+  #password: 54321
+  username: cm9vdAo=
+  password: NTQzMjEK
+
+
+apiVersion: v1
+kind: Secret
+metadata:
+  name: mysec4
+type: Opaque
+stringData:
+  config.yaml: | 
+    username: root
+    password: 54321
+
+=>kubectl get secret -o yaml
+
+
+MountingSecret:
+apiVersion: v1
+kind: Pod
+metadata:
+  name: myngpod
+spec:
+  containers:
+  - name: myngpod
+    image: nginx
+    volumeMounts:
+      - name: mymount
+        mountPath: "/etc/mymount"
+        readOnly: true
+  volumes: 
+  - name: mymount
+    secret:
+      secretName: mysec
+
+=>kubectl apply -f pod1.yaml
+=>kubectl get pod
+=>kubectl exec -it myngpod -- bash
+=>cd /etc/mymount/
+
+
+MountingEnvVariableSecret:
+apiVersion: v1
+kind: Pod
+metadata:
+  name: myngpod
+spec:
+  containers:
+  - name: myngpod-env
+    image: nginx
+    env:
+      - name: SECRET_USERNAME
+        valueFrom:
+          secretKeyRef:
+            name: mysec
+            key: dbpass
+
+=>kubectl apply -f pod1.yaml
+=>kubectl get pod
+=>kubectl exec -it myngpod -- bash
+=>cd /etc/mymount/
+
+
+ResourceLimites:
+apiVersion: v1
+kind: Pod
+metadata:
+  name: my-pod
+spec:
+  containers:
+  - image: nginx
+    name: my-cont
+    resources:
+      requests:
+        memory: "64Mi"
+      limits:
+        memory: "128Mi"
+        cpu: "1"
+
+
+=>kubectl get pod -o wide
+=>kubectl describe node my-node
+=>kubectl delete -f pod1.yaml
+
+
+
+
+================================================= 
+Section 6: Domain 5 - Observability
+================================================= 
+
+Liveness:
+-------------------------------------------------
+livenessProbe three type:
+  http, command, tcp
+=>kubectl run -it ubuntu --image=ubuntu
+=>kubectl exec -it ubuntu -- service nginx status
+=>echo $?
+=>kubectl exec -it ubunty -- bash
+  =apt-get update && apt-get install nginx -y
+  =service nginx start
+  =service nginx status
+  =echo $?
+
+apiVersion: v1
+kind: Pod
+metadata:
+  name: lnpod
+spec:
+  containers:
+  - image: ubuntu
+    name: lnpod
+    tty: true
+    livenessProbe:
+      exec:
+        command: 
+        - service
+        - nginx
+        - status
+      initialDelaySeconds: 10
+      periodSeconds: 5
+
+=>kubectl apply -f pod.yaml
+=>kubectl exec -it lnpod -- service nginx status
+=>kubectl get pods
+
+
+
+Readiness:
+-------------------------------------------------
+apiVersion: v1
+kind: Pod
+metadata:
+  name: rdpod
+spec:
+  containers:
+  - image: ubuntu
+    name: rdpod
+    tty: true
+    readinessProbe:
+      exec:
+        command: 
+        - cat
+        - /tmp/healthy
+      initialDelaySeconds: 10
+      periodSeconds: 5
+
+
+=>kubectl apply -f pod2.yaml 
+=>kubectl get pods
+=>kubectl exec -it rdpod -- touch /tmp/healthy
+=>kubectl exec -it rdpod -- rm /tmp/healthy
+
+
+
+
+Appliation logs:
+-------------------------------------------------
+Fache multi container podlog:
+apiVersion: v1
+kind: Pod
+metadata:
+  name: mlpod
+spec:
+  containers:
+  - image: busybox
+    name: cont1
+    command: ["ping"]
+    args: ["google.com"]
+  - image: busybox
+    name: cont2
+    command: ["ping"]
+    args: ["8.8.8.8"]
+
+
+=>kubectl logs mlpod cont2
+
+
+
+Monitoring Components 
+-------------------------------------------------
+Install Metric server:
+=>kubectl apply -f https://github.com/kubernetes-sigs/metrics-server/releases/latest/download/components.yaml
+
+=>kubectl top pods
+=>kubectl top nodes
+
+=>kubectl top pods --all-namespaces
+
+
+
+
+#Event
+-------------------------------------------------
+=>kubectl get events -n kube-system
+=>kubectl get events
+
+
+#Field Selector
+-------------------------------------------------
+=>kubectl get pods --all-namespaces --field-selector metadata.namespace!=default
+=>kubectl get events --field-selector involvedObject.name=mynginx
+=>kubectl get pods --field-selector ""
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+Question 1: Resource Quotas
+---------------------------------------------------
+Create a pod named kplabs-quota. The pod should have following configuration:
+a. Should run with nginx image.
+b. It should use maximum of 512 MiB of memory.
+c. It should use maximum of 2 core CPU.
+d. The POD should require a minimum of 128 MiB of memory before it is scheduled.
+apiVersion: v1
+kind: Pod
+metadata:
+  labels:
+    run: kplabs-quota
+  name: kplabs-quota
+spec:
+  containers:
+  - image: nginx
+    name: kplabs-quota
+    resources:
+      requests:
+        memory: "128Mi"
+      limits:
+        memory: "512Mi"
+        cpu: "2"
+
+
+Question 2: Secrets
+Create a secret named kplabs-secret. The secret should have content where user=admin and pass=12345. Create a pod from the nginx image. Mount the secret as environment variables in the pod. The username should be available as DB_USER and password should be available as DB_PASSWORD inside the pod
+
+=>kubectl create secret generic kplabs-secret --from-literal=user=admin --from-literal=pass=12345
+apiVersion: v1
+kind: Pod
+metadata:
+  name: kplabs-secret-pod
+spec:
+  containers:
+  - name: mycontainer
+    image: nginx
+    env:
+      - name: DB_USER
+        valueFrom:
+          secretKeyRef:
+            name: kplabs-secret
+            key: user
+      - name: DB_PASSWORD
+        valueFrom:
+          secretKeyRef:
+            name: kplabs-secret
+            key: pass
+  restartPolicy: Never
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
