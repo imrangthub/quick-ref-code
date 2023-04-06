@@ -1066,22 +1066,92 @@ spec:
 
 
 
+Practice Test - Domain 5
+---------------------------------------------------
+Question 1: Probes
+
+Create a POD from the nginx image. Pod should be named kplabs-probe. The pod should be created in such a way that if the application inside is not responding to HTTP requests made on port 8080, then Kubernetes should restart the POD.
+
+apiVersion: v1
+kind: Pod
+metadata:
+  name: kplabs-probe
+spec:
+  containers:
+  - name: liveness
+    image: nginx
+    livenessProbe:
+      httpGet:
+        path: /
+        port: 8080
+      initialDelaySeconds: 3
+      periodSeconds: 3
+
+
+Question 2: Probes
+Create a POD named newprobe. Pod should run from nginx image. The Pod should run with arguments defined below. Create a probe that checks if a file on that path /tmp/myfile exists. If it does not exist, the POD should be restarted.
+
+    - /bin/sh
+    - -c
+    - touch /tmp/myfile; 3600
+
+apiVersion: v1
+kind: Pod
+metadata:
+  name: newprobe
+spec:
+  containers:
+  - name: liveness
+    image: nginx
+    args:
+    - /bin/sh
+    - -c
+    - touch /tmp/myfile; sleep 3600
+    livenessProbe:
+      exec:
+        command:
+        - cat
+        - /tmp/myfile
+      initialDelaySeconds: 3
+      periodSeconds: 3
+
+
+=>kubectl get events --field-selector involvedObject.name=liveness-http
+=>echo | kubectl get events --field-selector involvedObject.name=newprobe > myoutput.txt
 
 
 
 
+================================================= 
+#Section 7: Domain 6 - State Persistence
+================================================= 
+There are many type volume
+
+hostPath:
+apiVersion: v1
+kind: Pod
+metadata:
+  name: mypod
+spec:
+  containers:
+  - name: mypod
+    image: nginx
+    volumeMounts:
+      - mountPath: /data
+        name: podv1
+  volumes:
+    - name: podv1
+      hostPath:
+        path: /root/mydata
+        type: DirectoryOrCreate
 
 
 
 
-
-
-
-
-
-
-
-
+Debug:
+-----------------------------------------------
+=>kubectl describe pod -n default
+=>systemctl status kubelet
 
 
 
