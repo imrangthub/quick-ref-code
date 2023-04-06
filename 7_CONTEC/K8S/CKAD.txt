@@ -1125,27 +1125,50 @@ spec:
 ================================================= 
 #Section 7: Domain 6 - State Persistence
 ================================================= 
-There are many type volume
-
-hostPath:
+There are many type volume: hostPath:
 apiVersion: v1
 kind: Pod
 metadata:
-  name: mypod
+  name: mypod-vol
 spec:
   containers:
-  - name: mypod
+  - name: mypod-cont
     image: nginx
     volumeMounts:
-      - mountPath: /data
-        name: podv1
+    - mountPath: /data
+      name: podvol
   volumes:
-    - name: podv1
-      hostPath:
-        path: /root/mydata
-        type: DirectoryOrCreate
+  - name: podvol
+    hostPath:
+      path: /mydata
+      type: DirectoryOrCreate
 
 
+
+apiVersion: v1
+kind: Pod
+metadata:
+  name: mypod-vol
+spec:
+  containers:
+  - name: mypod-cont
+    image: nginx
+    volumeMounts:
+    - mountPath: /data
+      name: podvol
+  volumes:
+  - name: podvol
+    hostPath:
+      path: /root/mydata
+      type: DirectoryOrCreate
+
+
+
+
+
+================================================= 
+#Section 8: Domain 7 - Multi Continer
+================================================= 
 
 
 Debug:
@@ -1179,7 +1202,6 @@ Debug:
 
 Install Kubernetes
 -------------------------------------------------
-
 1)Mamage Kubernetes Services
 2)MiniKube
 3)Install Kubernetes Manually
