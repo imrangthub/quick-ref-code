@@ -1164,6 +1164,66 @@ spec:
 
 
 
+#PersistentVolume and PersistentVolumeClaim
+-------------------------------------------------
+Persistent Volume:pv.yaml
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: block-pv
+spec:
+  storageClassName: manual
+  capacity:
+    storage: 10Gi
+  accessModes:
+    - ReadWriteOnce
+  hostPath:
+    path: /tmp/data
+
+
+=>kubectl apply -f pv.yaml 
+=>kubectl get pv
+
+PersistentVolumeClaim: pvc.yaml
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: pvc
+spec:
+  storageClassName: manual
+  accessModes:
+  - ReadWriteOnce
+  resources:
+    requests:
+      storage: 10Gi
+
+=>kubectl apply -f pvc.yaml
+=>kubectl get pvc
+
+PVC pod: pod-pvc.yaml
+apiVersion: v1
+kind: Pod
+metadata:
+  name: kplabs-pvc
+spec:
+  containers:
+    - name: my-frontend
+      image: nginx
+      volumeMounts:
+      - mountPath: "/data"
+        name: my-volume
+  volumes:
+    - name: my-volume
+      persistentVolumeClaim:
+        claimName: pvc
+
+=>kubectl apply -f pvc-pod.yaml
+=>df -h
+=>kubectl exec -it mycont -- bash
+
+
+
+
 
 
 ================================================= 
