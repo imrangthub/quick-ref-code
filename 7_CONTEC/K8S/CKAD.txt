@@ -1223,6 +1223,324 @@ spec:
 
 
 
+#ConfigMap
+-----------------------------------------------
+
+=>kubectl get configmap
+=>kubectl create configmap my-dev-config --from-literal=app.mem=1024m
+
+=>kubectl get configmap -o yaml
+
+
+File Base configMap:
+app.user=imran
+app.pass=root
+app.dburl=http://some-url.com
+=>kubectl create configmap my-file-base-config --from-file=dev.properties
+=>kubectl get configmap -o yaml
+
+ConfigMap Mounted to Pod:
+apiVersion: v1
+kind: Pod
+metadata:
+  name: myconfigmap-pod2
+spec:
+  containers:
+    - name: conmap-cont
+      image: nginx
+      volumeMounts:
+      - name: configmap-vol
+        mountPath: "/data"
+  volumes:
+    - name: configmap-vol
+      configMap: 
+        name: my-file-base-config 
+  restartPolicy: Never
+
+=>kubectl exec -it myconfigmap-pod2 -- bash
+=>cd data
+=>cat dev.properties
+
+
+
+
+#Security Contex
+-----------------------------------------------
+Three Important Permission Aspects:
+  runAsUser, runAsGroup, fsGroup
+
+  =>kubectl run my-bubx --image=busybox -it sh
+
+apiVersion: v1
+kind: Pod
+metadata:
+  name: my-bubx2
+spec:
+  containers:
+  - image: busybox
+    name: my-bubx2
+    command: ["sh", "-c", "sleep 1h"]
+  securityContext: 
+    runAsUser: 1000
+    runAsGroup: 3000
+
+=>kubectl apply -f pod3.yaml
+=>kubectl exec my-bubx2 -it -- sh
+=>cd /tmp && touch myfile.txt
+=>ls -l
+
+With fsGroup:
+apiVersion: v1
+kind: Pod
+metadata:
+  name: my-bubx
+spec:
+  containers:
+  - image: busybox
+    name: my-bubx-cont
+    command: ["sh", "-c", "sleep 1h"]
+    volumeMounts:
+    - name: my-sec-ctx-vol
+      mountPath: /mydata
+  volumes:
+    - name: my-sec-ctx-vol
+      emptyDir: {}
+  securityContext: 
+    runAsUser: 1000
+    runAsGroup: 3000
+    fsGroup: 2000
+
+
+
+
+#Practice Test - Domain 6
+-----------------------------------------------
+Question 1 - ConfigMap
+  Create a configmap named kplabs-config which contains all the contents of that file.
+  course: kubernetes 2020
+  instructor: zeal
+  type: certification
+
+Mount the configmap to a pod named configmap-pod based on nginx image in such a way that all contents are available at /etc/config/kplabs.config
+
+Ans:
+Create a properties file with this:
+=>vi app.properties
+=>kubectl create configmap my-file-base-config --from-file=app.properties
+=>kubectl get configmap
+
+apiVersion: v1
+kind: Pod
+metadata:
+  name: mypod1
+spec:
+  containers:
+    - name: conmap-cont
+      image: nginx
+      volumeMounts:
+      - name: configmap-vol
+        mountPath: "/data"
+  volumes:
+    - name: configmap-vol
+      configMap: 
+        name: my-file-base-config 
+  restartPolicy: Never
+
+Question 2 - PV and PVC
+
+Create a persistent volume with the name kplabs-pv. The size should be 2Gi and hostpath should be /tmp/mydata. It should have access mode of ReadWriteOnce
+
+Create a persistent volume claim that will make use of the PV created earlier.
+
+Create a Pod named kplabs-pv-pod. The POD should have the volume mounted at /mydata directory.
+
+
+
+Question 3 - Security Context
+
+Create a POD named busybox-security. The pod should run a command sleep 3600.  The primary process in POD should run with UID of 1000 and GID of 2000 all newly created contents of volume should have the group ID of 3000.
+
+
+
+Question 4 - Secrets and Environment Variables
+
+Andrew works as a database administrator and has generated set of credentials that will be used by the application to connect to the database. Instead of giving the credentials to developers to hard-code in their application, he has requested security team to create a secret and mount it as an environment variable to the application containers.
+
+
+
+a. Create a secret name db-creds which has following data:
+
+user: dbreadonly
+pass: myDBPassword#%
+ 
+
+b. Create a pod from nginx image. The pod should be named secret-pod
+
+
+
+c. Mount the secret to the POD in such a way that the contents of the database user are available in the form of DB_USER environment variable and database password is available in the form of DB_PASSWORD environment variable inside the container.
+
+
+
+Question 5 - Secrets and Volumes
+
+a. Create a secret name app-creds that has the following data:
+
+appuser: dbreadonly
+apppass: myDBPassword#%
+b. Create a pod based on nginx image with the name of app-pod
+
+c. Mount the secret to the pod so that it is available in the path of /etc/secret
+
+Answer 1: ConfigMap
+
+Step 1: Create a file named kplabs.config and add all the contents specified in the question.
+
+Step 2: Create a new configmap from that file
+
+kubectl create configmap kplabs-config --from-file ./kplabs.config
+
+Step 3: Create a POD with ConfigMap Mounted
+
+apiVersion: v1
+kind: Pod
+metadata:
+  name: configmap-pod
+spec:
+  containers:
+    - name: configmap-container
+      image: nginx
+      volumeMounts:
+      - name: config-volume
+        mountPath: /etc/config
+  volumes:
+    - name: config-volume
+      configMap:
+        name: kplabs-config
+  restartPolicy: Never
+
+
+Answer 2: PV and PVC
+
+Step 1: Create a Persistent Volume
+
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: kplabs-pv
+spec:
+  capacity:
+    storage: 2Gi
+  accessModes:
+    - ReadWriteOnce
+  hostPath:
+    path: "/tmp/mydata"
+Step 2: Create a Persistent Volume Claim
+
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: kplabs-pvc
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 2Gi
+Step 3: Create a Pod with Mounted Volume
+
+apiVersion: v1
+kind: Pod
+metadata:
+  name: kplabs-pv-pod
+spec:
+    containers:
+    - name: pod
+      image: nginx
+      volumeMounts:
+      - mountPath: /mydata
+        name: myvolume
+    volumes:
+    - name: myvolume
+      persistentVolumeClaim:
+        claimName: kplabs-pvc
+
+
+Answer 3: Security Context
+
+
+
+apiVersion: v1
+kind: Pod
+metadata:
+  name: busybox-security
+spec:
+  securityContext:
+    runAsUser: 1000
+    runAsGroup: 2000
+    fsGroup: 3000
+  containers:
+  - name: busybox-container
+    image: busybox
+    command: [ "sleep","3600" ]
+
+
+Answer 4: Secrets and Environment Variables
+
+Step 1: Create a secret
+
+kubectl create secret generic db-creds --from-literal=user=dbreadonly --from-literal=pass=myDBPassword#%
+
+
+
+Step 2: Create a POD with Nginx Image and Mount The Secret
+
+apiVersion: v1
+kind: Pod
+metadata:
+  name: secret-pod
+spec:
+  containers:
+  - image: nginx
+    name: secret-pod
+    env:
+      - name: DB_USER
+        valueFrom:
+          secretKeyRef:
+            name: db-creds
+            key: user
+      - name: DB_PASSWORD
+        valueFrom:
+          secretKeyRef:
+            name: db-creds
+            key: pass
+
+
+Answer 5 - Secrets and Volumes
+
+Step 1: Create a Secret
+
+kubectl create secret generic app-creds --from-literal=appuser=dbreadonly --from-literal=apppass=myDBPassword#%
+
+Step 2: Create Manifest Files based on Specification;
+
+apiVersion: v1
+kind: Pod
+metadata:
+  name: app-pod
+spec:
+  containers:
+  - image: nginx
+    name: app-pod
+    volumeMounts:
+    - name: myvolume
+      mountPath: "/etc/secret"
+      readOnly: true
+  volumes:
+  - name: myvolume
+    secret:
+      secretName: app-creds
+
 
 
 
@@ -1230,8 +1548,191 @@ spec:
 #Section 8: Domain 7 - Multi Continer
 ================================================= 
 
+apiVersion: v1
+kind: Pod
+metadata:
+  name: app-pod
+spec:
+  containers:
+  - image: nginx
+    name: cont1
+  - image: busybox
+    name: cont2
+    command: 
+     - sleep
+     - "1h"
 
-Debug:
+=>kubectl get pods
+=>kubectl describe pods
+=>kubectl exec -it app-pod -c cont2 -- sh
+
+=>wget 10.244.1.2
+
+apiVersion: v1
+kind: Pod
+metadata:
+  name: kplabs-multicontainer
+spec:
+  containers:
+  - name: first-container
+    image: nginx
+  - name: second-container
+    image: mykplabs/kubernetes:nginx
+  - name: third-container
+    image: busybox
+    command: ["sleep", "3600"]
+
+
+
+
+Multi-Container POD Patterns
+-----------------------------------------------
+
+SideCare Pattern:
+
+
+Ambassador Pattern( a type of sidecare pattern):
+
+Create a configMap (haproxy.cfg)from this value:
+global
+    daemon
+    maxconn 256
+
+defaults
+    mode http
+    timeout connect 5000ms
+    timeout client 50000ms
+    timeout server 50000ms
+
+listen http-in
+    bind *:80
+    server server1 127.0.0.1:9080 maxconn 32
+
+=>kubectl create configmap kplabs-ambassador-config --from-file ./haproxy.cfg    
+
+
+apiVersion: v1
+kind: Pod
+metadata:
+  name: ambassador-pod
+spec:
+  containers:
+  - name: first-container
+    image: mykplabs/kubernetes:nginx
+  - name: haproxy-container
+    image: haproxy:1.7
+    ports:
+       - containerPort: 80
+    volumeMounts:
+     - name: config-volume
+       mountPath: /usr/local/etc/haproxy/haproxy.cfg
+  volumes:
+    - name: config-volume
+      configMap:
+        name: kplabs-ambassador-config
+
+=>kubectl get pods -o wide       
+=>kubectl run mybusybox -it --image=busybox -- sh
+=>wget ip of ambassador-pod
+
+
+Adapter Pattern
+---------------------------------------------------
+
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: fluentd-config
+data:
+  fluentd.conf: |
+    <source>
+      type tail
+      format none
+      path /var/log/1.log
+      pos_file /var/log/1.log.pos
+      tag PHP
+    </source>
+    <source>
+      type tail
+      format none
+      path /var/log/2.log
+      pos_file /var/log/2.log.pos
+      tag JAVA
+    </source>
+    <match **>
+       @type file
+       path /var/log/fluent/access
+    </match>
+---
+apiVersion: v1
+kind: Pod
+metadata:
+  name: counter
+spec:
+  containers:
+  - name: count
+    image: busybox
+    args:
+    - /bin/sh
+    - -c
+    - >
+      i=0;
+      while true;
+      do
+        echo "$i: $(date)" >> /var/log/1.log;
+        echo "$(date) INFO $i" >> /var/log/2.log;
+        i=$((i+1));
+        sleep 1;
+      done
+    volumeMounts:
+    - name: varlog
+      mountPath: /var/log
+  - name: count-agent
+    image: k8s.gcr.io/fluentd-gcp:1.30
+    env:
+    - name: FLUENTD_ARGS
+      value: -c /etc/fluentd-config/fluentd.conf
+    volumeMounts:
+    - name: varlog
+      mountPath: /var/log
+    - name: config-volume
+      mountPath: /etc/fluentd-config
+  volumes:
+  - name: varlog
+    emptyDir: {}
+  - name: config-volume
+    configMap:
+      name: fluentd-config
+
+
+=>kubectl apply -f mypod.yaml
+=>kubectl exec -it counter -- sh
+
+=>tail -f /var/log/1.log
+=>tail -f /var/log/2.log
+=>tail -f /var/log/fluent/access.20230408.b5f8ccf3468ae28ef
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+================================================= 
+#Debug
+================================================= 
+
+
+Pod Details:
 -----------------------------------------------
 =>kubectl describe pod -n default
 =>systemctl status kubelet
