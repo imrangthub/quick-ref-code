@@ -1723,6 +1723,353 @@ spec:
 
 
 
+================================================= 
+#New Update | Exam Preparation
+================================================= 
+
+Deployment:--------------------------------------
+--------------------------------
+=>kubectl create deployment my-deployment --image=nginx --dry-run=client -o yaml
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  creationTimestamp: null
+  labels:
+    app: my-deployment
+  name: my-deployment
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: my-deployment
+  strategy: 
+    type: Recreate
+  template:
+    metadata:
+      creationTimestamp: null
+      labels:
+        app: my-deployment
+    spec:
+      containers:
+      - image: nginx
+        name: nginx
+        resources: {}
+status: {}
+
+
+=>kubectl explain deployment.spec.strategy
+
+=>kubectl apply -f dpl1.yaml
+=>kubectl get deployment
+=>kubectl get pods
+=>kubectl get rs
+
+Now change deployment dpl1.yaml with a invalid image name 
+Deploy again thne:
+
+=>kubectl apply -f dpl1.yaml
+=>kubectl get deployment
+=>kubectl get pods
+=>kubectl get rs
+
+Now show all pod now sutdown, now container are running
+this is of Recreate stategy.
+Fixed the proper deployment config (image) then pod will be OutsideOfWork
+
+
+Samelair process for RollingUpdate:
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  creationTimestamp: null
+  labels:
+    app: my-deployment
+  name: my-deployment
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: my-deployment
+  strategy: 
+    type: RollingUpdate
+  template:
+    metadata:
+      creationTimestamp: null
+      labels:
+        app: my-deployment
+    spec:
+      containers:
+      - image: nginx
+        name: nginx
+        resources: {}
+status: {}
+
+
+
+#Blue Green deployment:
+------------------------------------------------------
+
+
+=>kubectl run blue-pod --image=nginx
+=>kubectl run green-pod --image=nginx
+
+=>kubectl label pod blue-pod app=app-v1
+=>kubectl label pod green-pod app=app-v2
+
+=>kubectl get pods --show-labels
+
+Create a service
+apiVersion: v1
+kind: Service
+metadata:
+  name: my-service
+spec: 
+  type: NodePort
+  ports:
+  - name: http
+    port: 80
+    targetPort: 80
+  selector:
+    app: app-v1
+
+=>kubectl get svc
+=>kubectl describe service my-service
+
+Update service "selector" value app-v2
+and deploy again, then check the end point
+
+Or 
+Cand Edit directly 
+=>kubectl edi  t svc
+
+
+
+#Canary deployment:
+------------------------------------------------------
+1. Create Deployment Manifests:
+
+kubectl create deployment v1-app --image=nginx --replicas 3 --dry-run=client -o yaml
+kubectl create deployment v2-app --image=httpd --replicas 1 --dry-run=client -o yaml
+2. Store these manifests in v1-canary.yaml and v2-canary.yaml
+
+3. Add a common label of deptype: canary to both of these manifest files for the pod template section
+
+4. Create deployment in K8s
+
+kubectl apply -f v1-canary.yaml
+kubectl apply -f v1-canary.yaml
+5. Verify if PODS are created with appropriate labels:
+
+kubectl get pods --show-labels
+
+6. Create a Canary Service
+
+canary-svc.yaml
+
+apiVersion: v1
+kind: Service
+metadata:
+ name: canary-deployment
+spec:
+ type: NodePort
+ ports:
+ - name: http
+   port: 80
+   targetPort: 80
+ selector:
+   deptype: canary
+kubectl apply -f canary-svc.yaml
+
+7. Verify if Service have 4 Endpoint IPs:
+
+kubectl describe svc canary-deployment
+8. Make CURL request to see if requests are distributed among v1 and v2 apps
+curl PUBLIC-IP:NODEPORT
+
+
+#Custom Resource
+------------------------------------------
+Kubernetes Documentation Referred for Base CRD manifests:
+
+https://kubernetes.io/docs/tasks/extend-kubernetes/custom-resources/custom-resource-definitions/
+
+Manifests File (Step 1 and Step 2)
+
+crd.yaml
+
+apiVersion: apiextensions.k8s.io/v1
+kind: CustomResourceDefinition
+metadata:
+  name: crontabs.kplabs.internal
+spec:
+  group: kplabs.internal
+  versions:
+    - name: v1
+      served: true
+      storage: true
+      schema:
+        openAPIV3Schema:
+          type: object
+          properties:
+            spec:
+              type: object
+              properties:
+                cronSpec:
+                  type: string
+                image:
+                  type: string
+                replicas:
+                  type: number
+  scope: Namespaced
+  names:
+    plural: crontabs
+    singular: crontab
+    kind: CronTab
+    shortNames:
+    - ct
+crd-object.yaml
+
+apiVersion: "kplabs.internal/v1"
+kind: CronTab
+metadata:
+  name: my-new-cron-object
+spec:
+  cronSpec: "* * * * */5"
+  image: my-awesome-cron-image
+  replicas: 3
+AWS Service Operator Manifest File:
+
+https://raw.githubusercontent.com/awslabs/aws-service-operator/master/configs/aws-service-operator.yaml
+
+
+
+#Authentication
+----------------------------------------------
+=>cat .kube/config
+=>curl -k https://controlplane:6443
+
+
+=>curl -k https://controlplane:6443 --header "Authorization: 
+Bearer ewrwfsdlkfjdlf="
+Call with token
+
+
+
+#Authorization
+----------------------------------------------
+
+Create a Role:
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  namespace: default
+  name: pod-reader
+rules:
+- apiGroups: [""] # "" indicates the core API group
+  resources: ["pods"]
+  verbs: ["list"]
+
+=>kubectl apply -f myrole.yaml 
+
+=>kubectl get role
+=>kubectl describe role pod-reader
+
+
+Role banding:
+
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: read-pods
+  namespace: default
+subjects:
+- kind: User
+  name: system:serviceaccount:default:myadmin
+  apiGroup: rbac.authorization.k8s.io
+roleRef:
+  kind: Role 
+  name: pod-reader
+  apiGroup: rbac.authorization.k8s.io
+
+
+=>kubectl apply -f role-banding.yaml
+=>kubectl get rolebinding
+=>kubectl describe rolebinding read-pods
+
+
+
+ClusterRole:
+---------------------------------------------
+
+Create a Cluster role:
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: pod-reader
+rules:
+- apiGroups: [""]
+  resources: ["secrets"]
+  verbs: ["get", "watch", "list"]
+
+
+=>kubectl get clusterrole
+=>kubectl describe clusterrole pod-role
+
+Cluster Role banding:
+
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: pod-list-global
+subjects:
+- kind: User
+  name: system:serviceaccount:default:myadmin
+  apiGroup: rbac.authorization.k8s.io
+roleRef:
+  kind: ClusterRole
+  name: pod-reader
+  apiGroup: rbac.authorization.k8s.io
+
+  =>kubectl apply -f cls-role-banign.yaml
+  =>kubectl get clusterrolbinding 
+  =>kubectl describne clusterrolbinding pod-list-global
+
+
+
+Cluster role to Role Banding:
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: read-pods
+  namespace: default
+subjects:
+- kind: User
+  name: system:serviceaccount:default:myadmin
+  apiGroup: rbac.authorization.k8s.io
+roleRef:
+  kind: ClusterRole 
+  name: pod-reader
+  apiGroup: rbac.authorization.k8s.io
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -1730,12 +2077,20 @@ spec:
 ================================================= 
 #Debug
 ================================================= 
-
+=>kubectl api-resources
+Details about api and with short name
 
 Pod Details:
 -----------------------------------------------
 =>kubectl describe pod -n default
 =>systemctl status kubelet
+
+
+Create a deployment
+=>kubectl create deployment mydeployment --image=nginx --dry-run=client -o yaml
+=>kubectl explain deployment.spec.strategy
+
+
 
 
 
