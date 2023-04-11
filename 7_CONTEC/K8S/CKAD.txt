@@ -137,20 +137,44 @@ spec:
 =>kubectl exec -it my-pod1 sh
 
 
-PracticeDomain1:
+#PracticeDomain1:
 -----------------------------------------------------
 Q1:
 apiVersion: v1
 kind: Pod
 metadata:
-  name: kplabs-ports
+  name: kplabs-nginx
+spec:
+  containers:
+    - name: mycontainer
+      image: nginx
+
+Q2:
+apiVersion: v1
+kind: Pod
+metadata:
+  name: kplabs-cmdargs
+spec:
+  containers:
+    - name: cmdcontainer
+      image: busybox
+      command: ["sleep"]
+      args: ["3500"]
+
+Q3:
+apiVersion: v1
+kind: Pod
+metadata:
+  name: kplabs-pods
 spec:
   containers:
     - name: nginx
       image: nginx
-      command: ["sleep"]
-      args: ["3500"]
-Q2:
+      ports: 
+      - containerPort: 80
+
+
+Q4:
 apiVersion: v1
 kind: Pod
 metadata:
@@ -179,13 +203,18 @@ spec:
 
 #Label and Selectors:
 -------------------------------------------------
+=>kubectl label --help
+
 =>kubectl run pod1 --image=nginx
 =>kubectl get pods --show-labels
 Show Labels
 
 =>kubectl label pod pod1 env=prod
 =>kubectl label  pods --all status=runing
+Add Label
+
 =>kubectl get pods -l env=prod
+Filter by label
 
 =>kubectl label pod pod2 env-
 Delete label
@@ -194,10 +223,14 @@ Delete label
 
 #ReplicaSet:
 -------------------------------------------------
-=>kubectl create deployment mydeploy --image=nginx --replicas 3 --dry-run=client -o yaml
+=>kubectl create deployment myreplica --image=nginx --replicas 3 --dry-run=client -o yaml
+Generate a deployment file and Update for ReplicaSet
+
 =>kubectl get rs
 =>kubectl get replicaset
 =>kubectl apply -f rpset.yaml
+
+=>kubectl describe replicaset myrpset
 
 =>kubectl get pods --show-labels
 =>kubectl delete rs myrpset
@@ -219,7 +252,7 @@ spec:
         tier: myrpset
     spec:
       containers:
-      - name: myng
+      - name: myngcont
         image: nginx
 
 
@@ -260,22 +293,31 @@ Generate deployment yaml file
 Delete deployment
 
 
+Edit yaml file for Update the deployment, like change the image version
+then check the rollout history
+=>kubectl rollout --help
+
 =>kubectl rollout history deployment.v1.apps/mydeployment
 =>kubectl rollout history deployment.v1.apps/mydeployment --revision 2
 Get Rollout history and check revision details
 
+=>kubectl get deployment my-dep -o yaml
 =>kubectl describe deployment mydeployment
 Check which revision version currently runing 
 
 =>kubectl rollout history deployment.v1.apps/mydeployment
+=>kubectl rollout undo deployment.v1.apps/mydeployment
 =>kubectl rollout undo deployment.v1.apps/mydeployment --to-revision=2
+=>kubectl describe deploy mydeployment
 Deployment rolback
 
 
 
 Form axSurge and maxUnavailable:
+=>kubectl get deployment my-dep -o yaml
+Check masSurge and maxUnavailable
 =>kubectl create deployment mydeploy --images=nginx --replica 3
-=>kubectl get deployment mydeploy -o yaml
+
 
 =>kubectl create deployment mydeploy --image=nginx --replicas 3
 =>kubectl get deployment mydeploy -o yaml
@@ -283,8 +325,9 @@ Showo details info of deployemnt
 
 
 =>kubectl set image deployment mydeploy nginx=httpd
-Change deployemnt
+Update  deployemnt
 =>kubectl edit deployment mydeploy
+=>kubectl get pods
 Edit deoloyement
 
 
@@ -299,9 +342,25 @@ Roolout/Undo the deployemnt last deployment
 Scele up/down deployemnt
 
 
+#InP
+------------------------------------------------
+1)How to set a new Image to deployment as part of rolling Update
+2)Need to know --record Instruction
+3)You should know how to rollback a deployment
+4)you should be able to scale the deployment
+
+
+
+
+
 
 #Batch Job:
 -------------------------------------------------
+
+Job are two type:
+1)jobs (Run to completion)
+2)CronJob
+
 simpldJob:
 apiVersion: batch/v1
 kind: Job
@@ -351,6 +410,134 @@ spec:
 =>kubectl get job
 =>kubectl get job -w
 =>kubectl delete cronjob mycronjob
+
+
+
+#PracticeDomain02:
+-----------------------------------------------------
+Question 1: Labels
+Create a pod named kplabs-label. The pod should be launched from nginx image. The name of container should be nginx-container. Attach following label to the pod.
+env=production
+app=webserver
+Solution:
+apiVersion: v1
+kind: Pod
+metadata:
+  creationTimestamp: null
+  labels:
+    env: production
+    app: webserver
+  name: kplabs-label
+spec:
+  containers:
+  - image: nginx
+    name: kplabs-container
+
+
+
+Question 2: Deployments
+Create a deployment named kplabs-deployment. The deployment should be launched from nginx image. The deployment should have three replicas. The selector should be based on the label of app=nginx
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: kplabs-deployment
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: nginx
+  template:
+    metadata:
+      labels:
+        app: nginx
+    spec:
+      containers:
+      - image: nginx
+        name: nginx
+
+
+Question 3: Deployments - Rolling Updates and Rollbacks
+Create a deployment named kplabs-updates. The deployment should be launched from nginx image. There should be two  replicas. Verify the status of the deployment. As part of rolling update, update the image to nginx2:alpine. Verify the status of deployment. Perform a rollback to the previous version. Verify the status of deployment.
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: my-deploy
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: nginx
+  template:
+    metadata:
+      labels:
+        app: nginx
+    spec:
+      containers:
+      - image: nginx
+        name: nginx-cont
+
+
+
+
+=>kubectl apply -f mydeployment.yaml
+=>kubectl set image deployment my-deploy nginx-cont=nginx2:alpine --record=true
+=>kubectl get pods
+  If show ImagePullBackOff then its deployment update failed
+
+=>kubectl rollout undo deployment/my-deploy
+Undo deploument and rollback
+
+
+Question 4: Labels and Selectors
+Create a deployment named kplabs-selector. The pods should be launched from nginx image.The pods should only be launched in a node which has a label of disk=ssd. Observe the status of deployment. Add the appropriate label to the worker node and then observe the status of the deployment.
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: node-select-deployment
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: nginx-node-select
+  template:
+    metadata:
+      labels:
+        app: nginx-node-select
+    spec:
+      containers:
+      - image: nginx
+        name: node-select-cont
+      nodeSelector:
+        disktype: ssd
+
+=>kubectl delete -f dep1.yaml
+=>kubectl get pods
+Pod will show panding status becouse disktype: ssd not found on node
+Now need to add this on node 
+
+=>kubectl get node
+=>kubectl get node --show-labels
+=>kubectl label nodes node01 disktype=ssd
+=>kubectl get deployment
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
