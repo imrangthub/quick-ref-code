@@ -614,7 +614,7 @@ spec:
 #D3:Service and Networking               
 ================================================= 
 
-Services act as a Gateway of variable amount services in different node.
+Services act as a Gateway of variable amount pods in different node.
 
 ServiceType:
   NodePort
@@ -629,13 +629,17 @@ Step 1: Creating Backend and Frontend PODS
 =>kubectl run bkpod1 --image=nginx
 =>kubectl run fndpod --image=ubuntu --command -- sleep 3600
 
+=>kubectl exec mypod1 -- ls /usr/share/nginx/html
+
 Step 2: Test the Connection between Frontend and Backend PODs
 =>kubectl get pods -o wide
 =>kubectl exec -it fndpod -- bash
 =>apt-get update && apt-get -y install curl
 Curl to backend IP
 
-Step 3: Create a new Service
+
+
+Step 3: Create a new Service (clusterIp by default)
 vi myservice.yaml
 
 apiVersion: v1
@@ -659,8 +663,8 @@ metadata:
   name: app-service
 subsets:
   - addresses:
-      - ip: 10.244.0.3
-      - ip: 10.244.0.2
+      - ip: 10.244.1.3
+      - ip: 10.244.1.4
     ports:
       - port: 80
 
@@ -755,6 +759,7 @@ spec:
 Step 3: Fetch the Worker Node Public IP
 
 =>kubectl get nodes -o wide
+=>curl 192.2.145.12:32613
 Copy the Public IP of Worker Node and Paste it in browser along with NodePort
 
 
@@ -818,12 +823,18 @@ Step 3: Verify Service Logs
 
 #Service Account
 -------------------------------------------------
+=>cat /run/secrets/kubernetes.io/serviceaccount/token
+Pod token
+
 =>kubectl get sa
 =>kubectl get serviceaccount
-=>kubectl get serviceaccount -n prod-namespace
-=>kubectl get secret -n prod-namespace
+=>kubectl get serviceaccount -n my-mynmspc
+=>kubectl get secret -n my-mynmspc
 
-=>kubectl get secrets -n prod-namespace 
+=>kubectl get pod -o yaml
+Chace current pod service account
+
+=>kubectl get secrets -n prod-mynmspc 
 =>kubectl get sa default -o yaml
 
 =>kubectl get pod myng -o yaml
@@ -839,19 +850,24 @@ Step 3: Verify Service Logs
 
 #Network Security Policies
 -------------------------------------------------
+
+=>kubectl run mybx1 --image=busybox --sh
+=>kubectl run mybx2 --image=busybox --sh
+Run two Pod and ping each other
+
+
 policy1:
-apiVersion: networking.k8s.io/vi
+apiVersion: networking.k8s.io/v1
 kind: NetworkPolicy
-metadata: 
-  name: my-net-policy1
+metadata:
+  name: test-network-policy
   namespace: default
 spec:
   podSelector:
     matchLabels:
-      run: pod1
+      run: mybx2
   policyTypes:
     - Ingress
-    - Egress
 
 =>kubectl apply -f my-net-poilicy
 
