@@ -1064,31 +1064,31 @@ Three Secret type:
 =>kubectl get secret
 
 GenericType:
+=>kubectl create secret generic --help
 =>kubectl create secret generic mysec --from-literal=dbpass=dbpass12345
+=>kubectl create secret generic mysec1 --from-literal=key1=supersecret --from-literal=key2=topsecret
 =>kubectl describe secret mysec
 
 =>kubectl get secret mysec -o yaml
 =>echo ZGJwYXNzMTIzNDU= | base64 -d
 
-
-FileType:
-=>echo dbpass321>dbpass.txt
-=>kubectl create secret generic mysec2 --from-file=./dbpass.txt
-=>kubectl get secret
-=>kubectl describe secret mysec2
-
-
-YamlType:
 apiVersion: v1
 kind: Secret
 metadata:
-  name: mysec3
+  name: mysec2
 type: Opaque
 data:
-  #username: root
-  #password: 54321
-  username: cm9vdAo=
-  password: NTQzMjEK
+  #key1: root
+  #key2: 54321
+  key1: cm9vdAo=
+  key2: NTQzMjEK
+
+
+FileType:
+=>echo key1=supersec>secFile.txt
+=>kubectl create secret generic mysec3 --from-file=./secFile.txt
+=>kubectl get secret
+=>kubectl describe secret mysec3
 
 
 apiVersion: v1
@@ -1115,12 +1115,12 @@ spec:
     image: nginx
     volumeMounts:
       - name: mymount
-        mountPath: "/etc/mymount"
+        mountPath: "/etc/secmount"
         readOnly: true
   volumes: 
   - name: mymount
     secret:
-      secretName: mysec
+      secretName: mysec1
 
 =>kubectl apply -f pod1.yaml
 =>kubectl get pod
@@ -1132,7 +1132,7 @@ MountingEnvVariableSecret:
 apiVersion: v1
 kind: Pod
 metadata:
-  name: myngpod
+  name: pod2
 spec:
   containers:
   - name: myngpod-env
@@ -1141,8 +1141,23 @@ spec:
       - name: SECRET_USERNAME
         valueFrom:
           secretKeyRef:
-            name: mysec
-            key: dbpass
+            name: mysec2
+            key: key1
+
+apiVersion: v1
+kind: Pod
+metadata:
+  name: pod4
+spec:
+  containers:
+  - name: myngpod-env
+    image: nginx
+    env:
+      - name: SECRET_USERNAME
+        valueFrom:
+          secretKeyRef:
+            name: mysec4
+            key: key1
 
 =>kubectl apply -f pod1.yaml
 =>kubectl get pod
@@ -1151,6 +1166,26 @@ spec:
 
 
 ResourceLimites:
+apiVersion: v1
+kind: Pod
+metadata:
+  name: pod2
+spec:
+  containers:
+  - name: pod2-cont
+    image: nginx
+    resources:
+      requests:
+        memory: "64Mi"
+        cpu: "250m"
+      limits:
+        memory: "128Mi"
+        cpu: "500m"
+
+=>kubectl get pod2 -o wide
+=>kubectl describe node node01
+=>kubectl delete -f pod2.yaml
+
 apiVersion: v1
 kind: Pod
 metadata:
@@ -1167,9 +1202,63 @@ spec:
         cpu: "1"
 
 
-=>kubectl get pod -o wide
-=>kubectl describe node my-node
-=>kubectl delete -f pod1.yaml
+
+
+#Practice Test - Domain 4
+-------------------------------------------------
+Question 1: Resource Quotas
+Create a pod named kplabs-quota. The pod should have following configuration:
+a. Should run with nginx image.
+b. It should use maximum of 512 MiB of memory.
+c. It should use maximum of 2 core CPU.
+d. The POD should require a minimum of 128 MiB of memory before it is 
+scheduled.
+
+apiVersion: v1
+kind: Pod
+metadata:
+  name: kplabs-quota
+spec:
+  containers:
+  - name: kplabs-quota-cont
+    image: nginx
+    resources:
+      requests:
+        memory: "128Mi"
+      limits: 
+        memory: "512Mi"
+        cpu: "2"
+
+
+
+Question 2: Secrets
+Create a secret named kplabs-secret. The secret should have content where user=admin and pass=12345. Create a pod from the nginx image. Mount the secret as environment variables in the pod. The username should be available as DB_USER and password should be available as DB_PASSWORD inside the pod
+
+=>kubectl create secret generic --help
+=>kubectl create secret generic mysec1 --from-literal=user=admin --from-literal=pass=12345
+
+apiVersion: v1
+kind: Pod
+metadata:
+  name: pod3
+spec:
+  containers:
+  - name: myngpod-env
+    image: nginx
+    env:
+      - name: DB_USER
+        valueFrom:
+          secretKeyRef:
+            name: mysec1
+            key: user
+      - name: DB_PASSWORD
+        valueFrom:
+          secretKeyRef:
+            name: mysec1
+            key: pass
+
+
+
 
 
 
