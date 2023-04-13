@@ -875,8 +875,6 @@ spec:
 
 
 
-
-
 #PracticeDomain3:
 -----------------------------------------------------
 
@@ -884,6 +882,7 @@ Q1: Create a deployment named kplabs-service. The deployment should have three r
 he service port should be 8080. The website should be accessible from port 32001 from all hosts.
 
 =>kubectl create deployment kplabs-service --image=nginx --replicas=1 --dry-run=client -o yaml
+
 apiVersion: apps/v1
 kind: Deployment
 metadata:
@@ -922,8 +921,14 @@ spec:
   selector:
     run: kplabs-service
 
+SSH to node and curl with nodeport
 
-Q2: Rung this services and access nginx from service IP
+=>curl serviceIP:32001
+=>curl nodeIP:32001
+
+
+
+Q2: Rung this services and access nginx from service IP, this is with port mapping issue.
 apiVersion: apps/v1
 kind: Deployment
 metadata:
@@ -966,6 +971,7 @@ The pod should make use of redis image. Expose port 6379.
 =>kubectl create namespace my-namespace
 
 =>kubectl run pod --help
+=>kubectl run kplabs-namespace --image=redise --help
 =>kubectl run redis-pod --image=redis --port=6379 -n my-namespace
 
 
@@ -975,7 +981,22 @@ Create a new service account named kplabs. Launch a new pod named kplabs-sa from
 
 =>kubectl create serviceaccount myseracc
 =>kubectl get sa
-=>kubectl run kplabs-sa --image=nginx --serviceaccount "kplabs"
+apiVersion: v1
+kind: Pod
+metadata:
+  creationTimestamp: null
+  labels:
+    run: kplabns-sa
+  name: kplabns-sa
+spec:
+  containers:
+  - image: nginx
+    name: kplabns-sa
+    resources: {}
+  dnsPolicy: ClusterFirst
+  restartPolicy: Always
+  serviceAccountName: kplabs
+status: {}
 
 
 Question 5: Deployments and Service Account
@@ -1026,6 +1047,7 @@ spec:
 =>kubectl get deployment --all-namespaces
 =>kubectl get pod -n newkplabs
 =>kubectl edit deployment troubleshoot-deployment  -n newkplabs
+Fixed the image name ninx to nginx
 
 
 
