@@ -1487,13 +1487,13 @@ spec:
 
 
 
-#PersistentVolume and PersistentVolumeClaim
+#PersistentVolume and PersistentVolumeClaim | pv
 -------------------------------------------------
 Persistent Volume:pv.yaml
 apiVersion: v1
 kind: PersistentVolume
 metadata:
-  name: block-pv
+  name: my-pv
 spec:
   storageClassName: manual
   capacity:
@@ -1506,12 +1506,13 @@ spec:
 
 =>kubectl apply -f pv.yaml 
 =>kubectl get pv
+This pv create in host node
 
 PersistentVolumeClaim: pvc.yaml
 apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
-  name: pvc
+  name: my-pvc
 spec:
   storageClassName: manual
   accessModes:
@@ -1527,10 +1528,10 @@ PVC pod: pod-pvc.yaml
 apiVersion: v1
 kind: Pod
 metadata:
-  name: kplabs-pvc
+  name: pvcpod
 spec:
   containers:
-    - name: my-frontend
+    - name: mypvccont
       image: nginx
       volumeMounts:
       - mountPath: "/data"
@@ -1538,7 +1539,7 @@ spec:
   volumes:
     - name: my-volume
       persistentVolumeClaim:
-        claimName: pvc
+        claimName: my-pvc
 
 =>kubectl apply -f pvc-pod.yaml
 =>df -h
@@ -1548,11 +1549,11 @@ spec:
 
 #ConfigMap
 -----------------------------------------------
-
+=>kubectl create configmap --help
 =>kubectl get configmap
 =>kubectl create configmap my-dev-config --from-literal=app.mem=1024m
 
-=>kubectl get configmap -o yaml
+=>kubectl get configmap my-config -o yaml
 
 
 File Base configMap:
@@ -1566,7 +1567,7 @@ ConfigMap Mounted to Pod:
 apiVersion: v1
 kind: Pod
 metadata:
-  name: myconfigmap-pod2
+  name: pod2
 spec:
   containers:
     - name: conmap-cont
@@ -1577,7 +1578,7 @@ spec:
   volumes:
     - name: configmap-vol
       configMap: 
-        name: my-file-base-config 
+        name: my-configmap
   restartPolicy: Never
 
 =>kubectl exec -it myconfigmap-pod2 -- bash
@@ -1631,7 +1632,7 @@ spec:
   securityContext: 
     runAsUser: 1000
     runAsGroup: 3000
-    fsGroup: 2000
+    fsGroup: 4000
 
 
 
@@ -1649,108 +1650,38 @@ Mount the configmap to a pod named configmap-pod based on nginx image in such a 
 Ans:
 Create a properties file with this:
 =>vi app.properties
-=>kubectl create configmap my-file-base-config --from-file=app.properties
+=>kubectl create configmap my-file-base-config --from-file=app.config
 =>kubectl get configmap
 
 apiVersion: v1
 kind: Pod
 metadata:
-  name: mypod1
+  name: configmappod
 spec:
   containers:
     - name: conmap-cont
       image: nginx
       volumeMounts:
-      - name: configmap-vol
-        mountPath: "/data"
-  volumes:
-    - name: configmap-vol
-      configMap: 
-        name: my-file-base-config 
-  restartPolicy: Never
-
-Question 2 - PV and PVC
-
-Create a persistent volume with the name kplabs-pv. The size should be 2Gi and hostpath should be /tmp/mydata. It should have access mode of ReadWriteOnce
-
-Create a persistent volume claim that will make use of the PV created earlier.
-
-Create a Pod named kplabs-pv-pod. The POD should have the volume mounted at /mydata directory.
-
-
-
-Question 3 - Security Context
-
-Create a POD named busybox-security. The pod should run a command sleep 3600.  The primary process in POD should run with UID of 1000 and GID of 2000 all newly created contents of volume should have the group ID of 3000.
-
-
-
-Question 4 - Secrets and Environment Variables
-
-Andrew works as a database administrator and has generated set of credentials that will be used by the application to connect to the database. Instead of giving the credentials to developers to hard-code in their application, he has requested security team to create a secret and mount it as an environment variable to the application containers.
-
-
-
-a. Create a secret name db-creds which has following data:
-
-user: dbreadonly
-pass: myDBPassword#%
- 
-
-b. Create a pod from nginx image. The pod should be named secret-pod
-
-
-
-c. Mount the secret to the POD in such a way that the contents of the database user are available in the form of DB_USER environment variable and database password is available in the form of DB_PASSWORD environment variable inside the container.
-
-
-
-Question 5 - Secrets and Volumes
-
-a. Create a secret name app-creds that has the following data:
-
-appuser: dbreadonly
-apppass: myDBPassword#%
-b. Create a pod based on nginx image with the name of app-pod
-
-c. Mount the secret to the pod so that it is available in the path of /etc/secret
-
-Answer 1: ConfigMap
-
-Step 1: Create a file named kplabs.config and add all the contents specified in the question.
-
-Step 2: Create a new configmap from that file
-
-kubectl create configmap kplabs-config --from-file ./kplabs.config
-
-Step 3: Create a POD with ConfigMap Mounted
-
-apiVersion: v1
-kind: Pod
-metadata:
-  name: configmap-pod
-spec:
-  containers:
-    - name: configmap-container
-      image: nginx
-      volumeMounts:
-      - name: config-volume
+      - name: myfconfigmap-vol
         mountPath: /etc/config
   volumes:
-    - name: config-volume
-      configMap:
-        name: kplabs-config
+    - name: myfconfigmap-vol
+      configMap: 
+        name: app.config 
   restartPolicy: Never
 
 
-Answer 2: PV and PVC
 
-Step 1: Create a Persistent Volume
+Question 2 - PV and PVC
+Create a persistent volume with the name kplabs-pv. The size should be 2Gi and hostpath should be /tmp/mydata. It should have access mode of ReadWriteOnce
+Create a persistent volume claim that will make use of the PV created earlier.
+Create a Pod named kplabs-pv-pod. The POD should have the volume mounted at /mydata directory.
 
+Create pv: 
 apiVersion: v1
 kind: PersistentVolume
 metadata:
-  name: kplabs-pv
+  name: my-pv
 spec:
   capacity:
     storage: 2Gi
@@ -1758,24 +1689,23 @@ spec:
     - ReadWriteOnce
   hostPath:
     path: "/tmp/mydata"
-Step 2: Create a Persistent Volume Claim
 
+Create a Persistent Volume Claim
 apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
-  name: kplabs-pvc
+  name: my-pvc
 spec:
   accessModes:
     - ReadWriteOnce
   resources:
     requests:
       storage: 2Gi
-Step 3: Create a Pod with Mounted Volume
 
 apiVersion: v1
 kind: Pod
 metadata:
-  name: kplabs-pv-pod
+  name: mypvcpod
 spec:
     containers:
     - name: pod
@@ -1786,17 +1716,20 @@ spec:
     volumes:
     - name: myvolume
       persistentVolumeClaim:
-        claimName: kplabs-pvc
+        claimName: my-pvc
+
+=>ssh node01
+=>ls /tmp/mydata
+=>cat /tmp/mydata/myFile.txt
 
 
-Answer 3: Security Context
-
-
+Question 3 - Security Context
+Create a POD named busybox-security. The pod should run a command sleep 3600.  The primary process in POD should run with UID of 1000 and GID of 2000 all newly created contents of volume should have the group ID of 3000.
 
 apiVersion: v1
 kind: Pod
 metadata:
-  name: busybox-security
+  name: sctpod
 spec:
   securityContext:
     runAsUser: 1000
@@ -1805,52 +1738,61 @@ spec:
   containers:
   - name: busybox-container
     image: busybox
-    command: [ "sleep","3600" ]
+    command: ["sleep","3600"]
 
-
-Answer 4: Secrets and Environment Variables
-
-Step 1: Create a secret
-
-kubectl create secret generic db-creds --from-literal=user=dbreadonly --from-literal=pass=myDBPassword#%
+=>kubectl exec -it sctpod -- sh
+=>id
 
 
 
-Step 2: Create a POD with Nginx Image and Mount The Secret
+Question 4 - Secrets and Environment Variables
+a. Create a secret name db-creds which has following data:
+user: dbreadonly
+pass: myDBPassword#%
+b. Create a pod from nginx image. The pod should be named secret-pod
+c. Mount the secret to the POD in such a way that the contents of the database user are available in the form of DB_USER environment variable and database password is available in the form of DB_PASSWORD environment variable inside the container.
+
+Create a secret
+=>kubectl create secret generic mydbsec --from-literal=user=dbreadonly --from-literal=pass=myDBPassword
 
 apiVersion: v1
 kind: Pod
 metadata:
-  name: secret-pod
+  name: mysecpod
 spec:
   containers:
   - image: nginx
-    name: secret-pod
+    name: mysec-cont
     env:
       - name: DB_USER
         valueFrom:
           secretKeyRef:
-            name: db-creds
+            name: mydbsec
             key: user
       - name: DB_PASSWORD
         valueFrom:
           secretKeyRef:
-            name: db-creds
+            name: mydbsec
             key: pass
 
+=>kubectl exec -it mysecpod -- bash
+=>env
 
-Answer 5 - Secrets and Volumes
+Question 5 - Secrets and Volumes
+a. Create a secret name app-creds that has the following data:
+appuser: dbreadonly
+apppass: myDBPassword
+b. Create a pod based on nginx image with the name of app-pod
+c. Mount the secret to the pod so that it is available in the path of /etc/secret
 
-Step 1: Create a Secret
 
-kubectl create secret generic app-creds --from-literal=appuser=dbreadonly --from-literal=apppass=myDBPassword#%
-
-Step 2: Create Manifest Files based on Specification;
+Create a secret
+=>kubectl create secret generic mydbsec --from-literal=user=dbreadonly --from-literal=pass=myDBPassword
 
 apiVersion: v1
 kind: Pod
 metadata:
-  name: app-pod
+  name: podsec2
 spec:
   containers:
   - image: nginx
@@ -1862,7 +1804,10 @@ spec:
   volumes:
   - name: myvolume
     secret:
-      secretName: app-creds
+      secretName: mydbsec
+
+
+
 
 
 
