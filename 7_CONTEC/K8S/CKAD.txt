@@ -1260,9 +1260,6 @@ spec:
 
 
 
-
-
-
 ================================================= 
 Section 6: Domain 5 - Observability
 ================================================= 
@@ -1380,77 +1377,16 @@ Install Metric server:
 =>kubectl get events --field-selector involvedObject.name=mynginx
 =>kubectl get pods --field-selector ""
 
+=>kubectl create namespace myns
+=>kubectl  get namespace
+=>kubectl run mung --image=nginx -n myns
+=>kubectl get pods --all-namespaces --field-selector metadata.namespace=myns
 
 
 
-
-
-
-
-
-
-
-
-
-
-Question 1: Resource Quotas
----------------------------------------------------
-Create a pod named kplabs-quota. The pod should have following configuration:
-a. Should run with nginx image.
-b. It should use maximum of 512 MiB of memory.
-c. It should use maximum of 2 core CPU.
-d. The POD should require a minimum of 128 MiB of memory before it is scheduled.
-apiVersion: v1
-kind: Pod
-metadata:
-  labels:
-    run: kplabs-quota
-  name: kplabs-quota
-spec:
-  containers:
-  - image: nginx
-    name: kplabs-quota
-    resources:
-      requests:
-        memory: "128Mi"
-      limits:
-        memory: "512Mi"
-        cpu: "2"
-
-
-Question 2: Secrets
-Create a secret named kplabs-secret. The secret should have content where user=admin and pass=12345. Create a pod from the nginx image. Mount the secret as environment variables in the pod. The username should be available as DB_USER and password should be available as DB_PASSWORD inside the pod
-
-=>kubectl create secret generic kplabs-secret --from-literal=user=admin --from-literal=pass=12345
-apiVersion: v1
-kind: Pod
-metadata:
-  name: kplabs-secret-pod
-spec:
-  containers:
-  - name: mycontainer
-    image: nginx
-    env:
-      - name: DB_USER
-        valueFrom:
-          secretKeyRef:
-            name: kplabs-secret
-            key: user
-      - name: DB_PASSWORD
-        valueFrom:
-          secretKeyRef:
-            name: kplabs-secret
-            key: pass
-  restartPolicy: Never
-
-
-
-
-
-Practice Test - Domain 5
+#Practice Test - Domain 5
 ---------------------------------------------------
 Question 1: Probes
-
 Create a POD from the nginx image. Pod should be named kplabs-probe. The pod should be created in such a way that if the application inside is not responding to HTTP requests made on port 8080, then Kubernetes should restart the POD.
 
 apiVersion: v1
@@ -1479,23 +1415,29 @@ Create a POD named newprobe. Pod should run from nginx image. The Pod should run
 apiVersion: v1
 kind: Pod
 metadata:
-  name: newprobe
+  labels:
+    test: liveness
+  name: pod3
 spec:
   containers:
   - name: liveness
-    image: nginx
+    image: registry.k8s.io/busybox
     args:
     - /bin/sh
     - -c
-    - touch /tmp/myfile; sleep 3600
+    - touch /tmp/healthy; sleep 10; rm -f /tmp/healthy; sleep 600
     livenessProbe:
       exec:
         command:
         - cat
-        - /tmp/myfile
-      initialDelaySeconds: 3
-      periodSeconds: 3
+        - /tmp/healthy
+      initialDelaySeconds: 2
+      periodSeconds: 2
 
+
+
+Question 4: Events
+Store all the events associated with the pod liveness-http and store it to /tmp/podlog.txt. Make sure to use the kubectl command and do not modify anything in the output.
 
 =>kubectl get events --field-selector involvedObject.name=liveness-http
 =>echo | kubectl get events --field-selector involvedObject.name=newprobe > myoutput.txt
