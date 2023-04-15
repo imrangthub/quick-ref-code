@@ -2099,8 +2099,9 @@ spec:
 #New Update | Exam Preparation
 ================================================= 
 
-Deployment:--------------------------------------
---------------------------------
+#Deployment  Strategy:
+-------------------------------------------------
+=>kubectl explain deployment.spec.strategy
 =>kubectl create deployment my-deployment --image=nginx --dry-run=client -o yaml
 
 apiVersion: apps/v1
@@ -2130,8 +2131,6 @@ spec:
 status: {}
 
 
-=>kubectl explain deployment.spec.strategy
-
 =>kubectl apply -f dpl1.yaml
 =>kubectl get deployment
 =>kubectl get pods
@@ -2141,6 +2140,9 @@ Now change deployment dpl1.yaml with a invalid image name
 Deploy again thne:
 
 =>kubectl apply -f dpl1.yaml
+Or
+=>kubectl edit deployment my-deployment
+
 =>kubectl get deployment
 =>kubectl get pods
 =>kubectl get rs
@@ -2148,7 +2150,8 @@ Deploy again thne:
 Now show all pod now sutdown, now container are running
 this is of Recreate stategy.
 Fixed the proper deployment config (image) then pod will be OutsideOfWork
-
+Or
+=>kubectl rollout undo deployment/my-deployment
 
 Samelair process for RollingUpdate:
 
@@ -2183,7 +2186,6 @@ status: {}
 #Blue Green deployment:
 ------------------------------------------------------
 
-
 =>kubectl run blue-pod --image=nginx
 =>kubectl run green-pod --image=nginx
 
@@ -2193,6 +2195,7 @@ status: {}
 =>kubectl get pods --show-labels
 
 Create a service
+=>kubectl create service nodeport my-service --tcp=80:80 --dry-run=client -o yaml
 apiVersion: v1
 kind: Service
 metadata:
@@ -2213,8 +2216,8 @@ Update service "selector" value app-v2
 and deploy again, then check the end point
 
 Or 
-Cand Edit directly 
-=>kubectl edi  t svc
+Can Edit directly 
+=>kubectl edit svc
 
 
 
@@ -2222,16 +2225,53 @@ Cand Edit directly
 ------------------------------------------------------
 1. Create Deployment Manifests:
 
-kubectl create deployment v1-app --image=nginx --replicas 3 --dry-run=client -o yaml
-kubectl create deployment v2-app --image=httpd --replicas 1 --dry-run=client -o yaml
+kubectl create deployment deployment1 --image=nginx --replicas 3 --dry-run=client -o yaml
+kubectl create deployment deployment2 --image=httpd --replicas 1 --dry-run=client -o yaml
 2. Store these manifests in v1-canary.yaml and v2-canary.yaml
 
-3. Add a common label of deptype: canary to both of these manifest files for the pod template section
+3. Add a common label of (deptype:canary ) to both of these manifest files for the pod template section
+v1-canary.yaml:
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: deployment1
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: app-nginx
+  template:
+    metadata:
+      labels:
+        app: app-nginx
+        deptype: mycanary 
+    spec:
+      containers:
+      - image: nginx
+        name: nginx-cont
+v1-canary.yaml:
+Same as two only change replica and image
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: deployment2
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: app-httpd
+  template:
+    metadata:
+      labels:
+        app: app-httpd
+        deptype: mycanary 
+    spec:
+      containers:
+      - image: httpd
+        name: nginx-cont
 
-4. Create deployment in K8s
-
-kubectl apply -f v1-canary.yaml
-kubectl apply -f v1-canary.yaml
+kubectl apply -f deployment1.yaml
+kubectl apply -f deployment2.yaml
 5. Verify if PODS are created with appropriate labels:
 
 kubectl get pods --show-labels
@@ -2243,7 +2283,7 @@ canary-svc.yaml
 apiVersion: v1
 kind: Service
 metadata:
- name: canary-deployment
+ name: canary-svc 
 spec:
  type: NodePort
  ports:
@@ -2251,7 +2291,7 @@ spec:
    port: 80
    targetPort: 80
  selector:
-   deptype: canary
+   deptype: mycanary
 kubectl apply -f canary-svc.yaml
 
 7. Verify if Service have 4 Endpoint IPs:
