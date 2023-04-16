@@ -2307,6 +2307,9 @@ Kubernetes Documentation Referred for Base CRD manifests:
 
 https://kubernetes.io/docs/tasks/extend-kubernetes/custom-resources/custom-resource-definitions/
 
+=>kubectl proxy --port=8080
+=>curl 127.0.0.1:8080
+
 Manifests File (Step 1 and Step 2)
 
 crd.yaml
@@ -2341,6 +2344,10 @@ spec:
     kind: CronTab
     shortNames:
     - ct
+
+=>k apply -f crd.yaml 
+
+
 crd-object.yaml
 
 apiVersion: "kplabs.internal/v1"
@@ -2351,9 +2358,21 @@ spec:
   cronSpec: "* * * * */5"
   image: my-awesome-cron-image
   replicas: 3
-AWS Service Operator Manifest File:
 
+=>kubectl apply -f crdo.yaml 
+=>kubectl get crontab
+
+
+
+AWS Service Operator Manifest File:
 https://raw.githubusercontent.com/awslabs/aws-service-operator/master/configs/aws-service-operator.yaml
+
+
+
+
+
+
+
 
 
 
@@ -2362,10 +2381,43 @@ https://raw.githubusercontent.com/awslabs/aws-service-operator/master/configs/aw
 =>cat .kube/config
 =>curl -k https://controlplane:6443
 
+=>cd /etc/kubernetes/manifests/
+=>ls
+=>cat kube-apiserver.yaml 
+
 
 =>curl -k https://controlplane:6443 --header "Authorization: 
 Bearer ewrwfsdlkfjdlf="
 Call with token
+
+=>kubectl create serviceaccount myservicacc
+
+apiVersion: v1
+kind: Pod
+metadata:
+  creationTimestamp: null
+  labels:
+    run: ngpod
+  name: ngpod
+spec:
+  serviceAccountName: myservicacc
+  containers:
+  - image: nginx
+    name: ngpod
+    resources: {}
+  dnsPolicy: ClusterFirst
+
+
+=>kubectl get pod -o yaml
+=>k exec -it ngpod -- bash
+=>cat /run/secrets/kubernetes.io/serviceaccount/token
+
+
+=>curl -k https://controlplane:6443/api/v1 --header "Authorization: 
+Bearer sfsfsf"
+
+
+
 
 
 
@@ -2379,7 +2431,7 @@ metadata:
   namespace: default
   name: pod-reader
 rules:
-- apiGroups: [""] # "" indicates the core API group
+- apiGroups: [""]
   resources: ["pods"]
   verbs: ["list"]
 
@@ -2472,7 +2524,6 @@ roleRef:
 #Exam Preparation
 ----------------------------------------------------
 =>kubectl api-resources
-
 =>alias k=kubectl
 Create alias for code
 =>k get pods
@@ -2480,18 +2531,120 @@ Create alias for code
 =>k run mynginx --image=nginx --port=80 --dry-run=client -o yaml
 Generate a POD  yaml file
 
-
 =>k create deployment -h
 How to crearte a deployment get Help
 =>kubectl create deployment my-dep --image=nginx --replicas=3 --dry-run=client -o yaml
 
 
 
+Domain1-Core concept:
+1) Vary well to create pod
+=>kubectl run mynginx --image=nginx --port=80 --restart=Never --dry-run -o yaml>newpod.yaml
+On this command, It will creatre a pod if not mentation (--restart=Never) it will create a deployemnt
+2) Have to very femilary with tis cli command
+3) Can not modify all config/expect in live pod
 
 
-Edit Pod
-=>kubectl run mybusybox --image=busybox
+=>kubectl eidt pod mybusybox
+  add or update label on the pod is ok.
+But all Properties are not able to update on live pod. It will a Forbidden error
 
+For update any properties flow this step:
+=>kubectl get pod mybusybox -o yaml>myupdatedbusybox.yaml
+Save current pod config and delete it then run update pod.
+=>kubectl apply -f myupdatedbusybox.yaml
+
+
+
+Domain2-Pod Design:
+1) Very familier with labels and selectors.
+2) How can apply to and object both vi manifest file and live modification.
+3) Network policy with label
+
+4) Very familary deployment.
+5) Deploymetn is the key of CKAD exam.
+6) Have to undestandi ths deployment from screate.
+7) Create and modify live deployment.
+8) Understand the Important of labels and selectors in deployment.
+9) Have a good idea about masSurge and maxUnavailable in deployment and how to modify it
+10) Be good at with rollign update and rollbacks, its very Important.
+
+11) Jobs and CronJob familary.
+12) Dont worry about cron date/time, find the exmple fron docuemtation and use it.
+13) Understanding of activeDeadlineSeconds with in CronJob
+
+
+
+Domain3-Service and Neworkign:
+1) NodePort service 
+2) Network policy
+3) Diffeetnt between servie Port and targetPort
+4) How to change live service port
+5) Be sure services and Pod must be in same namespaces.
+
+6) Network policy with label and troubleshooting question.
+
+
+
+Domain4-configuration:
+1) ConfigMap
+2) How to mount configMap to a specific path vi volume
+3) SecurityContext (runAsUser, runAsGroup, fsGroup)
+4) Good idea about Resource Quotas
+5) Request and limits for Resource Quotas and set at Pod level
+6) What happen if nodes not match the minum request value
+7) May no direct question for Resource Quotas.
+8) Undestranding of Kubernetes Secret
+9) Create Mount it as env variable and volume fo Pod
+10) Familiar with environment variables
+
+11) How can associate service account with existing deployment and existing POD
+12) Name space has its own default service account
+13) Add secrect on live deployment and Pod
+
+
+
+Domain5- Liveness and Readiness:
+1) Exma may not asky for liveness and readyness 
+2) Liveness/Readiness not be able to update on live pod, save pod a new yaml and apply it.
+3) Diffeetnt between bot and some Troubleshooting question for this relevent.
+4) Like: deploy a pod by dont ready yet, what is problm fixed.
+
+5) Have to konw only kubectl logs command about it.
+6) Question like: save pod log a file.
+7) Event is inport Topics
+
+8) kubectl top pods/ kubectl top nodes 
+9) Metric server will pre-install in exam.
+10) Have to familier to see CPU/Memory usege of a specific pod or nods.
+11) Queston like: on 3 pod wihich pod use most cpu and save this on a file
+
+12) Many Debugging related question will be with:
+  Network Policies
+  Services
+  Liveness/Readiness Probes
+  Deployment etc
+
+
+
+Domain6-PV and PVC:
+1) Be familier with PV and PVC
+2) Why use hostPath and emptyDir, be clear for this defferent.
+3) Question Like: Create a pod attach a voliume ton path of mount is a such way
+volume should be deleted once pod is removed.
+
+
+
+Domain7-MultiContainer:
+1) Be prepared for the question based on Sidecar Pattern
+2) Practice queston related to HAProxy and FluentD 10 time before exam
+3) HAProxy and FluentD  have to vary family with tis two.
+4) HAProxy and FluentD all configuration provide on exam dont worry about congig.
+
+
+
+
+  
 
 
 
