@@ -20,27 +20,32 @@ https://kodekloud.com/lessons/recap-core-concepts/
 #General                                
 =================================================
 
-=>kubectl explain pod
 =>kubectl api-resources
 
 =>kubectl version
-=>kubectl version --short
+=>kubectl version --short 
 =>kubectl get nodes
 
 =>kubectl get pods
 =>kubectl get pods -o wide
 =>kubectl get -o json pod prodName
 
+=>kubectl explain pod
+=>kubectl explain deployment
+
 =kubectl logs myPod
 
+=>kubectl run --help
 =>kubectl run nginx --image=nginx --dry-run=client
 =>kubectl run nginx --image=nginx --dry-run=client -o yaml
 =>kubectl run myng --image=nginx --dry-run=client -o yaml>labelpod.yaml
 =>kubectl create deployment --image=nginx nginx --dry-run=client -o yaml
+=>kubectl run ng3 --image=nginx -- /bin/sh -c "while true; do echo  $(date); sleep 1; done "
 
 =>kubectl run mynginx --image=nginx
 =>kubectl run  bu1 --image=busybox -- sh  -c "hostname -i"
 =>kubectl run logpod --image=busybox -- sh -c "ping google.com"
+=>kubectl run bx2 --image=busybox -- sh -c "while true; do echo $(date)>>/var/1.log; sleep 1; done"
 
 =>kubectl run -it ubuntu1 --image=ubuntu --restart=Never -- bash -ec "apt update; apt install mysql-server; bash"
           =while true; do echo "infinity"; sleep 1; done
@@ -234,6 +239,7 @@ Generate a deployment file and Update for ReplicaSet
 
 =>kubectl get pods --show-labels
 =>kubectl delete rs myrpset
+If a pod got sutdown then replicatSet re create it
 
 
 repliSet1:
@@ -305,6 +311,13 @@ Get Rollout history and check revision details
 =>kubectl describe deployment mydeployment
 Check which revision version currently runing 
 
+=>kubedtl rollout undo --help
+
+=>kubectl rollout history deployment/dep1 --revision=3
+Check rollout history data
+
+=>kubectl rollout undo deployment/dep1 --to-revision=2
+
 =>kubectl rollout history deployment.v1.apps/mydeployment
 =>kubectl rollout undo deployment.v1.apps/mydeployment
 =>kubectl rollout undo deployment.v1.apps/mydeployment --to-revision=2
@@ -318,14 +331,19 @@ Form axSurge and maxUnavailable:
 Check masSurge and maxUnavailable
 =>kubectl create deployment mydeploy --images=nginx --replica 3
 
-
-=>kubectl create deployment mydeploy --image=nginx --replicas 3
-=>kubectl get deployment mydeploy -o yaml
-Showo details info of deployemnt
+maxSurge: The number of pods that can be created above the desired amount of pods.
+maxUnavailable: The number of pods that can be unavailable during the update process.
 
 
+=>kubectl set --help
+=>kubectl set image --help
 =>kubectl set image deployment mydeploy nginx=httpd
 Update  deployemnt
+
+
+=>kubectl get deploy dep1 -o yaml>dep2.yaml
+Then update the file of dep2.yaml 
+OR
 =>kubectl edit deployment mydeploy
 =>kubectl get pods
 Edit deoloyement
@@ -338,6 +356,7 @@ Edit deoloyement
 =>kubectl rollout undo deployment/mydeploy
 Roolout/Undo the deployemnt last deployment
 
+=>kubectl scale deployment --help
 =>kubectl scale deployment mydeploy --replicas 1
 Scele up/down deployemnt
 
@@ -356,10 +375,14 @@ Scele up/down deployemnt
 
 #Batch Job:
 -------------------------------------------------
-
 Job are two type:
 1)jobs (Run to completion)
 2)CronJob
+
+=>kubectl get jobs
+=>kubectl create job --help
+=>kubectl create job my-job --image=busybox --dry-run=client -o yaml
+
 
 simpldJob:
 apiVersion: batch/v1
@@ -378,12 +401,17 @@ spec:
 
 
 =>kubectl apply -f myjob.yml
-=>kubectl logs myjob-qd2jr 
+=>kubectl logs myjob-pod 
 After complate the job task pod are not exit, stay with complate Status.
 
 =>kubectl get jobs
 =>kubectl delete job myjob
 When delete the job all related pos will be delete
+
+
+
+=>kubectl create cronjob --help
+=>kubectl create cronjob my-job --image=busybox --schedule="*/1 * * * *"  --dry-run=client -o yaml
 
 cronJob:
 apiVersion: batch/v1beta1
@@ -409,6 +437,8 @@ spec:
 =>kubectl get cronjob
 =>kubectl get job
 =>kubectl get job -w
+
+=>kubectl describe cronjob cron1
 =>kubectl delete cronjob mycronjob
 
 
@@ -419,7 +449,11 @@ Question 1: Labels
 Create a pod named kplabs-label. The pod should be launched from nginx image. The name of container should be nginx-container. Attach following label to the pod.
 env=production
 app=webserver
+
 Solution:
+=>kubectl run --help
+=>kubectl run kplabs-label --image=nginx --labels="app=webservr,env=production" --dry-run -o yaml>pod1.yaml
+
 apiVersion: v1
 kind: Pod
 metadata:
@@ -437,6 +471,9 @@ spec:
 
 Question 2: Deployments
 Create a deployment named kplabs-deployment. The deployment should be launched from nginx image. The deployment should have three replicas. The selector should be based on the label of app=nginx
+
+=>kubectl create deployment --help
+=>kubectl create deployment kplabs --image=nginx --replicas=3 --dry-run=client -o yaml>dep2.yaml
 
 apiVersion: apps/v1
 kind: Deployment
