@@ -737,45 +737,51 @@ curl to service IP with port
 
 Create Service with Selector:
 -------------------------------------------------
-Step 1: Creating Deployments
+
+Step 1: Creating Service
+apiVersion: v1
+kind: Service
+metadata:
+   name: sltsvc1
+spec:
+   selector:
+     env: webapp
+   ports:
+   - port: 80
+     targetPort: 80
+
+Step 2: Creating Deployments
+
+=>kubectl get node --show-labels
+=>kubectl label nodes node01 disktype=ssd
+
 apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: mydep
   labels:
-    env: backend-service
+    env: mydep-lb
 spec:
-  replicas: 2
+  replicas: 5
   selector:
     matchLabels:
-      env: backend-service
+      env: webapp
   template:
     metadata:
       labels:
-        env: backend-service
+        env: webapp
     spec:
       containers:
       - name: mydep-cont
         image: imranmadbar/nginx
-        command: ["echo","-e"]
-        args: ["Welcome to nginx! \nHost Name: $(hostname -f)\nHost IP: $(hostname -i)">/usr/share/nginx/html/index.html]
         ports:
         - containerPort: 80
+      nodeSelector:
+        disktype: ssd
 
 =>kubectl apply -f mydeployment.yaml
 =>kubectl get pods --show-labels
 
-Step 2: Creating Service
-apiVersion: v1
-kind: Service
-metadata:
-   name: myselector-service
-spec:
-   selector:
-     env: backend-service
-   ports:
-   - port: 80
-     targetPort: 80
 
 =>kubectl apply -f myselector-service.yaml
 =>kubectl describe service myselector-service
@@ -806,7 +812,7 @@ Step 2: Create NodePort service
 apiVersion: v1
 kind: Service
 metadata:
-   name: mynodeport-service
+   name: npsvc
 spec:
    selector:
      type: publicpod
@@ -940,8 +946,10 @@ spec:
 #PracticeDomain3:
 -----------------------------------------------------
 
-Q1: Create a deployment named kplabs-service. The deployment should have three replicas and the image should be based on nginx. Create a service based on NodePort. T
-he service port should be 8080. The website should be accessible from port 32001 from all hosts.
+Q1: Create a deployment named kplabs-service. 
+The deployment should have three replicas and the image should be based on nginx. 
+Create a service based on NodePort. 
+The service port should be 8080. The website should be accessible from port 32001 from all hosts.
 
 =>kubectl create deployment kplabs-service --image=nginx --replicas=1 --dry-run=client -o yaml
 
@@ -985,7 +993,7 @@ spec:
 
 SSH to node and curl with nodeport
 
-=>curl serviceIP:32001
+=>curl serviceIP:8080
 =>curl nodeIP:32001
 
 
@@ -1039,7 +1047,8 @@ The pod should make use of redis image. Expose port 6379.
 
 
 Question 4: Service Account
-Create a new service account named kplabs. Launch a new pod named kplabs-sa from nginx image. The pod should be launched from the kplabs service account. Verify whether the token has been mounted inside the pod.
+Create a new service account named kplabs. Launch a new pod named kplabs-sa from nginx image. 
+The pod should be launched from the kplabs service account. Verify whether the token has been mounted inside the pod.
 
 =>kubectl create serviceaccount myseracc
 =>kubectl get sa
@@ -1062,7 +1071,9 @@ status: {}
 
 
 Question 5: Deployments and Service Account
-Create a deployment named deployment-sa. The deployment should have 2 replicas of nginx image. After the deployment has been created, check the service account associated with the pods. Modify the deployment so that all pods shall use the service account of kplabs.
+Create a deployment named deployment-sa. The deployment should have 2 replicas of nginx image. 
+After the deployment has been created, check the service account associated with the pods. 
+Modify the deployment so that all pods shall use the service account of kplabs.
 
 =>kubectl create deployment --help
 =>kubectl create deployment deployment-sa  --image=nginx --replicas=3
