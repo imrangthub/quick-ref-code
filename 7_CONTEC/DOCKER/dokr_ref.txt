@@ -156,6 +156,15 @@ ENTRYPOINT ["sleep"]
 CMD["10"] 
 
 
+Custom Nginx:
+FROM nginx:latest
+MAINTAINER madbarsoft.com
+RUN apt-get update &&\
+    apt-get install -y iputils-ping &&\
+    apt-get install -y net-tools && \
+    rm -rf /var/lib/apt/lists/*
+RUN chmod -R 777 /usr/share/nginx/html
+RUN echo "<h1 style='text-align:center'>Welcome to nginx!<h1>Host IP: $(hostname -i)</br>Host Name: $(hostname -f)" > /usr/share/nginx/html/index.html
 
 
 # Pull Images | download Images

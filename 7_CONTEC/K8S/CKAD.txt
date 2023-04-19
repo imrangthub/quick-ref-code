@@ -42,6 +42,9 @@ https://kodekloud.com/lessons/recap-core-concepts/
 =>kubectl create deployment --image=nginx nginx --dry-run=client -o yaml
 =>kubectl run ng3 --image=nginx -- /bin/sh -c "while true; do echo  $(date); sleep 1; done "
 
+=>kubectl run pod1 --image=imranmadbar/nginx && sleep 2 && kubectl exec -it pod1 -- bash
+=>echo -e "Welcome to nginx! \nHost Name: $(hostname -f)\nHost IP: $(hostname -i)">/usr/share/nginx/html/index.html
+
 =>kubectl run mynginx --image=nginx
 =>kubectl run  bu1 --image=busybox -- sh  -c "hostname -i"
 =>kubectl run logpod --image=busybox -- sh -c "ping google.com"
@@ -530,6 +533,13 @@ Undo deploument and rollback
 Question 4: Labels and Selectors
 Create a deployment named kplabs-selector. The pods should be launched from nginx image.The pods should only be launched in a node which has a label of disk=ssd. Observe the status of deployment. Add the appropriate label to the worker node and then observe the status of the deployment.
 
+=>kubectl create deployment --help
+=>kubectl create deployment my-dep --image=nginx --replicas=3  --dry-run=client -o yaml>dep4.yaml
+
+Edit yaml file and add this under spec as containers
+      nodeSelector:
+        disktype: ssd
+
 apiVersion: apps/v1
 kind: Deployment
 metadata:
@@ -550,7 +560,6 @@ spec:
       nodeSelector:
         disktype: ssd
 
-=>kubectl delete -f dep1.yaml
 =>kubectl get pods
 Pod will show panding status becouse disktype: ssd not found on node
 Now need to add this on node 
@@ -563,6 +572,9 @@ Now need to add this on node
 
 Question 5:  CronJob
 Create a job named kplabs-job. The job should run every minute and should print out the current date.
+
+=>kubectl create cronjob --help
+=>kubectl create cronjob kplabs-job --image=busybox --schedule="*/1 * * * *" --dry-run=client -o yaml>cron5.yaml
 
 apiVersion: batch/v1
 kind: CronJob
@@ -636,6 +648,11 @@ spec:
       - image: nginx
         name: mydeploy-cont
 
+=>kubectl rollout history deployment mydeploy
+=>kubectl rollout undo deployment/mydeploy
+Roolout/Undo the deployemnt last deployment
+
+=>kubectl set image --help
 =>kubectl set image deployment mydeploy mydeploy-cont=httpd
 =>kubectl set image deployment mydeploy mydeploy-cont=nginx --record
 
@@ -664,8 +681,8 @@ serviceExample1:
 Step 1: Creating Backend and Frontend PODS
 =>kubectl run bkpod1 --image=nginx
 =>kubectl run bkpod1 --image=nginx
-=>kubectl run fndpod --image=ubuntu --command -- sleep 3600
-
+=>kubectl run fndpod --image=ubuntu --command -- sleep 1h
+=>echo -e "Welcome to nginx! \nHost Name: $(hostname -f)\nHost IP: $(hostname -i)">/usr/share/nginx/html/index.html
 =>kubectl exec mypod1 -- ls /usr/share/nginx/html
 
 Step 2: Test the Connection between Frontend and Backend PODs
@@ -678,6 +695,10 @@ Curl to backend IP
 
 Step 3: Create a new Service (clusterIp by default)
 vi myservice.yaml
+
+=>kubectl create service --help
+=>kubectl create service clusterip --help
+=>kubectl create service clusterip svc1 --tcp=80:80 --dry-run=client -o yaml
 
 apiVersion: v1
 kind: Service
@@ -701,11 +722,13 @@ metadata:
 subsets:
   - addresses:
       - ip: 10.244.1.3
-      - ip: 10.244.1.4
+      - ip: 10.244.1.2
     ports:
       - port: 80
 
 =>kubectl apply -f myendpoint.yaml
+
+
 
 Step 5: Test the Connection
 =>kubectl exec -it fndpod -- bash
@@ -718,7 +741,7 @@ Step 1: Creating Deployments
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: mydeployment
+  name: mydep
   labels:
     env: backend-service
 spec:
@@ -732,8 +755,10 @@ spec:
         env: backend-service
     spec:
       containers:
-      - name: ngpod
-        image: nginx
+      - name: mydep-cont
+        image: imranmadbar/nginx
+        command: ["echo","-e"]
+        args: ["Welcome to nginx! \nHost Name: $(hostname -f)\nHost IP: $(hostname -i)">/usr/share/nginx/html/index.html]
         ports:
         - containerPort: 80
 
