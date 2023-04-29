@@ -80,6 +80,206 @@ https://kodekloud.com/lessons/recap-core-concepts/
 
 
 
+KodeKloud
+=================================================
+#CoreConcept         
+================================================= 
+
+Pod
+-------------------------------------------------
+Edit current running pod, like change image
+1) kubectl edit pod myng
+OR
+2) Edit then pod defanation yaml file and run again
+=>Kubectl apply -f mypod.yaml
+
+
+Generate another pod defenation yaml file from current pod
+=>>kubectl get pod mypod -o yaml
+=>kubectl get pod mypod -o yaml> pod.yaml
+
+
+ReplicaSet
+-------------------------------------------------
+Simple ReplicaSet:
+apiVersion:apps/v1
+kind: ReplicaSet
+metadata:
+  name: replicaset-1
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      tier: frontend
+  template:
+    metadata:
+      labels:
+        tier: frontend
+    spec:
+      containers:
+      - name: nginx
+        image: nginx
+
+
+For finding any issu in defination yaml file, first run the yaml
+=>kubectl create -f myreplicaset.yaml
+And now check the error message
+
+
+
+Scale ReplicaSet
+1) Update number of replica(replicas:5) in yaml file and run
+=>kubectl replace -f myreplica.yaml
+OR
+2) Run
+=>kubectl scale --replicas=5 -f myreplica.yaml
+OR
+3) Run with replical type(replicaset) and name (myreplicaset) 
+=>kubectl scale --replicas=5 replicaset myreplicaset
+2 and 3 Not made change the original defination file
+
+Check ReplicaSet info like: uses image, etc
+=>kubectl describe rs new-replica-set
+
+Check the pod status of ReplicaSet
+=>kubectl get rs new-replica-set
+
+
+If need to Update ReplicaSet like Image change, then its does not automatically re-create the  pod.
+First you can eidt current rs
+=>kubectl edit rs new-replica-set 
+Then delete existing pod
+=>kubectl delete pod --all
+and RS will create new pod with new Image
+OR
+Delete old rs and create again
+
+
+=>kubectl get rs myreplicaset1 -o yaml
+=>kubectl get rs myreplicaset1 -o yaml>myrs2.yaml
+
+
+#Deployment
+-------------------------------------------------
+=>kubectl create deployment --help
+=>kubectl create deployment httpd-frontend --image=httpd:2.4-alpine --replicas=3 --dry-run=client -o yaml>mydeployment1.yaml
+
+
+Generate a yaml file from current deployment
+=>kubectl get deployment mydeployment -o yaml
+=>kubectl get deployment httpd-frontend -o yaml>mydeployment2.yaml
+
+
+
+
+#NameSpace
+-------------------------------------------------
+=>kubectl get all
+
+=>kubectl get namespace
+=>kubectl get pod --namespace=research
+=>kubectl get pod -n=research
+=>kubectl run redis --image=redis --namespace=research
+
+
+=>kubectl get pod -A
+=>kubectl get pod --all-namespaces
+Show all pod with namespace
+
+=>kubectl get pods -n=marketing
+=>kubectl get svc -n=marketing
+Show service of a specific namespace
+
+
+
+Creating Kubernetes objects imperatively
+-------------------------------------------------
+There are two main ways to manage Kubernetes objects: imperative (with kubectl commands) and 
+declarative (by writing manifests and then using kubectl apply).
+
+
+=>kubectl run --help
+=>kubectl run redis --image=redis:alpine --labels="tier=db"
+=>get pod --show-labels
+
+
+=>kubectl create service --help
+=>kubectl create service clusterip --help
+=>kubectl create service clusterip redis-service --tcp=6379:6379
+
+
+=>kubectl create deployment --help
+=>kubectl create deployment webapp --image=kodekloud/webapp-color --replicas=3
+
+=>kubectl run custom-nginx --image=nginx --port=8080
+
+
+=>kubectl create namespace dev-ns
+
+
+=>kubectl create deployment redis-deploy --image=redis --replicas=2 -n=dev-ns
+
+
+
+=>kubectl create service clusterip --help
+
+
+=>kubectl create service clusterip httpd --tcp=5678:80
+=>kubectl get pod --show-labels
+=>kubectl edit svc  httpd
+=>kubectl describe services httpd
+
+
+
+=>kubectl expose --help
+Need rnd
+
+=>kubectl run httpd --image=httpd:alpine --port=80 --expose=true
+This command create pod as well as service with same name with labels and bind service with pod at a time
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+ZonVovg
 =================================================
 #D1:CoreConcept               
 ================================================= 
