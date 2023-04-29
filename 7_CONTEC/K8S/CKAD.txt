@@ -203,6 +203,11 @@ declarative (by writing manifests and then using kubectl apply).
 =>get pod --show-labels
 
 
+Create a service redis-service to expose the redis application within the cluster on port 6379.
+Use imperative commands.
+=>kubectl expose pod redis --port=6379 --name=redis-service
+=>kubectl describe svc redis-service
+OR
 =>kubectl create service --help
 =>kubectl create service clusterip --help
 =>kubectl create service clusterip redis-service --tcp=6379:6379
@@ -230,10 +235,12 @@ declarative (by writing manifests and then using kubectl apply).
 =>kubectl describe services httpd
 
 
-
+expose:
 =>kubectl expose --help
-Need rnd
-
+"expose" command user for expose existing pod for expose.
+=>kubectl expose pod redis --port=6379 --name=redis-service
+OR 
+Create pod and service at a same time
 =>kubectl run httpd --image=httpd:alpine --port=80 --expose=true
 This command create pod as well as service with same name with labels and bind service with pod at a time
 
