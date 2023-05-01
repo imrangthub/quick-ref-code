@@ -272,7 +272,7 @@ This command create pod as well as service with same name with labels and bind s
 
 
 Practice:
-========
+================================================= 
 What is the command used to run the pod ubuntu-sleeper?
 =>kubectl describe pod ubuntu-sleeper
 
@@ -445,6 +445,73 @@ add this:
 
 #Secret
 -------------------------------------------------
+=>kubectl get secret
+=>kubectl get secret db-secret -o yaml
+=>echo "sfsdfrweewer" | base64 --decode
+
+=>kubectl describe secret dashboard-token 
+Show How many secret data on a secret, What is the type of the dashboard-token secret.
+
+
+1)Create a new secret named db-secret with the data given below.
+  Secret Name: db-secret
+  Secret 1: DB_Host=sql01
+  Secret 2: DB_User=root
+  Secret 3: DB_Password=password123
+
+=>kubectl create secret --help
+=>kubectl create secret generic --help
+=>kubectl create secret generic my-secret --from-literal=key1=supersecret --from-literal=key2=topsecret
+=>kubectl create secret generic db-secret --from-literal=DB_Host=sql01 --from-literal=DB_User=root --from-literal=DB_Password=password123
+
+=>kubectl get secret db-secret -o yaml
+=>kubectl describe secret db-secret
+
+
+=>kubectl describe pod webapp-pod
+Show Is the pod has any secret
+
+2)Configure webapp-pod to load environment variables from the newly created secret.
+Delete and recreate the pod if required.
+
+Pod name: webapp-pod
+Image name: kodekloud/simple-webapp-mysql
+Env From: Secret=db-secret
+
+
+envFrom:
+ - secretRef:
+    name: db-secret
+
+Add this under container like this:
+spec:
+  containers:
+  - image: kodekloud/simple-webapp-mysql
+    imagePullPolicy: Always
+    name: webapp
+    resources: {}
+    terminationMessagePath: /dev/termination-log
+    terminationMessagePolicy: File
+    envFrom:
+      - secretRef:
+          name: db-secret
+
+
+=>kubectl edit pod webapp-pod
+=>kubectl replace --force -f /tmp/kubectl-edit-3803810208.yaml
+
+
+
+#Solution: Security Contexts
+-------------------------------------------------
+1)What is the user used to execute the sleep process within the ubuntu-sleeper pod?
+=>kubectl exec -it ubuntu-sleeper -- whoami
+
+2)Edit the pod ubuntu-sleeper to run the sleep process with user ID 1010.
+
+Pod Name: ubuntu-sleeper
+Image Name: ubuntu
+SecurityContext: User 1010
 
 
 
@@ -460,6 +527,43 @@ add this:
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+@@@
 ZonVovg
 =================================================
 #D1:CoreConcept               
