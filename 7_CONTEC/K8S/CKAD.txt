@@ -725,6 +725,248 @@ Update the memory limit from 10 20
 
 
 
+#Taints and Tolerations
+-------------------------------------------------
+Tain = Node
+Toleration = Pod
+
+=>kubectl describe node controlplane | grep Taints
+
+
+#Solution: Taints and Tolerations
+-------------------------------------------------
+
+
+1)How many nodes exist on the system?
+=>kubectl get node
+
+
+2)Create a taint on node01 with key of spray, value of mortein and effect of NoSchedule
+Key = spray
+Value = mortein
+Effect = NoSchedule
+
+=>kubectl taint --help
+=>kubectl taint nodes node01 spray=mortein:NoSchedule
+=>kubectl describe node node01 | grep Taints
+
+
+3) Create a pod name mosquito, Why pod on pending state ?
+=>kubectl describe pod mosquito
+
+4)Create another pod named bee with the nginx image, which has a toleration set to the taint mortein.
+
+Image name: nginx
+Key: spray
+Value: mortein
+Effect: NoSchedule
+Status: Running
+
+=> kubectl run bee --image=nginx --dry-run=client -o yaml>bee.yaml
+=>vi bee.yaml
+
+apiVersion: v1
+kind: Pod
+metadata:
+  creationTimestamp: null
+  labels:
+    run: bee
+  name: bee
+spec:
+  containers:
+  - image: nginx
+    name: bee
+    resources: {}
+  dnsPolicy: ClusterFirst
+  restartPolicy: Always
+  tolerations:
+    - key: "spray"
+      value: "mortein"
+      effect: "NoSchedule"
+      operator: "Equal"
+status: {}
+
+=>k apply -f bee.yaml 
+
+
+5)Notice the bee pod was scheduled on node node01 despite the taint?
+=>kuebctl get pod -o wide
+
+6)Remove the taint on controlplane, which currently has the taint effect of NoSchedule.
+=>kubectl describe node controlplane
+Check:
+Taints:             node-role.kubernetes.io/control-plane:NoSchedule
+
+Remove it:
+=>kubectl taint node controlplane node-role.kubernetes.io/control-plane:NoSchedule-
+
+
+
+##Node Selectors
+-------------------------------------------------
+=>kubectl label nodes node01 size=learge
+Labeling a node
+
+apiVersion: v1
+kind: Pod
+metadata:
+  creationTimestamp: null
+  labels:
+    run: bee
+  name: bee
+spec:
+  containers:
+  - image: nginx
+    name: bee
+  nodeSelector:
+    size: Large
+
+=>kuebctl apply -f newpod.yaml
+
+
+
+#Solution: Node Selectors
+-------------------------------------------------
+
+1)How many Labels exist on node node01?
+=>kubectl describe node node01
+Check  Labels:             beta.kubernetes.io/arch=amd64
+
+2)Apply/Add a label color=blue to node node01
+=>kubectl label node --help
+=>kubectl label node node01 color=blue
+
+3)Create a new deployment named blue with the nginx image and 3 replicas.
+=>kubectl create deployment --help
+=>kubectl create deployment blue --image=nginx --replicas=3
+
+4)Which nodes can the pods for the blue deployment be placed on?
+=>kubectl get pod -o wide
+=>kubectl describe node node01 | grep Taints
+
+
+5)Set Node Affinity to the deployment to place the pods on node01 only.
+Name: blue
+Replicas: 3
+Image: nginx
+NodeAffinity: requiredDuringSchedulingIgnoredDuringExecution
+Key: color
+value: blue
+
+=>kubectl label node node01 color=blue
+
+=>kubectl edit deployment blue
+Add this:
+  affinity:
+    nodeAffinity:
+      requiredDuringSchedulingIgnoredDuringExecution:
+        nodeSelectorTerms:
+        - matchExpressions:
+          - key: color
+            operator: In
+            values:
+            - blue
+
+Complate deployment yaml will like this:
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  creationTimestamp: null
+  labels:
+    app: blue
+  name: blue
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: blue
+  strategy: {}
+  template:
+    metadata:
+      creationTimestamp: null
+      labels:
+        app: blue
+    spec:  
+      affinity:
+        nodeAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            nodeSelectorTerms:
+            - matchExpressions:
+              - key: color
+                operator: In
+                values:
+                - blue
+      containers:
+      - image: nginx
+        name: nginx
+        resources: {}
+status: {}
+
+
+6)Create a new deployment named red with the nginx image and 2 replicas, and ensure it gets placed on the controlplane node only.
+Use the label key - node-role.kubernetes.io/control-plane - which is already set on the controlplane node.
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  creationTimestamp: null
+  labels:
+    app: red
+  name: red
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: red
+  strategy: {}
+  template:
+    metadata:
+      creationTimestamp: null
+      labels:
+        app: red
+    spec:  
+      affinity:
+        nodeAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            nodeSelectorTerms:
+            - matchExpressions:
+              - key: node-role.kubernetes.io/control-plane
+                operator: Exists
+      containers:
+      - image: nginx
+        name: nginx
+        resources: {}
+status: {}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
