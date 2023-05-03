@@ -513,33 +513,214 @@ Pod Name: ubuntu-sleeper
 Image Name: ubuntu
 SecurityContext: User 1010
 
+add this under containers: section
+  securityContext:
+    runAsUser:1010
+
+Like this:
+spec:
+  containers:
+  - command:
+    - sleep
+    - "4800"
+    image: ubuntu
+    securityContext:
+      runAsUser: 1010
+
+=>kubectl replace --force -f /tmp/kubectl-edit-1907445851.yaml
+
+Pod and container lavel SecurityContext:
+apiVersion: v1
+kind: Pod
+metadata:
+  name: multi-pod
+spec:
+  securityContext:
+    runAsUser: 1001
+  containers:
+  -  image: ubuntu
+     name: web
+     command: ["sleep", "5000"]
+     securityContext:
+      runAsUser: 1002
+  -  image: ubuntu
+     name: sidecar
+     command: ["sleep", "5000"]
+
+
+3)Update pod ubuntu-sleeper to run as Root user and with the SYS_TIME capability.
+Pod Name: ubuntu-sleeper
+Image Name: ubuntu
+SecurityContext: Capability SYS_TIME
+
+=>kubectl edit pod ubuntu-sleeper
+add this under SecurityContext:
+capabilities:
+  add: ["SYS_TIME"]
+
+=>kubectl replace --force -f /tmp/kubectl-edit-2505242802.yaml
 
 
 
 
 
+#Solution: Service Accounts
+-------------------------------------------------
+
+=>kubectl get serviceaccount
+
+
+1)What is the secret token used by the default service account?
+=>kubectl describe sa default
+
+2)Which account does the Dashboard application use to query the Kubernetes API?
+Check the error:
+pods is forbidden: User "system:serviceaccount:default:default" cannot list resource "pods" in API group "" in the namespace "default"
+
+Its default account identify by "system:serviceaccount:default:default".
+
+
+3)Inspect the Dashboard Application POD and identify the Service Account mounted on it.
+Identify the service account name of the pod:
+
+=>kubectl get pod mypod -o yaml
+and Find this:
+serviceAccount: default
+
+4)what location is the ServiceAccount credentials available within the pod?
+=>kubectl describe pod web-dashboard-65b9cf6cbb-vpkkz 
+Now check the  Mounts: properties
+
+5)Create a new ServiceAccount named dashboard-sa
+=>kubectl create sa dashboard-sa
+
+
+6)We just added additional permissions for the newly created dashboard-sa account using RBAC.
+
+pod-reader-role.yaml
+kind: Role
+apiVersion: rbac.authorization.k8s.io/v1
+metadata:
+  namespace: default
+  name: pod-reader
+rules:
+- apiGroups:
+  - ''
+  resources:
+  - pods
+  verbs:
+  - get
+  - watch
+  - list
+
+dashboard-sa-role-binding.yaml 
+kind: RoleBinding
+apiVersion: rbac.authorization.k8s.io/v1
+metadata:
+  name: read-pods
+  namespace: default
+subjects:
+- kind: ServiceAccount
+  name: dashboard-sa # Name is case sensitive
+  namespace: default
+roleRef:
+  kind: Role #this must be Role or ClusterRole
+  name: pod-reader # this must match the name of the Role or ClusterRole you wish to bind to
+  apiGroup: rbac.authorization.k8s.io
+
+=>kubectl get role
+=>kubectl get rolebinding
+
+
+7)Enter the access token in the UI of the dashboard application. Click Load Dashboard button to load Dashboard
+
+Create an authorization token for the newly created service account, copy the generated token and paste it into the token field of the UI.
+To do this, run kubectl create token dashboard-sa for the dashboard-sa service account, copy the token and paste it in the UI.
+
+
+=>kubectl get sa
+=>kubectl describe sa dashboard-sa
+=>kubectl describe secret dashboard-sa-token-rdqw9
+
+
+8)You shouldn't have to copy and paste the token each time. The Dashboard application is programmed to read token from the secret mount location. However currently, the default service account is mounted. Update the deployment to use the newly created ServiceAccount
+Edit the deployment to change ServiceAccount from default to dashboard-sa
+
+=>k get deployment
+=>kubectl get deployment -o yaml>mydeployment.yaml
+=>kubectl delete deploy web-dashboard 
+
+=>vi mydeployment.yaml
+Add serviceAccountName: dashboard-sa under templated spec
+
+    template:
+      metadata:
+        creationTimestamp: null
+        labels:
+          name: web-dashboard
+      spec:
+        serviceAccountName: dashboard-sa
+        containers:
 
 
 
 
+#Solution: Resource Requirements
+-------------------------------------------------
+When a pod is created the containers are assigned a default CPU request of .5 and 
+memory of 256Mi". 
+For the POD to pick up those defaults you must have first set those as default values for request and limit by creating a LimitRange in that namespace.
+
+apiVersion: v1
+kind: LimitRange
+metadata:
+  name: mem-limit-range
+spec:
+  limits:
+  - default:
+      memory: 512Mi
+    defaultRequest:
+      memory: 256Mi
+    type: Container
+
+apiVersion: v1
+kind: LimitRange
+metadata:
+  name: cpu-limit-range
+spec:
+  limits:
+  - default:
+      cpu: 1
+    defaultRequest:
+      cpu: 0.5
+    type: Container 
+
+1)A pod called rabbit is deployed. Identify the CPU requirements set on the Pod?
+=>kubectl describe pod rabbit
 
 
+2)Another pod called elephant has been deployed in the default namespace. It fails to get to a running state. Inspect this pod and identify the Reason why it is not running.
 
+=>kubectl describe pod elephant
 
+Check this section:
+    Last State:     Terminated
+      Reason:       OOMKilled
+      Exit Code:    1
 
+3)The status OOMKilled indicates that it is failing because the pod ran out of memory. Identify the memory limit set on the POD.
 
+=>kubectl describe pod elephant
+    Limits:
+      memory:  10Mi
 
+4)The elephant pod runs a process that consumes 15Mi of memory. Increase the limit of the elephant pod to 20Mi.
 
-
-
-
-
-
-
-
-
-
-
+=>kubectl get pod -o yaml elephant >newpod.yaml
+=>kubectl delete pod elephant 
+=>vi newpod.yaml 
+Update the memory limit from 10 20
+=>kubectl apply -f newpod.yaml 
 
 
 
