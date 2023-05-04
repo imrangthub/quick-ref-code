@@ -1249,6 +1249,28 @@ livenessProbe:
 
 
 
+##Container Logging and Monitor
+--------------------------------------------------
+
+=>kubectl logs mypod 
+
+1)Let us deploy metrics-server to monitor the PODs and Nodes. Pull the git repository for the deployment files.
+Run: git clone https://github.com/kodekloudhub/kubernetes-metrics-server.git
+
+=>kubectl create -f .
+Create matrice server.
+
+=>kubectl top node
+Check resource monitoring of nodes
+
+
+2)Identify the node that consumes the most CPU(cores).
+  Identify the node that consumes the most Memory(bytes).
+=>kubectl top node
+
+3)Identify the most memory consumes pod
+  Identify the POD that consumes the least CPU(cores).
+=>kubectl top pod
 
 
 
@@ -1256,6 +1278,262 @@ livenessProbe:
 
 
 
+##Section 6: POD Design
+==================================================
+
+##Labels, Selectors and Annotations
+--------------------------------------------------
+
+
+
+##Solution: Labels, Selectors and Annotations
+--------------------------------------------------
+
+1)We have deployed a number of PODs. They are labelled with tier, env and bu. How many PODs exist in the dev environment (env)?
+Use selectors to filter the output
+
+=>kubectl get pod --selector env=dev
+OR
+=>kubectl get pod --selector env=dev --no-headers
+=>kubectl get pod --selector env=dev --no-headers | wc -l
+
+2)How many objects are in the prod environment including PODs, ReplicaSets and any other objects?
+=>kubectl get all
+=>kubectl get all --selector env=prod
+OR
+=>kubectl get all --selector env=prod | wc -l
+
+
+3)Identify the POD which is part of the prod environment, the finance BU and of frontend tier?
+=>kubectl get pod --selector env=prod,bu=finance,tier=frontend
+
+
+4)A ReplicaSet definition file is given replicaset-definition-1.yaml. Try to create the replicaset. There is an issue with the file. Try to fix it.
+=>kubectl apply -f replicaset-definition-1.yaml 
+=>vi replicaset-definition-1.yaml 
+=>kubectl apply -f replicaset-definition-1.yaml 
+
+=>kubectl get rs
+
+
+
+
+
+##Deployment
+--------------------------------------------------
+
+=>kubectl create -f mydeployment.yaml --record
+=>kubectl rollout status deployment/mydeployment
+=>kubectl rollout history deployment/mydeployment
+Creating a deployment
+
+Creating a deployment, checking the rollout status and history:
+In the example below, we will first create a simple deployment and inspect the rollout status and the rollout history:
+
+=>kubectl create deployment nginx --image=nginx:1.16
+=>kubectl rollout status deployment nginx
+=>kubectl rollout history deployment nginx
+
+
+Using the --revision flag:
+Here the revision 1 is the first version where the deployment was created.
+You can check the status of each revision individually by using the --revision flag:
+
+=>kubectl rollout history deployment nginx --revision=1
+
+
+Using the --record flag:
+You would have noticed that the "change-cause" field is empty in the rollout history output. We can use the --record flag to save the command used to create/update a deployment against the revision number.
+
+=>kubectl set image deployment nginx nginx=nginx:1.17 --record
+=> kubectl rollout history deployment nginx
+=>kubectl edit deployments. nginx --record
+=>kubectl set image deployment nginx nginx=nginx:1.17 --record=true
+=>kubectl edit deployments. nginx --record=true
+=>kubectl rollout history deployment nginx --revision=3
+
+
+Undo a change:Lets now rollback to the previous revision:
+=>kubectl rollout history deployment nginx
+=>kubectl rollout history deployment nginx --revision=3
+=>kubectl describe deployments. nginx | grep -i image:
+With this, we have rolled back to the previous version of the deployment with the image = nginx:1.17.
+
+=>kubectl rollout history deployment nginx --revision=1
+=>kubectl rollout undo deployment nginx --to-revision=1
+=>kubectl describe deployments. nginx | grep -i image:
+
+To rollback to specific revision we will use the --to-revision flag.
+With --to-revision=1, it will be rolled back with the first image we used to create a deployment
+
+
+
+
+
+
+
+##Solution:Deployment Rolling Updte and Rollback
+--------------------------------------------------
+1)What container image is used to deploy the applications?
+
+=>k describe deployment frontend 
+
+2)Inspect the deployment and identify the current strategy?
+=>k describe deployment frontend 
+StrategyType:           RollingUpdate
+
+3)Let us try that. Upgrade the application by setting the image on the deployment to kodekloud/webapp-color:v2
+
+=>kubectl edit deployment frontend
+Edit the yaml file
+OR
+=>kubectl set image --help
+=>kubectl set image deploy frontend simple-webapp=kodekloud/webapp-color:v2
+=>kubectl describe deployment frontend 
+
+
+4)Up to how many PODs can be down for upgrade at a time
+Consider the current strategy settings and number of PODs - 4
+
+=>kubectl describe deploy frontend 
+checkout:
+RollingUpdateStrategy:  25% max unavailable, 25% max surge
+Its mean 1 pod what is 25%.
+
+
+5)Change the deployment strategy to Recreate
+
+=>kubectl get deployment frontend -o yaml>newdeployment.yaml
+=>kuebctl delete deploy frontend
+ strategy:
+    type: Recreate
+=>kubectl apply -f newdeployment.yaml
+=>kubectl describe deploy frondend
+Check:
+StrategyType:       Recreate
+
+
+
+##Job and CronJob
+--------------------------------------------------
+
+
+
+##Solution: Job and CronJob
+--------------------------------------------------
+throw-dice.yaml
+apiVersion: v1
+kind: Pod
+metadata:
+  name: throw-dice-pod
+spec:
+  containers:
+  -  image: kodekloud/throw-dice
+     name: throw-dice
+  restartPolicy: Never
+
+1)Create a Job using this POD definition file or from the imperative command and look at how many attempts does it take to get a '6'.
+Use the specification given on the below.
+
+Job Name: throw-dice-job
+Image Name: kodekloud/throw-dice
+
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: throw-dice-job
+spec:
+  template:
+    spec:
+      containers:
+      - name: throw-dice-job
+        image: kodekloud/throw-dice
+      restartPolicy: Never
+  backoffLimit: 25
+
+=>vi myjob.yaml
+=>kubectl apply -f myjon.yaml
+
+=>kubectl describe job throw-dice-job 
+
+
+
+2)Update the job definition to run as many times as required to get 3 successful 6's.
+Delete existing job and create a new one with the given spec. Monitor and wait for the job to succeed.
+
+Job Name: throw-dice-job
+Image Name: kodekloud/throw-dice
+Completions: 3
+Job Succeeded: True
+
+=>vi jobn3.yaml
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: throw-dice-job
+spec:
+  template:
+    spec:
+      containers:
+      - name: throw-dice-job
+        image: kodekloud/throw-dice
+      restartPolicy: Never
+  backoffLimit: 30
+  completions: 3
+
+=>kubectl delete job throw-dice-job
+=>kubectl apply -f job3.yaml
+
+=> k describe job throw-dice-job 
+Check:
+Pods Statuses:    1 Active (0 Ready) / 2 Succeeded / 5 Failed
+
+
+3)That took a while. Let us try to speed it up, by running upto 3 jobs in parallel.
+Update the job definition to run 3 jobs in parallel.
+
+Job Name: throw-dice-job
+Image Name: kodekloud/throw-dice
+Completions: 3
+Parallelism: 3
+
+=>vi jon4.yaml
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: throw-dice-job
+spec:
+  template:
+    spec:
+      containers:
+      - name: throw-dice-job
+        image: kodekloud/throw-dice
+      restartPolicy: Never
+  backoffLimit: 30
+  completions: 3
+  parallelism: 3
+
+
+4)Let us now schedule that job to run at 21:30 hours every day.
+Create a CronJob for this.
+CronJob Name: throw-dice-cron-job
+Image Name: kodekloud/throw-dice
+Schedule: 30 21 * * *
+
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: throw-dice-cron-job
+spec:
+  schedule: "30 21 * * *"
+  jobTemplate:
+    spec:
+      template:
+        spec:
+          containers:
+          - name: throw-dice-cron-job
+            image: kodekloud/throw-dice
+          restartPolicy: OnFailure
 
 
 
