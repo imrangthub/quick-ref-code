@@ -1819,6 +1819,98 @@ Add this under metadata:
 
 
 
+##Network Policies
+--------------------------------------------------
+Two type Network Policy:
+ - Ingress
+ - Egress
+
+##Solution: Network Policies
+--------------------------------------------------
+1)How many network policies do you see in the environment?
+=>kubectl get networkpolicy 
+=>kubectl get netpol
+
+2)Which pod is the Network Policy applied on?
+=>kubectl get networkpolicy 
+
+Check pod-selector:
+NAME             POD-SELECTOR   AGE
+payroll-policy   name=payroll   2m34s
+
+
+3)What type of traffic is this Network Policy configured to handle?
+=>kubectl describe netpol payroll-policy
+
+4)What is the impact of the rule configured on this Network Policy?
+Internal pod can access on 8080 port
+Spec:
+  PodSelector:     name=payroll
+  Allowing ingress traffic:
+    To Port: 8080/TCP
+    From:
+      PodSelector: name=internal
+
+
+5)Create a network policy to allow traffic from the Internal application only to the payroll-service and db-service.
+Use the spec given below. You might want to enable ingress traffic to the pod to test your rules in the UI.
+
+Policy Name: internal-policy
+Policy Type: Egress
+Egress Allow: payroll
+Payroll Port: 8080
+Egress Allow: mysql
+MySQL Port: 3306
+
+mynetpolicy.yaml
+
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: internal-policy
+  namespace: default
+spec:
+  podSelector:
+    matchLabels:
+      name: internal
+  policyTypes:
+    - Egress
+  egress:
+    - to:
+        - podSelector:
+            matchLabels:
+              name: payroll
+      ports:
+        - protocol: TCP
+          port: 8080
+    - to:
+        - podSelector:
+            matchLabels:
+              name: mysql
+      ports:
+        - protocol: TCP
+          port: 3306
+
+=>kubectl apply -f mynetpolicy.yaml
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 ##Section 5: temp
 ==================================================
