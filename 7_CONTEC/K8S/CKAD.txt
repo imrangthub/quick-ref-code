@@ -1157,11 +1157,141 @@ Proble show in pod config properties like connadn, args image name typho etc.
 
 ##Section 5: Observability
 ==================================================
+This chapter expose a service what is able to access from browser url.
+
+
+##Readiness and Liveness Probes
+--------------------------------------------------
+
+Curl for serveice url:
+curl-test.sh 
+for i in {1..20}; do
+   kubectl exec --namespace=kube-public curl -- sh -c 'test=`wget -qO- -T 2  http://webapp-service.default.svc.cluster.local:8080/ready 2>&1` && echo "$test OK" || echo "Failed"';
+   echo ""
+done
+
+=>./curl-test.sh
+
+
+crash-app.sh 
+kubectl exec --namespace=kube-public curl -- wget -qO- http://webapp-service.default.svc.cluster.local:8080/crash
+
+
+freeze-app.sh 
+nohup kubectl exec --namespace=kube-public curl -- wget -qO- http://webapp-service.default.svc.cluster.local:8080/freeze &
+
+
+
+
+##Solution: Readiness adn Liveness Probes
+--------------------------------------------------
+
+1)Update the newly created pod 'simple-webapp-2' with a readinessProbe using the given spec
+Spec is given on the below. Do not modify any other properties of the pod.
+
+Pod Name: simple-webapp-2
+Image Name: kodekloud/webapp-delayed-start
+Readiness Probe: httpGet
+Http Probe: /ready
+Http Port: 8080
+
+=>kubectl get pod simple-webapp-2 -o yaml>newpod.yaml
+=>kubectl delete pod simple-webapp-2 
+=>vi newpod.yaml
+
+Add this rediness probe under containers: section
+readinessProbe:
+  httpGet:
+    path: /ready
+    port:8080
+
+=>kubectl get pod
+Now this pod running but not ready, waiting for ready
+
+
+=>./crash-app.sh
+Crash the application, it will be restart again.
+
+
+2)Update both the pods with a livenessProbe using the given spec
+Delete and recreate the PODs.
+
+Pod Name: simple-webapp-1
+Image Name: kodekloud/webapp-delayed-start
+Liveness Probe: httpGet
+Http Probe: /live
+Http Port: 8080
+Period Seconds: 1
+Initial Delay: 80
+Pod Name: simple-webapp-2
+Image Name: kodekloud/webapp-delayed-start
+Liveness Probe: httpGet
+Http Probe: /live
+Http Port: 8080
+Initial Delay: 80
+Period Seconds: 1
+
+
+=>kubectl get pod -o yaml>allwebapp.yaml
+=>kubectl delete pod --all
+=>vi allwebapp.yaml
+
+Add this on containers: section for bot container
+
+livenessProbe:
+  httpGet:
+    path: /live
+    port: 8080
+  periodSeconds: 1
+  initialDelaySeconds: 80
 
 
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+##Section 5: temp
+==================================================
+##temp
+--------------------------------------------------
+##Solution: temp
+--------------------------------------------------
 
 
 
