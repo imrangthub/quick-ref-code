@@ -1540,24 +1540,280 @@ spec:
 
 
 
+##Section 7: Services & Networking
+==================================================
+
+
+##Services - ClusterIP
+--------------------------------------------------
+
+
+
+##Solution: Services - ClusterIP
+--------------------------------------------------
+
+1)What is the targetPort configured on the kubernetes service?
+=>kubectl describe svc kubernetes 
+Check:
+TargetPort:        6443/TCP
+
+
+
+2)How many labels are configured on the kubernetes service?
+=>kubectl describe svc kubernetes 
+Check:
+Labels:            component=apiserver
+                   provider=kubernetes
+
+
+3)Create a new service to access the web application using the service-definition-1.yaml file.
+Name: webapp-service
+Type: NodePort
+targetPort: 8080
+port: 8080
+nodePort: 30080
+selector:
+  name: simple-webapp
+
+=>vi service.yaml
+apiVersion: v1
+kind: Service
+metadata:
+  name: webapp-service
+  namespace: default
+spec:
+  ports:
+  - nodePort: 30080
+    port: 8080
+    targetPort: 8080
+  selector:
+    name: simple-webapp
+  type: NodePort
 
 
 
 
 
+#Ingress Networking
+--------------------------------------------------
+
+
+##Solution: Ingress Networking-1
+--------------------------------------------------
+1)We have deployed Ingress Controller, resources and applications. Explore the setup.
+
+=>kubectl get deployment -A
+=>kubectl get po -A
+=>kubectl get all -A
+Show all resource from all namespace
+
+
+2)Which namespace is the Ingress Controller deployed in?
+=>kubectl get all -A
+
+3)What is the name of the Ingress Controller Deployment?
+=>kubectl get deploy -n ingress-nginx 
+
+
+4)Which namespace are the applications deployed in?
+=>kubectl get pod -A
+
+
+5)How many applications are deployed in the app-space namespace?
+=>kubectl get pod -n app-space
+
+6)Which namespace is the Ingress Resource deployed in?
+=>kubectl get ingress -A
+
+
+7)What backend is the /wear path on the Ingress configured with?
+=>kubectl describe ingress ingress-wear-watch -n app-space
+
+8)At what path is the video streaming application made available on the Ingress?
+=>kubectl describe ingress ingress-wear-watch -n app-space
+Check:
+Rules:
+  Host        Path  Backends
+  ----        ----  --------
+  *           
+              /wear    wear-service:8080 (10.244.0.6:8080)
+              /watch   video-service:8080 (10.244.0.5:8080)
+
+
+9)You are requested to change the URLs at which the applications are made available.
+Make the video application available at /stream.
+Ingress: ingress-wear-watch
+Path: /stream
+Backend Service: video-service
+Backend Service Port: 8080
+
+=>kubectl edit ingress ingress-wear-watch -n app-space
+Edit the path
+Check:
+spec:
+  rules:
+  - http:
+      paths:
+      - backend:
+          service:
+            name: wear-service
+            port:
+              number: 8080
+        path: /wear
+        pathType: Prefix
+      - backend:
+          service:
+            name: video-service
+            port:
+              number: 8080
+        path: /stream
+        pathType: Prefix
 
 
 
+10)You are requested to add a new path to your ingress to make the food delivery application available to your customers.
+Make the new application available at /eat.
+
+Ingress: ingress-wear-watch
+Path: /eat
+Backend Service: food-service
+Backend Service Port: 8080
+
+=>kubectl get deploy -n app-space
+=>kubectl edit ingress ingress-wear-watch -n app-space
+Add this:
+     - backend:
+          service:
+            name: food-service
+            port:
+              number: 8080
+        path: /eat
+        pathType: Prefix
+
+
+11)Identify the namespace in which the new application is deployed.
+=>kubectl get pod -A
+
+
+12)What is the name of the deployment of the new application?
+=>kubectl get deployment -n critical-space
 
 
 
+13)You are requested to make the new application available at /pay.
+Identify and implement the best approach to making this application available on the ingress controller and test to make sure its working. Look into annotations: rewrite-target as well.
+
+Ingress Created
+Path: /pay
+Configure correct backend service
+Configure correct backend port
+
+=>kubectl get svc -n critical-space
+Check this servie name and port:
+pay-service   ClusterIP   10.97.197.16   <none>        8282/TCP   6m8s
+
+=>kubectl create ingress -h
+=kubectl create ingress simple --rule="foo.com/bar=svc1:8080,tls=my-cert"
+
+=>kubectl create ingress ingress-pay -n critical-space --rule="/pay=pay-service:8282"
+=>kubectl get ingress -n critical-space
+=>kubectl describe ingress ingress-pay -n critical-space
+
+=>kubectl get pod -n critical-space
+=>kubectl logs webapp-pay-58cdc69889-s4xd5  -n critical-space
+
+=>kubectl edit ingress ingress-pay -n critical-space
+Add this in metadata section:
+
+annotations:
+  nginx.ingress.kubernetes.io/rewrite-target: /
 
 
 
+##Solution: Ingress Networking-2
+--------------------------------------------------
+NGINX Ingress Controller App:
+
+1)Create a name space ingress-nginx
+=>kubectl create namespace ingress-nginx
+=>kubectl get namespace
+
+2)The NGINX Ingress Controller requires a ConfigMap object. Create a ConfigMap object with name ingress-nginx-controller in the ingress-nginx namespace.
+
+No data needs to be configured in the ConfigMap.
+Name: ingress-nginx-controller
+
+=>kubectl create configmap -h
+=>kubectl create configmap ingress-nginx-controller -n ingress-nginx
 
 
 
+3)The NGINX Ingress Controller requires two ServiceAccounts. Create both ServiceAccount with name ingress-nginx and ingress-nginx-admission in the ingress-nginx namespace.
+Use the spec provided below.
+Name: ingress-nginx
+Name: ingress-nginx-admission
 
+=>kubectl create sa -h
+=>kubectl create sa ingress-nginx -n ingress-nginx
+=>kubectl create sa ingress-nginx-admission -n ingress-nginx
+
+=>kubectl get sa -n ingress-nginx
+
+4)We have created the Roles, RoleBindings, ClusterRoles, and ClusterRoleBindings for the ServiceAccount. Check it out!!
+
+=>kubectl get roles -n ingress-nginx
+=>kubectl get rolebindings -n ingress-nginx
+=>kubectl describe role ingress-nginx -n ingress-nginx
+
+
+
+5)Let us now deploy the Ingress Controller. Create the Kubernetes objects using the given file.
+The Deployment and it's service configuration is given at /root/ingress-controller.yaml. There are several issues with it. Try to fix them.
+Deployed in the correct namespace.
+Replicas: 1
+Use the right image
+Namespace: ingress-nginx
+Service name: ingress-nginx-controller
+NodePort: 30080
+
+
+=>kubectl apply -f ingress-controller.yaml
+
+6)Create the ingress resource to make the applications available at /wear and /watch on the Ingress service.
+Also, make use of rewrite-target annotation field: -
+
+nginx.ingress.kubernetes.io/rewrite-target: /
+Ingress resource comes under the namespace scoped, so don't forget to create the ingress in the app-space namespace.
+
+Ingress Created
+Path: /wear
+Path: /watch
+Configure correct backend service for /wear
+Configure correct backend service for /watch
+Configure correct backend port for /wear service
+Configure correct backend port for /watch service
+
+
+=>kubectl get deployment -n ingress-nginx
+
+=>kubectl expose deploy ingress-nginx-controller -n ingress-nginx --name ingress --port=80 --target-port=80 --type NodePort
+=>kubectl get svc -n ingress-nginx
+=>kubectl edit svc ingress -n ingress-nginx
+
+
+=>kubectl get ingress -n ingress-nginx
+=>ubectl create ingress -h
+=>kubectl create ingress simple --rule="foo.com/bar=svc1:8080,tls=my-cert"
+
+=>kubectl create ingress ingress-wear-watch -n app-space --rule="/wear=wear-service:8080" --rule="/watch=video-service:8080"
+=>kubectl describe ingress -n app-space
+
+=>kubectl edit ingress ingress-wear-watch -n app-space
+
+Add this under metadata:
+  annotations:
+    nginx.ingress.kubernetes.io/rewrite-target: /
+    nginx.ingress.kubernetes.io/ssl-redirect: "false"
 
 
 
