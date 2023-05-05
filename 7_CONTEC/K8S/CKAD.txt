@@ -1906,6 +1906,37 @@ spec:
 ##Section 8: State Persistence
 ==================================================
 
+Using PVCs in Pods:
+
+apiVersion: v1
+kind: Pod
+metadata:
+  name: mypod
+spec:
+  containers:
+    - name: myfrontend
+      image: nginx
+      volumeMounts:
+      - mountPath: "/var/www/html"
+        name: mypd
+  volumes:
+    - name: mypd
+      persistentVolumeClaim:
+        claimName: myclaim
+
+
+What type of volume is used to mount a Microsoft Azure Data Disk into a Pod?
+AzurDisk
+
+What volume type is to be used to mount a directory from the node on which the pod is running?
+hostPath
+
+What volume type is used to store data in a Pod only as long as that Pod is running on that node? When the Pod is deleted the files are to be deleted as well.
+emptyDir
+
+What is the fc volume type used for?
+To mount and existing Fiber channel volume into a Pod
+
 
 ##State Persistence
 --------------------------------------------------
@@ -1913,8 +1944,218 @@ spec:
 
 
 
-##Solution: State Persistence
+
+
+
+##Solution: Persistent Volumes
 --------------------------------------------------
+
+1)The application stores logs at location /log/app.log. View the logs.
+You can exec in to the container and open the file:
+
+=>kubectl exec webapp -- cat /log/app.log
+
+
+2)Configure a volume to store these logs at /var/log/webapp on the host.
+Use the spec provided below.
+Name: webapp
+Image Name: kodekloud/event-simulator
+Volume HostPath: /var/log/webapp
+Volume Mount: /log
+
+apiVersion: v1
+kind: Pod
+metadata:
+  creationTimestamp: null
+  labels:
+    run: webapp
+  name: webapp
+spec:
+  containers:
+  - image: kodekloud/event-simulator
+    name: webapp
+    volumeMounts:
+      - mountPath: /log
+        name: my-vol
+    resources: {}
+  dnsPolicy: ClusterFirst
+  restartPolicy: Always
+  volumes:
+    - name: my-vol
+      hostPath:
+        path: /var/log/webapp
+
+=>kubectl replace --force -f pod4.yaml
+=>ls  /var/log/webapp/app.log 
+
+
+
+3)Create a Persistent Volume with the given specification.
+Volume Name: pv-log
+Storage: 100Mi
+Access Modes: ReadWriteMany
+Host Path: /pv/log
+Reclaim Policy: Retain
+
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: pv-log
+spec:
+  capacity:
+    storage: 100Mi
+  volumeMode: Filesystem
+  accessModes:
+    - ReadWriteMany
+  persistentVolumeReclaimPolicy: Retain
+  hostPath:
+    path: /pv/log
+
+=>kubectl apply -f pv1.yaml 
+=>kubectl get pv
+
+
+4)Let us claim some of that storage for our application. Create a Persistent Volume Claim with the given specification.
+Volume Name: claim-log-1
+Storage Request: 50Mi
+Access Modes: ReadWriteOnce
+
+
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: claim-log-1
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 50Mi
+
+=>kubectl get pvc
+
+
+5)Why is the claim not bound to the available Persistent Volume?
+Because those both has access Modes Mismatch.
+
+6)Update the Access Mode on the claim to bind it to the PV.
+Delete and recreate the claim-log-1.
+
+
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: claim-log-1
+spec:
+  accessModes:
+    - ReadWriteMany
+  resources:
+    requests:
+      storage: 50Mi
+
+=>kubectl replace --force -f pvc.yaml 
+=>kubectl get pvc
+
+
+7)You requested for 50Mi, how much capacity is now available to the PVC?
+=>kubectl get pvc
+
+
+
+8)Update the webapp pod to use the persistent volume claim as its storage.
+Replace hostPath configured earlier with the newly created PersistentVolumeClaim.
+Name: webapp
+Image Name: kodekloud/event-simulator
+Volume: PersistentVolumeClaim=claim-log-1
+Volume Mount: /log
+
+
+=>ls /pv/log
+
+apiVersion: v1
+kind: Pod
+metadata:
+  creationTimestamp: null
+  labels:
+    run: webapp
+  name: webapp
+spec:
+  containers:
+  - image: kodekloud/event-simulator
+    name: webapp
+    volumeMounts:
+      - mountPath: /log
+        name: my-vol
+    resources: {}
+  dnsPolicy: ClusterFirst
+  restartPolicy: Always
+  volumes:
+    - name: my-vol
+      persistentVolumeClaim:
+        claimName: claim-log-1
+
+
+=>kubectl replace --force -f pod5.yaml
+=>ls /pv/log
+
+
+9)What is the Reclaim Policy set on the Persistent Volume pv-log?
+=>kubectl get pv
+Check:
+RECLAIM POLICY=Retain
+
+Its mean: After deleteging PVC PV will Retain but not available for use. 
+
+
+10)Try deleting the PVC and notice what happens.
+If the command hangs, you can use CTRL + C to get back to the bash prompt OR check the status of the pvc from another terminal
+
+=>kubectl delete pvc claim-log-1
+Now STATUS will be Terminating 
+
+
+
+11)Why is the PVC stuck in Terminating state?
+The PVC being use by the pod of webapp.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
