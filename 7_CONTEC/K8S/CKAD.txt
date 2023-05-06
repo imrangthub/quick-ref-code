@@ -2125,7 +2125,159 @@ The PVC being use by the pod of webapp.
 
 
 
+##Section 9: Update for Sep 2021
+==================================================
 
+##Authentication, Authorization and Admission Control
+--------------------------------------------------
+
+All request go to kube-apiserver for authencation:
+
+kubectl ------------------------------>
+                                          -> kube-apiserver
+crul https://kube-server-ip ---------->
+
+Auth Mechanisms:
+ - Static Password File
+ - Static Token File
+ - certificates
+ - Identity Server
+
+
+
+##KubeConfig
+--------------------------------------------------
+
+KubeConfig will three section in a single file called Config in .kube folder:
+Section are:
+ - Cluster       |  Array of cluster
+ - Contexts      | Array of contents, Cluster and user thogether build context
+ - Users         | Array of Users
+
+=>kubectl config -h
+=>kubectl config view
+=>kubectl config view --kubeconfig=my-custome-config
+
+=>kubectl config use-context prod-user@production
+
+
+my-custom-config:
+apiVersion: v1
+kind: Config
+clusters:
+- name: production
+  cluster:
+    certificate-authority: /etc/kubernetes/pki/ca.crt
+    server: https://controlplane:6443
+
+- name: development
+  cluster:
+    certificate-authority: /etc/kubernetes/pki/ca.crt
+    server: https://controlplane:6443
+
+- name: kubernetes-on-aws
+  cluster:
+    certificate-authority: /etc/kubernetes/pki/ca.crt
+    server: https://controlplane:6443
+
+- name: test-cluster-1
+  cluster:
+    certificate-authority: /etc/kubernetes/pki/ca.crt
+    server: https://controlplane:6443
+
+contexts:
+- name: test-user@development
+  context:
+    cluster: development
+    user: test-user
+
+- name: aws-user@kubernetes-on-aws
+  context:
+    cluster: kubernetes-on-aws
+    user: aws-user
+
+- name: test-user@production
+  context:
+    cluster: production
+    user: test-user
+
+- name: research
+  context:
+    cluster: test-cluster-1
+    user: dev-user
+
+users:
+- name: test-user
+  user:
+    client-certificate: /etc/kubernetes/pki/users/test-user/test-user.crt
+    client-key: /etc/kubernetes/pki/users/test-user/test-user.key
+- name: dev-user
+  user:
+    client-certificate: /etc/kubernetes/pki/users/dev-user/developer-user.crt
+    client-key: /etc/kubernetes/pki/users/dev-user/dev-user.key
+- name: aws-user
+  user:
+    client-certificate: /etc/kubernetes/pki/users/aws-user/aws-user.crt
+    client-key: /etc/kubernetes/pki/users/aws-user/aws-user.key
+
+current-context: test-user@development
+preferences: {}
+
+
+
+
+
+##Solution: KubeConfig
+--------------------------------------------------
+
+1)Where is the default kubeconfig file located in the current environment?
+Find the current home directory by looking at the HOME environment variable.
+
+=>echo $HOME
+=>pwd 
+=>ls .kube
+=>cat .kube/config
+
+2)How many cluster and Users are defined in the default kubeconfig file?
+=>cat .kube/config
+
+3)What is the name of the cluster/user configured in the default kubeconfig file?
+=>cat .kube/config
+
+
+4)I would like to use the dev-user to access test-cluster-1. Set the current context to the right one so I can do that.
+Once the right context is identified, use the kubectl config use-context command.
+Current context set
+
+By default kubectl config command user /root/.kube/config file, to user custome file have to mentation like this
+
+=>kubectl config use-context research --kubeconfig /root/my-kube-config
+
+=>cat /root/my-kube-config
+Check:
+current-context: research
+kind: Config
+preferences: {}
+
+
+5)We don't want to have to specify the kubeconfig file option on each command. Make the my-kube-config file the default kubeconfig.
+Default kubeconfig file configured
+
+=>mv /root/my-kube-config /root/.kube/config
+=>cat /root/.kube/config
+=>kubectl config view
+
+
+
+6)With the current-context set to research, we are trying to access the cluster. However something seems to be wrong. Identify and fix the issue.
+Try running the kubectl get pods command and look for the error. All users certificates are stored at /etc/kubernetes/pki/users.
+
+=>ls /etc/kubernetes/pki/users/dev-user/
+Its look file name issue in config file, lets fixed it
+=>vi  /root/.kube/config
+
+=>kubectl get pod
+Now request no error.
 
 
 
