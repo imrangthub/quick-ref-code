@@ -2282,42 +2282,243 @@ Now request no error.
 
 
 
+##API Groups
+--------------------------------------------------
+curl http://localhost:6443 -k
+
+=>kubectl proxy
+=>curl http://localhost:8081- -k
+
+
+ Main Two type of API group:
+ - Core Groups
+   - Pod
+ - Named Group
+   - /apps
+      - /v1
+          - /deployment
+          - /ReplicaSets
+
+
+
+
+
+##Authorization
+--------------------------------------------------
+
+Authorization Mechanisms:
+ - Node
+ - ABAC
+ - RBAC
+ - Webhook
+-AlwaysAllow
+-AlwaysDeny
+
+
+
+
+##141. Role Based Access Controls
+--------------------------------------------------
+=>kubectl get roles
+=>kubectl get rolebindings
+=>kubectl describe role developer
+
+=>kubectl auth can-i create deployment
+=>kubectl auth can-i delete nodes
+
+=>kubectl auth can-i create deployment --as dev-user
+=>kubectl auth can-i create deployment --as dev-user --namespace test
+
+
+
+Role: Create Role Object by specifice name, rule with a yaml file
+RoleBinding: Bind User with a role
 
 
 
 
 
 
+##Solution: Role Based Access Controls
+--------------------------------------------------
+
+1) Inspect the environment and identify the authorization modes configured on the cluster.
+Check the kube-apiserver settings.
+
+=>cat /etc/kubernetes/manifests/kube-apiserver.yaml
+Check: authorization-mode=
+spec:
+  containers:
+  - command:
+    - kube-apiserver
+    - --advertise-address=192.7.86.6
+    - --allow-privileged=true
+    - --authorization-mode=Node,RBAC
+OR
+=>ps -aux | grep authorization
+
+
+2)How many roles exist in the default namespace?
+=>kubectl get roles
+
+3)How many roles exist in all namespaces together?
+=>kubectl get roles -A --no-headers | wc -l
+
+
+4)What are the resources the kube-proxy role in the kube-system namespace is given access to?
+=>kubectl describe role kube-proxy -n kube-system
+
+
+5)Which account is the kube-proxy role assigned to?
+=>kubectl get rolebinding kube-proxy -n kube-system
+=>kubectl describe rolebinding kube-proxy -n kube-system
+
+
+
+6)A user dev-user is created. User's details have been added to the kubeconfig file. Inspect the permissions granted to the user. Check if the user can list pods in the default namespace.
+Use the --as dev-user option with kubectl to run commands as the dev-user.
+
+=>kubectl config view
+=>kubectl auth can-i list pods --as dev-user
+=>kubectl get pods --as dev-user
+
+
+
+7)Create the necessary roles and role bindings required for the dev-user to create, list and delete pods in the default namespace.
+Use the given spec:
+Role: developer
+Role Resources: pods
+Role Actions: list
+Role Actions: create
+Role Actions: delete
+RoleBinding: dev-user-binding
+RoleBinding: Bound to dev-user
+
+Create Role:
+=>kubectl create role -h
+=>kubectl create role developer --verb=list,create,delete --resource=pods
+=>kubectl get role
+=>kubectl describe roles developer 
+
+CreateRoleBinding:
+=>kubectl create rolebinding -h
+=>kubectl create rolebinding dev-user-binding --role=developer --user=dev-user
+=>kubectl describe rolebinding dev-user-binding 
+
+
+8)A set of new roles and role-bindings are created in the blue namespace for the dev-user. However, the dev-user is unable to get details of the dark-blue-app pod in the blue namespace. Investigate and fix the issue.
+We have created the required roles and rolebindings, but something seems to be wrong.
+
+=>kubectl get pod dark-blue-app -n blue --as dev-user
+=>kubectl get rolebinding -n blue
+
+=>kubectl describe role developer -n blue
+Check the Resource Name: dark-blue-app  not in there
+PolicyRule:
+  Resources  Non-Resource URLs  Resource Names  Verbs
+  ---------  -----------------  --------------  -----
+  pods       []                 [blue-app]      [get watch create delete]
+
+
+Need to add this app on resource, for that need to Edit role:
+
+=>kubectl edit role developer -n blue
+
+Add app name on resourceName
+rules:
+- apiGroups:
+  - ""
+  resourceNames:
+  - dark-blue-app
+
+Check, this ok now
+=>kubectl get pod dark-blue-app -n blue --as dev-user
+
+
+
+9)Add a new rule in the existing role developer to grant the dev-user permissions to create deployments in the blue namespace.
+Remember to add api group "apps".
+
+=>kubectl create deployment mydeploy --image=nginx -n blue --as dev-user
+=>kubectl edit role developer -n blue
+add this:
+- apiGroups:
+  - apps
+  resources:
+  - deployments
+  verbs:
+  - get
+  - watch
+  - create
+  - delete
 
 
 
 
+##144. Cluster Roles
+--------------------------------------------------
+
+##Solution: Cluster Roles
+--------------------------------------------------
+1)How many ClusterRoles and ClusterRoleBindings do you see defined in the cluster?
+=>kubectl get clusterroles --no-headers | wc -l
+=>kubectl get clusterrolebinding --no-headers | wc -l
+
+2)What namespace is the cluster-admin clusterrole part of?
+Cluster roles and cluster are not part of any namespace
+
+
+3)What user/groups are the cluster-admin role bound to?
+The ClusterRoleBinding for the role is with the same name.
+=>kubectl describe clusterrolebinding cluster-admin
+
+
+4)What level of permission does the cluster-admin role grant?
+Inspect the cluster-admin role's privileges.
+=>kubectl describe clusterrole cluster-admin
+
+
+5)A new user michelle joined the team. She will be focusing on the nodes in the cluster. Create the required ClusterRoles and ClusterRoleBindings so she gets access to the nodes.
+
+=>kubectl get nodes --as michelle
+
+CreateClusterRole:
+=>kubectl create clusterrole -h
+=>kubectl create clusterrole pod-reader --verb=get,list,watch --resource=pods
+=>kubectl create clusterrole michelle-role --verb=get,list,watch --resource=nodes
+
+CreateClusterBinding:
+=>kubectl create clusterrolebinding michelle-role-binding --clusterrole=michelle-role --user=michelle
+
+=>kubectl describe clusterrole michelle-role
+=>kubectl describe clusterrolebinding michelle-role-binding
 
 
 
+6)michelle's responsibilities are growing and now she will be responsible for storage as well. Create the required ClusterRoles and ClusterRoleBindings to allow her access to Storage.
+Get the API groups and resource names from command kubectl api-resources. Use the given spec:
+
+ClusterRole: storage-admin
+Resource: persistentvolumes
+Resource: storageclasses
+ClusterRoleBinding: michelle-storage-admin
+ClusterRoleBinding Subject: michelle
+ClusterRoleBinding Role: storage-admin
+
+=>kubectl api-resources
+
+=>kubectl create clusterrole storage-admin --resource=persistentvolumes,storageclasses --verb=list,create,get,watch
+=>kubectl describe clusterrole storage-admin 
+
+=>kubectl get clusterrole storage-admin -o yaml
+Check out two Role
 
 
+Create ClusterroleBinding:
+=>kubectl create clusterrolebinding michelle-storage-admin --user=michelle --clusterrole=storage-admin
+=>kubectl describe clusterrolebinding michelle-storage-admin
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+=>kubectl get storageclass --as michelle
 
 
 
