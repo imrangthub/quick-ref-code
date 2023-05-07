@@ -82,7 +82,7 @@ https://kodekloud.com/lessons/recap-core-concepts/
 
 KodeKloud
 =================================================
-#CoreConcept         
+##CoreConcept         
 ================================================= 
 
 Pod
@@ -113,7 +113,7 @@ For edit other file generate another yaml file from current pod status and updat
 
 
 
-ReplicaSet
+##ReplicaSet
 -------------------------------------------------
 Simple ReplicaSet:
 apiVersion:apps/v1
@@ -141,7 +141,8 @@ And now check the error message
 
 
 
-Scale ReplicaSet
+##Scale ReplicaSet
+-------------------------------------------------
 1) Update number of replica(replicas:5) in yaml file and run
 =>kubectl replace -f myreplica.yaml
 OR
@@ -173,7 +174,7 @@ Delete old rs and create again
 =>kubectl get rs myreplicaset1 -o yaml>myrs2.yaml
 
 
-#Deployment
+##Deployment
 -------------------------------------------------
 With Deployments you can easily edit any field/property of the POD template. 
 
@@ -187,7 +188,7 @@ Generate a yaml file from current deployment
 
 
 
-#NameSpace
+##NameSpace
 -------------------------------------------------
 =>kubectl get all
 
@@ -271,9 +272,9 @@ This command create pod as well as service with same name with labels and bind s
 
 
 
-Practice:
-================================================= 
-What is the command used to run the pod ubuntu-sleeper?
+## Solution: Configuration
+-------------------------------------------------
+1)What is the command used to run the pod ubuntu-sleeper?
 =>kubectl describe pod ubuntu-sleeper
 
 Create a pod with the ubuntu image to run a container to sleep for 5000 seconds.
@@ -338,7 +339,7 @@ spec:
 
 
 
-Update pod ubuntu-sleeper-3 to sleep for 2000 seconds.
+2)Update pod ubuntu-sleeper-3 to sleep for 2000 seconds.
 =>kubectl get pod ubuntu-sleeper-3 -o yaml>newpod.yaml
 Modify the newpod.yaml file and run again
 OR
@@ -373,7 +374,7 @@ spec:
 
 =>kubectl run webapp-green2 --image=kodekloud/webapp-color --command -- python app.py  -- --color=green
 
-Create a pod with the given specifications. By default it displays a blue background. 
+3)Create a pod with the given specifications. By default it displays a blue background. 
 Set the given command line arguments to change it to green.
 
 
@@ -381,11 +382,12 @@ Set the given command line arguments to change it to green.
 
 
 
-#ConfigMap
+
+##ConfigMap
 -------------------------------------------------
 
-#Practice:
-=========
+##Solution ConfigMap
+-------------------------------------------------
 What is the environment variable name set on the container in the pod?
 =>kubectl describe pod webapp-color
 
@@ -443,7 +445,7 @@ add this:
 =>kubectl replace --force -f newpod.yaml
 
 
-#Secret
+##Secret
 -------------------------------------------------
 =>kubectl get secret
 =>kubectl get secret db-secret -o yaml
@@ -453,6 +455,8 @@ add this:
 Show How many secret data on a secret, What is the type of the dashboard-token secret.
 
 
+##Solution: Secret
+-------------------------------------------------
 1)Create a new secret named db-secret with the data given below.
   Secret Name: db-secret
   Secret 1: DB_Host=sql01
@@ -502,7 +506,7 @@ spec:
 
 
 
-#Solution: Security Contexts
+##Solution: Security Contexts
 -------------------------------------------------
 1)What is the user used to execute the sleep process within the ubuntu-sleeper pod?
 =>kubectl exec -it ubuntu-sleeper -- whoami
@@ -564,7 +568,7 @@ capabilities:
 
 
 
-#Solution: Service Accounts
+##Solution: Service Accounts
 -------------------------------------------------
 
 =>kubectl get serviceaccount
@@ -665,7 +669,7 @@ Add serviceAccountName: dashboard-sa under templated spec
 
 
 
-#Solution: Resource Requirements
+##Solution: Resource Requirements
 -------------------------------------------------
 When a pod is created the containers are assigned a default CPU request of .5 and 
 memory of 256Mi". 
@@ -725,7 +729,7 @@ Update the memory limit from 10 20
 
 
 
-#Taints and Tolerations
+##Taints and Tolerations
 -------------------------------------------------
 Tain = Node
 Toleration = Pod
@@ -825,7 +829,7 @@ spec:
 
 
 
-#Solution: Node Selectors
+##Solution: Node Selectors
 -------------------------------------------------
 
 1)How many Labels exist on node node01?
@@ -2525,6 +2529,257 @@ Create ClusterroleBinding:
 
 
 
+##147. Admission Controllers
+--------------------------------------------------
+kubectl -> Aluthentication -> Authorization -> AdmissionController -> Create Pod
+
+AdmissionController List:
+ - AlwaysPullImages
+ - DefaultStorageClass
+ - EventRateLimit
+ - NamespaceLifeCycle
+and More..........
+
+=>kub-apiserver -h | grep enable-admission-plugins
+=>kubectl exec kube-apiserver-controlplane -n kube-system -- kube-apiserver -h | grep enable-admission-plugins
+
+
+
+
+##149. Solution: Admission Controllers
+--------------------------------------------------
+1)What is not a function of admission controller?
+Authencate a user.
+
+2)Which admission controller is not enabled by default?
+=>kubectl get pods -n kube-system
+=>kubectl exec -it kube-apiserver-controlplane -n kube-system -- kube-apiserver -h | grep 'enable-admission-plugins'
+
+
+3)Which admission controller is enabled in this cluster which is normally disabled?
+=>vi /etc/kubernetes/manifests/kube-apiserver.yaml
+=>grep enable-admission-plugin /etc/kubernetes/manifests/kube-apiserver.yaml
+
+
+
+4)The previous step failed because kubernetes have NamespaceExists admission controller enabled which rejects requests to namespaces that do not exist. So, to create a namespace that does not exist automatically, we could enable the NamespaceAutoProvision admission controller
+Enable the NamespaceAutoProvision admission controller
+Note: Once you update kube-apiserver yaml file, please wait for a few minutes for the kube-apiserver to restart completely.
+
+=>kubectl run nginx --image nginx -n blue
+
+Have to add NamespaceAutoProvision controller to the file like this: 
+- --enable-admission-plugins=NodeRestriction,NamespaceAutoProvision
+
+=>vi /etc/kubernetes/manifests/kube-apiserver.yaml
+
+=>kubectl get ns
+=>kubectl run mynginx --image=nginx -n blue
+
+Note that the NamespaceExists and NamespaceAutoProvision admission controllers are deprecated and now replaced by NamespaceLifecycle admission controller.
+
+The NamespaceLifecycle admission controller will make sure that requests
+to a non-existent namespace is rejected and that the default namespaces such as
+default, kube-system and kube-public cannot be deleted.
+
+
+
+5)Disable DefaultStorageClass admission controller
+This admission controller observes creation of PersistentVolumeClaim objects that do not request any specific storage class and automatically adds a default storage class to them. This way, users that do not request any special storage class do not need to care about them at all and they will get the default one.
+Note: Once you update kube-apiserver yaml file then please wait few mins for the kube-apiserver to restart completely.
+
+
+=>vi /etc/kubernetes/manifests/kube-apiserver.yaml
+Add this under -command: section
+- --disable-admission-plugins=DefaultStorageClass
+
+
+Since the kube-apiserver is running as pod you can check the process to see enabled and disabled plugins.
+=>ps -ef | grep kube-apiserver | grep admission-plugins
+
+
+
+
+##150. Validating and Mutating Admission Controllers
+--------------------------------------------------
+
+
+
+
+
+##Solution: 150. Validating and Mutating Admission Controllers
+--------------------------------------------------
+1)Which of the below combination is correct for Mutating and validating admission controllers ?
+NamespaceAutoProvision- Mutating , NamespaceExists - Validating
+
+
+2)What is the flow of invocation of admission controllers?
+First Mutating then Validating
+
+
+3)Create TLS secret webhook-server-tls for secure webhook communication in webhook-demo namespace.
+We have already created below cert and key for webhook server which should be used to create secret.
+Certificate : /root/keys/webhook-server-tls.crt
+Key : /root/keys/webhook-server-tls.key
+
+=>kubectl -n webhook-demo create secret tls webhook-server-tls \
+--cert "/root/keys/webhook-server-tls.crt" \
+--key "/root/keys/webhook-server-tls.key"
+
+
+4)
+Now create a deployment.
+=>k apply -f webhook-deployment.yaml 
+
+Create webhook service now so that admission controller can communicate with webhook.
+We have already added sample service definition under /root/webhook-service.yaml so just create service with that definition.
+=>k apply -f webhook-service.yaml 
+
+
+We have added MutatingWebhookConfiguration under /root/webhook-configuration.yaml.
+If we apply this configuration which resource and actions it will affect?
+Pod with create operation.
+
+Create webhookConfiguration:
+=>kubectl apply -f webhook-configuration.yaml 
+
+In previous steps we have deployed demo webhook which does below
+- Denies all request for pod to run as root in container if no securityContext is provided.
+- If no value is set for runAsNonRoot, a default of true is applied, and the user ID defaults to 1234
+- Allow to run containers as root if runAsNonRoot set explicitly to false in the securityContext
+
+
+5)What are runAsNonRoot and runAsUser values for previously created pods securityContext?
+We did not specify any securityContext values in pod definition so check out the changes done by mutation webhook in pod
+
+=>k get pod
+=>kubectl get pod pod-with-defaults -o yaml
+Check Security Context section:
+ securityContext:
+    runAsNonRoot: true
+    runAsUser: 1234
+  serviceAccount: default
+
+
+
+6)Deploy pod with a securityContext explicitly allowing it to run as root
+We have added pod definition file under /root/pod-with-override.yaml
+Validate securityContext after you deploy this pod
+
+=>cat pod-with-override.yaml
+apiVersion: v1
+kind: Pod
+metadata:
+  name: pod-with-override
+  labels:
+    app: pod-with-override
+spec:
+  restartPolicy: OnFailure
+  securityContext:
+    runAsNonRoot: false
+  containers:
+    - name: busybox
+      image: busybox
+      command: ["sh", "-c", "echo I am running as user $(id -u)"]
+
+=>k apply -f pod-with-override.yaml 
+
+
+7)Deploy a pod with a conflicting securityContext i.e. pod running with a user id of 0 (root)
+We have added pod definition file under /root/pod-with-conflict.yaml
+Mutating webhook should reject the request as its asking to run as root user without setting runAsNonRoot: false
+
+=>cat pod-with-conflict.yaml 
+# A pod with a conflicting securityContext setting: it has to run as a non-root
+# user, but we explicitly request a user id of 0 (root).
+# Without the webhook, the pod could be created, but would be unable to launch
+# due to an unenforceable security context leading to it being stuck in a
+# 'CreateContainerConfigError' status. With the webhook, the creation of
+# the pod is outright rejected.
+apiVersion: v1
+kind: Pod
+metadata:
+  name: pod-with-conflict
+  labels:
+    app: pod-with-conflict
+spec:
+  restartPolicy: OnFailure
+  securityContext:
+    runAsNonRoot: true
+    runAsUser: 0
+  containers:
+    - name: busybox
+      image: busybox
+      command: ["sh", "-c", "echo I am running as user $(id -u)"]
+
+
+
+
+
+
+##153. API Versions/API Deprecations
+--------------------------------------------------
+
+
+
+##Solution: 153. API Versions/API Deprecations
+--------------------------------------------------
+
+1)Identify the short names of the deployments, replicasets, cronjobs and customresourcedefinitions.
+=>kubectl api-resources
+
+2)What is the patch version in the given Kubernetes API version?
+Kubernetes API version - 1.22.2
+2, the last one
+
+3)Identify which API group a resource called job is part of?
+=>kubectl explain job
+Check
+KIND:     Job
+VERSION:  batch/v1
+
+
+4)What is the preferred version for authorization.k8s.io api group?
+
+=>kubectl proxy 8001&
+curl localhost:8081/apis/authorization.k8s.io
+
+
+5)Enable the v1alpha1 version for rbac.authorization.k8s.io API group on the controlplane node.
+Note: If you made a mistake in the config file could result in the API server being unavailable and can break the cluster.
+
+=>cp /etc/kubernetes/manifests/kube-apiserver.yaml /root/kube-apiserver.yaml.backup
+Add this line:
+- --runtime-config=rbac.authorization.k8.io/v1alpha1
+
+6)Install the kubectl convert plugin on the controlplane node.
+If unsure how to install then refer to the official k8s documentation page which is available at the top right panel.
+
+=>curl -LO "https://dl.k8s.io/$(curl -L -s https://dl.k8s.io/release/stable.txt)/bin/linux/amd64/kubectl-convert.sha256"
+
+=>chmod +x kubectl-convert
+=>mv kubectl-convert /usr/local/bin/
+
+=>kubectl-convert -h
+
+
+7)Ingress manifest file is already given under the /root/ directory called ingress-old.yaml.
+With help of the kubectl convert command, change the deprecated API version to the networking.k8s.io/v1 and create the resource.
+
+=>cat ingress-old.yaml
+=>kubectl-convert -f ingress-old.yaml --output-version networking.k8s.io/v1
+=>kubectl-convert -f ingress-old.yaml --output-version networking.k8s.io/v1>newintrss.yaml
+=>kubectl apply -f newintrss.yaml
+
+
+
+
+
+
+
+##157. Custom Resource Definition
+--------------------------------------------------
+Not so much possible to come in exam to create a custome resource, but it is possible. and better to know
 
 
 
@@ -2533,12 +2788,52 @@ Create ClusterroleBinding:
 
 
 
-##Section 5: temp
+##164. Solution: Deployment strategies
+--------------------------------------------------
+
+1)A deployment has been created in the default namespace. What is the deployment strategy used for this deployment?
+=>kubectl describe deployment frontend
+
+2)The deployment called frontend app is exposed on the NodePort via a service.
+Identify the name of this service.
+
+=>kubectl describe deployment frontend
+=>k get svc
+=>k describe svc frontend-service 
+
+
+3)A new deployment called frontend-v2 has been created in the default namespace using the image kodekloud/webapp-color:v2. This deployment will be used to test a newer version of the same app.
+Configure the deployment in such a way that the service called frontend-service routes less than 20% of traffic to the new deployment.
+Do not increase the replicas of the frontend deployment.
+
+=>kubectl get deployment
+=>kubectl describe service frontend-service
+=>kubectl describe deployment frontend-v2
+
+=>kubectl scale deployment --replicas=1 frontend-v2
+
+4)Scale down the v1 version of the apps to 0 replicas and scale up the new(v2) version to 5 replicas.
+=>kubectl scale deployment --replicas=5 frontend-v2
+=>kubectl scale deployment --replicas=0 frontend
+
+=>kubectl delete deployment frontend
+
+
+
+
+##169. Labs - Helm Concepts
+--------------------------------------------------
+https://helm.sh/docs/intro/install/#from-apt-debianubuntu
+
+
+
+
+##Kubernetes Challenges
 ==================================================
-##temp
---------------------------------------------------
-##Solution: temp
---------------------------------------------------
+https://kodekloud.com/lessons/challenge-1-3/
+
+
+
 
 
 
