@@ -3613,6 +3613,138 @@ status: {}
 
 ##SCHEDULING, PRACTICE TEST RESOURCE LIMITS
 -------------------------------------------------
+1)A pod called rabbit is deployed. Identify the CPU requirements set on the Pod
+=>kubectl describe pod myPod
+
+2)Another pod called elephant has been deployed in the default namespace. It fails to get to a running state. Inspect this pod and identify the Reason why it is not running.
+=>kubectl describe pod elephant
+check 
+   Last State:     Terminated
+      Reason:       OOMKilled
+The status OOMKilled indicates that it is failing because the pod ran out of memory. 
+Identify the memory limit set on the POD.
+
+
+
+
+
+
+##SCHEDULING, PRACTICE TEST DAEMONSETS
+-------------------------------------------------
+1)How many DaemonSets are created in the cluster in all namespaces?
+Check all namespaces
+=>kubectl get daemonsets -A
+
+
+2)On how many nodes are the pods scheduled by the DaemonSet kube-proxy?
+=>kubectl get daemonsets -A
+=>kubectl describe daemonset kube-flannel-ds -n kube-flannel
+
+checkout  
+Containers:
+   kube-flannel:
+    Image:      docker.io/rancher/mirrored-flannelcni-flannel:v0.19.2
+
+
+3)Deploy a DaemonSet for FluentD Logging.
+
+Use the given specifications.
+
+Name: elasticsearch
+Namespace: kube-system
+Image: registry.k8s.io/fluentd-elasticsearch:1.20
+
+apiVersion: apps/v1
+kind: DaemonSet
+metadata:
+  name: elasticsearch
+  namespace: kube-system
+spec:
+  selector:
+    matchLabels:
+      app: fluentd-elasticsearch
+  template:
+    metadata:
+      labels:
+        app: fluentd-elasticsearch
+    spec:
+      containers:
+        - name: fluentd
+          image: registry.k8s.io/fluentd-elasticsearch:1.20
+
+
+
+
+
+##SCHEDULING, PRACTICE TEST – STATIC PODS
+-------------------------------------------------
+1)kubectl get pods --field-selector spec.nodeName!= -A | grep -c "nodeName:"
+=>kubectl get pods --field-selector spec.nodeName!= -A | grep -c "controlplane"
+kubectl get pods --field-selector spec.nodeName!= -A | grep -c "node01"
+
+
+2)Which of the below components is NOT deployed as a static POD?
+=>kubectl get pods --field-selector spec.nodeName!= -A -o=custom-columns=POD:metadata.name,NODE:spec.nodeName
+
+3)What is the path of the directory holding the static pod definition files?
+/etc/kubernetes/manifests
+
+4)Create a static pod named static-busybox that uses the busybox image and the command sleep 1000
+
+Name: static-busybox
+Image: busybox
+
+=>cd /etc/kubernetes/manifests
+=>vi mystatipoc.yaml
+
+apiVersion: v1
+kind: Pod
+metadata:
+  name: static-busybox
+spec:
+  containers:
+  - name: busybox
+    image: busybox
+    command:
+      - sleep
+      - "1000"
+
+Kubernetes will automatically detect the new static pod and start running it.
+
+=>kubectl get pod
+
+
+5)Edit the image on the static pod to use with neiw image
+=>kubectl edit pod mystaticpod
+
+
+
+
+
+##SCHEDULING, PRACTICE TEST MULTIPLE SCHEDULERS
+-------------------------------------------------
+1)What is the name of the POD that deploys the default kubernetes scheduler in this environment?
+=>kubectl get pods -n kube-system -l component=kube-scheduler -o jsonpath='{.items[0].metadata.name}'
+
+
+2)What is the image used to deploy the kubernetes scheduler?
+Inspect the kubernetes scheduler pod and identify the image
+=>kubectl describe pod -n kube-system | grep scheduler
+
+
+3)Checkout the following Kubernetes objects:
+
+ServiceAccount: my-scheduler (kube-system namespace)
+ClusterRoleBinding: my-scheduler-as-kube-scheduler
+ClusterRoleBinding: my-scheduler-as-volume-scheduler
+
+Run the command: kubectl get serviceaccount -n kube-system and kubectl get clusterrolebinding
+
+
+
+
+
+
 
 
 
