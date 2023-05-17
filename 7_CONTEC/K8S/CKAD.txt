@@ -3051,6 +3051,572 @@ https://kodekloud.com/lessons/challenge-1-3/
 
 
 
+##Solution2
+=================================================
+##CoreConcept         
+================================================= 
+
+Pod
+-------------------------------------------------
+
+
+##Solution:01 Configuration
+-------------------------------------------------
+1)Which nodes are these pods placed on?
+=>kubectl get pod -o wide
+
+2)What does the READY column in the output of the kubectl get pods command indicate?
+runing container/total container.
+
+3)Create a new pod with the name redis and with the image redis123.
+=>kubectl run redis --image=redis123 --dry-run=client -o yaml
+
+4)Now change the image on this pod to redis.
+=>kubectl edit pod redis 
+
+Edit current running pod, like change image
+5) kubectl edit pod myng
+OR
+6) Edit then pod defanation yaml file and run again
+=>Kubectl apply -f mypod.yaml
+
+
+Generate another pod defenation yaml file from current pod
+=>>kubectl get pod mypod -o yaml
+=>kubectl get pod mypod -o yaml> pod.yaml
+
+
+Remember, you CANNOT edit specifications of an existing POD other than the below.
+spec.containers[*].image
+spec.initContainers[*].image
+spec.activeDeadlineSeconds
+spec.tolerations
+
+For edit other file generate another yaml file from current pod status and update it, delete perivious pod and run new one.
+=>kubectl get pod mypod -o yaml> pod.yaml
+=>kubectl apply -f pod.yaml
+
+
+
+
+
+##ReplicaSet
+-------------------------------------------------
+Simple ReplicaSet:
+apiVersion:apps/v1
+kind: ReplicaSet
+metadata:
+  name: replicaset-1
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      tier: frontend
+  template:
+    metadata:
+      labels:
+        tier: frontend
+    spec:
+      containers:
+      - name: nginx
+        image: nginx
+
+
+For finding any issu in defination yaml file, first run the yaml
+=>kubectl create -f myreplicaset.yaml
+And now check the error message
+
+
+
+##Scale ReplicaSet
+-------------------------------------------------
+1) Update number of replica(replicas:5) in yaml file and run
+=>kubectl replace -f myreplica.yaml
+OR
+2) Run
+=>kubectl scale --replicas=5 -f myreplica.yaml
+OR
+3) Run with replical type(replicaset) and name (myreplicaset) 
+=>kubectl scale --replicas=5 replicaset myreplicaset
+2 and 3 Not made change the original defination file
+
+Check ReplicaSet info like: uses image, etc
+=>kubectl describe rs new-replica-set
+
+Check the pod status of ReplicaSet
+=>kubectl get rs new-replica-set
+
+
+If need to Update ReplicaSet like Image change, then its does not automatically re-create the  pod.
+First you can eidt current rs
+=>kubectl edit rs new-replica-set 
+Then delete existing pod
+=>kubectl delete pod --all
+and RS will create new pod with new Image
+OR
+Delete old rs and create again
+
+
+=>kubectl get rs myreplicaset1 -o yaml
+=>kubectl get rs myreplicaset1 -o yaml>myrs2.yaml
+
+
+
+##Solution:02 ReplicaSet
+-------------------------------------------------
+1)How many ReplicaSets exist on the system?
+=>kubectl get replicaset
+
+2)What is the image used to create the pods in the new-replica-set?
+=>kubectl describe rs new-replica-set
+
+
+3)Why do you think the PODs are not ready in replicaset?
+=>kubectl get rs
+=>kubectl get pods
+
+=>kubectl get events --field-selector involvedObject.name=podName
+OR
+=>kubectl logs podName
+
+4)Delete the two newly created ReplicaSets - replicaset-1 and replicaset-2
+=>kubectl delete rs replicaset-1 replicaset-2
+
+
+5)Fix the original replica set new-replica-set to use the correct busybox image.
+Either delete and recreate the ReplicaSet or Update the existing ReplicaSet and then delete all PODs, so new ones with the correct image will be created.
+
+=>kubectl get rs
+=>kubectl edit rs new-replica-set
+=>k delete pod --all
+
+
+6)Scale the ReplicaSet to 5 PODs.
+Use kubectl scale command or edit the replicaset using kubectl edit replicaset.
+=>kubectl scale replicaset new-replica-set --replicas=5
+OR
+=>kubectl edit rs new-replica-set
+Update new value in:
+spec:
+  replicas: 2
+  selector:
+
+
+
+
+##Deployment
+-------------------------------------------------
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: deployment-1
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      name: busybox-pod
+  template:
+    metadata:
+      labels:
+        name: busybox-pod
+    spec:
+      containers:
+      - name: busybox-container
+        image: busybox
+        command:
+        - sh
+        - "-c"
+        - echo Hello Kubernetes! && sleep 3600
+
+With Deployments you can easily edit any field/property of the POD template. 
+
+=>kubectl create deployment --help
+=>kubectl create deployment httpd-frontend --image=httpd:2.4-alpine --replicas=3 --dry-run=client -o yaml>mydeployment1.yaml
+
+
+Generate a yaml file from current deployment
+=>kubectl get deployment mydeployment -o yaml
+=>kubectl get deployment httpd-frontend -o yaml>mydeployment2.yaml
+
+
+
+##Solution:03 Deployment
+-------------------------------------------------
+
+1)What is the image used to create the pods in the new deployment?
+=>kubectl describe deploy frontend-deployment 
+
+2)Why do you think the deployment is not ready?
+
+=>kubectl get deployment
+=>kubectl describe deployment
+=>kubectl get pod
+=>kubectl get events --field-selector involvedObject.name=podName
+
+3)Create a new Deployment with the below attributes using your own deployment definition file.
+Name: httpd-frontend;
+Replicas: 3;
+Image: httpd:2.4-alpine
+Name: httpd-frontend
+Replicas: 3
+Image: httpd:2.4-alpine
+
+=>kubectl create deployment -h
+=>kubectl create deployment httpd-frontend --image=httpd:2.4-alpine --replicas=3 --dry-run=client -o yaml>mydep.yaml
+
+
+
+
+
+##NameSpace
+-------------------------------------------------
+=>kubectl get all
+
+=>kubectl get namespace
+=>kubectl get pod --namespace=research
+=>kubectl get pod -n=research
+=>kubectl run redis --image=redis --namespace=research
+
+
+=>kubectl get pod -A
+=>kubectl get pod --all-namespaces
+Show all pod with namespace
+
+=>kubectl get pods -n=marketing
+=>kubectl get svc -n=marketing
+Show service of a specific namespace
+
+
+
+
+
+##Solution:04 NameSpace
+-------------------------------------------------
+
+1)How many Namespaces exist on the system?
+=>kubectl get ns
+
+2)How many pods exist in the research namespace?
+=>kubectl get pod -n research
+
+3)Create a POD in the finance namespace.
+Name: redis
+Image Name: redis
+=>kubectl run redis --image=redis --namespace finance
+
+4)Which namespace has the blue pod in it?
+=>kubectl get pods --all-namespaces | grep blue
+
+
+5)What DNS name should the Blue application use to access the database db-service in the dev namespace?
+You can try it in the web application UI. Use port 6379.
+
+The FQDN consists of the <service-name>.<namespace>.svc.cluster.local format.
+like:my-service.my-namespace.svc.cluster.local
+
+
+
+
+##Solution:05 CORE CONCEPTS, PRACTICE TEST SERVICES
+-------------------------------------------------
+
+1)How many Services exist on the system?
+=>kubectl get svc
+
+2)What is the targetPort configured on the kubernetes service?
+=>kubectl describe svc kubernetes 
+
+
+3)How many labels are configured on the kubernetes service?
+=>kubectl describe svc kubernetes 
+
+5)Create a new service to access the web application using the service-definition-1.yaml file.
+Name: webapp-service
+Type: NodePort
+targetPort: 8080
+port: 8080
+nodePort: 30080
+selector:
+  name: simple-webapp
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: webapp-service
+  namespace: default
+spec:
+  ports:
+  - nodePort: 30080
+    port: 8080
+    targetPort: 8080
+  selector:
+    name: simple-webapp
+  type: NodePort
+
+
+
+Creating Kubernetes objects imperatively
+-------------------------------------------------
+There are two main ways to manage Kubernetes objects: imperative (with kubectl commands) and 
+declarative (by writing manifests and then using kubectl apply).
+
+
+=>kubectl run --help
+=>kubectl run redis --image=redis:alpine --labels="tier=db"
+=>get pod --show-labels
+
+
+Create a service redis-service to expose the redis application within the cluster on port 6379.
+Use imperative commands.
+=>kubectl expose pod redis --port=6379 --name=redis-service
+=>kubectl describe svc redis-service
+OR
+=>kubectl create service --help
+=>kubectl create service clusterip --help
+=>kubectl create service clusterip redis-service --tcp=6379:6379
+
+
+expose:
+=>kubectl expose --help
+"expose" command user for expose existing pod for expose.
+=>kubectl expose pod redis --port=6379 --name=redis-service
+OR 
+Create pod and service at a same time
+=>kubectl run httpd --image=httpd:alpine --port=80 --expose=true
+This command create pod as well as service with same name with labels and bind service with pod at a time
+
+
+
+
+##Solution:06 CORE CONCEPTS, IMPERATIVE COMMANDS
+-------------------------------------------------
+
+1)Deploy a pod named nginx-pod using the nginx:alpine image.
+Name: nginx-pod
+Image: nginx:alpine
+
+=>kubectl run nginx-pod --image=nginx:alpine
+
+2)Deploy a redis pod using the redis:alpine image with the labels set to tier=db.
+=>kubectl run --help
+=>kubectl run redis --image=redis:alpine --labels="tier=db"
+=>get pod --show-labels
+
+
+3)Create a service redis-service to expose the redis application within the cluster on port 6379.
+Use imperative commands.
+Service: redis-service
+Port: 6379
+Type: ClusterIP
+
+=>kubectl expose pod redis --port=6379 --name=redis-service
+=>kubectl describe svc redis-service
+OR
+=>kubectl create service --help
+=>kubectl create service clusterip --help
+=>kubectl create service clusterip redis-service --tcp=6379:6379
+
+
+4)Create a deployment named webapp using the image kodekloud/webapp-color with 3 replicas.
+Try to use imperative commands only. Do not create definition files.
+Name: webapp
+Image: kodekloud/webapp-color
+Replicas: 3
+
+=>kubectl create deployment --help
+=>kubectl create deployment webapp --image=kodekloud/webapp-color --replicas=3
+
+
+5)Create name space and Create a new deployment called redis-deploy in the dev-ns namespace with the redis image. It should have 2
+=>kubectl run custom-nginx --image=nginx --port=8080
+=>kubectl create namespace dev-ns
+=>kubectl create deployment redis-deploy --image=redis --replicas=2 -n=dev-ns
+
+
+6)Create a pod called httpd using the image httpd:alpine in the default namespace. Next, create a service of type ClusterIP by the same name (httpd). The target port for the service should be 80.
+
+=>kubectl run httpd --image=httpd:alpine --port=80
+
+=>kubectl create service clusterip --help
+=>kubectl create service clusterip httpd --tcp=5678:80
+
+=>kubectl get pod --show-labels
+
+=>kubectl edit pod httpd
+Update the lavel as service
+
+
+
+##solution2-schedulling     
+================================================= 
+
+
+##SCHEDULING, PRACTICE TEST MANUAL SCHEDULING
+-------------------------------------------------
+
+1)Why is the POD in a pending state?
+Inspect the environment for various kubernetes control plane components.
+because nod schedular found
+
+=>k get pod -o yaml | scheduler
+   schedulerName: default-scheduler
+
+=>k describe pod nginx
+
+
+2)Manually schedule the pod on node01.
+Delete and recreate the POD if necessary.
+add this:
+  nodeName: node01
+
+apiVersion: v1
+kind: Pod
+metadata:
+  name: nginx
+spec:
+  nodeName: node01
+  containers:
+  -  image: nginx
+     name: nginx
+
+=>kubectl get pod -o wide
+Now check the NODE for schedule node name
+
+
+
+
+
+##SCHEDULING, PRACTICE TEST LABELS AND SELECTORS
+-------------------------------------------------
+
+1)How many objects are in the prod environment including PODs, ReplicaSets and any other objects?
+=>kubectl get all --show-labels | grep prod
+
+
+
+
+
+##SCHEDULING, PRACTICE TEST LABELS AND SELECTORS
+-------------------------------------------------
+
+
+
+
+
+##SCHEDULING, PRACTICE TEST – NODE AFFINITY
+-------------------------------------------------
+1)How many Labels exist on node node01?
+=>kubectl describe node node01
+Check Labels section
+
+
+2)Apply a label color=blue to node node01
+=>kubectl label node node01 color=blue
+
+3)Which nodes can the pods for the blue deployment be placed on?
+Make sure to check taints on both nodes!
+
+=>kubectl describe node node01
+=>kubectl describe node | grep Taints
+=>kubectl get pod -o wide
+
+
+4)Set Node Affinity to the deployment to place the pods on node01 only.
+
+
+Name: blue
+Replicas: 3
+Image: nginx
+NodeAffinity: requiredDuringSchedulingIgnoredDuringExecution
+Key: color
+value: blue
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  creationTimestamp: null
+  labels:
+    app: blue
+  name: blue
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: blue
+  strategy: {}
+  template:
+    metadata:
+      creationTimestamp: null
+      labels:
+        app: blue
+    spec:  
+      affinity:
+        nodeAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            nodeSelectorTerms:
+            - matchExpressions:
+              - key: color
+                operator: In
+                values:
+                - blue
+      containers:
+      - image: nginx
+        name: nginx
+        resources: {}
+status: {}
+
+
+5)Create a new deployment named red with the nginx image and 2 replicas, and ensure it gets placed on the controlplane node only.
+
+Use the label key - node-role.kubernetes.io/control-plane - which is already set on the controlplane node.
+
+Name: red
+Replicas: 2
+Image: nginx
+NodeAffinity: requiredDuringSchedulingIgnoredDuringExecution
+Key: node-role.kubernetes.io/control-plane
+Use the right operator
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  creationTimestamp: null
+  labels:
+    app: red
+  name: red
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: red
+  strategy: {}
+  template:
+    metadata:
+      creationTimestamp: null
+      labels:
+        app: red
+    spec:  
+      affinity:
+        nodeAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            nodeSelectorTerms:
+            - matchExpressions:
+              - key: node-role.kubernetes.io/control-plane
+                operator: Exists
+      containers:
+      - image: nginx
+        name: nginx
+        resources: {}
+status: {}
+
+
+
+##SCHEDULING, PRACTICE TEST RESOURCE LIMITS
+-------------------------------------------------
+
+
+
+
 
 
 @@@
