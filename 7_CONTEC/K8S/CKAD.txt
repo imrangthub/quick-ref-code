@@ -3495,14 +3495,6 @@ Now check the NODE for schedule node name
 
 
 
-
-##SCHEDULING, PRACTICE TEST LABELS AND SELECTORS
--------------------------------------------------
-
-
-
-
-
 ##SCHEDULING, PRACTICE TEST – NODE AFFINITY
 -------------------------------------------------
 1)How many Labels exist on node node01?
@@ -3741,6 +3733,452 @@ ClusterRoleBinding: my-scheduler-as-volume-scheduler
 Run the command: kubectl get serviceaccount -n kube-system and kubectl get clusterrolebinding
 
 
+
+
+
+##SCHEDULING, PRACTICE TEST – TAINTS AND TOLERATIONS
+-------------------------------------------------
+1)Do any taints exist on node01 node?
+
+=>kubectl describe node node01 | grep -i taints
+=>kubectl get node node01 -o=jsonpath='{.spec.taints}'
+
+2)Create a taint on node01 with key of spray, value of mortein and effect of NoSchedule
+
+Key = spray
+Value = mortein
+Effect = NoSchedule
+
+=>kubectl taint nodes node01 spray=mortein:NoSchedule
+
+3)Why do you think the pod is in a pending state?
+=>kubectl describe pod mosquito
+
+
+
+4)Create another pod named bee with the nginx image, which has a toleration set to the taint mortein.
+Image name: nginx
+Key: spray
+Value: mortein
+Effect: NoSchedule
+Status: Running
+
+
+apiVersion: v1
+kind: Pod
+metadata:
+  name: bee
+spec:
+  containers:
+    - name: nginx
+      image: nginx
+  tolerations:
+    - key: spray
+      operator: Equal
+      value: mortein
+      effect: NoSchedule
+
+
+
+5)Remove the taint on controlplane, which currently has the taint effect of NoSchedule.
+=>kubectl taint nodes controlplane node-role.kubernetes.io/control-plane:NoSchedule-
+
+
+
+
+
+
+
+
+=================================================
+##Login & Monitoring         
+================================================= 
+
+
+
+
+##OGGING & MONITORING, PRACTICE TEST MONITOR CLUST
+-------------------------------------------------
+1)Let us deploy metrics-server to monitor the PODs and Nodes. Pull the git repository for the deployment files.
+Run: git clone https://github.com/kodekloudhub/kubernetes-metrics-server.git
+
+=>kubectl create -f . 
+=>kubectl top node
+
+2)Identify the node that consumes the most CPU(cores).
+=>kubectl top nodes --sort-by=cpu
+
+
+3)Identify the node that consumes the most Memory(bytes).
+=>kubectl top nodes --sort-by=memory
+
+
+4)Identify the POD that consumes the most Memory(bytes)/CPU.
+=>kubectl top pods --sort-by=memory
+=>kubectl top pods --all-namespaces --sort-by=memory
+
+=>kubectl top pods --all-namespaces --sort-by=cpu
+
+
+5)A user - USER5 - has expressed concerns accessing the application. Identify the cause of the issue.
+Inspect the logs of the POD
+=>kubectl logs webapp-1
+
+
+
+
+=================================================
+##Application Lifecycle Management
+=================================================
+
+
+##APPLICATION LIFECYCLE MANAGEMENT, PRACTICE TEST ROLLING UPDATES AND ROLLBACKS 
+--------------------------------------------------
+1)Run the script named curl-test.sh to send multiple requests to test the web application. Take a note of the output.
+
+for i in {1..35}; do
+   kubectl exec --namespace=kube-public curl -- sh -c 'test=`wget -qO- -T 2  http://webapp-service.default.svc.cluster.local:8080/info 2>&1` && echo "$test OK" || echo "Failed"';
+   echo ""
+dones
+
+
+2)Inspect the deployment and identify the current strategy
+=>kubectl get deploy
+=>kubectl describe deploy myhdeploy
+
+3)Let us try that. Upgrade the application by setting the image on the deployment to kodekloud/webapp-color:v2
+Do not delete and re-create the deployment. Only set the new image name for the existing deployment.
+
+Deployment Name: frontend
+Deployment Image: kodekloud/webapp-color:v2
+
+=>kubectl edit deploy frontend
+
+
+5)Up to how many PODs can be down for upgrade at a time
+Consider the current strategy settings and number of PODs - 4
+=>kubectl describe deploy frontend
+Check 
+RollingUpdateStrategy:  25% max unavailable, 25% max surge
+
+
+6)Change the deployment strategy to Recreate
+Delete and re-create the deployment if necessary. Only update the strategy type for the existing deployment.
+
+Deployment Name: frontend
+Deployment Image: kodekloud/webapp-color:v2
+Strategy: Recreate
+
+Edit thei file, delete old deployment and run new file
+
+
+
+
+
+##Practice Test Commands and Arguments
+----------------------------------------------------------
+1)What is the command used to run the pod ubuntu-sleeper?
+=>kubectl get pod -o yaml
+
+
+2)Create a pod with the ubuntu image to run a container to sleep for 5000 seconds. Modify the file ubuntu-sleeper-2.yaml
+apiVersion: v1 
+kind: Pod 
+metadata:
+  name: ubuntu-sleeper-2 
+spec:
+  containers:
+  - name: ubuntu
+    image: ubuntu
+    command: ["sleep"]
+    args: ["5000"]
+
+apiVersion: v1
+kind: Pod 
+metadata:
+  name: ubuntu-sleeper-3
+spec:
+  containers:
+  - name: ubuntu
+    image: ubuntu
+    command:
+      - "sleep"
+      - "1200"
+
+Dockerfile1
+FROM python:3.6-alpine
+RUN pip install flask
+COPY . /opt/
+EXPOSE 8080
+WORKDIR /opt
+ENTRYPOINT ["python", "app.py"]
+
+Dockerfile2
+FROM python:3.6-alpine
+RUN pip install flask
+COPY . /opt/
+EXPOSE 8080
+WORKDIR /opt
+ENTRYPOINT ["python", "app.py"]
+CMD ["--color", "red"]
+
+
+
+3)Create a pod with the given specifications. By default it displays a blue background. Set the given command line arguments to change it to green.
+Pod Name: webapp-green
+Image: kodekloud/webapp-color
+Command line arguments: --color=green
+
+apiVersion: v1 
+kind: Pod 
+metadata:
+  name: webapp-green
+  labels:
+      name: webapp-green 
+spec:
+  containers:
+  - name: simple-webapp
+    image: kodekloud/webapp-color
+    command: ["--color","green"]
+
+
+
+
+##Practice Test Env
+----------------------------------------------------------
+1)What is the environment variable name set on the container in the pod?
+
+=>kubectl exec webapp-color -- env
+
+2)How many ConfigMaps exists in the default namespace?
+=>k get configmap
+=>kubectl describe configmap db-config
+
+
+3)Create a new ConfigMap for the webapp-color POD. Use the spec given below.
+
+ConfigMap Name: webapp-config-map
+Data: APP_COLOR=darkblue
+Data: APP_OTHER=disregard
+
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: webapp-config-map
+data:
+  APP_COLOR: darkblue
+  APP_OTHER: disregard
+
+=>kubectl create configmap webapp-config-map --from-literal=APP_COLOR=darkblue --from-literal=APP_OTHER=disregard
+
+4)Update the environment variable on the POD to use only the APP_COLOR key from the newly created ConfigMap.
+Note: Delete and recreate the POD. Only make the necessary changes. Do not modify the name of the Pod.
+
+Pod Name: webapp-color
+ConfigMap Name: webapp-config-map
+
+apiVersion: v1
+kind: Pod
+metadata:
+  name: webapp-pod
+spec:
+  containers:
+    - name: webapp-container
+      image: your-webapp-image
+      env:
+        - name: APP_COLOR
+          valueFrom:
+            configMapKeyRef:
+              name: webapp-config-map
+              key: APP_COLOR
+
+
+
+
+
+
+
+
+
+
+##Practice Test secrets
+----------------------------------------------------------
+
+=>kubectl get secrets
+
+1)How many secrets are defined in the dashboard-token secret?
+=>kubectl describe secrets dashboard-token
+
+2)What is the type of the dashboard-token secret?
+=>kubectl describe secrets dashboard-token
+
+
+3)Which of the following is not a secret data defined in dashboard-token secret?
+Type
+
+
+4)We are going to deploy an application with the below architecture
+We have already deployed the required pods and services. Check out the pods and services created. Check out the web application using the Webapp MySQL link above your terminal, next to the Quiz Portal Link.
+
+https://prnt.sc/uABsPLI-MODK
+
+
+The reason the application is failed is because we have not created the secrets yet. Create a new secret named db-secret with the data given below.
+
+
+Secret Name: db-secret
+Secret 1: DB_Host=sql01
+Secret 2: DB_User=root
+Secret 3: DB_Password=password123
+
+apiVersion: v1
+kind: Secret
+metadata:
+  name: db-secret
+type: Opaque
+data:
+  DB_Host: c3FsMDE=
+  DB_User: cm9vdA==
+  DB_Password: cGFzc3dvcmQxMjM=
+
+
+Configure webapp-pod to load environment variables from the newly created secret.
+Delete and recreate the pod if required.
+
+Pod name: webapp-pod
+Image name: kodekloud/simple-webapp-mysql
+Env From: Secret=db-secret
+
+=>kubectl edit pod webapp
+add this like:
+spec:
+  containers:
+  - image: kodekloud/simple-webapp-mysql
+    envFrom:
+        - secretRef:
+            name: db-secret
+
+
+
+##Practice Test MultiContainer
+----------------------------------------------------------
+1)Create a multi-container pod with 2 containers.
+Use the spec given below.
+If the pod goes into the crashloopbackoff then add the command sleep 1000 in the lemon container.
+
+Name: yellow
+Container 1 Name: lemon
+Container 1 Image: busybox
+Container 2 Name: gold
+Container 2 Image: redis
+
+apiVersion: v1
+kind: Pod
+metadata:
+  name: yellow
+spec:
+  restartPolicy: OnFailure
+  containers:
+    - name: lemon
+      image: busybox
+      command: ["sleep", "1000"]
+    - name: gold
+      image: redis
+
+
+2)We have deployed an application logging stack in the elastic-stack namespace. Inspect it.
+https://prnt.sc/ar4DoZncsZIQ
+
+
+Once the pod is in a ready state, inspect the Kibana UI using the link above your terminal. There shouldn't be any logs for now.
+We will configure a sidecar container for the application to send logs to Elastic Search.
+NOTE: It can take a couple of minutes for the Kibana UI to be ready after the Kibana pod is ready.
+You can inspect the Kibana logs by running:
+
+=>kubectl -n elastic-stack logs kibana
+
+Inspect the app pod and identify the number of containers in it.
+It is deployed in the elastic-stack namespace.
+
+=>k get pod -n elastic-stack
+
+
+The application outputs logs to the file /log/app.log. View the logs and try to identify the user having issues with Login.
+Inspect the log file inside the pod.
+=>k exec app -n elastic-stack -- cat /log/app.log
+
+
+3)Edit the pod to add a sidecar container to send logs to Elastic Search. Mount the log volume to the sidecar container.
+Only add a new container. Do not modify anything else. Use the spec provided below.
+Note: State persistence concepts are discussed in detail later in this course. For now please make use of the below documentation link for updating the concerning pod.
+https://kubernetes.io/docs/tasks/access-application-cluster/communicate-containers-same-pod-shared-volume/
+
+Name: app
+Container Name: sidecar
+Container Image: kodekloud/filebeat-configured
+Volume Mount: log-volume
+Mount Path: /var/log/event-simulator/
+Existing Container Name: app
+Existing Container Image: kodekloud/event-simulator
+
+=>kubectl edit pod -n elastic-stack
+
+- image: kodekloud/filebeat-configured
+  name: sidecar
+  volumeMounts:
+    - mountPath: /var/log/event-simulator/
+      name: log-volume
+
+
+
+##Practice Test Init Container
+----------------------------------------------------------
+1)Identify the pod that has an initContainer configured.
+
+=>kubectl describe pod
+
+2)Update the pod red to use an initContainer that uses the busybox image and sleeps for 20 seconds
+
+Delete and re-create the pod if necessary. But make sure no other configurations change.
+Pod: red
+initContainer Configured Correctly
+
+
+3)A new application orange is deployed. There is something wrong with it. Identify and fix the issue.
+Once fixed, wait for the application to run before checking solution.
+
+
+
+
+=================================================
+##Cluster Maintenance            
+================================================= 
+
+
+
+##Practice Test OS Upgradation
+-------------------------------------------------
+1)We need to take node01 out for maintenance. Empty the node of all applications and mark it unschedulable.
+
+Node node01 Unschedulable
+Pods evicted from node01
+
+=>kubectl cordon node01
+=>kubectl drain node01 --ignore-daemonsets
+
+The maintenance tasks have been completed. Configure the node node01 to be schedulable again.
+
+=>kubectl uncordon node01
+Now Node01 is Schedulable
+
+
+##Practice Test Cluster Upgraztation
+-------------------------------------------------
+
+1)How many nodes can host workloads in this cluster?
+Inspect the applications and taints set on the nodes.
+
+=>kubectl describe node | grep Taints:
 
 
 
