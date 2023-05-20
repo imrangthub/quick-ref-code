@@ -4184,8 +4184,491 @@ Inspect the applications and taints set on the nodes.
 
 
 
+=================================================
+##Security            
+================================================= 
 
 
+
+##PracticeTest View Certificate Detatails
+-------------------------------------------------
+
+=>ls /etc/kubernetes/manifests/
+=>ls /etc/kubernetes/pki/
+All Certifict with++ file defination here
+
+1)Identify the certificate file used for the kube-api server.
+
+ By default, this file is named kube-apiserver.yaml and is typically located in the /etc/kubernetes/ directory.
+=>sudo find /etc/kubernetes -name kube-apiserver.yaml
+=>cat /etc/kubernetes/manifests/kube-apiserver.yaml | grep tls-cert-file
+
+
+2)The kube-api server stopped again! Check it out. Inspect the kube-api server logs and identify the root cause and fix the issue.
+Run crictl ps -a command to identify the kube-api server container. Run crictl logs container-id command to view the logs.
+
+
+
+
+
+##PracticeTest Certificate API
+-------------------------------------------------
+
+
+
+
+
+
+
+
+
+
+
+
+
+=================================================
+##Storage            
+================================================= 
+
+
+
+##PracticeTest PERSISTENT VOLUME CLAIMS
+-------------------------------------------------
+
+=>kubectl exec webapp -- cat /log/app.log
+
+1)Configure a volume to store these logs at /var/log/webapp on the host.
+
+Use the spec provided below.
+Name: webapp
+Image Name: kodekloud/event-simulator
+Volume HostPath: /var/log/webapp
+Volume Mount: /log
+
+
+apiVersion: v1
+kind: Pod
+metadata:
+  name: webapp
+spec:
+  containers:
+    - name: webapp-container
+      image: kodekloud/event-simulator
+      volumeMounts:
+        - name: log-volume
+          mountPath: /log
+  volumes:
+    - name: log-volume
+      hostPath:
+        path: /var/log/webapp
+
+=>kubectl apply -f pod2.yaml
+
+
+2)Create a Persistent Volume with the given specification.
+
+Volume Name: pv-log
+Storage: 100Mi
+Access Modes: ReadWriteMany
+Host Path: /pv/log
+Reclaim Policy: Retain
+
+
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: pv-log
+spec:
+  capacity:
+    storage: 100Mi
+  accessModes:
+    - ReadWriteMany
+  hostPath:
+    path: /pv/log
+  persistentVolumeReclaimPolicy: Retain
+
+
+=>kubectl get pv
+
+2)Let us claim some of that storage for our application. Create a Persistent Volume Claim with the given specification.
+
+Volume Name: claim-log-1
+Storage Request: 50Mi
+Access Modes: ReadWriteOnce
+
+
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: claim-log-1
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 50Mi
+  volumeName: pv-log
+
+=>kubectl get pvc
+
+
+3)Why is the claim not bound to the available Persistent Volume?
+Access Mode missmatch
+
+
+
+4)Update the Access Mode on the claim to bind it to the PV.
+
+Delete and recreate the claim-log-1.
+
+Volume Name: claim-log-1
+Storage Request: 50Mi
+PVol: pv-log
+Status: Bound
+
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: claim-log-1
+spec:
+  accessModes:
+    - ReadWriteMany
+  resources:
+    requests:
+      storage: 50Mi
+  volumeName: pv-log
+status:
+  phase: Bound
+
+
+
+5)Update the webapp pod to use the persistent volume claim as its storage.
+
+
+Replace hostPath configured earlier with the newly created PersistentVolumeClaim.
+
+
+Name: webapp
+Image Name: kodekloud/event-simulator
+Volume: PersistentVolumeClaim=claim-log-1
+Volume Mount: /log
+
+apiVersion: v1
+kind: Pod
+metadata:
+  name: webapp
+spec:
+  containers:
+    - name: webapp-container
+      image: kodekloud/event-simulator
+      volumeMounts:
+        - name: log-volume
+          mountPath: /log
+  volumes:
+    - name: log-volume
+      persistentVolumeClaim:
+        claimName: claim-log-1
+
+
+6)What would happen to the PV if the PVC was destroyed?
+PV is not deleted but not available
+
+
+
+
+
+##PracticeTest – STORAGE CLASS
+-------------------------------------------------
+
+=>kubectl get storageclass | sc
+
+1)What is the name of the Storage Class that does not support dynamic volume provisioning?
+
+glusterfs-sc
+nfs-sc
+local-storage
+portWorx-Storageclass
+
+The local-storage Storage Class is an example of a Storage Class that does not support dynamic volume provisioning. I
+
+
+2)Let's fix that. Create a new PersistentVolumeClaim by the name of local-pvc that should bind to the volume local-pv.
+
+
+Inspect the pv local-pv for the specs.
+
+PVC: local-pvc
+Correct Access Mode?
+Correct StorageClass Used?
+PVC requests volume size = 500Mi?
+
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: local-pvc
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 500Mi
+  volumeName: local-pv
+  storageClassName: local-storage
+
+
+
+3)Create a new pod called nginx with the image nginx:alpine. The Pod should make use of the PVC local-pvc and mount the volume at the path /var/www/html.
+The PV local-pv should in a bound state.
+
+
+apiVersion: v1
+kind: Pod
+metadata:
+  name: nginx
+spec:
+  containers:
+    - name: nginx-container
+      image: nginx:alpine
+      volumeMounts:
+        - name: html-volume
+          mountPath: /var/www/html
+  volumes:
+    - name: html-volume
+      persistentVolumeClaim:
+        claimName: local-pvc
+
+
+
+4)Create a new Storage Class called delayed-volume-sc that makes use of the below specs:
+
+provisioner: kubernetes.io/no-provisioner
+volumeBindingMode: WaitForFirstConsumer
+
+
+
+
+=================================================
+##Netorking            
+================================================= 
+
+
+
+##PracticeTest  EXPLORE ENVIRONMENT
+-------------------------------------------------
+
+1)What is the Internal IP address of the controlplane node in this cluster?
+=>kubectl get node -o wide
+
+
+2)What is the network interface configured for cluster connectivity on the controlplane node?
+node-to-node communication
+=>ifconfig
+Check the IP
+
+3)We use Containerd as our container runtime. What is the interface/bridge created by Containerd on the controlplane node?
+cni0
+=>ip link show
+
+4)If you were to ping google from the controlplane node, which route does it take?
+What is the IP address of the Default Gateway?
+
+=>ip route | grep default
+
+
+
+5)What is the port the kube-scheduler is listening on in the controlplane node?
+=>netstat -tuln
+
+6)Notice that ETCD is listening on two ports. Which of these have more client connections established?
+2350
+2379
+6443
+2380
+
+Based on the provided options, the two ports typically associated with ETCD are:
+Port 2379: This is the default port for ETCD client communication.
+Port 2380: This is the default port for ETCD peer-to-peer communication.
+
+
+##PracticeTest  CNI
+-------------------------------------------------
+
+1)Inspect the kubelet service and identify the container runtime endpoint value is set for Kubernetes.
+=>tr \\0 ' ' < /proc/"$(pgrep kubelet)"/cmdline
+
+2)What is the path configured with all binaries of CNI supported plugins?
+=>ls /opt/cni/bin/
+
+
+
+
+##PracticeTest  Deploy Network Solution | NETWORKING WEAVE
+-------------------------------------------------
+In this practice test we will install weave-net POD networking solution to the cluster. Let us first inspect the setup.
+
+
+1)What is the Networking Solution used by this cluster?
+=>ls /etc/cni/net.d/
+=>kubectl get pods -n kube-system
+
+
+2)How many weave agents/peers are deployed in this cluster?
+=>kubectl get pods -n kube-system -l name=weave-net -o wide --no-headers | wc -l
+
+3)Identify the name of the bridge network/interface created by weave on each node.
+=>ifconfig
+
+
+4)What is the default gateway configured on the PODs scheduled on node01?
+Try scheduling a pod on node01 and check ip route output
+
+apiVersion: v1
+kind: Pod
+metadata:
+  name: test-pod
+spec:
+  nodeName: node01
+  containers:
+  - name: busybox
+    image: busybox
+    command:
+    - sleep
+    - "3600"
+
+=>kubectl exec -it test-pod -- sh
+=>ip route
+
+
+
+
+
+
+##PracticeTest SERVICE NETWORKING
+-------------------------------------------------
+1)What network range are the nodes in the cluster part of?
+=>kubectl get node -o wide
+
+2)what is pod cider rang?
+=>kubectl cluster-info dump | grep -oP '(?<=--cluster-cidr=)[\d./]+'
+
+3)What is the IP Range configured for the services within the cluster?
+=>kubectl cluster-info dump | grep -oP '(?<=--service-cluster-ip-range=)[\d./]+'
+
+4)How many kube-proxy pods are deployed in this cluster?
+=>k get pod -A | grep proxy
+
+5)How does this Kubernetes cluster ensure that a kube-proxy pod runs on all nodes in the cluster?
+Inspect the kube-proxy pods and try to identify how they are deployed.
+
+By default, Kubernetes ensures that a kube-proxy pod runs on all nodes in the cluster through the use of a DaemonSet.
+
+
+
+
+
+##PracticeTest  COREDNS IN KUBERNETES
+-------------------------------------------------
+
+1)Identify the DNS solution implemented in this cluster.
+=>kubectl get endpoints -A
+=>kubectl get endpoints kube-dns --namespace=kube-system
+
+2)How many pods of the DNS server are deployed?
+=>kubectl get pods -n kube-system -l k8s-app=kube-dns --no-headers | wc -l
+
+3)What is the name of the service created for accessing CoreDNS?
+=>kubectl get service -n kube-system -l k8s-app=kube-dns -o jsonpath='{.items[0].metadata.name}'
+
+
+4)What is the IP of the CoreDNS server that should be configured on PODs to resolve services?
+=>kubectl get svc -n kube-system -l k8s-app=kube-dns -o jsonpath='{.items[0].spec.clusterIP}'
+
+5)kubectl get svc -n kube-system -l k8s-app=kube-dns -o jsonpath='{.items[0].spec.clusterIP}'
+=>/etc/coredns/Corefile
+
+6)How is the Corefile passed into the CoreDNS POD?
+The Corefile is typically passed into the CoreDNS pod by configuring it as a ConfigMap object in Kubernetes. 
+
+7)What is the name of the ConfigMap object created for Corefile?
+coredns
+=>kubectl get configmap -n kube-system -l k8s-app=kube-dns -o jsonpath='{.items[0].metadata.name}'
+
+8)What is the root domain/zone configured for this kubernetes cluster?
+cluster.local is the root domain or zone configured for the Kubernetes cluster.
+
+
+9)Which of the names CANNOT be used to access the HR service from the test pod?
+
+10)Which of the below name can be used to access the payroll service from the test application?
+
+
+11)Which of the below name CANNOT be used to access the payroll service from the test application?
+
+12)We just deployed a web server - webapp - that accesses a database mysql - server. However the web server is failing to connect to the database server. Troubleshoot and fix the issue.
+
+They could be in different namespaces. First locate the applications. The web server interface can be seen by clicking the tab Web Server at the top of your terminal.
+
+Web Server: webapp
+Uses the right DB_Host name
+
+
+
+12)From the hr pod nslookup the mysql service and redirect the output to a file /root/CKA/nslookup.out
+
+
+
+
+##PracticeTest CKA – INGRESS NETWORKIN
+-------------------------------------------------
+
+1)We have deployed Ingress Controller, resources and applications. Explore the setup.
+=>k get ingress -A
+
+2)What is the name of the Ingress Resource?
+=>k get ingress -A
+
+3)What is the Host configured on the Ingress Resource?
+The host entry defines the domain name that users use to reach the application like www.google.com
+
+4)What backend is the /wear path on the Ingress configured with?
+=>k describe ingress ingress-wear-watch -n app-space
+
+5)You are requested to change the URLs at which the applications are made available.
+Make the video application available at /stream.
+
+Ingress: ingress-wear-watch
+Path: /stream
+Backend Service: video-service
+Backend Service Port: 8080
+
+6)You are requested to add a new path to your ingress to make the food delivery application available to your customers.
+
+
+Make the new application available at /eat.
+Ingress: ingress-wear-watch
+Path: /eat
+Backend Service: food-service
+Backend Service Port: 8080
+
+
+
+
+
+
+
+
+
+
+
+
+=================================================
+##Security            
+================================================= 
+
+
+
+##PracticeTest
+-------------------------------------------------
 
 
 
