@@ -4653,6 +4653,375 @@ Backend Service Port: 8080
 
 
 
+=================================================
+##Install            
+================================================= 
+
+
+
+##PracticeTest Install
+-------------------------------------------------
+1)Install the kubeadm and kubelet packages on the controlplane and node01.
+
+Use the exact version of 1.26.0-00 for both.
+kubeadm installed on controlplane ?
+kubelet installed on controlplane?
+Kubeadm installed on worker node01 ?
+Kubelet installed on worker node01 ?
+
+
+2)What is the version of kubelet installed?
+=>kubelet --version
+
+
+3)Initialize Control Plane Node (Master Node). Use the following options:
+
+apiserver-advertise-address - Use the IP address allocated to eth0 on the controlplane node
+apiserver-cert-extra-sans - Set it to controlplane
+pod-network-cidr - Set to 10.244.0.0/16
+Once done, set up the default kubeconfig file and wait for node to be part of the cluster.
+
+
+Controlplane node initialized
+
+
+
+4)Install a Network Plugin. As a default, we will go with flannel
+Refer to the official documentation for the procedure.
+
+Network Plugin deployed?
+
+
+
+
+
+
+
+=================================================
+##TROUBLESHOOTING
+================================================= 
+
+         
+##PracticeTest  Application failure
+-------------------------------------------------
+
+1)Troubleshooting Test 1: A simple 2 tier application is deployed in the alpha namespace. It must display a green web page on success. Click on the App tab at the top of your terminal to view your application. It is currently failed. Troubleshoot and fix the issue.
+Stick to the given architecture. Use the same names and port numbers as given in the below architecture diagram. Feel free to edit, delete or recreate objects as necessary.
+
+Architecture Image:
+https://prnt.sc/NxnO9ORob0tT
+
+Solution:
+The service name used for the MySQL Pod is incorrect. According to the Architecture diagram, it should be mysql-service.
+To fix this, first delete the current service: kubectl -n alpha delete svc mysql
+Then create a new service with the following YAML file (or use imperative command):
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: mysql-service
+  namespace: alpha
+spec:
+    ports:
+    - port: 3306
+      targetPort: 3306
+    selector:
+      name: mysql
+
+
+Create the new service: kubectl create -f <service.yaml>
+
+
+2)Troubleshooting Test 2: The same 2 tier application is deployed in the beta namespace. It must display a green web page on success. Click on the App tab at the top of your terminal to view your application. It is currently failed. Troubleshoot and fix the issue.
+Stick to the given architecture. Use the same names and port numbers as given in the below architecture diagram. Feel free to edit, delete or recreate objects as necessary.
+
+ArchitectureImage:
+https://prnt.sc/45eaA8moRPg-
+
+Issue:In the beta namespace, check the ports configured on the services.
+
+Solution:
+If you inspect the mysql-service in the beta namespace, you will notice that the targetPort used to create this service is incorrect.
+Compare this to the Architecture diagram and change it to 3306. Update the mysql-service as per the below YAML:
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: mysql-service
+  namespace: beta
+spec:
+    ports:
+    - port: 3306
+      targetPort: 3306
+    selector:
+      name: mysql
+
+
+
+
+3)Troubleshooting Test 3: The same 2 tier application is deployed in the gamma namespace. It must display a green web page on success. Click on the App tab at the top of your terminal to view your application. It is currently failed or unresponsive. Troubleshoot and fix the issue.
+Stick to the given architecture. Use the same names and port numbers as given in the below architecture diagram. Feel free to edit, delete or recreate objects as necessary.
+
+ArchitectureImage:
+https://prnt.sc/45eaA8moRPg-
+
+Issue:Inspect the selector used by the mysql-service. Is it correct?
+
+Solution:
+If you inspect the mysql-service, you will see that that the selector used does not match the label on the mysql pod.
+
+Service:
+
+root@controlplane:~# kubectl -n gamma describe svc mysql-service | grep -i selector
+Selector:          name=sql00001
+root@controlplane:~#
+Pod:
+
+root@controlplane:~# kubectl -n gamma describe pod mysql | grep -i label   
+Labels:       name=mysql
+root@controlplane:~#
+As you can see the selector used is name=sql001 whereas it should be name=mysql.
+Update the mysql-service to use the correct selector as per the below YAML:
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: mysql-service
+  namespace: gamma
+spec:
+    ports:
+    - port: 3306
+      targetPort: 3306
+    selector:
+      name: mysql
+
+
+
+4)Troubleshooting Test 4: The same 2 tier application is deployed in the delta namespace. It must display a green web page on success. Click on the App tab at the top of your terminal to view your application. It is currently failed. Troubleshoot and fix the issue.
+Stick to the given architecture. Use the same names and port numbers as given in the below architecture diagram. Feel free to edit, delete or recreate objects as necessary.
+
+ArchitectureImage:
+https://prnt.sc/22a4uBitG4LT
+
+Issue:Are the environment variables used by the deployment correct?
+
+
+Try accessing the web application from the browser using the tab called app. You will notice that it cannot connect to the MySQL database:
+Environment Variables: DB_Host=mysql-service; DB_Database=Not Set; DB_User=sql-user; DB_Password=paswrd; 1045 (28000): Access denied for user 'sql-user'@'10.244.1.9' (using password: YES)
+
+
+According to the architecture diagram, the DB_User should be root but it is set to sql-user in the webapp-mysql deployment.
+Use the command kubectl -n delta edit deployments.apps webapp-mysql and update the environment variable as follows:
+
+spec:
+      containers:
+      - env:
+        - name: DB_Host
+          value: mysql-service
+        - name: DB_User
+          value: root
+        - name: DB_Password
+          value: paswrd
+
+
+This will recreate the pod and you should then be able to access the application.
+
+
+5)Troubleshooting Test 5: The same 2 tier application is deployed in the epsilon namespace. It must display a green web page on success. Click on the App tab at the top of your terminal to view your application. It is currently failed. Troubleshoot and fix the issue.
+Stick to the given architecture. Use the same names and port numbers as given in the below architecture diagram. Feel free to edit, delete or recreate objects as necessary.
+
+ArchitectureImage:
+https://prnt.sc/haJDWtZ_iwKN
+
+Issue:
+Ensure the right password is configured for the database on the MySQL pod and the Web application.
+
+Solution:
+If you inspect the environment variable called MYSQL_ROOT_PASSWORD, you will notice that the value is incorrect as compared to the architecture diagram: -
+
+
+root@controlplane:~# kubectl -n epsilon describe pod mysql  | grep MYSQL_ROOT_PASSWORD 
+      MYSQL_ROOT_PASSWORD:  passwooooorrddd
+root@controlplane:~#
+
+
+Correct this by deleting and recreating the mysql pod with the correct environment variable as follows: -
+
+spec:
+  containers:
+  - env:
+    - name: MYSQL_ROOT_PASSWORD
+      value: paswrd
+
+
+Also edit the webapp-mysql deployment and make sure that the DB_User environment variable is set to root as follows: -
+
+spec:
+    containers:
+    - env:
+      - name: DB_Host
+        value: mysql-service
+      - name: DB_User
+        value: root
+      - name: DB_Password
+        value: paswrd
+
+
+Once the objects are recreated, and you should be able to access the application.
+
+
+
+6)Troubleshooting Test 6: The same 2 tier application is deployed in the zeta namespace. It must display a green web page on success. Click on the App tab at the top of your terminal to view your application. It is currently failed. Troubleshoot and fix the issue.
+Stick to the given architecture. Use the same names and port numbers as given in the below architecture diagram. Feel free to edit, delete or recreate objects as necessary.
+
+ArchitectureImage:
+https://prnt.sc/o7VazUYzU9gS
+
+Issue:
+Inspect the ports used by the web-service is it correct? Are the environment variable used as per the architecture diagram?
+
+Solution:
+There are a few things wrong in this setup:
+
+1. If you inspect the web-service, you will see that the nodePort used is incorrect.
+This service should be exposed on port 30081 and NOT 30088.
+
+root@controlplane:~# kubectl -n zeta get svc web-service 
+NAME          TYPE       CLUSTER-IP       EXTERNAL-IP   PORT(S)          AGE
+web-service   NodePort   10.102.190.212   <none>        8080:30088/TCP   3m1s
+root@controlplane:~#
+
+
+To correct this, delete the service and recreate it using the below YAML file:
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: web-service
+  namespace: zeta
+spec:
+  ports:
+  - nodePort: 30081
+    port: 8080
+    targetPort: 8080
+  selector:
+    name: webapp-mysql
+  type: NodePort
+
+
+2. Also edit the webapp-mysql deployment and make sure that the DB_User environment variable is set to root as follows: -
+
+spec:
+    containers:
+    - env:
+      - name: DB_Host
+        value: mysql-service
+      - name: DB_User
+        value: root
+      - name: DB_Password
+        value: paswrd
+
+
+3. The DB_Password used by the mysql pod is incorrect. Delete the current pod and recreate with the correct environment variable as per the snippet below: -
+
+spec:
+  containers:
+  - env:
+    - name: MYSQL_ROOT_PASSWORD
+      value: paswrd
+
+
+Once the objects are recreated, and you should be able to access the application.
+
+
+
+
+
+
+
+
+
+
+
+
+=================================================
+##Other Topics            
+================================================= 
+
+
+
+##PracticeTest Practice JSON PATH
+-------------------------------------------------
+
+
+
+##PracticeTest advanced-kubectl-commands
+-------------------------------------------------
+
+1)Get the list of nodes in JSON format and store it in a file at /opt/outputs/nodes.json.
+=>kubectl get nodes -o json>/opt/outputs/nodes.json
+
+2)Get the details of the node node01 in json format and store it in the file /opt/outputs/node01.json.
+=>kubectl get node node01 -o json>/opt/outputs/node01.json
+
+
+3)Use JSON PATH query to fetch node names and store them in /opt/outputs/node_names.txt.
+Remember the file should only have node names.
+=>kubectl get nodes -o jsonpath='{.items[*].metadata.name}'>/opt/outputs/node_names.txt
+
+
+
+4)Use JSON PATH query to retrieve the osImages of all the nodes and store it in a file /opt/outputs/nodes_os.txt.
+The osImages are under the nodeInfo section under status of each node.
+=>kubectl get nodes -o jsonpath='{.items[*].status.nodeInfo.osImage}' > /opt/outputs/nodes_os.txt
+
+
+5)A kube-config file is present at /root/my-kube-config. Get the user names from it and store it in a file /opt/outputs/users.txt.
+Use the command kubectl config view --kubeconfig=/root/my-kube-config to view the custom kube-config.
+
+=>kubectl config view --kubeconfig=my-kube-config -o jsonpath="{.users[*].name}" > /opt/outputs/users.txt
+
+
+6)A set of Persistent Volumes are available. Sort them based on their capacity and store the result in the file /opt/outputs/storage-capacity-sorted.txt.
+=>kubectl get pv --sort-by=.spec.capacity.storage > /opt/outputs/storage-capacity-sorted.txt
+
+
+7)That was good, but we don't need all the extra details. Retrieve just the first 2 columns of output and store it in /opt/outputs/pv-and-capacity-sorted.txt.
+The columns should be named NAME and CAPACITY. Use the custom-columns option and remember, it should still be sorted as in the previous question.
+=>kubectl get pv --sort-by=.spec.capacity.storage -o=custom-columns=NAME:.metadata.name,CAPACITY:.spec.capacity.storage > /opt/outputs/pv-and-capacity-sorted.txt
+
+
+
+8)Use a JSON PATH query to identify the context configured for the aws-user in the my-kube-config context file and store the result in /opt/outputs/aws-context-name.
+=>kubectl config view --kubeconfig=my-kube-config -o jsonpath="{.contexts[?(@.context.user=='aws-user')].name}" > /opt/outputs/aws-context-name
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
