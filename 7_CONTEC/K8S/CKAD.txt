@@ -350,44 +350,6 @@ like:my-service.my-namespace.svc.cluster.local
 
 
 
-##Solution:05 CORE CONCEPTS, PRACTICE TEST SERVICES
--------------------------------------------------
-
-1)How many Services exist on the system?
-=>kubectl get svc
-
-2)What is the targetPort configured on the kubernetes service?
-=>kubectl describe svc kubernetes 
-
-
-3)How many labels are configured on the kubernetes service?
-=>kubectl describe svc kubernetes 
-
-5)Create a new service to access the web application using the service-definition-1.yaml file.
-Name: webapp-service
-Type: NodePort
-targetPort: 8080
-port: 8080
-nodePort: 30080
-selector:
-  name: simple-webapp
-
-apiVersion: v1
-kind: Service
-metadata:
-  name: webapp-service
-  namespace: default
-spec:
-  ports:
-  - nodePort: 30080
-    port: 8080
-    targetPort: 8080
-  selector:
-    name: simple-webapp
-  type: NodePort
-
-
-
 Creating Kubernetes objects imperatively
 -------------------------------------------------
 There are two main ways to manage Kubernetes objects: imperative (with kubectl commands) and 
@@ -470,6 +432,8 @@ Replicas: 3
 
 =>kubectl run httpd --image=httpd:alpine --port=80
 
+=>kubectl expose pod httpd --port=80 --name=httpd
+OR
 =>kubectl create service clusterip --help
 =>kubectl create service clusterip httpd --tcp=5678:80
 
@@ -492,12 +456,13 @@ Update the lavel as service
 
 
 
-## Solution: Configuration
+## Solution1: command and Args
 -------------------------------------------------
 1)What is the command used to run the pod ubuntu-sleeper?
+=>kubectl get pod ubntu-sleeper -o yaml
 =>kubectl describe pod ubuntu-sleeper
 
-Create a pod with the ubuntu image to run a container to sleep for 5000 seconds.
+2)Create a pod with the ubuntu image to run a container to sleep for 5000 seconds.
 apiVersion: v1 
 kind: Pod 
 metadata:
@@ -606,10 +571,12 @@ Set the given command line arguments to change it to green.
 ##ConfigMap
 -------------------------------------------------
 
-##Solution ConfigMap
+##Solution01 | ConfigMap
 -------------------------------------------------
 What is the environment variable name set on the container in the pod?
 =>kubectl describe pod webapp-color
+=>kubectl get pod webapp-color -o yaml
+=>kubectl exec webapp-color -- env
 
 
 1)Update the environment variable on the POD to display a green background.
@@ -663,6 +630,17 @@ add this:
               key: APP_COLOR
 
 =>kubectl replace --force -f newpod.yaml
+
+
+
+
+
+
+
+
+
+
+
 
 
 ##Secret
@@ -2162,12 +2140,10 @@ What is the fc volume type used for?
 To mount and existing Fiber channel volume into a Pod
 
 
-##State Persistence
+
+
+##Persistent Volumes
 --------------------------------------------------
-
-
-
-
 
 
 
@@ -2344,6 +2320,100 @@ The PVC being use by the pod of webapp.
 
 
 
+##Storage Class
+--------------------------------------------------
+
+
+
+##Solution2: Storage Class
+--------------------------------------------------
+=>kubectl get storageclass
+
+
+1)What is the name of the Storage Class that does not support dynamic volume provisioning?
+local-storage
+
+The "local-storage" Storage Class in Kubernetes does not support dynamic volume provisioning. It is used to represent local storage devices attached to the nodes in the cluster. With this Storage Class, you need to manually manage the provisioning and allocation of local storage volumes.
+
+
+2)Let's fix that. Create a new PersistentVolumeClaim by the name of local-pvc that should bind to the volume local-pv.
+
+
+Inspect the pv local-pv for the specs.
+PVC: local-pvc
+Correct Access Mode?
+Correct StorageClass Used?
+PVC requests volume size = 500Mi?
+
+
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: local-pvc
+spec:
+  accessModes:
+    - ReadWriteOnce
+  storageClassName: local-storage
+  resources:
+    requests:
+      storage: 500Mi
+  selector:
+    matchLabels:
+      volume: local-pv
+
+The Storage Class called local-storage makes use of VolumeBindingMode set to WaitForFirstConsumer. This will delay the binding and provisioning of a PersistentVolume until a Pod using the PersistentVolumeClaim is created.
+
+
+
+3)Create a new pod called nginx with the image nginx:alpine. The Pod should make use of the PVC local-pvc and mount the volume at the path /var/www/html.
+
+apiVersion: v1
+kind: Pod
+metadata:
+  name: nginx
+spec:
+  containers:
+    - name: nginx
+      image: nginx:alpine
+      ports:
+        - containerPort: 80
+      volumeMounts:
+        - name: data-volume
+          mountPath: /var/www/html
+  volumes:
+    - name: data-volume
+      persistentVolumeClaim:
+        claimName: local-pvc
+
+apiVersion: v1
+kind: Pod
+metadata:
+  name: nginx
+  labels:
+    name: nginx
+spec:
+  containers:
+  - name: nginx
+    image: nginx:alpine
+    volumeMounts:
+      - name: local-persistent-storage
+        mountPath: /var/www/html
+  volumes:
+    - name: local-persistent-storage
+      persistentVolumeClaim:
+        claimName: local-pvc
+
+
+4)Create a new Storage Class called delayed-volume-sc that makes use of the below specs:
+provisioner: kubernetes.io/no-provisioner
+volumeBindingMode: WaitForFirstConsumer
+
+apiVersion: storage.k8s.io/v1
+kind: StorageClass
+metadata:
+  name: delayed-volume-sc
+provisioner: kubernetes.io/no-provisioner
+volumeBindingMode: WaitForFirstConsumer
 
 
 
