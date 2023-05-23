@@ -3066,6 +3066,92 @@ With help of the kubectl convert command, change the deprecated API version to t
 --------------------------------------------------
 Not so much possible to come in exam to create a custome resource, but it is possible. and better to know
 
+What is a custom resource?
+It is an extension of the Kubernetes API that is not necessarily available in a default Kubernetes installation.
+
+
+
+
+##Solution | Custom Resource
+--------------------------------------------------
+1)CRD Object can be either namespaced or cluster scoped.
+Is this statement true or false?
+
+ans:
+A CRD can be either namespaced or cluster-scoped. When you create a CRD, you can specify its scope in the spec.scope field of the CRD manifest.
+
+
+
+2)We have provided an incomplete CRDs manifest file called crd.yaml under the /root directory. Let’s complete it and create a custom resource definition from it.
+Let’s create a custom resource definition called internals.datasets.kodekloud.com. Assign the group to datasets.kodekloud.com and the resource is accessible only from a specific namespace.
+
+Make sure the version should be v1 and needed to enable the version so it’s being served via REST API.
+So finally create a custom resource from a given manifest file called custom.yaml.
+
+
+Note :- Make sure resources should be created successfully from the custom.yaml file.
+
+The solution file for crd.yaml is pasted below:
+
+---
+apiVersion: apiextensions.k8s.io/v1
+kind: CustomResourceDefinition
+metadata:
+  name: internals.datasets.kodekloud.com 
+spec:
+  group: datasets.kodekloud.com
+  versions:
+    - name: v1
+      served: true
+      storage: true
+      schema:
+        openAPIV3Schema:
+          type: object
+          properties:
+            spec:
+              type: object
+              properties:
+                internalLoad:
+                  type: string
+                range:
+                  type: integer
+                percentage:
+                  type: string
+  scope: Namespaced 
+  names:
+    plural: internals
+    singular: internal
+    kind: Internal
+    shortNames:
+    - int
+
+=>kubectl create -f custom.yaml 
+after correcting and creating CRD.
+
+
+3)What are the properties given to the CRD’s called collectors.monitoring.controller?
+=>kubectl describe crd collectors.monitoring.controller
+
+
+4)Create a custom resource called datacenter and the apiVersion should be traffic.controller/v1.
+Set the dataField length to 2 and access permission should be true.
+To create a custom resource called datacenter :-
+
+apiVersion: traffic.controller/v1
+kind: Global
+metadata:
+  name: datacenter
+spec:
+  dataField: 2
+  access: true
+
+
+
+5)What is the short name given to the CRD globals.traffic.controller ?
+=>kubectl describe crd globals.traffic.controller
+
+
+
 
 
 
@@ -3106,9 +3192,134 @@ Do not increase the replicas of the frontend deployment.
 
 
 
-##169. Labs - Helm Concepts
+##169.  Install Helm
 --------------------------------------------------
 https://helm.sh/docs/intro/install/#from-apt-debianubuntu
+
+
+
+
+
+
+##Solution - | Install Helm
+--------------------------------------------------
+1)Identify the name of the Operating system installed.
+=>cat /etc/*release
+
+2)Install the helm package.
+
+curl https://baltocdn.com/helm/signing.asc | gpg --dearmor | sudo tee /usr/share/keyrings/helm.gpg > /dev/null
+sudo apt-get install apt-transport-https --yes
+echo "deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/helm.gpg] https://baltocdn.com/helm/stable/debian/ all main" | sudo tee /etc/apt/sources.list.d/helm-stable-debian.list
+sudo apt-get update
+sudo apt-get install helm
+
+=>helm version --short
+
+3)Use the help page of helm command to identify the command used to retrieve helm client environment information.
+=>helm -h
+=>helm env
+
+
+4)What is a command line flag used to enable verbose output?
+=>helm --help
+=>helm --debug
+
+
+
+
+
+
+
+##Helm Concept
+--------------------------------------------------
+
+ObjectYamlFile=> ObjectTemplateYamlFile+valueYamlFile=> HelmChart
+It has Chart.yaml file for this chart
+
+=>helm search hub wordpress
+
+=>helm list
+=>helm uninstall my-release
+
+
+
+
+
+##Solution  | Helm Concept
+--------------------------------------------------
+1)Which command is used to search for a wordpress helm chart package from the Artifact Hub?
+=>helm search hub wordpress
+
+2)Add a bitnami helm chart repository in the controlplane node.
+name - bitnami
+chart repo name - https://charts.bitnami.com/bitnami
+
+=>helm repo add bitnami https://charts.bitnami.com/bitnami
+
+
+3)Which command is used to search for the joomla package from the added repository?
+=>helm search repo joomla
+
+
+4)What is the app version of joomla in the bitnami helm repository?
+=>helm search repo joomla
+look at the APP VERSION
+
+
+
+5)How many helm repositories are added in the controlplane node?
+=>helm repo list
+
+
+6)Install drupal helm chart from the bitnami repository.
+Release name should be bravo.
+Chart name should be bitnami/drupal.
+Note: Ignore the state of the application now.
+
+=>helm install bravo bitnami/drupal
+=>helm list
+
+7)Uninstall the drupal helm package which we installed earlier.
+=>helm uninstall bravo
+
+
+8)Download the bitnami apache package under the /root directory.
+Note: Do not install the package. Just download it.
+=>helm pull --untar bitnami/apache
+
+
+
+9)Inspect the file values.yaml and make changes so that 2 replicas of the webserver are running and the http is exposed on nodeport 30080.
+Note: You can read the Bitnami documentation for more.
+https://github.com/bitnami/charts/tree/master/bitnami/apache/#installing-the-chart
+
+
+
+10)Install the apache from the downloaded helm package.
+Release name: mywebapp
+Note: Do make changes accordingly so that 2 replicas of the webserver are running and the http is exposed on nodeport 30080.
+Make sure that the pods are in the running state.
+
+Edit the values.yaml file and change the parameters to replicaCount: 2 and http: 30080 under the nodePorts section. Then run helm install command to install the package.
+
+  nodePorts:
+    replicaCount: 2
+    http: "30080"
+    https: ""
+
+Once you have modified the values.yaml file , run the below command to install the apache package on the controlplane node:
+=>helm install mywebapp ./apache
+
+After installation, run the below command to list the mywebapp release:
+=>helm list 
+
+
+
+
+
+
+
 
 
 
