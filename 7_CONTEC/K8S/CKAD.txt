@@ -93,6 +93,21 @@ Pod
 
 ##Solution:01 | Pod
 -------------------------------------------------
+
+What is the image used to create the new pods?
+=>kubectl describe pod newpods-j44dw | grep -i image
+
+How many container part of the webapp pod and What images are used in the new webapp pod?
+=>kubectl describe pod webapp
+Check the container section,and look at the images used.
+
+
+Why do you think the container agentx in pod webapp is in error?
+=>kubectl describe pod webapp 
+and look under the events section, An image by that name does not exist in DockerHub.
+
+
+
 1)Which nodes are these pods placed on?
 =>kubectl get pod -o wide
 
@@ -101,6 +116,7 @@ runing container/total container.
 
 3)Create a new pod with the name redis and with the image redis123.
 =>kubectl run redis --image=redis123 --dry-run=client -o yaml
+=>kubectl run redis --image=redis123 --dry-run=client -o yaml > redis-definition.yaml
 
 4)Now change the image on this pod to redis.
 =>kubectl edit pod redis 
@@ -236,7 +252,6 @@ spec:
 
 
 
-
 ##Deployment
 -------------------------------------------------
 apiVersion: apps/v1
@@ -321,8 +336,6 @@ Show service of a specific namespace
 
 
 
-
-
 ##Solution:04 NameSpace
 -------------------------------------------------
 
@@ -346,6 +359,7 @@ You can try it in the web application UI. Use port 6379.
 
 The FQDN consists of the <service-name>.<namespace>.svc.cluster.local format.
 like:my-service.my-namespace.svc.cluster.local
+=>db-service.dev.svc.cluster.local
 
 
 
@@ -428,17 +442,18 @@ Replicas: 3
 =>kubectl create deployment redis-deploy --image=redis --replicas=2 -n=dev-ns
 
 
-6)Create a pod called httpd using the image httpd:alpine in the default namespace. Next, create a service of type ClusterIP by the same name (httpd). The target port for the service should be 80.
+6)Create a pod called httpd using the image httpd:alpine in the default namespace. 
+Next, create a service of type ClusterIP by the same name (httpd). The target port for the service should be 80.
 
+=>kubectl run httpd --image=httpd:alpine --port=80 --expose
+OR
 =>kubectl run httpd --image=httpd:alpine --port=80
-
 =>kubectl expose pod httpd --port=80 --name=httpd
 OR
 =>kubectl create service clusterip --help
 =>kubectl create service clusterip httpd --tcp=5678:80
 
 =>kubectl get pod --show-labels
-
 =>kubectl edit pod httpd
 Update the lavel as service
 
@@ -530,7 +545,8 @@ Modify the newpod.yaml file and run again
 OR
 =>kubectl replace --force -f newpod.yaml
 It will delete existing pod and create new one
-
+OR
+=>kubectl apply --force -f /tmp/kubectl-edit-219235037.yaml
 
 
 
@@ -561,10 +577,19 @@ spec:
 
 3)Create a pod with the given specifications. By default it displays a blue background. 
 Set the given command line arguments to change it to green.
-
-
 =>kubectl run webapp-green --image=kodekloud/webapp-color -- --color=green
-
+OR
+apiVersion: v1 
+kind: Pod 
+metadata:
+  name: webapp-green
+  labels:
+      name: webapp-green 
+spec:
+  containers:
+  - name: simple-webapp
+    image: kodekloud/webapp-color
+    args: ["--color", "green"]
 
 
 
@@ -649,6 +674,35 @@ Show How many secret data on a secret, What is the type of the dashboard-token s
 
 ##Solution3: | Secret
 -------------------------------------------------
+How many secrets are defined in the dashboard-token secret?
+=>kubectl describe secrets dashboard-token 
+and look at the data field.
+There are three secrets - ca.crt, namespace and token.
+
+
+Which of the following is not a secret data defined in dashboard-token secret?
+=>kubectl describe secrets dashboard-token 
+and look at the data field.
+There are three secrets - ca.crt, namespace and token. type is not a secret data.
+
+
+
+
+We are going to deploy an application with the below architecture
+We have already deployed the required pods and services. Check out the pods and services created. 
+Check out the web application using the Webapp MySQL link above your terminal, next to the Quiz Portal Link.
+https://prnt.sc/hAc-9XtgJ4eX
+
+The reason the application is failed is because we have not created the secrets yet. Create a new secret named db-secret with the data given below.
+You may follow any one of the methods discussed in lecture to create the secret.
+
+Secret Name: db-secret
+Secret 1: DB_Host=sql01
+Secret 2: DB_User=root
+Secret 3: DB_Password=password123
+
+
+
 1)Create a new secret named db-secret with the data given below.
   Secret Name: db-secret
   Secret 1: DB_Host=sql01
@@ -725,7 +779,12 @@ spec:
 
 =>kubectl replace --force -f /tmp/kubectl-edit-1907445851.yaml
 
+
 Pod and container lavel SecurityContext:
+
+A Pod definition file named multi-pod.yaml is given.
+The pod is created with multiple containers and security contexts defined at the Pod and Container level.
+
 apiVersion: v1
 kind: Pod
 metadata:
@@ -743,6 +802,15 @@ spec:
      name: sidecar
      command: ["sleep", "5000"]
 
+With what user are the processes in the web container started?
+The User ID defined in the securityContext of the container overrides the User ID in the POD. 1002
+
+With what user are the processes in the sidecar container started?
+The pod is created with multiple containers and security contexts defined at the Pod and Container level.1001
+
+
+
+
 
 3)Update pod ubuntu-sleeper to run as Root user and with the SYS_TIME capability.
 Pod Name: ubuntu-sleeper
@@ -750,11 +818,116 @@ Image Name: ubuntu
 SecurityContext: Capability SYS_TIME
 
 =>kubectl edit pod ubuntu-sleeper
-add this under SecurityContext:
+add this under  SecurityContext:
 capabilities:
   add: ["SYS_TIME"]
 
 =>kubectl replace --force -f /tmp/kubectl-edit-2505242802.yaml
+
+
+4)Now update the pod to also make use of the NET_ADMIN capability.
+
+Pod Name: ubuntu-sleeper
+Image Name: ubuntu
+SecurityContext: Capability SYS_TIME
+SecurityContext: Capability NET_ADMIN
+Add this under containers section:
+    securityContext:
+      capabilities:
+        add: ["SYS_TIME", "NET_ADMIN"]
+
+
+
+##Solution6: | Resource Limits
+-------------------------------------------------
+
+
+##Solution6: | Resource Requirements
+-------------------------------------------------
+When a pod is created the containers are assigned a default CPU request of .5 and 
+memory of 256Mi". 
+For the POD to pick up those defaults you must have first set those as default values for request and limit by creating a LimitRange in that namespace.
+
+apiVersion: v1
+kind: LimitRange
+metadata:
+  name: mem-limit-range
+spec:
+  limits:
+  - default:
+      memory: 512Mi
+    defaultRequest:
+      memory: 256Mi
+    type: Container
+
+apiVersion: v1
+kind: LimitRange
+metadata:
+  name: cpu-limit-range
+spec:
+  limits:
+  - default:
+      cpu: 1
+    defaultRequest:
+      cpu: 0.5
+    type: Container 
+
+1)A pod called rabbit is deployed. Identify the CPU requirements set on the Pod?
+=>kubectl describe pod rabbit
+Check:    
+Requests:
+      cpu:        1
+
+2)Another pod called elephant has been deployed in the default namespace. It fails to get to a running state. Inspect this pod and identify the Reason why it is not running.
+
+=>kubectl describe pod elephant
+
+Check this section:
+    Last State:     Terminated
+      Reason:       OOMKilled
+      Exit Code:    1
+The status OOMKilled indicates that it is failing because the pod ran out of memory. Identify the memory limit set on the POD.
+
+
+The elephant pod runs a process that consumes 15Mi of memory. Increase the limit of the elephant pod to 20Mi.
+apiVersion: v1
+kind: Pod
+metadata:
+  name: elephant
+  namespace: default
+spec:
+  containers:
+  - args:
+    - --vm
+    - "1"
+    - --vm-bytes
+    - 15M
+    - --vm-hang
+    - "1"
+    command:
+    - stress
+    image: polinux/stress
+    name: mem-stress
+    resources:
+      limits:
+        memory: 20Mi
+      requests:
+        memory: 5Mi
+
+
+3)The status OOMKilled indicates that it is failing because the pod ran out of memory. Identify the memory limit set on the POD.
+
+=>kubectl describe pod elephant
+    Limits:
+      memory:  10Mi
+
+4)The elephant pod runs a process that consumes 15Mi of memory. Increase the limit of the elephant pod to 20Mi.
+
+=>kubectl get pod -o yaml elephant >newpod.yaml
+=>kubectl delete pod elephant 
+=>vi newpod.yaml 
+Update the memory limit from 10 20
+=>kubectl apply -f newpod.yaml 
 
 
 
@@ -858,65 +1031,6 @@ Add serviceAccountName: dashboard-sa under templated spec
         serviceAccountName: dashboard-sa
         containers:
 
-
-
-
-##Solution6: | Resource Requirements
--------------------------------------------------
-When a pod is created the containers are assigned a default CPU request of .5 and 
-memory of 256Mi". 
-For the POD to pick up those defaults you must have first set those as default values for request and limit by creating a LimitRange in that namespace.
-
-apiVersion: v1
-kind: LimitRange
-metadata:
-  name: mem-limit-range
-spec:
-  limits:
-  - default:
-      memory: 512Mi
-    defaultRequest:
-      memory: 256Mi
-    type: Container
-
-apiVersion: v1
-kind: LimitRange
-metadata:
-  name: cpu-limit-range
-spec:
-  limits:
-  - default:
-      cpu: 1
-    defaultRequest:
-      cpu: 0.5
-    type: Container 
-
-1)A pod called rabbit is deployed. Identify the CPU requirements set on the Pod?
-=>kubectl describe pod rabbit
-
-
-2)Another pod called elephant has been deployed in the default namespace. It fails to get to a running state. Inspect this pod and identify the Reason why it is not running.
-
-=>kubectl describe pod elephant
-
-Check this section:
-    Last State:     Terminated
-      Reason:       OOMKilled
-      Exit Code:    1
-
-3)The status OOMKilled indicates that it is failing because the pod ran out of memory. Identify the memory limit set on the POD.
-
-=>kubectl describe pod elephant
-    Limits:
-      memory:  10Mi
-
-4)The elephant pod runs a process that consumes 15Mi of memory. Increase the limit of the elephant pod to 20Mi.
-
-=>kubectl get pod -o yaml elephant >newpod.yaml
-=>kubectl delete pod elephant 
-=>vi newpod.yaml 
-Update the memory limit from 10 20
-=>kubectl apply -f newpod.yaml 
 
 
 
