@@ -1349,9 +1349,38 @@ Existing Container Image: kodekloud/event-simulator
   volumeMounts:
     - mountPath: /var/log/event-simulator/
       name: log-volume
-
-
 https://www.loom.com/share/c2ae70197e8340a0ba77fc1de8179182
+
+OR
+apiVersion: v1
+kind: Pod
+metadata:
+  name: app
+  namespace: elastic-stack
+  labels:
+    name: app
+spec:
+  containers:
+  - name: app
+    image: kodekloud/event-simulator
+    volumeMounts:
+    - mountPath: /log
+      name: log-volume
+
+  - name: sidecar
+    image: kodekloud/filebeat-configured
+    volumeMounts:
+    - mountPath: /var/log/event-simulator/
+      name: log-volume
+
+  volumes:
+  - name: log-volume
+    hostPath:
+      # directory location on host
+      path: /var/log/webapp
+      # this field is optional
+      type: DirectoryOrCreate
+
 
 
 
@@ -1405,87 +1434,10 @@ Read more about initContainers here. And try out the upcoming practice test.
 https://kubernetes.io/docs/concepts/workloads/pods/init-containers/
 
 
-
-##Solution2 – Init Containers
---------------------------------------------------
-
-1)Identify the pod that has an initContainer configured.
-=>kubectl describe pod
-
-2)What is the state of the initContainer on pod blue?
-=>kubectl describe pod
-Cehck out this:
-      State:          Terminated
-      Reason:       Completed
-
-3)We just created a new app named purple. How many initContainers does it have?
-=>kubectl describe pod purple
-
-4)What is the state of the POD?
-=>kubectl describe pod purple
-Status:           Pending
-IP:               10.42.0.12
-
-
-5)How long after the creation of the POD will the application come up and be available to users?
-=>kubectl describe pod purple
-add all the init container wait or sleep time then 
-
-
-6)Update the pod red to use an initContainer that uses the busybox image and sleeps for 20 seconds
-Delete and re-create the pod if necessary. But make sure no other configurations change.
-
-Pod: red
-initContainer Configured Correctly
-
-=>kubectl get pod red -o yaml>red.yaml
-=>kubectl delete pod red 
-=>vi red.yaml
-
-  initContainers:
-    - image: busybox
-      name: red-initcontainer
-      command:
-        - "sleep"
-        - "20"
-
-Add it like this:
-
-spec:
-  initContainers:
-    - image: busybox
-      name: red-initcontainer
-      command:
-        - "sleep"
-        - "20"
-  containers:
-  - command:
-    - sh
-    - -c
-    - echo The app is running! && sleep 3600
-    image: busybox:1.28
-    imagePullPolicy: IfNotPresent
-    name: red-container
-
-7)A new application orange is deployed. There is something wrong with it. Identify and fix the issue.
-Once fixed, wait for the application to run before checking solution.
-
-=>kubectl describe pod orange
-Proble show in pod config properties like connadn, args image name typho etc.
-
-
-
-
-##Section3: Observability
-==================================================
-This chapter expose a service what is able to access from browser url.
-
-
 ##Readiness and Liveness Probes
 --------------------------------------------------
 
-Curl for serveice url:
-curl-test.sh 
+cat curl-test.sh 
 for i in {1..20}; do
    kubectl exec --namespace=kube-public curl -- sh -c 'test=`wget -qO- -T 2  http://webapp-service.default.svc.cluster.local:8080/ready 2>&1` && echo "$test OK" || echo "Failed"';
    echo ""
@@ -1532,6 +1484,34 @@ Now this pod running but not ready, waiting for ready
 
 =>./crash-app.sh
 Crash the application, it will be restart again.
+OR
+apiVersion: v1
+kind: Pod
+metadata:
+  creationTimestamp: "2021-08-01T04:55:35Z"
+  labels:
+    name: simple-webapp
+  name: simple-webapp-2
+  namespace: default
+spec:
+  containers:
+  - env:
+    - name: APP_START_DELAY
+      value: "80"
+    image: kodekloud/webapp-delayed-start
+    imagePullPolicy: Always
+    name: simple-webapp
+    ports:
+    - containerPort: 8080
+      protocol: TCP
+    readinessProbe:
+      httpGet:
+        path: /ready
+        port: 8080
+
+=>kubectl replace -f webpod2.yaml --force
+
+When the application crashes, the container is restarted. During this period the service directs users to the available POD, since the POD status is not READY.
 
 
 2)Update both the pods with a livenessProbe using the given spec
@@ -1566,6 +1546,74 @@ livenessProbe:
   periodSeconds: 1
   initialDelaySeconds: 80
 
+OR
+Use the following YAML for simple-webapp-1.yaml:
+
+apiVersion: v1
+kind: Pod
+metadata:
+  labels:
+    name: simple-webapp
+  name: simple-webapp-1
+  namespace: default
+spec:
+  containers:
+  - env:
+    - name: APP_START_DELAY
+      value: "80"
+    image: kodekloud/webapp-delayed-start
+    imagePullPolicy: Always
+    name: simple-webapp
+    ports:
+    - containerPort: 8080
+      protocol: TCP
+    readinessProbe:
+      httpGet:
+        path: /ready
+        port: 8080
+    livenessProbe:
+      httpGet:
+        path: /live
+        port: 8080
+      periodSeconds: 1
+      initialDelaySeconds: 80
+
+=>kubectl replace -f simple-webapp-1.yaml --force
+
+for simple-webapp-2, use the following YAML file:
+
+apiVersion: v1
+kind: Pod
+metadata:
+  labels:
+    name: simple-webapp
+  name: simple-webapp-2
+  namespace: default
+spec:
+  containers:
+  - env:
+    - name: APP_START_DELAY
+      value: "80"
+    image: kodekloud/webapp-delayed-start
+    imagePullPolicy: Always
+    name: simple-webapp
+    ports:
+    - containerPort: 8080
+      protocol: TCP
+    readinessProbe:
+      httpGet:
+        path: /ready
+        port: 8080
+    livenessProbe:
+      httpGet:
+        path: /live
+        port: 8080
+      periodSeconds: 1
+      initialDelaySeconds: 80
+
+
+=>kubectl replace -f simple-webapp-2.yaml --force
+
 
 
 
@@ -1577,6 +1625,7 @@ livenessProbe:
 ##Solution: Container Logging and Monitor
 --------------------------------------------------
 =>kubectl logs mypod 
+=>kubectl logs webapp-2 -c simple-webapp
 
 1)Let us deploy metrics-server to monitor the PODs and Nodes. Pull the git repository for the deployment files.
 Run: git clone https://github.com/kodekloudhub/kubernetes-metrics-server.git
@@ -1597,6 +1646,106 @@ Check resource monitoring of nodes
 =>kubectl top pod
 
 
+
+
+##Solution2 – Init Containers
+--------------------------------------------------
+
+1)Identify the pod that has an initContainer configured.
+=>kubectl describe pod
+Check:
+IPs:
+  IP:  10.42.0.10
+Init Containers:
+  init-myservice:
+
+
+
+2)What is the state of the initContainer on pod blue?
+=>kubectl describe pod
+Cehck out this:
+      State:          Terminated
+      Reason:       Completed
+
+3)We just created a new app named purple. How many initContainers does it have?
+=>kubectl describe pod purple
+
+
+4)What is the state of the POD?
+=>kubectl describe pod purple
+Status:           Pending
+IP:               10.42.0.12
+
+
+5)How long after the creation of the POD will the application come up and be available to users?
+=>kubectl describe pod purple
+add all the init container wait or sleep time then 
+Check the commands used in the initContainers. The first one sleeps for 600 seconds (10 minutes) and the second one sleeps for 1200 seconds (20 minutes)
+Adding the sleep times for both initContainers, the application will start after 1800 seconds or 30 minutes.
+
+
+
+6)Update the pod red to use an initContainer that uses the busybox image and sleeps for 20 seconds
+Delete and re-create the pod if necessary. But make sure no other configurations change.
+
+Pod: red
+initContainer Configured Correctly
+
+=>kubectl get pod red -o yaml>red.yaml
+=>kubectl delete pod red 
+=>vi red.yaml
+
+  initContainers:
+    - image: busybox
+      name: red-initcontainer
+      command:
+        - "sleep"
+        - "20"
+
+Add it like this:
+
+spec:
+  initContainers:
+    - image: busybox
+      name: red-initcontainer
+      command:
+        - "sleep"
+        - "20"
+  containers:
+  - command:
+    - sh
+    - -c
+    - echo The app is running! && sleep 3600
+    image: busybox:1.28
+    imagePullPolicy: IfNotPresent
+    name: red-container
+OR
+---
+apiVersion: v1
+kind: Pod
+metadata:
+  name: red
+  namespace: default
+spec:
+  containers:
+  - command:
+    - sh
+    - -c
+    - echo The app is running! && sleep 3600
+    image: busybox:1.28
+    name: red-container
+  initContainers:
+  - image: busybox
+    name: red-initcontainer
+    command: 
+      - "sleep"
+      - "20"
+7)A new application orange is deployed. There is something wrong with it. Identify and fix the issue.
+Once fixed, wait for the application to run before checking solution.
+
+=>kubectl describe pod orange
+Proble show in pod config properties like connadn, args image name typho etc.
+=>kubectl get pod orange -o yaml > /root/orange.yaml
 
 
 
