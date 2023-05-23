@@ -945,8 +945,10 @@ Update the memory limit from 10 20
 2)Which account does the Dashboard application use to query the Kubernetes API?
 Check the error:
 pods is forbidden: User "system:serviceaccount:default:default" cannot list resource "pods" in API group "" in the namespace "default"
-
 Its default account identify by "system:serviceaccount:default:default".
+OR
+=>kubectl logs podName
+Chck pod event section:
 
 
 3)Inspect the Dashboard Application POD and identify the Service Account mounted on it.
@@ -1006,7 +1008,8 @@ roleRef:
 Create an authorization token for the newly created service account, copy the generated token and paste it into the token field of the UI.
 To do this, run kubectl create token dashboard-sa for the dashboard-sa service account, copy the token and paste it in the UI.
 
-
+=>kubectl create token dashboard-sa
+OR
 =>kubectl get sa
 =>kubectl describe sa dashboard-sa
 =>kubectl describe secret dashboard-sa-token-rdqw9
@@ -1021,6 +1024,9 @@ Edit the deployment to change ServiceAccount from default to dashboard-sa
 
 =>vi mydeployment.yaml
 Add serviceAccountName: dashboard-sa under templated spec
+OR
+=>kubectl edit deploy web-dashboard
+Add this serviceAccount in pod space
 
     template:
       metadata:
@@ -1048,8 +1054,9 @@ Toleration = Pod
 -------------------------------------------------
 
 
-1)How many nodes exist on the system?
+1)How many nodes exist on the system, Do any taints exist on node01 node?
 =>kubectl get node
+=>kubectl describe node node01 | grep -i taints
 
 
 2)Create a taint on node01 with key of spray, value of mortein and effect of NoSchedule
@@ -1073,7 +1080,7 @@ Value: mortein
 Effect: NoSchedule
 Status: Running
 
-=> kubectl run bee --image=nginx --dry-run=client -o yaml>bee.yaml
+=>kubectl run bee --image=nginx --dry-run=client -o yaml>bee.yaml
 =>vi bee.yaml
 
 apiVersion: v1
@@ -1167,7 +1174,8 @@ value: blue
 =>kubectl label node node01 color=blue
 
 =>kubectl edit deployment blue
-Add this:
+Add this: in spec section:
+
   affinity:
     nodeAffinity:
       requiredDuringSchedulingIgnoredDuringExecution:
