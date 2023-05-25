@@ -2906,6 +2906,34 @@ Auth Mechanisms:
 
 
 
+##Solution1: Docker
+--------------------------------------------------
+
+1)When a container is created using the image built with this Dockerfile, what is the command used to RUN the application inside it.
+
+Open the Dockerfile and look for ENTRYPOINT command.
+
+
+2)Run an instance of the image webapp-color and publish port 8080 on the container to 8282 on the host.
+=>docker run -p 8282:8080 -d webapp-color 
+
+
+3)What is the base Operating System used by the python:3.6 image?
+=>docker run python:3.6 cat /etc/*release*
+
+4)Build a new smaller docker image by modifying the same Dockerfile and name it webapp-color and tag it lite.
+Hint: Find a smaller base image for python:3.6. Make sure the final image is less than 150MB.
+Ans:
+In the webapp-color directory, run the ls -l command to list the Dockerfile and other files.
+And modify Dockerfile to use python:3.6-alpine image and then build using docker build -t webapp-color:lite .
+
+5)Run an instance of the new image webapp-color:lite and publish port 8080 on the container to 8383 on the host.
+=>docker run -d -p 8383:8080 webapp-color:lite
+
+
+
+
+
 ##KubeConfig
 --------------------------------------------------
 
@@ -3000,16 +3028,31 @@ Find the current home directory by looking at the HOME environment variable.
 =>cat .kube/config
 
 2)How many cluster and Users are defined in the default kubeconfig file?
+=>kubectl config view
+OR
 =>cat .kube/config
 
-3)What is the name of the cluster/user configured in the default kubeconfig file?
+3)What is the name of the cluster/user/context configured in the default kubeconfig file?
+=>kubectl config view
 =>cat .kube/config
+Check:
+users:
+- name: kubernetes-admin
+
+contexts:
+- context:
+    cluster: kubernetes
 
 
 4)I would like to use the dev-user to access test-cluster-1. Set the current context to the right one so I can do that.
 Once the right context is identified, use the kubectl config use-context command.
 Current context set
 
+To use that context, run the command: 
+=>kubectl config --kubeconfig=/root/my-kube-config use-context research
+To know the current context, run the command: 
+=>kubectl config --kubeconfig=/root/my-kube-config current-context
+OR
 By default kubectl config command user /root/.kube/config file, to user custome file have to mentation like this
 
 =>kubectl config use-context research --kubeconfig /root/my-kube-config
@@ -3105,7 +3148,10 @@ RoleBinding: Bind User with a role
 
 1) Inspect the environment and identify the authorization modes configured on the cluster.
 Check the kube-apiserver settings.
-
+Use the command 
+=>kubectl describe pod kube-apiserver-controlplane -n kube-system 
+and look for --authorization-mode.
+OR
 =>cat /etc/kubernetes/manifests/kube-apiserver.yaml
 Check: authorization-mode=
 spec:
@@ -3155,6 +3201,40 @@ Role Actions: delete
 RoleBinding: dev-user-binding
 RoleBinding: Bound to dev-user
 
+Use the command kubectl create to create a role developer and rolebinding dev-user-binding in the default namespace.
+
+To create a Role:- 
+=>kubectl create role developer --namespace=default --verb=list,create,delete --resource=pods
+
+To create a RoleBinding:- 
+=>kubectl create rolebinding dev-user-binding --namespace=default --role=developer --user=dev-user
+OR
+kind: Role
+apiVersion: rbac.authorization.k8s.io/v1
+metadata:
+  namespace: default
+  name: developer
+rules:
+- apiGroups: [""]
+  resources: ["pods"]
+  verbs: ["list", "create","delete"]
+
+---
+kind: RoleBinding
+apiVersion: rbac.authorization.k8s.io/v1
+metadata:
+  name: dev-user-binding
+subjects:
+- kind: User
+  name: dev-user
+  apiGroup: rbac.authorization.k8s.io
+roleRef:
+  kind: Role
+  name: developer
+  apiGroup: rbac.authorization.k8s.io
+
+OR
+
 Create Role:
 =>kubectl create role -h
 =>kubectl create role developer --verb=list,create,delete --resource=pods
@@ -3169,6 +3249,14 @@ CreateRoleBinding:
 
 8)A set of new roles and role-bindings are created in the blue namespace for the dev-user. However, the dev-user is unable to get details of the dark-blue-app pod in the blue namespace. Investigate and fix the issue.
 We have created the required roles and rolebindings, but something seems to be wrong.
+
+New roles and role bindings are created in the blue namespace.
+Check out the resourceNames configured on the role.
+
+Run the command: 
+=>kubectl edit role developer -n blue 
+and correct the resourceNames field. You don't have to delete the role.
+OR
 
 =>kubectl get pod dark-blue-app -n blue --as dev-user
 =>kubectl get rolebinding -n blue
@@ -3200,6 +3288,8 @@ Check, this ok now
 9)Add a new rule in the existing role developer to grant the dev-user permissions to create deployments in the blue namespace.
 Remember to add api group "apps".
 
+Use the command kubectl edit to add a new rule for user dev-user to grant permissions to create deployments in the blue namespace.
+
 =>kubectl create deployment mydeploy --image=nginx -n blue --as dev-user
 =>kubectl edit role developer -n blue
 add this:
@@ -3213,7 +3303,31 @@ add this:
   - create
   - delete
 
+So it looks like this:
 
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  name: developer
+  namespace: blue
+rules:
+- apiGroups:
+  - apps
+  resourceNames:
+  - dark-blue-app
+  resources:
+  - pods
+  verbs:
+  - get
+  - watch
+  - create
+  - delete
+- apiGroups:
+  - apps
+  resources:
+  - deployments
+  verbs:
+  - create
 
 
 ##144. Cluster Roles
@@ -3223,7 +3337,11 @@ add this:
 --------------------------------------------------
 1)How many ClusterRoles and ClusterRoleBindings do you see defined in the cluster?
 =>kubectl get clusterroles --no-headers | wc -l
+=>kubectl get clusterroles --no-headers -o json | jq '.items | length'
+
 =>kubectl get clusterrolebinding --no-headers | wc -l
+=>kubectl get clusterrolebindings --no-headers -o json | jq '.items | length'
+
 
 2)What namespace is the cluster-admin clusterrole part of?
 Cluster roles and cluster are not part of any namespace
@@ -3240,6 +3358,37 @@ Inspect the cluster-admin role's privileges.
 
 
 5)A new user michelle joined the team. She will be focusing on the nodes in the cluster. Create the required ClusterRoles and ClusterRoleBindings so she gets access to the nodes.
+
+Use the command kubectl create to create a clusterrole and clusterrolebinding for user michelle to grant access to the nodes.
+After that test the access using the command kubectl auth can-i list nodes --as michelle.
+
+cluste.yaml 
+---
+kind: ClusterRole
+apiVersion: rbac.authorization.k8s.io/v1
+metadata:
+  name: node-admin
+rules:
+- apiGroups: [""]
+  resources: ["nodes"]
+  verbs: ["get", "watch", "list", "create", "delete"]
+
+---
+kind: ClusterRoleBinding
+apiVersion: rbac.authorization.k8s.io/v1
+metadata:
+  name: michelle-binding
+subjects:
+- kind: User
+  name: michelle
+  apiGroup: rbac.authorization.k8s.io
+roleRef:
+  kind: ClusterRole
+  name: node-admin
+  apiGroup: rbac.authorization.k8s.io
+
+=>kubectl apply -f cluste.yaml 
+OR
 
 =>kubectl get nodes --as michelle
 
@@ -3266,6 +3415,39 @@ ClusterRoleBinding: michelle-storage-admin
 ClusterRoleBinding Subject: michelle
 ClusterRoleBinding Role: storage-admin
 
+Use the command kubectl create to create a new ClusterRole and ClusterRoleBinding.
+Assign it correct resources and verbs.
+After that test the access using the command kubectl auth can-i list storageclasses --as michelle.
+
+---
+kind: ClusterRole
+apiVersion: rbac.authorization.k8s.io/v1
+metadata:
+  name: storage-admin
+rules:
+- apiGroups: [""]
+  resources: ["persistentvolumes"]
+  verbs: ["get", "watch", "list", "create", "delete"]
+- apiGroups: ["storage.k8s.io"]
+  resources: ["storageclasses"]
+  verbs: ["get", "watch", "list", "create", "delete"]
+
+---
+kind: ClusterRoleBinding
+apiVersion: rbac.authorization.k8s.io/v1
+metadata:
+  name: michelle-storage-admin
+subjects:
+- kind: User
+  name: michelle
+  apiGroup: rbac.authorization.k8s.io
+roleRef:
+  kind: ClusterRole
+  name: storage-admin
+  apiGroup: rbac.authorization.k8s.io
+
+=>kubectl apply -f clusterRoleBinding.yaml 
+OR
 =>kubectl api-resources
 
 =>kubectl create clusterrole storage-admin --resource=persistentvolumes,storageclasses --verb=list,create,get,watch
@@ -3309,11 +3491,16 @@ and More..........
 Authencate a user.
 
 2)Which admission controller is not enabled by default?
+Check enable-admission-plugins in kube-apiserver help options
+NamespaceAutoProvision
+
 =>kubectl get pods -n kube-system
 =>kubectl exec -it kube-apiserver-controlplane -n kube-system -- kube-apiserver -h | grep 'enable-admission-plugins'
 
 
 3)Which admission controller is enabled in this cluster which is normally disabled?
+Check enable-admission-plugins in /etc/kubernetes/manifests/kube-apiserver.yaml
+
 =>vi /etc/kubernetes/manifests/kube-apiserver.yaml
 =>grep enable-admission-plugin /etc/kubernetes/manifests/kube-apiserver.yaml
 
@@ -3324,6 +3511,21 @@ Enable the NamespaceAutoProvision admission controller
 Note: Once you update kube-apiserver yaml file, please wait for a few minutes for the kube-apiserver to restart completely.
 
 =>kubectl run nginx --image nginx -n blue
+
+Edit /etc/kubernetes/manifests/kube-apiserver.yaml 
+and add NamespaceAutoProvision admission controller to --enable-admission-plugins list
+
+=>vi /etc/kubernetes/manifests/kube-apiserver.yaml
+Add this:
+    - --enable-admission-plugins=NodeRestriction,NamespaceAutoProvision
+
+Add NamespaceAutoProvision admission controller to --enable-admission-plugins list to /etc/kubernetes/manifests/kube-apiserver.yaml
+It should look like below
+
+    - --enable-admission-plugins=NodeRestriction,NamespaceAutoProvision
+API server will automatically restart and pickup this configuration.
+
+OR
 
 Have to add NamespaceAutoProvision controller to the file like this: 
 - --enable-admission-plugins=NodeRestriction,NamespaceAutoProvision
@@ -3344,6 +3546,8 @@ default, kube-system and kube-public cannot be deleted.
 5)Disable DefaultStorageClass admission controller
 This admission controller observes creation of PersistentVolumeClaim objects that do not request any specific storage class and automatically adds a default storage class to them. This way, users that do not request any special storage class do not need to care about them at all and they will get the default one.
 Note: Once you update kube-apiserver yaml file then please wait few mins for the kube-apiserver to restart completely.
+
+Add DefaultStorageClass to disable-admission-plugins in /etc/kubernetes/manifests/kube-apiserver.yaml
 
 
 =>vi /etc/kubernetes/manifests/kube-apiserver.yaml
