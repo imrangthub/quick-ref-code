@@ -1844,6 +1844,12 @@ With --to-revision=1, it will be rolled back with the first image we used to cre
 
 ##Solution2: Deployment Rolling Updte and Rollback
 --------------------------------------------------
+cat curl-test.sh 
+for i in {1..35}; do
+   kubectl exec --namespace=kube-public curl -- sh -c 'test=`wget -qO- -T 2  http://webapp-service.default.svc.cluster.local:8080/info 2>&1` && echo "$test OK" || echo "Failed"';
+   echo ""
+done
+
 1)What container image is used to deploy the applications?
 
 =>k describe deployment frontend 
@@ -1891,7 +1897,7 @@ StrategyType:       Recreate
 
 ##Solution3: Job and CronJob
 --------------------------------------------------
-throw-dice.yaml
+cat throw-dice.yaml
 apiVersion: v1
 kind: Pod
 metadata:
@@ -1902,31 +1908,40 @@ spec:
      name: throw-dice
   restartPolicy: Never
 
+=>kubectl logs throw-dice-pod
+
 1)Create a Job using this POD definition file or from the imperative command and look at how many attempts does it take to get a '6'.
 Use the specification given on the below.
 
 Job Name: throw-dice-job
 Image Name: kodekloud/throw-dice
 
+=>kubectl create job throw-dice-job --image=kodekloud/throw-dice --dry-run=client -o yaml > throw-dice-job.yaml
+
 apiVersion: batch/v1
 kind: Job
 metadata:
   name: throw-dice-job
 spec:
+  backoffLimit: 15 # This is so the job does not quit before it succeeds.
   template:
     spec:
       containers:
-      - name: throw-dice-job
+      - name: throw-dice
         image: kodekloud/throw-dice
       restartPolicy: Never
-  backoffLimit: 25
 
 =>vi myjob.yaml
 =>kubectl apply -f myjon.yaml
-
 =>kubectl describe job throw-dice-job 
 
 
+
+How many attempts did it take to complete the job?
+=>kubectl describe job throw-dice-job 
+Check this:
+Pods Statuses:    0 Active (0 Ready) / 1 Succeeded / 1 Failed
+togeher both: 2
 
 2)Update the job definition to run as many times as required to get 3 successful 6's.
 Delete existing job and create a new one with the given spec. Monitor and wait for the job to succeed.
@@ -1982,6 +1997,8 @@ spec:
   backoffLimit: 30
   completions: 3
   parallelism: 3
+
+=>k replace --force -f myjob1.yaml 
 
 
 4)Let us now schedule that job to run at 21:30 hours every day.
@@ -2075,18 +2092,25 @@ Two type Network Policy:
 1)How many network policies do you see in the environment?
 =>kubectl get networkpolicy 
 =>kubectl get netpol
+https://prnt.sc/FF-fgT5W8thh
+
 
 2)Which pod is the Network Policy applied on?
 =>kubectl get networkpolicy 
-
 Check pod-selector:
 NAME             POD-SELECTOR   AGE
 payroll-policy   name=payroll   2m34s
 
+Then find this pod
+=>kubectl get po --show-labels | grep name=payroll
+
+
 
 3)What type of traffic is this Network Policy configured to handle?
+=>kubectl describe networkpolicy
 =>kubectl describe netpol payroll-policy
-
+Chck this:
+Policy Types: Ingress
 
 
 4)What is the impact of the rule configured on this Network Policy?
@@ -2140,7 +2164,49 @@ spec:
         - protocol: TCP
           port: 3306
 
+OR
+Solution manifest file for a network policy internal-policy as follows:
+
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: internal-policy
+  namespace: default
+spec:
+  podSelector:
+    matchLabels:
+      name: internal
+  policyTypes:
+  - Egress
+  - Ingress
+  ingress:
+    - {}
+  egress:
+  - to:
+    - podSelector:
+        matchLabels:
+          name: mysql
+    ports:
+    - protocol: TCP
+      port: 3306
+
+  - to:
+    - podSelector:
+        matchLabels:
+          name: payroll
+    ports:
+    - protocol: TCP
+      port: 8080
+
+  - ports:
+    - port: 53
+      protocol: UDP
+    - port: 53
+      protocol: TCP
+
 =>kubectl apply -f mynetpolicy.yaml
+Note: We have also allowed Egress traffic to TCP and UDP port. This has been added to ensure that the internal DNS resolution works from the internal pod.
+Remember: The kube-dns service is exposed on port 53:
 
 
 
@@ -2176,6 +2242,7 @@ Show all resource from all namespace
 
 6)Which namespace is the Ingress Resource deployed in?
 =>kubectl get ingress -A
+=>kubectl get ingress --all-namespaces
 
 
 7)What backend is the /wear path on the Ingress configured with?
@@ -2200,7 +2267,8 @@ Backend Service: video-service
 Backend Service Port: 8080
 
 =>kubectl edit ingress ingress-wear-watch -n app-space
-Edit the path
+Edit the path:         path: /stream
+
 Check:
 spec:
   rules:
@@ -2260,6 +2328,33 @@ Path: /pay
 Configure correct backend service
 Configure correct backend port
 
+Create a new Ingress for the new pay application in the critical-space namespace.
+Use the command kubectl get svc -n critical-space to know the service and port details.
+
+Solution manifest file to create a new ingress service to make the application available at /pay as follows:
+
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: test-ingress
+  namespace: critical-space
+  annotations:
+    nginx.ingress.kubernetes.io/rewrite-target: /
+    nginx.ingress.kubernetes.io/ssl-redirect: "false"
+spec:
+  rules:
+  - http:
+      paths:
+      - path: /pay
+        pathType: Prefix
+        backend:
+          service:
+           name: pay-service
+           port:
+            number: 8282
+
+OR
 =>kubectl get svc -n critical-space
 Check this servie name and port:
 pay-service   ClusterIP   10.97.197.16   <none>        8282/TCP   6m8s
@@ -2345,6 +2440,34 @@ Configure correct backend service for /watch
 Configure correct backend port for /wear service
 Configure correct backend port for /watch service
 
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: ingress-wear-watch
+  namespace: app-space
+  annotations:
+    nginx.ingress.kubernetes.io/rewrite-target: /
+    nginx.ingress.kubernetes.io/ssl-redirect: "false"
+spec:
+  rules:
+  - http:
+      paths:
+      - path: /wear
+        pathType: Prefix
+        backend:
+          service:
+           name: wear-service
+           port: 
+            number: 8080
+      - path: /watch
+        pathType: Prefix
+        backend:
+          service:
+           name: video-service
+           port:
+            number: 8080
+
+OR
 
 =>kubectl get deployment -n ingress-nginx
 
