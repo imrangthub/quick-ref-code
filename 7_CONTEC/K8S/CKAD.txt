@@ -2552,6 +2552,31 @@ Image Name: kodekloud/event-simulator
 Volume HostPath: /var/log/webapp
 Volume Mount: /log
 
+=>kubectl get po webapp -o yaml > webapp.yaml
+
+apiVersion: v1
+kind: Pod
+metadata:
+  name: webapp
+spec:
+  containers:
+  - name: event-simulator
+    image: kodekloud/event-simulator
+    env:
+    - name: LOG_HANDLERS
+      value: file
+    volumeMounts:
+    - mountPath: /log
+      name: log-volume
+
+  volumes:
+  - name: log-volume
+    hostPath:
+      # directory location on host
+      path: /var/log/webapp
+      # this field is optional
+      type: Directory
+OR
 apiVersion: v1
 kind: Pod
 metadata:
@@ -2625,6 +2650,7 @@ spec:
 
 
 5)Why is the claim not bound to the available Persistent Volume?
+=>kubectl get pv,pvc
 Because those both has access Modes Mismatch.
 
 6)Update the Access Mode on the claim to bind it to the PV.
@@ -2658,9 +2684,27 @@ Image Name: kodekloud/event-simulator
 Volume: PersistentVolumeClaim=claim-log-1
 Volume Mount: /log
 
-
 =>ls /pv/log
 
+apiVersion: v1
+kind: Pod
+metadata:
+  name: webapp
+spec:
+  containers:
+  - name: event-simulator
+    image: kodekloud/event-simulator
+    env:
+    - name: LOG_HANDLERS
+      value: file
+    volumeMounts:
+    - mountPath: /log
+      name: log-volume
+  volumes:
+  - name: log-volume
+    persistentVolumeClaim:
+      claimName: claim-log-1
+OR
 apiVersion: v1
 kind: Pod
 metadata:
@@ -2706,6 +2750,8 @@ Now STATUS will be Terminating
 
 11)Why is the PVC stuck in Terminating state?
 The PVC being use by the pod of webapp.
+The PVC was still being used by the webapp pod when we issued the delete command. Until the pod is deleted, the PVC will remain in a terminating state.
+
 
 
 
@@ -2716,6 +2762,7 @@ The PVC being use by the pod of webapp.
 
 ##Solution2: Storage Class
 --------------------------------------------------
+=>kubectl get sc
 =>kubectl get storageclass
 
 
@@ -2725,16 +2772,30 @@ local-storage
 The "local-storage" Storage Class in Kubernetes does not support dynamic volume provisioning. It is used to represent local storage devices attached to the nodes in the cluster. With this Storage Class, you need to manually manage the provisioning and allocation of local storage volumes.
 
 
+What is the Volume Binding Mode used for this storage class (the one identified in the previous question)?
+=>kubectl describe sc local-storage
+=>kubectl get sc
+
 2)Let's fix that. Create a new PersistentVolumeClaim by the name of local-pvc that should bind to the volume local-pv.
-
-
 Inspect the pv local-pv for the specs.
 PVC: local-pvc
 Correct Access Mode?
 Correct StorageClass Used?
 PVC requests volume size = 500Mi?
 
-
+Inspect the persistent volume and look for the Access Mode, Storage and StorageClassName used. Use this information to create the PVC.
+kind: PersistentVolumeClaim
+apiVersion: v1
+metadata:
+  name: local-pvc
+spec:
+  accessModes:
+  - ReadWriteOnce
+  storageClassName: local-storage
+  resources:
+    requests:
+      storage: 500Mi
+OR
 apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
@@ -2751,11 +2812,28 @@ spec:
       volume: local-pv
 
 The Storage Class called local-storage makes use of VolumeBindingMode set to WaitForFirstConsumer. This will delay the binding and provisioning of a PersistentVolume until a Pod using the PersistentVolumeClaim is created.
-
+Run the command: kubectl describe pvc local-pvc and look under the Events section.
 
 
 3)Create a new pod called nginx with the image nginx:alpine. The Pod should make use of the PVC local-pvc and mount the volume at the path /var/www/html.
-
+apiVersion: v1
+kind: Pod
+metadata:
+  name: nginx
+  labels:
+    name: nginx
+spec:
+  containers:
+  - name: nginx
+    image: nginx:alpine
+    volumeMounts:
+      - name: local-persistent-storage
+        mountPath: /var/www/html
+  volumes:
+    - name: local-persistent-storage
+      persistentVolumeClaim:
+        claimName: local-pvc
+OR
 apiVersion: v1
 kind: Pod
 metadata:
