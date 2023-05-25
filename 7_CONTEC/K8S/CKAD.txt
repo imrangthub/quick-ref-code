@@ -3583,6 +3583,8 @@ We have already created below cert and key for webhook server which should be us
 Certificate : /root/keys/webhook-server-tls.crt
 Key : /root/keys/webhook-server-tls.key
 
+Create tls secret type in kubernetes with --cert and --key options
+
 =>kubectl -n webhook-demo create secret tls webhook-server-tls \
 --cert "/root/keys/webhook-server-tls.crt" \
 --key "/root/keys/webhook-server-tls.key"
@@ -3591,14 +3593,67 @@ Key : /root/keys/webhook-server-tls.key
 4)
 Now create a deployment.
 =>k apply -f webhook-deployment.yaml 
+cat webhook-deployment.yaml 
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: webhook-server
+  namespace: webhook-demo
+  labels:
+    app: webhook-server
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: webhook-server
+  template:
+    metadata:
+      labels:
+        app: webhook-server
+    spec:
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 1234
+      containers:
+      - name: server
+        image: stackrox/admission-controller-webhook-demo:latest
+        imagePullPolicy: Always
+        ports:
+        - containerPort: 8443
+          name: webhook-api
+        volumeMounts:
+        - name: webhook-tls-certs
+          mountPath: /run/secrets/tls
+          readOnly: true
+      volumes:
+      - name: webhook-tls-certs
+        secret:
+          secretName: webhook-server-tls
+
 
 Create webhook service now so that admission controller can communicate with webhook.
 We have already added sample service definition under /root/webhook-service.yaml so just create service with that definition.
 =>k apply -f webhook-service.yaml 
 
+cat /root/webhook-service.yaml 
+apiVersion: v1
+kind: Service
+metadata:
+  name: webhook-server
+  namespace: webhook-demo
+spec:
+  selector:
+    app: webhook-server
+  ports:
+    - port: 443
+      targetPort: webhook-api
+
+
 
 We have added MutatingWebhookConfiguration under /root/webhook-configuration.yaml.
 If we apply this configuration which resource and actions it will affect?
+
+Check operations and resources under rules in /root/webhook-configuration.yaml
 Pod with create operation.
 
 Create webhookConfiguration:
@@ -3608,6 +3663,29 @@ In previous steps we have deployed demo webhook which does below
 - Denies all request for pod to run as root in container if no securityContext is provided.
 - If no value is set for runAsNonRoot, a default of true is applied, and the user ID defaults to 1234
 - Allow to run containers as root if runAsNonRoot set explicitly to false in the securityContext
+
+
+Deploy a pod with no securityContext specified.
+We have added pod definition file under /root/pod-with-defaults.yaml
+
+=>kubectl apply -f /root/pod-with-defaults.yaml
+cat /root/pod-with-defaults.yaml
+# A pod with no securityContext specified.
+# Without the webhook, it would run as user root (0). The webhook mutates it
+# to run as the non-root user with uid 1234.
+apiVersion: v1
+kind: Pod
+metadata:
+  name: pod-with-defaults
+  labels:
+    app: pod-with-defaults
+spec:
+  restartPolicy: OnFailure
+  containers:
+    - name: busybox
+      image: busybox
+      command: ["sh", "-c", "echo I am running as user $(id -u)"]
+
 
 
 5)What are runAsNonRoot and runAsUser values for previously created pods securityContext?
@@ -3623,9 +3701,18 @@ Check Security Context section:
 
 
 
+
+
+
 6)Deploy pod with a securityContext explicitly allowing it to run as root
 We have added pod definition file under /root/pod-with-override.yaml
 Validate securityContext after you deploy this pod
+
+Run below command
+
+=>kubectl apply -f /root/pod-with-override.yaml
+then Validate securityContext with
+=>kubectl get po pod-with-override -o yaml | grep -A2 " securityContext:"
 
 =>cat pod-with-override.yaml
 apiVersion: v1
@@ -3649,6 +3736,12 @@ spec:
 7)Deploy a pod with a conflicting securityContext i.e. pod running with a user id of 0 (root)
 We have added pod definition file under /root/pod-with-conflict.yaml
 Mutating webhook should reject the request as its asking to run as root user without setting runAsNonRoot: false
+
+Run below command
+
+=>kubectl apply -f /root/pod-with-conflict.yaml
+You should get error like below
+Error from server: error when creating "/root/pod-with-conflict.yaml": admission webhook "webhook-server.webhook-demo.svc" denied the request: runAsNonRoot specified, but runAsUser set to 0 (the root user)
 
 =>cat pod-with-conflict.yaml 
 # A pod with a conflicting securityContext setting: it has to run as a non-root
@@ -3694,6 +3787,10 @@ Kubernetes API version - 1.22.2
 2, the last one
 
 3)Identify which API group a resource called job is part of?
+
+Run the command kubectl explain job and see the API Version in the top of the line.
+At first will be the API group and second will be the version : <group>/<version>
+
 =>kubectl explain job
 Check
 KIND:     Job
@@ -3702,6 +3799,8 @@ VERSION:  batch/v1
 
 4)What is the preferred version for authorization.k8s.io api group?
 
+It supports v1 and v1beta1 but the preferred version is v1.
+
 =>kubectl proxy 8001&
 curl localhost:8081/apis/authorization.k8s.io
 
@@ -3709,6 +3808,35 @@ curl localhost:8081/apis/authorization.k8s.io
 5)Enable the v1alpha1 version for rbac.authorization.k8s.io API group on the controlplane node.
 Note: If you made a mistake in the config file could result in the API server being unavailable and can break the cluster.
 
+Add the --runtime-config=rbac.authorization.k8s.io/v1alpha1 option to the kube-apiserver.yaml file.
+
+As a good practice, take a backup of that apiserver manifest file before going to make any changes.
+
+In case, if anything happens due to misconfiguration you can replace it with the backup file.
+
+root@controlplane:~# cp -v /etc/kubernetes/manifests/kube-apiserver.yaml /root/kube-apiserver.yaml.backup
+Now, open up the kube-apiserver manifest file in the editor of your choice. It could be vim or nano.
+
+root@controlplane:~# vi /etc/kubernetes/manifests/kube-apiserver.yaml
+Add the --runtime-config flag in the command field as follows :-
+
+ - command:
+    - kube-apiserver
+    - --advertise-address=10.18.17.8
+    - --allow-privileged=true
+    - --authorization-mode=Node,RBAC
+    - --client-ca-file=/etc/kubernetes/pki/ca.crt
+    - --enable-admission-plugins=NodeRestriction
+    - --enable-bootstrap-token-auth=true
+    - --runtime-config=rbac.authorization.k8s.io/v1alpha1 --> This one 
+After that kubelet will detect the new changes and will recreate the apiserver pod.
+
+It may take some time.
+
+root@controlplane:~# kubectl get po -n kube-system
+Check the status of the apiserver pod. It should be in running condition.
+
+OR
 =>cp /etc/kubernetes/manifests/kube-apiserver.yaml /root/kube-apiserver.yaml.backup
 Add this line:
 - --runtime-config=rbac.authorization.k8.io/v1alpha1
@@ -3716,6 +3844,34 @@ Add this line:
 6)Install the kubectl convert plugin on the controlplane node.
 If unsure how to install then refer to the official k8s documentation page which is available at the top right panel.
 
+Download the latest release version from the curl command :-
+
+root@controlplane:~# curl -LO https://dl.k8s.io/release/$(curl -L -s https://dl.k8s.io/release/stable.txt)/bin/linux/amd64/kubectl-convert
+  % Total    % Received % Xferd  Average Speed   Time    Time     Time  Current
+                                 Dload  Upload   Total   Spent    Left  Speed
+100   154  100   154    0     0   6416      0 --:--:-- --:--:-- --:--:--  6416
+100 60.7M  100 60.7M    0     0   142M      0 --:--:-- --:--:-- --:--:--  142M
+then check the availability by ls command :-
+
+root@controlplane:~# pwd
+/root
+root@controlplane:~# ls
+kubectl-convert  multi-pod.yaml  sample.yaml
+Change the permission of the file and move to the /usr/local/bin/ directory.
+
+root@controlplane:~# pwd
+/root
+root@controlplane:~# chmod +x kubectl-convert 
+root@controlplane:~# 
+root@controlplane:~# mv kubectl-convert /usr/local/bin/kubectl-convert
+root@controlplane:~# 
+Use the --help option to see more option.
+
+root@controlplane:~# kubectl-convert --help
+If it'll show more options that means it's configured correctly if it'll give an error that means we haven't set up properly.
+
+
+OR
 =>curl -LO "https://dl.k8s.io/$(curl -L -s https://dl.k8s.io/release/stable.txt)/bin/linux/amd64/kubectl-convert.sha256"
 
 =>chmod +x kubectl-convert
@@ -3727,6 +3883,23 @@ If unsure how to install then refer to the official k8s documentation page which
 7)Ingress manifest file is already given under the /root/ directory called ingress-old.yaml.
 With help of the kubectl convert command, change the deprecated API version to the networking.k8s.io/v1 and create the resource.
 
+Run the command: kubectl-convert -f ingress-old.yaml --output-version networking.k8s.io/v1 | kubectl apply -f -
+
+
+Run the command kubectl-convert to change the deprecated API version as follows :-
+root@controlplane:~# kubectl-convert -f ingress-old.yaml --output-version networking.k8s.io/v1
+
+# store new changes into a file 
+root@controlplane:~# kubectl-convert -f ingress-old.yaml --output-version networking.k8s.io/v1 > ingress-new.yaml
+After changing the API version and storing into a file, use the kubectl create -f command to deploy the resource :-
+
+root@controlplane:~# kubectl create -f ingress-new.yaml
+Inspect the apiVersion as follows :-
+
+root@controlplane:~# kubectl get ing ingress-space -oyaml | grep apiVersion
+Note: Maybe you will not see the service and other resources mentioned in the ingress YAML on the controlplane node because we have to only deploy the ingress resource with the latest API version.
+
+OR
 =>cat ingress-old.yaml
 =>kubectl-convert -f ingress-old.yaml --output-version networking.k8s.io/v1
 =>kubectl-convert -f ingress-old.yaml --output-version networking.k8s.io/v1>newintrss.yaml
@@ -3738,7 +3911,7 @@ With help of the kubectl convert command, change the deprecated API version to t
 
 
 
-##157. Custom Resource Definition
+##157. Practice Test  | Custom Resource Definition
 --------------------------------------------------
 Not so much possible to come in exam to create a custome resource, but it is possible. and better to know
 
@@ -3753,9 +3926,11 @@ It is an extension of the Kubernetes API that is not necessarily available in a 
 1)CRD Object can be either namespaced or cluster scoped.
 Is this statement true or false?
 
-ans:
+ans: True
 A CRD can be either namespaced or cluster-scoped. When you create a CRD, you can specify its scope in the spec.scope field of the CRD manifest.
 
+What is a custom resource?
+It is an extension of the Kubernetes API that is not necessarily available in a default Kubernetes installation.
 
 
 2)We have provided an incomplete CRDs manifest file called crd.yaml under the /root directory. Let’s complete it and create a custom resource definition from it.
@@ -3808,10 +3983,14 @@ after correcting and creating CRD.
 3)What are the properties given to the CRD’s called collectors.monitoring.controller?
 =>kubectl describe crd collectors.monitoring.controller
 
+Run the commad: kubectl describe crd collectors.monitoring.controller and inspect the given CRD.
+
+
 
 4)Create a custom resource called datacenter and the apiVersion should be traffic.controller/v1.
 Set the dataField length to 2 and access permission should be true.
 To create a custom resource called datacenter :-
+
 
 apiVersion: traffic.controller/v1
 kind: Global
@@ -3824,6 +4003,8 @@ spec:
 
 
 5)What is the short name given to the CRD globals.traffic.controller ?
+Inspect the CRD globals.traffic.controller and identify the short names.
+gb
 =>kubectl describe crd globals.traffic.controller
 
 
@@ -3839,10 +4020,12 @@ spec:
 --------------------------------------------------
 
 1)A deployment has been created in the default namespace. What is the deployment strategy used for this deployment?
+Run: kubectl describe deployments.apps frontend and inspect the StrategyType
 =>kubectl describe deployment frontend
 
 2)The deployment called frontend app is exposed on the NodePort via a service.
 Identify the name of this service.
+Inspect the services created in the default namespace.
 
 =>kubectl describe deployment frontend
 =>k get svc
@@ -3853,18 +4036,30 @@ Identify the name of this service.
 Configure the deployment in such a way that the service called frontend-service routes less than 20% of traffic to the new deployment.
 Do not increase the replicas of the frontend deployment.
 
+
+The frontend-v2 deployment currently has 2 replicas. The frontend service now routes traffic to 7 pods in total ( 5 replicas on the frontend deployment and 2 replicas from frontend-v2 deployment).
+Since the service distributes traffic to all pods equally, in this case, approximately 29% of the traffic will go to frontend-v2 deployment.
+To reduce this below 20%, scale down the pods on the v2 version to the minimum possible replicas = 1.
+Run: kubectl scale deployment --replicas=1 frontend-v2
+Once this is done, only ~17% of traffic should go to the v2 version.
+
+
 =>kubectl get deployment
 =>kubectl describe service frontend-service
 =>kubectl describe deployment frontend-v2
 
 =>kubectl scale deployment --replicas=1 frontend-v2
 
+We have now established that the new version v2 of the application is working as expected.
+We can now safely redirect all users to the v2 version.
+
+
 4)Scale down the v1 version of the apps to 0 replicas and scale up the new(v2) version to 5 replicas.
 =>kubectl scale deployment --replicas=5 frontend-v2
 =>kubectl scale deployment --replicas=0 frontend
 
 =>kubectl delete deployment frontend
-
+You can now reload the Webapp tab to validate that all user traffic now uses the v2 version of the app.
 
 
 
