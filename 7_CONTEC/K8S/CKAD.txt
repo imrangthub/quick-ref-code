@@ -1646,14 +1646,34 @@ Add this serviceAccount in pod space
 
 ##Taints and Tolerations
 -------------------------------------------------
+=>kubectl taint nodes nodeName key=value:taint-effect
+Three type of taint-effect:
+ - NoSchedule               | No pod will- be deploy
+ - PreferNoSchedule         | Try to nod pod deploy
+ - NoExecute                | No New pod will be deploy, existing pod will evect if not can tolarent
+
+
 Tain = Node
 Toleration = Pod
 
 =>kubectl describe node controlplane | grep Taints
 
 
+=>kuhectl taint nodes node1 app=blue:NoSchedule
+apiVersion: v1
+kind: Pod
+metadata:
+  name: mypod
+spec:
+  containers:
+    - name: my-ngcontainer
+      image: nginx
 
-
+    tolerations:
+      - key: "app"
+        operator: "Equal"
+        value: "blue"
+        effect: "NoSchedule"
 
 
 
@@ -1728,8 +1748,16 @@ Remove it:
 
 
 
+
+
+
 ##Node Selectors| Affinity
 -------------------------------------------------
+To deploy specific pod to specific Node we cand user Node Selector:
+Lavel the node and add this to pod as Node selector
+
+NodeAffinity user for complex node select operation:
+
 =>kubectl label nodes node01 size=learge
 Labeling a node
 
@@ -1748,6 +1776,41 @@ spec:
     size: Large
 
 =>kuebctl apply -f newpod.yaml
+
+
+Node selectro has limitation, we cand user only single level and secelator.
+If a complex requirment not deon this way, Here we have to user:
+nodeSelector and Node Affinity together
+
+affinity:
+  nodeAffinity:
+    requiredDuringSchedulingIgnoredDuringExecution:
+      nodeSelectorTerms:
+      - matchExpressions:
+        - key: color
+          operator: In
+          values:
+          - blue
+          - small
+
+Two tyep of affinity now available:
+
+requiredDuringSchedulingIgnoredDuringExecution:
+preferredDuringSchedulingIgnoredDuringExecution:
+
+Planned:
+requiredDuringSchedulingRequiredDuringExecution:
+If any lavel is remove after schedule, in this case pod willbe remove
+
+
+Taints and Tolerations vs Node Affinity
+-------------------------------------------------
+Taints and Tolerations usually select the right node for the pod but pod can be   schedule other node.
+And With
+Node Affinity can schedule to right node but other pod may schedule on the same node
+ For Slove this provlem, user taints and Tolerant and Node Affinityh both together.
+
+
 
 
 
