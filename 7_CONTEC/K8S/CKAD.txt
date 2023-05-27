@@ -85,8 +85,9 @@ https://kodekloud.com/lessons/recap-core-concepts/
 ##CoreConcept         
 ================================================= 
 
-When instal kubernetes, install this component:
 
+When instal kubernetes, install this component:
+-------------------------------------------------
 - API Server
   API Server act as a frontend of kubernetes, user, devece, terminal interface etc.
 
@@ -108,6 +109,7 @@ When instal kubernetes, install this component:
 
 
 Two type Node: 
+-------------------------------------------------
 - Master
        It has install kube-apiserver and its make it master node.
        Master also containe: etcd, controller, scheduler etc.
@@ -123,8 +125,68 @@ kubectl:
         =>kubectl run hellow-world-app
         =>kubectl cluster-info
         =>kubectl get nodes
-Pod 
+
+
+Docker vs ContainerD 
 -------------------------------------------------
+Kubernetes->Docker was titly couple at first time, then kubernetes get popularity
+and Other vendor want to join like rkt etc. 
+This time kubernetes make an interface for CRI(Container runtime Interface) and now 
+every vendor can join if it mentain OCI(Open Container Initiative=imagespace,runtimespace).
+
+Docker was before OCI this why it not flow the OCI, to help this use a tool called dockershim with kubernetes.
+
+Docker component (CLI,api, volumes,auth,security,build) working with containerD
+and ContainerD support OCI so, from kubernetes v1.24 remove dockershim, only working with containerD.
+
+ContainerD - CLI = ctr 
+ctr come with containerD not friendly only support limited feature for debuging purpose.
+Like:
+=>ctr image pull docker.io/library/redis
+=>ctr run docker.io/library/redis redis
+
+A alternetis of ctr is nerdctl, its provide docker like cli for containerD.
+Its support newest feature in containerD, lazy pulling, dokcer composer, namespace in kubernetes etc.
+
+NERDCTL command like docker:
+=>nerdctl run --name redis redis
+=>nerdctl run --name mywebserver -p8181:80 -d nginx
+
+CLI - CRICTL
+crictl provides a CLI for CRI compatable container runtime, install separately.
+User to inspect, debug container runtimes work accross dirrerent runtime and mantaine develop by kubernetes.
+
+kubernetes->CRI->crictl->| rkt, containerD etc.
+=>crictl pull nginx
+=>crictl images
+=>crictl ps -a
+=>crictl logs 567890987654456789
+=>crictl pod
+
+
+
+
+
+##POD
+-------------------------------------------------
+Kubernetes use yaml defination file as inpur to kubernetes.
+
+All defination file flow same strecture, all file 4 top/root lavel field, this field are required.
+
+apiVersion: v1               | Object version
+kind: Pod                    | Object type       
+metadata:                    | Data about the object
+spac:   
+
+
+apiVersion: v1               | Object version
+kind: Pod                    | Object type       
+metadata:                    | Data about the object
+  name: my-pod
+  labels:
+    app: myapp
+    type: back-end
+spac:                        | Object spacefication secrion, provide aditional iinfo about object.
 
 
 
@@ -187,6 +249,9 @@ For edit other file generate another yaml file from current pod status and updat
 
 ##ReplicaSet
 -------------------------------------------------
+Replica controller and ReplicaSet are same purpose, controller is older and ReplicaSet are newar.
+
+
 Simple ReplicaSet:
 apiVersion:apps/v1
 kind: ReplicaSet
@@ -210,6 +275,15 @@ spec:
 For finding any issu in defination yaml file, first run the yaml
 =>kubectl create -f myreplicaset.yaml
 And now check the error message
+
+
+BasicCommand:
+=>kubectl create -f rsfilw.yaml
+=>kubectl get rs
+=>kubectl delete rs myrsx
+=>kubectl replace -f myrs.yaml
+=>kubectl scale -replicas=5 -f myrsfile.yaml
+
 
 
 
@@ -292,6 +366,17 @@ spec:
 
 ##Deployment
 -------------------------------------------------
+Deployment defination file as ReplicaSet just kind willbe Deployment
+
+=>kubectl create -f mydeploy.yaml
+Its create three Object:
+
+=>k get deploy
+=>k get rs
+=>k get pods
+OR
+=>k get all
+
 apiVersion: apps/v1
 kind: Deployment
 metadata:
@@ -356,6 +441,18 @@ Image: httpd:2.4-alpine
 
 ##NameSpace
 -------------------------------------------------
+Call one service to other service in different namespace:
+app-service call db-service in DEV namespace:
+
+app-service.connect("db-service.dev.svc.cluster.local")
+      
+         db-service     .dev        .svc       .cluster.local
+Here:    serviceName    Namespace   Service    Domain                  
+
+Switch Namespace:
+=>kubectl config set-context $(kubectl config current-contest) --namespace=dev
+=>kubectl get pods --all-namespace
+
 =>kubectl get all
 
 =>kubectl get namespace
@@ -372,7 +469,20 @@ Show all pod with namespace
 =>kubectl get svc -n=marketing
 Show service of a specific namespace
 
-
+We can set Resource Quota for specifice namespace.
+like:
+apiVersion: v1
+kind: ResourceQuota
+metadata: 
+  name: compute-quota
+  namespace: dev
+spac:
+  hard:
+    prods: "10"
+    request.cpu: "4"
+    request.memory: "5Gi"
+    limits.cpu: "10"
+    limits.memory: "10Gi"
 
 ##Solution:04 NameSpace
 -------------------------------------------------
