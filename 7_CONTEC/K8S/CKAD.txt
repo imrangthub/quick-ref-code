@@ -1939,9 +1939,12 @@ status: {}
 --------------------------------------------------
 
 Design Pattern of MultiContainer Pod:
-   - Sidecar Pattern
-   - Adapter Pattern
-   - Ambassador Pattern
+   - Sidecar Pattern                   | a log container with a webserver to send log to a central logging system.
+   - Adapter Pattern                   | Before sending the log file to system convart to log a common pattern for this a container.
+   - Ambassador Pattern                | To connect multple db server a Proxy localhost db container.
+
+
+
 
 
 
@@ -2105,8 +2108,67 @@ Read more about initContainers here. And try out the upcoming practice test.
 https://kubernetes.io/docs/concepts/workloads/pods/init-containers/
 
 
+
+
+
+
+##Section4: Observability
+==================================================
+Pod lifecycle:
+
+- Pending state 
+  When a pod is start it is on pending state, scheduler find the ringht -node for it, if not find keep it pending sate.
+  If a pod pending state run describe command, its tell you why.
+  =>kubectl describe pod my-pod
+- ContainerCreating
+  When a pod schedule its on Container creating state, pull the image and run all the container of the pod in side node.
+- Running state
+  When all container is ready it is gor for running state.
+
+This three stat show on STATUS colume.
+ 
+
+
+Pod Conditions:
+- PodScheduled    = True/false
+- Initialized     = True/false
+- ContainerReady  = True/false
+- Ready           = True/fasle
+
+Run describe command and check conditaiton section.
+=>kubectl describe pod my-pod
+
+
+A pod is show Ready state but internal application may take more time to 
+recieving user request, for this create a custome condation for set when a pod actually ready.
+Add this rediness probe under containers: section
+
+readinessProbe:
+  httpGet:
+    path: /ready
+    port:8080
+
+
+Its cna be: httpGet:, tcpSocket:, exec: connand   
+With readinessProbe you can add different funcationality:
+
+initialDelaySeconds: 
+periodSeconds:
+failureThreshold:  etc.
+
+
 ##Readiness and Liveness Probes
 --------------------------------------------------
+If a container inside a pod crush or exitsted, kubernetes try to restart the container ageing, and continue to do it.
+
+Liveness Probes: 
+  Its a machinesume to check/monitor the pod is healthy or running, You cand define it checking with call a http-api, tch or cmd.
+
+livenessProbe:
+  httpGet:
+    path: /ready
+    port:8080
+
 
 cat curl-test.sh 
 for i in {1..20}; do
@@ -2291,6 +2353,11 @@ spec:
 
 ##Container Logging and Monitor
 --------------------------------------------------
+When multiple container running in a pod, for showing container logs you have to mentation container name with log command.
+=>kubectl logs podName  -c containerName
+
+
+
 
 
 ##Solution: Container Logging and Monitor
@@ -2417,6 +2484,9 @@ Once fixed, wait for the application to run before checking solution.
 =>kubectl describe pod orange
 Proble show in pod config properties like connadn, args image name typho etc.
 =>kubectl get pod orange -o yaml > /root/orange.yaml
+
+
+
 
 
 
