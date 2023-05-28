@@ -2497,7 +2497,22 @@ Proble show in pod config properties like connadn, args image name typho etc.
 
 ##Labels, Selectors and Annotations
 --------------------------------------------------
+In kubernetes we add level on kubernetes object, for select then diffenere option. add level on pod:
+apiVersion: v1
+kind: Pod
+metadata:
+  name: throw-dice-pod
+  labels:
+    evn: prod
+    app: back-end
+spec:
+  containers: 
+  -  image: kodekloud/throw-dice
+     name: throw-dice
+  restartPolicy: Never
 
+Now to get this level pod:
+=>kubectl get pods --selector env=prod
 
 
 ##Solution1: Labels, Selectors and Annotations
@@ -2535,6 +2550,7 @@ OR
 
 ##Deployment Rolling Updte and Rollback
 --------------------------------------------------
+kubectl create for creating object, kubectl apply for update object.
 
 =>kubectl create -f mydeployment.yaml --record
 =>kubectl rollout status deployment/mydeployment
@@ -2631,8 +2647,10 @@ StrategyType:       Recreate
 
 
 
+
 ##Job and CronJob
 --------------------------------------------------
+Job start imidetly whenre we can set schedule on CronJob.
 
 
 
