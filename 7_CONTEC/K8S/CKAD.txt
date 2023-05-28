@@ -2788,15 +2788,67 @@ spec:
 
 ##Section 7: Services & Networking
 ==================================================
+Kubernetes Services enable communication group of application with another user or objects.
+Services make losscoupling with microservice.
+
+Services just a object, its listaning port on Node and make communicate with a port of pod.
+A service is a virtual server in sede a node, its has a IP.
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: webapp-service
+  namespace: default
+spec:
+  type: NodePort
+  ports:
+  - nodePort: 30080               | Node port
+    port: 8080                    | Service port
+    targetPort: 80                | application port
+  selector:                       | Identify the pods
+    name: simple-webapp
+
+
+
+Three type of Series:
+ - NodePort
+   Make access the app with external, To map a Node port and a pod port.
+
+ - ClusterIP
+   Service has ip and port.
+ - LoadBalancer
+
+
+Services can spand multiple node with same port.
+To access that user node ip and the same port any node.
+
+
+
 
 
 ##Services - ClusterIP
 --------------------------------------------------
+This is the defafult service type of kubernetes.
+ClusterIP service make layer or group of application communication easy wdfith a self IP call clusterIP.
+
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: webapp-service
+  namespace: default
+spec:
+  type: ClusterIP
+  ports:
+    port: 8080                    | Service port
+    targetPort: 80                | application port
+  selector:                       | Identify the pods
+    name: simple-webapp
 
 
 
 ##Solution1: Services - ClusterIP
---------------------------------------------------
+--------------------------------------------------z
 
 1)What is the targetPort configured on the kubernetes service?
 =>kubectl describe svc kubernetes 
@@ -2840,11 +2892,21 @@ spec:
 
 
 
-##Network Policies
+##Network Policies | Network Security
 --------------------------------------------------
+Kubernetes make all Allow for all pod can make communication each other in a Clusster.
+
 Two type Network Policy:
- - Ingress
- - Egress
+ - Ingress           | In comming request from the user.
+ - Egress            | Outgoing request from app server.
+
+
+Network Policy also a Object in kubernetes, link one or more pod and set rule/policy to enable communication.
+
+
+
+
+
 
 ##Solution2: Network Policies
 --------------------------------------------------
