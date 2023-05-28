@@ -3318,6 +3318,45 @@ Add this under metadata:
 ##Section 8: State Persistence
 ==================================================
 
+
+Volume in Docker
+--------------------------------------------------
+Generally Docker dont save data any host path or volume.
+Docker Staorage:
+- Storage Drivers
+- Volume Drivers
+
+Docker stoarage in local machine file system in: /var/lib/docker
+Docker manage Image and Container in Layer model, When we Create a container from a Image
+It crete a container (R/W) layer top on Image. Image is readonly and Container layer copy all file in 
+Contaner layer what is Read/Write layer.
+
+
+Docker has Two type mounting:
+- Volume Mounting | data seve on var/lib/docker/volumes directory
+- Bind Mounting   | In this case container mount its data in host absulate path
+
+Docker has different staorage driver:
+ - AUFS
+ - ZFS
+ - BTRFS
+ - DEVECE MAPPER
+ - OVERLAY
+
+  
+
+Volume in Kubernetes
+--------------------------------------------------
+Generally Kubernetes dont save data any host path or volume.
+In Kubernetes we have to create volumem in host or other or Storage provide like AWS location to keep data
+and Mounting it on Pod
+
+For this in Multi Node cluster with multiple pod it make huge task, to reduce this operation consists
+Prestent volume come in to picture.
+
+
+
+
 Using PVCs in Pods:
 
 apiVersion: v1
@@ -3352,12 +3391,39 @@ To mount and existing Fiber channel volume into a Pod
 
 
 
-##Persistent Volumes
+##Persistent Volumes | Persistent Volumes Claims
 --------------------------------------------------
+In Kubernetes for centrally mange pod data and volume user combinagion of:
+- Presistent Volume and 
+- PersistentVolumeClaim
+
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: pv-log
+spec:
+  capacity:
+    storage: 100Mi
+  volumeMode: Filesystem
+  accessModes:
+    - ReadWriteMany
+  persistentVolumeReclaimPolicy: Retain
+  hostPath:
+    path: /pv/log
+
+Its has Three Access Mode:
+ - ReadWriteMany
+ - ReadWriteOnce
+ - ReadOnlyMany
 
 
+ Persistent Volumes and Persistent Volumes Claims are two dirrerent Object in kunbernetes.
+ Usually admin create PV and User user to PVC
 
-##Solution1: Persistent Volumes
+ Every PVC bind with a single PV(One -to -One)
+
+
+##Solution1: Persistent Volumes | Persistent Volumes Claims
 --------------------------------------------------
 
 1)The application stores logs at location /log/app.log. View the logs.
@@ -3578,6 +3644,21 @@ The PVC was still being used by the webapp pod when we issued the delete command
 
 ##Storage Class
 --------------------------------------------------
+Every pcv bind with pv, so have to create it berore binging, this is call static Provisioning.
+Storage class come to Dynamic Provisioning.
+
+In this case we not have to create any pv(It will create auto by Storage class), 
+we have to create just StorageClass and come it with pvc to pod binging automatically.
+
+
+StatefulSets are like DeploymentSet, dirrerent is its run pod sequential with pod index number.
+
+
+Headless Service:
+
+PersistentVolumeClaimTemplate for create auto vpc.
+
+
 
 
 
