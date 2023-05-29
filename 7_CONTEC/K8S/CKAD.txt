@@ -3791,20 +3791,10 @@ volumeBindingMode: WaitForFirstConsumer
 ##Section 9: Update for Sep 2021
 ==================================================
 
-##Authentication, Authorization and Admission Control
+##Define, Build and Modify Container Image
 --------------------------------------------------
-
-All request go to kube-apiserver for authencation:
-
-kubectl ------------------------------>
-                                          -> kube-apiserver
-crul https://kube-server-ip ---------->
-
-Auth Mechanisms:
- - Static Password File
- - Static Token File
- - certificates
- - Identity Server
+In a Dockerfile every thing in RIGHT CAPS all are INSTRACTION and left are ARGUMENT.
+Docker image are Layers architecture.
 
 
 
@@ -3834,14 +3824,66 @@ And modify Dockerfile to use python:3.6-alpine image and then build using docker
 
 
 
+##Authentication, Authorization and Admission Control
+--------------------------------------------------
+You must have to secure kubernetes cluster host secure.
+
+kube-apiserver one of  is the entry door of kunbernetes cluster, almost all operation can be done by this api server.
+So, this is the second point to make secure. Also make controll of accessing of kube-apiserver its self.
+
+Authentication of kunbe-apiserver by:
+ - Files-Username and Password
+ - Files-Username and Token
+ - certificates
+ - Externaem provider - LDAP
+ - Servcie Account
+
+
+Authorization of kunbe-apiserver by:
+- RBAC Authorization
+- ABAC Authorization
+- Node Authorization
+- Webhook Mode
+
+All Communication between kube-apiserver and other component like kubelet, etcd, controller etc are TLS Encryped.
+
+Authentication
+---------------------------------------------------
+Two type of kubernetes user:
+- User/human
+- Service Account/ Machine
+Kubernetes its not manage account natively, user exterrna machinesume. like LDAP.
+But kubernetes manage ServiceAccount.
+
+
+All request go to kube-apiserver for authencation:
+kubectl ------------------------------>
+                                          -> kube-apiserver
+crul https://kube-server-ip ---------->
+
+Auth Mechanisms:
+ - Static Password File
+ - Static Token File
+ - certificates
+ - Identity Server
+
+
+CERTIFICATE generation not part on CKAD exam.
+
+
+
+
 
 
 ##KubeConfig
 --------------------------------------------------
+Budefault kubectl tools find a file under user home directory, $HOME/.kube/config for authencation.
+This why you dont add any file kubectl command any file.
+
 
 KubeConfig will three section in a single file called Config in .kube folder:
 Section are:
- - Cluster       |  Array of cluster
+ - Cluster       | Array of cluster
  - Contexts      | Array of contents, Cluster and user thogether build context
  - Users         | Array of Users
 
@@ -3913,6 +3955,16 @@ users:
 
 current-context: test-user@development
 preferences: {}
+
+
+current-context: test-user@development
+This is for current contest set, To see default config file this:
+=>kubectl config view
+For custome file view command:
+=>kubectl config view --kubeconfig=my-custome-config
+
+To user Dfirrent config bile bring this in default flder .kube, then to set deferent context user:
+=>kubectl config use-context prod-user@production
 
 
 
@@ -3988,6 +4040,7 @@ Now request no error.
 
 
 
+
 ##API Groups
 --------------------------------------------------
 curl http://localhost:6443 -k
@@ -3995,17 +4048,59 @@ curl http://localhost:6443 -k
 =>kubectl proxy
 =>curl http://localhost:8081- -k
 
+=>curl https://kube-master:6443/version
+=>curl https://kube-master:6334/api/v1/pods
 
- Main Two type of API group:
- - Core Groups
-   - Pod
- - Named Group
-   - /apps
-      - /v1
-          - /deployment
-          - /ReplicaSets
+Kubernetes has different type of api Groups: /metrics, /healthz, /version,/api,/apis,/logs
+
+This two Groups 
+- /api   | Core group
+- /apis  | Name Group
+
+Under this Core grpup: /api
+/v1 - under this
+/namespace, /pods,/rc,events,/endpoint,/nods,/binding,/pv,/pvc,/configmap,/service,/secrets etc.
 
 
+Under this named grpup: /apis
+/apps,/extensions,/networking.k8s.io,/storage.k8s.io,/storage.k8s.io,/authentication.k8s.io,/certificate.k8s.io etc.
+and Unser this named grpup: all apis has its own resource and resources has its action.
+
+/apps:
+ - /v1
+   - /deployment
+       - /list
+       - /get
+       - /create 
+       - /delete
+       - /update
+       - /watch 
+   - /replicaset
+   - /StatefulSets
+     
+Like:
+/networking.k8s.io
+- /v1 
+  - /networkpolicy
+
+Like:
+/certificate.k8s
+- /v1
+    -/certificatesigningrequests
+
+Kubernetes API Groups Documentation show all details.
+Also in kunbernetes cluster:
+For show all aveilable api groups:
+curl http://localhost:6443 -k
+
+Then, show for names api
+curl http://localhost:6443/apis -k | grep "name"
+
+To access kubectl cluster make a proxy:
+=>kubectl proxy
+=>curl http://localhost:8081- -k
+
+kube proxy not equeal as kubectl proxy.
 
 
 
@@ -4014,21 +4109,58 @@ curl http://localhost:6443 -k
 
 Authorization Mechanisms:
  - Node
- - ABAC
+   Node authorization.
+
+ - ABAC   
+   attributes base authorization, create attributes in json formate a file and add this.
+   every time upde this file need to restart.
+
  - RBAC
+   Create role and add user on this role.
  - Webhook
+   Outsource for authencation.
 -AlwaysAllow
 -AlwaysDeny
 
-
+You cand user multiple authorization mode at a time. all mode working on flow the order.
 
 
 ##141. Role Based Access Controls
 --------------------------------------------------
+Create a role using file:
+
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  namespace: default
+  name: developer
+rules:
+- apiGroups: [""]
+  resources: ["pods"]
+  verbs: ["list", "create","delete"]
+
+Nest we have to create a role bindign, rolebinding bind the role to the user.
+
+kind: RoleBinding
+apiVersion: rbac.authorization.k8s.io/v1
+metadata:
+  name: dev-user-binding
+subjects:
+- kind: User
+  name: dev-user
+  apiGroup: rbac.authorization.k8s.io
+roleRef:
+  kind: Role
+  name: developer
+  apiGroup: rbac.authorization.k8s.io
+
+
+To check Role and rolebinding:
 =>kubectl get roles
 =>kubectl get rolebindings
 =>kubectl describe role developer
 
+To check access or other persmission:
 =>kubectl auth can-i create deployment
 =>kubectl auth can-i delete nodes
 
@@ -4036,12 +4168,8 @@ Authorization Mechanisms:
 =>kubectl auth can-i create deployment --as dev-user --namespace test
 
 
-
 Role: Create Role Object by specifice name, rule with a yaml file
 RoleBinding: Bind User with a role
-
-
-
 
 
 
@@ -4232,8 +4360,40 @@ rules:
   - create
 
 
+
+
+
 ##144. Cluster Roles
 --------------------------------------------------
+In kubernetes all Resource are catagoies are namespace or cluster scope.
+Namespace Resource:
+- pods
+- replicaset
+- roles
+- service 
+- deployment etc.
+If you not defined any namespace it will create in default namespace.
+
+Cluter Scoped:
+- nodes
+- pv
+- clusterroles
+- cluseterrolebinding
+- namespaces etc.
+Cluster role and Cluster binding for create cluster wise resource and namespace role/binding for namespace wise resource modify.
+Same as namespace role and rolebinding, first create cluster role and rolebinding for user.
+
+Cluster role can access all namespace resources.
+
+
+
+To get the all kist on namespace resource list:
+=>kubectl api-resources --namespace=true
+=>kubectl api-resources --namespace=false
+
+
+
+
 
 ##Solution4: Cluster Roles
 --------------------------------------------------
@@ -4372,8 +4532,20 @@ Create ClusterroleBinding:
 
 ##147. Admission Controllers
 --------------------------------------------------
-kubectl -> Aluthentication -> Authorization -> AdmissionController -> Create Pod
+kubectl -> Aluthentication -> Authorization  -> Create Pod
+Usually Aluthentication done by certificate. may with role base Authorization.
 
+But, Role base Authorization are not able make restrection in more details like:
+- Only permite image allow, and certain registry
+- Do not permit runAs Root user
+- Only permit certain capabilities
+- Pod always has labels etc.
+
+For make this kind of restraction AdmissionController come in to picture.
+
+
+
+kubectl -> Aluthentication -> Authorization -> AdmissionController -> Create Pod
 AdmissionController List:
  - AlwaysPullImages
  - DefaultStorageClass
@@ -4383,6 +4555,14 @@ and More..........
 
 =>kub-apiserver -h | grep enable-admission-plugins
 =>kubectl exec kube-apiserver-controlplane -n kube-system -- kube-apiserver -h | grep enable-admission-plugins
+
+AdmissionController not only valaid and reject user request, It can also done back end operation.
+and May change thei request its self.
+
+NamespaceAutoProvision and NamespaceExists controller deprecated,
+Now it NamespaceLifeCycle admission controller.
+
+
 
 
 
@@ -4459,6 +4639,8 @@ Add this under -command: section
 
 Since the kube-apiserver is running as pod you can check the process to see enabled and disabled plugins.
 =>ps -ef | grep kube-apiserver | grep admission-plugins
+
+
 
 
 
