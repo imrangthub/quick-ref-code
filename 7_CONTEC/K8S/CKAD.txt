@@ -4647,7 +4647,25 @@ Since the kube-apiserver is running as pod you can check the process to see enab
 
 ##150. Validating and Mutating Admission Controllers
 --------------------------------------------------
+Two type AdmissionController
+- Mutation AdmissionController            | Change the Object, the request its self.
+- Validation AdmissionController          | Validate the request, Allow or Dineis
 
+MutationController working before ValidationController, Like: Change the request berore validate.
+This is all builtion Controller.
+
+
+For Custome Admission Controller:
+
+First Create Webhook Server, then add this on. For this we can build our own webhook server any langualge.
+just support validate amd mutate api as json data of request and response.
+
+CKAD exam dont have to develop webhook server code, just need to deploy and what we cand do using this.
+
+For working with custom webhook sever:
+- First deploy the webhook server
+- then Need a service to access this
+- then need a configurarion to access the service in cluster, so create a config Object
 
 
 
@@ -4857,6 +4875,32 @@ spec:
 
 ##153. API Versions/API Deprecations
 --------------------------------------------------
+VersionName:
+Alpha -> Beta ->GA(Stable)
+
+Alpha: Not enable by default, have to ebale vi flag.
+Beta, GA: Ebable by default.
+
+If any apiGroup has multiple version, PreferredVersion will work by default. To check tis:
+=>localhost:8002/apis/batch
+Other version call: Storage Version
+
+To enable other version:
+add the line in :
+ExecStart = /
+  --runtime-config=batch/v2alpha1\\
+and Restart thsi api server.
+
+Which versin we have to user for this we can check API Deprection.and ists rule.
+
+Rules:
+RuleOne: Remove a version on nesxt encrement version.
+Rule2: For next verson hve to be same filed of previous version.
+Role3: alpha version not replace GA, and not to be depracate before GA is comming.
+
+  
+
+
 
 
 
@@ -5001,6 +5045,8 @@ Not so much possible to come in exam to create a custome resource, but it is pos
 
 What is a custom resource?
 It is an extension of the Kubernetes API that is not necessarily available in a default Kubernetes installation.
+
+
 
 
 
