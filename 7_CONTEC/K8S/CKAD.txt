@@ -5057,12 +5057,17 @@ For that you need a Controller ! the second part is this to watch and take actio
 
 Custome Resouece Controller
 --------------------------------------------------
+Custome resource create doen and data in ETCD, Now we have to Monitor on data in ETCD and take action.
+thats Why ed need a custome controller.
+A Custome Controller is a any process what is contionuslly monitor the etcd to permorm action.
+You can develop Custome controller by any langualge like: Go, Python etc.
+
+It is better build a container and run int on kubernatis cluster and user it.
 
 
 
-
-
-
+CKAD exam not have to build customer controller, May need to build a customer resource using defination file.
+and working  with existing Custome resource Controller what is already may deploy.
 
 
 Not so much possible to come in exam to create a custome resource, but it is possible. and better to know
@@ -5072,6 +5077,17 @@ It is an extension of the Kubernetes API that is not necessarily available in a 
 
 
 
+
+Operator Framework
+--------------------------------------------------
+Until now we see that create and CRD and Custome Controller together for working.
+Its cand be package this two as Framework called: Operator Framework.Its more only CRD and CC.
+
+Operator can do as human Operatior like: manage app install, uninstall etc.
+All Operator in avalialbelin operation Hub with documentation. etcd,graffena,myusql etc.
+
+
+CKAD exam not commming Operaton only may come CRD.
 
 
 
@@ -5166,6 +5182,28 @@ gb
 
 
 
+##Deployment strategies
+--------------------------------------------------
+Currently Only RollingUpdate and Recreate strategies can be define on deployment file.
+But thereis other deployment strategies aveilable: 
+ - BlueGreen
+   In this case all new service deploy and at a time switch traffic to news services. 
+
+So, How to deploy blue green:
+Suppose current running service run with tag blue(in pod template label), now Update Service new version app with green tag.
+Now update the tage of deploy ment blue to green and all traffic go to greent pods.
+
+ - Canary
+   In this case Deploy all new version app and a few traffic flow to new app. 
+   If every thisng ok then go for full traffic.
+
+So, how to deploy Canary:
+As Current deployment and service running with a label, and new version deploy with to a dirrent label.
+Now add another common label on both deployment as result both version reecive the traffic.
+To provide a few traffice in new version reduce the number of pod on new app version deployment like pod 1.
+
+in kunbernetes Traffice to deployment % are the number of pod.
+By using ServcieMess we can route traffice as required to target deployment.
 
 
 
@@ -5217,11 +5255,22 @@ You can now reload the Webapp tab to validate that all user traffic now uses the
 
 
 
+
+
+
 ##169.  Install Helm
 --------------------------------------------------
 https://helm.sh/docs/intro/install/#from-apt-debianubuntu
 
+Helm call package manger, In kunbernetes we bild our app with different type deployment file.
+In Helm all make together build the app. Name of the package in know what and how many package need to deploy.
 
+To Install the helm, Need a complate kubernetes cluster and run:
+
+=>sudo snap install helm --classic
+Or 
+Useing package pkg Manager
+Or may download package file using Curl
 
 
 
@@ -5253,13 +5302,10 @@ sudo apt-get install helm
 
 
 
-
-
-
 ##Helm Concept
 --------------------------------------------------
 
-ObjectYamlFile=> ObjectTemplateYamlFile+valueYamlFile=> HelmChart
+ObjectYamlFile=>| ObjectTemplateYamlFile+valueYamlFile=>| HelmChart
 It has Chart.yaml file for this chart
 
 =>helm search hub wordpress
@@ -5267,7 +5313,7 @@ It has Chart.yaml file for this chart
 =>helm list
 =>helm uninstall my-release
 
-
+CKAD: This is all need on Exam.
 
 
 
