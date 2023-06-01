@@ -3,6 +3,17 @@
 #################################################
 
 
+https://killer.sh/ckad
+https://blog.getambassador.io/ckad-cka-exam-tips-from-10-people-who-passed-the-exam-24132b1f1cc5
+10 people commat for CKAD
+
+CKAD Exam Artical:
+https://blog.getambassador.io/how-to-pass-the-ckad-exam-f8ca180ee853
+
+
+DCUBE20 25% disc
+https://devopscube.com/ckad-exam-study-guide/
+Good site for exam  slabus
 
 CNCF Certification
 Certified Kubernetes Application Developer: http://kub.to/dev
@@ -85,6 +96,24 @@ https://kodekloud.com/lessons/recap-core-concepts/
 ##CoreConcept         
 ================================================= 
 
+Two type Node: 
+-------------------------------------------------
+- Master
+       It has install kube-apiserver and its make it master node.
+       Master also containe: etcd, controller, scheduler etc.
+- Worker
+       Install container runtime or rkt or cri-o etc.
+       Its contain kubelet what is response master node kube-apiserver.
+
+
+kubectl: 
+      Its a commandline utility, user to deploy manage application on kubernetes cluster.
+      Get the cluster information, status the other node etc.
+      Using command like:
+        =>kubectl run hellow-world-app
+        =>kubectl cluster-info
+        =>kubectl get nodes
+
 
 When instal kubernetes, install this component:
 -------------------------------------------------
@@ -107,24 +136,6 @@ When instal kubernetes, install this component:
 - kubelet
   Kubelet is an agent present on each node, make sure the container running on node as aspected.
 
-
-Two type Node: 
--------------------------------------------------
-- Master
-       It has install kube-apiserver and its make it master node.
-       Master also containe: etcd, controller, scheduler etc.
-- Worker
-       Install container runtime or rkt or cri-o etc.
-       Its contain kubelet what is response master node kube-apiserver.
-
-
-kubectl: 
-      Its a commandline utility, user to deploy manage application on kubernetes cluster.
-      Get the cluster information, status the other node etc.
-      Using command like:
-        =>kubectl run hellow-world-app
-        =>kubectl cluster-info
-        =>kubectl get nodes
 
 
 Docker vs ContainerD 
@@ -188,6 +199,9 @@ metadata:                    | Data about the object
     type: back-end
 spac:                        | Object spacefication secrion, provide aditional iinfo about object.
 
+Wen a pod is start it accessable within from of its host machine, for out side user need to add 
+Another component of kubernatis called Service.
+
 
 
 
@@ -250,6 +264,13 @@ For edit other file generate another yaml file from current pod status and updat
 ##ReplicaSet
 -------------------------------------------------
 Replica controller and ReplicaSet are same purpose, controller is older and ReplicaSet are newar.
+ReplicaSet make certain number of pod allows running.
+
+Event you need only a single pod you cand user replicaSet, it keep allow one podn runing in your system.
+
+One of mazor Diffeetnt of ReplicaSet and RsController is selector property, what is optional in RsController.
+Using this selector ReplicaSet select the pod on its own area.
+
 
 
 Simple ReplicaSet:
@@ -287,7 +308,7 @@ BasicCommand:
 
 
 
-##Scale ReplicaSet
+##Update/Scale ReplicaSet
 -------------------------------------------------
 1) Update number of replica(replicas:5) in yaml file and run
 =>kubectl replace -f myreplica.yaml
@@ -298,6 +319,8 @@ OR
 3) Run with replical type(replicaset) and name (myreplicaset) 
 =>kubectl scale --replicas=5 replicaset myreplicaset
 2 and 3 Not made change the original defination file
+
+There are other approce to Update replicaset count.this is advance.
 
 Check ReplicaSet info like: uses image, etc
 =>kubectl describe rs new-replica-set
@@ -366,7 +389,9 @@ spec:
 
 ##Deployment
 -------------------------------------------------
-Deployment defination file as ReplicaSet just kind willbe Deployment
+Deployment defination file as ReplicaSet just kind willbe Deployment.
+Deployment mainly provide different type approce for pod Update like: Recreate, RollingUpdate.
+
 
 =>kubectl create -f mydeploy.yaml
 Its create three Object:
@@ -447,7 +472,7 @@ app-service call db-service in DEV namespace:
 app-service.connect("db-service.dev.svc.cluster.local")
       
          db-service     .dev        .svc       .cluster.local
-Here:    serviceName    Namespace   Service    Domain                  
+Here:    serviceName    Namespace   Service    Default Domain anme in k8                  
 
 Switch Namespace:
 =>kubectl config set-context $(kubectl config current-contest) --namespace=dev
