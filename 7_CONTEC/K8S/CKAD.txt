@@ -90,8 +90,7 @@ https://kodekloud.com/lessons/recap-core-concepts/
 =>kubectl describe pod mynginx
 
 
-
-##KodeKloud
+@@@KodeKloud
 =================================================
 ##CoreConcept         
 ================================================= 
@@ -99,14 +98,14 @@ https://kodekloud.com/lessons/recap-core-concepts/
 Two type Node: 
 -------------------------------------------------
 - Master
-       It has install kube-apiserver and its make it master node.
+       It has install kube-apiserver and this is  make it master node.
        Master also containe: etcd, controller, scheduler etc.
 - Worker
        Install container runtime or rkt or cri-o etc.
-       Its contain kubelet what is response master node kube-apiserver.
+       Its contain kubelet component what is response master node kube-apiserver.
 
 
-kubectl: 
+kubectl CLI: 
       Its a commandline utility, user to deploy manage application on kubernetes cluster.
       Get the cluster information, status the other node etc.
       Using command like:
@@ -128,13 +127,14 @@ When instal kubernetes, install this component:
   Like createing container and assign this to approvaid node.
 
 - Controller
-  Controller is the brain behind the workstation, its notice when node,container,endpoint gose down, and make decision bring new one.
+  Controller is the brain behind the workstation, its notice when node,container,endpoint gose down, 
+  and make decision bring new one. and find right node for right pod and other component.
 
 - ContainerRuntime
-  ContainerRuntime is the underlying software for running container(Docker).
+  ContainerRuntime is the underlying software for running container(Docker, containerD).
 
 - kubelet
-  Kubelet is an agent present on each node, make sure the container running on node as aspected.
+  Kubelet is an agent present on each worker node, make sure the container running on node as aspected.
 
 
 
@@ -187,7 +187,7 @@ All defination file flow same strecture, all file 4 top/root lavel field, this f
 apiVersion: v1               | Object version
 kind: Pod                    | Object type       
 metadata:                    | Data about the object
-spac:   
+spac:                        | Object spacefication secrion, provide aditional iinfo about object.
 
 
 apiVersion: v1               | Object version
@@ -207,9 +207,13 @@ Another component of kubernatis called Service.
 
 ##Solution:01 | Pod
 -------------------------------------------------
+=>kubectl run nginx --image=nginx
 
 What is the image used to create the new pods?
 =>kubectl describe pod newpods-j44dw | grep -i image
+
+Show pod IP, NODe
+=>k get pod -o wide
 
 How many container part of the webapp pod and What images are used in the new webapp pod?
 =>kubectl describe pod webapp
@@ -234,6 +238,9 @@ runing container/total container.
 
 4)Now change the image on this pod to redis.
 =>kubectl edit pod redis 
+For Edit/Change pod image is easy done by =>kubectl edit command with in a single command.
+No need to take other step.
+
 
 Edit current running pod, like change image
 5) kubectl edit pod myng
@@ -263,6 +270,8 @@ For edit other file generate another yaml file from current pod status and updat
 
 ##ReplicaSet
 -------------------------------------------------
+RsVersion:  apiVersion: apps/v1
+
 Replica controller and ReplicaSet are same purpose, controller is older and ReplicaSet are newar.
 ReplicaSet make certain number of pod allows running.
 
@@ -374,6 +383,12 @@ Either delete and recreate the ReplicaSet or Update the existing ReplicaSet and 
 =>kubectl edit rs new-replica-set
 =>k delete pod --all
 
+Edit/Change Image name from Rs is done only one command kubectl edit rs rsName, but need to delete previously created pod.
+Because old pod running on with old image, for effact update image, need to delte all pod created by this rs,
+If delte all pod using =>kubectl delte pod --all command, thend this rs will create new pod wfith update image.
+
+
+
 
 6)Scale the ReplicaSet to 5 PODs.
 Use kubectl scale command or edit the replicaset using kubectl edit replicaset.
@@ -468,11 +483,10 @@ Image: httpd:2.4-alpine
 -------------------------------------------------
 Call one service to other service in different namespace:
 app-service call db-service in DEV namespace:
-
-app-service.connect("db-service.dev.svc.cluster.local")
+  app-service.connect("db-service.dev.svc.cluster.local")
       
          db-service     .dev        .svc       .cluster.local
-Here:    serviceName    Namespace   Service    Default Domain anme in k8                  
+Here:    serviceName    Namespace   Service    Default Domain name in k8      v            
 
 Switch Namespace:
 =>kubectl config set-context $(kubectl config current-contest) --namespace=dev
@@ -483,7 +497,7 @@ Switch Namespace:
 =>kubectl get namespace
 =>kubectl get pod --namespace=research
 =>kubectl get pod -n=research
-=>kubectl run redis --image=redis --namespace=research
+=>kubectl run redis --image=redis -n=research
 
 
 =>kubectl get pod -A
@@ -509,8 +523,17 @@ spac:
     limits.cpu: "10"
     limits.memory: "10Gi"
 
+
+
+
 ##Solution:04 NameSpace
 -------------------------------------------------
+
+=>k get namespace --no-headers | wc -l
+
+=>k get pod -A
+Get all pod in all namespacw
+
 
 1)How many Namespaces exist on the system?
 =>kubectl get ns
@@ -539,8 +562,9 @@ like:my-service.my-namespace.svc.cluster.local
 
 Creating Kubernetes objects imperatively
 -------------------------------------------------
-There are two main ways to manage Kubernetes objects: imperative (with kubectl commands) and 
-declarative (by writing manifests and then using kubectl apply).
+There are two main ways to manage Kubernetes objects: 
+  imperative (with kubectl commands) and 
+  declarative (by writing manifests and then using kubectl apply).
 
 
 =>kubectl run --help
@@ -573,6 +597,8 @@ This command create pod as well as service with same name with labels and bind s
 ##Solution:06 | IMPERATIVE COMMANDS
 -------------------------------------------------
 
+
+
 1)Deploy a pod named nginx-pod using the nginx:alpine image.
 Name: nginx-pod
 Image: nginx:alpine
@@ -591,6 +617,7 @@ Service: redis-service
 Port: 6379
 Type: ClusterIP
 
+=>k expose pod -h
 =>kubectl expose pod redis --port=6379 --name=redis-service
 =>kubectl describe svc redis-service
 OR
