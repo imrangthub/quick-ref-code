@@ -2183,12 +2183,18 @@ status: {}
 
 ##Multi-Container Pods
 --------------------------------------------------
+One o the benifet of multicontainer pod its can share same storage same data as localhost, no need volume or other share data.
+Its work as a pod a localmachine and containers are process or running service in it.
+
+Like a Business service produce some logs and a logs service send it to a central logs process system.
+
 
 Design Pattern of MultiContainer Pod:
    - Sidecar Pattern                   | a log container with a webserver to send log to a central logging system.
    - Adapter Pattern                   | Before sending the log file to system convart to log a common pattern for this a container.
    - Ambassador Pattern                | To connect multple db server a Proxy localhost db container.
 
+all pattern implementation is same: Define multicontainer as list in pod.
 
 
 
@@ -2306,7 +2312,8 @@ spec:
 
 ##initContainers
 --------------------------------------------------
-An initContainer is configured in a pod like all other containers, except that it is specified inside a initContainers section, like this:
+An initContainer is configured in a pod like all other containers, 
+except that it is specified inside a initContainers section, like this:
 
 
 apiVersion: v1
@@ -2326,8 +2333,11 @@ spec:
     command: ['sh', '-c', 'git clone <some-repository-that-will-be-used-by-application> ;']
 
 
-When a POD is first created the initContainer is run, and the process in the initContainer must run to a completion before the real container hosting the application starts.
-You can configure multiple such initContainers as well, like how we did for multi-pod containers. In that case each init container is run one at a time in sequential order.
+When a POD is first created the initContainer is run, 
+and the process in the initContainer must run to a completion before the real container hosting the application starts.
+
+You can configure multiple such initContainers as well, like how we did for multi-pod containers. 
+In that case each init container is run one at a time in sequential order.
 If any of the initContainers fail to complete, Kubernetes restarts the Pod repeatedly until the Init Container succeeds.
 
 apiVersion: v1
@@ -2361,15 +2371,16 @@ https://kubernetes.io/docs/concepts/workloads/pods/init-containers/
 ##Section4: Observability
 ==================================================
 Pod lifecycle:
-
-- Pending state 
-  When a pod is start it is on pending state, scheduler find the ringht -node for it, if not find keep it pending sate.
-  If a pod pending state run describe command, its tell you why.
-  =>kubectl describe pod my-pod
-- ContainerCreating
-  When a pod schedule its on Container creating state, pull the image and run all the container of the pod in side node.
-- Running state
-  When all container is ready it is gor for running state.
+  - Pending state 
+    When a pod is start it is on pending state, scheduler find the ringht -node for it, if not find keep it pending sate.
+    If a pod pending state run describe command, its tell you why.
+    =>kubectl describe pod my-pod
+    
+  - ContainerCreating
+    When a pod schedule its on Container creating state, pull the image and run all the container of the pod in side node.
+    
+  - Running state
+    When all container is ready it is gor for running state.
 
 This three stat show on STATUS colume.
  
