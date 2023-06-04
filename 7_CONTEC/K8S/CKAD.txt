@@ -668,8 +668,9 @@ Update the lavel as service
 
 ##Command and Args in Docker 
 -------------------------------------------------
-Container unlike vM its for specific task, when finish the task its tarminated automatically.
-Container unitl remain a process or task running on it. If a web service in container stop or cursh container are exists.
+Container unlike vM its a specific task, when finish the task its tarminated automatically.
+Container remain unitl a process or task inside it running on it. 
+If a web service in container stop or cursh container are exists.
 
 
 NGINX Image:
@@ -711,11 +712,13 @@ CMD ["bash"]
 
 This Nginx image and Ubuntu image has tow dirrerent CMD command:
 
-Nginx start a process in side container using this command 
-CMD ["/usr/sbin/nginx", "-g", "daemon off;"]
+  Nginx start a process in side container using this command 
+  CMD ["/usr/sbin/nginx", "-g", "daemon off;"]
 
-Whenre Ubuntu container run this bash Command
-CMD ["bash"]
+  Whenre Ubuntu container run this bash Command
+  CMD ["bash"]
+
+
 
 Bash is not a actual process, its a shell for listing inpur from tarminal.
 Expect to receiving actuall process command, if not find then it exist.
@@ -747,9 +750,11 @@ OR
 AsJSONArraty Formate:
 CMD sleep 2
 CMD ["sleep","5"]
+
 Remember: when cmd will be JSON formate, First element of array have to be executable.
-And Command and Arg not mixed as, command and param should be different
+And Command and Arg not mixed as, 
 CMD ["sleep 5"]
+command and param should be different.
 
 If this way i build by image like, and run it, it will be 5 sec. No need parse arge on run time.
 From Ubuntu
@@ -807,8 +812,8 @@ spec:
       image: my-ununtu
       args: ["10"]
 
-If we want to Override the command form Pod file, it will be like this:
 
+If we want to Override the command form Pod file, it will be like this:
 apiVersion: v1
 kind: Pod
 metadata:
@@ -826,8 +831,63 @@ kubernetes "args"    override Docker "CMD"
 
 
 
+
+=>kubectl run ub1 --image=ubuntu sleep 4000
+If we pass value on inparageve way, then its reveive in pod as Args.
+
+This is with args:
+apiVersion: v1 
+kind: Pod 
+metadata:
+  name: ub3 
+spec:
+  containers:
+  - name: ubuntu
+    image: ubuntu
+    args:
+       - "sleep"
+       - "5000"
+OR
+apiVersion: v1
+kind: Pod 
+metadata:
+  name: ub4
+spec:
+  containers:
+  - name: ubuntu
+    image: ubuntu
+    args: ["sleep","5000"]
+
+
+This is with command:
+apiVersion: v1 
+kind: Pod 
+metadata:
+  name: ub3 
+spec:
+  containers:
+  - name: ubuntu
+    image: ubuntu
+    command:
+       - "sleep"
+       - "5000"
+OR
+apiVersion: v1
+kind: Pod 
+metadata:
+  name: ub5
+spec:
+  containers:
+  - name: ubuntu
+    image: ubuntu
+    command: ["sleep","5000"]
+
+
+
 ## Solution1: Pod command and Args
 -------------------------------------------------
+=>kubectl run ub1 --image=ubuntu sleep 4000
+
 1)What is the command used to run the pod ubuntu-sleeper?
 =>kubectl get pod ubntu-sleeper -o yaml
 =>kubectl describe pod ubuntu-sleeper
@@ -892,6 +952,73 @@ spec:
     args: ["--color", "pink"]
 
 
+SimpleDockerFile:
+  FROM python:3.6-alpine
+  RUN pip install flask
+  COPY . /opt/
+  EXPOSE 8080
+  WORKDIR /opt
+  ENTRYPOINT ["python", "app.py"]
+  CMD ["--color", "red"]
+
+FinalRunningCommandWillBe:
+=>python app.py --color red
+
+
+
+cat Dockerfile 
+FROM python:3.6-alpine
+RUN pip install flask
+COPY . /opt/
+EXPOSE 8080
+WORKDIR /opt
+ENTRYPOINT ["python", "app.py"]
+CMD ["--color", "red"]
+
+cat webapp-color-pod.yaml 
+  apiVersion: v1 
+  kind: Pod 
+  metadata:
+    name: webapp-green
+    labels:
+        name: webapp-green 
+  spec:
+    containers:
+    - name: simple-webapp
+      image: kodekloud/webapp-color
+      command: ["--color","green"]
+
+FinalRunningCommandWillBe:
+=>--color green
+
+
+cat Dockerfile 
+  FROM python:3.6-alpine
+  RUN pip install flask
+  COPY . /opt/
+  EXPOSE 8080
+  WORKDIR /opt
+  ENTRYPOINT ["python", "app.py"]
+  CMD ["--color", "red"]
+
+cat webapp-color-pod-2.yaml 
+apiVersion: v1 
+kind: Pod 
+metadata:
+  name: webapp-green
+  labels:
+      name: webapp-green 
+spec:
+  containers:
+  - name: simple-webapp
+    image: kodekloud/webapp-color
+    command: ["python", "app.py"]
+    args: ["--color", "pink"]
+
+FinalRunningCommandWillBe:
+=>python app.py --color pink
+
+
 
 
 2)Update pod ubuntu-sleeper-3 to sleep for 2000 seconds.
@@ -948,6 +1075,8 @@ spec:
 
 
 
+
+
 ##Environment Varibale | evn
 -------------------------------------------------
 Set Env varibale in Docker:
@@ -971,7 +1100,7 @@ spec:
         value: green
 
 
-In pod wc can set env from different source:
+In pod we can set env from different source:
 env: 
   - name: APP_COLOR
     value: green
@@ -992,30 +1121,15 @@ env:
  
 ##ConfigMap
 -------------------------------------------------
-When we have loat of evn data it is deficult to manage  those variable data.This is why comd ConfigMap.
-For this create a ConfigMap using keyvalue payers and ingect in pod:
+When we have loat of evn data it is deficult to manage  those variable data.This is why ConfigMap.
+For this create a ConfigMap using keyvalue payers and interact in pod:
 
-apiVersion: v1 
-kind: Pod 
-metadata:
-  name: webapp-green
-  labels:
-      name: webapp-green 
-spec:
-  containers:
-  - name: simple-webapp
-    image: kodekloud/webapp-color
-    args: ["--color", "green"]
-    
-    envFrom:
-      - configMapRef:
-        name: myapp-configmap
 
 
 Create a configmap both two way: Imparative and Diclarative:
 
 =>kubectl create configmap --help
-=>kubectl create configmap my-config --from-literal=key1=config1 --from-literal=key2=config2
+=>kubectl create configmap my-configmap --from-literal=key1=val1 --from-literal=key2=val2
 Or from a keyvalue file  
 
 Declarative:
@@ -1031,8 +1145,26 @@ data:
 =>kubectl describe configmap my-configmap
 
 
-We can Ingect the configmap a single value for a confifmap as volume
 
+apiVersion: v1 
+kind: Pod 
+metadata:
+  name: webapp-green
+  labels:
+      name: webapp-green 
+spec:
+  containers:
+  - name: simple-webapp
+    image: kodekloud/webapp-color
+    args: ["--color", "green"]
+    
+    envFrom:
+      - configMapRef:
+        name: my-configmap
+
+
+
+We can ingect the configmap: as evn, as a single value for a confifmap, or whole data at-once as a volume:
 ENV: 
 envFrom:
   - configMapRef:
@@ -1052,6 +1184,10 @@ volume:
     configMap:
       name: my-configmap
     
+
+
+
+
 
 
 ##Solution02 | ConfigMap
@@ -1077,11 +1213,11 @@ Identify the database host from the config map db-config?
   Data: APP_COLOR=darkblue
   Data: APP_OTHER=disregard
 
-
 =>kubectl create configmap --help
 =>kubectl create configmap my-config --from-literal=key1=config1 --from-literal=key2=config2
 
 =>kubectl create configmap webapp-config-map --from-literal=APP_COLOR=darkblue --from-literal=APP_OTHER=disregard
+OR
 apiVersion: v1
 data:
   APP_COLOR: darkblue
@@ -1092,6 +1228,9 @@ metadata:
   name: webapp-config-map
 
 =>kubectl get cm
+
+We can Edit configmap any falue with a single command using kubectl edit command.
+=>kubectl edit configmap webapp-config-map 
 
 
 
@@ -1120,6 +1259,8 @@ add this:
 
 ##Secret
 -------------------------------------------------
+There are two step to use a secret: Create a secret, Ingect it on pod.
+
 For pass data to a pod we can use configmap, but configmap data are plane text.
 For database credentials and this type sensitive data should not keep as planetex formate this why come secret in kubernetes.
 Secret data are encoded
@@ -1139,11 +1280,14 @@ data:
   DB_USER: sfsfsfsfsfs==
   DB_PP: sfsdff2342
 
-you must proved data in encoded formate, for encode in linux:
+You must proved data in base64 encoded formate, for encode in linux:
 =>echo -n "mysql" | base64
 Decode:
 =>echo -n "3df32==" | base64 --decode
 
+
+When you create secret by imparative command no need to providce secret as encoded, plan tex is ok.
+Onther hand Declarative way not allow plantext data, need base64 endoded.
 
 
 
@@ -1155,6 +1299,13 @@ Decode:
 Show How many secret data on a secret, What is the type of the dashboard-token secret.
 
 
+
+For createing secret, secret data can be collect from fa file usig from file method.
+the file carry data as keyvalue payers and myfile.properties extension.
+
+
+We can Edit Secret using only a single command eidt:
+=>k edit secret db-secret 
 
 
 
@@ -1181,7 +1332,8 @@ We have already deployed the required pods and services. Check out the pods and 
 Check out the web application using the Webapp MySQL link above your terminal, next to the Quiz Portal Link.
 https://prnt.sc/hAc-9XtgJ4eX
 
-The reason the application is failed is because we have not created the secrets yet. Create a new secret named db-secret with the data given below.
+The reason the application is failed is because we have not created the secrets yet. 
+Create a new secret named db-secret with the data given below.
 You may follow any one of the methods discussed in lecture to create the secret.
 
 Secret Name: db-secret
@@ -1263,8 +1415,8 @@ Its only show one process runing on it.
 This is call Process Isolation.
 
 Docker User:
-Container has root user and other not rool user, By default container run under root prvelise.
-If you dont want to run contafiner with default user you can pass user8 id on run command like this:
+Container has root user its like this root user of host, By default container run under root prvelise.
+If you dont want to run container with default user you can pass user id on run command like this:
 =>docker run --user=1000 ubuntu sleep 1000
 OR
 We cand set this user on docker file:
@@ -1274,11 +1426,13 @@ CMD ["sleep 1000"]
 
 Docker container root user are not powerful as host root user, It can not has parmission as host root user.
 Docer user Linux Capability to implement this.
-Using  Linux Capability you cand add and remove capability power of docker container root user.
+Using  Linux Capability(dap-add/cap-drop) you cand add and remove capability power of docker container root user.
 =>docker run --user=1000 ubuntu sleep 5
 =>docker run --cap-add MAC_ADMIN ubuntu sleep 5
+=>docker run --cap-drop KILL ubuntu sleep 5
 
-
+You and run docker container with all privileged enable using priviledge flag
+=>docker run --privileged ubuntu
 
 
 
@@ -1287,7 +1441,8 @@ Using  Linux Capability you cand add and remove capability power of docker conta
 -------------------------------------------------
 
 As docker container we can add security on container lavel or pod lavel
-When add it on pod level, it is for all container in a pod. If add security on container lavels then its is override thsi pod lavel security.
+When add it on pod level, it is for all container in a pod. 
+If add security on container lavels then its is override thsi pod lavel security.
 
 Add Security on Pod Level:
 apiVersion: v1
@@ -1405,6 +1560,9 @@ Add this under containers section:
       capabilities:
         add: ["SYS_TIME", "NET_ADMIN"]
 
+Security Contest Update/Edit not done by one edit command, need to take another step from temp file run.
+
+
 
 
 ##Resource Requirements | Resource Limits
@@ -1425,9 +1583,9 @@ Kubernetes by default set limit to container if you not set to.
 Default value is:
 CPU = 1vCPU, Momory= 512Mi
 
-When you set resource limit on pod and If a pod try to cross the limit,
-In CPU kubernets throttle the uses of cpu, but not limit make throttle on memory.
-If a pod continouslly try to use more memory then pod will terminated.
+When you set resource limit on pod and If a pod try to cross the limit:
+  In CPU kubernets throttle the uses of cpu, but not limit make throttle on memory.
+  If a pod continouslly try to use more memory then pod will terminated.
 
 
 
@@ -1524,32 +1682,37 @@ Update the memory limit from 10 20
 
 ##Service Accounts
 -------------------------------------------------
-Every name space has default service account.
-It has a Secrect Object and a Token accoucated with it.
-When a pod created auto assocated this servieaccount to the pod and mounted token in this well know place of the pod.
-
-From kubernetes v1.22 not automatically mounted.
-From kubernetes v1.24 not auto create a toke and secret, Need to create secre token expectedly.
-First create s Service account then associated to Secre and token.
+CKAD EXAM: Only know how to woring with service Account.
 
 
 Service Accounts for Other security purpose like: Authorization, Authentication, Role etc.
 In CKAD only need to how work with service account.
 
 Totally Two type fo Account in Kubernetes: 
-UserAccout: User human. Like a admin user do adminastatiov task and a developer deploy pod.
-ServiceAccoutn: Use by Machine. Like: a Jenken app need to deploy a pod in kubernetes cluster.
+  UserAccout: User human. Like a admin user do adminastatiov task and a developer deploy pod.
+  ServiceAccoutn: Use by Machine. Like: a Jenken app need to deploy a pod in kubernetes cluster.
+
 
 
 =>kubectl create serviceaccount my-serviceAccount
 =>kubectl get serviceaccount
-
-when a service account create a Token automatically created, what is for extrrnal authencation for kubernetes cluster.
+When a service account create a Token automatically created, what is for extrrnal authencation for kubernetes cluster.
 
 When a service acc created its create:
-aServiceAccObject
-aToken
-aSecretWithToken
+  aServiceAccObject
+  aToken
+  aSecretWithToken
+Then secretObjet link with service account.
+
+To view the token run:
+=>kunbectl describe serviceaccount my-serviceaccount
+Chekout and token:
+ Tokens:
+=>kubectrl describe secret my-sec-token-kbbdm
+Check:
+ token:
+This token can be use Bearer token on rest call api.
+Like any curl request this token can be user as Authorization header Bearar token.
 
 then secret object link with service account.
 You can use this token to access outside of cluster.
@@ -1558,6 +1721,22 @@ If the app in same cluster then kubernetes make it simple to mounting the secret
 When create a pod by default default secret mounted inside all pod. to see this:
 =>kubect describe pod my-pod
 
+
+
+If the thard-party app placed in the same kubernetes cluster then no need to user this token as bearer.
+This token can be mounted inside the pod.
+
+
+Every name space has its own default service account.
+It has a Secrect Object and a Token accoucated with it.
+When a pod created auto assocated this servieaccount to the pod and mounted token as volume mount 
+in this well know place of the pod.
+
+For the show where the file mounted in pod:
+=>kubectl describe pod mypod
+Check Mounts:
+=>kubectl exec -it my-pod -- ls /var/run/secrets/kubernatis.is/serviceaccount
+It show three file inside it, its one is token.
 
 If requird custome service accoutn add field of serviceAccountName
 
@@ -1588,9 +1767,22 @@ spec:
 
 
 
+ 
+1.22 to 1.24 Update of ServieAcc:
+---------------------------------------------------
+
+From kubernetes v1.22 not automatically mounted. token has no time limit.
+From kubernetes v1.24 not auto create a toke and secret.
+  Need to create secre token expectedly.
+  First create s Service account then associated to Secre and token.
+
+
+
+
+
 ##Solution5: | Service Accounts
 -------------------------------------------------
-
+=>k get sa
 =>kubectl get serviceaccount
 
 
@@ -1979,6 +2171,8 @@ spec:
         name: nginx
         resources: {}
 status: {}
+
+
 
 
 
