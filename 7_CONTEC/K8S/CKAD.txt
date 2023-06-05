@@ -2761,7 +2761,7 @@ metadata:
   name: throw-dice-pod
   labels:
     evn: prod
-    app: back-end
+    app: back-end   
 spec:
   containers: 
   -  image: kodekloud/throw-dice
@@ -2830,20 +2830,21 @@ You can check the status of each revision individually by using the --revision f
 
 
 Using the --record flag:
-You would have noticed that the "change-cause" field is empty in the rollout history output. We can use the --record flag to save the command used to create/update a deployment against the revision number.
+You would have noticed that the "change-cause" field is empty in the rollout history output. 
+We can use the --record flag to save the command used to create/update a deployment against the revision number.
 
 =>kubectl set image deployment nginx nginx=nginx:1.17 --record
-=> kubectl rollout history deployment nginx
-=>kubectl edit deployments. nginx --record
+=>kubectl rollout history deployment nginx
+=>kubectl edit deployments nginx --record
 =>kubectl set image deployment nginx nginx=nginx:1.17 --record=true
-=>kubectl edit deployments. nginx --record=true
+=>kubectl edit deployments nginx --record=true
 =>kubectl rollout history deployment nginx --revision=3
 
 
 Undo a change:Lets now rollback to the previous revision:
 =>kubectl rollout history deployment nginx
 =>kubectl rollout history deployment nginx --revision=3
-=>kubectl describe deployments. nginx | grep -i image:
+=>kubectl describe deployments nginx | grep -i image:
 With this, we have rolled back to the previous version of the deployment with the image = nginx:1.17.
 
 =>kubectl rollout history deployment nginx --revision=1
@@ -2909,6 +2910,7 @@ StrategyType:       Recreate
 --------------------------------------------------
 Job start imidetly whenre we can set schedule on CronJob.
 
+ReplicaSet keep runnign pod allows, where Job bring the pod for a specific task and after it finish its go down.
 
 
 ##Solution3: Job and CronJob
@@ -3049,7 +3051,25 @@ Kubernetes Services enable communication group of application with another user 
 Services make losscoupling with microservice.
 
 Services just a object, its listaning port on Node and make communicate with a port of pod.
-A service is a virtual server in sede a node, its has a IP.
+A service is a virtual server inside a node, its has a IP.
+
+Service can make communication kunbernetes different group of apps or service.
+
+Three type of Series:
+ - NodePort
+   Make access the app with external, To map a Node port and a pod port.
+
+ - ClusterIP
+   Service create a vertual IP in side the cluster to communication with oter service, it has ip and port.
+   Diffeetnt server like a group of frontend server or backend serer.
+
+ - LoadBalancer
+   We provision a loadbalancer for our application in support by cloud provider.
+
+
+
+##Services - nodePort
+--------------------------------------------------
 
 apiVersion: v1
 kind: Service
@@ -3065,16 +3085,10 @@ spec:
   selector:                       | Identify the pods
     name: simple-webapp
 
+In a service only port: field is mandatory, if not TargetPort then it assign as port: value,
+and if not provide nodePort: if automatically take a port in valide range of node port.
 
-
-Three type of Series:
- - NodePort
-   Make access the app with external, To map a Node port and a pod port.
-
- - ClusterIP
-   Service has ip and port.
- - LoadBalancer
-
+You can mape multiple port in a single service.
 
 Services can spand multiple node with same port.
 To access that user node ip and the same port any node.
@@ -3088,6 +3102,11 @@ To access that user node ip and the same port any node.
 This is the defafult service type of kubernetes.
 ClusterIP service make layer or group of application communication easy wdfith a self IP call clusterIP.
 
+Suppose a three tier application: frondend - backend - db
+In this case ClusterIP Service will create one ClusterIP-Service for each tier with a IP.
+Now all tire communicate with each other by this IP.
+
+
 
 apiVersion: v1
 kind: Service
@@ -3097,9 +3116,10 @@ metadata:
 spec:
   type: ClusterIP
   ports:
-    port: 8080                    | Service port
-    targetPort: 80                | application port
+    port: 8080                    | Pod/app port
+    targetPort: 80                | this service port
   selector:                       | Identify the pods
+    tier: backend-app
     name: simple-webapp
 
 
@@ -3151,16 +3171,81 @@ spec:
 
 ##Network Policies | Network Security
 --------------------------------------------------
-Kubernetes make all Allow for all pod can make communication each other in a Clusster.
+Kubernetes make all Allow for all pod/service can make communication each other in a cluster.
 
 Two type Network Policy:
- - Ingress           | In comming request from the user.
- - Egress            | Outgoing request from app server.
+ - Ingress           | In comming request from the user to he POD.
+ - Egress            | Outgoing request from POD app server to out side user.
 
 
 Network Policy also a Object in kubernetes, link one or more pod and set rule/policy to enable communication.
 
 
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: db-pod-policy
+spec:
+  podSelector:             | Which pod policy apply to like a db server with label role=db.
+    matchLabels:
+      role: db
+  policyTypes:
+    - Ingress
+  ingress:
+    - from:
+        - podSelector:     | From which pod ingress traffic allow on the db pod, here a api-server with this label. 
+            matchLabels:
+              name: api-server
+      ports:
+        - protocol: TCP
+          port: 8080
+
+
+Network solution which support NetworkPolicy:
+ - Kube-route
+ - Calico
+ - Romana
+ - Weave-net
+ 
+Network solution which  not support NetworkPolicy:
+- Flannel
+
+
+We still able to create NetworkPolicy althrow the network solution not support policy.
+It not work but not throw any error.
+
+
+Developing Network Policies
+--------------------------------------------------
+Suppose we have a Three tire application: webapp, api-server, db
+
+Step:
+  Apply a policy to db pod, and block all in/out traffic.
+  Now need to undestanding which type of communication/rule have to add with this policy.
+  In this case for db server receiving incommuning traffice from api-server and return query result.
+  For this need to add a Ingress policy to this db pod policy from api-server.
+  No need to worry about db output query result to api-server, no policy needed.
+  When the db pod allow Ingress traffice from api-server auto respone result has been allow. 
+But DB server not allow make any query/request to api-server in this policy.
+This is a Egress traffic, to allow this need a extra Egress role in db pod.
+
+
+A single policy can hold Ingress or Egress or Both role.
+
+We add namespace in the policy, with pod selector or with out pod selector.
+We can also only  specify namespace only, no need this pod, this case all pod able to communicate in this ns.
+We cna also spacify a IP or blick of IP to cummunicate with a server out side of cluster.
+
+So three type of selector:
+ - podSelector
+ - namespaceSelector
+ - ipBlock
+This three support apply to -from and -to block in policy.
+OR
+We cna user this rule as tow (podSelector AND namespaceSelector)t ype of selector:
+ - podSelector
+   namespaceSelector
+ - ipBlock
 
 
 
@@ -3292,6 +3377,10 @@ Remember: The kube-dns service is exposed on port 53:
 
 #Ingress Networking
 --------------------------------------------------
+
+
+
+
 
 
 ##Solution: Ingress Networking-1
