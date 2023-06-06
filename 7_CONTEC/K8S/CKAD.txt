@@ -4087,7 +4087,7 @@ Add this under metadata:
 
 Volume in Docker
 --------------------------------------------------
-Generally Docker dont save data any host path or volume.
+Generally Docker do not save data any host path or volume.
 Docker Staorage:
 - Storage Drivers
 - Volume Drivers
@@ -4113,7 +4113,7 @@ Docker has different staorage driver:
 
 Volume in Kubernetes
 --------------------------------------------------
-Generally Kubernetes dont save data any host path or volume.
+Generally Kubernetes do not save data any host path or volume.
 In Kubernetes we have to create volumem in host or other or Storage provide like AWS location to keep data
 and Mounting it on Pod
 
@@ -4148,13 +4148,38 @@ AzurDisk
 What volume type is to be used to mount a directory from the node on which the pod is running?
 hostPath
 
-What volume type is used to store data in a Pod only as long as that Pod is running on that node? When the Pod is deleted the files are to be deleted as well.
+What volume type is used to store data in a Pod only as long as that Pod is running on that node? 
+When the Pod is deleted the files are to be deleted as well.
 emptyDir
 
 What is the fc volume type used for?
 To mount and existing Fiber channel volume into a Pod
 
 
+
+apiVersion: v1
+kind: Pod
+metadata:
+  name: webapp
+spec:
+  containers:
+  - name: event-simulator
+    image: kodekloud/event-simulator
+    env:
+    - name: LOG_HANDLERS
+      value: file
+    volumeMounts:
+    - mountPath: /log           | Inside Container path
+      name: log-volume
+
+  volumes:
+  - name: log-volume
+    hostPath:
+      path: /var/log/webapp      | Host machine path
+      type: Directory
+
+This hostPath good for single host machine, for multi node cluster this is not a good approce.
+Have to use external replicated storage solution, there are many like: awsAlasticStoraverVolume 
 
 
 ##Persistent Volumes | Persistent Volumes Claims
@@ -4410,17 +4435,30 @@ The PVC was still being used by the webapp pod when we issued the delete command
 
 ##Storage Class
 --------------------------------------------------
-Every pcv bind with pv, so have to create it berore binging, this is call static Provisioning.
+Every pcv bind with pv, so have to create it before binging, this is call static Provisioning.
 Storage class come to Dynamic Provisioning.
 
 In this case we not have to create any pv(It will create auto by Storage class), 
 we have to create just StorageClass and come it with pvc to pod binging automatically.
 
 
+
+
+
+
+
+StatefulSets:
+--------------------------------------------------
 StatefulSets are like DeploymentSet, dirrerent is its run pod sequential with pod index number.
+
+Deployment not possible to run pod sequentially what is required, then come to StatefulSets.
+StatefulSets same as deploument, its create pod flow the deployment template and scale as required also rolling update.
+
 
 
 Headless Service:
+--------------------------------------------------
+
 
 PersistentVolumeClaimTemplate for create auto vpc.
 
@@ -4437,7 +4475,9 @@ PersistentVolumeClaimTemplate for create auto vpc.
 1)What is the name of the Storage Class that does not support dynamic volume provisioning?
 local-storage
 
-The "local-storage" Storage Class in Kubernetes does not support dynamic volume provisioning. It is used to represent local storage devices attached to the nodes in the cluster. With this Storage Class, you need to manually manage the provisioning and allocation of local storage volumes.
+The "local-storage" Storage Class in Kubernetes does not support dynamic volume provisioning. 
+It is used to represent local storage devices attached to the nodes in the cluster. 
+With this Storage Class, you need to manually manage the provisioning and allocation of local storage volumes.
 
 
 What is the Volume Binding Mode used for this storage class (the one identified in the previous question)?
@@ -4479,7 +4519,8 @@ spec:
     matchLabels:
       volume: local-pv
 
-The Storage Class called local-storage makes use of VolumeBindingMode set to WaitForFirstConsumer. This will delay the binding and provisioning of a PersistentVolume until a Pod using the PersistentVolumeClaim is created.
+The Storage Class called local-storage makes use of VolumeBindingMode set to WaitForFirstConsumer. 
+This will delay the binding and provisioning of a PersistentVolume until a Pod using the PersistentVolumeClaim is created.
 Run the command: kubectl describe pvc local-pvc and look under the Events section.
 
 
