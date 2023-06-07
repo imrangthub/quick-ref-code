@@ -4595,7 +4595,7 @@ volumeBindingMode: WaitForFirstConsumer
 
 
 
-##Section 9: Update for Sep 2021
+##Update for Sep 2021
 ==================================================
 
 ##Define, Build and Modify Container Image
@@ -4646,7 +4646,7 @@ Authentication of kunbe-apiserver by:
  - Servcie Account
 
 
-Authorization of kunbe-apiserver by:
+Authorization of kube-apiserver by:
 - RBAC Authorization
 - ABAC Authorization
 - Node Authorization
@@ -4684,7 +4684,7 @@ CERTIFICATE generation not part on CKAD exam.
 
 ##KubeConfig
 --------------------------------------------------
-Budefault kubectl tools find a file under user home directory, $HOME/.kube/config for authencation.
+By default kubectl tools find a file under user home directory, $HOME/.kube/config for authencation.
 This why you dont add any file kubectl command any file.
 
 
@@ -4908,6 +4908,10 @@ To access kubectl cluster make a proxy:
 =>curl http://localhost:8081- -k
 
 kube proxy not equeal as kubectl proxy.
+
+
+
+
 
 
 
@@ -5187,7 +5191,8 @@ Cluter Scoped:
 - clusterroles
 - cluseterrolebinding
 - namespaces etc.
-Cluster role and Cluster binding for create cluster wise resource and namespace role/binding for namespace wise resource modify.
+Cluster role and Cluster binding for create cluster wise resource and namespace role/binding for namespace wise 
+resource modify.
 Same as namespace role and rolebinding, first create cluster role and rolebinding for user.
 
 Cluster role can access all namespace resources.
@@ -5459,7 +5464,7 @@ Two type AdmissionController
 - Validation AdmissionController          | Validate the request, Allow or Dineis
 
 MutationController working before ValidationController, Like: Change the request berore validate.
-This is all builtion Controller.
+This is all builtin Controller.
 
 
 For Custome Admission Controller:
@@ -5680,6 +5685,8 @@ spec:
 
 
 
+
+
 ##153. API Versions/API Deprecations
 --------------------------------------------------
 VersionName:
@@ -5702,8 +5709,14 @@ Which versin we have to user for this we can check API Deprection.and ists rule.
 
 Rules:
 RuleOne: Remove a version on nesxt encrement version.
-Rule2: For next verson hve to be same filed of previous version.
-Role3: alpha version not replace GA, and not to be depracate before GA is comming.
+Rule2: For next version have to be same filed of previous version.
+Role3: alpha version not replace GA, and not to be depracate before GA is comming. v2 can be depricated v1 only.
+
+=>kubectl convert -f oldFile --output-version newAPIVersion
+=>kubectl convert -f mydeployment,yaml --output-version apps/v1
+For convert older version to new version.
+
+
 
   
 
@@ -5853,8 +5866,12 @@ A resource is object in kubernetes, like deployment,job,ReplicsSet etc.
 How resource work:
 Deployment(Resource run)-> ETCD(Database) Keep the Data-> Controller(Monitoring tools) Monitor the run as expectedly.
 
+We not need to create controller for deployment, in builtin with kubernatis source code wirtten by Go langualge.
+
+
 As it you can create your won Custome Resources in Kubernetes. For that you have to config Kubernetes API.
-So, Where you defive apis, this is called CRD(Custome resource defination) file a yaml file with details of api for custome resource.
+So, Where you defive apis, this is called CRD(Custome resource defination) file a yaml file with details of api 
+for custome resource.
 
 Now Create the CR by using the file and you able to create your resource.
 But until now this resource do notheng its only create object and save info in ECTD no taken action.
