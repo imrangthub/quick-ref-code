@@ -1157,10 +1157,10 @@ spec:
   - name: simple-webapp
     image: kodekloud/webapp-color
     args: ["--color", "green"]
-    
+
     envFrom:
       - configMapRef:
-        name: my-configmap
+          name: my-configmap
 
 
 
@@ -3045,7 +3045,7 @@ spec:
 
 
 
-##Section 7: Services & Networking
+##Services & Networking
 ==================================================
 Kubernetes Services enable communication group of application with another user or objects.
 Services make losscoupling with microservice.
@@ -3085,7 +3085,7 @@ spec:
   selector:                       | Identify the pods
     name: simple-webapp
 
-In a service only port: field is mandatory, if not TargetPort then it assign as port: value,
+In a service only port: field is mandatory, if not TargetPort then it assign  port value as TargetPort,
 and if not provide nodePort: if automatically take a port in valide range of node port.
 
 You can mape multiple port in a single service.
@@ -3106,6 +3106,9 @@ spec:
   selector:
     name: simple-webapp
   type: NodePort
+
+
+=>kubectl create service nodeport mysvc4 --tcp=8080:80 --node-port=30040 --dry-run=client -o yaml>mysvc.yaml
 
 
 
@@ -3197,7 +3200,7 @@ kind: NetworkPolicy
 metadata:
   name: db-pod-policy
 spec:
-  podSelector:             | Which pod policy apply to like a db server with label role=db.
+  podSelector:             | Which pod policy apply to like a db pod/server with pod label role=db.
     matchLabels:
       role: db
   policyTypes:
@@ -3243,7 +3246,7 @@ This is a Egress traffic, to allow this need a extra Egress role in db pod.
 
 A single policy can hold Ingress or Egress or Both role.
 
-We add namespace in the policy, with pod selector or with out pod selector.
+We add namespace in the policy, with pod selector or without pod selector.
 We can also only  specify namespace only, no need this pod, this case all pod able to communicate in this ns.
 We cna also spacify a IP or blick of IP to cummunicate with a server out side of cluster.
 
@@ -3253,7 +3256,7 @@ So three type of selector:
  - ipBlock
 This three support apply to -from and -to block in policy.
 OR
-We cna user this rule as tow (podSelector AND namespaceSelector)t ype of selector:
+We cna user this rule as tow (podSelector AND namespaceSelector) type of selector:
  - podSelector
    namespaceSelector
  - ipBlock
@@ -3418,7 +3421,7 @@ IngressController:
   A Service requird to expose to our side with a configMap data value
   Also need a ServiceAccount for get permisson to do all this thing.
 
-So required component for ingressController:
+So required component for IngressController:
 - Deployment
 - Service
 - ConfigMap
@@ -3426,6 +3429,7 @@ So required component for ingressController:
 
 Simple Ingress Controller:
 cat ingress-controller.yaml 
+
 apiVersion: apps/v1
 kind: Deployment
 metadata:
@@ -3591,9 +3595,6 @@ kind: Ingress
 metadata:
   name: test-ingress
   namespace: critical-space
-  annotations:
-    nginx.ingress.kubernetes.io/rewrite-target: /
-    nginx.ingress.kubernetes.io/ssl-redirect: "false"
 spec:
   rules:
   - http:
@@ -3643,12 +3644,23 @@ spec:
 
 
 For a new application added:
-- Need a service what is haveto mentation on Ingress file.
-- Need a deployment with this service
-- Finally Pod running with this deployment
+- Need a service what is haveto route traffic and mentation on Ingress defenation yaml file.
+- Need a deployment with this service, pod running with this deployment
 
 (app mean a deployment)
 =>kubectl get deploy --all-namespaces
+
+
+Format:
+=>kubectl create ingress <ingress-name> --rule="host/path=service:port"
+
+Example:
+=>kubectl create ingress ingress-test --rule="wear.my-online-store.com/wear*=wear-service:80"
+
+
+
+
+
 
 ##Solution: Ingress Networking-1
 --------------------------------------------------
@@ -4141,6 +4153,9 @@ spec:
       persistentVolumeClaim:
         claimName: myclaim
 
+The same is true for ReplicaSets or Deployments. Add this to the pod template section of a Deployment on ReplicaSet.
+
+
 
 What type of volume is used to mount a Microsoft Azure Data Disk into a Pod?
 AzurDisk
@@ -4210,8 +4225,9 @@ Its has Three Access Mode:
 
  Persistent Volumes and Persistent Volumes Claims are two dirrerent Object in kunbernetes.
  Usually admin create PV and User user to PVC
-
  Every PVC bind with a single PV(One -to -One)
+
+
 
 
 ##Solution1: Persistent Volumes | Persistent Volumes Claims
@@ -4432,6 +4448,11 @@ The PVC was still being used by the webapp pod when we issued the delete command
 
 
 
+CKAD exam this is all about Presistent volume:
+We have covered the required topics for the exam for the Storage section.
+
+
+
 
 ##Storage Class
 --------------------------------------------------
@@ -4595,6 +4616,11 @@ volumeBindingMode: WaitForFirstConsumer
 
 
 
+
+
+
+
+
 ##Update for Sep 2021
 ==================================================
 
@@ -4628,6 +4654,8 @@ And modify Dockerfile to use python:3.6-alpine image and then build using docker
 
 5)Run an instance of the new image webapp-color:lite and publish port 8080 on the container to 8383 on the host.
 =>docker run -d -p 8383:8080 webapp-color:lite
+
+
 
 
 
@@ -4681,7 +4709,6 @@ CERTIFICATE generation not part on CKAD exam.
 
 
 
-
 ##KubeConfig
 --------------------------------------------------
 By default kubectl tools find a file under user home directory, $HOME/.kube/config for authencation.
@@ -4699,6 +4726,10 @@ Section are:
 =>kubectl config view --kubeconfig=my-custome-config
 
 =>kubectl config use-context prod-user@production
+
+Set Context:
+=>kubectl config --kubeconfig=/root/my-kube-config use-context research
+=>kubectl config --kubeconfig=/root/my-kube-config current-context
 
 
 my-custom-config:
@@ -4811,7 +4842,9 @@ Current context set
 
 To use that context, run the command: 
 =>kubectl config --kubeconfig=/root/my-kube-config use-context research
+
 To know the current context, run the command: 
+=>kubectl config current-context
 =>kubectl config --kubeconfig=/root/my-kube-config current-context
 OR
 By default kubectl config command user /root/.kube/config file, to user custome file have to mentation like this
@@ -4825,7 +4858,8 @@ kind: Config
 preferences: {}
 
 
-5)We don't want to have to specify the kubeconfig file option on each command. Make the my-kube-config file the default kubeconfig.
+5)We don't want to have to specify the kubeconfig file option on each command. 
+Make the my-kube-config file the default kubeconfig.
 Default kubeconfig file configured
 
 =>mv /root/my-kube-config /root/.kube/config
@@ -4950,7 +4984,7 @@ rules:
   resources: ["pods"]
   verbs: ["list", "create","delete"]
 
-Nest we have to create a role bindign, rolebinding bind the role to the user.
+Now we have to create a role bindign, rolebinding bind the role to the user.
 
 kind: RoleBinding
 apiVersion: rbac.authorization.k8s.io/v1
@@ -4984,7 +5018,12 @@ RoleBinding: Bind User with a role
 
 
 
-##Solution3: Role Based Access Controls
+
+
+
+
+
+##Role Based Access Controls
 --------------------------------------------------
 
 1) Inspect the environment and identify the authorization modes configured on the cluster.
@@ -5174,6 +5213,8 @@ rules:
 
 
 
+
+
 ##144. Cluster Roles
 --------------------------------------------------
 In kubernetes all Resource are catagoies are namespace or cluster scope.
@@ -5199,9 +5240,9 @@ Cluster role can access all namespace resources.
 
 
 
-To get the all kist on namespace resource list:
-=>kubectl api-resources --namespace=true
-=>kubectl api-resources --namespace=false
+To get the all kist on namespace/non-namesapce resource list:
+=>kubectl api-resources --namespaced=true
+=>kubectl api-resources --namespaced=false
 
 
 
@@ -5236,6 +5277,11 @@ Inspect the cluster-admin role's privileges.
 Use the command kubectl create to create a clusterrole and clusterrolebinding for user michelle to grant access to the nodes.
 After that test the access using the command kubectl auth can-i list nodes --as michelle.
 
+=>kubectl auth can-i list nodes --as michelle
+
+=>kubectl create clusterrole cls-role --verb=get,list,create,delete --resource=nodes
+OR
+=>kubectl create clusterrole node-admin --verb=get,watch,list,create,delete --resource=nodes --dry-run=client -o yaml > node-admin.yaml
 cluste.yaml 
 ---
 kind: ClusterRole
@@ -5247,6 +5293,8 @@ rules:
   resources: ["nodes"]
   verbs: ["get", "watch", "list", "create", "delete"]
 
+
+=>kubectl create clusterrolebinding michelle-binding --clusterrole=node-admin --user=michelle --dry-run=client -o yaml > michelle-binding.yaml
 ---
 kind: ClusterRoleBinding
 apiVersion: rbac.authorization.k8s.io/v1
@@ -5276,6 +5324,11 @@ CreateClusterBinding:
 
 =>kubectl describe clusterrole michelle-role
 =>kubectl describe clusterrolebinding michelle-role-binding
+
+Check:
+=>k auth can-i list node --as michelle
+=>k config can-i list node --as michelle
+
 
 
 
@@ -5379,7 +5432,7 @@ Now it NamespaceLifeCycle admission controller.
 
 
 
-##149. Solution5: Admission Controllers
+##Admission Controllers
 --------------------------------------------------
 1)What is not a function of admission controller?
 Authencate a user.
@@ -5390,12 +5443,16 @@ NamespaceAutoProvision
 
 =>kubectl get pods -n kube-system
 =>kubectl exec -it kube-apiserver-controlplane -n kube-system -- kube-apiserver -h | grep 'enable-admission-plugins'
+OR
+=>kubectl exec -it kube-apiserver-controlplane -n kube-system -- kube-apiserver -h
+Check this:
+--disable-admission-plugins strings                                                         
 
 
 3)Which admission controller is enabled in this cluster which is normally disabled?
 Check enable-admission-plugins in /etc/kubernetes/manifests/kube-apiserver.yaml
 
-=>vi /etc/kubernetes/manifests/kube-apiserver.yaml
+=>cat /etc/kubernetes/manifests/kube-apiserver.yaml
 =>grep enable-admission-plugin /etc/kubernetes/manifests/kube-apiserver.yaml
 
 
@@ -5419,17 +5476,11 @@ It should look like below
     - --enable-admission-plugins=NodeRestriction,NamespaceAutoProvision
 API server will automatically restart and pickup this configuration.
 
-OR
-
-Have to add NamespaceAutoProvision controller to the file like this: 
-- --enable-admission-plugins=NodeRestriction,NamespaceAutoProvision
-
-=>vi /etc/kubernetes/manifests/kube-apiserver.yaml
-
 =>kubectl get ns
 =>kubectl run mynginx --image=nginx -n blue
 
-Note that the NamespaceExists and NamespaceAutoProvision admission controllers are deprecated and now replaced by NamespaceLifecycle admission controller.
+Note that the NamespaceExists and NamespaceAutoProvision admission controllers are deprecated and now replaced by 
+NamespaceLifecycle admission controller.
 
 The NamespaceLifecycle admission controller will make sure that requests
 to a non-existent namespace is rejected and that the default namespaces such as
@@ -5457,7 +5508,7 @@ Since the kube-apiserver is running as pod you can check the process to see enab
 
 
 
-##150. Validating and Mutating Admission Controllers
+##Validating and Mutating Admission Controllers
 --------------------------------------------------
 Two type AdmissionController
 - Mutation AdmissionController            | Change the Object, the request its self.
@@ -5499,13 +5550,13 @@ Key : /root/keys/webhook-server-tls.key
 
 Create tls secret type in kubernetes with --cert and --key options
 
+=>kubectl create secret tls webhook-server-tls --cert "/root/keys/webhook-server-tls.crt" --key "/root/keys/webhook-server-tls.key" -n webhook-demo
 =>kubectl -n webhook-demo create secret tls webhook-server-tls \
 --cert "/root/keys/webhook-server-tls.crt" \
 --key "/root/keys/webhook-server-tls.key"
 
 
-4)
-Now create a deployment.
+4) Now create a deployment.
 =>k apply -f webhook-deployment.yaml 
 cat webhook-deployment.yaml 
 apiVersion: apps/v1
@@ -5729,10 +5780,15 @@ For convert older version to new version.
 
 1)Identify the short names of the deployments, replicasets, cronjobs and customresourcedefinitions.
 =>kubectl api-resources
+=>kubectl api-resources | grep -e customresourcedefinitions -e cronjobs
 
 2)What is the patch version in the given Kubernetes API version?
 Kubernetes API version - 1.22.2
 2, the last one
+
+=>kubectl version --short
+
+
 
 3)Identify which API group a resource called job is part of?
 
@@ -5751,6 +5807,9 @@ It supports v1 and v1beta1 but the preferred version is v1.
 
 =>kubectl proxy 8001&
 curl localhost:8081/apis/authorization.k8s.io
+Where & runs the command in the background and kubectl proxy command starts the proxy to the kubernetes API server.
+
+
 
 
 5)Enable the v1alpha1 version for rbac.authorization.k8s.io API group on the controlplane node.
@@ -5793,29 +5852,13 @@ Add this line:
 If unsure how to install then refer to the official k8s documentation page which is available at the top right panel.
 
 Download the latest release version from the curl command :-
+=>curl -LO https://dl.k8s.io/release/$(curl -L -s https://dl.k8s.io/release/stable.txt)/bin/linux/amd64/kubectl-convert
 
-root@controlplane:~# curl -LO https://dl.k8s.io/release/$(curl -L -s https://dl.k8s.io/release/stable.txt)/bin/linux/amd64/kubectl-convert
-  % Total    % Received % Xferd  Average Speed   Time    Time     Time  Current
-                                 Dload  Upload   Total   Spent    Left  Speed
-100   154  100   154    0     0   6416      0 --:--:-- --:--:-- --:--:--  6416
-100 60.7M  100 60.7M    0     0   142M      0 --:--:-- --:--:-- --:--:--  142M
-then check the availability by ls command :-
-
-root@controlplane:~# pwd
-/root
-root@controlplane:~# ls
-kubectl-convert  multi-pod.yaml  sample.yaml
 Change the permission of the file and move to the /usr/local/bin/ directory.
-
-root@controlplane:~# pwd
-/root
-root@controlplane:~# chmod +x kubectl-convert 
-root@controlplane:~# 
-root@controlplane:~# mv kubectl-convert /usr/local/bin/kubectl-convert
-root@controlplane:~# 
+=>chmod +x kubectl-convert 
+=>mv kubectl-convert /usr/local/bin/kubectl-convert
 Use the --help option to see more option.
-
-root@controlplane:~# kubectl-convert --help
+=>kubectl-convert --help
 If it'll show more options that means it's configured correctly if it'll give an error that means we haven't set up properly.
 
 
@@ -5824,7 +5867,6 @@ OR
 
 =>chmod +x kubectl-convert
 =>mv kubectl-convert /usr/local/bin/
-
 =>kubectl-convert -h
 
 
@@ -5835,16 +5877,16 @@ Run the command: kubectl-convert -f ingress-old.yaml --output-version networking
 
 
 Run the command kubectl-convert to change the deprecated API version as follows :-
-root@controlplane:~# kubectl-convert -f ingress-old.yaml --output-version networking.k8s.io/v1
+=>kubectl-convert -f ingress-old.yaml --output-version networking.k8s.io/v1
 
 # store new changes into a file 
-root@controlplane:~# kubectl-convert -f ingress-old.yaml --output-version networking.k8s.io/v1 > ingress-new.yaml
+=>kubectl-convert -f ingress-old.yaml --output-version networking.k8s.io/v1 > ingress-new.yaml
 After changing the API version and storing into a file, use the kubectl create -f command to deploy the resource :-
 
-root@controlplane:~# kubectl create -f ingress-new.yaml
+=>kubectl create -f ingress-new.yaml
 Inspect the apiVersion as follows :-
 
-root@controlplane:~# kubectl get ing ingress-space -oyaml | grep apiVersion
+=>kubectl get ing ingress-space -oyaml | grep apiVersion
 Note: Maybe you will not see the service and other resources mentioned in the ingress YAML on the controlplane node because we have to only deploy the ingress resource with the latest API version.
 
 OR
@@ -6120,7 +6162,7 @@ sudo apt-get install helm
 
 
 4)What is a command line flag used to enable verbose output?
-=>helm --help
+ helm -h | grep verbose
 =>helm --debug
 
 

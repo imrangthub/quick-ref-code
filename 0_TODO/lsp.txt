@@ -10,8 +10,16 @@ Faster delete pod
 
 CKAD-feedback
 
+
+Assignment:
+===============================================
+Create configmap
+Set user role rolebinding and get pod
+
+
 CKAD-EXAM-CHAPTER
 ================================================
+
 -CoreConcept
  Done, concept and patise test.
 
@@ -41,5 +49,105 @@ e. On the exam day, stay calm. The exam is not as difficult as people make it ou
 f. Use a high-spec laptop, as using a lower-spec laptop like an i5 can cause performance issues during the exam.
 g. The exam environment is known to be poor, with lags and hangs, but have patience. You will have sufficient time, so don't try to rush as the system may not work properly.
 
+
+
+ConfigMap:
+----------------------------------
+We can Edit configmap in a single command.
+=>kubectl edit configmap my-configmap
+
+
+Set complate env with value:
+apiVersion: v1
+kind: Pod
+metadata:
+  name: my-app
+spec:
+  containers:
+  - image: nginx
+    name: my-app
+    env:
+     - name: TYPE
+       value: web application
+     - name: COLOR
+       value: blue
+  restartPolicy: Always
+
+
+Set env value from configmap:
+apiVersion: v1
+kind: Pod
+metadata:
+  name: my-app2
+spec:
+  containers:
+  - image: nginx
+    name: my-app
+    env:
+     - name: COLOR
+       valueFrom:
+          configMapKeyRef:
+             name: webapp-config-map
+             key: APP_COLOR
+  restartPolicy: Always
+
+
+A single env now set value from configmap:
+
+=>kubectl exec my-app -- env
+  APP_COLOR=darkblue
+
+
+
+
+Set complate env from configmap:
+
+apiVersion: v1
+kind: Pod
+metadata:
+  name: my-app3
+spec:
+  containers:
+  - image: nginx
+    name: my-app
+    envFrom:
+      - configMapRef:
+          name: webapp-config-map
+  restartPolicy: Always
+
+When it done all env abailable in this pod as list:
+=>kubectl exec my-app3 -- env
+  APP_COLOR=darkblue
+  APP_OTHER=disregard
+
+
+Volume mount from configmap:
+
+apiVersion: v1
+kind: Pod
+metadata:
+  name: webapp-green
+  labels:
+    name: webapp-green
+spec:
+  containers:
+    - name: simple-webapp
+      image: kodekloud/webapp-color
+      args: ["--color", "green"]
+      volumeMounts:
+        - name: my-app-volume
+          mountPath: /path/to/config
+  volumes:
+    - name: my-app-volume
+      configMap:
+        name: webapp-config-map
+
+This way this data place on you pod location, and user by app inside pod.
+=>k exec webapp-green -- ls /path/to/config
+APP_COLOR
+APP_OTHER
+
+=>k exec webapp-green -- cat /path/to/config/APP_COLOR
+darkblue
 
 
