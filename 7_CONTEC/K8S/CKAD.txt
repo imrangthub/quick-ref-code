@@ -302,7 +302,7 @@ spec:
         image: nginx
 
 
-For finding any issu in defination yaml file, first run the yaml
+For finding any issu in defination yaml file, first run the yamldate
 =>kubectl create -f myreplicaset.yaml
 And now check the error message
 
@@ -4709,8 +4709,28 @@ CERTIFICATE generation not part on CKAD exam.
 
 
 
+
 ##KubeConfig
 --------------------------------------------------
+kube-apiserver restrect/authencation/authorization done when a api/activity done in cluster.
+
+For a get request involvement:
+=>kubectl get pod
+ --server my-kube-playground:6443
+ --client-ke admin.key
+ --client-certificate admin.crt
+ --certificate-suthority ca.crt
+
+OR
+=>kubectl get pod 
+   --kubeconfig=my-custome-config
+This way all relevent data in a single config file
+
+OR
+=>kubectl get pod 
+If you put notheng by default if find a config file in the path:
+$HOME/.kube/config
+
 By default kubectl tools find a file under user home directory, $HOME/.kube/config for authencation.
 This why you dont add any file kubectl command any file.
 
@@ -4731,68 +4751,73 @@ Set Context:
 =>kubectl config --kubeconfig=/root/my-kube-config use-context research
 =>kubectl config --kubeconfig=/root/my-kube-config current-context
 
+=>k get pod --kubeconfig=my-kube-config
 
-my-custom-config:
+cat my-kube-config
 apiVersion: v1
-kind: Config
 clusters:
-- name: production
-  cluster:
+- cluster:
     certificate-authority: /etc/kubernetes/pki/ca.crt
     server: https://controlplane:6443
-
-- name: development
-  cluster:
+  name: development
+- cluster:
     certificate-authority: /etc/kubernetes/pki/ca.crt
     server: https://controlplane:6443
-
-- name: kubernetes-on-aws
-  cluster:
+  name: imran-cluster
+- cluster:
     certificate-authority: /etc/kubernetes/pki/ca.crt
     server: https://controlplane:6443
-
-- name: test-cluster-1
-  cluster:
+  name: kubernetes-on-aws
+- cluster:
     certificate-authority: /etc/kubernetes/pki/ca.crt
     server: https://controlplane:6443
-
+  name: production
+- cluster:
+    certificate-authority: /etc/kubernetes/pki/ca.crt
+    server: https://controlplane:6443
+  name: test-cluster-1
 contexts:
-- name: test-user@development
-  context:
-    cluster: development
-    user: test-user
-
-- name: aws-user@kubernetes-on-aws
-  context:
+- context:
     cluster: kubernetes-on-aws
     user: aws-user
-
-- name: test-user@production
-  context:
-    cluster: production
-    user: test-user
-
-- name: research
-  context:
+  name: aws-user@kubernetes-on-aws
+- context:
+    cluster: imran-cluster
+    namespace: kube-system
+    user: imran-user
+  name: imran
+- context:
     cluster: test-cluster-1
     user: dev-user
-
+  name: research
+- context:
+    cluster: development
+    user: test-user
+  name: test-user@development
+- context:
+    cluster: production
+    user: test-user
+  name: test-user@production
+current-context: imran
+kind: Config
+preferences: {}
 users:
-- name: test-user
-  user:
-    client-certificate: /etc/kubernetes/pki/users/test-user/test-user.crt
-    client-key: /etc/kubernetes/pki/users/test-user/test-user.key
-- name: dev-user
-  user:
-    client-certificate: /etc/kubernetes/pki/users/dev-user/developer-user.crt
-    client-key: /etc/kubernetes/pki/users/dev-user/dev-user.key
 - name: aws-user
   user:
     client-certificate: /etc/kubernetes/pki/users/aws-user/aws-user.crt
     client-key: /etc/kubernetes/pki/users/aws-user/aws-user.key
-
-current-context: test-user@development
-preferences: {}
+- name: dev-user
+  user:
+    client-certificate: /etc/kubernetes/pki/users/dev-user/dev-user.crt
+    client-key: /etc/kubernetes/pki/users/dev-user/dev-user.key
+- name: imran-user
+  user:
+    client-certificate: /etc/kubernetes/pki/users/test-user/test-user.crt
+    client-key: /etc/kubernetes/pki/users/test-user/test-user.key
+- name: test-user
+  user:
+    client-certificate: /etc/kubernetes/pki/users/test-user/test-user.crt
+    client-key: /etc/kubernetes/pki/users/test-user/test-user.key
 
 
 current-context: test-user@development
@@ -4941,12 +4966,19 @@ To access kubectl cluster make a proxy:
 =>kubectl proxy
 =>curl http://localhost:8081- -k
 
+
+
 kube proxy not equeal as kubectl proxy.
 
+kube proxy    | for create a proxy server for make a proxy in between tow service or other component
+kubectl proxy | for make curl rquest with default certificat info to kube-apiserver
 
 
 
 
+
+ClusterConfig cluster,user,context relevent to: $HOME/.kube/config  config.
+Authorization&Authorization relavent to: kube-apiserver pod | /etc/kubernetes/kube-apiserver.yaml
 
 
 ##Authorization
@@ -4970,7 +5002,7 @@ Authorization Mechanisms:
 You cand user multiple authorization mode at a time. all mode working on flow the order.
 
 
-##141. Role Based Access Controls
+##Role Based Access Controls
 --------------------------------------------------
 Create a role using file:
 
@@ -5023,7 +5055,7 @@ RoleBinding: Bind User with a role
 
 
 
-##Role Based Access Controls
+##Solution: Role Based Access Controls
 --------------------------------------------------
 
 1) Inspect the environment and identify the authorization modes configured on the cluster.
