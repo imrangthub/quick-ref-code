@@ -5744,7 +5744,23 @@ VersionName:
 Alpha -> Beta ->GA(Stable)
 
 Alpha: Not enable by default, have to ebale vi flag.
-Beta, GA: Ebable by default.
+Alpha: May not come to next releae version or its can be remove with any notice.
+After all of the bug fixed and testing it come to beta version or drop.
+
+Beta:
+Beta stage also have minor bug, it enable bu defautl.
+
+GA: Its ( v1 ), Ebable by default.
+
+
+PraferedVersion:
+For a single thisng mya has multiple api version, to see the prefered version use:
+=>kubectl explain
+
+StorageVersion:
+Object save on ETCD storage may or may not to different version from prefered version.
+
+
 
 If any apiGroup has multiple version, PreferredVersion will work by default. To check tis:
 =>localhost:8002/apis/batch
@@ -5756,12 +5772,21 @@ ExecStart = /
   --runtime-config=batch/v2alpha1\\
 and Restart thsi api server.
 
+
+
+
+
+API Deprection
+--------------------------------------------------
 Which versin we have to user for this we can check API Deprection.and ists rule.
 
 Rules:
 RuleOne: Remove a version on nesxt encrement version.
 Rule2: For next version have to be same filed of previous version.
-Role3: alpha version not replace GA, and not to be depracate before GA is comming. v2 can be depricated v1 only.
+Role3: Beta and GA version must have to mantin in 9 to 12 month, alpha 0.
+       alpha version not replace GA, and not to be depracate before GA is comming. v2 can be depricated v1 only.
+       
+
 
 =>kubectl convert -f oldFile --output-version newAPIVersion
 =>kubectl convert -f mydeployment,yaml --output-version apps/v1
@@ -5781,6 +5806,7 @@ For convert older version to new version.
 1)Identify the short names of the deployments, replicasets, cronjobs and customresourcedefinitions.
 =>kubectl api-resources
 =>kubectl api-resources | grep -e customresourcedefinitions -e cronjobs
+=>k api-resources | grep -e deployments -e replicasets -e cronjobs -e customresourcedefinitions
 
 2)What is the patch version in the given Kubernetes API version?
 Kubernetes API version - 1.22.2
@@ -5806,7 +5832,8 @@ VERSION:  batch/v1
 It supports v1 and v1beta1 but the preferred version is v1.
 
 =>kubectl proxy 8001&
-curl localhost:8081/apis/authorization.k8s.io
+=>curl localhost:8081/apis/authorization.k8s.io
+
 Where & runs the command in the background and kubectl proxy command starts the proxy to the kubernetes API server.
 
 
@@ -5901,8 +5928,12 @@ OR
 
 
 
-##157.Custom Resource Definition
+##Custom Resource Definition
 --------------------------------------------------
+What is a custom resource?
+It is an extension of the Kubernetes API that is not necessarily available in a default Kubernetes installation.
+CRD Object can be either namespaced or cluster scoped.
+
 What is kubernetes Resource:
 A resource is object in kubernetes, like deployment,job,ReplicsSet etc.
 How resource work:
@@ -5935,16 +5966,14 @@ It is better build a container and run int on kubernatis cluster and user it.
 CKAD exam not have to build customer controller, May need to build a customer resource using defination file.
 and working  with existing Custome resource Controller what is already may deploy.
 
-
 Not so much possible to come in exam to create a custome resource, but it is possible. and better to know
 
-What is a custom resource?
-It is an extension of the Kubernetes API that is not necessarily available in a default Kubernetes installation.
 
 
 
 
-Operator Framework
+
+// Operator Framework
 --------------------------------------------------
 Until now we see that create and CRD and Custome Controller together for working.
 Its cand be package this two as Framework called: Operator Framework.Its more only CRD and CC.
@@ -5977,6 +6006,40 @@ So finally create a custom resource from a given manifest file called custom.yam
 
 
 Note :- Make sure resources should be created successfully from the custom.yaml file.
+
+In-complate CRD:
+cat crd.yaml 
+---
+apiVersion: apiextensions.k8s.io/v1
+kind: CustomResourceDefinition
+metadata:
+  name:  
+spec:
+  group: 
+  versions:
+    - name: v2
+      served: false
+      storage: true
+      schema:
+        openAPIV3Schema:
+          type: object
+          properties:
+            spec:
+              type: object
+              properties:
+                internalLoad:
+                  type: string
+                range:
+                  type: integer
+                percentage:
+                  type: string
+  scope: 
+  names:
+    plural: internal
+    singular: internal
+    kind: Internal
+    shortNames:
+    - int
 
 The solution file for crd.yaml is pasted below:
 
@@ -6011,6 +6074,8 @@ spec:
     kind: Internal
     shortNames:
     - int
+
+
 
 =>kubectl create -f custom.yaml 
 after correcting and creating CRD.
@@ -6127,6 +6192,10 @@ You can now reload the Webapp tab to validate that all user traffic now uses the
 ##169.  Install Helm
 --------------------------------------------------
 https://helm.sh/docs/intro/install/#from-apt-debianubuntu
+
+For Helm Install you need a fuctional kubernetes Cluster and with kubectl tools with propepr config/access.
+
+
 
 Helm call package manger, In kunbernetes we bild our app with different type deployment file.
 In Helm all make together build the app. Name of the package in know what and how many package need to deploy.
