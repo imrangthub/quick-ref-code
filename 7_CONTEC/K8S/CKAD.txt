@@ -4624,7 +4624,7 @@ volumeBindingMode: WaitForFirstConsumer
 ##Update for Sep 2021
 ==================================================
 
-##Define, Build and Modify Container Image
+##Define, Build and Modify Container Image  
 --------------------------------------------------
 In a Dockerfile every thing in RIGHT CAPS all are INSTRACTION and left are ARGUMENT.
 Docker image are Layers architecture.
@@ -4648,6 +4648,7 @@ Open the Dockerfile and look for ENTRYPOINT command.
 
 4)Build a new smaller docker image by modifying the same Dockerfile and name it webapp-color and tag it lite.
 Hint: Find a smaller base image for python:3.6. Make sure the final image is less than 150MB.
+
 Ans:
 In the webapp-color directory, run the ls -l command to list the Dockerfile and other files.
 And modify Dockerfile to use python:3.6-alpine image and then build using docker build -t webapp-color:lite .
@@ -5427,10 +5428,14 @@ Create ClusterroleBinding:
 
 
 
-##147. Admission Controllers
+##Admission Controllers
 --------------------------------------------------
 kubectl -> Aluthentication -> Authorization  -> Create Pod
 Usually Aluthentication done by certificate. may with role base Authorization.
+
+Aluthentication->By .kube/config file
+Authorization->By RoleBase
+
 
 But, Role base Authorization are not able make restrection in more details like:
 - Only permite image allow, and certain registry
@@ -5780,7 +5785,7 @@ Alpha: May not come to next releae version or its can be remove with any notice.
 After all of the bug fixed and testing it come to beta version or drop.
 
 Beta:
-Beta stage also have minor bug, it enable bu defautl.
+Beta stage also have minor bug, it enable by defautl.
 
 GA: Its ( v1 ), Ebable by default.
 
@@ -5813,15 +5818,15 @@ API Deprection
 Which versin we have to user for this we can check API Deprection.and ists rule.
 
 Rules:
-RuleOne: Remove a version on nesxt encrement version.
+RuleOne: Remove a version on nesxt increments version.
 Rule2: For next version have to be same filed of previous version.
 Role3: Beta and GA version must have to mantin in 9 to 12 month, alpha 0.
        alpha version not replace GA, and not to be depracate before GA is comming. v2 can be depricated v1 only.
        
 
 
-=>kubectl convert -f oldFile --output-version newAPIVersion
-=>kubectl convert -f mydeployment,yaml --output-version apps/v1
+=>kubectl convert -f oldFile --output-version newVersion
+=>kubectl convert -f mydeployment.yaml --output-version apps/v1
 For convert older version to new version.
 
 
@@ -6108,7 +6113,19 @@ spec:
     - int
 
 
-
+Now the resource will be like this:
+cat custom.yaml 
+---
+kind: Internal
+apiVersion: datasets.kodekloud.com/v1
+metadata:
+  name: internal-space
+  namespace: default
+spec:
+  internalLoad: "high"
+  range: 80
+  percentage: "50"
+  
 =>kubectl create -f custom.yaml 
 after correcting and creating CRD.
 
@@ -6294,6 +6311,11 @@ name - bitnami
 chart repo name - https://charts.bitnami.com/bitnami
 
 =>helm repo add bitnami https://charts.bitnami.com/bitnami
+
+
+
+=>helm repo add bitnami https://charts.bitnami.com/bitnami
+=>helm repo list
 
 
 3)Which command is used to search for the joomla package from the added repository?
