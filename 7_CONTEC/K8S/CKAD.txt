@@ -1171,12 +1171,15 @@ envFrom:
     name: myapp-configmap
 
 SINGLE ENV:
-env:
-  - name:
-    valueFrom: 
-      configMapKeyRef:
-        name: my-configmap
-        key: APP_COLOR
+ containers:
+  - env:
+    - name: APP_COLOR
+      valueFrom:
+       configMapKeyRef:
+         name: webapp-config-map
+         key: APP_COLOR
+    image: kodekloud/webapp-color
+    name: webapp-color
 
 OR as VOLUME:
 volume:
@@ -1190,7 +1193,7 @@ volume:
 
 
 
-##Solution02 | ConfigMap
+##Solution | ConfigMap
 -------------------------------------------------
 What is the environment variable name set on the container in the pod?
 =>kubectl describe pod webapp-color
