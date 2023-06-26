@@ -3,6 +3,67 @@
 #################################################
 
 
+
+alias k='kubectl'
+alias cc='clear'
+alias kk='kubectl get'
+alias ke='kubectl edit'
+alias kkk='kubectl delete'
+alias kc='kubectl create'
+alias kd='kubectl describe'
+
+
+
+cat fsvc.yaml 
+apiVersion: v1
+kind: Service
+metadata:
+  creationTimestamp: null
+  labels:
+    app: fsvc
+  name: fsvc
+spec:
+  ports:
+  - name: 80-80
+    port: 80
+    protocol: TCP
+    targetPort: 80
+    nodePort: 30080
+  selector:
+    env: prod
+  type: NodePort
+status:
+  loadBalancer: {}
+
+controlplane ~ ➜  cat pod1.yaml 
+apiVersion: v1
+kind: Pod
+metadata:
+  creationTimestamp: null
+  labels:
+    env: prod
+  name: ng
+spec:
+  containers:
+  - image: nginx
+    name: ng
+    resources: {}
+    volumeMounts:
+    - name: pod-vol
+      mountPath: /usr/share/nginx/html
+  volumes:
+  - name: pod-vol
+    hostPath:
+      path: /root/imran/
+      type: DirectoryOrCreate
+  dnsPolicy: ClusterFirst
+  restartPolicy: Always
+status: {}
+
+
+
+
+
 https://brain2life.hashnode.dev/how-to-set-helpful-aliases-for-kubernetes-commands-in-ubuntu-2004
 
 Faster delete pod

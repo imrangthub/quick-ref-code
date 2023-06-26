@@ -11,7 +11,17 @@ CKAD Exam Artical:
 https://blog.getambassador.io/how-to-pass-the-ckad-exam-f8ca180ee853
 
 
+KODEKLOUD20 – handy while registering for the CKA or CKAD exams at Linux Foundation to get a 20% discount.
 DCUBE20 25% disc
+JUNEBBQ30 =276
+
+For Copun code:
+https://scriptcrunch.com/linux-foundation-coupon/
+https://www.retailmenot.com/view/training.linuxfoundation.org?u=VEU72QPA3JFM5FXAIEYRRLZUNM
+https://www.couponchief.com/linuxfoundation.org
+
+
+
 https://devopscube.com/ckad-exam-study-guide/
 Good site for exam  slabus
 
@@ -1189,8 +1199,87 @@ volume:
     
 
 
+SetSimpleEnvinPod:
+apiVersion: v1
+kind: Pod
+metadata:
+  name: webapp-color
+spec:
+  containers:
+  - env:
+    - name: APP_COLOR
+      value: green
+    image: kodekloud/webapp-color
+    name: webapp-colo
 
 
+SetSimpleEnvinPodFromConfigMP:
+apiVersion: v1
+kind: Pod
+metadata:
+  name: webapp-color
+spec:
+  containers:
+  - env:
+    - name: APP_COLOR
+        valueFrom:
+          configMapKeyRef:
+            name: game-demo 
+            key: player_initial_lives
+    image: kodekloud/webapp-color
+    name: webapp-colo
+
+Whole configmapAtaTime:
+
+apiVersion: v1
+kind: Pod
+metadata:
+  name: dapi-test-pod
+spec:
+  containers:
+    - name: test-container
+      image: registry.k8s.io/busybox
+      envFrom:
+      - configMapRef:
+          name: special-config
+
+
+WholeSecretMapatATime:
+
+FroamSecret:
+apiVersion: v1
+kind: Pod
+metadata:
+  name: envfrom-secret
+spec:
+  containers:
+  - name: envars-test-container
+    image: nginx
+    envFrom:
+    - secretRef:
+        name: test-secret
+
+
+FromSecretKeyRef:
+apiVersion: v1
+kind: Pod
+metadata:
+  name: envvars-multiple-secrets
+spec:
+  containers:
+  - name: envars-test-container
+    image: nginx
+    env:
+    - name: BACKEND_USERNAME
+      valueFrom:
+        secretKeyRef:
+          name: backend-user
+          key: backend-username
+    - name: DB_USERNAME
+      valueFrom:
+        secretKeyRef:
+          name: db-user
+          key: db-username
 
 
 ##Solution | ConfigMap
@@ -1597,7 +1686,8 @@ When you set resource limit on pod and If a pod try to cross the limit:
 -------------------------------------------------
 When a pod is created the containers are assigned a default CPU request of .5 and 
 memory of 256Mi". 
-For the POD to pick up those defaults you must have first set those as default values for request and limit by creating a LimitRange in that namespace.
+For the POD to pick up those defaults you must have first set those as default values for request and limit 
+by creating a LimitRange in that namespace.
 
 apiVersion: v1
 kind: LimitRange
@@ -2422,7 +2512,8 @@ failureThreshold:  etc.
 If a container inside a pod crush or exitsted, kubernetes try to restart the container ageing, and continue to do it.
 
 Liveness Probes: 
-  Its a machinesume to check/monitor the pod is healthy or running, You cand define it checking with call a http-api, tch or cmd.
+  Its a machinesume to check/monitor the pod is healthy or running, 
+  You cand define it checking with call a http-api, tch or cmd.
 
 livenessProbe:
   httpGet:
@@ -2860,6 +2951,14 @@ With --to-revision=1, it will be rolled back with the first image we used to cre
 
 
 
+
+=>kubectl rollout history deploy frontend
+=>kubectl rollout history deployment frontend --revision=3
+
+=>kubectl rollout undo deployment frontend --to-revision=1
+
+
+
 ##Solution2: Deployment Rolling Updte and Rollback
 --------------------------------------------------
 cat curl-test.sh 
@@ -2911,7 +3010,16 @@ StrategyType:       Recreate
 
 ##Job and CronJob
 --------------------------------------------------
-Job start imidetly whenre we can set schedule on CronJob.
+ Job ensures that the specified number of pods are executed successfully to complete the task. 
+ Other workload resources like Deployment try to maintain the desired state of an application that is 
+ required to run for a long time.
+
+When a pod of job rech complated state with out any error/iss its mean the job are complated.
+If the pod thorew are nto able to rech complate state or throw erroer its mean job not complated yet.
+
+
+
+Job start imidetly. whenre we can set schedule on CronJob.
 
 ReplicaSet keep runnign pod allows, where Job bring the pod for a specific task and after it finish its go down.
 
@@ -4233,6 +4341,28 @@ Its has Three Access Mode:
  Every PVC bind with a single PV(One -to -One)
 
 
+Same path tow mouintpoint:
+
+apiVersion: v1
+kind: Pod
+metadata:
+  name: webapp2
+spec:
+  containers:
+  - name: webapp
+    image: kodekloud/event-simulator
+    volumeMounts:
+      - name: app-log
+        mountPath: /log
+      - name: app-log2
+        mountPath: /log/
+  volumes:
+    - name: app-log
+      hostPath:
+        path: /var/log/webapp
+    - name: app-log2
+      hostPath:
+          path: /root
 
 
 ##Solution1: Persistent Volumes | Persistent Volumes Claims
@@ -6009,6 +6139,61 @@ CKAD exam not have to build customer controller, May need to build a customer re
 and working  with existing Custome resource Controller what is already may deploy.
 
 Not so much possible to come in exam to create a custome resource, but it is possible. and better to know
+
+
+
+crdExample:
+cat im-crd.yaml 
+apiVersion: apiextensions.k8s.io/v1
+kind: CustomResourceDefinition
+metadata:
+  # name must match the spec fields below, and be in the form: <plural>.<group>
+  name: imranscrd.imranmadbar.com
+spec:
+  # group name to use for REST API: /apis/<group>/<version>
+  group: imranmadbar.com
+  # list of versions supported by this CustomResourceDefinition
+  versions:
+    - name: v1
+      # Each version can be enabled/disabled by Served flag.
+      served: true
+      # One and only one version must be marked as the storage version.
+      storage: true
+      schema:
+        openAPIV3Schema:
+          type: object
+          properties:
+            spec:
+              type: object
+              properties:
+                name:
+                  type: string
+                gender:
+                  type: string
+                age:
+                  type: integer
+  # either Namespaced or Cluster
+  scope: Namespaced
+  names:
+    # plural name to be used in the URL: /apis/<group>/<version>/<plural>
+    plural: imranscrd
+    # singular name to be used as an alias on the CLI and for display
+    singular: imrancrd
+    # kind is normally the CamelCased singular type. Your resource manifests use this.
+    kind: ImranCrd
+    shortNames:
+    - ic
+
+ csExample:
+ cat im-cs.yaml 
+apiVersion: "imranmadbar.com/v1"
+kind: ImranCrd 
+metadata:
+  name: imran-cs
+spec:
+  name: iman
+  gender: Male
+  age: 39
 
 
 

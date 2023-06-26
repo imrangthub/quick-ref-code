@@ -17,6 +17,9 @@ Skype:mdimran.bs23@gmail.com
 https://bs23.talentlms.com
 
 
+http://gitlab.banglalink.net/users/sign_in
+http://gitlab.banglalink.net/dashboard/projects
+
 https://gale.udemy.com/organization/search/?src=ukw&q=kubernatis
 
 
@@ -292,9 +295,88 @@ apihub Debuging Server issue
 ===========================
 
 
+MyBL | Nginx Loadbalancer
 =>http://172.16.254.193:7171/octopus-iris/actuator/info
 =>http://172.16.254.193:7171/octopus-iris/swagger-ui.html
-Nginx Loadbalancer
+
+
+OPENAPI | Nginx Loadbalancer
+172.16.254.51
+
+
+Simple Log:
+172.16.254.137 - [22/Jun/2023:11:43:00 +0600] "GET /customer-information/customer-information/52906902/prepaid-balances?sortType=SERVICE_TYPE HTTP/1.1" 200 1534 "-" "-" 172.16.254.194:7081 0.138 0.138 f3cb569287401a4624932aa84d554e9d
+172.16.254.224 - [22/Jun/2023:11:43:00 +0600] "GET /customer-information/customer-information/customer-information/get-language/channel/MobileApp/msisdn/8801971481479/ HTTP/1.1" 200 104 "-" "-" 172.16.254.209:7081 0.019 0.019 1ef3a9c59c0e3f5b393daa2dafdd2acf
+172.16.254.147 - [22/Jun/2023:11:43:00 +0600] "GET /customer-information/customer-information/258573271/subscription-products HTTP/1.1" 200 1130 "-" "-" 172.16.254.194:7081 0.014 0.014 196ad6c4269f4a95c609edf4afa71ada
+172.16.254.137 - [22/Jun/2023:11:43:00 +0600] "GET /customer-information/customer-information?include=SUBSCRIPTION_TYPES&msisdn=8801971158267 HTTP/1.1" 200 348 "-" "-" 172.16.254.194:7081 0.012 0.012 1f98eb21d4f008cbe8315f35d734a614
+172.16.254.224 - [22/Jun/2023:11:43:00 +0600] "GET /customer-information/customer-information/146230025/available-loan-products HTTP/1.1" 200 920 "-" "-" 172.16.254.11:7081 0.146 0.146 e876ffc7d4980eb784440572eaac6fea
+172.16.254.2 - [22/Jun/2023:11:43:00 +0600] "GET /customer-information/customer-information/222590886/prepaid-balances?sortType=SERVICE_TYPE HTTP/1.1" 200 808 "-" "-" 172.16.254.11:7081 0.116 0.116 ab7df153a9043dd6461d0756e189383f
+172.16.254.196 - [22/Jun/2023:11:43:00 +0600] "GET /customer-information/customer-information?include=SUBSCRIPTION_TYPES&msisdn=8801922822731 HTTP/1.1" 200 348 "-" "-" 172.16.254.209:7081 0.013 0.012 e89f35f99e25f2edb2d6e2592891418a
+172.16.254.137 - [22/Jun/2023:11:43:00 +0600] "GET /loyalty/loyalty//priyojon-status?customerId=1921134591 HTTP/1.1" 404 140 "-" "-" 172.16.254.194:7081 0.005 0.004 46193e9ec47153fbd8b074e0e0410187
+172.16.254.2 - [22/Jun/2023:11:43:00 +0600] "GET /customer-information/customer-information/258273756/available-loan-products HTTP/1.1" 200 12 "-" "-" 172.16.254.194:7081 0.011 0.010 ca0ae16db435aa54250184e59df0f4c4
+172.16.254.196 - [22/Jun/2023:11:43:00 +0600] "GET /customer-information/customer-information/46492192/available-loan-products HTTP/1.1" 200 711 "-" "-" 172.16.191.35:7081 0.210 0.210 05e39fbd98784545c5e2f5ee13cf4e8d
+
+
+
+
+'$remote_addr - [$time_local] "$request"' '$status $body_bytes_sent "$http_referer"'  
+'"$http_user_agent" $upstream_addr $upstream_response_time'  " $request_time" " $request_id"
+
+
+172.16.254.196 - [22/Jun/2023:11:43:00 +0600] "GET /loyalty/loyalty//priyojon-status?customerId=1968889839 HTTP/1.1" 404 140 "-" "-" 172.16.254.194:7081 0.001 0.002 8dd86ce4639f843c4fc7b8cabee3cfea
+   $1         $2      $3                 $4     $5          $6                                                 $7     $8  $9 $10  $11          $12         $13   $14         $15
+
+
+172.16.254.137 - [22/Jun/2023:00:01:32 +0600] "GET /loyalty/loyalty//priyojon-status?customerId=1920842816 HTTP/1.1" 404
+=>awk '{print $1,$2,$3,$4,$5,$6,$7, $8}' access.log
+
+711 "-" "-" 172.16.254.11:7081 0.145 0.145 15b525e112b18fa40a5051846f19effa 
+=>awk '{print $9,$10,$11,$12,$13,$14,$15}' access.log
+
+
+System check:
+---------------------------------------------------
+sar -u
+CPU - sar -u
+Memory - free -g, sar -r
+Disk - df -kh
+
+
+
+
+DebugScriptBasic:
+-----------------------------------
+=>tail -f access.log
+
+
+Filtering | by property
+----------------------------------------------------
+=>cat access.log | grep '22/Jun/2023'
+=>cat access.log | grep '22/Jun/2023' | wc -l
+Filter by date
+
+=>tail -5 access.log | awk '22/Jun/2023' | sort | uniq --count
+
+
+
+
+Count:
+----------------------------------
+=>cat temp.log | wc -l
+Count log number
+
+
+=>awk '{print $8}' access.log
+Print Status Code 
+
+=>awk '{print $8,$12}' access.log
+=>tail -5 access.log | awk '{print $8,$12}'
+Print Status Code and gate-way node IP
+
+=>tail -5 access.log | awk '{print $8,$12}' | sort | uniq --count
+Which server get how many status code with count and IP for last 5 Request
+
+
 
 
 DebugScript1:
@@ -303,11 +385,9 @@ DebugScript1:
 =>tail -f access.log | grep -v '200'  | grep -v '202'
 Filtering status code except 200 and 202 
 
-=>cat access.log | awk '{print $(NF-2)}'
-Printing only destination IP: 
-
-=> cat access.log | awk '{print $(NF-2)}' | sort | uniq --count
-Print destination IP count: 
+=>cat access.log | awk '{print $(NF-3)}'
+=>cat access.log | awk '{print $(NF-3)}' | sort | uniq --count
+Printing only destination IP/Count 
 
 
 =>cat access.log | grep –v '200'  | grep –v '202' | awk '{print $(NF-2)}' | sort | uniq --count
@@ -321,7 +401,7 @@ DebugScript2:
 -----------------------------------
 
 =>tail -100000 ../logs/access.log | awk '{ print $8}'|sort |uniq --repeated --count
-Print load balanced IPs and their count
+Print last 100000 request status count summery
 
 =>tail -10000 access.log |awk '{print $12,$8}'|sort|uniq --repeated --count
 Print load balanced IPs and their status count
