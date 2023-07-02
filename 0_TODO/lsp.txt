@@ -13,6 +13,73 @@ alias kc='kubectl create'
 alias kd='kubectl describe'
 
 
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: redis-access
+  namespace: default
+spec:
+  podSelector:
+    matchLabels:
+      access: redis
+  policyTypes:
+    - Ingress
+  ingress:
+    - from:
+        - podSelector:
+            matchLabels:
+              app: redis
+      ports:
+        - protocol: TCP
+          port: 6379
+
+To create deployment:
+
+kubectl create deployment redis --image=redis:alpine --replicas=1
+To expose the deployment using ClusterIP:
+
+kubectl expose deployment redis --name=redis --port=6379 --target-port=6379
+To create ingress rule:
+
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: redis-access
+  namespace: default
+spec:
+  podSelector:
+    matchLabels:
+       app: redis
+  policyTypes:
+  - Ingress
+  ingress:
+  - from:
+    - podSelector:
+        matchLabels:
+          access: redis
+    ports:
+     - protocol: TCP
+       port: 6379
+
+       
+               
+spec:
+  containers:
+  - name: simple-webapp
+    image: kodekloud/event-simulator
+    env:
+    - name: OVERRIDE_USER
+      value: USER99394
+    volumeMount:
+    - mountPath:
+        path: /log/app.log
+        name: app-log
+    volumes:
+    - name: app-log
+      hostPath:
+        path: /opt/outputs/e-com-1123.logs
+        type: FileOrCreate
+        
 
 cat fsvc.yaml 
 apiVersion: v1
