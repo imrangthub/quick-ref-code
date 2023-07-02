@@ -259,9 +259,249 @@ spec:
         value: "8080"
 
 
+
+
 =================================================
-##MockExam-2     
+##MockExam-2
 ================================================= 
+
+
+Q1:Create a deployment called my-webapp with image: nginx, label tier:frontend and 2 replicas. 
+Expose the deployment as a NodePort service with name front-end-service , port: 80 and NodePort: 30083
+
+Ans:
+=>kubectl create deployment my-webapp --image=nginx --replicas=2 --dry-run=client -oyaml>mydep.yaml
+=>kubectl expose deployment my-webapp --name front-end-service --type NodePort --port=80 --dry-run=client -oyaml>svc1.yaml
+Then add this nodePort: 30083
+
+
+Q2:Add a taint to the node node01 of the cluster. Use the specification below:
+key: app_type, value: alpha and effect: NoSchedule
+Create a pod called alpha, image: redis with toleration to node01.
+
+Ans:
+=>kubectl taint node node01 app_type=alpha:NoSchedule
+=>kubectl run alpha --image=redis --dry-run=client -oyaml>pod1.yaml
+Now add tolerations on spec: section.
+
+apiVersion: v1
+kind: Pod
+metadata:
+  creationTimestamp: null
+  labels:
+    run: alpha
+  name: alpha
+spec:
+  tolerations:
+    - effect: NoSchedule
+      key: app_type
+      value: alpha
+  containers:
+  - image: redis
+    name: alpha
+    resources: {}
+  dnsPolicy: ClusterFirst
+  restartPolicy: Always
+status: {}
+
+
+Q3:Apply a label app_type=beta to node controlplane. Create a new deployment called beta-apps with image: nginx and replicas: 3. 
+Set Node Affinity to the deployment to place the PODs on controlplane only.
+NodeAffinity: requiredDuringSchedulingIgnoredDuringExecution
+
+Ans:
+=>kubectl label node controlplane app_type=beta
+=>kubectl create deploy beta-apps --image=nginx --replicas=3 --dry-run=client -oyaml>mydep.yaml
+
+Add this:
+    spec:
+      affinity:
+        nodeAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            nodeSelectorTerms:
+            - matchExpressions:
+              - key: app_type
+                operator: In
+                values: ["beta"]
+
+=>k get po -o wide
+
+
+
+Q4:Create a new Ingress Resource for the service my-video-service to be made available at the 
+URL: http://ckad-mock-exam-solution.com:30093/video.
+
+To create an ingress resource, the following details are: -
+annotation: nginx.ingress.kubernetes.io/rewrite-target: /
+
+host: ckad-mock-exam-solution.com
+path: /video
+
+Once set up, the curl test of the URL from the nodes should be successful: HTTP 200
+
+Ans:
+=>kubectl create ingress ingress --rule="ckad-mock-exam-solution.com/video*=my-video-service:8080" --dry-run=client -oyaml>ing.yaml
+
+
+Q5:We have deployed a new pod called pod-with-rprobe. This Pod has an initial delay before it is Ready. Update the newly created pod pod-with-rprobe with a readinessProbe using the given spec
+httpGet path: /ready
+httpGet port: 8080
+
+Ans:
+=>kubectl get pod pod-with-rprobe -oyaml>pod.yaml
+Edit this and add this on containers: section:
+   readinessProbe:
+      httpGet:
+        path: /ready
+        port: 8080
+
+
+
+Q6:Create a new pod called nginx1401 in the default namespace with the image nginx. 
+Add a livenessProbe to the container to restart it if the command ls /var/www/html/probe fails. 
+This check should start after a delay of 10 seconds and run every 60 seconds.
+You may delete and recreate the object. Ignore the warnings from the probe.
+
+Ans:
+
+apiVersion: v1
+kind: Pod
+metadata: 
+  name: nginx1401
+spec:
+  containers:
+    - image: nginx
+      name: nginx1401
+      livenessProbe:
+        exec:
+          command: ["ls /var/www/html/probe"]
+        initialDelaySeconds: 10
+        periodSecond: 60
+
+
+Q7:Create a job called whalesay with image docker/whalesay and command "cowsay I am going to ace CKAD!".
+completions: 10
+backoffLimit: 6
+restartPolicy: Never
+This simple job runs the popular cowsay game that was modifed by docker
+
+Ans:
+=> kubectl create job --image=docker/whalesay whalesay --dry-run=client -oyaml>myjob.yaml
+Then:
+apiVersion: batch/v1
+kind: Job
+metadata:
+  creationTimestamp: null
+  name: whalesay
+spec:
+  completions: 10
+  backoffLimit: 6
+  template:
+    metadata:
+      creationTimestamp: null
+    spec:
+      containers:
+      - image: docker/whalesay
+        name: whalesay
+        resources: {}
+        command:
+          - sh
+          - -c
+          - "cowsay I am going to ace CKAD!"
+      restartPolicy: Never
+status: {}
+
+
+
+Q8:Create a pod called multi-pod with two containers.
+
+Container 1:
+name: jupiter, image: nginx
+
+Container 2:
+name: europa, image: busybox
+command: sleep 4800
+
+Environment Variables:
+Container 1:
+type: planet
+Container 2:
+type: moon
+
+Ans:
+
+apiVersion: v1
+kind: Pod
+metadata:
+  name: multi-pod
+spec:
+  containers:
+  - name: jupiter
+    image: nginx
+    env:
+      - name: type
+        value: planet
+  - name: europa
+    image: busybox
+    command: ["/bin/sh","-c","sleep 4800"]
+    env:
+      - name: type
+        value: moon
+
+
+Q9:Create a PersistentVolume called custom-volume with size: 50MiB reclaim policy:retain, Access Modes: ReadWriteMany and hostPath: /opt/data
+
+Ans:
+Get from documetation, and eidt:
+
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: custom-volume
+spec:
+  capacity:
+    storage: 50Mi
+  volumeMode: Filesystem
+  accessModes:
+    - ReadWriteMany
+  persistentVolumeReclaimPolicy: Retain
+  hostPath:
+    path: /opt/data
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
