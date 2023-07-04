@@ -223,7 +223,37 @@ spec:
   restartPolicy: Always
 status: {}
 
+OR | as Ans:
+Use the following YAML file to create the pod:
 
+apiVersion: v1
+kind: Pod
+metadata:
+  creationTimestamp: null
+  labels:
+    run: my-busybox
+  name: my-busybox
+  namespace: dev2406
+spec:
+  volumes:
+  - name: secret-volume
+    secret:
+      secretName: dotfile-secret
+  nodeSelector:
+    kubernetes.io/hostname: controlplane
+  containers:
+  - command:
+    - sleep
+    args:
+    - "3600"
+    image: busybox
+    name: secret
+    volumeMounts:
+    - name: secret-volume
+      readOnly: true
+      mountPath: "/etc/secret-volume"
+
+      
 
 Q4:Create a single ingress resource called ingress-vh-routing. The resource should route HTTP traffic to multiple hostnames as specified below:
 
@@ -269,6 +299,40 @@ spec:
                 port:
                   number: 8080
 
+OR | as Ans:
+Use the following YAML to create the ingress resource:
+
+---
+kind: Ingress
+apiVersion: networking.k8s.io/v1
+metadata:
+  name: ingress-vh-routing
+  annotations:
+    nginx.ingress.kubernetes.io/rewrite-target: /
+spec:
+  rules:
+  - host: watch.ecom-store.com
+    http:
+      paths:
+      - pathType: Prefix
+        path: "/video"
+        backend:
+          service:
+            name: video-service
+            port:
+              number: 8080
+  - host: apparels.ecom-store.com
+    http:
+      paths:
+      - pathType: Prefix
+        path: "/wear"
+        backend:
+          service:
+            name: apparels-service
+            port:
+              number: 8080
+
+
 
 Q5:A pod called dev-pod-dind-878516 has been deployed in the default namespace. Inspect the logs for the container called log-x and redirect the warnings to /opt/dind-878516_logs.txt on the controlplane node
 Redirect warnings to file
@@ -277,16 +341,6 @@ Redirect warnings to file
 Ans:
 =>kubectl logs dev-pod-dind-878516 -c log-x | grep WARNING > /opt/dind-878516_logs.txt
 =>cat /opt/dind-878516_logs.txt
-
-
-
-
-
-
-
-
-
-
 
 
 
