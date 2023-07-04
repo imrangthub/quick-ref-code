@@ -101,7 +101,6 @@ https://kodekloud.com/lessons/recap-core-concepts/
 
 
 @@@KodeKloud
-
 =================================================
 ##MockExam-1         
 ================================================= 
@@ -137,6 +136,7 @@ Ans:
 With a- single commd Edit Operation done
 =>kubectl delete pod -l name=busybox-pod
 For delete all running pod by label
+
 
 
 Q6:Create a service messaging-service to expose the redis deployment in the marketing namespace within the cluster on port 6379.
@@ -212,8 +212,8 @@ Q14:Create a redis deployment using the image redis:alpine with 1 replica and la
 Ans:
 =>kubectl create deploy redis --image=redis:alpine --replicas=1
 =>kubectl expose deployment redis --name=redis --port=6379 --target-port=6379
-then create a netpol using documentation.
 
+then create a netpol using documentation.
 apiVersion: networking.k8s.io/v1
 kind: NetworkPolicy
 metadata:
@@ -343,6 +343,8 @@ Ans:
 =>kubectl create ingress ingress --rule="ckad-mock-exam-solution.com/video*=my-video-service:8080" --dry-run=client -oyaml>ing.yaml
 
 
+
+
 Q5:We have deployed a new pod called pod-with-rprobe. This Pod has an initial delay before it is Ready. Update the newly created pod pod-with-rprobe with a readinessProbe using the given spec
 httpGet path: /ready
 httpGet port: 8080
@@ -377,6 +379,9 @@ spec:
           command: ["ls /var/www/html/probe"]
         initialDelaySeconds: 10
         periodSecond: 60
+
+
+
 
 
 Q7:Create a job called whalesay with image docker/whalesay and command "cowsay I am going to ace CKAD!".
