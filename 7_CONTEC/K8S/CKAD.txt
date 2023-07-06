@@ -101,16 +101,426 @@ https://kodekloud.com/lessons/recap-core-concepts/
 
 
 @@@KodeKloud
-
-https://kodekloud.com/lessons/challenge-1-3/
-https://kodekloud.com/lessons/certified-kubernetes-application-developer-mock-exam-series/
-
-
 ##kc10
 Kubernetes Challenges
 =================================================
 Challenge 1:
 =================================================
+Q. 14
+info_outline
+Question
+SECTION: APPLICATION ENVIRONMENT, CONFIGURATION and SECURITY
+
+
+For this question, please set the context to cluster3 by running:
+
+
+kubectl config use-context cluster3
+
+
+Define a Kubernetes custom resource definition (CRD) for a new resource kind called Foo (plural form - foos) in the samplecontroller.k8s.io group.
+
+This CRD should have a version of v1alpha1 with a schema that includes two properties as given below:
+
+
+deploymentName (a string type) and replicas (an integer type with minimum value of 1 and maximum value of 5).
+
+
+
+It should also include a status subresource which enables retrieving and updating the status of Foo object, including the availableReplicas property, which is an integer type.
+The Foo resource should be namespace scoped.
+
+
+Note: We have provided a template /root/foo-crd-aecs.yaml for your ease. There are few issues with it so please make sure to incorporate the above requirements before deploying on cluster.
+
+info_outline
+Solution
+student-node ~ ➜  kubectl config use-context cluster3
+Switched to context "cluster3".
+
+student-node ~ ➜  vim foo-crd-aecs.yaml
+
+student-node ~ ➜  cat foo-crd-aecs.yaml 
+apiVersion: apiextensions.k8s.io/v1
+kind: CustomResourceDefinition
+metadata:
+  name: foos.samplecontroller.k8s.io
+  annotations:
+    "api-approved.kubernetes.io": "unapproved, experimental-only"
+spec:
+  group: samplecontroller.k8s.io
+  scope: Namespaced
+  names:
+    kind: Foo
+    plural: foos
+  versions:
+    - name: v1alpha1
+      served: true
+      storage: true
+      schema:
+        # schema used for validation
+        openAPIV3Schema:
+          type: object
+          properties:
+            spec:
+              # Spec for schema goes here !
+              type: object
+              properties:
+                deploymentName:
+                  type: string
+                replicas:
+                  type: integer
+                  minimum: 1
+                  maximum: 5
+            status:
+              type: object
+              properties:
+                availableReplicas:
+                  type: integer
+      # subresources for the custom resource
+      subresources:
+        # enables the status subresource
+        status: {}
+
+student-node ~ ➜  kubectl apply -f foo-crd-aecs.yaml
+customresourcedefinition.apiextensions.k8s.io/foos.samplecontroller.k8s.io created
+
+
+Q. 12
+info_outline
+Question
+SECTION: APPLICATION ENVIRONMENT, CONFIGURATION and SECURITY
+
+
+For this question, please set the context to cluster2 by running:
+
+
+kubectl config use-context cluster2
+
+
+Please fix any possible mistakes in the manifest file located at /root/ckad11-obj-aecs.yaml, which contains a sample object created from a custom resource definition.
+
+Note: Create the object using the above manifest when done.
+
+info_outline
+Solution
+student-node ~ ➜  kubectl config use-context cluster2
+Switched to context "cluster2".
+
+student-node ~ ➜  kubectl apply -f /root/ckad11-obj-aecs.yaml
+error: error parsing /root/ckad11-obj-aecs.yaml: error converting YAML to JSON: yaml: line 7: mapping values are not allowed in this context
+
+student-node ~ ✖ vim /root/ckad11-obj-aecs.yaml
+
+student-node ~ ➜  cat /root/ckad11-obj-aecs.yaml
+apiVersion: apps/v1
+kind: MyCustomResource
+metadata:
+  name: ckad11-my-custom-resource-aecs
+spec:
+  name: John  #1 Fixed the indentation issue
+  age: -10
+status:
+  phase: Invalid
+
+student-node ~ ➜  kubectl apply -f /root/ckad11-obj-aecs.yaml
+error: unable to recognize "/root/ckad11-obj-aecs.yaml": no matches for kind "MyCustomResource" in version "apps/v1"
+
+student-node ~ ✖ kubectl api-resources | grep -i MyCustomResource
+mycustomresources                 mcr          example.com/v1                         true         MyCustomResource
+
+student-node ~ ➜  vim /root/ckad11-obj-aecs.yaml
+
+student-node ~ ➜  cat /root/ckad11-obj-aecs.yaml
+apiVersion: example.com/v1  #2 fixed the apiVersion used
+kind: MyCustomResource
+metadata:
+  name: ckad11-my-custom-resource-aecs
+spec:
+  name: John  #1 Fixed the indentation issue
+  age: -10
+status:
+  phase: Invalid
+
+student-node ~ ➜  kubectl apply -f /root/ckad11-obj-aecs.yaml
+The MyCustomResource "ckad11-my-custom-resource-aecs" is invalid: 
+* spec.age: Invalid value: -10: spec.age in body should be greater than or equal to 5
+* status.phase: Unsupported value: "Invalid": supported values: "Pending", "Running", "Completed"
+
+student-node ~ ✖ vim /root/ckad11-obj-aecs.yaml
+
+student-node ~ ➜  cat /root/ckad11-obj-aecs.yaml
+apiVersion: example.com/v1  #2 fixed the apiVersion used
+kind: MyCustomResource
+metadata:
+  name: ckad11-my-custom-resource-aecs
+spec:
+  name: John  #1 Fixed the indentation issue
+  age: 5 #3 use the valid entries
+status:
+  phase: Running #4 use the valid entries
+
+student-node ~ ➜  k apply -f /root/ckad11-obj-aecs.yaml
+mycustomresource.example.com/ckad11-my-custom-resource-aecs created
+
+
+Q. 11
+info_outline
+Question
+SECTION: APPLICATION OBSERVABILITY AND MAINTENANCE
+
+For this question, please set the context to cluster1 by running:
+
+
+kubectl config use-context cluster1
+
+
+
+Create a pod resou-limit using yaml file provided in the /root/resou-limit-aom.yaml .However, currently, there is an issue in the manifest. Find the issue, fix it and create the pod.
+
+
+Do not change the values for the limits.
+
+info_outline
+Solution
+You will see the following error
+
+the Pod "resou-limit-aom" is invalid: spec.containers[0].resources.requests: Invalid value: "2": must be less than or equal to cpu limit
+Update the yaml file
+
+apiVersion: v1
+kind: Pod
+metadata:
+  name: resou-limit-aom
+spec:
+  containers:
+  - name: ubuntu
+    image: ubuntu
+    resources:
+      requests:
+        cpu: "1"
+        memory: "256Mi"
+      limits:
+        cpu: "1"
+        memory: "512Mi" 
+Now create the pod using kubectl create -f resou-limit-aom.yaml
+
+
+Q. 9
+info_outline
+Question
+SECTION: APPLICATION OBSERVABILITY AND MAINTENANCE
+
+Identify the kube api-resources that use api_version=storage.k8s.io/v1 using kubectl command line interface and store them in /root/api-version.txt on student-node.
+
+info_outline
+Solution
+Use the following command to get details:
+
+kubectl api-resources --sort-by=kind | grep -i storage.k8s.io/v1  > /root/api-version.txt
+
+
+Q. 8
+info_outline
+Question
+SECTION: APPLICATION DEPLOYMENT
+
+
+For this question, please set the context to cluster2 by running:
+
+
+kubectl config use-context cluster2
+
+
+The team Garuda has deployed a web and security application using the Helm tool. Inspect those deployed resources and write their release name to the /root/apps-release-names.txt file on the student-node.
+
+Also, the same team deployed one application in the testing-apd namespace. The testing was done, and the team wants you to delete that release. Find out the release name and delete it.
+
+
+NOTE: - Do not worry about the status of the deployment.
+
+info_outline
+Solution
+Run the following command to change the context: -
+
+kubectl config use-context cluster2
+
+
+In this task, we will use the kubectl and helm commands. Here are the steps: -
+
+
+
+To check all the resources in all namespaces in the cluster2, we would have to run the following command:
+kubectl get all -A
+
+
+It will list all the available resources of all namespaces.
+
+
+
+We can see that the resources have used prefix called garuda in the name.
+
+
+To list all of the releases on the garuda-apps-apd namespace. Run the following command as follows: -
+helm ls -n garuda-apps-apd
+
+
+We can see the release names of the web and security applications, and they are deployed on the garuda-apps-apd namespace.
+
+
+
+Write their release names by using the echo command as follows: -
+echo "garuda-secret-apd,garuda-web-apd" > /root/apps-release-names.txt
+
+
+NOTE: - Make sure you have logged in student-node.
+
+
+
+On the same cluster, one more testing application is running on the testing-apd namespace, which we must delete because it is consuming resources.
+helm ls -n testing-apd
+
+
+helm uninstall -n testing-apd image-scanner 
+
+
+Q. 7
+info_outline
+Question
+SECTION: APPLICATION DEPLOYMENT
+
+
+For this question, please set the context to cluster3 by running:
+
+
+kubectl config use-context cluster3
+
+
+One co-worker deployed an nginx helm chart on the cluster3 server called lvm-crystal-apd. A new update is pushed to the helm chart, and the team wants you to update the helm repository to fetch the new changes.
+
+
+After updating the helm chart, upgrade the helm chart version to above 13.2.9 and increase the replica count to 2.
+
+
+NOTE: - We have to perform this task on the cluster3-controlplane node.
+
+
+You can SSH into the cluster3 using ssh cluster3-controlplane command.
+
+info_outline
+Solution
+Run the following command to change the context: -
+
+
+kubectl config use-context cluster3
+
+
+In this task, we will use the kubectl and helm commands. Here are the steps: -
+
+
+
+Log in to the cluster3-controlplane node first and use the helm ls command to list all the releases installed using Helm in the Kubernetes cluster.
+
+helm ls -A
+
+
+Here -A or --all-namespaces option lists all the releases of all the namespaces.
+
+
+
+Identify the namespace where the resources get deployed.
+
+
+Use the helm repo ls command to list the helm repositories.
+helm repo ls 
+
+
+Now, update the helm repository with the following command: -
+
+helm repo update lvm-crystal-apd -n crystal-apd-ns
+
+
+The above command updates the local cache of available charts from the configured chart repositories.
+
+
+
+The helm search command searches for all the available charts in a specific Helm chart repository. In our case, it's the nginx helm chart.
+helm search repo lvm-crystal-apd/nginx -n crystal-apd-ns -l | head -n30
+
+
+The -l or --versions option is used to display information about all available chart versions.
+
+
+
+Upgrade the helm chart to above 13.2.9 and also, increase the replica count of the deployment to 2 from the command line. Use the helm upgrade command as follows: -
+
+helm upgrade lvm-crystal-apd lvm-crystal-apd/nginx -n crystal-apd-ns --version=13.2.12 --set replicaCount=2
+
+
+After upgrading the chart version, you can verify it with the following command: -
+
+helm ls -n crystal-apd-ns
+
+
+Look under the CHART column for the chart version.
+
+
+
+Use the kubectl get command to check the replicas of the deployment: -
+kubectl get deploy -n crystal-apd-ns
+
+
+The available count 2 is under the AVAILABLE column.
+
+
+Q. 6
+info_outline
+Question
+SECTION: APPLICATION DEPLOYMENT
+
+
+For this question, please set the context to cluster1 by running:
+
+
+kubectl config use-context cluster1
+
+
+One application, webpage-server-01, is deployed on the Kubernetes cluster by the Helm tool. Now, the team wants to deploy a new version of the application by replacing the existing one. A new version of the helm chart is given in the /root/new-version directory on the student-node. Validate the chart before installing it on the Kubernetes cluster. 
+
+
+Use the helm command to validate and install the chart. After successfully installing the newer version, uninstall the older version. 
+
+
+info_outline
+Solution
+Run the following command to change the context: -
+
+kubectl config use-context cluster1
+
+
+In this task, we will use the helm commands. Here are the steps: -
+
+
+
+Use the helm ls command to list the release deployed on the default namespace using helm.
+helm ls -n default
+
+
+First, validate the helm chart by using the helm lint command: -
+cd /root/
+
+helm lint ./new-version
+
+
+Now, install the new version of the application by using the helm install command as follows: -
+helm install --generate-name ./new-version
+
+We haven't got any release name in the task, so we can generate the random name from the --generate-name option.
+
+Finally, uninstall the old version of the application by using the helm uninstall command: -
+
+helm uninstall webpage-server-01 -n default
+
 
 2
 info_outline
