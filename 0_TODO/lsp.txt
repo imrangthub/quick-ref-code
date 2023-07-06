@@ -7,6 +7,7 @@ Ing:
 Deployment multiple label issue for service.
 2)Waht is emptyDir() in volues
 
+https://www.youtube.com/watch?v=ZwC2NWWUDL0
 
 ps -ef | grep kube-apiserver | grep admission-plugins
 kubectl exec -it kube-apiserver-controlplane -n kube-system -- kube-apiserver -h | grep 'enable-admission-plugins'
@@ -19,6 +20,79 @@ alias ke='kubectl edit'
 alias kkk='kubectl delete'
 alias kc='kubectl create'
 alias kd='kubectl describe'
+
+
+ 1 apiVersion: v1
+  2 kind: Pod
+  3 metadata:
+  4   creationTimestamp: null
+  5   labels:
+  6     run: dos-containers-pod
+  7   name: dos-containers-pod
+  8   namespace: ckad-multi-containers
+  9 spec:
+ 10   containers:
+ 11   - image: nginx:1.17
+ 12     name: alpha
+ 13     env:
+ 14       - name: ROLE
+ 15         value: "SERVER"
+ 16   - image: busybox:1.28
+ 17     name: beta
+ 18     command: ["sh", "-c",'echo "Hello multi-containers"']
+ 19     resources: {}
+ 20   restartPolicy: Always
+ 21 status: {}
+
+
+apiVersion: v1
+kind: Pod
+metadata:
+  creationTimestamp: null
+  labels:
+    run: dos-containers-pod
+  name: dos-containers-pod
+  namespace: ckad-multi-containers
+spec:
+  containers:
+  - image: nginx:1.17
+    name: dos-containers-pod
+    env:
+      - name: ROLE
+        value: "SERVER"
+  - image: busybox:1.28
+    name: beta
+    command: ["sh", "-c",'echo "Hello multi-containers"']
+    resources: {}
+  dnsPolicy: ClusterFirst
+  restartPolicy: Always
+status: {}
+
+
+apiVersion: v1
+kind: Pod
+metadata:
+  name: tres-containers-pod
+  namespace: ckad-multi-containers
+spec:
+  containers:
+  - name: primero
+    image: busybox:1.28
+    env:
+    - name: ORDER
+      value: FIRST
+  - name: segundo
+    image: nginx:1.17
+    ports:
+    - containerPort: 8080
+  - name: tercero
+    image: busybox:1.31.1
+    env:
+    - name: ORDER
+      value: THIRD
+    command: ["/bin/sh", "-c", "tail -f /dev/null"]
+
+
 
 
 apiVersion: networking.k8s.io/v1

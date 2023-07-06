@@ -102,248 +102,419 @@ https://kodekloud.com/lessons/recap-core-concepts/
 
 @@@KodeKloud
 
+https://kodekloud.com/lessons/challenge-1-3/
+https://kodekloud.com/lessons/certified-kubernetes-application-developer-mock-exam-series/
+
+
+##kc10
+Kubernetes Challenges
 =================================================
-LIGHTNING LABS-02
+Challenge 1:
 =================================================
 
-Q1:We have deployed a few pods in this cluster in various namespaces. Inspect them and identify the pod which is not in a Ready state. Troubleshoot and fix the issue.
-Next, add a check to restart the container on the same pod if the command ls /var/www/html/file_check fails. This check should start after a delay of 10 seconds and run every 60 seconds.
+Q3
+Question
+
+SECTION: APPLICATION DESIGN AND BUILD
+For this question, please set the context to cluster1 by running:
+kubectl config use-context cluster1
 
 
-You may delete and recreate the object. Ignore the warnings from the probe.
-Task completed correctly?
+Create a persistent volume called data-pv-ckad02-str with the below properties:
+- Its capacity should be 128Mi.
+- The volume type should be hostpath and path should be /opt/data-pv-ckad02-str.
+Next, create a persistent volume claim called data-pvc-ckad02-str as per below properties:
+- Request 50Mi of storage from data-pv-ckad02-str PV.
 
 
-Ans:
-=>kubectl get po -A 
-Check reday status for problem pod
-=>kubectl describe po  nginx1401 -n dev1401
-
-=>kubectl get po  nginx1401 -n dev1401 -oyaml>pod.yaml
-Check the problem add editional fumction:
-Update this section:
-spec:
-  containers:
-  - image: kodekloud/nginx
-    imagePullPolicy: IfNotPresent
-    name: nginx
-    ports:
-    - containerPort: 9080
-      protocol: TCP
-    readinessProbe:
-      failureThreshold: 3
-      httpGet:
-        path: /
-        port: 9080
-        scheme: HTTP
-      periodSeconds: 10
-      successThreshold: 1
-      timeoutSeconds: 1
-    livenessProbe:
-      exec: 
-        command:
-          - ls
-          - /var/www/html/file_check
-      initialDelaySeconds: 10
-      periodSeconds: 60
-    resources: {}
-
-
-=>k replace -f pod.yaml --force
-
-Q2:Create a cronjob called dice that runs every one minute. Use the Pod template located at /root/throw-a-dice. The image throw-dice randomly returns a value between 1 and 6. The result of 6 is considered success and all others are failure.
-
-The job should be non-parallel and complete the task once. Use a backoffLimit of 25.
-
-If the task is not completed within 20 seconds the job should fail and pods should be terminated.
-
-
-You don't have to wait for the job completion. As long as the cronjob has been created as per the requirements.
-
-Cronjob created correctly?
-
-
-Ans:
-Copy the base line cronjob code from documentation adn this:
-cat cron.yaml 
-apiVersion: batch/v1
-kind: CronJob
-metadata:
-  name: dice
-spec:
-  schedule: "*/1 * * * *"
-  jobTemplate:
-    spec:
-      completions: 1
-      backoffLimit: 25
-      activeDeadlineSeconds: 20
-      template:
-        spec:
-          containers:
-          - name: dice
-            image: kodekloud/throw-dice
-            imagePullPolicy: IfNotPresent
-          restartPolicy: Never
-
-
-
-
-Q3:Create a pod called my-busybox in the dev2406 namespace using the busybox image. The container should be called secret and should sleep for 3600 seconds.
-The container should mount a read-only secret volume called secret-volume at the path /etc/secret-volume. The secret being mounted has already been created for you and is called dotfile-secret.
-Make sure that the pod is scheduled on controlplane and no other node in the cluster.
-
-Pod created correctly?
-
-Ans:
-=>kubectl run my-busybox --image=busybox --dry-run=client -oyaml>podbusy.yaml
-Add volume:
-cat podbusy.yaml 
-apiVersion: v1
-kind: Pod
-metadata:
-  creationTimestamp: null
-  labels:
-    run: my-busybox
-  name: my-busybox
-spec:
-  nodeName: controlplane
-  volumes:
-    - name: secret-volume
-      secret:
-        secretName: dotfile-secret
-  containers:
-  - image: busybox
-    name: my-busybox
-    resources: {}
-    volumeMounts:
-      - name: secret-volume
-        readOnly: true
-        mountPath: /etc/secret-volume
-  dnsPolicy: ClusterFirst
-  restartPolicy: Always
-status: {}
-
-OR | as Ans:
-Use the following YAML file to create the pod:
+Solution
+Use below YAML to create desired Kubernetes objects:
 
 apiVersion: v1
-kind: Pod
+kind: PersistentVolume
 metadata:
-  creationTimestamp: null
-  labels:
-    run: my-busybox
-  name: my-busybox
-  namespace: dev2406
+  name: data-pv-ckad02-str
 spec:
-  volumes:
-  - name: secret-volume
-    secret:
-      secretName: dotfile-secret
-  nodeSelector:
-    kubernetes.io/hostname: controlplane
-  containers:
-  - command:
-    - sleep
-    args:
-    - "3600"
-    image: busybox
-    name: secret
-    volumeMounts:
-    - name: secret-volume
-      readOnly: true
-      mountPath: "/etc/secret-volume"
-
-      
-
-Q4:Create a single ingress resource called ingress-vh-routing. The resource should route HTTP traffic to multiple hostnames as specified below:
-
-The service video-service should be accessible on http://watch.ecom-store.com:30093/video
-
-The service apparels-service should be accessible on http://apparels.ecom-store.com:30093/wear
-
-
-Here 30093 is the port used by the Ingress Controller
-
-Ingress resource configured correctly?
-
-Ans:
-Get a ingress from documentation and update this:
-cat ingress.yaml 
-apiVersion: networking.k8s.io/v1
-kind: Ingress
-metadata:
-  name: ingress-vh-routing
-  annotations:
-    nginx.ingress.kubernetes.io/rewrite-target: /
-spec:
-  ingressClassName: nginx-example
-  rules:
-    - host: watch.ecom-store.com
-      http:
-        paths:
-          - pathType: Prefix
-            path: "/video"
-            backend: 
-              service:
-                name: video-service
-                port: 
-                  number: 8080
-    - host: apparels.ecom-store.com
-      http:
-        paths:
-          - pathType: Prefix
-            path: "/wear"
-            backend:
-              service:
-                name: apparels-service
-                port:
-                  number: 8080
-
-OR | as Ans:
-Use the following YAML to create the ingress resource:
+  capacity:
+    storage: 128Mi
+  accessModes:
+    - ReadWriteOnce
+  hostPath:
+    path: /opt/data-pv-ckad02-str
+  storageClassName: manual
 
 ---
-kind: Ingress
-apiVersion: networking.k8s.io/v1
+apiVersion: v1
+kind: PersistentVolumeClaim
 metadata:
-  name: ingress-vh-routing
-  annotations:
-    nginx.ingress.kubernetes.io/rewrite-target: /
+  name: data-pvc-ckad02-str
 spec:
-  rules:
-  - host: watch.ecom-store.com
-    http:
-      paths:
-      - pathType: Prefix
-        path: "/video"
-        backend:
-          service:
-            name: video-service
-            port:
-              number: 8080
-  - host: apparels.ecom-store.com
-    http:
-      paths:
-      - pathType: Prefix
-        path: "/wear"
-        backend:
-          service:
-            name: apparels-service
-            port:
-              number: 8080
+  storageClassName: manual
+  volumeName: data-pv-ckad02-str
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 50Mi
+
+
+Q. 4
+Question
+SECTION: APPLICATION DESIGN AND BUILD
+For this question, please set the context to cluster1 by running:
+kubectl config use-context cluster1
+
+
+In the ckad-multi-containers namespaces, create a ckad-sidecar-pod pod that matches the following requirements.
+Pod has an emptyDir volume named my-vol.
+The first container named main-container, runs nginx:1.16 image. 
+This container mounts the my-vol volume at /usr/share/nginx/html path.
+
+The second container named sidecar-container, runs busybox:1.28 image. 
+This container mounts the my-vol volume at /var/log path.
+Every 5 seconds, this container should write the current date along with greeting message 
+Hi I am from Sidecar container to index.html in the my-vol volume.
+
+
+Solution
+Use below YAML to create the desired pod:
+
+apiVersion: v1
+kind: Pod
+metadata:
+  namespace: ckad-multi-containers
+  name: ckad-sidecar-pod
+spec:
+  containers:
+    - image: nginx:1.16
+      name: main-container
+      resources: {}
+      ports:
+        - containerPort: 80
+      volumeMounts:
+        - name: my-vol
+          mountPath: /usr/share/nginx/html
+    - image: busybox:1.28
+      command:
+        - /bin/sh
+        - -c
+        - while true; do echo $(date -u) Hi I am from Sidecar container >> /var/log/index.html; sleep 5;done
+      name: sidecar-container
+      resources: {}
+      volumeMounts:
+        - name: my-vol
+          mountPath: /var/log
+  dnsPolicy: Default
+  volumes:
+    - name: my-vol
+      emptyDir: {}
+
+
+You can verify the logs with below command:
+kubectl exec -n ckad-multi-containers ckad-sidecar-pod --container main-container -- cat /usr/share/nginx/html/index.html
+
+Similar logs should be displayed as below:
+Mon Mar 20 06:02:07 UTC 2023 Hi I am from Sidecar container
 
 
 
-Q5:A pod called dev-pod-dind-878516 has been deployed in the default namespace. Inspect the logs for the container called log-x and redirect the warnings to /opt/dind-878516_logs.txt on the controlplane node
-Redirect warnings to file
+
+Q. 5
+Question
+SECTION: APPLICATION DEPLOYMENT
+For this question, please set the context to cluster3 by running:
+kubectl config use-context cluster3
 
 
-Ans:
-=>kubectl logs dev-pod-dind-878516 -c log-x | grep WARNING > /opt/dind-878516_logs.txt
-=>cat /opt/dind-878516_logs.txt
+Our new client wants to deploy the resources through the popular Helm tool. 
+In the initial phase, our team lead wants to deploy nginx, a very powerful and versatile web server 
+software that is widely used to serve static content, reverse proxying, load balancing, 
+from the bitnami helm chart on the cluster3-controlplane node.
+The chart URL and other specifications are as follows: -
+
+
+1. The chart URL link - https://charts.bitnami.com/bitnami
+2. The chart repository name should be polar.
+3. The release name should be nginx-server.
+4. All the resources should be deployed on the cd-tool-apd namespace.
+
+
+NOTE: - You have to perform this task from the student-node.
+
+Solution
+Run the following command to change the context: -
+kubectl config use-context cluster3
+
+
+In this task, we will use the helm commands. Here are the steps: -
+Add the repostiory to Helm with the following command: -
+helm repo add polar https://charts.bitnami.com/bitnami
+
+The helm repo add command is used to add a new chart repository to Helm and this allows us to 
+browse and install charts from the new repository using the Helm package manager.
+
+
+Use the helm repo ls command which is used to list all the currently configured Helm chart repositories 
+on Kubernetes cluster.
+
+=>helm repo ls 
+
+Search for the nginx chart in a polar chart repository as follows: -
+=>helm search repo polar | grep nginx
+
+The helm search repo command is used to search for charts in a specified Helm chart repository. 
+Also, it allows us to browse available charts and view their details, 
+such as their name, version, description, and maintainers.
+
+Before installing the chart, we have to create a namespace as given in the task description. 
+Then we can install the nginx chart on a Kubernetes cluster.
+
+=>kubectl create ns cd-tool-apd
+=>helm install nginx-server polar/nginx -n cd-tool-apd
 
 
 
+Q. 6
+Question
+SECTION: APPLICATION DEPLOYMENT
+For this question, please set the context to cluster3 by running:
+kubectl config use-context cluster3
+
+One co-worker deployed an nginx helm chart on the cluster3 server called lvm-crystal-apd. 
+A new update is pushed to the helm chart, and the team wants you to update the helm repository to fetch the new changes.
+After updating the helm chart, upgrade the helm chart version to above 13.2.9 and increase the replica count to 2.
+
+NOTE: - We have to perform this task on the cluster3-controlplane node.
+You can SSH into the cluster3 using ssh cluster3-controlplane command.
+
+
+Solution
+Run the following command to change the context: -
+kubectl config use-context cluster3
+In this task, we will use the kubectl and helm commands. Here are the steps: -
+
+Log in to the cluster3-controlplane node first and use the helm ls command to list all the releases installed using 
+Helm in the Kubernetes cluster.
+
+=>helm ls -A
+
+Here -A or --all-namespaces option lists all the releases of all the namespaces.
+Identify the namespace where the resources get deployed.
+Use the helm repo ls command to list the helm repositories.
+=>helm repo ls 
+
+Now, update the helm repository with the following command: -
+
+=>helm repo update lvm-crystal-apd -n crystal-apd-ns
+The above command updates the local cache of available charts from the configured chart repositories.
+
+The helm search command searches for all the available charts in a specific Helm chart repository. 
+In our case, it's the nginx helm chart.
+=>helm search repo lvm-crystal-apd/nginx -n crystal-apd-ns -l | head -n30
+
+The -l or --versions option is used to display information about all available chart versions.
+
+Upgrade the helm chart to above 13.2.9 and also, increase the replica count of the deployment to 2 from the command line. 
+Use the helm upgrade command as follows: -
+
+=>helm upgrade lvm-crystal-apd lvm-crystal-apd/nginx -n crystal-apd-ns --version=13.2.12 --set replicaCount=2
+After upgrading the chart version, you can verify it with the following command: -
+
+=>helm ls -n crystal-apd-ns
+Look under the CHART column for the chart version.
+
+
+Use the kubectl get command to check the replicas of the deployment: -
+=>kubectl get deploy -n crystal-apd-ns
+The available count 2 is under the AVAILABLE column.
+
+
+
+Q13
+SECTION: APPLICATION OBSERVABILITY AND MAINTENANCE
+For this question, please set the context to cluster2 by running:
+kubectl config use-context cluster2
+
+
+A manifest file located at root/ckad-flash89.yaml on cluster2-controlplane. 
+Which can be used to create a multi-containers pod. 
+There are issues with the manifest file, preventing resource creation. 
+Identify the errors, fix them and create resource.
+
+
+You can access controlplane by ssh cluster2-controlplane if required.
+
+Solution
+Set context to cluster2 and SSH to cluster2-controlplane.
+use the kubectl create command we will see following error.
+
+=>kubectl create -f ckad-flash89.yaml
+
+error: resource mapping not found for name: "ckad-flash-89" namespace: "" from "ckad-flash89.yaml": no matches for kind "Pod" in version "V1"
+ensure CRDs are installed first
+about error shows us there is something wrong with apiVersion. So change it v1 and try again. and check status.
+
+kubectl get pods
+NAME            READY   STATUS             RESTARTS      AGE
+ckad-flash89-aom   1/2     CrashLoopBackOff   3 (39s ago)   93s
+Now check for reason using
+
+=>kubectl describe pod ckad-flash89-aom
+we will see that there is problem with nginx container
+
+open yaml file and check in spec -> nginx container you can see error with 
+mountPath --> mountPath: "/var/log" change it to mountPath: /var/log/nginx and apply changes.
+
+
+
+
+Q. 14
+Question
+SECTION: APPLICATION ENVIRONMENT, CONFIGURATION and SECURITY
+For this question, please set the context to cluster2 by running:
+kubectl config use-context cluster2
+
+
+We have a Kubernetes namespace called ckad12-ctm-sa-aecs, which contains a service account and a pod. 
+Your task is to modify the pod so that it uses the service account defined in the same namespace.
+
+Additionally, you need to ensure that the pod has access to the API credentials associated with the 
+service account by enabling the automounting feature for the credentials.
+
+
+Solution
+Here we will do two things:
+
+Remove automountServiceAccountToken: false field to enable automount of creds and specifying 
+our service account as: serviceAccountName: ckad12-my-custom-sa-aecs
+
+student-node ~ ➜  kubectl config use-context cluster2
+Switched to context "cluster2".
+
+student-node ~ ➜  kubectl get pods -n ckad12-ctm-sa-aecs ckad12-ctm-nginx-aecs -o yaml > ckad-custom-sa.yaml
+student-node ~ ➜  vim ckad-custom-sa.yaml 
+student-node ~ ➜  cat ckad-custom-sa.yaml 
+apiVersion: v1
+kind: Pod
+metadata:
+  name: ckad12-ctm-nginx-aecs
+  namespace: ckad12-ctm-sa-aecs
+spec:
+  # automountServiceAccountToken: false  *removed to enable automount of creds
+  containers:
+  - image: nginx
+    imagePullPolicy: Always
+    name: nginx
+  serviceAccountName: ckad12-my-custom-sa-aecs # using custom sa
+
+student-node ~ ➜  kubectl replace -f ckad-custom-sa.yaml --force 
+pod "ckad12-ctm-nginx-aecs" deleted
+pod/ckad12-ctm-nginx-aecs replaced
+
+
+
+Q. 16
+Question
+SECTION: APPLICATION ENVIRONMENT, CONFIGURATION and SECURITY
+For this question, please set the context to cluster1 by running:
+kubectl config use-context cluster1
+
+
+Create a pod named ckad17-qos-aecs-3 in namespace ckad17-nqoss-aecs 
+with image nginx and container name ckad17-qos-ctr-3-aecs.
+
+Define other fields such that the Pod is configured to use the Quality of Service (QoS) class of Burstable.
+
+Also retrieve the name and QoS class of each Pod in the namespace ckad17-nqoss-aecs in the below 
+format and save the output to a file named qos_status_aecs in the /root directory.
+
+
+Format:
+NAME    QOS
+pod-1   qos_class
+pod-2   qos_class
+
+
+Solution
+student-node ~ ➜ kubectl config use-context cluster1
+Switched to context "cluster1".
+
+student-node ~ ➜  cat << EOF | kubectl apply -f -
+apiVersion: v1
+kind: Pod
+metadata:
+  name: ckad17-qos-aecs-3
+  namespace: ckad17-nqoss-aecs
+spec:
+  containers:
+  - name: ckad17-qos-ctr-3-aecs
+    image: nginx
+    resources:
+      limits:
+        memory: "200Mi"
+      requests:
+        memory: "100Mi"
+EOF
+
+pod/ckad17-qos-aecs-3 created
+
+student-node ~ ➜  kubectl --namespace=ckad17-nqoss-aecs get pod --output=custom-columns="NAME:.metadata.name,QOS:.status.qosClass"
+NAME                QOS
+ckad17-qos-aecs-1   BestEffort
+ckad17-qos-aecs-2   Guaranteed
+ckad17-qos-aecs-3   Burstable
+
+student-node ~ ➜  kubectl --namespace=ckad17-nqoss-aecs get pod --output=custom-columns="NAME:.metadata.name,QOS:.status.qosClass" > /root/qos_status_aecs
+
+
+
+
+Q. 20
+Question
+SECTION: SERVICES AND NETWORKING
+For this question, please set the context to cluster3 by running:
+kubectl config use-context cluster3
+
+You are requested to create a network policy named deny-all-svcn that denies 
+all incoming and outgoing traffic to ckad12-svcn namespace.
+
+
+Note: The namespace ckad12-svcn doesn't exist. Create the namespace before creating the Policy.
+
+Solution
+Create the namespace using the following command - kubectl create ns ckad12-svcn
+
+Create the network policy in the namespace ckad12-svcn using the following manifest.
+
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: deny-all-svcn
+  namespace: ckad12-svcn
+spec:
+  podSelector: {}
+  policyTypes:
+  - Ingress
+  - Egress
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+##lightLab
 =================================================
 LIGHTNING LABS-01
 =================================================
@@ -617,6 +788,243 @@ status: {}
 
 
 
+=================================================
+LIGHTNING LABS-02
+=================================================
+
+Q1:We have deployed a few pods in this cluster in various namespaces. Inspect them and identify the pod which is not in a Ready state. Troubleshoot and fix the issue.
+Next, add a check to restart the container on the same pod if the command ls /var/www/html/file_check fails. This check should start after a delay of 10 seconds and run every 60 seconds.
+
+
+You may delete and recreate the object. Ignore the warnings from the probe.
+Task completed correctly?
+
+
+Ans:
+=>kubectl get po -A 
+Check reday status for problem pod
+=>kubectl describe po  nginx1401 -n dev1401
+
+=>kubectl get po  nginx1401 -n dev1401 -oyaml>pod.yaml
+Check the problem add editional fumction:
+Update this section:
+spec:
+  containers:
+  - image: kodekloud/nginx
+    imagePullPolicy: IfNotPresent
+    name: nginx
+    ports:
+    - containerPort: 9080
+      protocol: TCP
+    readinessProbe:
+      failureThreshold: 3
+      httpGet:
+        path: /
+        port: 9080
+        scheme: HTTP
+      periodSeconds: 10
+      successThreshold: 1
+      timeoutSeconds: 1
+    livenessProbe:
+      exec: 
+        command:
+          - ls
+          - /var/www/html/file_check
+      initialDelaySeconds: 10
+      periodSeconds: 60
+    resources: {}
+
+
+=>k replace -f pod.yaml --force
+
+Q2:Create a cronjob called dice that runs every one minute. Use the Pod template located at /root/throw-a-dice. The image throw-dice randomly returns a value between 1 and 6. The result of 6 is considered success and all others are failure.
+
+The job should be non-parallel and complete the task once. Use a backoffLimit of 25.
+
+If the task is not completed within 20 seconds the job should fail and pods should be terminated.
+
+
+You don't have to wait for the job completion. As long as the cronjob has been created as per the requirements.
+
+Cronjob created correctly?
+
+
+Ans:
+Copy the base line cronjob code from documentation adn this:
+cat cron.yaml 
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: dice
+spec:
+  schedule: "*/1 * * * *"
+  jobTemplate:
+    spec:
+      completions: 1
+      backoffLimit: 25
+      activeDeadlineSeconds: 20
+      template:
+        spec:
+          containers:
+          - name: dice
+            image: kodekloud/throw-dice
+            imagePullPolicy: IfNotPresent
+          restartPolicy: Never
+
+
+
+
+Q3:Create a pod called my-busybox in the dev2406 namespace using the busybox image. The container should be called secret and should sleep for 3600 seconds.
+The container should mount a read-only secret volume called secret-volume at the path /etc/secret-volume. The secret being mounted has already been created for you and is called dotfile-secret.
+Make sure that the pod is scheduled on controlplane and no other node in the cluster.
+
+Pod created correctly?
+
+Ans:
+=>kubectl run my-busybox --image=busybox --dry-run=client -oyaml>podbusy.yaml
+Add volume:
+cat podbusy.yaml 
+
+apiVersion: v1
+kind: Pod
+metadata:
+  name: my-busybox
+  namespace: dev2406
+spec:
+  nodeName: controlplane
+  volumes:
+    - name: secret-volume
+      secret:
+        secretName: dotfile-secret
+  containers:
+    - name: secret
+      image: busybox
+      command:
+         - sleep
+         - "3600"
+      volumeMounts:
+        - name: secret-volume
+          readOnly: true
+          mountPath: /etc/secret-volume
+
+OR | as Ans:
+Use the following YAML file to create the pod:
+
+apiVersion: v1
+kind: Pod
+metadata:
+  creationTimestamp: null
+  labels:
+    run: my-busybox
+  name: my-busybox
+  namespace: dev2406
+spec:
+  volumes:
+  - name: secret-volume
+    secret:
+      secretName: dotfile-secret
+  nodeSelector:
+    kubernetes.io/hostname: controlplane
+  containers:
+  - command:
+    - sleep
+    args:
+    - "3600"
+    image: busybox
+    name: secret
+    volumeMounts:
+    - name: secret-volume
+      readOnly: true
+      mountPath: "/etc/secret-volume"
+
+      
+
+Q4:Create a single ingress resource called ingress-vh-routing. The resource should route HTTP traffic to multiple hostnames as specified below:
+
+The service video-service should be accessible on http://watch.ecom-store.com:30093/video
+
+The service apparels-service should be accessible on http://apparels.ecom-store.com:30093/wear
+
+
+Here 30093 is the port used by the Ingress Controller
+
+Ingress resource configured correctly?
+
+Ans:
+Get a ingress from documentation and update this:
+cat ingress.yaml 
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: ingress-vh-routing
+  annotations:
+    nginx.ingress.kubernetes.io/rewrite-target: /
+spec:
+  ingressClassName: nginx-example
+  rules:
+    - host: watch.ecom-store.com
+      http:
+        paths:
+          - pathType: Prefix
+            path: "/video"
+            backend: 
+              service:
+                name: video-service
+                port: 
+                  number: 8080
+    - host: apparels.ecom-store.com
+      http:
+        paths:
+          - pathType: Prefix
+            path: "/wear"
+            backend:
+              service:
+                name: apparels-service
+                port:
+                  number: 8080
+
+OR | as Ans:
+Use the following YAML to create the ingress resource:
+
+---
+kind: Ingress
+apiVersion: networking.k8s.io/v1
+metadata:
+  name: ingress-vh-routing
+  annotations:
+    nginx.ingress.kubernetes.io/rewrite-target: /
+spec:
+  rules:
+  - host: watch.ecom-store.com
+    http:
+      paths:
+      - pathType: Prefix
+        path: "/video"
+        backend:
+          service:
+            name: video-service
+            port:
+              number: 8080
+  - host: apparels.ecom-store.com
+    http:
+      paths:
+      - pathType: Prefix
+        path: "/wear"
+        backend:
+          service:
+            name: apparels-service
+            port:
+              number: 8080
+
+
+
+Q5:A pod called dev-pod-dind-878516 has been deployed in the default namespace. Inspect the logs for the container called log-x and redirect the warnings to /opt/dind-878516_logs.txt on the controlplane node
+Redirect warnings to file
+
+
+Ans:
+=>kubectl logs dev-pod-dind-878516 -c log-x | grep WARNING > /opt/dind-878516_logs.txt
+=>cat /opt/dind-878516_logs.txt
 
 
 
@@ -635,6 +1043,10 @@ status: {}
 
 
 
+
+
+
+##mok
 =================================================
 ##MockExam-1         
 ================================================= 
@@ -1046,7 +1458,7 @@ spec:
 
 
 
-
+##tut
 =================================================
 ##CoreConcept         
 ================================================= 
