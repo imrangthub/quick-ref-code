@@ -112,6 +112,338 @@ Kubernetes Challenges
 Challenge 1:
 =================================================
 
+2
+info_outline
+Question
+SECTION: APPLICATION DESIGN AND BUILD
+
+
+For this question, please set the context to cluster1 by running:
+
+
+kubectl config use-context cluster1
+
+
+In the ckad-job namespace, create a cron job called my-alarm that prints current datetime once a week at midnight on Sunday morning.
+
+
+In case the container in pod failed for any reason, it should be restarted automatically.
+
+Use busybox:1.28 image to create job.
+
+
+
+Sample output:
+
+Sun Mar  12 00:00:00 UTC 2023
+info_outline
+Solution
+Use below YAML to create cronjob:
+
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: my-alarm
+  namespace: ckad-job
+spec:
+  schedule: "0 0 * * 0"
+  jobTemplate:
+    spec:
+      template:
+        spec:
+          containers:
+          - name: hello
+            image: busybox:1.28
+            imagePullPolicy: IfNotPresent
+            command:
+            - /bin/sh
+            - -c
+            - date;
+          restartPolicy: OnFailure
+
+
+Q. 4
+info_outline
+Question
+SECTION: APPLICATION DESIGN AND BUILD
+
+
+For this question, please set the context to cluster1 by running:
+
+
+kubectl config use-context cluster1
+
+
+In the ckad-job namespace, create a cronjob named simple-python-job to run every 30 minutes to list all the running 
+processes inside a container that used python image (the command needs to be run in a shell).
+
+
+
+In Python, ps –eaf can be use to list all the running processes.
+
+info_outline
+Solution
+Create a YAML file with the content as below:
+
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: simple-python-job
+  namespace: ckad-job
+spec:
+  schedule: "*/30 * * * *"
+  jobTemplate:
+    spec:
+      template:
+        spec:
+          containers:
+          - name: simple-python-job
+            image: python
+            imagePullPolicy: IfNotPresent
+            command:
+            - /bin/sh
+            - -c
+            - ps –eaf
+          restartPolicy: OnFailure
+
+
+Then use kubectl apply -f file_name.yaml to create the required object.
+
+
+Q. 5
+info_outline
+Question
+SECTION: APPLICATION DEPLOYMENT
+
+
+For this question, please set the context to cluster1 by running:
+
+
+kubectl config use-context cluster1
+
+
+On the cluster1, the team has installed multiple helm charts on a different namespace. By mistake, those deployed resources include one of the vulnerable images called kodekloud/click-counter:latest. Find out the release name and uninstall it.
+
+
+info_outline
+Solution
+Run the following command to change the context: -
+
+kubectl config use-context cluster1
+
+
+In this task, we will use the helm commands and jq tool. Here are the steps: -
+
+
+
+Run the helm ls command with -A option to list the releases deployed on all the namespaces using helm.
+helm ls -A
+
+
+We will use the jq tool to extract the image name from the deployments.
+kubectl get deploy -n <NAMESPACE> <DEPLOYMENT-NAME> -o json | jq -r '.spec.template.spec.containers[].image'
+
+
+Replace <NAMESPACE> with the namespace and <DEPLOYMENT-NAME> with the deployment name, which we get from the previous commands.
+
+After finding the kodekloud/click-counter:latest image, use the helm uninstall to remove the deployed chart that are using this vulnerable image.
+
+
+helm uninstall <RELEASE-NAME> -n <NAMESPACE> 
+
+
+Q:8
+info_outline
+Question
+SECTION: APPLICATION DEPLOYMENT
+
+
+For this question, please set the context to cluster3 by running:
+
+
+kubectl config use-context cluster3
+
+
+Create a new deployment called ocean-apd in the default namespace using the image kodekloud/webapp-color:v1.
+Use the following specs for the deployment:
+
+
+1. Replica count should be 2.
+
+2. Set the Max Unavailable to 45% and Max Surge to 55%.
+
+3. Create the deployment and ensure all the pods are ready.
+
+4. After successful deployment, upgrade the deployment image to kodekloud/webapp-color:v2 and inspect the deployment rollout status.
+
+5. Check the rolling history of the deployment and on the student-node, save the current revision count number to the /opt/ocean-revision-count.txt file.
+
+6. Finally, perform a rollback and revert the deployment image to the older version.
+
+
+
+info_outline
+Solution
+Run the following command to change the context: -
+
+kubectl config use-context cluster3
+
+
+Use the following template to create a deployment called ocean-apd: -
+
+
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app: ocean-apd
+  name: ocean-apd
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: ocean-apd
+  strategy: 
+   type: RollingUpdate
+   rollingUpdate:
+     maxUnavailable: 45%
+     maxSurge: 55%
+  template:
+    metadata:
+      labels:
+        app: ocean-apd
+    spec:
+      containers:
+      - image: kodekloud/webapp-color:v1
+        name: webapp-color
+
+
+Now, create the deployment by using the kubectl create -f command in the default namespace: -
+
+kubectl create -f <FILE-NAME>.yaml
+
+
+After sometime, upgrade the deployment image to kodekloud/webapp-color:v2: -
+
+kubectl set image deploy ocean-apd webapp-color=kodekloud/webapp-color:v2
+
+
+And check out the rollout history of the deployment ocean-apd: -
+
+kubectl rollout history deploy ocean-apd
+deployment.apps/ocean-apd 
+REVISION  CHANGE-CAUSE
+1         <none>
+2         <none>
+
+
+NOTE: - Revision count is 2. In your lab, it could be different.
+
+
+
+On the student-node, store the revision count to the given file: -
+
+echo "2" > /opt/ocean-revision-count.txt
+
+
+In final task, rollback the deployment image to an old version: -
+
+kubectl rollout undo deployment ocean-apd
+
+
+Verify the image name by using the following command: -
+
+kubectl describe deploy ocean-apd | grep -i image
+
+
+It should be kodekloud/webapp-color:v1 image.
+
+
+
+Q. 18
+info_outline
+Question
+SECTION: SERVICES AND NETWORKING
+
+
+For this question, please set the context to cluster3 by running:
+
+
+kubectl config use-context cluster3
+
+
+We have already deployed an ingress resource in the app-space namespace.
+
+
+But for better SEO practices, you are requested to change the URLs at which the applications are made available.
+
+
+Change the path of the video application to make it available at /stream.
+
+
+
+Note: Check the backend services configured for the paths in the ingress resource.
+
+info_outline
+Solution
+To change the path of the service, you need to edit the ingress
+
+Edit the ingress using kubectl edit -n app-space ingress ingress-resource-svcn.
+Edit the /watch to make it as /stream.
+spec:
+  ingressClassName: nginx
+  rules:
+  - http:
+      paths:
+      - backend:
+          service:
+            name: wear-service
+            port:
+              number: 8080
+        path: /wear
+        pathType: Prefix
+      - backend:
+          service:
+            name: video-service
+            port:
+              number: 8080
+        path: /watch  #change path to /stream
+        pathType: Prefix
+status:
+  loadBalancer:
+    ingress:
+    - ip: 10.108.22.212
+OR:
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  namespace: app-space
+  name: ingress-resource-svcn
+  annotations:
+    nginx.ingress.kubernetes.io/rewrite-target: /
+spec:
+  ingressClassName: nginx
+  rules:
+  - http:
+      paths:
+      - path: /stream
+        pathType: Prefix
+        backend:
+          service:
+            name: video-service
+            port:
+              number: 8080
+      - path: /wear
+        pathType: Prefix
+        backend:
+          service:
+            name: wear-service
+            port:
+              number: 8080
+
+
+
 Q3
 Question
 
@@ -248,7 +580,8 @@ kubectl config use-context cluster3
 
 In this task, we will use the helm commands. Here are the steps: -
 Add the repostiory to Helm with the following command: -
-helm repo add polar https://charts.bitnami.com/bitnami
+
+=>helm repo add polar https://charts.bitnami.com/bitnami
 
 The helm repo add command is used to add a new chart repository to Helm and this allows us to 
 browse and install charts from the new repository using the Helm package manager.
@@ -354,7 +687,7 @@ error: resource mapping not found for name: "ckad-flash-89" namespace: "" from "
 ensure CRDs are installed first
 about error shows us there is something wrong with apiVersion. So change it v1 and try again. and check status.
 
-kubectl get pods
+=>kubectl get pods
 NAME            READY   STATUS             RESTARTS      AGE
 ckad-flash89-aom   1/2     CrashLoopBackOff   3 (39s ago)   93s
 Now check for reason using
