@@ -106,39 +106,24 @@ Kubernetes Challenges
 =================================================
 Challenge 1:
 =================================================
+
 Q. 14
-info_outline
 Question
 SECTION: APPLICATION ENVIRONMENT, CONFIGURATION and SECURITY
-
-
 For this question, please set the context to cluster3 by running:
-
-
 kubectl config use-context cluster3
 
 
-Define a Kubernetes custom resource definition (CRD) for a new resource kind called Foo (plural form - foos) in the samplecontroller.k8s.io group.
-
+Define a Kubernetes custom resource definition (CRD) for a new resource kind called Foo (plural form - foos) 
+in the samplecontroller.k8s.io group.
 This CRD should have a version of v1alpha1 with a schema that includes two properties as given below:
-
-
 deploymentName (a string type) and replicas (an integer type with minimum value of 1 and maximum value of 5).
 
-
-
-It should also include a status subresource which enables retrieving and updating the status of Foo object, including the availableReplicas property, which is an integer type.
+It should also include a status subresource which enables retrieving and updating the status of Foo object,
+including the availableReplicas property, which is an integer type.
 The Foo resource should be namespace scoped.
 
-
-Note: We have provided a template /root/foo-crd-aecs.yaml for your ease. There are few issues with it so please make sure to incorporate the above requirements before deploying on cluster.
-
-info_outline
 Solution
-student-node ~ ➜  kubectl config use-context cluster3
-Switched to context "cluster3".
-
-student-node ~ ➜  vim foo-crd-aecs.yaml
 
 student-node ~ ➜  cat foo-crd-aecs.yaml 
 apiVersion: apiextensions.k8s.io/v1
@@ -182,65 +167,28 @@ spec:
         # enables the status subresource
         status: {}
 
-student-node ~ ➜  kubectl apply -f foo-crd-aecs.yaml
-customresourcedefinition.apiextensions.k8s.io/foos.samplecontroller.k8s.io created
-
 
 Q. 12
-info_outline
 Question
 SECTION: APPLICATION ENVIRONMENT, CONFIGURATION and SECURITY
-
-
 For this question, please set the context to cluster2 by running:
-
-
 kubectl config use-context cluster2
 
 
-Please fix any possible mistakes in the manifest file located at /root/ckad11-obj-aecs.yaml, which contains a sample object created from a custom resource definition.
-
+Please fix any possible mistakes in the manifest file located at /root/ckad11-obj-aecs.yaml, 
+which contains a sample object created from a custom resource definition.
 Note: Create the object using the above manifest when done.
 
-info_outline
 Solution
-student-node ~ ➜  kubectl config use-context cluster2
-Switched to context "cluster2".
 
 student-node ~ ➜  kubectl apply -f /root/ckad11-obj-aecs.yaml
-error: error parsing /root/ckad11-obj-aecs.yaml: error converting YAML to JSON: yaml: line 7: mapping values are not allowed in this context
-
-student-node ~ ✖ vim /root/ckad11-obj-aecs.yaml
-
-student-node ~ ➜  cat /root/ckad11-obj-aecs.yaml
-apiVersion: apps/v1
-kind: MyCustomResource
-metadata:
-  name: ckad11-my-custom-resource-aecs
-spec:
-  name: John  #1 Fixed the indentation issue
-  age: -10
-status:
-  phase: Invalid
+error: line 7: mapping values are not allowed in this context
 
 student-node ~ ➜  kubectl apply -f /root/ckad11-obj-aecs.yaml
 error: unable to recognize "/root/ckad11-obj-aecs.yaml": no matches for kind "MyCustomResource" in version "apps/v1"
 
 student-node ~ ✖ kubectl api-resources | grep -i MyCustomResource
 mycustomresources                 mcr          example.com/v1                         true         MyCustomResource
-
-student-node ~ ➜  vim /root/ckad11-obj-aecs.yaml
-
-student-node ~ ➜  cat /root/ckad11-obj-aecs.yaml
-apiVersion: example.com/v1  #2 fixed the apiVersion used
-kind: MyCustomResource
-metadata:
-  name: ckad11-my-custom-resource-aecs
-spec:
-  name: John  #1 Fixed the indentation issue
-  age: -10
-status:
-  phase: Invalid
 
 student-node ~ ➜  kubectl apply -f /root/ckad11-obj-aecs.yaml
 The MyCustomResource "ckad11-my-custom-resource-aecs" is invalid: 
@@ -264,28 +212,21 @@ student-node ~ ➜  k apply -f /root/ckad11-obj-aecs.yaml
 mycustomresource.example.com/ckad11-my-custom-resource-aecs created
 
 
+
 Q. 11
-info_outline
 Question
 SECTION: APPLICATION OBSERVABILITY AND MAINTENANCE
-
 For this question, please set the context to cluster1 by running:
-
-
 kubectl config use-context cluster1
 
-
-
-Create a pod resou-limit using yaml file provided in the /root/resou-limit-aom.yaml .However, currently, there is an issue in the manifest. Find the issue, fix it and create the pod.
-
-
+Create a pod resou-limit using yaml file provided in the /root/resou-limit-aom.yaml
 Do not change the values for the limits.
 
-info_outline
 Solution
 You will see the following error
 
-the Pod "resou-limit-aom" is invalid: spec.containers[0].resources.requests: Invalid value: "2": must be less than or equal to cpu limit
+the Pod "resou-limit-aom" is invalid: spec.containers[0].resources.requests: 
+Invalid value: "2": must be less than or equal to cpu limit
 Update the yaml file
 
 apiVersion: v1
@@ -307,246 +248,141 @@ Now create the pod using kubectl create -f resou-limit-aom.yaml
 
 
 Q. 9
-info_outline
 Question
 SECTION: APPLICATION OBSERVABILITY AND MAINTENANCE
 
-Identify the kube api-resources that use api_version=storage.k8s.io/v1 using kubectl command line interface and store them in /root/api-version.txt on student-node.
+Identify the kube api-resources that use api_version=storage.k8s.io/v1 using kubectl command line interface 
+and store them in /root/api-version.txt on student-node.
 
-info_outline
 Solution
 Use the following command to get details:
 
-kubectl api-resources --sort-by=kind | grep -i storage.k8s.io/v1  > /root/api-version.txt
+=>kubectl api-resources --sort-by=kind | grep -i storage.k8s.io/v1  > /root/api-version.txt
 
 
-Q. 8
-info_outline
+
+=>Q. 8
 Question
-SECTION: APPLICATION DEPLOYMENT
+The team Garuda has deployed a web and security application using the Helm tool. 
+Inspect those deployed resources and write their release name to the /root/apps-release-names.txt
+
+Also, the same team deployed one application in the testing-apd namespace. 
+The testing was done, and the team wants you to delete that release. 
+Find out the release name and delete it.
 
 
-For this question, please set the context to cluster2 by running:
-
-
-kubectl config use-context cluster2
-
-
-The team Garuda has deployed a web and security application using the Helm tool. Inspect those deployed resources and write their release name to the /root/apps-release-names.txt file on the student-node.
-
-Also, the same team deployed one application in the testing-apd namespace. The testing was done, and the team wants you to delete that release. Find out the release name and delete it.
-
-
-NOTE: - Do not worry about the status of the deployment.
-
-info_outline
 Solution
-Run the following command to change the context: -
-
-kubectl config use-context cluster2
-
-
-In this task, we will use the kubectl and helm commands. Here are the steps: -
-
-
 
 To check all the resources in all namespaces in the cluster2, we would have to run the following command:
-kubectl get all -A
-
+=>kubectl get all -A
 
 It will list all the available resources of all namespaces.
-
-
-
 We can see that the resources have used prefix called garuda in the name.
 
-
 To list all of the releases on the garuda-apps-apd namespace. Run the following command as follows: -
-helm ls -n garuda-apps-apd
+=>helm ls -n garuda-apps-apd
 
-
-We can see the release names of the web and security applications, and they are deployed on the garuda-apps-apd namespace.
-
-
+We can see the release names of the web and security applications, 
+and they are deployed on the garuda-apps-apd namespace.
 
 Write their release names by using the echo command as follows: -
-echo "garuda-secret-apd,garuda-web-apd" > /root/apps-release-names.txt
+=>echo "garuda-secret-apd,garuda-web-apd" > /root/apps-release-names.txt
 
 
-NOTE: - Make sure you have logged in student-node.
-
-
-
-On the same cluster, one more testing application is running on the testing-apd namespace, which we must delete because it is consuming resources.
-helm ls -n testing-apd
-
-
-helm uninstall -n testing-apd image-scanner 
+On the same cluster, one more testing application is running on the testing-apd namespace, 
+which we must delete because it is consuming resources.
+=>helm ls -n testing-apd
+=>helm uninstall -n testing-apd image-scanner 
 
 
 Q. 7
-info_outline
 Question
-SECTION: APPLICATION DEPLOYMENT
-
-
-For this question, please set the context to cluster3 by running:
-
-
-kubectl config use-context cluster3
-
-
-One co-worker deployed an nginx helm chart on the cluster3 server called lvm-crystal-apd. A new update is pushed to the helm chart, and the team wants you to update the helm repository to fetch the new changes.
-
-
+One co-worker deployed an nginx helm chart on the cluster3 server called lvm-crystal-apd. 
+A new update is pushed to the helm chart, and the team wants you to update the helm repository to fetch the new changes.
 After updating the helm chart, upgrade the helm chart version to above 13.2.9 and increase the replica count to 2.
 
 
-NOTE: - We have to perform this task on the cluster3-controlplane node.
-
-
-You can SSH into the cluster3 using ssh cluster3-controlplane command.
-
-info_outline
 Solution
-Run the following command to change the context: -
-
-
-kubectl config use-context cluster3
-
-
-In this task, we will use the kubectl and helm commands. Here are the steps: -
-
-
-
-Log in to the cluster3-controlplane node first and use the helm ls command to list all the releases installed using Helm in the Kubernetes cluster.
-
-helm ls -A
-
-
-Here -A or --all-namespaces option lists all the releases of all the namespaces.
-
-
-
+=>helm ls -A
+Here lists all the releases of all the namespaces.
 Identify the namespace where the resources get deployed.
 
-
+=>helm repo ls 
 Use the helm repo ls command to list the helm repositories.
-helm repo ls 
 
-
+=>helm repo update lvm-crystal-apd -n crystal-apd-ns
 Now, update the helm repository with the following command: -
-
-helm repo update lvm-crystal-apd -n crystal-apd-ns
-
-
 The above command updates the local cache of available charts from the configured chart repositories.
 
 
+The helm search command searches for all the available charts in a specific Helm chart repository. 
+In our case, it's the nginx helm chart.
 
-The helm search command searches for all the available charts in a specific Helm chart repository. In our case, it's the nginx helm chart.
-helm search repo lvm-crystal-apd/nginx -n crystal-apd-ns -l | head -n30
-
-
+=>helm search repo lvm-crystal-apd/nginx -n crystal-apd-ns -l | head -n30
 The -l or --versions option is used to display information about all available chart versions.
 
 
 
-Upgrade the helm chart to above 13.2.9 and also, increase the replica count of the deployment to 2 from the command line. Use the helm upgrade command as follows: -
+Upgrade the helm chart to above 13.2.9 and also, increase the replica count of the deployment to 2 from the command line. 
+Use the helm upgrade command as follows: -
 
-helm upgrade lvm-crystal-apd lvm-crystal-apd/nginx -n crystal-apd-ns --version=13.2.12 --set replicaCount=2
-
+=>helm upgrade lvm-crystal-apd lvm-crystal-apd/nginx -n crystal-apd-ns --version=13.2.12 --set replicaCount=2
 
 After upgrading the chart version, you can verify it with the following command: -
-
-helm ls -n crystal-apd-ns
-
-
+=>helm ls -n crystal-apd-ns
 Look under the CHART column for the chart version.
 
-
-
 Use the kubectl get command to check the replicas of the deployment: -
-kubectl get deploy -n crystal-apd-ns
-
-
+=>kubectl get deploy -n crystal-apd-ns
 The available count 2 is under the AVAILABLE column.
 
 
 Q. 6
-info_outline
 Question
 SECTION: APPLICATION DEPLOYMENT
-
-
 For this question, please set the context to cluster1 by running:
-
-
 kubectl config use-context cluster1
 
 
-One application, webpage-server-01, is deployed on the Kubernetes cluster by the Helm tool. Now, the team wants to deploy a new version of the application by replacing the existing one. A new version of the helm chart is given in the /root/new-version directory on the student-node. Validate the chart before installing it on the Kubernetes cluster. 
+One application, webpage-server-01, is deployed on the Kubernetes cluster by the Helm tool. 
+Now, the team wants to deploy a new version of the application by replacing the existing one. 
+A new version of the helm chart is given in the /root/new-version directory on the student-node. 
+Validate the chart before installing it on the Kubernetes cluster. 
+
+Use the helm command to validate and install the chart. 
+After successfully installing the newer version, uninstall the older version. 
 
 
-Use the helm command to validate and install the chart. After successfully installing the newer version, uninstall the older version. 
-
-
-info_outline
 Solution
-Run the following command to change the context: -
-
-kubectl config use-context cluster1
-
-
-In this task, we will use the helm commands. Here are the steps: -
-
-
 
 Use the helm ls command to list the release deployed on the default namespace using helm.
-helm ls -n default
-
+=>helm ls -n default
 
 First, validate the helm chart by using the helm lint command: -
 cd /root/
 
-helm lint ./new-version
-
+=>helm lint ./new-version
 
 Now, install the new version of the application by using the helm install command as follows: -
-helm install --generate-name ./new-version
+=>helm install --generate-name ./new-version
 
 We haven't got any release name in the task, so we can generate the random name from the --generate-name option.
-
 Finally, uninstall the old version of the application by using the helm uninstall command: -
 
-helm uninstall webpage-server-01 -n default
+=>helm uninstall webpage-server-01 -n default
 
 
 2
-info_outline
 Question
-SECTION: APPLICATION DESIGN AND BUILD
-
-
-For this question, please set the context to cluster1 by running:
-
-
-kubectl config use-context cluster1
-
-
-In the ckad-job namespace, create a cron job called my-alarm that prints current datetime once a week at midnight on Sunday morning.
-
+In the ckad-job namespace, create a cron job called my-alarm that 
+prints current datetime once a week at midnight on Sunday morning.
 
 In case the container in pod failed for any reason, it should be restarted automatically.
-
 Use busybox:1.28 image to create job.
-
-
-
 Sample output:
-
 Sun Mar  12 00:00:00 UTC 2023
-info_outline
+
+
 Solution
 Use below YAML to create cronjob:
 
@@ -573,25 +409,12 @@ spec:
 
 
 Q. 4
-info_outline
 Question
-SECTION: APPLICATION DESIGN AND BUILD
-
-
-For this question, please set the context to cluster1 by running:
-
-
-kubectl config use-context cluster1
-
-
 In the ckad-job namespace, create a cronjob named simple-python-job to run every 30 minutes to list all the running 
 processes inside a container that used python image (the command needs to be run in a shell).
-
-
-
 In Python, ps –eaf can be use to list all the running processes.
 
-info_outline
+
 Solution
 Create a YAML file with the content as below:
 
@@ -617,93 +440,59 @@ spec:
           restartPolicy: OnFailure
 
 
-Then use kubectl apply -f file_name.yaml to create the required object.
-
 
 Q. 5
-info_outline
 Question
-SECTION: APPLICATION DEPLOYMENT
+
+On the cluster1, the team has installed multiple helm charts on a different namespace. 
+By mistake, those deployed resources include one of the vulnerable images called kodekloud/click-counter:latest.
+Find out the release name and uninstall it.
 
 
-For this question, please set the context to cluster1 by running:
-
-
-kubectl config use-context cluster1
-
-
-On the cluster1, the team has installed multiple helm charts on a different namespace. By mistake, those deployed resources include one of the vulnerable images called kodekloud/click-counter:latest. Find out the release name and uninstall it.
-
-
-info_outline
-Solution
-Run the following command to change the context: -
-
-kubectl config use-context cluster1
-
-
+Solution:
 In this task, we will use the helm commands and jq tool. Here are the steps: -
 
-
-
 Run the helm ls command with -A option to list the releases deployed on all the namespaces using helm.
-helm ls -A
+=>helm ls -A
 
 
 We will use the jq tool to extract the image name from the deployments.
 kubectl get deploy -n <NAMESPACE> <DEPLOYMENT-NAME> -o json | jq -r '.spec.template.spec.containers[].image'
 
+After finding the kodekloud/click-counter:latest image, 
+use the helm uninstall to remove the deployed chart that are using this vulnerable image.
 
-Replace <NAMESPACE> with the namespace and <DEPLOYMENT-NAME> with the deployment name, which we get from the previous commands.
-
-After finding the kodekloud/click-counter:latest image, use the helm uninstall to remove the deployed chart that are using this vulnerable image.
+=>helm uninstall <RELEASE-NAME> -n <NAMESPACE> 
 
 
-helm uninstall <RELEASE-NAME> -n <NAMESPACE> 
 
 
 Q:8
-info_outline
 Question
-SECTION: APPLICATION DEPLOYMENT
-
-
-For this question, please set the context to cluster3 by running:
-
-
-kubectl config use-context cluster3
-
-
 Create a new deployment called ocean-apd in the default namespace using the image kodekloud/webapp-color:v1.
 Use the following specs for the deployment:
 
-
 1. Replica count should be 2.
-
 2. Set the Max Unavailable to 45% and Max Surge to 55%.
-
 3. Create the deployment and ensure all the pods are ready.
-
-4. After successful deployment, upgrade the deployment image to kodekloud/webapp-color:v2 and inspect the deployment rollout status.
-
-5. Check the rolling history of the deployment and on the student-node, save the current revision count number to the /opt/ocean-revision-count.txt file.
-
+4. After successful deployment, upgrade the deployment image to kodekloud/webapp-color:v2 and 
+   inspect the deployment rollout status.
+5. Check the rolling history of the deployment and on the student-node, 
+   save the current revision count number to the /opt/ocean-revision-count.txt file.
 6. Finally, perform a rollback and revert the deployment image to the older version.
 
 
 
 info_outline
 Solution
-Run the following command to change the context: -
 
-kubectl config use-context cluster3
+Verify the image name by using the following command: -
 
-
-Use the following template to create a deployment called ocean-apd: -
+=>kubectl describe deploy ocean-apd | grep -i image
 
 
----
-apiVersion: apps/v1
+It should be kodekloud/webapp-color:v1 image.
+
 kind: Deployment
 metadata:
   labels:
@@ -728,78 +517,40 @@ spec:
       - image: kodekloud/webapp-color:v1
         name: webapp-color
 
+=>kubectl set image deploy ocean-apd webapp-color=kodekloud/webapp-color:v2
 
-Now, create the deployment by using the kubectl create -f command in the default namespace: -
-
-kubectl create -f <FILE-NAME>.yaml
-
-
-After sometime, upgrade the deployment image to kodekloud/webapp-color:v2: -
-
-kubectl set image deploy ocean-apd webapp-color=kodekloud/webapp-color:v2
-
-
-And check out the rollout history of the deployment ocean-apd: -
-
-kubectl rollout history deploy ocean-apd
+=>kubectl rollout history deploy ocean-apd
 deployment.apps/ocean-apd 
 REVISION  CHANGE-CAUSE
 1         <none>
 2         <none>
 
-
-NOTE: - Revision count is 2. In your lab, it could be different.
-
-
-
 On the student-node, store the revision count to the given file: -
-
 echo "2" > /opt/ocean-revision-count.txt
 
 
 In final task, rollback the deployment image to an old version: -
-
-kubectl rollout undo deployment ocean-apd
+=>kubectl rollout undo deployment ocean-apd
 
 
 Verify the image name by using the following command: -
+=>kubectl describe deploy ocean-apd | grep -i image
 
-kubectl describe deploy ocean-apd | grep -i image
-
-
-It should be kodekloud/webapp-color:v1 image.
 
 
 
 Q. 18
-info_outline
 Question
-SECTION: SERVICES AND NETWORKING
-
-
-For this question, please set the context to cluster3 by running:
-
-
-kubectl config use-context cluster3
-
-
 We have already deployed an ingress resource in the app-space namespace.
-
-
 But for better SEO practices, you are requested to change the URLs at which the applications are made available.
-
-
 Change the path of the video application to make it available at /stream.
-
-
-
 Note: Check the backend services configured for the paths in the ingress resource.
 
-info_outline
 Solution
 To change the path of the service, you need to edit the ingress
 
-Edit the ingress using kubectl edit -n app-space ingress ingress-resource-svcn.
+Edit the ingress using 
+=>kubectl edit -n app-space ingress ingress-resource-svcn.
 Edit the /watch to make it as /stream.
 spec:
   ingressClassName: nginx
@@ -856,12 +607,6 @@ spec:
 
 Q3
 Question
-
-SECTION: APPLICATION DESIGN AND BUILD
-For this question, please set the context to cluster1 by running:
-kubectl config use-context cluster1
-
-
 Create a persistent volume called data-pv-ckad02-str with the below properties:
 - Its capacity should be 128Mi.
 - The volume type should be hostpath and path should be /opt/data-pv-ckad02-str.
@@ -902,11 +647,6 @@ spec:
 
 Q. 4
 Question
-SECTION: APPLICATION DESIGN AND BUILD
-For this question, please set the context to cluster1 by running:
-kubectl config use-context cluster1
-
-
 In the ckad-multi-containers namespaces, create a ckad-sidecar-pod pod that matches the following requirements.
 Pod has an emptyDir volume named my-vol.
 The first container named main-container, runs nginx:1.16 image. 
@@ -963,34 +703,19 @@ Mon Mar 20 06:02:07 UTC 2023 Hi I am from Sidecar container
 
 Q. 5
 Question
-SECTION: APPLICATION DEPLOYMENT
-For this question, please set the context to cluster3 by running:
-kubectl config use-context cluster3
-
-
 Our new client wants to deploy the resources through the popular Helm tool. 
 In the initial phase, our team lead wants to deploy nginx, a very powerful and versatile web server 
 software that is widely used to serve static content, reverse proxying, load balancing, 
 from the bitnami helm chart on the cluster3-controlplane node.
 The chart URL and other specifications are as follows: -
 
-
 1. The chart URL link - https://charts.bitnami.com/bitnami
 2. The chart repository name should be polar.
 3. The release name should be nginx-server.
 4. All the resources should be deployed on the cd-tool-apd namespace.
 
-
-NOTE: - You have to perform this task from the student-node.
-
 Solution
-Run the following command to change the context: -
-kubectl config use-context cluster3
-
-
-In this task, we will use the helm commands. Here are the steps: -
 Add the repostiory to Helm with the following command: -
-
 =>helm repo add polar https://charts.bitnami.com/bitnami
 
 The helm repo add command is used to add a new chart repository to Helm and this allows us to 
@@ -999,7 +724,6 @@ browse and install charts from the new repository using the Helm package manager
 
 Use the helm repo ls command which is used to list all the currently configured Helm chart repositories 
 on Kubernetes cluster.
-
 =>helm repo ls 
 
 Search for the nginx chart in a polar chart repository as follows: -
@@ -1019,10 +743,6 @@ Then we can install the nginx chart on a Kubernetes cluster.
 
 Q. 6
 Question
-SECTION: APPLICATION DEPLOYMENT
-For this question, please set the context to cluster3 by running:
-kubectl config use-context cluster3
-
 One co-worker deployed an nginx helm chart on the cluster3 server called lvm-crystal-apd. 
 A new update is pushed to the helm chart, and the team wants you to update the helm repository to fetch the new changes.
 After updating the helm chart, upgrade the helm chart version to above 13.2.9 and increase the replica count to 2.
@@ -1036,18 +756,14 @@ Run the following command to change the context: -
 kubectl config use-context cluster3
 In this task, we will use the kubectl and helm commands. Here are the steps: -
 
-Log in to the cluster3-controlplane node first and use the helm ls command to list all the releases installed using 
-Helm in the Kubernetes cluster.
-
+list all the releases installed using Helm in the Kubernetes cluster.
 =>helm ls -A
-
-Here -A or --all-namespaces option lists all the releases of all the namespaces.
 Identify the namespace where the resources get deployed.
+
 Use the helm repo ls command to list the helm repositories.
 =>helm repo ls 
 
 Now, update the helm repository with the following command: -
-
 =>helm repo update lvm-crystal-apd -n crystal-apd-ns
 The above command updates the local cache of available charts from the configured chart repositories.
 
@@ -1057,40 +773,24 @@ In our case, it's the nginx helm chart.
 
 The -l or --versions option is used to display information about all available chart versions.
 
-Upgrade the helm chart to above 13.2.9 and also, increase the replica count of the deployment to 2 from the command line. 
-Use the helm upgrade command as follows: -
-
+Upgrade the helm chart to above 13.2.9 and also, increase the replica count of the deployment to 2
 =>helm upgrade lvm-crystal-apd lvm-crystal-apd/nginx -n crystal-apd-ns --version=13.2.12 --set replicaCount=2
-After upgrading the chart version, you can verify it with the following command: -
+
 
 =>helm ls -n crystal-apd-ns
-Look under the CHART column for the chart version.
-
-
-Use the kubectl get command to check the replicas of the deployment: -
+To verify look under the CHART column for the chart version .
 =>kubectl get deploy -n crystal-apd-ns
 The available count 2 is under the AVAILABLE column.
 
 
 
 Q13
-SECTION: APPLICATION OBSERVABILITY AND MAINTENANCE
-For this question, please set the context to cluster2 by running:
-kubectl config use-context cluster2
-
-
 A manifest file located at root/ckad-flash89.yaml on cluster2-controlplane. 
 Which can be used to create a multi-containers pod. 
 There are issues with the manifest file, preventing resource creation. 
 Identify the errors, fix them and create resource.
 
-
-You can access controlplane by ssh cluster2-controlplane if required.
-
 Solution
-Set context to cluster2 and SSH to cluster2-controlplane.
-use the kubectl create command we will see following error.
-
 =>kubectl create -f ckad-flash89.yaml
 
 error: resource mapping not found for name: "ckad-flash-89" namespace: "" from "ckad-flash89.yaml": no matches for kind "Pod" in version "V1"
@@ -1113,11 +813,6 @@ mountPath --> mountPath: "/var/log" change it to mountPath: /var/log/nginx and a
 
 Q. 14
 Question
-SECTION: APPLICATION ENVIRONMENT, CONFIGURATION and SECURITY
-For this question, please set the context to cluster2 by running:
-kubectl config use-context cluster2
-
-
 We have a Kubernetes namespace called ckad12-ctm-sa-aecs, which contains a service account and a pod. 
 Your task is to modify the pod so that it uses the service account defined in the same namespace.
 
@@ -1127,16 +822,6 @@ service account by enabling the automounting feature for the credentials.
 
 Solution
 Here we will do two things:
-
-Remove automountServiceAccountToken: false field to enable automount of creds and specifying 
-our service account as: serviceAccountName: ckad12-my-custom-sa-aecs
-
-student-node ~ ➜  kubectl config use-context cluster2
-Switched to context "cluster2".
-
-student-node ~ ➜  kubectl get pods -n ckad12-ctm-sa-aecs ckad12-ctm-nginx-aecs -o yaml > ckad-custom-sa.yaml
-student-node ~ ➜  vim ckad-custom-sa.yaml 
-student-node ~ ➜  cat ckad-custom-sa.yaml 
 apiVersion: v1
 kind: Pod
 metadata:
@@ -1150,19 +835,11 @@ spec:
     name: nginx
   serviceAccountName: ckad12-my-custom-sa-aecs # using custom sa
 
-student-node ~ ➜  kubectl replace -f ckad-custom-sa.yaml --force 
-pod "ckad12-ctm-nginx-aecs" deleted
-pod/ckad12-ctm-nginx-aecs replaced
 
 
 
 Q. 16
 Question
-SECTION: APPLICATION ENVIRONMENT, CONFIGURATION and SECURITY
-For this question, please set the context to cluster1 by running:
-kubectl config use-context cluster1
-
-
 Create a pod named ckad17-qos-aecs-3 in namespace ckad17-nqoss-aecs 
 with image nginx and container name ckad17-qos-ctr-3-aecs.
 
@@ -1179,10 +856,7 @@ pod-2   qos_class
 
 
 Solution
-student-node ~ ➜ kubectl config use-context cluster1
-Switched to context "cluster1".
 
-student-node ~ ➜  cat << EOF | kubectl apply -f -
 apiVersion: v1
 kind: Pod
 metadata:
@@ -1197,51 +871,13 @@ spec:
         memory: "200Mi"
       requests:
         memory: "100Mi"
-EOF
 
-pod/ckad17-qos-aecs-3 created
-
-student-node ~ ➜  kubectl --namespace=ckad17-nqoss-aecs get pod --output=custom-columns="NAME:.metadata.name,QOS:.status.qosClass"
+=>kubectl --namespace=ckad17-nqoss-aecs get pod --output=custom-columns="NAME:.metadata.name,QOS:.status.qosClass"
 NAME                QOS
 ckad17-qos-aecs-1   BestEffort
 ckad17-qos-aecs-2   Guaranteed
 ckad17-qos-aecs-3   Burstable
-
-student-node ~ ➜  kubectl --namespace=ckad17-nqoss-aecs get pod --output=custom-columns="NAME:.metadata.name,QOS:.status.qosClass" > /root/qos_status_aecs
-
-
-
-
-Q. 20
-Question
-SECTION: SERVICES AND NETWORKING
-For this question, please set the context to cluster3 by running:
-kubectl config use-context cluster3
-
-You are requested to create a network policy named deny-all-svcn that denies 
-all incoming and outgoing traffic to ckad12-svcn namespace.
-
-
-Note: The namespace ckad12-svcn doesn't exist. Create the namespace before creating the Policy.
-
-Solution
-Create the namespace using the following command - kubectl create ns ckad12-svcn
-
-Create the network policy in the namespace ckad12-svcn using the following manifest.
-
-apiVersion: networking.k8s.io/v1
-kind: NetworkPolicy
-metadata:
-  name: deny-all-svcn
-  namespace: ckad12-svcn
-spec:
-  podSelector: {}
-  policyTypes:
-  - Ingress
-  - Egress
-
-
-
+=>kubectl --namespace=ckad17-nqoss-aecs get pod --output=custom-columns="NAME:.metadata.name,QOS:.status.qosClass" > /root/qos_status_aecs
 
 
 
