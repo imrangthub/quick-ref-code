@@ -399,11 +399,6 @@ The available count 2 is under the AVAILABLE column.
 
 Q. 6
 Question
-SECTION: APPLICATION DEPLOYMENT
-For this question, please set the context to cluster1 by running:
-kubectl config use-context cluster1
-
-
 One application, webpage-server-01, is deployed on the Kubernetes cluster by the Helm tool. 
 Now, the team wants to deploy a new version of the application by replacing the existing one. 
 A new version of the helm chart is given in the /root/new-version directory on the student-node. 
@@ -503,7 +498,6 @@ spec:
 
 Q. 5
 Question
-
 On the cluster1, the team has installed multiple helm charts on a different namespace. 
 By mistake, those deployed resources include one of the vulnerable images called kodekloud/click-counter:latest.
 Find out the release name and uninstall it.
@@ -517,7 +511,7 @@ Run the helm ls command with -A option to list the releases deployed on all the 
 
 
 We will use the jq tool to extract the image name from the deployments.
-kubectl get deploy -n <NAMESPACE> <DEPLOYMENT-NAME> -o json | jq -r '.spec.template.spec.containers[].image'
+=>kubectl get deploy -n <NAMESPACE> <DEPLOYMENT-NAME> -o json | jq -r '.spec.template.spec.containers[].image'
 
 After finding the kodekloud/click-counter:latest image, 
 use the helm uninstall to remove the deployed chart that are using this vulnerable image.
