@@ -107,13 +107,86 @@ Kubernetes Challenges
 Challenge 1:
 =================================================
 
+
+Q5
+On the cluster2-controlplane node, a Helm chart repository is given under the /opt/ path. 
+It contains the files that describe a set of Kubernetes resources that can be deployed as a single unit. 
+The files have some issues. Fix those.
+
+
+1. The release name should be webapp-color-apd.
+2. All the resources should be deployed on the frontend-apd namespace.
+3. The service type should be node port.
+4. Scale the deployment to 3.
+5. Application version should be 1.20.0.
+
+NOTE: - Remember to make necessary changes in the values.yaml and Chart.yaml files 
+according to the specifications, and, to fix the issues, inspect the template files.
+
+
+Solution
+First, check the given namespace; if it doesn't exist, we must create it first; 
+
+Now, SSH to the cluster2-controlplane node and go to the /opt/ directory. 
+We have given the helm chart directory webapp-color-apd 
+that contains templates, values files, and the chart file etc.
+
+Update the values according to the given specifications as follows: -
+a.) Update the value of the appVersion to 1.20.0 in the Chart.yaml file.
+b.) Update the value of the replicaCount to 3 in the values.yaml file.
+c.) Update the value of the type to NodePort in the values.yaml file.
+These are the values we have to update.
+
+Now, we will use the helm lint command to check the Helm chart 
+
+=>cd /opt/
+=>helm lint ./webapp-color-apd/
+
+If there is no misconfiguration, we will see the similar output: -
+
+helm lint ./webapp-color-apd/
+==> Linting ./webapp-color-apd/
+[INFO] Chart.yaml: icon is recommended
+
+1 chart(s) linted, 0 chart(s) failed
+
+But in our case, there are some issues with the given templates.
+Deployment apiVersion needs to be correctly written. It should be apiVersion: apps/v1.
+
+In the service YAML, there is a typo in the template variable {{ .Values.service.name }} because of that, 
+it's not able to reference the value of the name field defined in the values.yaml 
+file for the Kubernetes service that is being created or updated.
+
+=>helm install webapp-color-apd -n frontend-apd ./webapp-color-apd
+=>helm ls -n frontend-apd
+
+
+
+14
+Create a service account named ckad23-sa-aecs in the namespace ckad23-nssa-aecs.
+Grant the service account get and list permissions to access all resources within the namespace using a 
+Role named wide-access-aecs.
+Also bind the Role to the service account using a RoleBinding named wide-access-rb-aecs, 
+restricting the access to the ckad23-nssa-aecs namespace only.
+
+
+Solution
+
+
+=>kubectl create ns ckad23-nssa-aecs
+=>kubectl create serviceaccount ckad23-sa-aecs -n ckad23-nssa-aecs
+
+=>kubectl create role wide-access-aecs --namespace=ckad23-nssa-aecs --verb=get,list --resource=* 
+
+=>kubectl create rolebinding wide-access-rb-aecs \
+   --role=wide-access-aecs \
+   --serviceaccount=ckad23-nssa-aecs:ckad23-sa-aecs \
+   --namespace=ckad23-nssa-aecs
+
+
+
 Q. 14
 Question
-SECTION: APPLICATION ENVIRONMENT, CONFIGURATION and SECURITY
-For this question, please set the context to cluster3 by running:
-kubectl config use-context cluster3
-
-
 Define a Kubernetes custom resource definition (CRD) for a new resource kind called Foo (plural form - foos) 
 in the samplecontroller.k8s.io group.
 This CRD should have a version of v1alpha1 with a schema that includes two properties as given below:
@@ -170,11 +243,6 @@ spec:
 
 Q. 12
 Question
-SECTION: APPLICATION ENVIRONMENT, CONFIGURATION and SECURITY
-For this question, please set the context to cluster2 by running:
-kubectl config use-context cluster2
-
-
 Please fix any possible mistakes in the manifest file located at /root/ckad11-obj-aecs.yaml, 
 which contains a sample object created from a custom resource definition.
 Note: Create the object using the above manifest when done.
@@ -215,10 +283,6 @@ mycustomresource.example.com/ckad11-my-custom-resource-aecs created
 
 Q. 11
 Question
-SECTION: APPLICATION OBSERVABILITY AND MAINTENANCE
-For this question, please set the context to cluster1 by running:
-kubectl config use-context cluster1
-
 Create a pod resou-limit using yaml file provided in the /root/resou-limit-aom.yaml
 Do not change the values for the limits.
 
@@ -248,9 +312,6 @@ Now create the pod using kubectl create -f resou-limit-aom.yaml
 
 
 Q. 9
-Question
-SECTION: APPLICATION OBSERVABILITY AND MAINTENANCE
-
 Identify the kube api-resources that use api_version=storage.k8s.io/v1 using kubectl command line interface 
 and store them in /root/api-version.txt on student-node.
 
@@ -272,7 +333,6 @@ Find out the release name and delete it.
 
 
 Solution
-
 To check all the resources in all namespaces in the cluster2, we would have to run the following command:
 =>kubectl get all -A
 
