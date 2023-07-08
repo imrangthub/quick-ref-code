@@ -107,97 +107,241 @@ Kubernetes Challenges
 Challenge 1:
 =================================================
 
-
-Q5
-On the cluster2-controlplane node, a Helm chart repository is given under the /opt/ path. 
-It contains the files that describe a set of Kubernetes resources that can be deployed as a single unit. 
-The files have some issues. Fix those.
-
-
-1. The release name should be webapp-color-apd.
-2. All the resources should be deployed on the frontend-apd namespace.
-3. The service type should be node port.
-4. Scale the deployment to 3.
-5. Application version should be 1.20.0.
-
-NOTE: - Remember to make necessary changes in the values.yaml and Chart.yaml files 
-according to the specifications, and, to fix the issues, inspect the template files.
-
-
-Solution
-First, check the given namespace; if it doesn't exist, we must create it first; 
-
-Now, SSH to the cluster2-controlplane node and go to the /opt/ directory. 
-We have given the helm chart directory webapp-color-apd 
-that contains templates, values files, and the chart file etc.
-
-Update the values according to the given specifications as follows: -
-a.) Update the value of the appVersion to 1.20.0 in the Chart.yaml file.
-b.) Update the value of the replicaCount to 3 in the values.yaml file.
-c.) Update the value of the type to NodePort in the values.yaml file.
-These are the values we have to update.
-
-Now, we will use the helm lint command to check the Helm chart 
-
-=>cd /opt/
-=>helm lint ./webapp-color-apd/
-
-If there is no misconfiguration, we will see the similar output: -
-
-helm lint ./webapp-color-apd/
-==> Linting ./webapp-color-apd/
-[INFO] Chart.yaml: icon is recommended
-
-1 chart(s) linted, 0 chart(s) failed
-
-But in our case, there are some issues with the given templates.
-Deployment apiVersion needs to be correctly written. It should be apiVersion: apps/v1.
-
-In the service YAML, there is a typo in the template variable {{ .Values.service.name }} because of that, 
-it's not able to reference the value of the name field defined in the values.yaml 
-file for the Kubernetes service that is being created or updated.
-
-=>helm install webapp-color-apd -n frontend-apd ./webapp-color-apd
-=>helm ls -n frontend-apd
-
-
-
-14
-Create a service account named ckad23-sa-aecs in the namespace ckad23-nssa-aecs.
-Grant the service account get and list permissions to access all resources within the namespace using a 
-Role named wide-access-aecs.
-Also bind the Role to the service account using a RoleBinding named wide-access-rb-aecs, 
-restricting the access to the ckad23-nssa-aecs namespace only.
-
-
-Solution
-
-
-=>kubectl create ns ckad23-nssa-aecs
-=>kubectl create serviceaccount ckad23-sa-aecs -n ckad23-nssa-aecs
-
-=>kubectl create role wide-access-aecs --namespace=ckad23-nssa-aecs --verb=get,list --resource=* 
-
-=>kubectl create rolebinding wide-access-rb-aecs \
-   --role=wide-access-aecs \
-   --serviceaccount=ckad23-nssa-aecs:ckad23-sa-aecs \
-   --namespace=ckad23-nssa-aecs
-
-
-
 Q. 14
 Question
+We have a Kubernetes namespace called ckad12-ctm-sa-aecs, which contains a service account and a pod. 
+Your task is to modify the pod so that it uses the service account defined in the same namespace.
+
+Additionally, you need to ensure that the pod has access to the API credentials associated with the 
+service account by enabling the automounting feature for the credentials.
+
+
+Solution
+Here we will do two things:
+apiVersion: v1
+kind: Pod
+metadata:
+  name: ckad12-ctm-nginx-aecs
+  namespace: ckad12-ctm-sa-aecs
+spec:
+  # automountServiceAccountToken: false  *removed to enable automount of creds
+  containers:
+  - image: nginx
+    imagePullPolicy: Always
+    name: nginx
+  serviceAccountName: ckad12-my-custom-sa-aecs # using custom sa
+
+
+
+
+Q. 16
+Question
+Create a pod named ckad17-qos-aecs-3 in namespace ckad17-nqoss-aecs 
+with image nginx and container name ckad17-qos-ctr-3-aecs.
+
+Define other fields such that the Pod is configured to use the Quality of Service (QoS) class of Burstable.
+
+Also retrieve the name and QoS class of each Pod in the namespace ckad17-nqoss-aecs in the below 
+format and save the output to a file named qos_status_aecs in the /root directory.
+
+
+Format:
+NAME    QOS
+pod-1   qos_class
+pod-2   qos_class
+
+
+Solution
+
+apiVersion: v1
+kind: Pod
+metadata:
+  name: ckad17-qos-aecs-3
+  namespace: ckad17-nqoss-aecs
+spec:
+  containers:
+  - name: ckad17-qos-ctr-3-aecs
+    image: nginx
+    resources:
+      limits:
+        memory: "200Mi"
+      requests:
+        memory: "100Mi"
+
+=>kubectl --namespace=ckad17-nqoss-aecs get pod --output=custom-columns="NAME:.metadata.name,QOS:.status.qosClass"
+NAME                QOS
+ckad17-qos-aecs-1   BestEffort
+ckad17-qos-aecs-2   Guaranteed
+ckad17-qos-aecs-3   Burstable
+=>kubectl --namespace=ckad17-nqoss-aecs get pod --output=custom-columns="NAME:.metadata.name,QOS:.status.qosClass" > /root/qos_status_aecs
+
+
+
+
+7Question
+In this task, we have to create two identical environments that are running different versions of the application. 
+The team decided to use the Blue/green deployment method to deploy a total 
+of 10 application pods which 30% green pod and rest 70% to blue.
+
+The name of the deployment is blue-apd.
+Use the label type-one: blue.
+Use the image kodekloud/webapp-color:v1.
+Add labels to the pod type-one: blue and version: v1.
+
+The name of the deployment is green-apd.
+Use the label type-two: green.
+Use the image kodekloud/webapp-color:v2.
+Add labels to the pod type-two: green and version: v1.
+
+The name of the service is route-apd-svc.
+Use the correct service type to access the application from outside the cluster and application should listen on port 8080.
+Use the selector label version: v1.
+
+curl http://cluster3-controlplane:NODE-PORT
+
+
+Solution
+Use the kubectl create command to create a deployment manifest file as follows: -
+
+=>kubectl create deployment blue-apd --image=kodekloud/webapp-color:v1 --dry-run=client -o yaml > <FILE-NAME-1>.yaml
+=kubectl create deployment green-apd --image=kodekloud/webapp-color:v2 --dry-run=client -o yaml > <FILE-NAME-2>.yaml
+=>kubectl create service nodeport route-apd-svc --tcp=8080:8080 --dry-run=client -oyaml > <FILE-NAME-3>.yaml
+
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    type-one: blue
+  name: blue-apd
+spec:
+  replicas: 7
+  selector:
+    matchLabels:
+      type-one: blue
+      version: v1
+  template:
+    metadata:
+      labels:
+        version: v1
+        type-one: blue
+    spec:
+      containers:
+        - image: kodekloud/webapp-color:v1
+          name: blue-apd
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    type-two: green
+  name: green-apd
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      type-two: green
+      version: v1
+  template:
+    metadata:
+      labels:
+        type-two: green
+        version: v1
+    spec:
+      containers:
+        - image: kodekloud/webapp-color:v2
+          name: green-apd
+---
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    app: route-apd-svc
+  name: route-apd-svc
+spec:
+  type: NodePort
+  ports:
+    - port: 8080
+      protocol: TCP
+      targetPort: 8080
+  selector:
+    version: v1
+
+
+
+11Question
+A manifest file located at root/ckad-flash89.yaml Which can be used to create a multi-containers pod. 
+There are issues with the manifest file
+
+Solution
+=>kubectl create -f ckad-flash89.yaml
+error: resource mapping not found for name: "ckad-flash-89" namespace: "" from "ckad-flash89.yaml": 
+no matches for kind "Pod" in version "V1"
+ensure CRDs are installed first
+about error shows us there is something wrong with apiVersion. So change it v1 and try again. and check status.
+
+kubectl get pods
+NAME            READY   STATUS             RESTARTS      AGE
+ckad-flash89-aom   1/2     CrashLoopBackOff   3 (39s ago)   93s
+
+Now check for reason using
+=>kubectl describe pod ckad-flash89-aom
+we will see that there is problem with nginx container
+
+open yaml file and check in spec -> nginx container you can see error with 
+mountPath --> mountPath: "/var/log" change it to mountPath: /var/log/nginx and apply changes.
+
+
+
+
+14Question
+Create a Kubernetes Pod named ckad16-memory-aecs, with a container named ckad16-memory-ctr-aecs 
+running the polinux/stress image, and configure it to use the following specifications:
+
+Command: stress
+Arguments: ["--vm", "1", "--vm-bytes", "15M", "--vm-hang", "1"]
+Requested memory: 10Mi
+Memory limit: 20Mi
+
+
+Solution
+student-node ~ ➜  kubectl config use-context cluster1
+Switched to context "cluster1".
+
+student-node ~ ➜  cat << EOF | kubectl apply -f -
+apiVersion: v1
+kind: Pod
+metadata:
+  name: ckad16-memory-aecs
+spec:
+  containers:
+  - name: ckad16-memory-ctr-aecs
+    image: polinux/stress
+    resources:
+      requests:
+        memory: "10Mi"
+      limits:
+        memory: "20Mi"
+    command: ["stress"]
+    args: ["--vm", "1", "--vm-bytes", "15M", "--vm-hang", "1"]
+EOF
+
+
+
+
+16Question
 Define a Kubernetes custom resource definition (CRD) for a new resource kind called Foo (plural form - foos) 
 in the samplecontroller.k8s.io group.
 This CRD should have a version of v1alpha1 with a schema that includes two properties as given below:
-deploymentName (a string type) and replicas (an integer type with minimum value of 1 and maximum value of 5).
+
+deploymentName (a string type) and 
+replicas (an integer type with minimum value of 1 and maximum value of 5).
 
 It should also include a status subresource which enables retrieving and updating the status of Foo object,
 including the availableReplicas property, which is an integer type.
 The Foo resource should be namespace scoped.
 
 Solution
-
 student-node ~ ➜  cat foo-crd-aecs.yaml 
 apiVersion: apiextensions.k8s.io/v1
 kind: CustomResourceDefinition
@@ -241,14 +385,112 @@ spec:
         status: {}
 
 
-Q. 12
-Question
+
+18Question
+We have deployed several applications in the ns-ckad17-svcn namespace that are exposed inside the cluster via ClusterIP.
+Your task is to create a LoadBalancer type service that will serve traffic to the applications based on its labels. 
+
+Service lb1-ckad17-svcn for serving traffic at port 31890 to pods with labels "exam=ckad, criteria=location".
+Service lb2-ckad17-svcn for serving traffic at port 31891 to pods with labels "exam=ckad, criteria=cpu-high".
+
+Solution
+To create the loadbalancer for the pods with the specified lables, 
+first we need to find the pods with the mentioned lables.
+
+=>kubectl -n ns-ckad17-svcn get pod -l exam=ckad,criteria=location
+-----
+NAME               READY   STATUS    RESTARTS   AGE
+geo-location-app   1/1     Running   0          10m
+
+=>kubectl -n ns-ckad17-svcn get pod -l exam=ckad,criteria=cpu-high
+-----
+NAME           READY   STATUS    RESTARTS   AGE
+cpu-load-app   1/1     Running   0          11m
+
+Now we know which pods use the labels, we can create the LoadBalancer type service using the imperative command.
+
+=>kubectl -n ns-ckad17-svcn expose pod geo-location-app --type=LoadBalancer --name=lb1-ckad17-svcn
+=>kubectl -n ns-ckad17-svcn expose pod cpu-load-app --type=LoadBalancer --name=lb2-ckad17-svcn
+
+Once the services are created, you can edit the services to use the correct nodePorts 
+as per the question using kubectl -n ns-ckad17-svcn edit svc lb2-ckad17-svcn.
+
+
+
+Q5
+On the cluster2-controlplane node, a Helm chart repository is given under the /opt/ path. 
+It contains the files that describe a set of Kubernetes resources that can be deployed as a single unit. 
+The files have some issues. Fix those.
+
+1. The release name should be webapp-color-apd.
+2. All the resources should be deployed on the frontend-apd namespace.
+3. The service type should be node port.
+4. Scale the deployment to 3.
+5. Application version should be 1.20.0.
+
+NOTE: - Remember to make necessary changes in the values.yaml and Chart.yaml files 
+according to the specifications, and, to fix the issues, inspect the template files.
+
+
+Solution
+Update the values according to the given specifications as follows: -
+a.) Update the value of the appVersion to 1.20.0 in the Chart.yaml file.
+b.) Update the value of the replicaCount to 3 in the values.yaml file.
+c.) Update the value of the type to NodePort in the values.yaml file.
+These are the values we have to update.
+
+Now, we will use the helm lint command to check the Helm chart 
+
+=>cd /opt/
+=>helm lint ./webapp-color-apd/
+
+If there is no misconfiguration, we will see the similar output: -
+
+helm lint ./webapp-color-apd/
+==> Linting ./webapp-color-apd/
+[INFO] Chart.yaml: icon is recommended
+
+1 chart(s) linted, 0 chart(s) failed
+
+But in our case, there are some issues with the given templates.
+Deployment apiVersion needs to be correctly written. It should be apiVersion: apps/v1.
+
+In the service YAML, there is a typo in the template variable {{ .Values.service.name }} because of that, 
+it's not able to reference the value of the name field defined in the values.yaml 
+file for the Kubernetes service that is being created or updated.
+
+=>helm install webapp-color-apd -n frontend-apd ./webapp-color-apd
+=>helm ls -n frontend-apd
+
+
+
+14
+Create a service account named ckad23-sa-aecs in the namespace ckad23-nssa-aecs.
+Grant the service account get and list permissions to access all resources within the namespace using a 
+Role named wide-access-aecs.
+Also bind the Role to the service account using a RoleBinding named wide-access-rb-aecs, 
+restricting the access to the ckad23-nssa-aecs namespace only.
+
+
+Solution
+=>kubectl create ns ckad23-nssa-aecs
+=>kubectl create serviceaccount ckad23-sa-aecs -n ckad23-nssa-aecs
+
+=>kubectl create role wide-access-aecs --namespace=ckad23-nssa-aecs --verb=get,list --resource=* 
+
+=>kubectl create rolebinding wide-access-rb-aecs \
+   --role=wide-access-aecs \
+   --serviceaccount=ckad23-nssa-aecs:ckad23-sa-aecs \
+   --namespace=ckad23-nssa-aecs
+
+
+
+Q. 12Question
 Please fix any possible mistakes in the manifest file located at /root/ckad11-obj-aecs.yaml, 
 which contains a sample object created from a custom resource definition.
 Note: Create the object using the above manifest when done.
 
 Solution
-
 student-node ~ ➜  kubectl apply -f /root/ckad11-obj-aecs.yaml
 error: line 7: mapping values are not allowed in this context
 
@@ -276,39 +518,6 @@ spec:
 status:
   phase: Running #4 use the valid entries
 
-student-node ~ ➜  k apply -f /root/ckad11-obj-aecs.yaml
-mycustomresource.example.com/ckad11-my-custom-resource-aecs created
-
-
-
-Q. 11
-Question
-Create a pod resou-limit using yaml file provided in the /root/resou-limit-aom.yaml
-Do not change the values for the limits.
-
-Solution
-You will see the following error
-
-the Pod "resou-limit-aom" is invalid: spec.containers[0].resources.requests: 
-Invalid value: "2": must be less than or equal to cpu limit
-Update the yaml file
-
-apiVersion: v1
-kind: Pod
-metadata:
-  name: resou-limit-aom
-spec:
-  containers:
-  - name: ubuntu
-    image: ubuntu
-    resources:
-      requests:
-        cpu: "1"
-        memory: "256Mi"
-      limits:
-        cpu: "1"
-        memory: "512Mi" 
-Now create the pod using kubectl create -f resou-limit-aom.yaml
 
 
 Q. 9
@@ -317,13 +526,11 @@ and store them in /root/api-version.txt on student-node.
 
 Solution
 Use the following command to get details:
-
 =>kubectl api-resources --sort-by=kind | grep -i storage.k8s.io/v1  > /root/api-version.txt
 
 
 
-=>Q. 8
-Question
+Q. 8Question
 The team Garuda has deployed a web and security application using the Helm tool. 
 Inspect those deployed resources and write their release name to the /root/apps-release-names.txt
 
@@ -348,7 +555,6 @@ and they are deployed on the garuda-apps-apd namespace.
 Write their release names by using the echo command as follows: -
 =>echo "garuda-secret-apd,garuda-web-apd" > /root/apps-release-names.txt
 
-
 On the same cluster, one more testing application is running on the testing-apd namespace, 
 which we must delete because it is consuming resources.
 =>helm ls -n testing-apd
@@ -371,17 +577,13 @@ Identify the namespace where the resources get deployed.
 Use the helm repo ls command to list the helm repositories.
 
 =>helm repo update lvm-crystal-apd -n crystal-apd-ns
-Now, update the helm repository with the following command: -
 The above command updates the local cache of available charts from the configured chart repositories.
-
 
 The helm search command searches for all the available charts in a specific Helm chart repository. 
 In our case, it's the nginx helm chart.
 
 =>helm search repo lvm-crystal-apd/nginx -n crystal-apd-ns -l | head -n30
 The -l or --versions option is used to display information about all available chart versions.
-
-
 
 Upgrade the helm chart to above 13.2.9 and also, increase the replica count of the deployment to 2 from the command line. 
 Use the helm upgrade command as follows: -
@@ -397,8 +599,8 @@ Use the kubectl get command to check the replicas of the deployment: -
 The available count 2 is under the AVAILABLE column.
 
 
-Q. 6
-Question
+
+Q. 6Question
 One application, webpage-server-01, is deployed on the Kubernetes cluster by the Helm tool. 
 Now, the team wants to deploy a new version of the application by replacing the existing one. 
 A new version of the helm chart is given in the /root/new-version directory on the student-node. 
@@ -409,13 +611,11 @@ After successfully installing the newer version, uninstall the older version.
 
 
 Solution
-
 Use the helm ls command to list the release deployed on the default namespace using helm.
 =>helm ls -n default
 
 First, validate the helm chart by using the helm lint command: -
 cd /root/
-
 =>helm lint ./new-version
 
 Now, install the new version of the application by using the helm install command as follows: -
@@ -423,12 +623,11 @@ Now, install the new version of the application by using the helm install comman
 
 We haven't got any release name in the task, so we can generate the random name from the --generate-name option.
 Finally, uninstall the old version of the application by using the helm uninstall command: -
-
 =>helm uninstall webpage-server-01 -n default
 
 
-2
-Question
+
+2Question
 In the ckad-job namespace, create a cron job called my-alarm that 
 prints current datetime once a week at midnight on Sunday morning.
 
@@ -463,39 +662,6 @@ spec:
           restartPolicy: OnFailure
 
 
-Q. 4
-Question
-In the ckad-job namespace, create a cronjob named simple-python-job to run every 30 minutes to list all the running 
-processes inside a container that used python image (the command needs to be run in a shell).
-In Python, ps –eaf can be use to list all the running processes.
-
-
-Solution
-Create a YAML file with the content as below:
-
-apiVersion: batch/v1
-kind: CronJob
-metadata:
-  name: simple-python-job
-  namespace: ckad-job
-spec:
-  schedule: "*/30 * * * *"
-  jobTemplate:
-    spec:
-      template:
-        spec:
-          containers:
-          - name: simple-python-job
-            image: python
-            imagePullPolicy: IfNotPresent
-            command:
-            - /bin/sh
-            - -c
-            - ps –eaf
-          restartPolicy: OnFailure
-
-
-
 Q. 5
 Question
 On the cluster1, the team has installed multiple helm charts on a different namespace. 
@@ -517,79 +683,6 @@ After finding the kodekloud/click-counter:latest image,
 use the helm uninstall to remove the deployed chart that are using this vulnerable image.
 
 =>helm uninstall <RELEASE-NAME> -n <NAMESPACE> 
-
-
-
-
-Q:8
-Question
-Create a new deployment called ocean-apd in the default namespace using the image kodekloud/webapp-color:v1.
-Use the following specs for the deployment:
-
-1. Replica count should be 2.
-2. Set the Max Unavailable to 45% and Max Surge to 55%.
-3. Create the deployment and ensure all the pods are ready.
-4. After successful deployment, upgrade the deployment image to kodekloud/webapp-color:v2 and 
-   inspect the deployment rollout status.
-5. Check the rolling history of the deployment and on the student-node, 
-   save the current revision count number to the /opt/ocean-revision-count.txt file.
-6. Finally, perform a rollback and revert the deployment image to the older version.
-
-
-
-info_outline
-Solution
-
-Verify the image name by using the following command: -
-
-=>kubectl describe deploy ocean-apd | grep -i image
-
-
-It should be kodekloud/webapp-color:v1 image.
-
-kind: Deployment
-metadata:
-  labels:
-    app: ocean-apd
-  name: ocean-apd
-spec:
-  replicas: 2
-  selector:
-    matchLabels:
-      app: ocean-apd
-  strategy: 
-   type: RollingUpdate
-   rollingUpdate:
-     maxUnavailable: 45%
-     maxSurge: 55%
-  template:
-    metadata:
-      labels:
-        app: ocean-apd
-    spec:
-      containers:
-      - image: kodekloud/webapp-color:v1
-        name: webapp-color
-
-=>kubectl set image deploy ocean-apd webapp-color=kodekloud/webapp-color:v2
-
-=>kubectl rollout history deploy ocean-apd
-deployment.apps/ocean-apd 
-REVISION  CHANGE-CAUSE
-1         <none>
-2         <none>
-
-On the student-node, store the revision count to the given file: -
-echo "2" > /opt/ocean-revision-count.txt
-
-
-In final task, rollback the deployment image to an old version: -
-=>kubectl rollout undo deployment ocean-apd
-
-
-Verify the image name by using the following command: -
-=>kubectl describe deploy ocean-apd | grep -i image
-
 
 
 
@@ -659,46 +752,6 @@ spec:
 
 
 
-Q3
-Question
-Create a persistent volume called data-pv-ckad02-str with the below properties:
-- Its capacity should be 128Mi.
-- The volume type should be hostpath and path should be /opt/data-pv-ckad02-str.
-Next, create a persistent volume claim called data-pvc-ckad02-str as per below properties:
-- Request 50Mi of storage from data-pv-ckad02-str PV.
-
-
-Solution
-Use below YAML to create desired Kubernetes objects:
-
-apiVersion: v1
-kind: PersistentVolume
-metadata:
-  name: data-pv-ckad02-str
-spec:
-  capacity:
-    storage: 128Mi
-  accessModes:
-    - ReadWriteOnce
-  hostPath:
-    path: /opt/data-pv-ckad02-str
-  storageClassName: manual
-
----
-apiVersion: v1
-kind: PersistentVolumeClaim
-metadata:
-  name: data-pvc-ckad02-str
-spec:
-  storageClassName: manual
-  volumeName: data-pv-ckad02-str
-  accessModes:
-    - ReadWriteOnce
-  resources:
-    requests:
-      storage: 50Mi
-
-
 Q. 4
 Question
 In the ckad-multi-containers namespaces, create a ckad-sidecar-pod pod that matches the following requirements.
@@ -755,8 +808,7 @@ Mon Mar 20 06:02:07 UTC 2023 Hi I am from Sidecar container
 
 
 
-Q. 5
-Question
+Q. 5Question
 Our new client wants to deploy the resources through the popular Helm tool. 
 In the initial phase, our team lead wants to deploy nginx, a very powerful and versatile web server 
 software that is widely used to serve static content, reverse proxying, load balancing, 
@@ -771,168 +823,12 @@ The chart URL and other specifications are as follows: -
 Solution
 Add the repostiory to Helm with the following command: -
 =>helm repo add polar https://charts.bitnami.com/bitnami
-
-The helm repo add command is used to add a new chart repository to Helm and this allows us to 
-browse and install charts from the new repository using the Helm package manager.
-
-
-Use the helm repo ls command which is used to list all the currently configured Helm chart repositories 
-on Kubernetes cluster.
 =>helm repo ls 
 
 Search for the nginx chart in a polar chart repository as follows: -
 =>helm search repo polar | grep nginx
-
-The helm search repo command is used to search for charts in a specified Helm chart repository. 
-Also, it allows us to browse available charts and view their details, 
-such as their name, version, description, and maintainers.
-
-Before installing the chart, we have to create a namespace as given in the task description. 
-Then we can install the nginx chart on a Kubernetes cluster.
-
 =>kubectl create ns cd-tool-apd
 =>helm install nginx-server polar/nginx -n cd-tool-apd
-
-
-
-Q. 6
-Question
-One co-worker deployed an nginx helm chart on the cluster3 server called lvm-crystal-apd. 
-A new update is pushed to the helm chart, and the team wants you to update the helm repository to fetch the new changes.
-After updating the helm chart, upgrade the helm chart version to above 13.2.9 and increase the replica count to 2.
-
-NOTE: - We have to perform this task on the cluster3-controlplane node.
-You can SSH into the cluster3 using ssh cluster3-controlplane command.
-
-
-Solution
-Run the following command to change the context: -
-kubectl config use-context cluster3
-In this task, we will use the kubectl and helm commands. Here are the steps: -
-
-list all the releases installed using Helm in the Kubernetes cluster.
-=>helm ls -A
-Identify the namespace where the resources get deployed.
-
-Use the helm repo ls command to list the helm repositories.
-=>helm repo ls 
-
-Now, update the helm repository with the following command: -
-=>helm repo update lvm-crystal-apd -n crystal-apd-ns
-The above command updates the local cache of available charts from the configured chart repositories.
-
-The helm search command searches for all the available charts in a specific Helm chart repository. 
-In our case, it's the nginx helm chart.
-=>helm search repo lvm-crystal-apd/nginx -n crystal-apd-ns -l | head -n30
-
-The -l or --versions option is used to display information about all available chart versions.
-
-Upgrade the helm chart to above 13.2.9 and also, increase the replica count of the deployment to 2
-=>helm upgrade lvm-crystal-apd lvm-crystal-apd/nginx -n crystal-apd-ns --version=13.2.12 --set replicaCount=2
-
-
-=>helm ls -n crystal-apd-ns
-To verify look under the CHART column for the chart version .
-=>kubectl get deploy -n crystal-apd-ns
-The available count 2 is under the AVAILABLE column.
-
-
-
-Q13
-A manifest file located at root/ckad-flash89.yaml on cluster2-controlplane. 
-Which can be used to create a multi-containers pod. 
-There are issues with the manifest file, preventing resource creation. 
-Identify the errors, fix them and create resource.
-
-Solution
-=>kubectl create -f ckad-flash89.yaml
-
-error: resource mapping not found for name: "ckad-flash-89" namespace: "" from "ckad-flash89.yaml": no matches for kind "Pod" in version "V1"
-ensure CRDs are installed first
-about error shows us there is something wrong with apiVersion. So change it v1 and try again. and check status.
-
-=>kubectl get pods
-NAME            READY   STATUS             RESTARTS      AGE
-ckad-flash89-aom   1/2     CrashLoopBackOff   3 (39s ago)   93s
-Now check for reason using
-
-=>kubectl describe pod ckad-flash89-aom
-we will see that there is problem with nginx container
-
-open yaml file and check in spec -> nginx container you can see error with 
-mountPath --> mountPath: "/var/log" change it to mountPath: /var/log/nginx and apply changes.
-
-
-
-
-Q. 14
-Question
-We have a Kubernetes namespace called ckad12-ctm-sa-aecs, which contains a service account and a pod. 
-Your task is to modify the pod so that it uses the service account defined in the same namespace.
-
-Additionally, you need to ensure that the pod has access to the API credentials associated with the 
-service account by enabling the automounting feature for the credentials.
-
-
-Solution
-Here we will do two things:
-apiVersion: v1
-kind: Pod
-metadata:
-  name: ckad12-ctm-nginx-aecs
-  namespace: ckad12-ctm-sa-aecs
-spec:
-  # automountServiceAccountToken: false  *removed to enable automount of creds
-  containers:
-  - image: nginx
-    imagePullPolicy: Always
-    name: nginx
-  serviceAccountName: ckad12-my-custom-sa-aecs # using custom sa
-
-
-
-
-Q. 16
-Question
-Create a pod named ckad17-qos-aecs-3 in namespace ckad17-nqoss-aecs 
-with image nginx and container name ckad17-qos-ctr-3-aecs.
-
-Define other fields such that the Pod is configured to use the Quality of Service (QoS) class of Burstable.
-
-Also retrieve the name and QoS class of each Pod in the namespace ckad17-nqoss-aecs in the below 
-format and save the output to a file named qos_status_aecs in the /root directory.
-
-
-Format:
-NAME    QOS
-pod-1   qos_class
-pod-2   qos_class
-
-
-Solution
-
-apiVersion: v1
-kind: Pod
-metadata:
-  name: ckad17-qos-aecs-3
-  namespace: ckad17-nqoss-aecs
-spec:
-  containers:
-  - name: ckad17-qos-ctr-3-aecs
-    image: nginx
-    resources:
-      limits:
-        memory: "200Mi"
-      requests:
-        memory: "100Mi"
-
-=>kubectl --namespace=ckad17-nqoss-aecs get pod --output=custom-columns="NAME:.metadata.name,QOS:.status.qosClass"
-NAME                QOS
-ckad17-qos-aecs-1   BestEffort
-ckad17-qos-aecs-2   Guaranteed
-ckad17-qos-aecs-3   Burstable
-=>kubectl --namespace=ckad17-nqoss-aecs get pod --output=custom-columns="NAME:.metadata.name,QOS:.status.qosClass" > /root/qos_status_aecs
-
 
 
 
