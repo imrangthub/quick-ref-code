@@ -4,7 +4,30 @@
 
 
 =>mysql -uroot -p
+=>mysql --host=127.0.0.1 --port=3307 -u root
+=>mysql --host=172.16.8.132 --port=6680 -u root -p
 
+
+#Current User
+----------------
+select user();
+
+Check user
+=>SELECT host, user FROM mysql.user;
+
+UserLogin
+-----------
+=>mysql -uroot -p 
+
+show databases;
+use databaseName;
+show tables;
+describe tableName;
+select * from tableName;
+
+
+SHOW VARIABLES LIKE 'HOSTNAME';     -- Returns: MyHostName
+SHOW VARIABLES LIKE 'BIND_ADDRESS'; -- Returns: 127.0.0.1
 
 
 =================================================
@@ -47,29 +70,6 @@ If storage engine is not InnoDB, use this to set it
 =>SET GLOBAL default_storage_engine = 'InnoDB';
 
 
-
-#Current User
-----------------
-select user();
-
-Check user
-=>SELECT host, user FROM mysql.user;
-
-UserLogin
------------
-=>mysql -uroot -p 
-
-show databases;
-use databaseName;
-show tables;
-describe tableName;
-select * from tableName;
-
-
-SHOW VARIABLES LIKE 'HOSTNAME';     -- Returns: MyHostName
-SHOW VARIABLES LIKE 'BIND_ADDRESS'; -- Returns: 127.0.0.1
-
-
 #Import SQL
 -------------------------------------------------
 source  D:/DOCKER_OAUTH2_WORKSHOP/GRANT_TYPE_PASSWORD/authorization-server-api/src/main/resources/spring_boot_oauth2_db.sql
@@ -86,6 +86,12 @@ shell> mysqladmin --protocol=SOCKET --socket=/tmp/mysql.sock version
 
 #MySQL Server Start
 --------------------------------------------------
+
+=>service mysql start
+=>systemctl status mysql
+=>service mysql stop
+
+
 Run the command prompt as admin and cd to bin directory of MySQL
 
 Generally it is (C:\Program Files\MySQL\mysql-5.6.36-winx64\bin)
@@ -124,11 +130,14 @@ Set max conn in Mysql
 #  MySQL | Connection check | Info check                                         
 ================================================= 
 
+=>SHOW PROCESSLIST;
+=>SHOW FULL PROCESSLIST;
+=>SELECT * FROM INFORMATION_SCHEMA.PROCESSLIST WHERE COMMAND != 'Sleep';
+Current Active Connection
 
 
 =>show status where `variable_name` = 'Threads_connected';
 =>SHOW STATUS WHERE variable_name LIKE "Threads_%" OR variable_name = "Connections"
-Current Active Connection
 
 
 =>SELECT * FROM INFORMATION_SCHEMA.PROCESSLIST;

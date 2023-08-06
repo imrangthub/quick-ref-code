@@ -79,13 +79,38 @@ curl --location --request POST 'http://localhost:8080/auth/token' --header 'clie
 
 
 =================================================
-# mysql                              
-================================================= 
-Bangla character issue:
+#mysql                              
+=================================================
+=>mysql -uroot -p
+=>mysql --host=127.0.0.1 --port=3307 -u root
+=>mysql -h 192.168.8.1 -p 6787 -u dbuser -p
 
+#Current User
+----------------
+select user();
+
+Check user
+=>SELECT host, user FROM mysql.user;
+
+UserLogin
+-----------
+=>mysql -uroot -p 
+
+show databases;
+use databaseName;
+show tables;
+describe tableName;
+select * from tableName;
+
+
+SHOW VARIABLES LIKE 'HOSTNAME';     -- Returns: MyHostName
+SHOW VARIABLES LIKE 'BIND_ADDRESS'; -- Returns: 127.0.0.1
+
+
+
+Bangla character issue:
 ALTER TABLE openapi_otp_service MODIFY COLUMN otp_sms VARCHAR(255)  
     CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL;
-	
 	
 
 

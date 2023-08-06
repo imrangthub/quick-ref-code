@@ -2,24 +2,23 @@
 #          CKAD EXAM-PREPARATION                #
 #################################################
 
+https://kodekloud.com/topic/join-our-community-56/
 
 https://killer.sh/ckad
 https://blog.getambassador.io/ckad-cka-exam-tips-from-10-people-who-passed-the-exam-24132b1f1cc5
 10 people commat for CKAD
 
-CKAD Exam Artical:
-https://blog.getambassador.io/how-to-pass-the-ckad-exam-f8ca180ee853
-
 
 KODEKLOUD20 – handy while registering for the CKA or CKAD exams at Linux Foundation to get a 20% discount.
-DCUBE20 25% disc
 JUNEBBQ30 =276
 
 For Copun code:
+https://ecoursedeals.com/ckad-certification-coupon/
 https://scriptcrunch.com/linux-foundation-coupon/
 https://www.retailmenot.com/view/training.linuxfoundation.org?u=VEU72QPA3JFM5FXAIEYRRLZUNM
 https://www.couponchief.com/linuxfoundation.org
-
+https://couponbarrow.com/store/linux-foundation-coupons/ckad-exam-coupon/
+https://getproductkey.net/shopping/linux-foundation
 
 
 https://devopscube.com/ckad-exam-study-guide/
@@ -27,14 +26,8 @@ Good site for exam  slabus
 
 CNCF Certification
 Certified Kubernetes Application Developer: http://kub.to/dev
-
 Candidate Handbook: https://www.cncf.io/certification/candidate-handbook
-
 Exam Tips: https://docs.linuxfoundation.org/tc-docs/certification/tips-cka-and-ckad
-
-Keep the code – DEVOPS15 – handy while registering for the CKA or CKAD exams at Linux Foundation to get a 15% discount.
-
-
 
 
 Certified Kubernetes Application Developer: https://www.cncf.io/certification/ckad/
@@ -45,12 +38,8 @@ https://www.youtube.com/watch?v=wtKef83kmUA&list=PL0hSJrxggIQoKLETBSmgbbvE4FO_eE
 https://docs.linuxfoundation.org/tc-docs/certification/faq-cka-ckad-cks
 FAQ
 
-lAB
-https://kodekloud.com/lessons/recap-core-concepts/
 
 
-
-=>sudo apt-get update && apt-get install iputils-ping && sudo apt install net-tools
 =================================================
 #General                                
 =================================================
@@ -103,9 +92,163 @@ https://kodekloud.com/lessons/recap-core-concepts/
 @@@KodeKloud
 ##kc10
 Kubernetes Challenges
+
+RND-PROB
+=================================================
+###
+We have an external webserver running on student-node which is exposed at port 9999.
+We have also created a service called external-webserver-ckad01-svcn 
+that can connect to our local webserver from within the cluster3 but, at the moment, it is not working as expected.
+
+Fix the issue so that other pods within cluster3 can use external-webserver-ckad01-svcn service to access the webserver.
+
+Solution
+Let's check if the webserver is working or not:
+student-node ~ ➜  curl student-node:9999
+  <h1>Welcome to nginx!</h1>
+
+
+Now we will check if service is correctly defined:
+ =>kubectl describe svc external-webserver-ckad01-svcn 
+  Name:              external-webserver-ckad01-svcn
+  Namespace:         default
+  .
+  Endpoints:         <none> # there are no endpoints for the service
+  ...
+  
+As we can see there is no endpoints specified for the service, hence we won't be able to get any output. 
+Since we can not destroy any k8s object, let's create the endpoint manually for this service as shown below:
+
+student-node ~ ➜  export IP_ADDR=$(ifconfig eth0 | grep inet | awk '{print $2}')
+student-node ~ ➜ kubectl --context cluster3 apply -f - <<EOF
+apiVersion: v1
+kind: Endpoints
+metadata:
+  # the name here should match the name of the Service
+  name: external-webserver-ckad01-svcn
+subsets:
+  - addresses:
+      - ip: $IP_ADDR
+    ports:
+      - port: 9999
+EOF
+
+Finally check if the curl test works now:
+student-node ~ ➜  kubectl --context cluster3 run --rm  -i test-curl-pod --image=curlimages/curl --restart=Never -- curl -m 2 external-webserver-ckad01-svcn
+...
+<title>Welcome to nginx!</title>
+...
+
+
+
+###
+IngressIssue:
+=>k get pods -n ingress-nginx 
+
+NAME                                        READY   STATUS      RESTARTS      AGE
+ingress-nginx-admission-create-l6fgw        0/1     Completed   0             11m
+ingress-nginx-admission-patch-sfgc4         0/1     Completed   0             11m
+ingress-nginx-controller-5f8964959d-278rc   0/1     Error       2 (26s ago
+
+=>k logs -n ingress-nginx ingress-nginx-controller-5f8964959d-278rc 
+No service with name default-backend-service found in namespace default:
+
+
+
+###
+=>kubectl create clusterrole healthz-access --non-resource-url=/healthz,/healthz/* --verb=get,post
+Create a clusterrole for non-resource with path and subpath.
+
+
+
+
+
 =================================================
 Challenge 1:
 =================================================
+JaklyPod:
+
+apiVersion: v1
+kind: Pod
+metadata:
+  creationTimestamp: null
+  labels:
+    run: jekyll
+  name: jekyll
+  namespace: development
+spec:
+  volumes:
+    - name: site
+      persistentVolumeClaim:
+        claimName: jekyll-site
+  initContainers:
+  - image: kodekloud/jekyll
+    name: copy-jekyll-site
+    command: [ "jekyll", "new", "/site" ]
+    volumeMounts:
+      - name: site
+        mountPath: /site
+  containers:
+  - image: kodekloud/jekyll-serve
+    name: jekyll
+    volumeMounts:
+      - name: site
+        mountPath: /site
+    resources: {}
+  dnsPolicy: ClusterFirst
+  restartPolicy: Always
+status: {}
+
+
+Q15
+In the ckad13-ns-sa-aecs namespace, configure the ckad13-nginx-pod-aecs Pod to include a projected volume named vault-token.
+Mount the service account token to the container at /var/run/secrets/tokens, 
+with an expiration time of 9000 seconds.
+Additionally, set the intended audience for the token to vault and path to vault-token.
+
+
+Ans:
+apiVersion: v1
+kind: Pod
+metadata:
+  name: ckad13-nginx-pod-aecs
+  namespace: ckad13-ns-sa-aecs
+spec:
+  containers:
+    - name: nginx-container
+      image: nginx
+      volumeMounts:
+        - name: token-volume
+          mountPath: /var/run/secrets/tokens
+          readOnly: true
+  volumes:
+    - name: token-volume
+      projected:
+        sources:
+          - serviceAccountToken:
+              expirationSeconds: 9000
+              path: vault-token
+              audience: vault
+
+
+13:
+Create a custom resource my-anime of kind Anime with the below specifications:
+Name of Anime: Death Note
+Episode Count: 37
+TIP: You may find the respective CRD with anime substring in it.
+
+=>kubectl get crd animes.animes.k8s.io \
+                 -o json \
+                 | jq .spec.versions[].schema.openAPIV3Schema.properties.spec.properties
+
+apiVersion: "animes.k8s.io/v1alpha1"
+kind: Anime
+metadata:
+  name: my-anime
+spec:
+  animeName: Death Note
+  episodeCount: 37
+
 
 Q. 14
 Question
@@ -328,6 +471,50 @@ EOF
 
 
 
+In the ckad13-ns-sa-aecs namespace, configure the ckad13-nginx-pod-aecs Pod to include a projected volume named vault-token. Mount the service account token to the container at /var/run/secrets/tokens, with an expiration time of 9000 seconds.
+Additionally, set the intended audience for the token to vault and path to vault-token.
+
+Ans:
+student-node ~ ➜  kubectl config use-context cluster2
+Switched to context "cluster2".
+
+student-node ~ ➜  k get po -n ckad13-ns-sa-aecs ckad13-nginx-pod-aecs -o yaml > ckad-pro-vol.yaml
+
+student-node ~ ➜  cat ckad-pro-vol.yaml
+apiVersion: v1
+kind: Pod
+metadata:
+  name: ckad13-nginx-pod-aecs
+  namespace: ckad13-ns-sa-aecs
+spec:
+  containers:
+  - image: nginx
+    imagePullPolicy: Always
+    name: nginx
+.
+.
+.
+   volumeMounts:                              # Added
+    - mountPath: /var/run/secrets/tokens       # Added
+      name: vault-token                        # Added
+.
+.
+.
+  serviceAccount: ckad13-sa-aecs
+  serviceAccountName: ckad13-sa-aecs
+  volumes:
+  - name: vault-token                   # Added
+    projected:                          # Added
+      sources:                          # Added
+      - serviceAccountToken:            # Added
+          path: vault-token             # Added
+          expirationSeconds: 9000       # Added
+          audience: vault               # Added
+
+student-node ~ ➜  k replace -f ckad-pro-vol.yaml --force 
+pod "ckad13-nginx-pod-aecs" deleted
+pod/ckad13-nginx-pod-aecs replaced
+
 
 16Question
 Define a Kubernetes custom resource definition (CRD) for a new resource kind called Foo (plural form - foos) 
@@ -477,12 +664,13 @@ Solution
 =>kubectl create serviceaccount ckad23-sa-aecs -n ckad23-nssa-aecs
 
 =>kubectl create role wide-access-aecs --namespace=ckad23-nssa-aecs --verb=get,list --resource=* 
+=>kubectl create role pod-creater -n=ckad20-auth-aecs --verb=list,create,get --resource=pods
 
 =>kubectl create rolebinding wide-access-rb-aecs \
    --role=wide-access-aecs \
    --serviceaccount=ckad23-nssa-aecs:ckad23-sa-aecs \
    --namespace=ckad23-nssa-aecs
-
+=>kubectl create rolebinding mock-user-binding -n=ckad20-auth-aecs --role=pod-creater --user=mock-user
 
 
 Q. 12Question
@@ -661,6 +849,8 @@ spec:
             - date;
           restartPolicy: OnFailure
 
+OR
+=>kubectl create cronjob my-alarm -n ckad-job --image=busybox:1.28 --schedule="0 0 * * 0" -- date
 
 Q. 5
 Question
@@ -832,10 +1022,17 @@ Search for the nginx chart in a polar chart repository as follows: -
 
 
 
+Challenge:2
+Change .kube/config file kunbe-apiserver port
+kube-apiserver.yaml client-cert file
+change dns deployment image in kube-system namespace
+
+and Node01
+=>kubectl uncordon node01
 
 
-
-
+Q1:Copy all images from the directory '/media' on the controlplane node to '/web' directory on node01
+=>scp * node01:/web
 
 
 
@@ -1003,6 +1200,8 @@ spec:
             name: time-config
             key: TIME_FREQ
     resources: {}
+
+
 
 
 
