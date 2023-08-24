@@ -2,13 +2,14 @@
 #          CKAD EXAM-PREPARATION                #
 #################################################
 
+
 https://kodekloud.com/topic/join-our-community-56/
 
 https://killer.sh/ckad
 https://blog.getambassador.io/ckad-cka-exam-tips-from-10-people-who-passed-the-exam-24132b1f1cc5
 10 people commat for CKAD
 
-
+obl
 KODEKLOUD20 – handy while registering for the CKA or CKAD exams at Linux Foundation to get a 20% discount.
 JUNEBBQ30 =276
 
@@ -87,6 +88,54 @@ FAQ
 =>kubectl delete pod my-pod1 
 
 =>kubectl describe pod mynginx
+
+
+
+gCommand
+===========================
+=>sudo apt-get update && apt-get install iputils-ping && sudo apt install net-tools
+
+
+=>kubectl create cronjob learning-every-minute  -n ckad-job --image=busybox:1.28 --schedule="* * * * *" -- 'I am practicing for CKAD certification'
+=>kubectl create cronjob my-alarm -n ckad-job               --image=busybox:1.28 --schedule="0 0 * * 0" -- date
+=>kubectl create cronjob simple-python-job -n ckad-job      --image=python       --schedule="*/30 * * * *" -- 'ps –eaf'
+
+=>k create clusterrole healthz-access --verb=get,post --non-resource-url=/healthz,/healthz/*
+
+
+=>scp ../media/* root@node01:/web
+Copey file to another
+
+=>ps -ef | grep kube-apiserver | grep admission-plugins
+=>kubectl exec -it kube-apiserver-controlplane -n kube-system -- kube-apiserver -h | grep 'enable-admission-plugins'
+
+=>k create cronjob simple-python-job -n ckad-job --image=python --schedule="*/30 * * * *" -- 'ps –eaf'
+
+
+=>kubectl create ingress world -n world --class=nginx --rule="world.universe.mine/europe*=europe:80" --rule="world.universe.mine/asia*=asia:80" 
+=>kubectl create ingress ingress-ckad09-svcn -n critical-space  --rule="/pay=pay-service:8282
+=>kubectl create ingress ingress-resource-svcn \
+  --namespace app-space \
+  --rule='/wear'='wear-service:8080' \
+  --rule='/watch'='video-service:8080' \
+  --annotation='nginx.ingress.kubernetes.io/rewrite-target=/' \
+  --annotation='nginx.ingress.kubernetes.io/ssl-redirect=false' \
+  --class=nginx
+
+
+ annotations:
+    "api-approved.kubernetes.io": "unapproved, experimental-only"
+
+
+
+=>kubectl --namespace=ckad17-nqoss-aecs get pod --output=custom-columns="NAME:.metadata.name,QOS:.status.qosClass"
+NAME                QOS
+ckad17-qos-aecs-1   BestEffort
+ckad17-qos-aecs-2   Guaranteed
+=>kubectl --namespace=ckad17-nqoss-aecs get pod --output=custom-columns="NAME:.metadata.name,QOS:.status.qosClass" > /root/qos_status_aecs
+
+
+
 
 
 @@@KodeKloud
@@ -6170,6 +6219,7 @@ What is the fc volume type used for?
 To mount and existing Fiber channel volume into a Pod
 
 
+HostPath as Volume:
 
 apiVersion: v1
 kind: Pod
@@ -6194,6 +6244,7 @@ spec:
 
 This hostPath good for single host machine, for multi node cluster this is not a good approce.
 Have to use external replicated storage solution, there are many like: awsAlasticStoraverVolume 
+
 
 
 ##Persistent Volumes | Persistent Volumes Claims
@@ -6445,6 +6496,71 @@ spec:
 
 =>kubectl replace --force -f pod5.yaml
 =>ls /pv/log
+
+
+HostPath Volume:
+
+apiVersion: v1
+kind: Pod
+metadata:
+  name: test-pd
+spec:
+  containers:
+  - image: registry.k8s.io/test-webserver
+    name: test-container
+    volumeMounts:
+    - mountPath: /test-pd
+      name: test-volume
+  volumes:
+  - name: test-volume
+    hostPath:
+      # directory location on host
+      path: /my/host/path
+      # this field is optional
+      type: Directory
+
+
+ConfigMap as Volume:
+
+apiVersion: v1
+kind: Pod
+metadata:
+  name: mypod
+spec:
+  containers:
+  - name: mypod
+    image: redis
+    volumeMounts:
+    - name: foo
+      mountPath: "/etc/foo"
+      readOnly: true
+  volumes:
+  - name: foo
+    configMap:
+      name: myconfigmap
+
+
+SecretAsVolume:
+
+apiVersion: v1
+kind: Pod
+metadata:
+  name: mypod
+spec:
+  containers:
+    - name: mypod
+      image: redis
+      volumeMounts:
+        - name: foo
+          mountPath: "/etc/foo"
+          readOnly: true
+  volumes:
+    - name: foo
+      secret:
+        secretName: mysecret
+        optional: true
+
+
 
 
 9)What is the Reclaim Policy set on the Persistent Volume pv-log?
@@ -8450,6 +8566,72 @@ Once you have modified the values.yaml file , run the below command to install t
 After installation, run the below command to list the mywebapp release:
 =>helm list 
 
+
+=================================================
+Helm:
+=================================================
+
+=>helm repo ls 
+List the helm repositories.
+
+=>helm ls -A
+Deployed Helm charts releases list, Here lists all the releases of all the namespaces.
+
+
+Official Helm Stable Charts: https://charts.helm.sh/stable
+Prometheus Helm chart repository: https://prometheus-community.github.io/helm-charts
+Rancher's Helm chart repository: https://releases.rancher.com/server-charts
+
+=>helm repo add repoName https://charts.bitnami.com/bitnami
+=>helm repo ls 
+Add the repostiory to Helm.
+It allows us to browse and install charts from the new repository using the Helm package manager.
+
+
+=>helm search repo nginx
+=>helm search hub nginx
+Search Helm charts, Its return last lates version. for more
+
+=>helm search repo bitnami/joomla -l | head -n10
+
+When you run "helm search repo nginx", it will query the repositories you have added to your Helm configuration 
+When you run "helm search hub nginx", it queries the Helm Hub and returns any matching charts related to nginx 
+that are available on the Helm Hub. The Helm Hub is a public repository and can be accessed by anyone.
+
+
+=>helm search repo polar | grep nginx
+=>helm install nginx-server polar/nginx 
+=>helm  install jom13 bitnami/joomla  --version=13.3.19
+Search and Inatall for the nginx chart in a polar chart repository
+
+
+
+cd /root/
+=>helm lint ./newVersion
+Validate the helm chart by using the helm lint command
+
+
+=>helm uninstall oldVersioApp -n default
+=>helm install -myNewApp ./new-version
+=>helm install --generate-name ./new-version
+Install/Uninstall application
+
+
+=>helm search repo lvm-crystal-apd/nginx -l | head -n30
+The helm search command searches for all the available charts in a specific Helm chart repository. 
+
+
+=>helm upgrade nging ofc/nginx-ingress --version=1.41.1
+=>helm upgrade lvm-crystal-apd lvm-crystal-apd/nginx -n crystal-apd-ns --version=13.2.12 --set replicaCount=2
+Upgrade the helm chart and increase the replica count.
+
+=>helm ls -n crystal-apd-ns
+Look under the CHART column for the chart version for varify.
+
+
+=>helm repo update myHelmChart
+Now, update the helm repository with the following command: -
+The above command updates the local cache of available charts from the configured chart repositories.
 
 
 

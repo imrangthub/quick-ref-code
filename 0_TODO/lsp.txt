@@ -15,58 +15,9 @@ dr="--dry-run=client -oyaml"
 
 
 
-gCommand
-===========================
-=>sudo apt-get update && apt-get install iputils-ping && sudo apt install net-tools
-
-
-
-=>scp ../media/* root@node01:/web
-Copey file to another
-
-=>ps -ef | grep kube-apiserver | grep admission-plugins
-=>kubectl exec -it kube-apiserver-controlplane -n kube-system -- kube-apiserver -h | grep 'enable-admission-plugins'
-
-=>k create cronjob simple-python-job -n ckad-job --image=python --schedule="*/30 * * * *" -- 'ps –eaf'
-
-kubectl create ingress ingress-resource-svcn \
-  --namespace app-space \
-  --rule='/wear'='wear-service:8080' \
-  --rule='/watch'='video-service:8080' \
-  --annotation='nginx.ingress.kubernetes.io/rewrite-target=/' \
-  --annotation='nginx.ingress.kubernetes.io/ssl-redirect=false' \
-  --class=nginx
-
-
-
-
-
 Ing:
 ===========================
-https://www.youtube.com/watch?v=ZwC2NWWUDL0
-
-automountServiceAccountToken: false
-
-=>kubectl run ckad-nginx-wiipwlznjy --image=nginx:1.17 --namespace=ckad-pod-design --restart=Never --dry-run=client -o yaml --labels=app=nginx-custom-annotation --overrides='{"apiVersion":"v1","metadata":{"annotations":{"HOMEPAGE":"https://kodekloud.com/"}}}' | kubectl create -f -
-
-ingress controller and the ingress resource.
-
-Define other fields such that the Pod is configured to use the Quality of Service (QoS) class of Burstable.
-
-imprative way name to container
-
-  annotations:
-    "api-approved.kubernetes.io": "unapproved, experimental-only"
-
-crd annotation
-
-What is defautl port for netpol
-LimitRange
-Create a Pod that gets assigned a QoS class of Guaranteed/Quality of Service (QoS) class of Burstable.
-
-A policy database-ckad-svcn to limit access to database pods only to backend pods.
-
-
+https://editor.networkpolicy.io/?id=D8pquOYJnWXVinmL
 
 
 
@@ -86,7 +37,50 @@ KCH:Skip-Q
 
 
 
+gCommand
+===========================
+=>sudo apt-get update && apt-get install iputils-ping && sudo apt install net-tools
 
+
+=>kubectl create cronjob learning-every-minute  -n ckad-job --image=busybox:1.28 --schedule="* * * * *" -- 'I am practicing for CKAD certification'
+=>kubectl create cronjob my-alarm -n ckad-job               --image=busybox:1.28 --schedule="0 0 * * 0" -- date
+=>kubectl create cronjob simple-python-job -n ckad-job      --image=python       --schedule="*/30 * * * *" -- 'ps –eaf'
+
+
+=>k create clusterrole healthz-access --verb=get,post --non-resource-url=/healthz,/healthz/*
+
+
+
+=>scp ../media/* root@node01:/web
+Copey file to another
+
+=>ps -ef | grep kube-apiserver | grep admission-plugins
+=>kubectl exec -it kube-apiserver-controlplane -n kube-system -- kube-apiserver -h | grep 'enable-admission-plugins'
+
+=>k create cronjob simple-python-job -n ckad-job --image=python --schedule="*/30 * * * *" -- 'ps –eaf'
+
+
+=>kubectl create ingress world -n world --class=nginx --rule="world.universe.mine/europe*=europe:80" --rule="world.universe.mine/asia*=asia:80" 
+=>kubectl create ingress ingress-ckad09-svcn -n critical-space  --rule="/pay=pay-service:8282
+=>kubectl create ingress ingress-resource-svcn \
+  --namespace app-space \
+  --rule='/wear'='wear-service:8080' \
+  --rule='/watch'='video-service:8080' \
+  --annotation='nginx.ingress.kubernetes.io/rewrite-target=/' \
+  --annotation='nginx.ingress.kubernetes.io/ssl-redirect=false' \
+  --class=nginx
+
+
+ annotations:
+    "api-approved.kubernetes.io": "unapproved, experimental-only"
+
+
+
+=>kubectl --namespace=ckad17-nqoss-aecs get pod --output=custom-columns="NAME:.metadata.name,QOS:.status.qosClass"
+NAME                QOS
+ckad17-qos-aecs-1   BestEffort
+ckad17-qos-aecs-2   Guaranteed
+=>kubectl --namespace=ckad17-nqoss-aecs get pod --output=custom-columns="NAME:.metadata.name,QOS:.status.qosClass" > /root/qos_status_aecs
 
 
 

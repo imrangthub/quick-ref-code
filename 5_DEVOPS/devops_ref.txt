@@ -162,6 +162,17 @@ Create repository with Maven group
 
 
 =================================================
+#Apache HTTP server benchmarking tool                       
+================================================= 
+=>ab -n 100 -c 10 https://www.google.com/
+
+-n 100=>Number of request
+-n 10=>Number of concurent request
+
+
+
+
+=================================================
 # SSH | SHALL | cmd                            
 ================================================= 
 
@@ -288,6 +299,11 @@ Between ======= and >>>>>>> are  remote (Accept Right).
 
 git log --oneline --decorate | grep -i CR
 Tract the merged List 
+
+=>git branch -D branchName
+Delete local branch
+
+
 
 Git Clone 
 ---------
@@ -597,7 +613,7 @@ install:install-file -Dfile=/home/imran/JAR_LIBRARY/ReportFont/segoeui.jar   -D
 
 =>java -jar -DMYSQL_HOST=127.0.0.1 arif-travel-agency-0.0.1-SNAPSHOT.jar
 =================================================
-#  Maven                                          
+#Maven   | MAVEN                                        
 ================================================= 
 mvn -v
 mvn clean
@@ -608,9 +624,29 @@ mvn spring-boot:run
 
 
 
+StartProject:
+------------------------------------------------
+=>mvn archetype:generate -DgroupId=com.bharath -DartifactId=hellomaven -DarchetypeArtifactId=maven-archetype-quickstart -DinteractiveMode=false
+=>mvn archetype:generate -DgroupId=com.bharath -DartifactId=java-project -DarchetypeArtifactId=maven-archetype-quickstart -DinteractiveMode=false
+=>mvn archetype:generate -DgroupId=com.bharath -DartifactId=java-web-project -DarchetypeArtifactId=maven-archetype-webapp -DinteractiveMode=false
+initProject in command line
+
+
+
+JarOparation
+------------------------------------------------
+=>jar -tf myJar.jar
+Show contain of the jar
+
+
+
+
+
+
+
+
 =>java -XX:+PrintFlagsFinal -version | grep ThreadStackSize
 In Linux:
-
 
 =>java -XX:+PrintFlagsFinal -version | findstr ThreadStackSize
 In Windows:
@@ -677,25 +713,135 @@ Now load the environment variables as follows:
 
 Wapper
 --------------------------------------------------
+GradleWapper allow you to run gradle task in your system without install gradle.
 =>gradle wrapper
 =>gradlew --version
 =>gradlew init
 =>gradlew.bat clean
 
 
+Create a gradle project with out install Gradle, only using wapper:
+ - Create a empty folder as project-name
+ - Create  setting file inside the folder: settings.gradle.kts
+
+
+
+
+
+
+
+
+
+
+
+
 =================================================
-#  JENKING                                          
+#  JENKING  | jenkins                                        
 ================================================= 
-2fab04a40b4146beba38a3da5b9c9415
-
-java -jar jenkins.war --httpPort=9999
-
+=>ngrok http 8080
+NgRock Make any localhost available online for 5 MM
 
 
-@echo off
-cd target 
-java -jar spring-boot-simple-web-0.0.1-SNAPSHOT.jar
-exit
+
+JenkinsPipeline
+------------------------------------------------
+TypeOfPipeline:
+- Delivery TypeOfPipeline
+- Build TypeOfPipeline
+- Jenkins TypeOfPipeline
+    - Script Jenkins Pipelione
+	- Declarative Jenkins Pipelione
+
+	
+
+
+
+
+
+
+
+uTutJenking
+--------------------------------------------------
+
+wget -O /etc/yum.repos.d/jenkins.repo http://pkg.jenkins-ci.org/redhat/jenkins.repo
+rpm --import https://jenkins-ci.org/redhat/jenkins-ci.org.key
+yum install jenkins
+
+service jenkins start
+cat /var/lib/jenkins/secrets/initialAdminPassword
+service jenkins start
+
+yum remove jenkins
+rm -rf /var/lib/jenkins
+All jenking plugins and library in this folder, if you uninstall jening remove this or it will keep jening old info
+
+
+
+Java Path:
+/lib/jvm/java-1.8.0-openjdk-1.8.0.242.b08-0.amzn2.0.1.x86_64
+
+Maven Path:
+
+/usr/share/maven
+
+Git Path:
+
+/usr/bin/git
+
+Assign Root User and Permissions:
+
+vi /etc/sysconfig/jenkins
+
+chown -R root:root /var/lib/jenkins
+chown -R root:root /var/cache/jenkins
+chown -R root:root /var/log/jenkins
+
+service jenkins restart
+
+
+Tomcat Installation and Integration:
+
+yum install tomcat
+
+yum install tomcat-webapps tomcat-admin-webapps 
+
+vi /usr/share/tomcat/conf/tomcat-users.xml
+
+Uncomment Admin roles and user and Add:
+
+<user username="deployer" password="deployer" roles="manager-script" />
+
+Deploy war/ear to a container:
+
+**/java-web-project.war
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 =================================================
