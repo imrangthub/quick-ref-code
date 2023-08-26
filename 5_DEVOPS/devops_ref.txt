@@ -551,10 +551,10 @@ Print load balanced IPs and their count
 Print load balanced IPs and their status count
 
 
-=>tail -10000 /app/apihub/Nginx_LB/logs/access.log | grep prepaid|awk '{ total += $14; count++ } END { print total/count }'
+=>tail -10000 /app/admin/Nginx_LB/logs/access.log | grep prepaid|awk '{ total += $14; count++ } END { print total/count }'
 Average RTT
 
-=>for (( i = 5; i >=0; i-- )) ; do grep $(date +%d/%b/%Y:%R -d "-$i min") /app/apihub/Nginx_LB/logs/access.log; done| awk '{ print $8}'|sort |uniq --repeated --count
+=>for (( i = 5; i >=0; i-- )) ; do grep $(date +%d/%b/%Y:%R -d "-$i min") /app/admin/Nginx_LB/logs/access.log; done| awk '{ print $8}'|sort |uniq --repeated --count
 Last 5 minute request satus
 
 
@@ -612,6 +612,12 @@ install:install-file -Dfile=/home/imran/JAR_LIBRARY/ReportFont/segoeui.jar   -D
 
 
 =>java -jar -DMYSQL_HOST=127.0.0.1 arif-travel-agency-0.0.1-SNAPSHOT.jar
+
+
+
+
+
+
 =================================================
 #Maven   | MAVEN                                        
 ================================================= 
@@ -626,6 +632,9 @@ mvn spring-boot:run
 
 StartProject:
 ------------------------------------------------
+=>mvn archetype:generate -DgroupId=com.imranmadbar -DartifactId=simple-mavenapp -DarchetypeArtifactId=maven-archetype-quickstart -DinteractiveMode=false
+
+
 =>mvn archetype:generate -DgroupId=com.bharath -DartifactId=hellomaven -DarchetypeArtifactId=maven-archetype-quickstart -DinteractiveMode=false
 =>mvn archetype:generate -DgroupId=com.bharath -DartifactId=java-project -DarchetypeArtifactId=maven-archetype-quickstart -DinteractiveMode=false
 =>mvn archetype:generate -DgroupId=com.bharath -DartifactId=java-web-project -DarchetypeArtifactId=maven-archetype-webapp -DinteractiveMode=false
@@ -713,8 +722,12 @@ Now load the environment variables as follows:
 
 Wapper
 --------------------------------------------------
-GradleWapper allow you to run gradle task in your system without install gradle.
+Create a wapper using gradle:
 =>gradle wrapper
+
+
+GradleWapper allow you to run gradle task in your system without install gradle.
+=>./gradlew -v
 =>gradlew --version
 =>gradlew init
 =>gradlew.bat clean
@@ -738,6 +751,60 @@ Create a gradle project with out install Gradle, only using wapper:
 =================================================
 #  JENKING  | jenkins                                        
 ================================================= 
+By default, Jenkins' home directory is located at /var/lib/jenkins on Ubuntu systems.
+Jenkins stores its data in its home directory.
+
+=>systemctl status jenkins.service
+=>systemctl stop jenkins
+=>systemctl start jenkins
+=>service jenkins restart
+
+=>sudo nano /lib/systemd/system/jenkins.service
+=>sudo systemctl daemon-reload
+=>sudo systemctl restart jenkins.service
+# check status by:
+=>sudo systemctl status jenkins.service
+
+For Change default port number
+
+
+
+
+
+
+
+
+Build Maven Project
+------------------------------------------------
+Way1:
+	echo "Test job jenkins"
+	cd /home/imran/Downloads/dsd/simple-spring-mvnapp
+	mvn clean
+	mvn install
+
+
+
+Run jer file
+----------------------------------------------------
+id
+cd /opt/jenkins_WORKSHOP
+echo "Application running............"
+BUILD_ID=dontKillMe nohup java -jar spring-boot-simple-web.jar  >> nohup.out 2>&1&
+echo "########################## RUN COMPLETED #############################"
+
+
+
+Copy file to remote host: run jar
+----------------------------------------------------
+REMOTE_USER=admin
+REMOTE_HOST=192.168.1.1
+REMOTE_PATH=/app/archive/testApp
+SOURCE_FILE=/opt/jenkins_WORKSHOP/spring-boot-simple-web.jar
+scp -i /var/lib/jenkins/.ssh/id_rsa $SOURCE_FILE $REMOTE_USER@$REMOTE_HOST:$REMOTE_PATH
+ssh -i /var/lib/jenkins/.ssh/id_rsa $REMOTE_USER@$REMOTE_HOST "nohup java -jar /app/archive/testApp/spring-boot-simple-web.jar > nohup.out 2>&1 &"
+
+
+
 =>ngrok http 8080
 NgRock Make any localhost available online for 5 MM
 
@@ -751,11 +818,6 @@ TypeOfPipeline:
 - Jenkins TypeOfPipeline
     - Script Jenkins Pipelione
 	- Declarative Jenkins Pipelione
-
-	
-
-
-
 
 
 

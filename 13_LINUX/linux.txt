@@ -5,12 +5,15 @@ MRP-imran
 =>alias d='docker'
 =>uptime
 =>printenv
-=>su - root
 =>hostname -I/f 
 =>cat /proc/version
 =>uname
 =>cat /etc/*-release
 =>lscpu | egrep 'Model name|CPU MHz|Thread|CPU\(s\)'
+
+=>su - root
+=>sudo su jenkins
+=>sudo su -s /bin/bash jenkins
 
 =>netstat -tulpn
 =>netstat -an | grep 80
@@ -41,8 +44,15 @@ Port lisaning info
 =================================================
 #                  Basic                                          
 ================================================= 
+
+=>hostname -I | awk '{print $2}'
+Print host base ip
+
 =>hostnaem mynodemachine
 Change node name
+
+=>id 
+Print user name and group and sube-group
 
 =>id userName
 =>chage -l imran
@@ -98,6 +108,7 @@ It is used to edit streams (files) using regular expressions. But this editing i
 
 	- chmod
 =>chwon -R imran myFile
+=>chgrp imran myFile
 >chmod 774 file.txt
 owner and group of a file full permission and allow all other users to read the file
 Change permissions for a file or directory
@@ -131,8 +142,22 @@ utility for processing and manipulating text files
 
 
 EnvSetting:
--------------------------------------------------
+------------------------------------------------
 Variable Setting:
+
+
+
+Host key Generate
+------------------------------------------------
+=>ssh-keygen -t rsa
+=>ssh-copy-id -i ./.ssh/id_rsa admin@192.168.1.2
+  enter password and done
+
+=>ssh admin@192.168.1.2
+=>ssh -i /var/lib/jenkins/.ssh/id_rsa admin@192.168.1.2
+=>sudo ssh -i /var/lib/jenkins/.ssh/id_rsa admin@192.168.1.2
+Now Can ssh without passwd
+
 
 
 =================================================
@@ -143,7 +168,7 @@ Variable Setting:
 
 =>find /mydir/otherdir -name '*somePartOfFileName*'
 =>find /app/myDir -type d -name 'someDir' 
-=>find /app/apihub -type f -iname '*runner*.sh'
+=>find /app/admin -type f -iname '*runner*.sh'
 
 Wild card Search
 
@@ -168,6 +193,35 @@ systemctl status nginx
 
 
 
+
+=================================================
+#Link | SoftLink | HardLink                            
+================================================= 
+=>sudo update-alternatives --display java
+=>sudo  update-alternatives --list java
+=>sudo update-alternatives --config java
+
+
+Fine alternatives install location:
+--------------------------------------------------
+imran@imranPC:~$ which java
+/usr/bin/java
+imran@imranPC:~$ ls -l /usr/bin/java
+lrwxrwxrwx 1 root root 22 মে       24  2022 /usr/bin/java -> /etc/alternatives/java
+imran@imranPC:~$ readlink /etc/alternatives/java
+/opt/jdk/jdk-11.0.15.1/bin/java
+imran@imranPC:~$ 
+imran@imranPC:~$ 
+imran@imranPC:~$ which mvn
+/usr/bin/mvn
+imran@imranPC:~$ ls -l /usr/bin/mvn
+lrwxrwxrwx 1 root root 21 মার্চ     12 17:21 /usr/bin/mvn -> /etc/alternatives/mvn
+imran@imranPC:~$ readlink /etc/alternatives/mvn
+/usr/share/maven/bin/mvn
+imran@imranPC:~$
+
+
+
 =================================================
 # host| dns                               
 ================================================= 
@@ -181,7 +235,7 @@ systemctl status nginx
 
 
 =================================================
-# Security | Permissions  | access                                
+#Permission Security | Permissions  | access                                
 ================================================= 
 
 =>tail -f /var/log/auth.log
@@ -189,7 +243,7 @@ Show login information
 
 =>chmod go=- two-simple.txt
 =>chmod ugo=- *
-Remoce all permission from group and other
+Remove all permission from group and other
 
 
 =>chmod u=rwx perm_test
@@ -779,9 +833,9 @@ Copy all file to another folder
 
 =>scp localmachine/path_to_the_file username@server_ip:/path_to_remote_directory
 
-=>scp -r /app/test/test.txt apihub@172.16.254.25:/app
+=>scp -r /app/test/test.txt admin@172.16.254.25:/app
 =>scp -r cassandra.yaml C:
-=>scp -r apihub@172.16.8.132:standalone.xml "C:"
+=>scp -r admin@172.16.8.132:standalone.xml "C:"
 =>docker cp e029d15afdfc:/etc/cassandra/cassandra.yaml C:/Z_MY_COMPUTER
 =>docker cp C:/Z_MY_COMPUTER/cassandra.yaml a394ae84224c:/etc/cassandra
 
@@ -860,6 +914,8 @@ Run the following command/ Login or logout:
 
 #Group
 -----------------------------------------------
+=>id
+ubuntu print current user name and group and sube-group
 
 =>compgen -g
 =>cat /etc/group
@@ -1021,7 +1077,6 @@ To enable/disable your service on every reboot
 
 
 
-=>sudo systemctl disable mysql.service
 
 # Output all active services:
 systemctl -t service --state=active --no-pager --no-legend
@@ -1032,6 +1087,10 @@ systemctl -t service --state=active --no-pager --no-legend | egrep '^*\.service.
 # Count of all running services:
 systemctl -t service --state=active --no-pager --no-legend | egrep '^*\.service.*running' -c -
 
+
+Disable a service start automati
+=>sudo systemctl disable mysql.service
+=>sudo systemctl disable jenkins
 
 
 
@@ -1193,8 +1252,11 @@ JRE_HOME=/opt/jdk/jdk1.8.0_333/jre
 =>sudo update-alternatives --remove java /opt/jdk/jdk1.8.0_333/bin/java
 
 
+Set JAVA_HOME variable
+--------------------------------------------------
+
 =>nano ~/.bashrc
-export JAVA_HOME="/opt/jdk/jdk1.8.0_333/"
+export JAVA_HOME="/opt/jdk/jdk-11.0.15.1/"
 export PATH=$PATH:$JAVA_HOME/bin
 
 save the file
@@ -1277,7 +1339,6 @@ create table std_tbl(
    PRIMARY KEY ( id )
 );
 =>INSERT INTO std_tbl VALUES (1, 'IMRAN', 'MALE');
-
 
 
 
