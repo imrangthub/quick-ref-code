@@ -749,7 +749,7 @@ Create a gradle project with out install Gradle, only using wapper:
 
 
 =================================================
-#  JENKING  | jenkins                                        
+#jenkins |  JENKING  | jenkins                                        
 ================================================= 
 By default, Jenkins' home directory is located at /var/lib/jenkins on Ubuntu systems.
 Jenkins stores its data in its home directory.
@@ -800,8 +800,19 @@ REMOTE_USER=admin
 REMOTE_HOST=192.168.1.1
 REMOTE_PATH=/app/archive/testApp
 SOURCE_FILE=/opt/jenkins_WORKSHOP/spring-boot-simple-web.jar
-scp -i /var/lib/jenkins/.ssh/id_rsa $SOURCE_FILE $REMOTE_USER@$REMOTE_HOST:$REMOTE_PATH
-ssh -i /var/lib/jenkins/.ssh/id_rsa $REMOTE_USER@$REMOTE_HOST "nohup java -jar /app/archive/testApp/spring-boot-simple-web.jar > nohup.out 2>&1 &"
+scp -i /home/imran/.ssh/id_rsa $SOURCE_FILE $REMOTE_USER@$REMOTE_HOST:$REMOTE_PATH
+ssh -i /home/imran/.ssh/id_rsa admin@192.168.2.2 "nohup java -jar /app/archive/testApp/spring-boot-simple-web.jar >> /app/archive/testApp/nohup.out 2>&1 &"
+
+
+Parameterize buil Run
+---------------------------------------------------
+# Define variables
+REMOTE_USER=admin
+REMOTE_PATH=/app/archive/testApp
+SOURCE_FILE=/opt/jenkins_WORKSHOP/$ARTIFACT.jar
+
+scp -i /home/imran/.ssh/id_rsa $SOURCE_FILE $REMOTE_USER@$HOST_NAME:$REMOTE_PATH
+ssh -i /home/imran/.ssh/id_rsa admin@$HOST_NAME "nohup java -jar /app/archive/testApp/$ARTIFACT.jar >> /app/archive/testApp/nohup.out 2>&1 &"
 
 
 
