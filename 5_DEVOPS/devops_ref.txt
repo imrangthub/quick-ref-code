@@ -833,6 +833,45 @@ TypeOfPipeline:
 
 
 
+PipLineOne:
+--------------------------------------------------
+Run jar in background in hostmachine:
+pipeline {
+    agent any
+    stages {
+        stage("Start Building") {
+            steps {
+                sh 'pwd'
+            }
+        }
+        
+        stage("Build") {
+            steps {
+                script {
+                    def remoteCommand = '''
+                        cd /app/archive/testApp/
+                        nohup java -jar spring-boot-simple-web.jar >> nohup.out 2>&1 &
+                    '''
+                        sh "ssh -i /home/imran/.ssh/id_rsa admin@192.268.3.2 '${remoteCommand}'"
+                }
+            }
+        }
+        
+        stage("Deploy") {
+            steps {
+                echo "Deploy done!"
+            }
+        }
+    }
+}
+
+
+
+
+
+
+
+
 uTutJenking
 --------------------------------------------------
 
