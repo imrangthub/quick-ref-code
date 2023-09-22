@@ -11,26 +11,186 @@ alias ke='kubectl edit'
 alias kkk='kubectl delete'
 alias kc='kubectl create'
 alias kd='kubectl describe'
+alias ka='kubectl apply --force'
 dr="--dry-run=client -oyaml"
+
+Document
+
+Certified Kubernetes Application Developer (CKAD) 
+
+PV/PVC
+https://kubernetes.io/docs/concepts/storage/persistent-volumes/
+
+
+Workload/cronjob
+https://kubernetes.io/docs/concepts/workloads/controllers/cron-jobs/
+
+
+NetPol/Service
+https://kubernetes.io/docs/concepts/services-networking/network-policies/
+
+
+ReesourcesManagement
+https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/
+
+
+ReqourceQusta
+https://kubernetes.io/docs/concepts/policy/resource-quotas/
+
+
+
+CRD
+https://kubernetes.io/docs/tasks/extend-kubernetes/custom-resources/custom-resource-definitions/
+
+
+
+
+containerD
+Askto build image using ctl and push image to docker repo
+
+FilterSome Pod with short and redirect result
+
+JsonPath
+SAVE OUTPI  :
+=>k get po | sudo tree them/logfile.log
+
+
+
+
+
+
 
 
 
 Ing:
 ===========================
-https://editor.networkpolicy.io/?id=D8pquOYJnWXVinmL
+https://killer.sh/
+https://killercoda.com/
 
+
+endpoint service
+Read about projected volumes
+hpa
+
+
+https://kodekloud.com/topic/faq-what-is-the-rewrite-target-option/
+
+
+NeedExplor:
+-------------------------------------------------
+=>$ kubectl delete all --all
+
+=>kubectl label po kubia-manual creation_method=manual
+=>kubectl label po kubia-manual-v2 env=debug --overwrite
+
+
+List the pods again to see the updated labels:
+$ kubectl get po -L creation_method,env
+
+
+And those that don’t have the env label:
+$ kubectl get po -l '!env'
+
+creation_method!=manual to select pods with the creation_method label with
+any value other than manual
+
+
+
+Exec to service:
+$ kubectl exec kubia-3inly env
+
+=>k get po -n ckad17-nqoss-aecs --output=custom-columns="NAME":.metadata.name,"QOS":.status.qosClass>qos_status_aecs
+=>kubectl get pods -A -o=custom-columns='POD_NAME:metadata.name,IP_ADDR:status.podIP' --sort-by=.status.podIP > /root/pod_ips_ckad02_svcn
+
+
+DaemonSet
+=>kubectl get daemonset
+Demonset every node can include NodeAffinity
 
 
 
 KCH:Skip-Q
 =================================================
 
+  envFrom:
+      - secretRef:
+          name: ckad01-db-scrt-aecs
+
+Dirrentent 
+command:
+      - /bin/sh
+      - -c
+      - echo Initialize application environment! && sleep 10
+
+      - echo 'Initialize application environment!'; sleep 10
+
+
+We have deployed some pods in the namespaces ckad-alpha and ckad-beta.
+
+You need to create a NetworkPolicy named ns-netpol-ckad that will restrict all Pods in Namespace ckad-alpha to only have outgoing traffic to Pods in Namespace ckad-beta . Ingress traffic should not be affected.
+
+
+However, the NetworkPolicy you create should allow egress traffic on port 53 TCP and UDP.
 
 
 
 
 
+Service and Endpoints
+              
+Create a new pod with image nginx and name ckad-probe-aom and configure the pod with 
+livenessProbe with command ls and set initialDelaySeconds to 5 .
 
+apiVersion: v1
+kind: Pod
+metadata:
+  creationTimestamp: null
+  labels:
+    run: ckad-probe-aom
+  name: ckad-probe-aom
+spec:
+  containers:
+  - image: nginx
+    name: ckad-probe-aom
+    resources: {}
+    livenessProbe:
+      exec:
+        command:
+           - ls
+      initialDelaySeconds: 5
+  dnsPolicy: ClusterFirst
+  restartPolicy: Always
+status: {}
+
+imparagein comm for this
+
+
+
+Nginx mountPath:
+
+apiVersion: v1
+kind: Pod
+metadata:
+  name: ckad-flash89-aom
+spec:
+  containers:
+    - name: nginx
+      image: nginx
+      volumeMounts:
+        - name: flash-logs
+          mountPath: /var/log/nginx
+    - name: busybox
+      image: busybox
+      command:
+        - bin/sh
+        - -c
+        - sleep 10000
+      volumeMounts:
+        - name: flash-logs
+          mountPath: /usr/src
+  volumes:
+    - name: flash-logs
+      emptyDir: {}
 
 
 
@@ -39,12 +199,17 @@ KCH:Skip-Q
 
 gCommand
 ===========================
+=>kubectl run ckad-probe-aom --image=nginx --restart=Always --labels=run=ckad-probe-aom
+
 =>sudo apt-get update && apt-get install iputils-ping && sudo apt install net-tools
+=>kubectl create quota my-quota --hard=cpu=1,memory=1G,pods=2,services=3,replicationcontrollers=2,resourcequotas=1,secrets=5,persistentvolumeclaims=10
+
 
 
 =>kubectl create cronjob learning-every-minute  -n ckad-job --image=busybox:1.28 --schedule="* * * * *" -- 'I am practicing for CKAD certification'
 =>kubectl create cronjob my-alarm -n ckad-job               --image=busybox:1.28 --schedule="0 0 * * 0" -- date
 =>kubectl create cronjob simple-python-job -n ckad-job      --image=python       --schedule="*/30 * * * *" -- 'ps –eaf'
+=>kubectl create cronjob learning-every-minute -n ckad-job --restart=OnFailure --image=busybox:1.28 --schedule="*/1 * * * *" -- echo 'I am practicing for CKAD certification'
 
 
 =>k create clusterrole healthz-access --verb=get,post --non-resource-url=/healthz,/healthz/*
@@ -82,6 +247,13 @@ ckad17-qos-aecs-1   BestEffort
 ckad17-qos-aecs-2   Guaranteed
 =>kubectl --namespace=ckad17-nqoss-aecs get pod --output=custom-columns="NAME:.metadata.name,QOS:.status.qosClass" > /root/qos_status_aecs
 
+Perform the connectivity test using 
+=>kubectl  exec testpod -- curl backend-ckad-svcn
+
+=>helm upgrade lvm-crystal-apd -n crystal-apd-ns lvm-crystal-apd/nginx --version=13.2.30 --set replicaCount=2
+
+SAVE OUTPI  :
+=>k get po | sudo tree them/logfile.log
 
 
 

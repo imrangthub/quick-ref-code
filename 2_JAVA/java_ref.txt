@@ -4918,3 +4918,26 @@ public class MyAppConfig implements WebMvcConfigurer {
 
 }
 
+
+
+SPRING:
+
+
+2023-09-09 15:26:56.116 DEBUG [edge-gateway,,] 26726 --- [tbeatExecutor-0] o.s.web.client.RestTemplate              : Accept=[application/json, application/*+json]
+2023-09-09 15:26:56.185 DEBUG [edge-gateway,,] 26726 --- [tbeatExecutor-0] o.s.web.client.RestTemplate              : Response 200 OK
+2023-09-09 15:26:57.186 DEBUG [edge-gateway,,] 26726 --- [tbeatExecutor-0] o.s.web.client.RestTemplate              : HTTP PUT http://172.16.254.122:7082/eureka/apps/EDGE-GATEWAY/192.168.1.6:edge-gateway:7081?status=UP&lastDirtyTimestamp=1694251602315
+
+
+
+
+exclude dependency adn add dependency
+------------------------------------------
+
+   implementation('org.springframework.boot:spring-boot-starter-web') {
+                // Exclude javax.xml.bind.JAXBElement
+                exclude group: 'javax.xml.bind', module: 'jaxb-api'
+            }
+
+            // Add Jakarta XML Binding (Jakarta XML-Bind) dependencies
+            implementation 'jakarta.xml.bind:jakarta.xml.bind-api:3.0.0'
+            implementation 'org.glassfish.jaxb:jaxb-runtime:3.0.0'

@@ -2,24 +2,10 @@
 #          CKAD EXAM-PREPARATION                #
 #################################################
 
-
-https://kodekloud.com/topic/join-our-community-56/
-
 https://killer.sh/ckad
+
 https://blog.getambassador.io/ckad-cka-exam-tips-from-10-people-who-passed-the-exam-24132b1f1cc5
 10 people commat for CKAD
-
-obl
-KODEKLOUD20 – handy while registering for the CKA or CKAD exams at Linux Foundation to get a 20% discount.
-JUNEBBQ30 =276
-
-For Copun code:
-https://ecoursedeals.com/ckad-certification-coupon/
-https://scriptcrunch.com/linux-foundation-coupon/
-https://www.retailmenot.com/view/training.linuxfoundation.org?u=VEU72QPA3JFM5FXAIEYRRLZUNM
-https://www.couponchief.com/linuxfoundation.org
-https://couponbarrow.com/store/linux-foundation-coupons/ckad-exam-coupon/
-https://getproductkey.net/shopping/linux-foundation
 
 
 https://devopscube.com/ckad-exam-study-guide/
@@ -39,6 +25,9 @@ https://www.youtube.com/watch?v=wtKef83kmUA&list=PL0hSJrxggIQoKLETBSmgbbvE4FO_eE
 https://docs.linuxfoundation.org/tc-docs/certification/faq-cka-ckad-cks
 FAQ
 
+
+NetworkPolicyEditory:
+https://editor.networkpolicy.io/?id=D8pquOYJnWXVinmL
 
 
 =================================================
@@ -89,6 +78,72 @@ FAQ
 
 =>kubectl describe pod mynginx
 
+=>kubectl get nodes -o jsonpath='{.items[*].status.addresses[?(@.type=="ExternalIP")].address}'
+Using JSONPath to get the IPs of all your nodes
+
+
+
+excCommand
+=======================================
+Create statuc pod
+yml file crete in /etc/kubernetes/manafiest/
+
+
+
+Take a backup of the etcd cluster and save it to /opt/etcd-backup.db.
+export ETCDCTL_API=3
+etcdctl snapshot save --endpoints https://[127.0.0.1]:2379 --cacert /etc/kubernetes/pki/etcd/ca.crt --cert /etc/kubernetes/pki/etcd/server.crt --key=/etc/kubernetes/pki/etcd/server.key  /opt/etcd-backup.db
+
+
+=>kubectl get nodes -o jsonpath='{.items[*].status.addresses[?(@.type=="InternalIP")].address}'
+List the InternalIP of all nodes of the cluster.
+
+=>vi /etc/kubernetes/kubelet.conf
+=>systemctl restart kubelet
+Kubeclt config file for node (master and slave bot)
+
+
+
+=>systemctl status containerd
+=> systemctl status kubelet
+
+
+This can be corrected by updating the file /var/lib/kubelet/config.yaml as follows: -
+
+Kubelet config file:
+Check the kubelet.conf file at /etc/kubernetes/kubelet.conf.
+
+
+=>kubectl get nodes -o jsonpath='{.items[*].status.nodeInfo.osImage}'
+Use JSON PATH query to retrieve the osImage
+
+
+=>kubectl get nodes -o json 
+Get the list of nodes in JSON format
+
+
+
+Node
+--------------------------------------
+=>journalctl -u kubelet -f
+=> journalctl -u kubelet 
+Investigation for cluster broken issue/master and workernode
+
+Node config file
+/etc/kubernetes/kubelet.conf 
+
+config file
+/var/lib/kubelet/config.yaml
+
+
+
+
+
+
+
+
+
+
 
 
 gCommand
@@ -97,6 +152,9 @@ gCommand
 
 
 =>kubectl create cronjob learning-every-minute  -n ckad-job --image=busybox:1.28 --schedule="* * * * *" -- 'I am practicing for CKAD certification'
+k create cronjob learning-every-minute -n ckad-job --restart=OnFailure --image=busybox:1.28 --schedule="*/1 * * * *" -- 'echo I am practicing for CKAD certification'
+
+
 =>kubectl create cronjob my-alarm -n ckad-job               --image=busybox:1.28 --schedule="0 0 * * 0" -- date
 =>kubectl create cronjob simple-python-job -n ckad-job      --image=python       --schedule="*/30 * * * *" -- 'ps –eaf'
 
@@ -133,6 +191,24 @@ NAME                QOS
 ckad17-qos-aecs-1   BestEffort
 ckad17-qos-aecs-2   Guaranteed
 =>kubectl --namespace=ckad17-nqoss-aecs get pod --output=custom-columns="NAME:.metadata.name,QOS:.status.qosClass" > /root/qos_status_aecs
+=>kubectl get pods -A -o=custom-columns='POD_NAME:metadata.name,IP_ADDR:status.podIP' --sort-by=.status.podIP
+
+=>k create quota ckad18-rq-aecs -n ckad18-rq-ns-aecs --hard=requests.cpu=50m,requests.memory=100Mi,limits.cpu=100m,limits.memory=200Mi
+=>kubectl -n admin2406 get deployment -o custom-columns=DEPLOYMENT:.metadata.name,CONTAINER_IMAGE:.spec.template.spec.containers[].image,READY_REPLICAS:.status.readyReplicas,NAMESPACE:.metadata.namespace --sort-by=.metadata.name
+=>k get node --output=custom-columns="NAME:.metadata.name">/opt/outputs/node_names.txt
+
+
+
+=>kubectl get pv --sort-by=.spec.capacity.storage
+A set of Persistent Volumes are available. Sort them based on their capacity
+
+
+Send every request for specific pod
+--------------------------------------------------
+apiVersion: v1
+kind: Service
+spec:
+sessionAffinity: ClientIP
 
 
 
@@ -247,6 +323,81 @@ spec:
   dnsPolicy: ClusterFirst
   restartPolicy: Always
 status: {}
+
+
+=>k expose pod jekyll --name=jekyll --type=NodePort --port=8080 --target-port=4000 -n development
+=>kubectl create role developer-role --verb=* --resource=pods,services,persistentvolumeclaims -n development
+
+
+
+Challenge 2:
+This 2-Node Kubernetes cluster is broken!
+
+
+=>vi /etc/kubernetes/manifests/kube-apiserver.yaml
+Change this;
+ - --client-ca-file=/etc/kubernetes/pki/ca-authority.crt
+
+Change:
+registry.k8s.io/kubedns:1.3.1
+
+
+Chalange 4:
+Build a highly available Redis Cluster based on the given architecture diagram.
+
+
+cat stful.yaml 
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: redis-cluster
+spec:
+  selector:
+    matchLabels:
+      app: redis-cluster  # has to match .spec.template.metadata.labels
+  serviceName: "redis-cluster-service"
+  replicas: 6 # by default is 1
+  minReadySeconds: 10 # by default is 0
+  template:
+    metadata:
+      labels:
+        app: redis-cluster # has to match .spec.selector.matchLabels
+    spec:
+      terminationGracePeriodSeconds: 10
+      volumes:
+        - name: 'conf'
+          configMap:
+            name: 'redis-cluster-configmap'
+            defaultMode: 0755
+      containers:
+      - name: redis
+        env:
+          - name: 'POD_IP'
+            valueFrom: 
+              fieldRef: 
+                fieldPath: 'status.podIP' 
+        image: redis:5.0.1-alpine
+        command:  ["/conf/update-node.sh", "redis-server", "/conf/redis.conf"]
+        ports:
+        - containerPort: 6379
+          name: client
+        - containerPort: 16379
+          name: gossip
+        volumeMounts:
+        - name: conf
+          mountPath: /conf
+          readOnly: false
+        - name: data
+          mountPath: '/data'
+          readOnly: false
+  volumeClaimTemplates:
+  - metadata:
+      name: 'data'
+    spec:
+      accessModes: [ "ReadWriteOnce" ]
+      resources:
+        requests:
+          storage: 1Gi
 
 
 Q15
@@ -826,6 +977,8 @@ Upgrade the helm chart to above 13.2.9 and also, increase the replica count of t
 Use the helm upgrade command as follows: -
 
 =>helm upgrade lvm-crystal-apd lvm-crystal-apd/nginx -n crystal-apd-ns --version=13.2.12 --set replicaCount=2
+  helm upgrade lvm-crystal-apd lvm-crystal-apd/nginx  -n crystal-apd-ns --version=14.0.0 --set replicaCount 2
+
 
 After upgrading the chart version, you can verify it with the following command: -
 =>helm ls -n crystal-apd-ns
@@ -11578,3 +11731,89 @@ DevPOpsLan
 https://kodekloud.com/lessons/labs-6/
 
 
+
+Basic Authentication
+=============================================
+
+Setup basic authentication on Kubernetes (Deprecated in 1.19)
+Note: This is not recommended in a production environment. This is only for learning purposes. Also note that this approach is deprecated in Kubernetes version 1.19 and is no longer available in later releases
+
+Follow the below instructions to configure basic authentication in a kubeadm setup.
+
+Create a file with user details locally at /tmp/users/user-details.csv
+
+# User File Contents
+password123,user1,u0001
+password123,user2,u0002
+password123,user3,u0003
+password123,user4,u0004
+password123,user5,u0005
+Edit the kube-apiserver static pod configured by kubeadm to pass in the user details. The file is located at /etc/kubernetes/manifests/kube-apiserver.yaml
+
+apiVersion: v1
+kind: Pod
+metadata:
+  name: kube-apiserver
+  namespace: kube-system
+spec:
+  containers:
+  - command:
+    - kube-apiserver
+      <content-hidden>
+    image: k8s.gcr.io/kube-apiserver-amd64:v1.11.3
+    name: kube-apiserver
+    volumeMounts:
+    - mountPath: /tmp/users
+      name: usr-details
+      readOnly: true
+  volumes:
+  - hostPath:
+      path: /tmp/users
+      type: DirectoryOrCreate
+    name: usr-details
+Modify the kube-apiserver startup options to include the basic-auth file
+
+apiVersion: v1
+kind: Pod
+metadata:
+  creationTimestamp: null
+  name: kube-apiserver
+  namespace: kube-system
+spec:
+  containers:
+  - command:
+    - kube-apiserver
+    - --authorization-mode=Node,RBAC
+      <content-hidden>
+    - --basic-auth-file=/tmp/users/user-details.csv
+Create the necessary roles and role bindings for these users:
+
+---
+kind: Role
+apiVersion: rbac.authorization.k8s.io/v1
+metadata:
+  namespace: default
+  name: pod-reader
+rules:
+- apiGroups: [""] # "" indicates the core API group
+  resources: ["pods"]
+  verbs: ["get", "watch", "list"]
+
+---
+# This role binding allows "jane" to read pods in the "default" namespace.
+kind: RoleBinding
+apiVersion: rbac.authorization.k8s.io/v1
+metadata:
+  name: read-pods
+  namespace: default
+subjects:
+- kind: User
+  name: user1 # Name is case sensitive
+  apiGroup: rbac.authorization.k8s.io
+roleRef:
+  kind: Role #this must be Role or ClusterRole
+  name: pod-reader # this must match the name of the Role or ClusterRole you wish to bind to
+  apiGroup: rbac.authorization.k8s.io
+Once created, you may authenticate into the kube-api server using the users credentials
+
+curl -v -k https://localhost:6443/api/v1/pods -u "user1:password123"

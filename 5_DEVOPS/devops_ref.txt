@@ -14,6 +14,10 @@ select * from information_schema.processlist where Command='Sleep'
 
 =>nslookup someDomain.nets
 Fine ip of domain
+=>vi /etc/hosts
+Add local dns record
+as:
+192.156.1.2 gitlab.madbarsoft.net
 
 =>route -n 
 Check the route path
@@ -841,7 +845,8 @@ pipeline {
     stages {
         stage("Start Building") {
             steps {
-                sh 'pwd'
+                echo "File copy......"
+                sh 'scp -i /home/admin/.ssh/id_rsa /opt/jenkins_WORKSHOP/spring-boot-simple-web.jar admin@192.268.1.1:/app/archive/testApp/'
             }
         }
         
@@ -852,7 +857,7 @@ pipeline {
                         cd /app/archive/testApp/
                         nohup java -jar spring-boot-simple-web.jar >> nohup.out 2>&1 &
                     '''
-                        sh "ssh -i /home/imran/.ssh/id_rsa admin@192.268.3.2 '${remoteCommand}'"
+                        sh "ssh -i /home/admin/.ssh/id_rsa admin@192.268.1.1 '${remoteCommand}'"
                 }
             }
         }

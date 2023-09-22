@@ -228,11 +228,17 @@ Server Deployment
 =================================================
 =>nginx -t
 Check configuration is ok
+=>nginx reload
+=>sudo nginx -s reload
 
 
 =>tail -1000 /app/apihub/Nginx_LB/logs/access.log | egrep -i '172.16.254.194' | awk '{print $8}' | sort | uniq --repeated --count
 Check the request status of specific server
 
+
+
+=>tail -1000000 access.log  | grep "172.16.254.157:7081" | awk '{print $6"/"$8}' | awk -F"/" '{print $2 "||" $NF}' | sort | uniq -c | sort -nr
+Service wise status code
 
 
 
@@ -386,6 +392,8 @@ Filtering | by property
 Filter by date
 
 =>tail -5 access.log | awk '22/Jun/2023' | sort | uniq --count
+tail -f access.log | awk '{print $12,$8}' | egrep --color=auto -i '172.16.254.157'
+
 
 
 
