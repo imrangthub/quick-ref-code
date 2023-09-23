@@ -4,6 +4,10 @@
 https://kodekloud.com/lessons/challenge-1-3/
 https://kodekloud.com/lessons/certified-kubernetes-application-developer-mock-exam-series/
 
+https://dev.mysql.com/downloads/installer/
+
+tar zxvf backups.tgz
+
 alias k='kubectl'
 alias cc='clear'
 alias kk='kubectl get'
@@ -59,6 +63,221 @@ SAVE OUTPI  :
 
 
 
+
+=====================================
+kilerInv:
+=====================================
+
+=>kubectl -n default describe pod pod1 | grep -i status:
+=>kubectl -n default get pod pod1 -o jsonpath="{.status.phase}"
+
+
+=>k run ng2 --image=nginx --dry-run=client -oyaml -- /bin/sh -c 'sleep 999'
+=>k run ng2 --image=nginx --dry-run=client -oyaml --command -- /bin/sh -c 'sleep 999'
+
+=>k -n neptune create job neb-new-job --image=busybox:1.31.0 $do > /opt/course/3/job.yaml -- sh -c "sleep 2 && echo
+done"
+
+
+
+=>k run pod6 --image=busybox:1.31.0 $do --command -- sh -c "touch /tmp/ready && sleep 1d" > 6.yaml
+
+=>k -n saturn get pod -o yaml | grep my-happy-shop -A10
+Change the Namespace to neptune, also remove the 
+status: section, volume, volumeMount and the nodeName
+
+
+=>k -n neptune rollout history deploy api-new-c32
+=>k -n neptune get deploy,pod | grep api-new-c32
+=>k -n neptune describe pod api-new-c32-7d64747c87-zh648 | grep -i error
+=>k -n neptune describe pod api-new-c32-7d64747c87-zh648 | grep -i image
+=>k -n neptune rollout undo deploy api-new-c32
+
+
+=>k -n pluto expose pod project-plt-6cc-api --name project-plt-6cc-svc --port 3333 --target-port 80
+
+=>k run tmp3 --restart=Never --rm --image=nginx:alpine -i -- curl ng-svc:8080
+=>k run tmp3 --restart=Never --rm --image=nginx:alpine -i -- curl ng-svc.ns1.svc.local:8080
+k run --rm tmp --restart=Never --image=nginx:alpine -i -- curl ng-svc1.ns1.svc.cluster.local:8080
+
+=>k run tmp --restart=Never --rm --image=nginx:alpine -i -- curl http://project-plt-6cc-svc.pluto:3333
+Check byTempod
+=>k -n pluto logs project-plt-6cc-api > /opt/course/10/service_test.log
+
+
+
+# build container stage 1
+FROM docker.io/library/golang:1.15.15-alpine3.14
+WORKDIR /src
+COPY . .
+RUN CGO_ENABLED=0 GOOS=linux go build -a -installsuffix cgo -o bin/app .
+# app container stage 2
+FROM docker.io/library/alpine:3.12.4
+COPY --from=0 /src/bin/app app
+# CHANGE NEXT LINE
+ENV SUN_CIPHER_ID=5b9c1065-e39d-4a43-a04a-e59bcea3e03f
+CMD ["./app"]
+
+=>sudo docker build -t registry.killer.sh:5000/sun-cipher:latest -t registry.killer.sh:5000/sun-cipher:v1-docker .
+=>sudo docker push registry.killer.sh:5000/sun-cipher:latest
+=>sudo docker push registry.killer.sh:5000/sun-cipher:v1-docker
+
+➜ cd /opt/course/11/image
+➜ podman build -t registry.killer.sh:5000/sun-cipher:v1-podman .
+=>podman push registry.killer.sh:5000/sun-cipher:v1-podman
+➜ podman run -d --name sun-cipher registry.killer.sh:5000/sun-cipher:v1-podman
+
+➜ podman ps
+➜ podman ps > /opt/course/11/containers
+➜ podman logs sun-cipher
+➜ podman logs sun-cipher > /opt/course/11/logs
+
+
+
+➜ k -n earth get pv,pvc
+➜ k -n earth describe pod project-earthflower-d6887f7c5-pn5wv | grep -A2 Mounts:
+
+
+
+apiVersion: storage.k8s.io/v1
+kind: StorageClass
+metadata:
+name: moon-retain
+provisioner: moon-retainer
+reclaimPolicy: Retain
+➜ k -n moon describe pvc moon-pvc-126
+
+
+➜ k -n moon exec secret-handler -- env | grep SECRET1
+➜ k -n moon exec secret-handler -- find /tmp/secret2
+➜ k -n moon exec secret-handler -- cat /tmp/secret2/key
+
+
+
+➜k -n moon describe pod web-moon-847496c686-2rzj4
+=>k -n moon create configmap configmap-web-moon-html --from-file=index.html=/opt/course/15/web-moon.html
+=>k run tmp --restart=Never --rm -i --image=nginx:alpine -- curl 10.44.0.78
+=>k -n moon describe pod web-moon-c77655cc-dc8v4 | grep -A2 Mounts:
+
+
+- name: logger-con # add
+image: busybox:1.31.0 # add
+command: ["sh", "-c", "tail -f /var/log/cleaner/cleaner.log"] # add
+volumeMounts: # add
+- name: logs # add
+mountPath: /var/log/cleaner 
+
+
+
+
+initContainers: # initContainer start
+- name: init-con
+image: busybox:1.31.0
+command: ['sh', '-c', 'echo "check this out!" > /tmp/web-content/index.html']
+volumeMounts:
+- name: web-content
+mountPath: /tmp/web-content # initContainer end
+➜ k run tmp --restart=Never --rm -i --image=nginx:alpine -- curl 10.0.0.67
+
+
+
+➜ k -n mars get all
+➜ k -n mars run tmp --restart=Never --rm -i --image=nginx:alpine -- curl -m 5 manager-api-svc:4444
+=>k -n mars run tmp --restart=Never --rm -i --image=nginx:alpine -- curl -m 5 10.0.1.14
+➜ k -n mars describe service manager-api-svc
+➜ k -n mars get ep
+➜ k -n mars run tmp --restart=Never --rm -i --image=nginx:alpine -- curl -m 5 manager-api-svc:4444
+
+
+
+➜ k -n jupiter run tmp --restart=Never --rm -i --image=nginx:alpine -- curl -m 5 jupiter-crew-svc:8080
+➜ k -n jupiter run tmp --restart=Never --rm -i --image=nginx:alpine -- curl -m 5 jupiter-crew-svc:8080
+➜ curl 192.168.100.11:30100
+
+
+
+➜ k -n venus run tmp --restart=Never --rm -i --image=busybox -i -- wget -O- frontend:80
+➜ k -n venus run tmp --restart=Never --rm --image=busybox -i -- wget -O- api:2222
+
+Test using: wget www.google.com and wget api:2222
+➜ k -n venus exec frontend-789cbdc677-c9v8h -- wget -O- www.google.com
+➜ k -n venus exec frontend-789cbdc677-c9v8h -- wget -O- api:2222
+
+# 20_np1.yaml
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+name: np1
+namespace: venus
+spec:
+podSelector:
+matchLabels:
+id: frontend # label of the pods this policy should be applied on
+policyTypes:
+- Egress # we only want to control egress
+egress:
+- to: # 1st egress rule
+  - podSelector: # allow egress only to pods with api label
+  matchLabels:
+  id: api
+- ports: # 2nd egress rule
+  - port: 53 # allow DNS UDP
+    protocol: UDP
+  - port: 53 # allow DNS TCP
+    protocol: TCP
+
+Now test
+➜ k -n venus exec frontend-789cbdc677-c9v8h -- wget -O- www.google.de
+➜ k -n venus exec frontend-789cbdc677-c9v8h -- wget -O- -T 5 www.google.de:80
+➜ k -n venus exec frontend-789cbdc677-c9v8h -- wget -O- api:2222
+
+
+
+
+➜ k -n sun get pod --show-labels
+=>k -n sun get pod -l type=runner
+k label -h # help
+=>k -n sun label pod -l type=runner protected=true # run for label runner
+=>k -n sun label pod -l type=worker protected=true # run for label worker
+=>k -n sun annotate pod -l protected=true protected="do not delete this pod"
+=>k -n sun get pod -l protected=true -o yaml | grep -A 8 metadata:
+
+
+➜ k run tmp --restart=Never --rm -i --image=nginx:alpine -- curl -m 5 sun-srv.sun:9999
+
+
+
+
+
+HelmReppUpdate:
+=>helm repo list
+=>helm repo update
+=>helm -n mercury upgrade internal-issue-report-apiv2 bitnami/nginx
+
+=>helm rollback
+Undo upgrade
+
+=>helm show values bitnami/apache # will show a long list of all possible value-settings
+=>helm -n mercury install internal-issue-report-apache bitnami/apache --set replicaCount=2
+=>k -n mercury get deploy internal-issue-report-apache
+
+pending-upgrade
+=>helm -n mercury ls -a
+=>helm -n mercury uninstall internal-issue-report-daniel
+=>helm -n mercury delete internal-issue-report-daniel
+
+
+Question:
+----------------------------------------
+There seems to be a broken release, stuck in pending-install state. Find it and delete it
+=>helm list --namespace mercury --pending
+=>helm delete -n mercury reponanme
+
+
+
+Q
+Team Moonpie, which has the Namespace moon, needs more storage. Create a new PersistentVolumeClaim named moon-pvc-126 in that namespace. This claim should use a new StorageClass moon-retain with the provisioner set to moon-retainer and the reclaimPolicy set to Retain. The claim should request storage of 3Gi, an accessMode of ReadWriteOnce and should use the new StorageClass.
+The provisioner moon-retainer will be created by another team, so it's expected that the PVC will not boot yet. Confirm this by writing the log message from the PVC into file /opt/course/13/pvc-126-reason.
 
 
 
