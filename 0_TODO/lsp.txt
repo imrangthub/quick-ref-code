@@ -14,52 +14,6 @@ alias kd='kubectl describe'
 alias ka='kubectl apply --force'
 dr="--dry-run=client -oyaml"
 
-Document
-
-Certified Kubernetes Application Developer (CKAD) 
-
-PV/PVC
-https://kubernetes.io/docs/concepts/storage/persistent-volumes/
-
-
-Workload/cronjob
-https://kubernetes.io/docs/concepts/workloads/controllers/cron-jobs/
-
-
-NetPol/Service
-https://kubernetes.io/docs/concepts/services-networking/network-policies/
-
-
-ReesourcesManagement
-https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/
-
-
-ReqourceQusta
-https://kubernetes.io/docs/concepts/policy/resource-quotas/
-
-
-
-CRD
-https://kubernetes.io/docs/tasks/extend-kubernetes/custom-resources/custom-resource-definitions/
-
-
-
-
-containerD
-Askto build image using ctl and push image to docker repo
-
-FilterSome Pod with short and redirect result
-
-JsonPath
-SAVE OUTPI  :
-=>k get po | sudo tree them/logfile.log
-
-
-
-
-
-
-
 
 
 Ing:
@@ -72,8 +26,17 @@ endpoint service
 Read about projected volumes
 hpa
 
+containerD
+Askto build image using ctl and push image to docker repo
 
-https://kodekloud.com/topic/faq-what-is-the-rewrite-target-option/
+FilterSome Pod with short and redirect result
+
+JsonPath
+SAVE OUTPI  :
+=>k get po | sudo tree them/logfile.log
+
+
+
 
 
 NeedExplor:
@@ -109,65 +72,24 @@ Demonset every node can include NodeAffinity
 
 
 
+
+
 KCH:Skip-Q
 =================================================
 
-  envFrom:
-      - secretRef:
-          name: ckad01-db-scrt-aecs
-
-Dirrentent 
-command:
-      - /bin/sh
-      - -c
-      - echo Initialize application environment! && sleep 10
-
-      - echo 'Initialize application environment!'; sleep 10
-
-
-We have deployed some pods in the namespaces ckad-alpha and ckad-beta.
-
-You need to create a NetworkPolicy named ns-netpol-ckad that will restrict all Pods in Namespace ckad-alpha to only have outgoing traffic to Pods in Namespace ckad-beta . Ingress traffic should not be affected.
-
-
-However, the NetworkPolicy you create should allow egress traffic on port 53 TCP and UDP.
 
 
 
 
 
-Service and Endpoints
-              
-Create a new pod with image nginx and name ckad-probe-aom and configure the pod with 
-livenessProbe with command ls and set initialDelaySeconds to 5 .
-
-apiVersion: v1
-kind: Pod
-metadata:
-  creationTimestamp: null
-  labels:
-    run: ckad-probe-aom
-  name: ckad-probe-aom
-spec:
-  containers:
-  - image: nginx
-    name: ckad-probe-aom
-    resources: {}
-    livenessProbe:
-      exec:
-        command:
-           - ls
-      initialDelaySeconds: 5
-  dnsPolicy: ClusterFirst
-  restartPolicy: Always
-status: {}
-
-imparagein comm for this
 
 
 
-Nginx mountPath:
+Volume-Env
+===========================
 
+volume:
+---------------------------
 apiVersion: v1
 kind: Pod
 metadata:
@@ -177,20 +99,68 @@ spec:
     - name: nginx
       image: nginx
       volumeMounts:
-        - name: flash-logs
+        - name: config
           mountPath: /var/log/nginx
-    - name: busybox
-      image: busybox
-      command:
-        - bin/sh
-        - -c
-        - sleep 10000
-      volumeMounts:
-        - name: flash-logs
-          mountPath: /usr/src
   volumes:
-    - name: flash-logs
-      emptyDir: {}
+  - name: config
+    emptyDir:
+      sizeLimit: 500Mi
+  volumes:
+  - name: test-volume
+    hostPath:
+      path: /data
+      type: Directory
+  volumes:
+    - name: config
+      persistentVolumeClaim:
+        claimName: test-nfs-claim
+  volumes:
+    - name: config
+      configMap:
+        name: myconfigmap
+  volumes:
+    - name: secret-volume
+      secret:
+        secretName: dotfile-secret
+
+
+env
+--------------------------
+
+apiVersion: v1
+kind: Pod
+metadata:
+  name: envar-demo
+spec:
+  containers:
+  - name: ng-inv
+    image: nginx
+    env:
+    - name: APPTYPE
+      value: "prod"
+    - name: "HI"
+      value: "hello"
+
+    env:
+      - name: APP_TYPE
+        valueFrom:
+          configMapKeyRef:
+            name: app-config
+            key: appenv.type
+    envFrom:
+    - configMapRef:
+        name: special-config
+
+    env:
+    - name: DB_USERNAME
+      valueFrom:
+        secretKeyRef:
+          name: dbuser-secret
+          key: db-username
+    envFrom:
+    - secretRef:
+        name: test-secret
+
 
 
 
