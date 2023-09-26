@@ -178,28 +178,27 @@ spec:
         valueFrom:
           configMapKeyRef:
             name: app-config
-            key: appenv.type
-    envFrom:
-    - configMapRef:
-        name: special-config
-
+            key: appenv.typ
     env:
     - name: DB_USERNAME
       valueFrom:
         secretKeyRef:
           name: dbuser-secret
           key: db-username
+
     envFrom:
     - secretRef:
         name: test-secret
-
-
+    envFrom:
+    - configMapRef:
+        name: special-config
 
 
 
 
 
 gCommand
+
 ===========================
 =>kubectl run ckad-probe-aom --image=nginx --restart=Always --labels=run=ckad-probe-aom
 
