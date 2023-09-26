@@ -141,9 +141,15 @@ spec:
       configMap:
         name: myconfigmap
   volumes:
+    - name: config
+      configMap:
+        name: redis-configmap
+        defaultMode: 0755
+  volumes:
     - name: secret-volume
       secret:
         secretName: dotfile-secret
+
 
 
 env
@@ -162,7 +168,11 @@ spec:
       value: "prod"
     - name: "HI"
       value: "hello"
-
+    env:
+    - name: POD_IP
+      valueFrom: 
+        fieldRef:
+          fieldPath: status.podIP
     env:
       - name: APP_TYPE
         valueFrom:
@@ -197,8 +207,6 @@ gCommand
 =>kubectl create quota my-quota --hard=cpu=1,memory=1G,pods=2,services=3,replicationcontrollers=2,resourcequotas=1,secrets=5,persistentvolumeclaims=10
 
 
-
-=>kubectl create cronjob learning-every-minute  -n ckad-job --image=busybox:1.28 --schedule="* * * * *" -- 'I am practicing for CKAD certification'
 =>kubectl create cronjob my-alarm -n ckad-job               --image=busybox:1.28 --schedule="0 0 * * 0" -- date
 =>kubectl create cronjob simple-python-job -n ckad-job      --image=python       --schedule="*/30 * * * *" -- 'ps –eaf'
 =>kubectl create cronjob learning-every-minute -n ckad-job --restart=OnFailure --image=busybox:1.28 --schedule="*/1 * * * *" -- echo 'I am practicing for CKAD certification'
@@ -213,8 +221,6 @@ Copey file to another
 
 =>ps -ef | grep kube-apiserver | grep admission-plugins
 =>kubectl exec -it kube-apiserver-controlplane -n kube-system -- kube-apiserver -h | grep 'enable-admission-plugins'
-
-=>k create cronjob simple-python-job -n ckad-job --image=python --schedule="*/30 * * * *" -- 'ps –eaf'
 
 
 =>kubectl create ingress world -n world --class=nginx --rule="world.universe.mine/europe*=europe:80" --rule="world.universe.mine/asia*=asia:80" 
@@ -318,7 +324,7 @@ The above command updates the local cache of available charts from the configure
 
 
 
-https://brain2life.hashnode.dev/how-to-set-helpful-aliases-for-kubernetes-commands-in-ubuntu-2004
+
 
 
 
