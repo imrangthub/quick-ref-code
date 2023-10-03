@@ -1,8 +1,7 @@
 #################################################
 #                 L-SP                          #
 #################################################
-https://kodekloud.com/lessons/challenge-1-3/
-https://kodekloud.com/lessons/certified-kubernetes-application-developer-mock-exam-series/
+
 
 https://dev.mysql.com/downloads/installer/
 
@@ -16,54 +15,25 @@ alias kkk='kubectl delete'
 alias kc='kubectl create'
 alias kd='kubectl describe'
 alias ka='kubectl apply --force'
+alias kr='kubectl replace --force'
 dr="--dry-run=client -oyaml"
 
 
 
 Ing:
 ===========================
-https://killer.sh/
-https://killercoda.com/
+kubectl config use-context cluster1
 
-
-endpoint service
-Read about projected volumes
-hpa
-
-containerD
-Askto build image using ctl and push image to docker repo
-
-FilterSome Pod with short and redirect result
-
-JsonPath
-SAVE OUTPI  :
-=>k get po | sudo tree them/logfile.log
-
-
-
-
-
-
-
-
-
-Ing:
-===========================
-https://killer.sh/
-https://killercoda.com/
-
-
-endpoint service
-Read about projected volumes
-hpa
-
-
-https://kodekloud.com/topic/faq-what-is-the-rewrite-target-option/
 
 
 NeedExplor:
 -------------------------------------------------
+=>k get po ng1 -o jsonpath='{.spec.nodeName}'
+
+=>helm upgrade lvm-crystal-apd lvm-crystal-apd/nginx  --set replicaCount=2 -n crystal-apd-ns
+
 =>$ kubectl delete all --all
+=>k run tmp --rm --restart=Never -i --image=nginx:alpine -- curl -m3 ng-svc:8080
 
 =>kubectl label po kubia-manual creation_method=manual
 =>kubectl label po kubia-manual-v2 env=debug --overwrite
@@ -84,8 +54,8 @@ any value other than manual
 Exec to service:
 $ kubectl exec kubia-3inly env
 
-=>k get po -n ckad17-nqoss-aecs --output=custom-columns="NAME":.metadata.name,"QOS":.status.qosClass>qos_status_aecs
-=>kubectl get pods -A -o=custom-columns='POD_NAME:metadata.name,IP_ADDR:status.podIP' --sort-by=.status.podIP > /root/pod_ips_ckad02_svcn
+=>k get po --output=custom-columns="NAME":.metadata.name,"QOS":.status.qosClass>qos_status_aecs
+=>k get po -o=custom-columns='POD_NAME:metadata.name,IP_ADDR:status.podIP' --sort-by=.status.podIP > /root/pod_ips_ckad02_svcn
 
 
 DaemonSet
@@ -93,6 +63,11 @@ DaemonSet
 Demonset every node can include NodeAffinity
 
 
+=>echo "imran"| base64
+=>echo 'aW1yYW4K' | base64 -d
+
+=>base64 my-file.txt
+=>base64 -d encod-file.txt
 
 
 
@@ -194,15 +169,73 @@ spec:
         name: special-config
 
 
-
+apiVersion: v1
+kind: Pod
+metadata:
+  creationTimestamp: null
+  labels:
+    run: ng3
+  name: ng3
+spec:
+  volumes:
+  - name: vol1
+    emptyDir: {}
+  - name: vol2
+    hostPath:
+      path: /tmp/
+  - name: vol3
+    persistentVolumeClaim:
+      claimName: pvc1
+  - name: vol4
+    configMap:
+      name: cm2
+  - name: vol5
+    secret:
+      secretName: sec2
+  containers:
+  - image: nginx
+    name: ng3
+    volumeMounts:
+    - name: vol4
+      mountPath: /tmp/web4
+    - name: vol5
+      mountPath: /tmp/web5
+    resources: {}
+    envFrom:
+     - configMapRef:
+         name: cm2
+     - secretRef:
+         name: sec2
+    env:
+    - name: env1
+      value: "This is env1 value"
+    - name: env2
+      valueFrom:
+        fieldRef:
+          fieldPath: status.podIP
+    - name: env3
+      valueFrom:
+        configMapKeyRef:
+            name: cm1
+            key: datakey
+    - name: env4
+      valueFrom:
+        secretKeyRef:
+            name: sec1
+            key: datakey
+  dnsPolicy: ClusterFirst
+  restartPolicy: Always
+status: {}
 
 
 gCommand
 
 ===========================
-=>kubectl run ckad-probe-aom --image=nginx --restart=Always --labels=run=ckad-probe-aom
-
 =>sudo apt-get update && apt-get install iputils-ping && sudo apt install net-tools
+
+=>kubectl run ckad-probe-aom --image=nginx --restart=Always -l=run=ckad-probe-aom
+=>k run ng -l env=prod,tier=backend --image=nginx
+
 =>kubectl create quota my-quota --hard=cpu=1,memory=1G,pods=2,services=3,replicationcontrollers=2,resourcequotas=1,secrets=5,persistentvolumeclaims=10
 
 
