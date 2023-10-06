@@ -2,29 +2,7 @@
 #          CKAD EXAM-PREPARATION                #
 #################################################
 
-
-https://blog.getambassador.io/ckad-cka-exam-tips-from-10-people-who-passed-the-exam-24132b1f1cc5
-10 people commat for CKAD
-
-
-https://devopscube.com/ckad-exam-study-guide/
-Good site for exam  slabus
-
-CNCF Certification
-Certified Kubernetes Application Developer: http://kub.to/dev
-Candidate Handbook: https://www.cncf.io/certification/candidate-handbook
-Exam Tips: https://docs.linuxfoundation.org/tc-docs/certification/tips-cka-and-ckad
-
-
-Certified Kubernetes Application Developer: https://www.cncf.io/certification/ckad/
-Candidate Handbook: https://www.cncf.io/certification/candidate-handbook
-Exam Tips: https://docs.linuxfoundation.org/tc-docs/certification/tips-cka-and-ckad
-https://www.youtube.com/watch?v=wtKef83kmUA&list=PL0hSJrxggIQoKLETBSmgbbvE4FO_eEgoB
-
-https://docs.linuxfoundation.org/tc-docs/certification/faq-cka-ckad-cks
-FAQ
-
-
+Exam Taken: 06/10/2023
 
 
 =================================================
@@ -133,23 +111,76 @@ config file
 
 
 
+=>kubectl get pv --sort-by=.spec.capacity.storage
+A set of Persistent Volumes are available. Sort them based on their capacity
+
+
+Send every request for specific pod
+--------------------------------------------------
+apiVersion: v1
+kind: Service
+spec:
+sessionAffinity: ClientIP
 
 
 
+=>k get po ng1 -o jsonpath='{.spec.nodeName}'
 
-gCommand
-===========================
+=>helm upgrade lvm-crystal-apd lvm-crystal-apd/nginx  --set replicaCount=2 -n crystal-apd-ns
+
+=>$ kubectl delete all --all
+=>k run tmp --rm --restart=Never -i --image=nginx:alpine -- curl -m3 ng-svc:8080
+
+=>kubectl label po kubia-manual creation_method=manual
+=>kubectl label po kubia-manual-v2 env=debug --overwrite
+
+
+List the pods again to see the updated labels:
+$ kubectl get po -L creation_method,env
+
+
+And those that don’t have the env label:
+$ kubectl get po -l '!env'
+
+creation_method!=manual to select pods with the creation_method label with
+any value other than manual
+
+
+
+Exec to service:
+$ kubectl exec kubia-3inly env
+
+=>k get po --output=custom-columns="NAME":.metadata.name,"QOS":.status.qosClass>qos_status_aecs
+=>k get po -o=custom-columns='POD_NAME:metadata.name,IP_ADDR:status.podIP' --sort-by=.status.podIP > /root/pod_ips_ckad02_svcn
+
+
+DaemonSet
+=>kubectl get daemonset
+Demonset every node can include NodeAffinity
+
+
+=>echo "imran"| base64
+=>echo 'aW1yYW4K' | base64 -d
+
+=>base64 my-file.txt
+=>base64 -d encod-file.txt
+
+
 =>sudo apt-get update && apt-get install iputils-ping && sudo apt install net-tools
 
+=>kubectl run ckad-probe-aom --image=nginx --restart=Always -l=run=ckad-probe-aom
+=>k run ng -l env=prod,tier=backend --image=nginx
 
-=>kubectl create cronjob learning-every-minute  -n ckad-job --image=busybox:1.28 --schedule="* * * * *" -- 'I am practicing for CKAD certification'
-k create cronjob learning-every-minute -n ckad-job --restart=OnFailure --image=busybox:1.28 --schedule="*/1 * * * *" -- 'echo I am practicing for CKAD certification'
+=>kubectl create quota my-quota --hard=cpu=1,memory=1G,pods=2,services=3,replicationcontrollers=2,resourcequotas=1,secrets=5,persistentvolumeclaims=10
 
 
 =>kubectl create cronjob my-alarm -n ckad-job               --image=busybox:1.28 --schedule="0 0 * * 0" -- date
 =>kubectl create cronjob simple-python-job -n ckad-job      --image=python       --schedule="*/30 * * * *" -- 'ps –eaf'
+=>kubectl create cronjob learning-every-minute -n ckad-job --restart=OnFailure --image=busybox:1.28 --schedule="*/1 * * * *" -- echo 'I am practicing for CKAD certification'
+
 
 =>k create clusterrole healthz-access --verb=get,post --non-resource-url=/healthz,/healthz/*
+
 
 
 =>scp ../media/* root@node01:/web
@@ -157,8 +188,6 @@ Copey file to another
 
 =>ps -ef | grep kube-apiserver | grep admission-plugins
 =>kubectl exec -it kube-apiserver-controlplane -n kube-system -- kube-apiserver -h | grep 'enable-admission-plugins'
-
-=>k create cronjob simple-python-job -n ckad-job --image=python --schedule="*/30 * * * *" -- 'ps –eaf'
 
 
 =>kubectl create ingress world -n world --class=nginx --rule="world.universe.mine/europe*=europe:80" --rule="world.universe.mine/asia*=asia:80" 
@@ -182,24 +211,83 @@ NAME                QOS
 ckad17-qos-aecs-1   BestEffort
 ckad17-qos-aecs-2   Guaranteed
 =>kubectl --namespace=ckad17-nqoss-aecs get pod --output=custom-columns="NAME:.metadata.name,QOS:.status.qosClass" > /root/qos_status_aecs
-=>kubectl get pods -A -o=custom-columns='POD_NAME:metadata.name,IP_ADDR:status.podIP' --sort-by=.status.podIP
 
-=>k create quota ckad18-rq-aecs -n ckad18-rq-ns-aecs --hard=requests.cpu=50m,requests.memory=100Mi,limits.cpu=100m,limits.memory=200Mi
-=>kubectl -n admin2406 get deployment -o custom-columns=DEPLOYMENT:.metadata.name,CONTAINER_IMAGE:.spec.template.spec.containers[].image,READY_REPLICAS:.status.readyReplicas,NAMESPACE:.metadata.namespace --sort-by=.metadata.name
-=>k get node --output=custom-columns="NAME:.metadata.name">/opt/outputs/node_names.txt
+Perform the connectivity test using 
+=>kubectl  exec testpod -- curl backend-ckad-svcn
 
+=>helm upgrade lvm-crystal-apd -n crystal-apd-ns lvm-crystal-apd/nginx --version=13.2.30 --set replicaCount=2
 
-
-=>kubectl get pv --sort-by=.spec.capacity.storage
-A set of Persistent Volumes are available. Sort them based on their capacity
+SAVE OUTPI  :
+=>k get po | sudo tree them/logfile.log
 
 
-Send every request for specific pod
---------------------------------------------------
-apiVersion: v1
-kind: Service
-spec:
-sessionAffinity: ClientIP
+
+=================================================
+Helm:
+=================================================
+
+=>helm repo ls 
+List the helm repositories.
+
+=>helm ls -A
+Deployed Helm charts releases list, Here lists all the releases of all the namespaces.
+
+
+Official Helm Stable Charts: https://charts.helm.sh/stable
+Prometheus Helm chart repository: https://prometheus-community.github.io/helm-charts
+Rancher's Helm chart repository: https://releases.rancher.com/server-charts
+
+=>helm repo add repoName https://charts.bitnami.com/bitnami
+=>helm repo ls 
+Add the repostiory to Helm.
+It allows us to browse and install charts from the new repository using the Helm package manager.
+
+
+=>helm search repo nginx
+=>helm search hub nginx
+Search Helm charts, Its return last lates version. for more
+
+=>helm search repo bitnami/joomla -l | head -n10
+
+When you run "helm search repo nginx", it will query the repositories you have added to your Helm configuration 
+When you run "helm search hub nginx", it queries the Helm Hub and returns any matching charts related to nginx 
+that are available on the Helm Hub. The Helm Hub is a public repository and can be accessed by anyone.
+
+
+=>helm search repo polar | grep nginx
+=>helm install nginx-server polar/nginx 
+=>helm  install jom13 bitnami/joomla  --version=13.3.19
+Search and Inatall for the nginx chart in a polar chart repository
+
+
+
+cd /root/
+=>helm lint ./newVersion
+Validate the helm chart by using the helm lint command
+
+
+=>helm uninstall oldVersioApp -n default
+=>helm install -myNewApp ./new-version
+=>helm install --generate-name ./new-version
+Install/Uninstall application
+
+
+=>helm search repo lvm-crystal-apd/nginx -l | head -n30
+The helm search command searches for all the available charts in a specific Helm chart repository. 
+
+
+=>helm upgrade nging ofc/nginx-ingress --version=1.41.1
+=>helm upgrade lvm-crystal-apd lvm-crystal-apd/nginx -n crystal-apd-ns --version=13.2.12 --set replicaCount=2
+Upgrade the helm chart and increase the replica count.
+
+=>helm ls -n crystal-apd-ns
+Look under the CHART column for the chart version for varify.
+
+
+=>helm repo update myHelmChart
+Now, update the helm repository with the following command: -
+The above command updates the local cache of available charts from the configured chart repositories.
+
 
 
 
