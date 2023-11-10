@@ -60,13 +60,6 @@ Automation Software performance report analysis.
 
 
 
-
-
-
-
-
-
-
 SBURock:
 Built Monitoring system for resilient Microservices architecture.
 
@@ -214,6 +207,12 @@ ROLES AND RESPONSIBILITIES
 
 
 
+NestTG:
+
+ACMP 4.0 certification from IBA University of Dhaka
+
+
+
 
 =================================================
 #APIHUB | Banglalink                                 
@@ -228,7 +227,7 @@ Morshed Alam
 
 
 
-Server Deployment
+Service Deployment
 =================================================
 
 172.16.254.193 = SLB | NGINX
@@ -250,19 +249,31 @@ Server Deployment
 
 
 
-=>tail -f /app/apihub/Nginx_LB/logs/access.log | egrep -i '172.16.254.209'
-
-
-
-=================================================
-#Nginx | nginx
-=================================================
+Slb-Operation
+--------------------------------------------------------
 =>nginx -t
 Check configuration is ok
 =>nginx reload
 =>sudo nginx -s reload
 
 
+=>tail -100 access.log |awk '{print $12,$8}'|sort|uniq --repeated --count
+Print load balanced IPs and their status count
+
+=>tail -f access.log | egrep -i '172.16.254.25'
+Check single slb/dmz reveived trafic or not
+
+
+=>tail -100 access.log | egrep -i '172.16.254.25' | awk '{print $8}' | sort | uniq --repeated --count
+=>tail -100 access.log | egrep -i '172.16.11.35' | awk '{print $8}' | sort | uniq --repeated --count
+Lan server by ip request check
+
+
+
+
+=>tail -f /app/apihub/Nginx_LB/logs/access.log | egrep -i '172.16.254.209'
+
+=>tail -1000 access.log | egrep -i '172.16.11.34' | awk '{print $8}' | sort | uniq --repeated --count
 =>tail -1000 /app/apihub/Nginx_LB/logs/access.log | egrep -i '172.16.254.194' | awk '{print $8}' | sort | uniq --repeated --count
 Check the request status of specific server
 
@@ -274,7 +285,11 @@ Service wise status code
 
 
 
-api-ex
+
+
+
+
+
 
 
 
@@ -618,6 +633,18 @@ curl -X POST "http://172.16.254.122:7380/openapi-provisioning/barring/6/barrings
 
 
 
+=================================================
+#  Kubernetes                                         
+================================================= 
+
+https://172.16.200.192:31000
+
+http://gitlab.banglalink.net/api-hub/mfs-integration.git
+
+/root/apihub/apihub-microservice
+/root/apihub/apihub-controller
+172.16.200.192 
+http://172.16.200.192:31515/
 
 
 
