@@ -9,6 +9,13 @@ Soft:
 Xmanager_Enterprise_v5.0.1249r_Incl_Keygen_v1.0_DFoX_URET
 
 =>java -jar -DMYSQL_HOST=127.0.0.1 arif-travel-agency-0.0.1-SNAPSHOT.jar
+
+
+
+=>jps
+=>ps -fC java
+Show all java running applicaton
+
 =================================================
 #        Java Compiler                                       
 ================================================= 
@@ -5117,7 +5124,9 @@ Example Usage:
 =================================================
 JVM | jvm Monitoring | memory operation
 =================================================
-
+=>jps
+=>ps -fC java
+Show all java running applicaton
 
 =>jcmd pId
 Show all availabel jvm command
@@ -5143,6 +5152,56 @@ jconsole
 ----------------------------------------------------
 =>jconsole
 For visual representation jvm
+
+
+
+
+GC:
+-----------------------------------------------------
+In JDK 8 
+-verbose:gc
+
+YoungGeneartion=Eden
+OldGneration=OldGen
+jdk17
+java -Xlog:gc*:file=gc.log -jar your-application.jar
+Quick show Gurbase collecton, add this flag on VM argument
+
+
+
+
+Check JVM flag (if not its show default flag)
+------------------------------------------
+=>jinfo -flag UseAdapptiveSizePolicy pId
+=>jinfo -flag UseAdapptiveSizePolicy 224323
+Check curretn gc Policy
+
+=>jinfo -flag NewRation PID
+=>jinfo -flag NewRation 23223
+Show the ration of Young and Old Generation GC ration
+
+to set a new Ration add VM flag:
+-XX:NewRation=1
+
+
+=>jinfo -flag ServivorRation PID
+Show YouGC ration
+
+Set Servibe Ration in YGC add flag
+-XX:ServivorRation=5
+
+
+TypeOfGC:
+- Serial
+  -XX:+UseSerialGC
+- Parallel
+  -XX:+UseParallelGC
+- Mostly Concurrent
+  -XX:+UseG1GC
+
+
+
+
 
 
 
