@@ -5111,3 +5111,52 @@ Example Usage:
 	Number of threads = 4 cores * 0.5 * (1 + 0.1) = 2.2 threads
 
 	In this example, you would create two thread pools, one for the I/O-intensive tasks and one for the CPU-intensive tasks. The I/O-intensive thread pool would have 3 threads and the CPU-intensive thread pool would have 2 threads.
+
+
+
+=================================================
+JVM | jvm Monitoring | memory operation
+=================================================
+
+
+=>jcmd pId
+Show all availabel jvm command
+
+=>jcmd 29286 VM.version
+=>jcmd 6056 VM.flags
+=>jcmd pId VM.flags
+Show runtime parameters that were used when starting for a specific Java process (Memory Unit Show In Byte)
+
+=>jstat -gc 6056
+Show garbage collection statistics, including the heap sizes.
+
+
+
+Show Memory and CPU uses by process pId
+=>top  (then press e for change mm unit)
+=>top -p pID
+=>ps -p 29286 -o rss= -o vsz= -o %mem= -o %cpu= -o comm=
+
+
+
+jconsole
+----------------------------------------------------
+=>jconsole
+For visual representation jvm
+
+
+
+
+
+
+
+
+
+
+
+
+
+JVM performance tuning for large applications:  benchmark, Benchmark, BENCHMARK!
+
+VM. Enable monitoring:
+common Java tooling (JVisualVM, JMX, hprof, and some JVM flags).

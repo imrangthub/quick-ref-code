@@ -195,7 +195,8 @@ then
 systemctl status nginx
 
 
-
+=>find . -type d -name ".git" -exec rm -rf {} \;
+Find all directory in sub-dir and delete all
 
 =================================================
 #Link | SoftLink | HardLink                            
@@ -564,6 +565,11 @@ Step1: Create file System
 =>sudo lshw -class memory
 Ram Details
 
+=>cat /proc/meminfo
+=>grep MemTotal /proc/meminfo
+Ram size check
+
+
 >lsblk -d
 =>lshw -class disk -short
 Hard disk size
@@ -581,10 +587,6 @@ Specific file size in hard disk
 =>df -kh .
 =>df -T -h /myDir/
 
-=>cat /proc/meminfo
-=>grep MemTotal /proc/meminfo
-Ram size check
-
 =>dmesg | grep blocks
 =>sudo fdisk -l | grep Disk
 =>sudo fdisk -l | grep "^Disk /" | gawk '{print $3,$4}'
@@ -592,6 +594,9 @@ Total disk Size
 
 #Cpu
 -------------------------------------------------
+=>uptime
+CPU usage over the last 1, 5, and 15 minutes with start-time and user
+
 =>lscpu
 
 =>lscpu
@@ -849,7 +854,7 @@ Copy all file to another folder
 Sharing file for all user
 
 
-#TAR |  ZIP
+#TAR |  ZIP | compress | Compression
 -------------------------------------------
 =>tar -cvf myTarFile.tar *
 Make tar file with all contain in current folder
@@ -862,10 +867,14 @@ UnTar
 =>tar -xvf myTarFile reqFile
 Add/emit a file to exists tar
 
+
+=>zip -r archive_name.zip directory_to_compress
+
 =>unzip file.zip -d destination_folder
 =>gzip myFolder
 =>sudo unzip -d /opt/gradle gradle-5.6.1-bin.zip 
 Zip/Unzip file
+
 
 
 
@@ -1290,6 +1299,7 @@ Set home
 
 
 
+
 =================================================
 # MySQL                  
 ================================================= 
@@ -1298,7 +1308,7 @@ Set home
 =>SELECT version();
 
 
-=>service mysql start
+=>service mysql start   
 =>systemctl status mysql
 =>service mysql stop
 
