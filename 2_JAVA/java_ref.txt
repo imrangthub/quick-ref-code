@@ -5131,6 +5131,11 @@ Show all java running applicaton
 =>jcmd pId
 Show all availabel jvm command
 
+=>java -XX:+PrintFlagsFinal
+=>java -XX:+PrintFlagsFinal -version | grep HeapSize
+Show all curretn(defautl) JVM setting with flag 
+
+
 =>jcmd 29286 VM.version
 =>jcmd 6056 VM.flags
 =>jcmd pId VM.flags
@@ -5145,6 +5150,9 @@ Show Memory and CPU uses by process pId
 =>top  (then press e for change mm unit)
 =>top -p pID
 =>ps -p 29286 -o rss= -o vsz= -o %mem= -o %cpu= -o comm=
+
+
+
 
 
 
@@ -5172,6 +5180,7 @@ Quick show Gurbase collecton, add this flag on VM argument
 
 Check JVM flag (if not its show default flag)
 ------------------------------------------
+
 =>jinfo -flag UseAdapptiveSizePolicy pId
 =>jinfo -flag UseAdapptiveSizePolicy 224323
 Check curretn gc Policy
@@ -5191,6 +5200,47 @@ Set Servibe Ration in YGC add flag
 -XX:ServivorRation=5
 
 
+
+Java memory footprint of process | application
+----------------------------------------------------
+In Jvm Runtime the primary MemoryConsumer:
+- Java Heap
+- Class Loadeing
+- JIT Compiler
+- Threads
+
+=>top -o%MEM
+Show the process info, here `RES` show the req ram phical ram taken by thie process like 5gb.
+
+=>pmap -x pid
+Now the RES 5gb in details, show with this command.
+Every single class,jar, .os file etc. what is consume how much mamory showing using this command.
+
+
+
+=>jcmd PID VM.classloader_status
+show how many class load and which class load
+
+=>jcmd PID GC.class_status
+Which class, field consume how much memory
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 TypeOfGC:
 - Serial
   -XX:+UseSerialGC
@@ -5200,16 +5250,13 @@ TypeOfGC:
   -XX:+UseG1GC
 
 
-
-
-
-
-
-
-
-
-
-
+ Vector v = new Vector();
+ while (true)
+ {
+     byte b[] = new byte[1048576];
+     v.add(b);
+ }
+This will continuously add a 1MB byte to a vector until it runs out of memory
 
 
 
@@ -5219,3 +5266,21 @@ JVM performance tuning for large applications:  benchmark, Benchmark, BENCHMARK!
 
 VM. Enable monitoring:
 common Java tooling (JVisualVM, JMX, hprof, and some JVM flags).
+
+
+GC process
+-----------------------------------------
+1. Young Generation Collection:
+Allocation: New objects are allocated in the Young Generation. This area is further divided into three spaces: Eden and two Survivor spaces (S0 and S1).
+
+Minor Garbage Collection (Minor GC): When the Young Generation fills up, a minor GC is triggered. During this phase:
+
+
+2. Old Generation Collection:
+Promotion: Objects that survive multiple minor GCs are eventually promoted to the Old Generation.
+
+Major Garbage Collection (Major GC or Full GC): The Old Generation collection is more expensive but occurs less frequently. During a major GC:
+
+Live objects in the Old Generation are identified.
+Unused (garbage) objects are collected, and memory is reclaimed.
+Compaction may occur to reduce fragmentation and ensure efficient memory usage.
