@@ -83,6 +83,50 @@ curl --location --request POST 'http://localhost:8080/auth/token' --header 'clie
 
 
 =================================================
+#http | connection | sockets | HTTP                
+================================================= 
+=>netstat -an | awk '{print $5"-"$6}' | sort | uniq --repeated --count
+display network-related information. 
+The options used are:
+-a: Show both listening and non-listening sockets.
+-n: Show numerical addresses (do not resolve hostnames).
+
+=>netstat -ant |grep CLOSE_WAIT | wc -l
+
+=>lsof -i :portNumber
+=>lsof -i :7082
+Check which process/application make wait connection
+
+=>ps -p 92669
+=>ps -fC java17 | grep 92669
+Then grep the pid for find the application
+
+
+for tcp dump
+=>tcpdump -i <interface> port <port>
+
+
+
+
+
+
+
+
+
+
+Apache HTTP server benchmarking tool  
+-------------------------------------------------
+=>ab -n 100 -c 10 https://www.google.com/
+
+-n 100=>Number of request
+-n 10=>Number of concurent request
+
+
+
+
+
+
+=================================================
 #mysql                              
 =================================================
 =>mysql -uroot -p
@@ -162,16 +206,6 @@ Create repository with Maven proxy
 Create repository with Maven group
 =>http://localhost:8081/repository/imran-group/
 
-
-
-
-=================================================
-#Apache HTTP server benchmarking tool                       
-================================================= 
-=>ab -n 100 -c 10 https://www.google.com/
-
--n 100=>Number of request
--n 10=>Number of concurent request
 
 
 
