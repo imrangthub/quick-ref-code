@@ -1319,33 +1319,21 @@ Set home
 #InstallMySql
 --------------------------------------------------------------------------------------------------
 =>sudo apt install mysql-server
-=>sudo mysql
-=>ALTER USER 'root'@'localhost' IDENTIFIED WITH mysql_native_password BY 'root';
-=>ALTER USER 'root'@'localhost' IDENTIFIED BY 'root';
-=>ALTER USER 'root'@'localhost' IDENTIFIED WITH auth_socket;
 =>systemctl is-active mysql
 
-Security configuration
-
-sudo apt-get remove --purge mysql*
-sudo apt-get purge mysql*
-sudo apt-get autoremove
-sudo apt-get autoclean
-sudo apt-get remove dbconfig-mysql
-sudo apt-get dist-upgrade
-
-Uninstall mysql server
+=>sudo mysql_secure_installation
 
 
-=>sudo apt install ./mysql-workbench-community_8.0.20-1ubuntu20.04_amd64.deb
-=>snap install mysql-workbench-community
-=>sudo snap connect mysql-workbench-community:password-manager-service :password-manager-service
+=>sudo mysql
 
+=>SELECT User, Host, authentication_string FROM mysql.user;
+Check all user
 
-mysql>update mysql.user set plugin = 'mysql_native_password' where User='root';
-mysql>FLUSH PRIVILEGES;
-mysql>exit;
-Access denied for user 'root'@'localhost'
+=>ALTER USER 'root'@'localhost' IDENTIFIED WITH mysql_native_password BY 'your_password';
+=>FLUSH PRIVILEGES;
+=>exit;
+=>sudo service mysql restart
+
 
 
 create table std_tbl(
@@ -1355,6 +1343,38 @@ create table std_tbl(
    PRIMARY KEY ( id )
 );
 =>INSERT INTO std_tbl VALUES (1, 'IMRAN', 'MALE');
+
+
+Update password policy:
+
+=>sudo mysql
+=>SHOW VARIABLES LIKE 'validate_password%';
+
+set global validate_password.check_user_name='OFF';
+SET GLOBAL validate_password.policy=LOW;
+SET GLOBAL validate_password.length=4;
+set global validate_password.mixed_case_count=0;
+set global validate_password.number_count=0;
+set global validate_password.special_char_count=0;
+set global validate_password.policy=0;
+SHOW VARIABLES LIKE 'validate_password%';
+
+
+
+
+
+Uninstall mysql server
+
+=>sudo systemctl stop mysql.service
+sudo apt-get remove mssql-server
+sudo apt-get remove --purge mysql*
+sudo apt-get purge mysql*
+sudo apt-get autoremove
+sudo apt-get autoclean
+sudo apt-get remove dbconfig-mysql
+sudo apt-get dist-upgrade
+
+
 
 
 
