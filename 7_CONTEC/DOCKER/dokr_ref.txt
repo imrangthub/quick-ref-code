@@ -472,7 +472,67 @@ Default value is 10 seconds, but the following command will use the time-out val
 
 
 
+version: '3.8'
 
+
+services:
+  front-end :
+    image: front-end-image
+    build:
+    context: /workspace/front-end
+    dockerfile: /workspace/front-end/docker/Dockerfile
+    ......
+
+  back-end :
+    image: back-end-image
+    build: https://github.com/back-end/my-project.git
+    ......
+
+  mysql-db:
+    image: mysql:latest
+    ......
+
+
+networks:
+  my-net:
+    driver: bridge
+
+volumes:
+  mysql-data:
+    driver: local
+
+
+version: '3.8'
+
+services:
+  nginx:
+    image: nginx:latest
+    ports:
+      - "80:80"
+    networks:
+      - mynetwork
+
+  mysql:
+    image: mysql:latest
+    environment:
+      MYSQL_ROOT_PASSWORD: root_password
+      MYSQL_DATABASE: mydatabase
+      MYSQL_USER: myuser
+      MYSQL_PASSWORD: mypassword
+    networks:
+      - mynetwork
+    volumes:
+      - mysql_data:/var/lib/mysql
+
+networks:
+  mynetwork:
+    driver: bridge
+
+volumes:
+  mysql_data:
+    driver: local
+
+    
 =================================================
 #Swarm | swarm
 =================================================
@@ -873,6 +933,25 @@ under Docker’s swarm mode.
 #Install Docker  
 =================================================
 
+Using script | In Ubuntu fromOfficialSite
+-------------------------------------------------
+ curl -fsSL https://get.docker.com -o get-docker.sh
+ sudo sh ./get-docker.sh --dry-run
+
+
+ =>systemctl status docker
+ =>docker version
+
+ check ubuntu group:
+ =>cat /etc/group
+
+For Permission:
+=>ls -l /var/run/docker.sock
+=>sudo chmod 666 /var/run/docker.sock
+=>systemctl restart docker.service
+
+
+
 Installing Doeckr for CentOS 7
 ---------------------------------------------------
 Create a script within the text file and save it
@@ -889,7 +968,9 @@ Step 3: Make the script executable:
 Run the script:
 
 
-Ubuntu
+
+
+Uninstall docker Ubuntu
 ---------------------------------------------------
 =>sudo apt-get update
 =>sudo apt install docker.io
