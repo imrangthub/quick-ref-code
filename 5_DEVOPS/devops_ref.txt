@@ -466,6 +466,19 @@ catalina.bat run
 =================================================
 #  NGINX | nginx                                          
 ================================================= 
+
+=>nginx -v
+=>sudo systemctl status nginx
+=>sudo systemctl start nginx
+=>sudo systemctl stop nginx
+=>sudo systemctl reload nginx
+=>sudo systemctl restart nginx
+
+
+=>sudo systemctl enable nginx
+=>sudo systemctl disable nginx
+Nginx autho start ennable disable when system boot 
+
 =>nginx -t
 Check configuration is ok
 =>start nginx
@@ -482,30 +495,130 @@ Reopening log files
 
 #Reverse Proxy
 -------------------------------------------------
+http {
+	...........
+	...........
 
-server {
-	listen       8181;
-	server_name  localhost;
+	server {
+		listen       8181;
+		server_name  localhost;
 
-location / {
-		proxy_pass   http://localhost:8080;
+	location / {
+			proxy_pass   http://localhost:8080;
+		}
 	}
+
 }
 
 #Load Balancer
 -------------------------------------------------
-upstream upstreamGroup1 {
-   server localhost:8080;
-   server localhost:8282;
-}
-server {
-	listen       70;
-	server_name  localhost;
 
-location / {
-		proxy_pass   http://upstreamGroup1;
+http {
+	...........
+	...........
+
+	upstream upstreamGroup1 {
+	server localhost:8080;
+	server localhost:8282;
+	}
+	server {
+		listen       70;
+		server_name  localhost;
+
+	location / {
+			proxy_pass   http://upstreamGroup1;
+		}
 	}
 }
+
+nginx.conf 
+-------------------------------------------------------
+Directives:
+	user             nobody;
+	error_log        logs/error.log notice;
+	worker_processes 1;
+
+Contexts:
+	events – General connection processing
+	http – HTTP traffic
+	mail – Mail traffic
+	stream – TCP and UDP traffic
+
+
+Sample Configuration File with Multiple Contexts
+------------------------------------------------
+user nobody; # a directive in the 'main' context
+
+events {
+    # configuration of connection processing
+}
+
+http {
+    # Configuration specific to HTTP and affecting all virtual servers  
+
+    server {
+        # configuration of HTTP virtual server 1       
+        location /one {
+            # configuration for processing URIs starting with '/one'
+        }
+        location /two {
+            # configuration for processing URIs starting with '/two'
+        }
+    } 
+    
+    server {
+        # configuration of HTTP virtual server 2
+    }
+}
+
+stream {
+    # Configuration specific to TCP/UDP and affecting all virtual servers
+    server {
+        # configuration of TCP virtual server 1 
+    }
+}
+
+
+
+
+In nginx.conf file under http{} Block:
+-------------------------------------------------------
+  server { # simple reverse-proxy
+    listen       80;
+    server_name  domain2.com www.domain2.com;
+    access_log   logs/domain2.access.log  main;
+
+    # serve static files
+    location ~ ^/(images|javascript|js|css|flash|media|static)/  {
+      root    /var/www/virtual/big.server.com/htdocs;
+      expires 30d;
+    }
+
+    # pass requests for dynamic content to rails/turbogears/zope, et al
+    location / {
+      proxy_pass      http://127.0.0.1:8080;
+    }
+  }
+
+  upstream big_server_com {
+    server 127.0.0.3:8000 weight=5;
+    server 127.0.0.3:8001 weight=5;
+    server 192.168.0.1:8000;
+    server 192.168.0.1:8001;
+  }
+
+  server { # simple load balancing
+    listen          80;
+    server_name     big.server.com;
+    access_log      logs/big.server.access.log main;
+
+    location / {
+      proxy_pass      http://big_server_com;
+    }
+  }
+
+
+
 
 
 Windows CMD
