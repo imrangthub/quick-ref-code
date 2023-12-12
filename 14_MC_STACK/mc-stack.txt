@@ -34,22 +34,22 @@ Simple or the default ConcurrentMapCacheManager.
 =================================================
 #redis | Redis                                     
 ================================================= 
-https://docs.spring.io/spring-data/redis/reference/redis/connection-modes.html
-https://medium.com/@htyesilyurt/spring-boot-3-redis-sentinel-lettuce-client-and-docker-compose-for-high-availability-1f1e3c372a5a
-https://www.youtube.com/watch?v=Pj8Q_9dovgY&list=PLq3uEqRnr_2HY6LMQsbvsK4btj51sWhBS&index=2
 
-
-
-=>redis-cli
-=>redis-cli -p 8888
-
+=>docker run -p 8888:6379 --name my-redis1 -d redis
+=>sudo apt install redis-tools
 =>redis-cli --version
+Run a Redis Server using docker and install resis-toos for redis-cli in ubuntu
+
 =>sudo systemctl status redis
-
-
 =>sudo vi /etc/redis/redis.conf
 Edit Config file
 =>sudo systemctl restart redis-server
+
+
+=>redis-cli ping
+=>redis-cli
+=>redis-cli -p 8888
+
 
 
 =>set mykey myvalue
@@ -58,6 +58,77 @@ Edit Config file
 =>keys *
 =>dbsize
 Show list of key
+
+=>del keyName
+Delete single key
+
+=>flushall
+Remove all data
+
+
+
+
+
+#Redis Sentinel 
+=================================================
+=>redis-cli
+=>redis-cli -p 8888
+
+=>redis-cli -h my_host -p my_port -a my_password
+=>redis-cli -h 172.16.7.161 -p 26379 -a pass
+
+
+=>sentinel masters  
+=>sentinel get-master-addr-by-name mymaster
+Info about all master
+
+=>SENTINEL REPLICAS mymaster
+Show connected replicas
+
+
+
+=>info replication
+Show Master and Slave info
+
+
+sentinel master mymaster
+sentinel slaves mymaster
+
+
+
+
+
+
+Doc
+-------------------------
+https://docs.spring.io/spring-data/redis/reference/redis/connection-modes.html
+https://medium.com/@htyesilyurt/spring-boot-3-redis-sentinel-lettuce-client-and-docker-compose-for-high-availability-1f1e3c372a5a
+https://www.youtube.com/watch?v=Pj8Q_9dovgY&list=PLq3uEqRnr_2HY6LMQsbvsK4btj51sWhBS&index=2
+
+
+Spring Boot, both Lettuce and Jedis are popular choices for interacting with Redis, which is an open-source, in-memory data structure store. 
+
+Lettuce:
+  Asynchronous Support
+  Thread Safety
+  Connection Pooling
+  Cluster Support
+
+Jedis:
+  Synchronous and Asynchronous Support:
+  Connection Pooling:
+  Maturity:
+
+Choosing Between Lettuce and Jedis:
+Performance:
+Lettuce is often considered more performant than Jedis, especially in scenarios where high concurrency and asynchronous behavior are important.
+
+Reactive Programming:
+If your application is built using reactive programming paradigms (e.g., Spring WebFlux), Lettuce may be a more natural fit.
+Ease of Use:
+
+Jedis has a simpler API, and if you are looking for a straightforward and easy-to-use client, Jedis might be a good choice.
+
 
 
 
@@ -72,8 +143,6 @@ Caching Topology:
 
 -Replication
  Chahe replicas every node
-
-
 
 UdamyCourse:
 https://gale.udemy.com/course/redis-latest/learn/lecture/21936116#overview
@@ -121,6 +190,7 @@ public class RedisConfig {
         return new LettuceConnectionFactory(staticMasterReplicaConfig, clientConfig);
     }
 }
+
 
 
 

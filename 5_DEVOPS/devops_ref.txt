@@ -518,11 +518,11 @@ http {
 	...........
 
 	upstream upstreamGroup1 {
-	server localhost:8080;
-	server localhost:8282;
+	server localhost:8081;
+	server localhost:8082;
 	}
 	server {
-		listen       70;
+		listen       8080;
 		server_name  localhost;
 
 	location / {
@@ -578,6 +578,10 @@ stream {
     }
 }
 
+
+log_format  custom_logs  '$remote_addr - [$time_local] "$request" '
+                       '$status $body_bytes_sent "$http_referer" '
+                       '"$http_user_agent" $upstream_addr $upstream_response_time' " $request_time" " $request_id";
 
 
 
@@ -795,6 +799,9 @@ http {
 }
 	
 
+
+Log Operation
+=================================================
 
 
 =================================================
