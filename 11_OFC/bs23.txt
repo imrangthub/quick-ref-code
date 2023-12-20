@@ -308,6 +308,8 @@ Print load balanced IPs and their status count
 Check single slb/dmz reveived trafic or not
 
 
+=>=>cat  access.log | grep -v '200' | awk '{print $12 " " $8}' | sort | uniq --count
+
 =>tail -100 access.log | egrep -i '172.16.254.25' | awk '{print $8}' | sort | uniq --repeated --count
 =>tail -100 access.log | egrep -i '172.16.11.35' | awk '{print $8}' | sort | uniq --repeated --count
 Lan server by ip request check
@@ -460,11 +462,11 @@ Simple Log:
 
 
 
-'$remote_addr - [$time_local] "$request"' '$status $body_bytes_sent "$http_referer"'  
-'"$http_user_agent" $upstream_addr $upstream_response_time'  " $request_time" " $request_id"
+'$remote_addr -   [$time_local]  "$request"' '$status   $body_bytes_sent "$http_referer"' '"$http_user_agent" $upstream_addr $upstream_response_time'  " $request_time" " $request_id"
+	$1		  $2	$3$4		   $5$6$7	    $8			$9 				$10				    $11					$12				$13 				       $14     		   $15
 
 
-172.16.254.196 - [22/Jun/2023:11:43:00 +0600] "GET /loyalty/loyalty//priyojon-status?customerId=1968889839 HTTP/1.1" 404 140 "-" "-" 172.16.254.194:7081 0.001 0.002 8dd86ce4639f843c4fc7b8cabee3cfea
+172.16.254.196 -  [22/Jun/2023:11:43:00 +0600] "GET /loyalty/loyalty//priyojon-status?customerId=1968889839 HTTP/1.1" 404 140 "-" "-" 172.16.254.194:7081 0.001 0.002 8dd86ce4639f843c4fc7b8cabee3cfea
    $1         $2      $3                 $4     $5          $6                                                 $7     $8  $9 $10  $11          $12         $13   $14         $15
 
 
@@ -496,8 +498,16 @@ Filtering | by property
 =>cat access.log | grep '22/Jun/2023' | wc -l
 Filter by date
 
+
+=>cat access.log | grep -v '200' | awk '{print $8}' | sort | uniq --count
+=>tail access.log | grep -v '200' | awk '{print $8}' | sort | uniq --count
+
+
+
 =>tail -5 access.log | awk '22/Jun/2023' | sort | uniq --count
 =>tail -f access.log | awk '{print $12,$8}' | egrep --color=auto -i '172.16.254.157'
+
+
 
 
 
@@ -536,7 +546,7 @@ Printing only destination IP/Count
 =>cat access.log | grep –v '200'  | grep –v '202' | awk '{print $(NF-2)}' | sort | uniq --count
 You can mix between these commands to achieve your goal. For example, you want to see which destination server is failing:
 
-
+=>cat  access.log | grep -v '200' | awk '{print $12 " " $8}' | sort | uniq --count
 =>tail -f access.log | grep '254.194' | grep -v '200'  | grep -v '202'
 
 

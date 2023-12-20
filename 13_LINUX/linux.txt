@@ -612,10 +612,78 @@ CPU usage over the last 1, 5, and 15 minutes with start-time and user
 
 
 =================================================
-#SH | sh | shall script| cmd                                  
+#SH | sh .sh | shall script| cmd | command                                
 ================================================= 
+=>tail -n 1000 access.log.131223>access.log
+Copy 1k Line to another file
+
 =>nohup sh my-syslog.sh &
 =>nohup sh my-syslog.sh > sys-log.txt &
+
+
+
+
+| sort | uniq --count
+-------------------------------------------------
+in example.txt file data
+apple
+orange
+banana
+apple
+orange
+orange
+
+=>cat example.txt | sort | uniq --count
+rs:
+   2 apple
+   1 banana
+   3 orange
+
+
+
+=>=>tail -n 20  access.log |awk  '{print $8}'
+=>tail -n 20  access.log |awk  '{print $8}'| sort | uniq --count
+Print uniq-count 8-no column for last 20 line
+
+=>cat access.log.131223 | awk '{print $8}'
+=>cat  access.log |awk  '{print $8}'| sort | uniq --count
+=>cat access.log | awk '{print $8}' | sort | uniq --count | grep 404
+=>cat access.log | grep -v '200' |  awk '{print $12 " " $8}' | sort | uniq --count
+For all file
+
+
+
+
+
+Ascending Order (default):
+ | sort file.txt
+
+Descending Order:
+ | sort -r file.txt
+
+
+
+
+awk | sh | Operation 
+-------------------------------------------------
+
+Name,Age,Location
+John,25,New York
+Jane,30,San Francisco
+Bob,22,Los Angeles
+
+=>awk -F',' '{print $2}' nohup.out
+rs:
+Age
+25
+30
+22
+
+=>awk -F',' '{total += $2} END {print "Total Age:", total}' nohup.out
+rs:
+Total Age: 77
+
+
 
 
 Exmp1

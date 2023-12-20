@@ -18,11 +18,31 @@ SSM
 
 	  
 #!/bin/bash
+sudo apt update -y
+sudo apt install nginx -y
+sudo systemctl enable nginx
+echo "<h1>Hello World from $(hostname -f)</h1>" > /usr/share/nginx/html/index.html
+
+
+#!/bin/bash
 yum update -y
 yum install -y httpd
 systemctl start httpd
 systemctl enable httpd
 echo "<h1>Hello World from $(hostname -f)</h1>" > /var/www/html/index.html
+
+
+$ssh -i your-key.pem ubuntu@ec2-instance-public-ip
+#Access EC2 with ssh
+
+$scp -i your-key.pem  /path/to/local/file.txt ubuntu@13.233.103.153:/path/to/ec2/
+#Copy file to EC2 from local-pc
+
+
+
+
+$sudo scp -i my-ec2-kye.pem  index.nginx-debian.html ubuntu@13.233.103.153:/var/www/html/
+Copy file to ec2
 
 
 =>ssh -i Myec2key.pem ec2-user@65.2.191.189
@@ -87,3 +107,24 @@ S3 Public access
         }
     ]
 }
+
+
+
+For S3 Public access, add this in Bucket Policy
+
+{
+    "Version": "2008-10-17",
+    "Id": "PolicyForPublicWebsiteContent",
+    "Statement": [
+        {
+            "Sid": "PublicReadGetObject",
+            "Effect": "Allow",
+            "Principal": {
+                "AWS": "*"
+            },
+            "Action": "s3:GetObject",
+            "Resource": "arn:aws:or-your-aws-bucket/*"
+        }
+    ]
+}
+
