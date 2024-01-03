@@ -740,7 +740,7 @@ Show all cron systex
 
 
 =================================================
-# Script | example                                   
+# Script | example | bash | sh                                  
 ================================================= 
 
 Return a random number:
@@ -766,6 +766,111 @@ then
 else
     echo "$number is odd."
 fi
+
+
+
+Processing step
+------------------------------------------------
+#!/bin/bash
+
+# Function to print a message with a spinner
+print_message() {
+    local message=$1
+    local spinner="/-\|"
+    printf "%s " "$message"
+    for i in $(seq 1 10); do
+        printf "%s" "${spinner:i % 4:1}"
+        sleep 0.1
+        printf "\b"
+    done
+    printf "   \n"  # Clear the spinner
+}
+
+# Process data function
+process_data() {
+    total_steps=10
+
+     print_message "Processing step 1/$total_steps"
+        # Simulate some data processing
+        sleep 1
+
+
+
+        print_message "Processing step 2/$total_steps"
+        # Simulate some data processing
+        sleep 1
+
+                print_message "Processing step 3/$total_steps"
+        # Simulate some data processing
+        sleep 1
+
+
+
+    echo "Processing completed!"
+}
+OR
+# Process data function
+process_data() {
+    total_steps=10
+
+    for ((step = 1; step <= total_steps; step++)); do
+        print_message "Processing step $step/$total_steps"
+        # Simulate some data processing
+        sleep 1
+    done
+
+    echo "Processing completed!"
+}
+
+# Call the function to process data
+process_data
+
+
+Example2
+--------------------------------------------
+#!/bin/bash
+
+# Function to print a formatted message
+print_message() {
+    local message="$1"
+    printf "[INFO] %s\n" "$message"
+}
+
+# Function to display a progress bar
+print_progress() {
+    local width=30
+    local progress=$1
+    local percentage=$((progress * 100 / width))
+    printf "["
+    for ((i = 0; i < width; i++)); do
+        if [ "$i" -le "$percentage" ]; then
+            printf "#"
+        else
+            printf " "
+        fi
+    done
+    printf "] %d%%\r" "$percentage"
+}
+
+# Function to process data
+process_data() {
+    total_steps=10
+
+    print_message "Starting data processing..."
+    
+    for ((step = 1; step <= total_steps; step++)); do
+        # Simulate some data processing
+        sleep 1
+
+        # Print a progress bar
+        print_progress "$step"
+    done
+
+    print_message "Data processing completed!"
+}
+
+# Call the function to process data
+process_data
 
 
 
@@ -940,6 +1045,9 @@ UnTar
 =>tar -xvf myTarFile reqFile
 Add/emit a file to exists tar
 
+
+=>zip app.zip app.js
+Single file zip
 
 =>zip -r archive_name.zip directory_to_compress
 

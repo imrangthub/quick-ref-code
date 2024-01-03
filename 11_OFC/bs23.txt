@@ -316,15 +316,16 @@ Lan server by ip request check
 
 
 
-
+=>cat access.log | awk '{print $8}' | sort  | uniq --count
 =>tail -f /app/apihub/Nginx_LB/logs/access.log | egrep -i '172.16.254.209'
-
 =>tail -1000 access.log | egrep -i '172.16.11.34' | awk '{print $8}' | sort | uniq --repeated --count
 =>tail -1000 /app/apihub/Nginx_LB/logs/access.log | egrep -i '172.16.254.194' | awk '{print $8}' | sort | uniq --repeated --count
 Check the request status of specific server
 
 
 
+cat access.log | awk '{print $6}'|grep customer-info | wc -l
+cat access.log | awk '{print $6}'|grep product-info | wc -l
 =>tail -1000000 access.log  | grep "172.16.254.157:7081" | awk '{print $6"/"$8}' | awk -F"/" '{print $2 "||" $NF}' | sort | uniq -c | sort -nr
 Service wise status code
 

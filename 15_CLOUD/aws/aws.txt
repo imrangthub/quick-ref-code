@@ -45,6 +45,13 @@ $sudo scp -i my-ec2-kye.pem  index.nginx-debian.html ubuntu@13.233.103.153:/var/
 Copy file to ec2
 
 
+#!/bin/bash
+sudo apt update -y
+sudo apt install nginx -y
+sudo systemctl enable nginx
+echo "<h1>Hello World from $(hostname -f)</h1>" > /var/www/html/index.nginx-debian.html
+
+
 =>ssh -i Myec2key.pem ec2-user@65.2.191.189
 =================================================
 #EC2 | Helping Heand | Example
@@ -62,14 +69,58 @@ For EC2 httpd permission error
 =================================================
 #Code | Helping Heand | Example
 =================================================
+
+
 #Node Lambda API
 -------------------------------------------------
-exports.handler =  async function(event, context) {
+export const handler = async (event) => {
+  // TODO implement
+  const response = {
+    statusCode: 200,
+    body: JSON.stringify('Hello from Lambda!'),
+  };
+  return response;
+};
+
+
+
+export const handler = async (event) => {
+  
+  //
+  
+  // Business logic will be here
+    
+  //
+  
+  
+  return "This is my final response data !";
+};
+
+
+
+// index.mjs
+
+// Lambda handler function
+export const handler = async (event, context) => {
+  try {
+    // Your Lambda function logic goes here
+
+    // Return a response
     return {
-        statusCode: 200,
-        body: JSON.stringify("Simple NodeJs API Response !"),
-      };
-}
+      statusCode: 200,
+      body: JSON.stringify({ message: 'Lambda function executed successfully' }),
+    };
+  } catch (error) {
+    // Handle errors
+    return {
+      statusCode: 500,
+      body: JSON.stringify({ error: 'Internal Server Error' }),
+    };
+  }
+};
+
+
+
 
 
 #PythonLabda
@@ -87,8 +138,7 @@ def lambda_handler(event, context):
         }
     }
 	
-	
-accessCode=690-846-845 locale=en-US
+
 
 
 
