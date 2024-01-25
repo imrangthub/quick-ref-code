@@ -507,8 +507,30 @@ server.tomcat.use-relative-redirects= # Whether HTTP 1.1 and later location head
 #Netty | 
 =================================================
 
+netty server has a default timeout of 10 seconds
+
 Idle timeout of the Netty channel. When not specified, an infinite timeout is used.
     server.netty.idle-timeout
+
+For Log:
+------------------------------
+spring:
+  cloud:
+    gateway:
+      httpclient:
+        wiretap: true
+      httpserver:
+        wiretap: true
+io:
+  netty:
+    leakDetectionLevel: paranoid
+
+logging:
+  level:
+    reactor:
+      netty: DEBUG
+      channel:
+        FluxReceive: DEBUG
 
 
 
@@ -524,6 +546,29 @@ spring:
           max-idle-time: 30000  | keep-alive settings to control how long persistent connections are kept alive:
 
 
+
+    @Bean
+    @Primary
+    public HttpClientProperties overwrittenHttpClientProperties() {
+        HttpClientProperties p = new HttpClientProperties();
+        p.setConnectTimeout(1000);
+        p.setResponseTimeout(Duration.ofMillis(3000));
+        return p;
+    }
+
+@Configuration(proxyBeanMethods = false)
+public class MyReactorNettyClientConfiguration {
+
+    @Bean
+    ClientHttpConnector clientHttpConnector(ReactorResourceFactory resourceFactory) {
+        HttpClient httpClient = HttpClient.create(resourceFactory.getConnectionProvider())
+                .runOn(resourceFactory.getLoopResources())
+                .option(ChannelOption.CONNECT_TIMEOUT_MILLIS, 60000)
+                .doOnConnected((connection) -> connection.addHandlerLast(new ReadTimeoutHandler(60)));
+        return new ReactorClientHttpConnector(httpClient);
+    }
+
+}
 
 
 
