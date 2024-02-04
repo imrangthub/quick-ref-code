@@ -30,6 +30,9 @@ SHOW VARIABLES LIKE 'HOSTNAME';     -- Returns: MyHostName
 SHOW VARIABLES LIKE 'BIND_ADDRESS'; -- Returns: 127.0.0.1
 
 
+
+
+
 =================================================
 #  CMD | MySQL |  Environment | Windows setup                                          
 ================================================= 
@@ -123,6 +126,13 @@ Set max conn in Mysql
 =>SET GLOBAL max_connections = 750;
 =>show variables like 'max_connections';
 
+
+
+Exporting/Importing MySQL Dump | dump
+-------------------------------------------------
+
+=>mysqldump -u my_username -p database_name > output_file_path
+=>mysqldump -h localhost -P 3306 -u root -p simple_db  > mytestdbsump.sql
 
 
 
@@ -324,6 +334,48 @@ from sa_submenu u, sa_grantobject o
 where u.SUBMENU_NO = o.SUBMENU_NO
 and u.SUBMENU_TYPE = 'A'
 and o.USER_NO =1190000001917;
+
+
+
+
+
+
+
+=================================================
+#              POSTGRE_SQL                                          
+================================================= 
+
+
+
+=>NET STOP MySQL80
+=>NET START MySQL80
+WIN+R and type services.msc find the mysql serice name
+
+=>create database databaseName
+Create new database
+
+=>\l
+Show db list
+=>\c newDB
+(Switch db)Connecti  to new db
+=>drop database databaseName;
+Delete Database
+
+=>\q
+Quite from db 
+
+=>\d
+Show table;
+
+=>\d show tableName
+Show table details
+
+
+Export/Import
+-----------------------
+=>pg_dump -U postgres -p 5432 -d arif_travel_agencydb -W -f c:\arif_travel_agencydb.sql
+=>psql -U postgres -d testdb < C:\arif_travel_agencydb.sql
+
 
 
 =================================================
@@ -781,40 +833,3 @@ CREATE TABLE `hibernate_sequence` (
 SELECT * FROM apihub.hibernate_sequence;
 
 
-
-
-
-=================================================
-#              POSTGRE_SQL                                          
-================================================= 
-
-
-
-=>NET STOP MySQL80
-=>NET START MySQL80
-WIN+R and type services.msc find the mysql serice name
-
-=>create database databaseName
-Create new database
-
-=>\l
-Show db list
-=>\c newDB
-(Switch db)Connecti  to new db
-=>drop database databaseName;
-Delete Database
-
-=>\q
-Quite from db 
-
-=>\d
-Show table;
-
-=>\d show tableName
-Show table details
-
-
-Export/Import
------------------------
-=>pg_dump -U postgres -p 5432 -d arif_travel_agencydb -W -f c:\arif_travel_agencydb.sql
-=>psql -U postgres -d testdb < C:\arif_travel_agencydb.sql
