@@ -402,6 +402,35 @@ History check
 =>git remote add origin http://repo.banglalink.net:8181/open-api/openapi-otp.git
 
 
+================================================= 
+Feign | feign
+================================================= 
+
+
+
+Properties (feign.httpclient):
+
+timeToLive: 900
+    The maximum time a connection may be reused, expressed in seconds (900 seconds or 15 minutes).
+
+connectionTimerRepeat: 3000
+    checks on the connection pool or related components
+    The value 3000 indicates that the connection timer will trigger its task every 3000 milliseconds or every 3 seconds.
+
+
+Feign default timetoLive is 900 Seconds. So If you want to close immediately after feign call, then change the 
+timetolive value and timeToLiveUnit.
+
+feign:
+  httpclient:
+    timeToLive: 30
+#    timeToLiveUnit : MILLISECONDS
+
+
+
+
+
+
 =================================================
 #Tomcat                                          
 ================================================= 
@@ -593,6 +622,18 @@ public NettyServerCustomizer nettyServerCustomizer() {
 
 
 
+@Component
+public class MyNettyReactiveWebServerCustomizer
+                implements WebServerFactoryCustomizer<NettyReactiveWebServerFactory> {
+	@Override
+	public void customize(NettyReactiveWebServerFactory factory) {
+		factory.addServerCustomizers(
+                        builder -> builder.option(ChannelOption.SO_BACKLOG, 2000));
+	}
+}
+
+
+
 
 =================================================
 #  NGINX | nginx                                          
@@ -621,6 +662,9 @@ Check configuration is ok
 
 =>nginx -s reopen	
 Reopening log files
+
+proxy_connect_timeout: Default is 60 seconds.
+proxy_read_timeout: Default is 60 seconds.
 
 
 
@@ -862,6 +906,27 @@ Test NGINX conf: /app/nginx/sbin/nginx –t
 Check log: tail –f access.log
 
 
+
+MyCHdg
+---------------------------------------------------
+cat access.log | awk '$8==499{print $14}' | sort -nr | head
+cat access.log | grep prepaid-balances | awk '$8==499{print $14}' | sort -nr | head
+Response time by httpStatus code
+
+cat access.log | grep prepaid-balances | awk '$8==499{print $14}' | sort -nr | tail -10
+Response time MaxMin
+
+
+cat access.log | grep prepaid-balances | awk '$8==499{print $12}' | sort | uniq -c | sort -nr
+Which gateway from Generate this statuCode
+
+cat access.log | grep prepaid-balances | awk '(($8==499)&&($12=="192.168.0.1:7081")){print $0}' | head
+Get full request about the statusCode by SLB IP
+
+
+
+
+
 DebugScript1:
 -----------------------------------
 
@@ -882,6 +947,11 @@ You can mix between these commands to achieve your goal. For example, you want t
 =>tail -f access.log | grep '254.194'
 
 
+=>cat access.log | grep prepaid-balances | awk '$8==499{print $14}' | sort -nr | head
+Response time by status code
+
+
+
 DebugScript2:
 -----------------------------------
 
@@ -892,7 +962,7 @@ Print load balanced IPs and their count
 Print load balanced IPs and their status count
 
 
-=>tail -10000 /app/admin/Nginx_LB/logs/access.log | grep prepaid|awk '{ total += $14; count++ } END { print total/count }'
+=>tail -10000 /app/admin/Nginx_LB/logs/access.log | grep customer-information |awk '{ total += $14; count++ } END { print total/count }'
 Average RTT
 
 =>for (( i = 5; i >=0; i-- )) ; do grep $(date +%d/%b/%Y:%R -d "-$i min") /app/admin/Nginx_LB/logs/access.log; done| awk '{ print $8}'|sort |uniq --repeated --count
@@ -930,9 +1000,117 @@ http {
 }
 	
 
+The right way to set the timeouts
+---------------------------------------------------------
+If there are proxies on your setup such as a “Load balancer”, a Firewall, a CDN, etc, you should set the timeouts so that you timeout first your application server and then the other proxies to the user.
 
-Log Operation
+Example:
+
+User → CDN → Nginx Load Balancer → Nginx application → Php_fpm
+
+It’s recommended to set the timeouts like this:
+
+n seconds to Php_fpm timeout.
+Set the php.ini max_execution_time and
+the request_terminate_timeout in your php_fpm config file.
+n+1 seconds to Nginx application timeout.
+Set the fastcgi_read_timeout in your nginx config.
+n+2 seconds to timeout to Nginx Load Balancer
+In your location doing the proxy_pass set the timeouts of:
+proxy_connect_timeout
+proxy_send_timeout
+proxy_read_timeout
+n+3 seconds of timeout for your CDN. NOTE: If you can’t set the timeouts of your CDN, then find what is its timeout and adjust the others according to it.
+It provides a correct chain of timeouts: Setting an incremental chain of timeouts lets you find who is reaching the timeout.
+
+
+
+
+
+
+
 =================================================
+#Server Tuning | tuning                                         
+================================================= 
+ResponseHeader:
+    connection: keep-alive, keep-alive
+    keep-alive: timeout=60
+
+getEmpEnfo1Fes1: <200 OK OK,[connection:"keep-alive", content-length:"48", content-type:"text/plain;charset=UTF-8", date:"Tue, 06 Feb 2024 01:17:51 GMT", keep-alive:"timeout=60"]>
+This response keep alive this connection
+
+
+Error:
+    apr_socket_recv: Connection reset by peer (104)
+
+Cos: Limit number of server Connection:
+    tomcat:
+        maxConnections: 100
+
+
+ proxy_ignore_client_abort on;
+When set to on, proxy_ignore_client_abort allows Nginx to continue processing the request and sending it to the upstream server even if the client terminates the connection prematurely.
+
+
+
+curl:
+-------------------------------------------------
+curl http://localhost:9993/fesxn?del=100000
+
+zhaquezikZM m n 
+
+
+
+EdgeGatewway-Noerror
+-----------------------------------------------
+spring:
+  main:
+    allow-bean-definition-overriding: true
+  cloud:
+    loadbalancer:
+      retry:
+        enabled: false
+    gateway:
+      httpclient:
+        pool:
+          type: fixed
+          maxIdleTime: 5000
+      discovery:
+        locator:
+          enabled: true
+          lowerCaseServiceId: true
+ribbon:
+  ReadTimeout: 15000
+eureka:
+  client:
+    serviceUrl:
+      defaultZone: http://localhost:7282/eureka/
+
+
+
+httpClientProperties: {
+prefix: "spring.cloud.gateway.httpclient",
+properties: {
+proxy: {
+type: "HTTP"
+},
+websocket: {
+proxyPing: true
+},
+wiretap: false,
+pool: {
+type: "FIXED",
+name: "proxy",
+maxConnections: 16,
+acquireTimeout: 45000,
+maxIdleTime: "PT5S",
+evictionInterval: "PT0S",
+metrics: false
+},
+
+
+
+
 
 
 =================================================
@@ -1010,6 +1188,24 @@ Linux Hepsze
 Windows heap size
 
 In case your physical memory size is more than 192 megabytes then default maximum heap size is one fourth of the physical memory.
+
+
+
+exclusions
+-----------------------------------------------------------
+<dependency>
+    <groupId>org.springframework.boot</groupId>
+    <artifactId>spring-boot-starter</artifactId>
+    <exclusions>
+        <exclusion>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-actuator</artifactId>
+        </exclusion>
+    </exclusions>
+</dependency>
+
+
+
 
 =================================================
 #                  GRADLE                                          
@@ -1276,7 +1472,148 @@ Deploy war/ear to a container:
 
 
 
+================================================= 
+#Grafana| promtail | loki |Grafana Loki Promtail 
+================================================= 
 
+
+Configure loki
+1.promtail configure
+->https://grafana.com/docs/loki/latest/send-data/promtail/
+2. Send to log loki
+3. virilization with grafana
+
+
+
+Grafana:
+Download: https://grafana.com/grafana/download
+
+    Standalone Linux Binaries(64 Bit)SHA256:
+    wget https://dl.grafana.com/enterprise/release/grafana-enterprise-10.3.1.linux-amd64.tar.gz
+    tar -zxvf grafana-enterprise-10.3.1.linux-amd64.tar.gz
+
+    ->cd /bin
+         ./grafana-server
+
+
+
+
+Loki-Promtail (Unzip this agenet):
+Dowbload: https://github.com/grafana/loki/releases/
+    loki-linux-amd64.zip
+    promtail-linux-amd64.zip
+
+download configfile:
+https://github.com/grafana/loki/blob/main/clients/cmd/promtail/promtail-local-config.yaml
+
+server:
+  http_listen_port: 9080
+  grpc_listen_port: 0
+
+positions:
+  filename: /tmp/positions.yaml
+
+clients:
+  - url: http://localhost:3100/loki/api/v1/push
+
+scrape_configs:
+- job_name: system
+  static_configs:
+  - targets:
+      - localhost
+    labels:
+      job: varlogs
+      __path__: /var/log/*log
+
+
+https://raw.githubusercontent.com/grafana/loki/master/cmd/loki/loki-local-config.yaml
+
+
+
+
+Start loki and Promtal with config:
+./loki-linux-amd64 -config.file=loki-local-config.yaml
+./promtail-linux-amd64 -config.file=promtail-local-config.yaml
+
+
+promtail-local-config.yaml
+server:
+  http_listen_port: 9080
+  grpc_listen_port: 0
+
+positions:
+  filename: /tmp/positions.yaml
+
+clients:
+  - url: http://localhost:3100/loki/api/v1/push
+
+scrape_configs:
+- job_name: system
+  static_configs:
+  - targets:
+      - localhost
+    labels:
+      job: varlogs
+      __path__: /var/log/*log
+
+
+
+
+loki-local-config.yaml
+
+auth_enabled: false
+
+server:
+  http_listen_port: 3100
+  grpc_listen_port: 9096
+
+common:
+  instance_addr: 127.0.0.1
+  path_prefix: /tmp/loki
+  storage:
+    filesystem:
+      chunks_directory: /tmp/loki/chunks
+      rules_directory: /tmp/loki/rules
+  replication_factor: 1
+  ring:
+    kvstore:
+      store: inmemory
+
+query_range:
+  results_cache:
+    cache:
+      embedded_cache:
+        enabled: true
+        max_size_mb: 100
+
+schema_config:
+  configs:
+    - from: 2020-10-24
+      store: tsdb
+      object_store: filesystem
+      schema: v12
+      index:
+        prefix: index_
+        period: 24h
+
+ruler:
+  alertmanager_url: http://localhost:9093
+
+
+
+
+
+
+
+
+Other Commands used firewall:
+---------------------------------
+
+sudo firewall-cmd --permanent --zone=public --add-port=3000/tcp
+sudo firewall-cmd --permanent --zone=public --add-port=3100/tcp
+sudo firewall-cmd --permanent --zone=public --add-port=9080/tcp
+
+sudo firewall-cmd --reload
 
 
 
