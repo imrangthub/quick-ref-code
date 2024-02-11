@@ -43,6 +43,10 @@ Create a file with size of 5MB
 Show current space free memory size
 
 =>tail -n 10000 nohup.out | grep -a20 'PrematureCloseException'
+
+=>ab -s 3 -n 100 -c 10 http://localhost:80
+=>ab -s0.100   http://localhost:9990/ping
+
 =================================================
 #Linux | DEPLOYMENT                                          
 =================================================
@@ -665,7 +669,7 @@ Reopening log files
 
 proxy_connect_timeout: Default is 60 seconds.
 proxy_read_timeout: Default is 60 seconds.
-
+proxy_ignore_client_abort on;
 
 
 #Reverse Proxy
@@ -836,7 +840,7 @@ http {
 }
 
 
-Froward Header
+Froward Header under http{} Block:
 -------------------------------------------
 server {
 	listen       8282;
@@ -1025,7 +1029,81 @@ It provides a correct chain of timeouts: Setting an incremental chain of timeout
 
 
 
+Nginx HA through Keepalived – Virtual IP vip
+-------------------------------------------------
 
+=>ip addr 
+Show ip and Net interface
+
+
+=>curl localhost:9090
+Check Nginx running
+
+
+
+
+=>apt install keepalived
+=>keepalived -v
+Install Keepalived
+
+
+
+
+Active Active FailoverConfig:
+------------------------------------------------
+cd /etc/keepalived/
+=>keepalived {start|stop|restart|reload|force-reload}
+
+
+
+=>vi check_nginx.sh
+#!/bin/sh
+if [ -z "`pidof nginx`" ]; then
+  exit 1
+fi
+
+
+
+=>cat keepalived.conf
+global_defs {
+ enable_script_security
+ script_user root
+}
+
+vrrp_script chk_haproxy {
+   script "pidof haproxy"        # check the pid not kill it
+   interval 2                    # check every 2 seconds
+   weight 2                      # add 2 points of prio if OK
+}
+
+vrrp_instance VI_1 {
+   interface eth0                # interface to monitor
+   state BACKUP
+   virtual_router_id 51          # Assign one ID for this route
+   priority 100                  # 150 on master, 100 on backup
+   unicast_peer {
+       172.18.0.4
+   }
+   virtual_ipaddress {
+        172.18.0.20            # the virtual IP
+   }
+   track_script {
+       chk_haproxy
+  }
+}
+
+
+
+=>chmod 644 /bin/check_nginx.sh
+=>chmod 644 /bin/keepalived.conf
+
+
+=>service keepalived start
+
+
+=>service keepalived restart
+=>service keepalived start
+=>service keepalived stop
 
 
 
@@ -1048,8 +1126,9 @@ Cos: Limit number of server Connection:
         maxConnections: 100
 
 
- proxy_ignore_client_abort on;
-When set to on, proxy_ignore_client_abort allows Nginx to continue processing the request and sending it to the upstream server even if the client terminates the connection prematurely.
+proxy_ignore_client_abort on;
+When set to on, proxy_ignore_client_abort allows Nginx to continue processing the request and sending 
+it to the upstream server even if the client terminates the connection prematurely.
 
 
 
