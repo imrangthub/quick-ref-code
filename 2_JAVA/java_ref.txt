@@ -4166,15 +4166,6 @@ private String generatedRandomPin() {
 }
 
 
-public String getHadoopConnectionString() {
-	String workingDir = System.getProperty("user.dir");
-	String conStr = "jdbc:phoenix:thin:url=%s://%s:%s/gateway/cdp-proxy-api/avatica;authentication=BASIC;ssl=true;avatica_user=%s;avatica_password=%s;truststore=%s;truststore_password=%s;serialization=PROTOBUF";
-	String connectionString = String.format(conStr,this.hadoopServerProtocol, this.hadoopServerIP,
-			this.hadoopServerPort,this.hadoopUserUserId, this.hadoopUserPassword,workingDir+File.separator+"cm-auto-global_truststore.jks",this.hadoopTruststorePassword);
- //   System.out.println(connectionString);
-	return connectionString;
-}
-
 
 
 ================================================
@@ -4948,6 +4939,29 @@ exclude dependency adn add dependency
             // Add Jakarta XML Binding (Jakarta XML-Bind) dependencies
             implementation 'jakarta.xml.bind:jakarta.xml.bind-api:3.0.0'
             implementation 'org.glassfish.jaxb:jaxb-runtime:3.0.0'
+
+
+
+================================================
+#jdbc | connection | Hadoop |  impala | haddop                                 
+================================================
+
+Impala connection string:
+	jdbc:impala://myrandomhost.imranmadbdr.net:8082;AuthMech=3;UID=werdsfdf;PWD=sfsdfsdf_dsfsdf;SSL=1;AllowSelfSignedCerts=1;
+	CAIssuedCertNamesMismatch=1;TrustedCerts=/home/impala/mysec.pem;
+	transportMode=HTTP;httpPath=gateway/cdp-proxy-api/impala;
+
+
+
+haddop Connection:
+    public String getHadoopConnectionString() {
+        String workingDir = System.getProperty("user.dir");
+        String conStr = "jdbc:phoenix:thin:url=%s://%s:%s/gateway/my-proxy-api/avatica;authentication=BASIC;ssl=true;avatica_user=%s;avatica_password=%s;truststore=%s;truststore_password=%s;serialization=PROTOBUF";
+        return String.format(conStr, this.hadoopServerProtocol, this.hadoopServerIP,
+                this.hadoopServerPort, this.hadoopUserUserId, this.hadoopUserPassword, workingDir + File.separator + "my-super-sec.jks", this.hadoopTruststorePassword);
+    }
+
+	
 
 
 

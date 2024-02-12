@@ -1029,81 +1029,114 @@ It provides a correct chain of timeouts: Setting an incremental chain of timeout
 
 
 
-Nginx HA through Keepalived – Virtual IP vip
+
+
+
+
+================================================= 
+#Nginx HA through Keepalived – Virtual IP vip
+================================================= 
+
+docker run -d --name slb1 --cap-add=NET_ADMIN --network mynet2 imranmadbar/nginx
+ip address add 192.168.0.50/24 dev eth0
+
+
+sudo apt update
+sudo apt install keepalived
+sudo apt install libipset13
+keepalived -v
+
+
+
+ProxyServer config
 -------------------------------------------------
+server {
+listen       8282;
+server_name  localhost;
+
+location / {
+    proxy_pass   http://172.18.0.2:80;
+    proxy_set_header X-Request-ID $request_id;
+
+  
+  }
+}
+
 
 =>ip addr 
 Show ip and Net interface
-
-
 =>curl localhost:9090
 Check Nginx running
 
 
 
 
-=>apt install keepalived
-=>keepalived -v
-Install Keepalived
-
-
-
-
 Active Active FailoverConfig:
 ------------------------------------------------
-cd /etc/keepalived/
-=>keepalived {start|stop|restart|reload|force-reload}
 
-
-
-=>vi check_nginx.sh
-#!/bin/sh
-if [ -z "`pidof nginx`" ]; then
-  exit 1
-fi
-
-
-
-=>cat keepalived.conf
-global_defs {
- enable_script_security
- script_user root
-}
-
-vrrp_script chk_haproxy {
-   script "pidof haproxy"        # check the pid not kill it
-   interval 2                    # check every 2 seconds
-   weight 2                      # add 2 points of prio if OK
-}
+root@3715d788b6a8:/etc/keepalived# cat keepalived.conf
 
 vrrp_instance VI_1 {
-   interface eth0                # interface to monitor
-   state BACKUP
-   virtual_router_id 51          # Assign one ID for this route
-   priority 100                  # 150 on master, 100 on backup
-   unicast_peer {
-       172.18.0.4
-   }
-   virtual_ipaddress {
-        172.18.0.20            # the virtual IP
-   }
-   track_script {
-       chk_haproxy
+  state MASTER
+  interface eth0
+  virtual_router_id 199
+  priority 150
+  advert_int 1
+  unicast_src_ip 192.168.0.5
+  unicast_peer {
+    192.168.0.4
+  }
+
+  authentication {
+    auth_type PASS
+    auth_pass 12345
+  }
+  
+  virtual_ipaddress {
+    192.168.0.100/24 brd 192.168.0.255 dev eth0
   }
 }
 
 
 
+
+
+root@66aeff787855:/# cat /etc/keepalived/keepalived.conf
+
+vrrp_instance VI_1 {
+  state BACKUP
+  interface eth0
+  virtual_router_id 199
+  priority 100
+  advert_int 1
+  unicast_src_ip 192.168.0.4
+  unicast_peer {
+    192.168.0.5
+  }
+
+  authentication {
+    auth_type PASS
+    auth_pass 12345
+  }
+  
+  virtual_ipaddress {
+    192.168.0.100/24 brd 192.168.0.255 dev eth0
+  }
+
+}
+
+
+cd /etc/keepalived/
+=>keepalived {start|stop|restart|reload|force-reload}
 =>chmod 644 /bin/check_nginx.sh
 =>chmod 644 /bin/keepalived.conf
-
-
 =>service keepalived start
-
-
+=>service keepalived force-reload
 =>service keepalived restart
 =>service keepalived start
 =>service keepalived stop
+
+
 
 
 
