@@ -194,6 +194,68 @@ public class RedisConfig {
 
 
 
+
+=================================================
+#    Message broker  | RabbitMQ                                        
+================================================= 
+
+
+
+Installing RabbitMQ:
+
+Docker:
+  =>docker run -it --rm --name rabbitmq -p 5672:5672 -p 15672:15672 rabbitmq:3.12-management
+=>rabbitmq-server start
+Start rabbitMQ Server, Open RabbitMQ command prompt
+
+=>localhost:15672
+guest/guest
+
+
+
+
+
+        
+              
+FanoutExchange:
+http://localhost:8083/rabbitmq/fanout/producer?exchangeName=fanout-exchange&messageData=HelloWorldMsg
+http://localhost:8084/rabbitmq/producer?empName=emp1&empId=emp001&salary=500000
+
+DirectExchange:
+http://localhost:8083/rabbitmq/direct/producer?exchangeName=direct-exchange&routingKey=finance&messageData=HelloWorldMSG
+
+
+
+
+
+
+Tach Info
+-------------------------------------------------
+
+
+Features of RabbitMQ:
+Connectivity Options:
+  RabbitMQ supports multiple messaging protocols and can be deployed in distributed/federated configurations to meet high availability, scalability requirements.
+Pluggable Architecture:
+  RabbitMQ allows to choose a persistence mechanism and also provides options to customize security for authentication and authorization as per the application needs.
+
+
+MQ-Types of Messaging
+
+Point to Point
+  In this type of communication, the broker sends messages to only one consumer, while the other consumers will wait till they get 
+the messages from the broker. No consumer will get the same message.
+
+If there are no consumers, the Broker will hold the messages till it gets a consumer (Queue based communication ). 
+If there is more than one consumer, they may get the next message but they won’t get the same message as the other consumer.
+
+
+Publish/Subscribe
+  In this type of communication, the Broker sends same copy of messages to all the active consumers. 
+  This type of communication is also known as Topic based communication where broker sends same message to all active 
+  consumer who has subscribed for particular Topic. 
+
+
 =================================================
 #kafka | Message broker  | KAFKA                                        
 ================================================= 
@@ -287,23 +349,10 @@ SpringKafka:
 https://gale.udemy.com/course/apache-kafka-for-developers-using-springboot/learn/lecture/37906902#overview
 
 
-=================================================
-#    Message broker  | RabbitMQ                                        
-================================================= 
 
 
-=>rabbitmq-server start
-Start rabbitMQ Server, Open RabbitMQ command prompt
 
-=>localhost:15672
-guest/guest
-              
-FanoutExchange:
-http://localhost:8083/rabbitmq/fanout/producer?exchangeName=fanout-exchange&messageData=HelloWorldMsg
-http://localhost:8084/rabbitmq/producer?empName=emp1&empId=emp001&salary=500000
 
-DirectExchange:
-http://localhost:8083/rabbitmq/direct/producer?exchangeName=direct-exchange&routingKey=finance&messageData=HelloWorldMSG
 
 
 
