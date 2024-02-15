@@ -198,13 +198,16 @@ public class RedisConfig {
 =================================================
 #    Message broker  | RabbitMQ                                        
 ================================================= 
+RabitMQ design overview (4 actors):                              
+  publisher(producer) --> exchange ----(routes)--> queue --> subscriber(consumer)
 
 
-
-Installing RabbitMQ:
-
+Installing and Run RabbitMQ: 
+-------------------------------------------------
 Docker:
-  =>docker run -it --rm --name rabbitmq -p 5672:5672 -p 15672:15672 rabbitmq:3.12-management
+docker run -it --rm --name rabbitmq -p 5672:5672 -p 15672:15672 rabbitmq:3.12-management
+
+OR
 =>rabbitmq-server start
 Start rabbitMQ Server, Open RabbitMQ command prompt
 
@@ -213,9 +216,25 @@ guest/guest
 
 
 
+Example: Geting Start with Simple Queue
+------------------------------------------------
+Creating a Quequ:
+Queues and Streams->add a new queque->add Queue
+
+Publish to Quequ:
+Click to queue->	my-test-queue1 -> Puhlish Message
+Now it will show Messsage(Ready)
+
+Received Msg from Quequ:
+Click Get Message from Quew
 
 
-        
+
+
+
+SimpleApp:
+http://localhost:8081/rabbitmq/sent-emp?empName=emp1&empId=emp001
+
               
 FanoutExchange:
 http://localhost:8083/rabbitmq/fanout/producer?exchangeName=fanout-exchange&messageData=HelloWorldMsg
@@ -254,6 +273,44 @@ Publish/Subscribe
   In this type of communication, the Broker sends same copy of messages to all the active consumers. 
   This type of communication is also known as Topic based communication where broker sends same message to all active 
   consumer who has subscribed for particular Topic. 
+
+
+RabbitMQ supports several exchange types:
+  Direct Exchange: Routes messages based on a specified routing key.
+  Fanout Exchange: Broadcasts messages to all queues bound to it.
+  Topic Exchange: Allows flexible routing with wildcard patterns in routing keys.
+  Headers Exchange: Routes based on message header attributes.
+  Default Exchange (Direct): Uses queue names as routing keys.
+
+
+RabbitMQ queue properties include:
+  Name: Unique identifier.
+  Durable: Survive broker restart.
+  Auto-Delete: Delete when no consumers.
+  Exclusive: Used by the creating connection.
+  Arguments: Additional settings (e.g., TTL, max length).
+  Message TTL: Maximum time a message can stay.
+  Maximum Priority: Sets message priority.
+  Maximum Length: Max number of messages.
+  Overflow Behavior: What happens when max length is reached.
+  Dead Letter Exchange/Key: For handling failed or expired messages.
+
+
+
+RabbitMQ Exchange type:
+------------------------------------------------
+Direct Exchange (One-to-One Relationship):
+  Like sending a letter to a specific person based on their address. Each message is routed to a single queue based on an exact match between the message's routing key and the queue's binding key.
+
+Fanout Exchange (One-to-Many Relationship):
+  Like broadcasting a message on TV. Each message sent to a fanout exchange is delivered to all queues bound to that exchange, regardless of any routing keys or message attributes.
+
+Topic Exchange (One-to-Many Relationship with Conditions):
+  Like sending emails to different groups based on their interests or topics. Messages are routed to queues based on wildcard matches between routing keys and routing patterns specified by the queues. One message may be delivered to multiple queues if they match the routing pattern.
+
+Headers Exchange (One-to-Many Relationship based on Message Attributes):
+  Like sorting mail based on various attributes or metadata attached to each letter. Messages are routed to queues based on headers and their values instead of routing keys. One message may be delivered to multiple queues if their header values match the specified criteria.
+
 
 
 =================================================
