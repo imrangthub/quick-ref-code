@@ -339,10 +339,6 @@ Headers Exchange (One-to-Many Relationship based on Message Attributes):
 =================================================
 #kafka | Message broker  | KAFKA                                        
 ================================================= 
-
-
-
-
 kafkalytic-intelejidea-pluging
 
 Install and Run KafKa:
@@ -407,114 +403,91 @@ Consumer Groups:
 
 Docker:
 ---------------------------------------------------------
-Here’s a sample docker-compose.yml file for setting up Kafka and ZooKeeper containers:
+gitClone: https://github.com/conduktor/kafka-stack-docker-compose
+=>docker-compose -f zk-single-kafka-single.yml up -d
+=>docker-compose -f zk-single-kafka-single.yml ps
+=>docker-compose -f zk-single-kafka-single.yml stop
 
-version: "2"
+
+zk-single-kafka-single.yml:
+
+version: '2.1'
 services:
-  zookeeper:
-    image: confluentinc/cp-zookeeper:6.2.0
-    hostname: zookeeper
-    container_name: zookeeper
-    ports:
-      - "22181:2181"
-    environment:
-      ZOOKEEPER_CLIENT_PORT: 2181
-      ZOOKEEPER_TICK_TIME: 2000
-  kafka:
-    image: confluentinc/cp-kafka:6.2.0
-    hostname: broker
-    container_name: broker
-    depends_on:
-      - zookeeper
-    ports:
-      - "29092:29092"
-      - "9092:9092"
-      - "9101:9101"
-    environment:
-      KAFKA_BROKER_ID: 1
-      KAFKA_ZOOKEEPER_CONNECT: 'zookeeper:2181'
-      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: PLAINTEXT:PLAINTEXT,PLAINTEXT_HOST:PLAINTEXT
-      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka:29092,PLAINTEXT_HOST://localhost:9092
-      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
-      KAFKA_TRANSACTION_STATE_LOG_MIN_ISR: 1
-      KAFKA_TRANSACTION_STATE_LOG_REPLICATION_FACTOR: 1
-      KAFKA_GROUP_INITIAL_REBALANCE_DELAY_MS: 0
-      KAFKA_JMX_PORT: 9101
-      KAFKA_JMX_HOSTNAME: localhost
-  kafdrop:
-    image: obsidiandynamics/kafdrop
-    restart: "no"
-    ports:
-      - "9007:9000"
-    environment:
-      KAFKA_BROKERCONNECT: "kafka:29092"
-      JVM_OPTS: "-Xms16M -Xmx48M -Xss180K -XX:-TieredCompilation -XX:+UseStringDeduplication -noverify"
-    depends_on:
-      - "kafka"
-
-
-OR
-version: '2'
-services:
-  zookeeper:
-    image: confluentinc/cp-zookeeper:latest
-    environment:
-      ZOOKEEPER_CLIENT_PORT: 2181
-      ZOOKEEPER_TICK_TIME: 2000
-    ports:
-      - 22181:2181
-  
-  kafka:
-    image: confluentinc/cp-kafka:latest
-    depends_on:
-      - zookeeper
-    ports:
-      - 29092:29092
-    environment:
-      KAFKA_BROKER_ID: 1
-      KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
-      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka:9092,PLAINTEXT_HOST://localhost:29092
-      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: PLAINTEXT:PLAINTEXT,PLAINTEXT_HOST:PLAINTEXT
-      KAFKA_INTER_BROKER_LISTENER_NAME: PLAINTEXT
-      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
-
-
-Simple: Install Kafka using Docker
-version: '3'
-
-services:
-  zookeeper:
-    image: wurstmeister/zookeeper
-    container_name: zookeeper
+  zoo1:
+    image: confluentinc/cp-zookeeper:7.3.2
+    hostname: zoo1
+    container_name: zoo1
     ports:
       - "2181:2181"
-  kafka:
-    image: wurstmeister/kafka
-    container_name: kafka
+    environment:
+      ZOOKEEPER_CLIENT_PORT: 2181
+      ZOOKEEPER_SERVER_ID: 1
+      ZOOKEEPER_SERVERS: zoo1:2888:3888
+
+  kafka1:
+    image: confluentinc/cp-kafka:7.3.2
+    hostname: kafka1
+    container_name: kafka1
     ports:
       - "9092:9092"
+      - "29092:29092"
+      - "9999:9999"
     environment:
-      KAFKA_ADVERTISED_HOST_NAME: localhost
-      KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
+      KAFKA_ADVERTISED_LISTENERS: INTERNAL://kafka1:19092,EXTERNAL://${DOCKER_HOST_IP:-127.0.0.1}:9092,DOCKER://host.docker.internal:29092
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: INTERNAL:PLAINTEXT,EXTERNAL:PLAINTEXT,DOCKER:PLAINTEXT
+      KAFKA_INTER_BROKER_LISTENER_NAME: INTERNAL
+      KAFKA_ZOOKEEPER_CONNECT: "zoo1:2181"
+      KAFKA_BROKER_ID: 1
+      KAFKA_LOG4J_LOGGERS: "kafka.controller=INFO,kafka.producer.async.DefaultEventHandler=INFO,state.change.logger=INFO"
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+      KAFKA_TRANSACTION_STATE_LOG_REPLICATION_FACTOR: 1
+      KAFKA_TRANSACTION_STATE_LOG_MIN_ISR: 1
+      KAFKA_JMX_PORT: 9999
+      KAFKA_JMX_HOSTNAME: ${DOCKER_HOST_IP:-127.0.0.1}
+      KAFKA_AUTHORIZER_CLASS_NAME: kafka.security.authorizer.AclAuthorizer
+      KAFKA_ALLOW_EVERYONE_IF_NO_ACL_FOUND: "true"
+    depends_on:
+      - zoo1
 
-=>docker-compose -f docker-compose.yml up -d
 
 
-$ nc -z localhost 22181
-Connection to localhost port 22181 [tcp/*] succeeded!
-$ nc -z localhost 29092
-Connection to localhost port 29092 [tcp/*] succeeded!
-Now let’s use the nc command to verify that both the servers are listening on the respective ports:
 
 
-=>docker exec -it kafka /bin/sh
-Connect to Kafka shell
+
+=>docker exec -it kafka1 /bin/bash
+=>kafka-topics --version
 
 
-=>kafka-topics.sh --create --zookeeper zookeeper:2181 --replication-factor 1 --partitions 1 --topic first_kafka_topic
-=>kafka-topics.sh --list --zookeeper zookeeper:2181
-Create your first Kafka topic
-All Kafka shell scripts are located in /opt/kafka_<version>/bin:
+=>kafka-topics --create --topic test-topic --bootstrap-server localhost:9092 --partitions 4 --replication-factor 1
+=>kafka-topics --list --bootstrap-server localhost:9092
+
+=>kafka-topics --bootstrap-server localhost:9092 --describe
+
+
+=>kafka-console-producer --broker-list localhost:9092 --topic test-topic
+Console Producer
+
+=>kafka-console-consumer --bootstrap-server localhost:9092 --topic test-topic --from-beginning
+console consumer
+
+
+=>kafka-consumer-groups --bootstrap-server localhost:9092 --list
+consumer group
+
+
+=>kafka-topics --bootstrap-server localhost:9092 --delete --topic '__consumer_offsets-.*'
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 Kafka Info Doc:
