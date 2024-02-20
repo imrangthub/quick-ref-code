@@ -193,11 +193,34 @@ public class RedisConfig {
 
 
 
+=================================================
+#Event-driven Architecture
+=================================================
+
+Event-driven Architecture alternate of loss cupling or temp-cuplinc(Synchronous communitation)
+
+Two even-driven model/technology:
+  1) Pub/sub model
+  2) Event Streming model
+
+1)Pub/sub model: Once an event is dreceived, its cannot be replayed, which means new 
+  subscribers join later will not have acccess paset event.
+
+2)Event Streming model: this model events are writeen to a log in a sequential manner.
+Producer publish events as they occur, and these events are stored in a well-ordered fashion
+consumer have the ability to read from any part of the event stream.
+One advantage of this model is thet events cna be replayed, allowing clients to join at 
+any time and received all past events.
+
+
+
 
 
 =================================================
 #    Message broker  | RabbitMQ                                        
 ================================================= 
+The AMQP operates on the principales of exchanges and queues for all queue operation.
+
 RabitMQ design overview (4 actors):                              
   publisher(producer) --> exchange ----(routes)--> queue --> subscriber(consumer)
 
@@ -317,6 +340,27 @@ Headers Exchange (One-to-Many Relationship based on Message Attributes):
 #kafka | Message broker  | KAFKA                                        
 ================================================= 
 
+
+
+
+kafkalytic-intelejidea-pluging
+
+Install and Run KafKa:
+
+$ tar -xzf kafka_2.13-3.6.1.tgz
+$ cd kafka_2.13-3.6.1
+
+
+Kafka with ZooKeeper
+# Start the ZooKeeper service
+$ bin/zookeeper-server-start.sh config/zookeeper.properties
+# Start the Kafka broker service
+$ bin/kafka-server-start.sh config/server.properties
+
+
+$ bin/kafka-topics.sh --create --topic quickstart-events --bootstrap-server localhost:9092
+CREATE A TOPIC TO STORE YOUR EVENTS
+
 =>cd /opt/apache-kafka/kafka3_6/bin
 
 
@@ -358,6 +402,159 @@ Create Console Consumer
 
 Consumer Groups:
 =>./kafka-consumer-groups.sh --bootstrap-server localhost:9092 --list
+
+
+
+Docker:
+---------------------------------------------------------
+Here’s a sample docker-compose.yml file for setting up Kafka and ZooKeeper containers:
+
+version: "2"
+services:
+  zookeeper:
+    image: confluentinc/cp-zookeeper:6.2.0
+    hostname: zookeeper
+    container_name: zookeeper
+    ports:
+      - "22181:2181"
+    environment:
+      ZOOKEEPER_CLIENT_PORT: 2181
+      ZOOKEEPER_TICK_TIME: 2000
+  kafka:
+    image: confluentinc/cp-kafka:6.2.0
+    hostname: broker
+    container_name: broker
+    depends_on:
+      - zookeeper
+    ports:
+      - "29092:29092"
+      - "9092:9092"
+      - "9101:9101"
+    environment:
+      KAFKA_BROKER_ID: 1
+      KAFKA_ZOOKEEPER_CONNECT: 'zookeeper:2181'
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: PLAINTEXT:PLAINTEXT,PLAINTEXT_HOST:PLAINTEXT
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka:29092,PLAINTEXT_HOST://localhost:9092
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+      KAFKA_TRANSACTION_STATE_LOG_MIN_ISR: 1
+      KAFKA_TRANSACTION_STATE_LOG_REPLICATION_FACTOR: 1
+      KAFKA_GROUP_INITIAL_REBALANCE_DELAY_MS: 0
+      KAFKA_JMX_PORT: 9101
+      KAFKA_JMX_HOSTNAME: localhost
+  kafdrop:
+    image: obsidiandynamics/kafdrop
+    restart: "no"
+    ports:
+      - "9007:9000"
+    environment:
+      KAFKA_BROKERCONNECT: "kafka:29092"
+      JVM_OPTS: "-Xms16M -Xmx48M -Xss180K -XX:-TieredCompilation -XX:+UseStringDeduplication -noverify"
+    depends_on:
+      - "kafka"
+
+
+OR
+version: '2'
+services:
+  zookeeper:
+    image: confluentinc/cp-zookeeper:latest
+    environment:
+      ZOOKEEPER_CLIENT_PORT: 2181
+      ZOOKEEPER_TICK_TIME: 2000
+    ports:
+      - 22181:2181
+  
+  kafka:
+    image: confluentinc/cp-kafka:latest
+    depends_on:
+      - zookeeper
+    ports:
+      - 29092:29092
+    environment:
+      KAFKA_BROKER_ID: 1
+      KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka:9092,PLAINTEXT_HOST://localhost:29092
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: PLAINTEXT:PLAINTEXT,PLAINTEXT_HOST:PLAINTEXT
+      KAFKA_INTER_BROKER_LISTENER_NAME: PLAINTEXT
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+
+
+Simple: Install Kafka using Docker
+version: '3'
+
+services:
+  zookeeper:
+    image: wurstmeister/zookeeper
+    container_name: zookeeper
+    ports:
+      - "2181:2181"
+  kafka:
+    image: wurstmeister/kafka
+    container_name: kafka
+    ports:
+      - "9092:9092"
+    environment:
+      KAFKA_ADVERTISED_HOST_NAME: localhost
+      KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
+
+=>docker-compose -f docker-compose.yml up -d
+
+
+$ nc -z localhost 22181
+Connection to localhost port 22181 [tcp/*] succeeded!
+$ nc -z localhost 29092
+Connection to localhost port 29092 [tcp/*] succeeded!
+Now let’s use the nc command to verify that both the servers are listening on the respective ports:
+
+
+=>docker exec -it kafka /bin/sh
+Connect to Kafka shell
+
+
+=>kafka-topics.sh --create --zookeeper zookeeper:2181 --replication-factor 1 --partitions 1 --topic first_kafka_topic
+=>kafka-topics.sh --list --zookeeper zookeeper:2181
+Create your first Kafka topic
+All Kafka shell scripts are located in /opt/kafka_<version>/bin:
+
+
+Kafka Info Doc:
+---------------------------------------------------------
+
+Kafka 4mainComponent:
+  Broker: Stores and manages data.Its a java process, can incress horizontally.
+  ZooKeeper: Manages Kafka cluster's configuration and coordination.
+  Producer: Sends data to Kafka. Communicate with broker with tcp. Producer create record with partiation number attributes.
+  Consumer: Receives data from Kafka
+
+
+Kafka-Records:
+  exist within Kafka topics. When data is produced to Kafka, it is encapsulated into records and appended to the 
+  log (partition) of the respective topic. Each record consists of a key, a value, headers, timestamp, offset,
+   and possibly other metadata. 
+
+
+Record comprises several components:
+
+  Key: An optional identifier for the record.
+  Value: The main data payload.
+  Headers: Optional metadata associated with the record.
+  Timestamp: Indicates when the record was produced or ingested into Kafka.
+  Offset: A unique identifier assigned to each record within a partition.
+  Partition: Specifies the partition to which the record belongs.
+
+
+To Unique identify a reocrd use (partition+Offset) composit key number. 
+
+
+
+
+Replication Factor: Replication factor factor make partation duplicate.
+  If replication-factor=2 then every partation has two copy if three then the number of copy is 3.
+
+
+
+
+
 
 
 
@@ -409,7 +606,125 @@ https://gale.udemy.com/course/apache-kafka-for-developers-using-springboot/learn
 
 
 
+udTut-repo:https://github.com/dilipsundarraj1/kafka-for-developers-using-spring-boot-v2/blob/main/SetUpKafkaDocker.md#set-up-broker-and-zookeeper
 
+Producer and Consume the Messages
+Let's going to the container by running the below command.
+docker exec -it kafka1 bash
+Create a Kafka topic using the kafka-topics command.
+kafka1:19092 refers to the KAFKA_ADVERTISED_LISTENERS in the docker-compose.yml file.
+kafka-topics --bootstrap-server kafka1:19092 \
+             --create \
+             --topic test-topic \
+             --replication-factor 1 --partitions 1
+Produce Messages to the topic.
+docker exec --interactive --tty kafka1  \
+kafka-console-producer --bootstrap-server kafka1:19092 \
+                       --topic test-topic
+Consume Messages from the topic.
+docker exec --interactive --tty kafka1  \
+kafka-console-consumer --bootstrap-server kafka1:19092 \
+                       --topic test-topic \
+                       --from-beginning
+Producer and Consume the Messages With Key and Value
+Produce Messages with Key and Value to the topic.
+docker exec --interactive --tty kafka1  \
+kafka-console-producer --bootstrap-server kafka1:19092 \
+                       --topic test-topic \
+                       --property "key.separator=-" --property "parse.key=true"
+Consuming messages with Key and Value from a topic.
+docker exec --interactive --tty kafka1  \
+kafka-console-consumer --bootstrap-server kafka1:19092 \
+                       --topic test-topic \
+                       --from-beginning \
+                       --property "key.separator= - " --property "print.key=true"
+Consume Messages using Consumer Groups
+docker exec --interactive --tty kafka1  \
+kafka-console-consumer --bootstrap-server kafka1:19092 \
+                       --topic test-topic --group console-consumer-41911\
+                       --property "key.separator= - " --property "print.key=true"
+Example Messages:
+a-abc
+b-bus
+Consume Messages With Headers
+docker exec --interactive --tty kafka1  \
+kafka-console-consumer --bootstrap-server kafka1:19092 \
+                       --topic library-events.DLT \
+                       --property "print.headers=true" --property "print.timestamp=true" 
+Example Messages:
+a-abc
+b-bus
+Set up a Kafka Cluster with 3 brokers
+Run this command and this will spin up a kafka cluster with 3 brokers.
+docker-compose -f docker-compose-multi-broker.yml up
+Create topic with the replication factor as 3
+docker exec --interactive --tty kafka1  \
+kafka-topics --bootstrap-server kafka1:19092 \
+             --create \
+             --topic test-topic \
+             --replication-factor 3 --partitions 3
+Produce Messages to the topic.
+docker exec --interactive --tty kafka1  \
+kafka-console-producer --bootstrap-server localhost:9092,kafka2:19093,kafka3:19094 \
+                       --topic test-topic
+Consume Messages from the topic.
+docker exec --interactive --tty kafka1  \
+kafka-console-consumer --bootstrap-server localhost:9092,kafka2:19093,kafka3:19094 \
+                       --topic test-topic \
+                       --from-beginning
+Log files in Multi Kafka Cluster
+Log files will be created for each partition in each of the broker instance of the Kafka cluster.
+Login to the container kafka1.
+docker exec -it kafka1 bash
+Login to the container kafka2.
+docker exec -it kafka2 bash
+Shutdown the kafka cluster
+docker-compose -f docker-compose-multi-broker.yml down
+Setting up min.insync.replica
+Topic - test-topic
+docker exec --interactive --tty kafka1  \
+kafka-configs  --bootstrap-server localhost:9092 --entity-type topics --entity-name test-topic \
+--alter --add-config min.insync.replicas=2
+Topic - library-events
+docker exec --interactive --tty kafka1  \
+kafka-configs  --bootstrap-server localhost:9092 --entity-type topics --entity-name library-events \
+--alter --add-config min.insync.replicas=2
+Advanced Kafka Commands
+List the topics in a cluster
+docker exec --interactive --tty kafka1  \
+kafka-topics --bootstrap-server kafka1:19092 --list
+
+Describe topic
+Command to describe all the Kafka topics.
+docker exec --interactive --tty kafka1  \
+kafka-topics --bootstrap-server kafka1:19092 --describe
+Command to describe a specific Kafka topic.
+docker exec --interactive --tty kafka1  \
+kafka-topics --bootstrap-server kafka1:19092 --describe \
+--topic test-topic
+Alter topic Partitions
+docker exec --interactive --tty kafka1  \
+kafka-topics --bootstrap-server kafka1:19092 \
+--alter --topic test-topic --partitions 40
+How to view consumer groups
+docker exec --interactive --tty kafka1  \
+kafka-consumer-groups --bootstrap-server kafka1:19092 --list
+Consumer Groups and their Offset
+docker exec --interactive --tty kafka1  \
+kafka-consumer-groups --bootstrap-server kafka1:19092 \
+--describe --group console-consumer-41911
+Log file and related config
+Log into the container.
+docker exec -it kafka1 bash
+The config file is present in the below path.
+/etc/kafka/server.properties
+The log file is present in the below path.
+/var/lib/kafka/data/
+How to view the commit log?
+docker exec --interactive --tty kafka1  \
+kafka-run-class kafka.tools.DumpLogSegments \
+--deep-iteration \
+--files /var/lib/kafka/data/test-topic-0/00000000000000000000.log
 
 
 

@@ -1233,6 +1233,167 @@ metrics: false
 
 
 
+=================================================
+# Network | packet analyzer | tcp | udp | http                                        
+================================================= 
+
+sudo apt install tshark
+Analysis tools  
+
+
+tshark -T fields -e ip.src -e ip.dst -r capture.pcap 
+tshark -r capture.pcap -q -z conv,eth -z conv,ip -z conv,tcp
+
+
+
+
+tcpdump
+-------------------------------------------------
+=>tcpdump -D
+Display available Net interfaces.
+
+=>sudo tcpdump 
+Start a capture
+
+=>sudo tcpdump wlo1
+Select an interface
+
+=>sudo tcpdump -i any -c5 icmp
+With number of packet and and protocol
+
+=>sudo tcpdump -i any tcp
+=>sudo tcpdump -i any tcp dst port 9191
+Check localhost all tcp activity
+
+=>sudo tcpdump -i tun0 dst port 9710
+=>sudo tcpdump -i tun0  host 172.16.8.132
+Print dump wdith host and interface and port
+
+
+
+
+=>sudo tcpdump -i tun0 dst port 9710 -w capture.pcap
+=>tcpdump -r capture.pcap
+Write to a file
+
+
+
+Exam1(unexpected behavior):
+11:20:43.926491 IP BS-960.50300 > 172.16.8.132.9710: Flags [S], seq 2623079097, win 64240, options [mss 1460,sackOK,TS val 4239763764 ecr 0,nop,wscale 7], length 0
+11:20:44.042601 IP 172.16.8.132.9710 > BS-960.50300: Flags [S.], seq 2254210938, ack 2623079098, win 28960, options [mss 1357,sackOK,TS val 1296118935 ecr 4239763764,nop,wscale 7], length 0
+11:20:44.042662 IP BS-960.50300 > 172.16.8.132.9710: Flags [.], ack 1, win 502, options [nop,nop,TS val 4239763880 ecr 1296118935], length 0
+11:20:44.042888 IP BS-960.50300 > 172.16.8.132.9710: Flags [P.], seq 1:416, ack 1, win 502, options [nop,nop,TS val 4239763880 ecr 1296118935], length 415
+11:20:44.050804 IP 172.16.8.132.9710 > BS-960.50300: Flags [.], ack 416, win 235, options [nop,nop,TS val 1296119051 ecr 4239763880], length 0
+11:20:44.144854 IP 172.16.8.132.9710 > BS-960.50300: Flags [P.], seq 1:960, ack 416, win 235, options [nop,nop,TS val 1296119071 ecr 4239763880], length 959
+11:20:44.144898 IP BS-960.50300 > 172.16.8.132.9710: Flags [.], ack 960, win 501, options [nop,nop,TS val 4239763982 ecr 1296119071], length 0
+11:20:44.144917 IP 172.16.8.132.9710 > BS-960.50300: Flags [P.], seq 960:965, ack 416, win 235, options [nop,nop,TS val 1296119071 ecr 4239763880], length 5
+11:20:44.144924 IP BS-960.50300 > 172.16.8.132.9710: Flags [.], ack 965, win 501, options [nop,nop,TS val 4239763982 ecr 1296119071], length 0
+
+
+Describe: TCP (Transmission Control Protocol) communication session between two hosts, BS-960 and 172.16.8.132, over port 9710. Let's analyze each line:
+
+    11:20:43.926491: Host BS-960 initiates a TCP connection by sending a SYN packet (Flags [S]) to 172.16.8.132. The sequence number is 2623079097, and the window size is 64240. It also includes TCP options such as Maximum Segment Size (MSS), Selective Acknowledgment (SACK), Timestamp (TS), and Window Scale. The length of the packet is 0.
+
+    11:20:44.042601: 172.16.8.132 responds with a SYN-ACK packet (Flags [S.]) indicating the start of a TCP connection. The sequence number is 2254210938, and it acknowledges the sequence number sent by BS-960. It also includes TCP options similar to the first packet. The length of the packet is 0.
+
+    11:20:44.042662: BS-960 acknowledges the SYN-ACK packet by sending an ACK packet (Flags [.], ack 1). This acknowledges the receipt of the SYN-ACK packet from 172.16.8.132.
+
+    11:20:44.042888: BS-960 sends a TCP packet with the PUSH (P) flag set, indicating that it has data to transmit. The sequence number ranges from 1 to 416, and it acknowledges the receipt of the SYN-ACK packet. The packet has a payload length of 415.
+
+    11:20:44.050804: 172.16.8.132 acknowledges the receipt of data (ack 416) sent by BS-960.
+
+    11:20:44.144854: 172.16.8.132 sends a TCP packet with data (Flags [P.]). The sequence number ranges from 1 to 960, and it acknowledges the data sent by BS-960. The packet has a payload length of 959.
+
+    11:20:44.144898: BS-960 acknowledges the receipt of data (ack 960) sent by 172.16.8.132.
+
+    11:20:44.144917: 172.16.8.132 sends another TCP packet with data, with a sequence number from 960 to 965. The packet has a payload length of 5.
+
+    11:20:44.144924: BS-960 acknowledges the receipt of data (ack 965) sent by 172.16.8.132.
+
+
+
+
+
+
+Exam2(unexpected behavior):
+12:28:09.401273 IP6 ip6-localhost.42652 > ip6-localhost.9191: Flags [P.], seq 448:668, ack 413, win 512, options [nop,nop,TS val 3215550272 ecr 3215532681], length 220
+12:28:10.223665 IP6 ip6-localhost.42652 > ip6-localhost.9191: Flags [F.], seq 668, ack 413, win 512, options [nop,nop,TS val 3215551094 ecr 3215550272], length 0
+12:28:12.405290 IP6 ip6-localhost.42652 > ip6-localhost.9191: Flags [R], seq 3650415546, win 0, length 0
+
+Sent with P flag indicating data push, seq 448-668, ack 413, win 512, length 220.
+Sent with F flag to close connection, seq 668, ack 413, win 512, length 0.
+Sent with R flag for abnormal termination, seq 3650415546, win 0, length 0.
+The sequence number is 3650415546, but since the R flag is set, this sequence number doesn't have the usual meaning. 
+The window size is 0, indicating that the sender can't accept any more data. 
+
+
+In summary, the communication starts with data being sent (Flags [P.]), followed by a request to close 
+the connection (Flags [F.]), and finally, an abnormal termination of the connection (Flags [R]). 
+
+
+
+
+
+Capture Packets: sudo tcpdump -i <interface> -s 0 -w capture.pcap port 80
+
+=>sudo tcpdump -i wlo1 -s 0 -w capture.pcap port 9191
+
+-i wlo1: This option specifies the interface on which tcpdump should capture packets. 
+In this case, wlo1 is the name of the network interface. The -i option stands for "interface".
+
+-s 0: This option sets the snapshot length for the captured packets. 
+A snapshot length of 0 means capturing the entire packet. By setting this to 0 (-s 0), tcpdump captures the full packet.
+
+port 80: This is a filter expression that specifies which packets tcpdump should capture.
+in this case captures packets that are either destined for or originating from port 80. 
+
+-w capture.pcap: This option specifies the name of the file to which tcpdump should write the captured packets.
+
+
+FlagDetails:
+  S	SYN	Connection Start
+  F	FIN	Connection Finish
+  P	PUSH	Data push
+  R	RST	Connection reset
+  .	ACK	Acknowledgment
+
+
+
+
+
+
+Java and JDBC communicates:
+  The Java application communicates with the MySQL database using JDBC.
+  JDBC internally uses the MySQL Connector/J driver.
+  The communication between the Java application and the MySQL database server occurs over TCP/IP using the MySQL protocol.
+
+
+
+TCP/IP:
+  TCP/IP is the foundational protocol suite for internet communication, including TCP and UDP. HTTP operates over TCP and is used for web communication. UDP provides faster but less reliable communication compared to TCP and is used in scenarios where speed is prioritized over reliability. TCP ensures reliable, ordered communication between applications but incurs more overhead compared to UDP.
+
+
+TCP/IP (Transmission Control Protocol/Internet Protocol):
+  TCP/IP is the fundamental protocol suite used for communication on the internet and most computer networks.
+  It provides a set of rules for data transmission between devices.
+  TCP/IP includes several protocols, including IP (Internet Protocol) for routing packets and TCP (Transmission Control Protocol) for reliable, connection-oriented communication.
+
+HTTP (Hypertext Transfer Protocol):
+  HTTP is a protocol used for transmitting hypermedia documents, such as HTML, over the internet.
+  It operates over TCP (Transmission Control Protocol), providing a reliable, connection-oriented communication channel.
+  HTTP is primarily used for web browsing, where clients (such as web browsers) request resources from web servers.
+
+UDP (User Datagram Protocol):
+  UDP is a connectionless protocol that operates on top of the IP (Internet Protocol).
+  It provides a way for applications to send datagrams to one another without establishing a connection first.
+  UDP is faster and more lightweight than TCP but does not guarantee delivery or order of packets.
+
+TCP (Transmission Control Protocol):
+  TCP is a connection-oriented protocol that operates on top of the IP (Internet Protocol).
+  It provides reliable, ordered, and error-checked delivery of data between applications.
+  TCP establishes a connection between the sender and receiver before data exchange and ensures data integrity through mechanisms like acknowledgment and retransmission.
+
+
 
 
 
