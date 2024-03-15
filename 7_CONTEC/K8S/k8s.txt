@@ -3,14 +3,121 @@
 #              K8S                             #
 #################################################
 
+systemctl --user start docker-desktop
+
+=>kubectl api-resources
+
+=>kubectl version
+=>kubectl version --short 
+=>kubectl get nodes
 
 
 
 
-
-
-#Minikube
 =================================================
+#General                                
+=================================================
+
+=>=>kubectl exec webapp-color -- env
+=>kubectl exec -it ubuntu-sleeper -- whoami
+=>kubectl exec -it webapp-color -- sh
+
+
+=>kubectl get pods
+=>kubectl get pods -o wide
+=>kubectl get -o json pod prodName
+
+=>kubectl explain pod
+=>kubectl explain deployment
+
+=kubectl logs myPod
+
+=>kubectl run --help
+=>kubectl run myng --image=nginx --dry-run=client -o yaml>labelpod.yaml
+=>kubectl create deployment --image=nginx nginx --dry-run=client -o yaml
+=>kubectl run ng3 --image=nginx -- /bin/sh -c "while true; do echo  $(date); sleep 1; done "
+
+=>k delete po myng
+
+
+docker tag currentImageName newImageName
+=>docker tag imranmadbar/nginx ng-debug
+Image from Image
+
+=>kubectl  run myng --imranmadbar/nginx
+DockerContRun:
+=>docker container run --name myng -dp 8080:80 imranmadbar/nginx
+
+
+Byuild image and push
+-------------------------------------------------
+docker run -d -p 5000:5000 --restart=always --name registry registry
+docker build . -t localhost:5000/openapi-customer-information
+docker push localhost:5000/openapi-customer-information
+=================================================
+Service:
+=================================================
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: webapp-service
+  namespace: default
+spec:
+  ports:
+  - nodePort: 30080
+    port: 8080
+    targetPort: 8080
+  selector:
+    name: simple-webapp
+  type: NodePort
+
+
+=>kubectl create service nodeport mysvc4 --tcp=8080:80 --node-port=30040
+=>kubectl create service nodeport mysvc4 --tcp=8080:80 --node-port=30040 --dry-run=client -o yaml>mysvc.yaml
+
+
+
+ExposeService:
+=>k expose pod jekyll --name=jekyll --type=NodePort --port=8080 --target-port=4000 -n development
+=>k expose pod myng --name=ng-svc --type=NodePort --port=8080 --target-port=80 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 

@@ -4,6 +4,8 @@ k#################################################
 Human->DockerClient->RestServer->DockerDeamon->ContainerD->RunC->Kernal
 =>docker container run --help | grep rm
 
+=>docker context ls
+
 =>docker --version
 =>docker info
 =>docker login
@@ -76,10 +78,20 @@ Check the different history in container
 is docker registraed, check
 =>sudo systemctl list-units --type=service | grep "docker" 
 
+docker tag imranmadbar/nginx localhost:5000/ng-debug
+create image from image
+
+docker save -o ng-debug.tar localhost:5000/ng-debug
+docker load -i ng-debug.tar
+Save image as tar| chenge
 =================================================
-#Debug
+#Registry
 =================================================
-=>curl http://localhost:5000/v2/
+docker run -d -p 5000:5000 --restart=always --name registry registry
+docker build . -t localhost:5000/openapi-customer-information
+docker push localhost:5000/openapi-customer-information
+
+
 
 
 =================================================
@@ -1119,3 +1131,42 @@ if __name__ == "__main__":
     # Run Flask Application
     app.run(host="0.0.0.0", port=8080)
 
+
+
+
+
+
+
+
+
+=================================================
+#Debug                                
+=================================================
+
+
+
+Delete hiden zombi container:
+-------------------------------------------------
+
+This worked for me on Linux, and without having to delete any resources.
+
+# Stop docker
+sudo service docker stop
+
+# Find your particular zombie proxy processes
+sudo netstat -pna | grep docker-proxy
+# tcp6       0      0 :::8025       :::*     LISTEN      <PID_A>/docker-proxy  
+# tcp6       0      0 :::13306      :::*     LISTEN      <PID_B>/docker-proxy
+# ...
+
+# Kill them
+sudo kill -9 PID_A PID_B ...
+
+# restart
+sudo service docker start
+
+
+
+
+sudo service docker stop
+sudo rm -f /var/lib/docker/network/files/local-kv.db

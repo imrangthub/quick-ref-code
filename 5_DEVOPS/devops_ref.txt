@@ -84,8 +84,10 @@ Copying directories from remote machine to local machine
 
 =>java -jar zipkin-server-2.23.15-exec.jar --server.port=9410 --zipkin.storage.type=cassandra3 --zipkin.storage.cassandra3.ensure-schema=true --zipkin.storage.cassandra3.contact-points=localhost:9042 --zipkin.storage.cassandra3.username=imran --zipkin.storage.cassandra3.password=123456 --zipkin.storage.cassandra3.keyspace=spring_boot_keyspc
 
+
+
 =================================================
-#CURL                                         
+#CURL   | Telnet | connection testing                                   
 =================================================
 
 
@@ -100,10 +102,26 @@ curl --location --request POST 'http://localhost:8080/auth/token' --header 'clie
 
 
 
+Telnet
+-----------------------------------------------------
+=>telnet 172.16.8.132 6600
+
+
+=>curl -vvv telnet://172.16.10.224:13146
+Check Connecton
+
+
+
 
 =================================================
 #http | connection | sockets | HTTP                
 ================================================= 
+
+netstat -an|grep ESTABLISHED | grep -w 8181
+find Socat with port
+
+
+
 =>netstat -an | awk '{print $5"-"$6}' | sort | uniq --repeated --count
 display network-related information. 
 The options used are:
@@ -123,7 +141,6 @@ Then grep the pid for find the application
 
 for tcp dump
 =>tcpdump -i <interface> port <port>
-
 
 
 
@@ -549,9 +566,15 @@ server.tomcat.threads.max=250
 #Netty | 
 =================================================
 
-The spring.cloud.gateway.httpclient component is responsible for handling outgoing HTTP requests from the gateway to other services. It provides a customizable HTTP client implementation that allows you to configure things like connection timeouts, maximum connections per route, and SSL settings. This component is used when the gateway is acting as a client to other services.
+The spring.cloud.gateway.httpclient component is responsible for handling outgoing HTTP requests from the gateway 
+to other services. It provides a customizable HTTP client implementation that allows you to configure things 
+like connection timeouts, maximum connections per route, 
+and SSL settings. This component is used when the gateway is acting as a client to other services.
 
-The 'spring.cloud.gateway.httpserver' component, on the other hand, is responsible for handling incoming HTTP requests from clients and routing them to the appropriate backend services. It provides a customizable HTTP server implementation that allows you to configure things like server ports, SSL settings, and request/response filters. This component is used when the gateway is acting as a server to clients.
+The 'spring.cloud.gateway.httpserver' component, on the other hand, is responsible for handling incoming HTTP 
+requests from clients and routing them to the appropriate backend services. 
+It provides a customizable HTTP server implementation that allows you to configure things like server ports, 
+SSL settings, and request/response filters. This component is used when the gateway is acting as a server to clients.
 
 
 
@@ -594,6 +617,76 @@ spring:
           max-idle-time: 30000  | keep-alive settings to control how long persistent connections are kept alive:
 
 
+server:
+  port: 80
+
+spring:
+  application:
+    name: spring-cloud-gateway-demo
+  cloud:
+    loadbalancer:
+      retry:
+        enabled: true
+        max-retries-on-next-service-instance: 1
+        max-retries-on-same-service-instance: 1
+        avoid-previous-instance: false
+        retryable-status-codes: 500, 501, 502, 503
+        retry-on-all-operations: true
+    gateway:
+      httpclient:
+        response-timeout: 3s
+        connect-timeout: 2000
+      default-filters:
+        - StripPrefix=1
+      routes:
+        - id: spring-webflux-demo
+          uri: lb://webflux-demo
+          predicates:
+            - "Path=/webflux-demo/**"
+    discovery:
+      client:
+        simple:
+          instances:
+            webflux-demo:
+              - uri: http://localhost:8080
+              - uri: http://localhost:8081
+
+
+spring:
+  application:
+    name: edge-gateway
+  main:
+    allow-bean-definition-overriding: true
+  cloud:
+    loadbalancer:
+      retry:
+        enabled: false
+    gateway:
+      httpclient:
+        connect-timeout: 3000              # Socket connection timeout in milliseconds
+        pool:
+          max-connections: 1500            # Maximum allowed active connections in the pool
+          max-per-route-connections: 500   # Maximum allowed active connections per route
+          connect-timeout: 5000            # Connection timeout for acquiring a connection from the pool
+          max-idle-time: 3000              # Maximum idle time for a connection in the pool in milliseconds
+          type: FIXED                      # Connection pool type (fixed pool of max connections)
+          metrics: true                    # Enable metrics for the connection pool
+      discovery:
+        locator:
+          enabled: true
+          lowerCaseServiceId: true
+
+
+
+           httpclient:
+        connect-timeout: 10000              # Socket connection timeout in milliseconds
+        pool:
+          max-connections: 3000            # Maximum allowed active connections in the pool
+          max-per-route-connections: 750   # Maximum allowed active connections per route
+          connect-timeout: 5000            # Connection timeout for acquiring a connection from the pool
+          max-idle-time: 3000              # Maximum idle time for a connection in the pool in milliseconds
+          type: FIXED                      # Connection pool type (fixed pool of max connections)
+          metrics: true                    # Enable metrics for the connection pool     
 
 @Bean
 @Primary
@@ -1230,6 +1323,86 @@ maxIdleTime: "PT5S",
 evictionInterval: "PT0S",
 metrics: false
 },
+
+
+
+
+
+
+=================================================
+#  APP TESTING |  MEMORY CHECK | jvm                                          
+================================================= 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+view how much of memory consumption in spring boot app
+
+Setup#1 Create spring boot app as .jar file and execute it using java -jar springboot-example.jar
+
+Setup#1 Now open the CMD and type jconsole and hit enter.
+=>jconsole
+
+Setup#1 Note :- before opening the jconsole you need to run .jar file
+
+Setup#1 Now you can see a window like below and it will appear application that previously ran in Local Process section.
+
+
+
+=================================================
+#  LOAD TESTING                                          
+================================================= 
+
+TPS=Transaction per second
+
+
+AHUB 
+-------------------------------------------------
+
+AHUB = 25/PS
+
+
+20 TPS testing for 1 minutes has been successful-Going for 40 TPS with 5 minutes now.
+Please go with 30 TPS then 40
+
+
+
+
+=================================================
+# Firewall | Windows                                          
+================================================= 
+=>nslookup www.google.com
+Get IP address
+=>control firewall.cpl
+Open firewall
+
+=>netstat -a -n
+
+
+Block any IP Address
+-------------------------------------------------
+
+In Windows Defender Firewall: 
+=>Advanced Settings > Inbound Rules > New Rule > Custom. Add Ibbound, Outbound Rules.
+
+
+
+
+
+
+
 
 
 
@@ -1950,62 +2123,6 @@ ENTRYPOINT FLASK_APP=/app/myapp.py flask run --host=0.0.0.0
 
 
 
-
-
-
-=================================================
-#  APP TESTING |  MEMORY CHECK                                          
-================================================= 
-
-
-view how much of memory consumption in spring boot app
-
-Setup#1 Create spring boot app as .jar file and execute it using java -jar springboot-example.jar
-
-Setup#1 Now open the CMD and type jconsole and hit enter.
-=>jconsole
-
-Setup#1 Note :- before opening the jconsole you need to run .jar file
-
-Setup#1 Now you can see a window like below and it will appear application that previously ran in Local Process section.
-
-
-
-=================================================
-#  LOAD TESTING                                          
-================================================= 
-
-TPS=Transaction per second
-
-
-AHUB 
--------------------------------------------------
-
-AHUB = 25/PS
-
-
-20 TPS testing for 1 minutes has been successful-Going for 40 TPS with 5 minutes now.
-Please go with 30 TPS then 40
-
-
-
-
-=================================================
-# Firewall | Windows                                          
-================================================= 
-=>nslookup www.google.com
-Get IP address
-=>control firewall.cpl
-Open firewall
-
-=>netstat -a -n
-
-
-Block any IP Address
--------------------------------------------------
-
-In Windows Defender Firewall: 
-=>Advanced Settings > Inbound Rules > New Rule > Custom. Add Ibbound, Outbound Rules.
 
 
 

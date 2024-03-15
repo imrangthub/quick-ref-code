@@ -31,11 +31,99 @@ Simple or the default ConcurrentMapCacheManager.
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+https://www.itpanther.com/category/redis/
+
+https://www.youtube.com/watch?v=tip2mgC6rwQ&list=PLVCgi5HZ0-YtWh-PD8LUCbdsG7oDIfGlD&index=13
+
+
+
+Redis couse:
+-------------------------------------------------
+https://www.itpanther.com/installing-redis-on-linux-using-a-package-manager/
+
+
+
+
+
+
+
+
+
+1. Visit https://www.itpanther.com/product/redis-virtual-lab/
+
+2. Add product to cart
+
+3. Move to Cart from the menu bar or https://www.itpanther.com/cart/
+
+4. Apply coupon code: QEPKNXWJ
+
+5. Checkout
+
+6. Wait for an email containing your Redis environment details.
+
+
+
+Remember:
+
+- Each registered email ID can avail of up to 5 sessions.
+
+- Each session grants access to the Lab environment for 1 hour.
+
+- To start a new session, repeat these steps.
+
+
+
+Happy Learning !!!
+
+
+
+Regards,
+
+Vikas Kumar Jha
+
+
+
+
 =================================================
 #redis | Redis                                     
 ================================================= 
+redis-server -v
+redis-server --check-system
+
+
+=>CONFIG GET "port"
+127.0.0.1:8888> CONFIG GET *
+Show currrent server configuration 
+
+
+
+
+
+
+
+
+
+
+=>docker run -v /home/bs960/imranMadbar/myPROJECT/redisWorkshop/redisLocalVol:/usr/local/etc/redis -p8080:8080 -d  --name myredis redis redis-server /usr/local/etc/redis/redis.conf
+
+
+
+
 
 =>docker run -p 8888:6379 --name my-redis1 -d redis
+=>docker run -p 8888:6379 --name my-redis1 -d my-redis
 =>sudo apt install redis-tools
 =>redis-cli --version
 Run a Redis Server using docker and install resis-toos for redis-cli in ubuntu
@@ -93,6 +181,42 @@ Show Master and Slave info
 
 sentinel master mymaster
 sentinel slaves mymaster
+
+
+
+
+
+
+
+Redis Performance Benchmarking
+-------------------------------------------------
+
+
+redis-benchmark -q -n 1000000
+redis-benchmark -q -n 1000000 -p 8888
+redis-benchmark -q -n 1000000 -h 10.128.0.2
+redis-benchmark -q -n 100 -t get,set
+  -q means run this in a quit mode and just display us the output.
+  -n means the total number of queries to run during this test.
+
+
+
+
+
+
+redis.conf
+---------------------------------------------------
+
+s960@BS-960:~/imranMadbar/myPROJECT/redisWorkshop/redisLocalVol$ cat redis.conf 
+port 8080
+bind 0.0.0.0
+protected-mode no
+save 5 2
+rdbcompression yes
+dbfilename redis-dump.rdb
+dir /data
+
+
 
 
 
@@ -190,6 +314,29 @@ public class RedisConfig {
         return new LettuceConnectionFactory(staticMasterReplicaConfig, clientConfig);
     }
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -339,6 +486,7 @@ Headers Exchange (One-to-Many Relationship based on Message Attributes):
 =================================================
 #kafka | Message broker  | KAFKA                                        
 ================================================= 
+OfsetExpolar
 kafkalytic-intelejidea-pluging
 
 Install and Run KafKa:
@@ -935,3 +1083,167 @@ Simple Soap Response:
 	  </ns2:output>
   </SOAP-ENV:Body>
 </SOAP-ENV:Envelope>
+
+
+
+
+
+=================================================
+# kong | Gateway                                      
+=================================================
+
+KongWithkeykclok:https://www.jerney.io/secure-apis-kong-keycloak-1/
+
+StartKongWithDocker:
+--------------------------------------------------
+
+
+Create a custom Docker network to allow the containers to discover and communicate with each other:
+ docker network create kong-net
+
+
+Start a PostgreSQL container:
+ docker run -d --name kong-database \
+  --network=kong-net \
+  -p 5432:5432 \
+  -e "POSTGRES_USER=kong" \
+  -e "POSTGRES_DB=kong" \
+  -e "POSTGRES_PASSWORD=kongpass" \
+  postgres:13
+
+
+Prepare the Kong database:
+  docker run --rm --network=kong-net \
+  -e "KONG_DATABASE=postgres" \
+  -e "KONG_PG_HOST=kong-database" \
+  -e "KONG_PG_PASSWORD=kongpass" \
+  -e "KONG_PASSWORD=test" \
+  kong/kong-gateway:3.6.0.0 kong migrations bootstrap
+
+
+
+Run the following command to start a container with Kong Gateway:
+
+docker run -d --name kong-gateway \
+ --network=kong-net \
+ -e "KONG_DATABASE=postgres" \
+ -e "KONG_PG_HOST=kong-database" \
+ -e "KONG_PG_USER=kong" \
+ -e "KONG_PG_PASSWORD=kongpass" \
+ -e "KONG_PROXY_ACCESS_LOG=/dev/stdout" \
+ -e "KONG_ADMIN_ACCESS_LOG=/dev/stdout" \
+ -e "KONG_PROXY_ERROR_LOG=/dev/stderr" \
+ -e "KONG_ADMIN_ERROR_LOG=/dev/stderr" \
+ -e "KONG_ADMIN_LISTEN=0.0.0.0:8001" \
+ -e "KONG_ADMIN_GUI_URL=http://localhost:8002" \
+ -e KONG_LICENSE_DATA \
+ -p 8000:8000 \
+ -p 8443:8443 \
+ -p 8001:8001 \
+ -p 8444:8444 \
+ -p 8002:8002 \
+ -p 8445:8445 \
+ -p 8003:8003 \
+ -p 8004:8004 \
+ kong/kong-gateway:3.6.0.0
+
+
+
+Verify your installation:
+Access the /services endpoint using the Admin API:
+ curl -i -X GET --url http://localhost:8001/services
+
+
+
+Verify that Kong Manager is running by accessing it using the URL specified in KONG_ADMIN_GUI_URL:
+ http://localhost:8002
+
+
+Clean up containers
+docker kill kong-gateway
+docker kill kong-database
+docker container rm kong-gateway
+docker container rm kong-database
+docker network rm kong-net
+
+
+
+Service and Route:
+------------------------------------------
+
+Creating services
+curl -i -s -X POST http://localhost:8001/services \
+  --data name=example_service \
+  --data url='http://httpbin.org'
+
+
+CheckServicd
+curl -X GET http://localhost:8001/services/serviceName
+
+Listing services
+curl -X GET http://localhost:8001/services
+
+
+
+Managing routes:
+
+
+
+Composer:
+----------------------------------------
+
+version: '3.4'
+
+services:
+  kong-database:
+    image: postgres:13
+    networks:
+      - kong-net
+    restart: unless-stopped
+    ports:
+      - 127.0.0.1:5432:5432
+    environment:
+      POSTGRES_USER: kong
+      POSTGRES_PASSWORD: kongpass
+      POSTGRES_DB: kong
+      PGDATA: /var/lib/postgresql/data/pgdata
+    volumes:
+      - db-volume:/var/lib/postgresql/data/pgdata
+  kong-gateway:
+    image: kong/kong-gateway:3.6.0.0
+    networks:
+      - kong-net
+    depends_on:
+      - kong-database
+    restart: unless-stopped
+    ports:
+      - 127.0.0.1:8000:8000
+      - 127.0.0.1:8001:8001
+      - 127.0.0.1:8002:8002
+      - 127.0.0.1:8003:8003
+      - 127.0.0.1:8004:8004
+      - 127.0.0.1:8443:8443
+      - 127.0.0.1:8444:8444
+      - 127.0.0.1:8445:8445
+    environment:
+      KONG_DATABASE: postgres
+      KONG_PG_HOST: kong-database
+      KONG_PG_USER: kong
+      KONG_PG_PASSWORD: kongpass
+      KONG_PROXY_ACCESS_LOG: /dev/stdout
+      KONG_ADMIN_ACCESS_LOG: /dev/stdout
+      KONG_PROXY_ERROR_LOG: /dev/stderr
+      KONG_ADMIN_ERROR_LOG: /dev/stderr
+      KONG_ADMIN_LISTEN: 0.0.0.0:8001
+      KONG_ADMIN_GUI_URL: http://localhost:8002
+networks:
+  kong-net:
+    external: false
+volumes:
+  db-volume:
+
+
+
+
+docker-compose up -d
+docker run --rm --network=kong_kong-net  -e "KONG_DATABASE=postgres"  -e "KONG_PG_HOST=kong-database"  -e "KONG_PG_PASSWORD=kongpass"  -e "KONG_PASSWORD=test" kong/kong-gateway:3.6.0.0 kong migrations bootstrap
