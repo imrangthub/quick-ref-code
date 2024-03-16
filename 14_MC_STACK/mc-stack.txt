@@ -95,7 +95,7 @@ Vikas Kumar Jha
 
 
 
-
+https://www.youtube.com/playlist?list=PLVCgi5HZ0-YtWh-PD8LUCbdsG7oDIfGlD
 =================================================
 #redis | Redis                                     
 ================================================= 
@@ -116,10 +116,7 @@ Show currrent server configuration
 
 
 
-=>docker run -v /home/bs960/imranMadbar/myPROJECT/redisWorkshop/redisLocalVol:/usr/local/etc/redis -p8080:8080 -d  --name myredis redis redis-server /usr/local/etc/redis/redis.conf
-
-
-
+docker run -v /home/bs960/imranMadbar/myPROJECT/redisWorkshop/redisLocalVol:/usr/local/etc/redis -p8080:8080 -d  --name myredis redis redis-server /usr/local/etc/redis/redis.conf
 
 
 =>docker run -p 8888:6379 --name my-redis1 -d redis
@@ -152,8 +149,6 @@ Delete single key
 
 =>flushall
 Remove all data
-
-
 
 
 
@@ -215,6 +210,311 @@ save 5 2
 rdbcompression yes
 dbfilename redis-dump.rdb
 dir /data
+
+
+
+
+#Redis Cluster
+=================================================
+
+
+CreateClusterWay1
+--------------------------------------------------
+
+Create Doecker Network:
+docker network create redis-net
+
+
+
+Create masterNode
+docker run --name redis-master -p 6379:6379 --network redis-net -d redis redis-server
+docker run --name redis-master -p 6379:6379 --network redis-net -d redis redis-server --appendonly yes
+
+
+
+Create Replica Node:
+docker run --name redis-replica1 -p 6380:6379 --network redis-net -d redis redis-server --appendonly yes --slaveof redis-master 6379
+docker run --name redis-replica2 -p 6381:6379 --network redis-net -d redis redis-server --appendonly yes --slaveof redis-master 6379
+
+
+Login to Master slave, master allow write/read and slave allow only read(get).
+redis-cli -p 6379
+
+redis-cli -p 6380
+redis-cli -p 6381
+
+
+
+
+Redis Sentinel using Docker:
+------------------------
+Get IP address of all the containers:
+docker inspect -f '{{.Name}} - {{range .NetworkSettings.Networks}}{{.IPAddress}}{{end}}' $(docker ps -aq)
+
+
+
+Create sentinel.conf file and provide master server details with master-node IP.
+echo "sentinel monitor mymaster 172.19.0.2 6379 2" > /home/bs960/imranMadbar/myPROJECT/redisWorkshop/redisCluster/wayOne/sentinel/sentinel_1/sentinel.conf
+echo "sentinel monitor mymaster 172.19.0.2 6379 2" > /home/bs960/imranMadbar/myPROJECT/redisWorkshop/redisCluster/wayOne/sentinel/sentinel_2/sentinel.conf
+echo "sentinel monitor mymaster 172.19.0.2 6379 2" > /home/bs960/imranMadbar/myPROJECT/redisWorkshop/redisCluster/wayOne/sentinel/sentinel_3/sentinel.conf
+OR | for SingleHost test case
+echo "sentinel monitor mymaster 192.168.1.4 6379 2" > /home/bs960/imranMadbar/myPROJECT/redisWorkshop/redisCluster/wayOne/sentinel/sentinel_1/sentinel.conf
+echo "sentinel monitor mymaster 192.168.1.4 6379 2" > /home/bs960/imranMadbar/myPROJECT/redisWorkshop/redisCluster/wayOne/sentinel/sentinel_2/sentinel.conf
+echo "sentinel monitor mymaster 192.168.1.4 6379 2" > /home/bs960/imranMadbar/myPROJECT/redisWorkshop/redisCluster/wayOne/sentinel/sentinel_3/sentinel.conf
+
+
+
+
+Create three docker containers for Sentinels:
+docker run -d --name redis-sentinel_1 -p 26381:26379 --network redis-net -v /home/bs960/imranMadbar/myPROJECT/redisWorkshop/redisCluster/wayOne/sentinel/sentinel_1:/data redis redis-sentinel /data/sentinel.conf
+docker run -d --name redis-sentinel_2 -p 26382:26379 --network redis-net -v /home/bs960/imranMadbar/myPROJECT/redisWorkshop/redisCluster/wayOne/sentinel/sentinel_2:/data redis redis-sentinel /data/sentinel.conf
+docker run -d --name redis-sentinel_3 -p 26383:26379 --network redis-net -v /home/bs960/imranMadbar/myPROJECT/redisWorkshop/redisCluster/wayOne/sentinel/sentinel_3:/data redis redis-sentinel /data/sentinel.conf
+
+
+
+Login to sentinels:
+redis-cli -p 26381
+SENTINEL CONFIG GET *
+
+get Master info
+SENTINEL MASTERS
+SENTINEL MASTER mymaster
+
+get Sentins Info
+SENTINEL SENTINELS mymaster
+
+
+
+Get Master and Slave Info:
+import redis
+
+sentinel = redis.sentinel.Sentinel([('localhost', 26381)], socket_timeout=0.1)
+master = sentinel.discover_master('mymaster')
+print (master)
+replicas = sentinel.discover_slaves('mymaster')
+print(replicas)
+
+
+
+
+
+
+PythonAppTo wirtw redis using sentaninet:
+
+
+import redis
+
+# Define Sentinel connection details
+sentinel = redis.sentinel.Sentinel([('localhost', 26381),('localhost', 26382),('localhost', 26383)], socket_timeout=0.1)
+master = sentinel.discover_master('mymaster')
+print (master)
+# Connect to the master Redis instance
+redis_master = redis.Redis(host=master[0], port=master[1], socket_timeout=0.1)
+
+# Set data in Redis
+redis_master.set('keyFromPy', 'This value write by 0 Python application')
+
+# Get data from Redis
+value = redis_master.get('keyFromPy')
+print(value)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+CreateClusterWay2
+--------------------------------------------------
+
+https://developer.redis.com/operate/redis-at-scale/scalability/exercise-1/
+https://blog.devops.dev/creating-a-redis-cluster-in-docker-0ce82ece9692
+https://ilhamdcp.hashnode.dev/creating-redis-cluster-with-docker-and-compose
+
+
+Create Doecker Network:
+docker network create redis-cluster
+
+
+There are 2 images that we need to pull first
+docker pull redis
+docker pull redislabs/redisinsight
+
+
+mkdir -p {7000..7005}
+mkdir 7000 7001 7002 7003 7004 7005
+Redis recommends nodes with a minimum number of 6. So we will create those nodes 
+
+Create a config file in parant directory:
+vi redis.conf
+bs960@BS-960:~/imranMadbar/myPROJECT/redisWorkshop/redisCluster$ cat redis.conf 
+# redis.conf file
+port 7000
+cluster-enabled yes
+cluster-config-file nodes.conf
+cluster-node-timeout 5000
+appendonly yes
+bind 0.0.0.0
+protected-mode no
+
+
+Then create the minimal configuration redis.conf and copy all directory
+for i in {7000..7005}; do cp redis.conf $i; done
+Update redis.conf file port as directory name
+
+
+
+
+Thne run this for each directory (redis instance, as node-1, node-1 ... etc.)
+docker run -v `pwd`/7001:/redis --name node-1 -p 7001:7001 --network redis-cluster redis redis-server /redis/redis.conf
+docker run -v `pwd`/7002:/redis --name node-2 -p 7002:7002 --network redis-cluster redis redis-server /redis/redis.conf
+docker run -v `pwd`/7003:/redis --name node-3 -p 7003:7003 --network redis-cluster redis redis-server /redis/redis.conf
+
+docker run -v `pwd`/7004:/redis --name node-4 -p 7004:7004 --network redis-cluster redis redis-server /redis/redis.conf
+docker run -v `pwd`/7005:/redis --name node-5 -p 7005:7005 --network redis-cluster redis redis-server /redis/redis.conf
+docker run -v `pwd`/7006:/redis --name node-6 -p 7006:7006 --network redis-cluster redis redis-server /redis/redis.conf
+
+
+
+Now create the cluster:
+docker exec -it node-1 bash
+redis-cli -p 7001 --cluster create node-1:7001 node-2:7002 node-3:7003 node-4:7004 node-5:7005 node-6:7006 --cluster-replicas 1 --cluster-yes
+Successfully Done if no error
+
+
+
+For UI View:RedisInsight
+
+
+ mkdir redisinsight
+ docker run -v `pwd`/redisinsight:/db -p 8001:8001 --network redis-cluster redislabs/redis-insight
+
+
+useCompose: docker-compose.yml
+version: '3'
+networks:
+  redis-cluster-compose:
+    driver: bridge
+
+services:
+  redis-node-1:
+    image: redis:latest
+    ports:
+      - 7000:7000
+    networks:
+      - redis-cluster-compose
+    hostname: redis-node-1
+    volumes:
+      - ./7000:/redis
+    command: redis-server /redis/redis.conf
+  redis-node-2:
+    image: redis:latest
+    ports:
+      - 7001:7001
+    networks:
+      - redis-cluster-compose
+    hostname: redis-node-2
+    volumes:
+      - ./7001:/redis
+    command: redis-server /redis/redis.conf
+
+  redis-node-3:
+    image: redis:latest
+    ports:
+      - 7002:7002
+    networks:
+      - redis-cluster-compose
+    hostname: redis-node-3
+    volumes:
+      - ./7002:/redis
+    command: redis-server /redis/redis.conf
+
+  redis-node-4:
+    image: redis:latest
+    ports:
+      - 7003:7003
+    networks:
+      - redis-cluster-compose
+    hostname: redis-node-4
+    volumes:
+      - ./7003:/redis
+    command: redis-server /redis/redis.conf
+
+  redis-node-5:
+    image: redis:latest
+    ports:
+      - 7004:7004
+    networks:
+      - redis-cluster-compose
+    hostname: redis-node-5
+    volumes:
+      - ./7004:/redis
+    command: redis-server /redis/redis.conf
+  
+  redis-node-6:
+    image: redis:latest
+    ports:
+      - 7005:7005
+    networks:
+      - redis-cluster-compose
+    hostname: redis-node-6
+    volumes:
+      - ./7005:/redis
+    command: redis-server /redis/redis.conf
+  
+  redis-cluster-creator:
+    image: redis:latest
+    ports:
+      - 6999:6999
+    networks:
+      - redis-cluster-compose
+    command: redis-cli -p 7000 --cluster create redis-node-1:7000 redis-node-2:7001 redis-node-3:7002 redis-node-4:7003 redis-node-5:7004 redis-node-6:7005 --cluster-replicas 1 --cluster-yes
+    depends_on:
+      - redis-node-1
+      - redis-node-2
+      - redis-node-3
+      - redis-node-4
+      - redis-node-5
+      - redis-node-6
+  
+  redis-insight:
+    image: redislabs/redisinsight
+    ports:
+      - 8001:8001
+    networks:
+      - redis-cluster-compose
+    volumes:
+      - ./redisinsight:/db
+    depends_on:
+      - redis-cluster-creator
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
