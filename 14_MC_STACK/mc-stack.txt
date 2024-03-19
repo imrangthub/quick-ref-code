@@ -99,6 +99,20 @@ https://www.youtube.com/playlist?list=PLVCgi5HZ0-YtWh-PD8LUCbdsG7oDIfGlD
 =================================================
 #redis | Redis                                     
 ================================================= 
+=>sudo apt install redis-tools
+=>redis-cli --version
+Run a Redis Server using docker and install resis-toos for redis-cli in ubuntu
+
+=>sudo systemctl status redis
+=>sudo vi /etc/redis/redis.conf
+Edit Config file, thne restart redis-service
+=>sudo systemctl restart redis-server
+
+
+=>redis-cli ping
+=>redis-cli
+=>redis-cli -p 8888
+
 redis-server -v
 redis-server --check-system
 
@@ -107,33 +121,10 @@ redis-server --check-system
 127.0.0.1:8888> CONFIG GET *
 Show currrent server configuration 
 
-
-
-
-
-
-
-
-
-
 docker run -v /home/bs960/imranMadbar/myPROJECT/redisWorkshop/redisLocalVol:/usr/local/etc/redis -p8080:8080 -d  --name myredis redis redis-server /usr/local/etc/redis/redis.conf
-
-
 =>docker run -p 8888:6379 --name my-redis1 -d redis
 =>docker run -p 8888:6379 --name my-redis1 -d my-redis
-=>sudo apt install redis-tools
-=>redis-cli --version
-Run a Redis Server using docker and install resis-toos for redis-cli in ubuntu
 
-=>sudo systemctl status redis
-=>sudo vi /etc/redis/redis.conf
-Edit Config file
-=>sudo systemctl restart redis-server
-
-
-=>redis-cli ping
-=>redis-cli
-=>redis-cli -p 8888
 
 
 
@@ -152,74 +143,49 @@ Remove all data
 
 
 
-#Redis Sentinel 
+
+#Redis HA 
 =================================================
-=>redis-cli
-=>redis-cli -p 8888
 
-=>redis-cli -h my_host -p my_port -a my_password
-=>redis-cli -h 172.16.7.161 -p 26379 -a pass
+Master Node:
+docker run -v /home/bs960/imranMadbar/myPROJECT/redisWorkshop/haV/master/config:/usr/local/etc/redis -v /home/bs960/imranMadbar/myPROJECT/redisWorkshop/haV/master/data:/data -p8080:8080 -d  --name redis_master redis redis-server /usr/local/etc/redis/redis.conf
 
-
-=>sentinel masters  
-=>sentinel get-master-addr-by-name mymaster
-Info about all master
-
-=>SENTINEL REPLICAS mymaster
-Show connected replicas
-
-
-
-=>info replication
-Show Master and Slave info
-
-
-sentinel master mymaster
-sentinel slaves mymaster
-
-
-
-
-
-
-
-Redis Performance Benchmarking
--------------------------------------------------
-
-
-redis-benchmark -q -n 1000000
-redis-benchmark -q -n 1000000 -p 8888
-redis-benchmark -q -n 1000000 -h 10.128.0.2
-redis-benchmark -q -n 100 -t get,set
-  -q means run this in a quit mode and just display us the output.
-  -n means the total number of queries to run during this test.
-
-
-
-
-
-
-redis.conf
----------------------------------------------------
-
-s960@BS-960:~/imranMadbar/myPROJECT/redisWorkshop/redisLocalVol$ cat redis.conf 
+Master: redis.conf file
 port 8080
 bind 0.0.0.0
 protected-mode no
 save 5 2
 rdbcompression yes
-dbfilename redis-dump.rdb
+dbfilename redis-master-dump.rdb
 dir /data
 
 
 
+Slave1
+docker run -v /home/bs960/imranMadbar/myPROJECT/redisWorkshop/haV/slave/config:/usr/local/etc/redis -v /home/bs960/imranMadbar/myPROJECT/redisWorkshop/haV/slave/data:/data -p8181:8181 -d  --name redis_slave redis redis-server /usr/local/etc/redis/redis.conf
 
-#Redis Cluster
+Slave: redis.conf file
+port 8181
+bind 0.0.0.0
+protected-mode no
+save 5 2
+rdbcompression yes
+dbfilename redis-slave-dump.rdb
+dir /data
+replicaof 192.168.217.145 8080
+
+
+
+
+redis-cli -p 8080
+redis-cli -p 8181
+=>info replication
+
+
+
+
+#Redis Sentinel 
 =================================================
-
-
-CreateClusterWay1
---------------------------------------------------
 
 Create Doecker Network:
 docker network create redis-net
@@ -254,69 +220,147 @@ docker inspect -f '{{.Name}} - {{range .NetworkSettings.Networks}}{{.IPAddress}}
 
 
 Create sentinel.conf file and provide master server details with master-node IP.
-echo "sentinel monitor mymaster 172.19.0.2 6379 2" > /home/bs960/imranMadbar/myPROJECT/redisWorkshop/redisCluster/wayOne/sentinel/sentinel_1/sentinel.conf
-echo "sentinel monitor mymaster 172.19.0.2 6379 2" > /home/bs960/imranMadbar/myPROJECT/redisWorkshop/redisCluster/wayOne/sentinel/sentinel_2/sentinel.conf
-echo "sentinel monitor mymaster 172.19.0.2 6379 2" > /home/bs960/imranMadbar/myPROJECT/redisWorkshop/redisCluster/wayOne/sentinel/sentinel_3/sentinel.conf
-OR | for SingleHost test case
-echo "sentinel monitor mymaster 192.168.1.4 6379 2" > /home/bs960/imranMadbar/myPROJECT/redisWorkshop/redisCluster/wayOne/sentinel/sentinel_1/sentinel.conf
-echo "sentinel monitor mymaster 192.168.1.4 6379 2" > /home/bs960/imranMadbar/myPROJECT/redisWorkshop/redisCluster/wayOne/sentinel/sentinel_2/sentinel.conf
-echo "sentinel monitor mymaster 192.168.1.4 6379 2" > /home/bs960/imranMadbar/myPROJECT/redisWorkshop/redisCluster/wayOne/sentinel/sentinel_3/sentinel.conf
-
+echo "sentinel monitor mymaster 172.19.0.2 6379 2" > /home/bs960/imranMadbar/myPROJECT/redisWorkshop/redisSentinel/sntnl1/sentinel.conf
+echo "sentinel monitor mymaster 172.19.0.2 6379 2" > /home/bs960/imranMadbar/myPROJECT/redisWorkshop/redisSentinel/sntnl2/sentinel.conf
+echo "sentinel monitor mymaster 172.19.0.2 6379 2" > /home/bs960/imranMadbar/myPROJECT/redisWorkshop/redisSentinel/sntnl3/sentinel.conf
 
 
 
 Create three docker containers for Sentinels:
-docker run -d --name redis-sentinel_1 -p 26381:26379 --network redis-net -v /home/bs960/imranMadbar/myPROJECT/redisWorkshop/redisCluster/wayOne/sentinel/sentinel_1:/data redis redis-sentinel /data/sentinel.conf
-docker run -d --name redis-sentinel_2 -p 26382:26379 --network redis-net -v /home/bs960/imranMadbar/myPROJECT/redisWorkshop/redisCluster/wayOne/sentinel/sentinel_2:/data redis redis-sentinel /data/sentinel.conf
-docker run -d --name redis-sentinel_3 -p 26383:26379 --network redis-net -v /home/bs960/imranMadbar/myPROJECT/redisWorkshop/redisCluster/wayOne/sentinel/sentinel_3:/data redis redis-sentinel /data/sentinel.conf
+docker run -d --name redis-sentinel_1 -p 26381:26379 --network redis-net -v /home/bs960/imranMadbar/myPROJECT/redisWorkshop/redisSentinel/sntnl1:/data redis redis-sentinel /data/sentinel.conf
+docker run -d --name redis-sentinel_2 -p 26382:26379 --network redis-net -v /home/bs960/imranMadbar/myPROJECT/redisWorkshop/redisSentinel/sntnl2:/data redis redis-sentinel /data/sentinel.conf
+docker run -d --name redis-sentinel_3 -p 26383:26379 --network redis-net -v /home/bs960/imranMadbar/myPROJECT/redisWorkshop/redisSentinel/sntnl3:/data redis redis-sentinel /data/sentinel.conf
 
 
 
-Login to sentinels:
-redis-cli -p 26381
-SENTINEL CONFIG GET *
 
-get Master info
-SENTINEL MASTERS
-SENTINEL MASTER mymaster
 
-get Sentins Info
-SENTINEL SENTINELS mymaster
+
+=>redis-cli -p 26381
+=>redis-cli -h my_host -p my_port -a my_password
+=>redis-cli -h 172.16.7.161 -p 26379 -a pass
+Login to sentinel
+
+
+=>sentinel masters  
+=>sentinel master mymaster
+Info about all master
+
+=>sentinel get-master-addr-by-name mymaster
+Get current master and port
+
+
+=>sentinel slaves mymaster
+=>SENTINEL REPLICAS mymaster
+Show connected replicas
+
+
 
 
 
 Get Master and Slave Info:
 import redis
-
-sentinel = redis.sentinel.Sentinel([('localhost', 26381)], socket_timeout=0.1)
+sentinel = redis.sentinel.Sentinel([('172.19.0.5', 26381),('localhost', 26382),('localhost', 26383)], socket_timeout=0.1)
 master = sentinel.discover_master('mymaster')
 print (master)
 replicas = sentinel.discover_slaves('mymaster')
 print(replicas)
-
-
-
-
-
-
-PythonAppTo wirtw redis using sentaninet:
-
-
+OR
+root@51e16a4bbd5a:/# cat wr2.py 
 import redis
+from redis.sentinel import Sentinel
 
-# Define Sentinel connection details
-sentinel = redis.sentinel.Sentinel([('localhost', 26381),('localhost', 26382),('localhost', 26383)], socket_timeout=0.1)
+# Define the list of Sentinel instances
+sentinel_servers = [('172.19.0.5', 26379),
+                    ('172.19.0.6', 26379),
+                    ('172.19.0.7', 26379)]
+
+# Define the service name
+service_name = 'mymaster'
+
+# Create a Sentinel object
+sentinel = Sentinel(sentinel_servers, socket_timeout=0.1)
+
+# Try to get the master
+try:
+    master = sentinel.master_for(service_name)
+    master.ping()  # Test the connection
+    print("Connected to the Redis master successfully.")
+except redis.exceptions.ConnectionError as e:
+    print(f"Failed to connect to the Redis master. Error: {e}")
+except Exception as e:
+    print(f"An error occurred: {e}")
+
+
+
+WriteDatausing Sentanels
+-----------------------------------------------------
+import redis
+sentinel = redis.sentinel.Sentinel([('172.19.0.5', 26381),('172.19.0.6', 26382),('172.19.0.7', 26383)], socket_timeout=0.1)
 master = sentinel.discover_master('mymaster')
 print (master)
 # Connect to the master Redis instance
 redis_master = redis.Redis(host=master[0], port=master[1], socket_timeout=0.1)
 
 # Set data in Redis
-redis_master.set('keyFromPy', 'This value write by 0 Python application')
+redis_master.set('keyFromPy', 'This value write by Python application')
 
 # Get data from Redis
 value = redis_master.get('keyFromPy')
 print(value)
+
+OR
+import redis
+from redis.sentinel import Sentinel
+sentinel_servers = [('172.19.0.5', 26379),
+                    ('172.19.0.6', 26379),
+                    ('172.19.0.7', 26379)]
+service_name = 'mymaster'
+sentinel = Sentinel(sentinel_servers, socket_timeout=0.1)
+
+try:
+    master = sentinel.master_for(service_name)
+    master.ping()
+    print("Connected to the Redis master successfully.")
+    master.set('keyFromPy', 'This is wirte from Python app throw Sentinent')
+    retrieved_value = master.get('keyFromPy')
+    print(f"Retrieved value for key keyFromPy: {retrieved_value.decode('utf-8')}")
+
+except redis.exceptions.ConnectionError as e:
+    print(f"Failed to connect to the Redis master. Error: {e}")
+except Exception as e:
+    print(f"An error occurred: {e}")
+
+
+
+
+
+
+Install Python on DockerContainer for checkRedis
+apt-get update
+apt-get install python3
+apt install python3-pip 
+pip install redis
+
+
+
+
+
+#Redis Performance Benchmarking
+==============================================
+
+
+redis-benchmark -q -n 1000000
+redis-benchmark -q -n 1000000 -p 8888
+redis-benchmark -q -n 1000000 -h 10.128.0.2
+redis-benchmark -q -n 100 -t get,set
+  -q means run this in a quit mode and just display us the output.
+  -n means the total number of queries to run during this test.
+
+
+
+
+
 
 
 
@@ -337,12 +381,6 @@ print(value)
 
 CreateClusterWay2
 --------------------------------------------------
-
-https://developer.redis.com/operate/redis-at-scale/scalability/exercise-1/
-https://blog.devops.dev/creating-a-redis-cluster-in-docker-0ce82ece9692
-https://ilhamdcp.hashnode.dev/creating-redis-cluster-with-docker-and-compose
-
-
 Create Doecker Network:
 docker network create redis-cluster
 
@@ -1323,6 +1361,8 @@ If storage engine is not InnoDB, use this to set it
 =================================================
 #  SPRING SOAP SERVICE                                          
 ================================================= 
+https://medium.com/@extio/developing-soap-web-services-with-spring-boot-a-comprehensive-guide-1d4f89bc3127
+
 
 http://localhost:8080/user-soap-service/user.wsdl
 http://localhost:8080/imranmadbar/ws/calculatorDemo.wsdl
@@ -1383,6 +1423,19 @@ Simple Soap Response:
 	  </ns2:output>
   </SOAP-ENV:Body>
 </SOAP-ENV:Envelope>
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
