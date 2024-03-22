@@ -142,6 +142,22 @@ Delete single key
 Remove all data
 
 
+=>redis-cli INFO MEMORY
+Check Memory
+
+=>redis-cli --latency-history
+For Latency Check
+
+
+=>CLIENT LIST
+It is possible to verify the number of active connections using the CLIENT LIST command.
+
+
+
+=>redis-cli --bigkeys
+redis-cli -h <hostname> -p <port> -a <password> --bigkeys
+For information about all key in redis (size, number of key etc)
+
 
 
 #Redis HA 
@@ -202,6 +218,10 @@ Create Replica Node:
 docker run --name redis-replica1 -p 6380:6379 --network redis-net -d redis redis-server --appendonly yes --slaveof redis-master 6379
 docker run --name redis-replica2 -p 6381:6379 --network redis-net -d redis redis-server --appendonly yes --slaveof redis-master 6379
 
+docker run --name redis-replica1 -p 6380:6379 --network redis-net -d redis redis-server --slaveof redis-master 6379
+docker run --name redis-replica2 -p 6381:6379 --network redis-net -d redis redis-server --slaveof redis-master 6379
+
+
 
 Login to Master slave, master allow write/read and slave allow only read(get).
 redis-cli -p 6379
@@ -219,7 +239,7 @@ docker inspect -f '{{.Name}} - {{range .NetworkSettings.Networks}}{{.IPAddress}}
 
 
 
-Create sentinel.conf file and provide master server details with master-node IP.
+Create sentinel.conf file and provide master server details with master-node (container) IP.
 echo "sentinel monitor mymaster 172.19.0.2 6379 2" > /home/bs960/imranMadbar/myPROJECT/redisWorkshop/redisSentinel/sntnl1/sentinel.conf
 echo "sentinel monitor mymaster 172.19.0.2 6379 2" > /home/bs960/imranMadbar/myPROJECT/redisWorkshop/redisSentinel/sntnl2/sentinel.conf
 echo "sentinel monitor mymaster 172.19.0.2 6379 2" > /home/bs960/imranMadbar/myPROJECT/redisWorkshop/redisSentinel/sntnl3/sentinel.conf
@@ -256,9 +276,19 @@ Show connected replicas
 
 
 
+docker run --name myng -d --network redis-net imranmadbar/nginx 
+docker run --name mypy -d --network redis-net python sleep 99999
+Run a simple client ng service, and install python
+
+Install Python on DockerContainer for checkRedis
+apt-get update
+apt-get install python3
+pip install redis
+apt-get install nano -y
 
 
-Get Master and Slave Info:
+
+Get Master and Slave Info (in side from docker):
 import redis
 sentinel = redis.sentinel.Sentinel([('172.19.0.5', 26381),('localhost', 26382),('localhost', 26383)], socket_timeout=0.1)
 master = sentinel.discover_master('mymaster')
@@ -266,7 +296,6 @@ print (master)
 replicas = sentinel.discover_slaves('mymaster')
 print(replicas)
 OR
-root@51e16a4bbd5a:/# cat wr2.py 
 import redis
 from redis.sentinel import Sentinel
 
@@ -292,39 +321,49 @@ except Exception as e:
     print(f"An error occurred: {e}")
 
 
-
 WriteDatausing Sentanels
 -----------------------------------------------------
 import redis
-sentinel = redis.sentinel.Sentinel([('172.19.0.5', 26381),('172.19.0.6', 26382),('172.19.0.7', 26383)], socket_timeout=0.1)
-master = sentinel.discover_master('mymaster')
-print (master)
-# Connect to the master Redis instance
-redis_master = redis.Redis(host=master[0], port=master[1], socket_timeout=0.1)
-
-# Set data in Redis
-redis_master.set('keyFromPy', 'This value write by Python application')
-
-# Get data from Redis
-value = redis_master.get('keyFromPy')
-print(value)
-
-OR
-import redis
 from redis.sentinel import Sentinel
+
 sentinel_servers = [('172.19.0.5', 26379),
                     ('172.19.0.6', 26379),
                     ('172.19.0.7', 26379)]
 service_name = 'mymaster'
+
 sentinel = Sentinel(sentinel_servers, socket_timeout=0.1)
+master = sentinel.master_for(service_name)
+replicas = sentinel.discover_slaves(service_name)
 
 try:
-    master = sentinel.master_for(service_name)
+    # Print current master and replicas
+    print("Master:", master.connection_pool.get_master_address())
+
+    print("Replicas:", replicas)
+
+    # Attempt to ping master
     master.ping()
     print("Connected to the Redis master successfully.")
-    master.set('keyFromPy', 'This is wirte from Python app throw Sentinent')
-    retrieved_value = master.get('keyFromPy')
-    print(f"Retrieved value for key keyFromPy: {retrieved_value.decode('utf-8')}")
+
+    # Ask for a key value and set it if provided
+    key = input("Enter the key: ").strip()
+    if key:
+        value = input("Enter the value: ").strip()
+        master.set(key, value)
+        print(f"Key '{key}' set successfully.")
+    else:
+        print("No key provided. Exiting.")
+
+    # Retrieve a key value if it exists
+    key_to_retrieve = input("Enter the key to retrieve: ").strip()
+    if key_to_retrieve:
+        retrieved_value = master.get(key_to_retrieve)
+        if retrieved_value:
+            print(f"Retrieved value: {retrieved_value.decode('utf-8')}")
+        else:
+            print(f"No value found for '{key_to_retrieve}'")
+    else:
+        print("No key provided for retrieval.")
 
 except redis.exceptions.ConnectionError as e:
     print(f"Failed to connect to the Redis master. Error: {e}")
@@ -336,11 +375,12 @@ except Exception as e:
 
 
 
-Install Python on DockerContainer for checkRedis
-apt-get update
-apt-get install python3
-apt install python3-pip 
-pip install redis
+
+
+
+
+
+
 
 
 
