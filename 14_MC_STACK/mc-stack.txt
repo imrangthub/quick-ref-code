@@ -385,8 +385,8 @@ except Exception as e:
 
 
 
-
-#Redis Performance Benchmarking
+==============================================
+#Redis Performance Benchmarking | Tuning
 ==============================================
 
 
@@ -396,6 +396,81 @@ redis-benchmark -q -n 1000000 -h 10.128.0.2
 redis-benchmark -q -n 100 -t get,set
   -q means run this in a quit mode and just display us the output.
   -n means the total number of queries to run during this test.
+
+
+Tuning
+---------------------------------------------------
+
+RDB Persistence and Append Only File
+If you are using the cluster mode of Redis then the RDB persistence and AOF is not required. So simply comment out these lines in redis.conf
+sudo vim /etc/redis/redis.conf
+
+# Comment out these lines
+save 900 1
+save 300 10
+save 60 10000
+
+rdbcompression no
+rdbchecksum no
+appendonly no
+
+
+
+Memory Usage
+Redis will use all of your available memory in the server unless this is configured. 
+edit your redis.conf just like below:
+	# Setting it to 16Gib
+	maxmemory 17179869184
+	
+maxmemory 500mb
+maxmemory-policy allkeys-lru
+
+
+	
+	
+TCP-KeepAlive
+Keepalive is a method to allow the same TCP connection for HTTP conversation instead of opening a new one with each new request.
+## Editing default config file /etc/redis/redis.conf
+# Update the value to 0
+tcp-keepalive 0
+
+
+
+TCP-backlog
+you will need this to be higher if you have many connections. To do this, edit your redis config file
+# TCP listen() backlog.
+# In high requests-per-second environments you need an high backlog in order
+# make sure to raise both the value of somaxconn and tcp_max_syn_backlog
+tcp-backlog 65536
+
+
+Set maxclients
+The default is 10000 and if you have many connections you may need to go higher
+# Once the limit is reached Redis will close all the new connections sending
+# an error 'max number of clients reached'.
+maxclients 10000
+
+HostSide:
+========
+Max-Connection
+sudo vim /etc/rc.local
+# make sure this line is just before of exit 0.
+sysctl -w net.core.somaxconn=65365
+
+
+Overcommit Memory
+Overcommit memory is a kernel parameter which checks if the memory is available or not.
+If the overcommit memory value is 0 then there is a chance that your Redis will get OOM (Out of Memory) error.
+echo 'vm.overcommit_memory = 1' >> /etc/sysctl.conf
+
+
+
+Transparent Huge Page(THP)
+but somehow it slows down the databases which are memory-based (for example — in the case of Redis). To overcome this issue you can disable THP.
+sudo vim /etc/rc.local
+
+# Add this line before exit 0
+echo never > /sys/kernel/mm/transparent_hugepage/enabled
 
 
 
