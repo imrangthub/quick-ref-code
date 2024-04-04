@@ -122,7 +122,7 @@ redis-server --check-system
 Show currrent server configuration 
 
 docker run -v /home/bs960/imranMadbar/myPROJECT/redisWorkshop/redisLocalVol:/usr/local/etc/redis -p8080:8080 -d  --name myredis redis redis-server /usr/local/etc/redis/redis.conf
-=>docker run -p 8888:6379 --name my-redis1 -d redis
+=>docker run -p 6379:6379 --name my-redis1 -d redis
 =>docker run -p 8888:6379 --name my-redis1 -d my-redis
 
 
@@ -369,14 +369,6 @@ except redis.exceptions.ConnectionError as e:
     print(f"Failed to connect to the Redis master. Error: {e}")
 except Exception as e:
     print(f"An error occurred: {e}")
-
-
-
-
-
-
-
-
 
 
 
@@ -1470,88 +1462,6 @@ Should output: default_storage_engine InnoDB
 
 =>SET GLOBAL default_storage_engine = 'InnoDB';
 If storage engine is not InnoDB, use this to set it
-
-
-
-=================================================
-#  SPRING SOAP SERVICE                                          
-================================================= 
-https://medium.com/@extio/developing-soap-web-services-with-spring-boot-a-comprehensive-guide-1d4f89bc3127
-
-
-http://localhost:8080/user-soap-service/user.wsdl
-http://localhost:8080/imranmadbar/ws/calculatorDemo.wsdl
-
-
-
-Simple Soap Request:
---------------------------------------
-
-<soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" 
-xmlns:cal="http://imranmadbar.com/types/calculator">
-	<soapenv:Header/>
-	<soapenv:Body>
-		<cal:SubtractionInput>
-			<cal:number1>10</cal:number1>
-			<cal:number2>4</cal:number2>
-		</cal:SubtractionInput>
-	</soapenv:Body>
-</soapenv:Envelope>
-
-<soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" xmlns:inh="http://com.imranmadbr/">
-   <soapenv:Header/>
-   <soapenv:Body>
-      <inh:opManager>
-         <!--Optional:-->
-         <version>2.0</version>
-         <service>xxx</service>
-         <method>xxx</method>
-         <param>xxxxxx</param>
-         <numberofparam>1</numberofparam>
-         <userid>xxxxxxx</userid>
-         <password>xxxxx</password>
-         <failclause>xxxx</failclause>
-      </inh:opManager>
-   </soapenv:Body>
-</soapenv:Envelope>
-
-
-
-<soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/"
-                  xmlns:us="http://imranmadbar.com/spring-boot-soap-service">
-    <soapenv:Header/>
-    <soapenv:Body>
-        <us:getUserRequest>
-            <us:name>imran</us:name>
-        </us:getUserRequest>
-    </soapenv:Body>
-</soapenv:Envelope>
-		
-Simple Soap Response:
--------------------------------------
-
-<SOAP-ENV:Envelope xmlns:SOAP-ENV="http://schemas.xmlsoap.org/soap/envelope/">
-  <SOAP-ENV:Header/>
-  <SOAP-ENV:Body>
-	  <ns2:output xmlns:ns2="http://imranmadbar.com/types/calculator">
-		  <ns2:result>6</ns2:result>
-	  </ns2:output>
-  </SOAP-ENV:Body>
-</SOAP-ENV:Envelope>
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 

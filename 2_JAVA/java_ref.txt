@@ -5306,3 +5306,193 @@ Major Garbage Collection (Major GC or Full GC): The Old Generation collection is
 Live objects in the Old Generation are identified.
 Unused (garbage) objects are collected, and memory is reclaimed.
 Compaction may occur to reduce fragmentation and ensure efficient memory usage.
+
+
+
+
+
+
+=================================================
+#Spring | spring boot | Spring Framework                                         
+================================================= 
+
+
+
+
+
+
+
+
+
+
+
+
+
+#  SPRING SOAP SERVICE                                          
+================================================= 
+https://medium.com/@extio/developing-soap-web-services-with-spring-boot-a-comprehensive-guide-1d4f89bc3127
+
+
+http://localhost:8080/user-soap-service/user.wsdl
+http://localhost:8080/imranmadbar/ws/calculatorDemo.wsdl
+
+
+
+Simple Soap Request:
+--------------------------------------
+
+<soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" 
+xmlns:cal="http://imranmadbar.com/types/calculator">
+	<soapenv:Header/>
+	<soapenv:Body>
+		<cal:SubtractionInput>
+			<cal:number1>10</cal:number1>
+			<cal:number2>4</cal:number2>
+		</cal:SubtractionInput>
+	</soapenv:Body>
+</soapenv:Envelope>
+
+<soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" xmlns:inh="http://com.imranmadbr/">
+   <soapenv:Header/>
+   <soapenv:Body>
+      <inh:opManager>
+         <!--Optional:-->
+         <version>2.0</version>
+         <service>xxx</service>
+         <method>xxx</method>
+         <param>xxxxxx</param>
+         <numberofparam>1</numberofparam>
+         <userid>xxxxxxx</userid>
+         <password>xxxxx</password>
+         <failclause>xxxx</failclause>
+      </inh:opManager>
+   </soapenv:Body>
+</soapenv:Envelope>
+
+
+
+<soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/"
+                  xmlns:us="http://imranmadbar.com/spring-boot-soap-service">
+    <soapenv:Header/>
+    <soapenv:Body>
+        <us:getUserRequest>
+            <us:name>imran</us:name>
+        </us:getUserRequest>
+    </soapenv:Body>
+</soapenv:Envelope>
+		
+Simple Soap Response:
+-------------------------------------
+
+<SOAP-ENV:Envelope xmlns:SOAP-ENV="http://schemas.xmlsoap.org/soap/envelope/">
+  <SOAP-ENV:Header/>
+  <SOAP-ENV:Body>
+	  <ns2:output xmlns:ns2="http://imranmadbar.com/types/calculator">
+		  <ns2:result>6</ns2:result>
+	  </ns2:output>
+  </SOAP-ENV:Body>
+</SOAP-ENV:Envelope>
+
+
+
+
+
+
+
+#Cloud | Gateway                                      
+=================================================
+
+Ratelimiting
+-------------------------------------------------
+  # Redis connection details
+  host: localhost  # Replace with your Redis server hostname/IP
+  port: 6379     # Replace with your Redis server port
+
+  # Define rate limit configurations (example for both users and clients)
+  user-rate-limit:
+    replenishRate: 10   # Replenish 10 tokens per second
+    burstCapacity: 20  # Allow a burst of 20 requests initially
+  client-rate-limit:
+    replenishRate: 5    # Replenish 5 tokens per second (different limit for clients)
+    burstCapacity: 15  # Allow a burst of 15 requests initially (different limit for clients)
+
+
+ routes:
+  - id: user-service  # Route for user requests
+    uri: lb://user-service  # Replace with your user service URI in Eureka
+    predicates:
+      - Path=/user/**  # Match requests starting with /user/
+    filters:
+      - RequestRateLimiter  # Apply rate limiting filter
+        keyResolver: userKeyResolver  # Define custom key resolver (explained later)
+
+  - id: customer-info  # Route for customer information requests
+    uri: lb://customer-info-service  # Replace with your customer service URI
+    predicates:
+      - Path=/customer/**  # Match requests starting with /customer/
+    filters:
+      - RequestRateLimiter  # Apply rate limiting filter
+        keyResolver: clientKeyResolver  # Define custom key resolver (explained later)
+
+
+Java
+@Component
+public class UserKeyResolver implements RequestRateLimiter.KeyResolver {
+
+  @Override
+  public String resolve(ServerWebExchange exchange) {
+    // Extract username from Keycloak token (assuming access token is present)
+    String username = extractUsernameFromToken(exchange.getRequest().getHeaders().get("Authorization"));
+    return "user:" + username;
+  }
+
+  // Implement logic to extract username from Keycloak token 
+  private String extractUsernameFromToken(List<String> authorization) {
+    // ... (your logic to parse token and extract username)
+  }
+}
+
+
+
+
+
+spring-cloud gateway filter
+--------------------------------
+
+
+
+import com.google.common.collect.ImmutableList;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.core.Ordered;
+import org.springframework.stereotype.Component;
+import org.springframework.web.server.ServerWebExchange;
+import org.springframework.web.server.WebFilter;
+import org.springframework.web.server.WebFilterChain;
+import reactor.core.publisher.Mono;
+
+
+@Component
+public class RequestIntercept implements WebFilter, Ordered {
+    private static Logger LOGGER = LoggerFactory.getLogger(RequestIntercept.class);
+    public static final ImmutableList<String> HEADERS_LIST =
+            ImmutableList.of(
+                    "Host",
+                    "User-Agent" );
+    @Override
+    public Mono<Void> filter(ServerWebExchange exchange, WebFilterChain chain) {
+        StringBuilder logData = new StringBuilder();
+        HEADERS_LIST.forEach((hedName)-> {
+            logData.append(hedName+": "+exchange.getRequest().getHeaders().getFirst(hedName)+" ");
+        });
+        LOGGER.info(logData.toString());
+        return chain.filter(exchange);
+    }
+    @Override
+    public int getOrder() {
+        return 1;
+    }
+
+}
+
+
