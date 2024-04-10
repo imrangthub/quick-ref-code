@@ -5315,6 +5315,199 @@ Compaction may occur to reduce fragmentation and ensure efficient memory usage.
 =================================================
 #Spring | spring boot | Spring Framework                                         
 ================================================= 
+https://github.com/eazybytes/spring
+
+
+SopWebService:
+https://github.com/in28minutes/spring-web-services/blob/master/soap-web-services/pom.xml
+https://github.com/in28minutes/spring-web-services/blob/master/3.0.0-upgrade-notes.md#soap-web-services-changes-for-spring-boot-3
+
+
+
+
+
+
+Gateway
+--------------------------------------------------
+@Bean
+public GatewayFilterFactory<RequestRateLimiterGatewayFilterFactory.Config> rateLimiterFilter() {
+    return new RequestRateLimiterGatewayFilterFactory() {
+        @Override
+        public Mono<Void> denyResponse(ServerWebExchange exchange, String key) {
+            ServerHttpResponse response = exchange.getResponse();
+            response.setStatusCode(HttpStatus.TOO_MANY_REQUESTS);
+            response.getHeaders().setContentType(MediaType.APPLICATION_JSON);
+            DataBuffer buffer = response.bufferFactory().wrap("{\"error\": \"RATE_LIMIT_EXCEEDED\", \"message\": \"Too many requests. Please try again later.\"}".getBytes());
+            return response.writeWith(Mono.just(buffer));
+        }
+    };
+}        
+
+
+@SuppressWarnings("unchecked")
+@Override
+public GatewayFilter apply(Config config) {
+  KeyResolver resolver = getOrDefault(config.keyResolver, defaultKeyResolver);
+  RateLimiter<Object> limiter = getOrDefault(config.rateLimiter, defaultRateLimiter);
+  boolean denyEmpty = getOrDefault(config.denyEmptyKey, this.denyEmptyKey);
+  HttpStatusHolder emptyKeyStatus = HttpStatusHolder.parse(getOrDefault(config.emptyKeyStatus, this.emptyKeyStatusCode));
+  return (exchange, chain) -> {
+    Route route = exchange.getAttribute(ServerWebExchangeUtils.GATEWAY_ROUTE_ATTR);
+    return resolver.resolve(exchange).defaultIfEmpty(EMPTY_KEY).flatMap(key -> {
+      if (EMPTY_KEY.equals(key)) {
+        if (denyEmpty) {
+          setResponseStatus(exchange, emptyKeyStatus);
+          return exchange.getResponse().setComplete();
+        }
+        return chain.filter(exchange);
+      }
+      return limiter.isAllowed(route.getId(), key).flatMap(response -> {
+        for (Map.Entry<String, String> header : response.getHeaders().entrySet()) {
+          exchange.getResponse().getHeaders().add(header.getKey(), header.getValue());
+        }
+        if (response.isAllowed()) {
+          return chain.filter(exchange);
+        }
+        setResponseStatus(exchange, config.getStatusCode());
+        return exchange.getResponse().setComplete();
+      });
+    });
+  };
+}
+
+
+
+import net.banglalink.apihub.openapi.edge.utils.JwtUtil;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cloud.gateway.route.RouteLocator;
+import org.springframework.cloud.gateway.route.builder.RouteLocatorBuilder;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.cloud.gateway.filter.ratelimit.KeyResolver;
+import org.springframework.cloud.gateway.filter.ratelimit.RedisRateLimiter;
+
+
+import org.springframework.context.annotation.Primary;
+import org.springframework.core.annotation.Order;
+import reactor.core.publisher.Mono;
+
+
+@Configuration
+public class GatewayConfiguration {
+
+
+
+    @Bean
+    @Primary
+    public RedisRateLimiter customerInfoRateLimiter() {
+        return new RedisRateLimiter(1, 1, 1);
+    }
+
+    @Bean
+    public RedisRateLimiter customerInfoRateLimiter5Tps() {
+        return new RedisRateLimiter(5, 5, 1);
+    }
+
+
+//    @Bean
+//    public KeyResolver hostAddressKeyResolver() {
+//        return exchange -> {
+//            return Mono.just(exchange.getRequest().getRemoteAddress().getAddress().getHostAddress());
+//        };
+//    }
+
+    @Autowired
+    private JwtUtil jwtUtil;
+
+
+
+    @Autowired
+    private RateLimitConfigurationService rateLimitConfigurationService;
+
+    @Bean
+    public KeyResolver userKeyResolver() {
+        return exchange -> Mono.just("391673b2-5106-4f9b-a801-7b92c0329d77")
+                .map(user -> rateLimitConfigurationService.getRateLimitForUser("391673b2-5106-4f9b-a801-7b92c0329d77").toString());
+    }
+
+
+    @Bean
+    public CustomRateLimiter customRateLimiter() {
+        return new CustomRateLimiter();
+    }
+
+
+    @Bean
+    public RouteLocator myRoutes(RouteLocatorBuilder builder, KeyResolver userKeyResolver) {
+
+
+
+        return builder.routes()
+                .route(p -> p.path("/openapi-customer-information/5tps/**")
+                        .filters(f -> f
+                                .filter(customRateLimiter())
+                                .rewritePath("/openapi-customer-information/5tps/(?<segment>.*)", "/${segment}")
+                         )
+                        .uri("lb://openapi-customer-information"))
+                .route(p -> p.path("/openapi-customer-information/**")
+                        .filters(f -> f
+                                .rewritePath("/openapi-customer-information/(?<segment>.*)", "/${segment}")
+                                .requestRateLimiter(r -> r.setRateLimiter(customerInfoRateLimiter())
+                                        .setKeyResolver(userKeyResolver)
+                                ))
+                        .uri("lb://openapi-customer-information"))
+
+                .route(p -> p.path("/openapi-iris/**")
+                        .filters(f -> f
+                                .rewritePath("/openapi-iris/(?<segment>.*)", "/${segment}"))
+                        .uri("lb://openapi-iris"))
+                .route(p -> p.path("/openapi-cms/**")
+                        .filters(f -> f
+                                .rewritePath("/openapi-cms/(?<segment>.*)", "/${segment}"))
+                        .uri("lb://openapi-cms"))
+                .route(p -> p.path("/openapi-complaint-management/**")
+                        .filters(f -> f
+                                .rewritePath("/openapi-complaint-management/(?<segment>.*)", "/${segment}"))
+                        .uri("lb://openapi-complaint-management"))
+                .route(p -> p.path("/openapi-evservice/**")
+                        .filters(f -> f
+                                .rewritePath("/openapi-evservice/(?<segment>.*)", "/${segment}"))
+                        .uri("lb://openapi-evservice"))
+                .route(p -> p.path("/openapi-lms/**")
+                        .filters(f -> f
+                                .rewritePath("/openapi-lms/(?<segment>.*)", "/${segment}"))
+                        .uri("lb://openapi-lms"))
+                .route(p -> p.path("/openapi-otp/**")
+                        .filters(f -> f
+                                .rewritePath("/openapi-otp/(?<segment>.*)", "/${segment}"))
+                        .uri("lb://openapi-otp"))
+                .route(p -> p.path("/openapi-provisioning/**")
+                        .filters(f -> f
+                                .rewritePath("/openapi-provisioning/(?<segment>.*)", "/${segment}"))
+                        .uri("lb://openapi-provisioning"))
+                .route(p -> p.path("/openapi-usages-history/**")
+                        .filters(f -> f
+                                .rewritePath("/openapi-usages-history/(?<segment>.*)", "/${segment}"))
+                        .uri("lb://openapi-usages-history"))
+                .build();
+    }
+
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -5330,11 +5523,24 @@ Compaction may occur to reduce fragmentation and ensure efficient memory usage.
 
 #  SPRING SOAP SERVICE                                          
 ================================================= 
+UdamyCourse for SOAP Service:
+Master Java Web Services and REST API with Spring Boot
+
+
+
 https://medium.com/@extio/developing-soap-web-services-with-spring-boot-a-comprehensive-guide-1d4f89bc3127
 
 
 http://localhost:8080/user-soap-service/user.wsdl
 http://localhost:8080/imranmadbar/ws/calculatorDemo.wsdl
+
+
+
+Create Soap Service:
+-------------------------------------
+Setp1: Define Request Response xml 
+setp2: Create .xsd file for validateion Request/response xml file
+Step3: For Get Java Pojo class for req/response from as .xsd file add JAXB library in pom file
 
 
 
