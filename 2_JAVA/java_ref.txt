@@ -5702,3 +5702,146 @@ public class RequestIntercept implements WebFilter, Ordered {
 }
 
 
+
+
+=================================================
+#FeignClient
+=================================================
+
+
+import org.springframework.cloud.openfeign.FeignClient;
+import org.springframework.web.bind.annotation.GetMapping;
+
+import feign.Response;
+
+@FeignClient(name = "exampleClient", url = "https://api.example.com")
+public interface ExampleClient {
+
+    @GetMapping("/resource")
+    Response getResource();
+}
+
+
+================================================
+
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
+import feign.Response;
+import feign.Util;
+
+@Service
+public class ExampleService {
+
+    @Autowired
+    private ExampleClient exampleClient;
+
+    public String fetchDataFromExternalService() {
+        Response response = exampleClient.getResource();
+        try {
+            if (response != null && response.body() != null) {
+                // Consume the response body
+                String responseBody = Util.toString(response.body().asReader());
+                
+                // Do something with the response body
+                return responseBody;
+            } else {
+                // Handle the case where response or response body is null
+                return "Error: Response or response body is null";
+            }
+        } finally {
+            // Close the response to release the connection
+            if (response != null) {
+                response.close();
+            }
+        }
+    }
+}
+
+
+===============
+
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
+import feign.Response;
+import feign.Util;
+
+@Service
+public class ExampleService {
+
+    @Autowired
+    private ExampleClient exampleClient;
+
+    public String fetchDataFromExternalService() {
+        try (Response response = exampleClient.getResource()) {
+            if (response != null && response.body() != null) {
+                // Consume the response body
+                String responseBody = Util.toString(response.body().asReader());
+                
+                // Do something with the response body
+                return responseBody;
+            } else {
+                // Handle the case where response or response body is null
+                return "Error: Response or response body is null";
+            }
+        } catch (IOException e) {
+            // Handle IOException if any
+            e.printStackTrace();
+            return "Error: IOException occurred";
+        }
+    }
+}
+
+===================================
+
+
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.ApplicationRunner;
+import org.springframework.boot.SpringApplication;
+import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.cloud.openfeign.FeignClient;
+import org.springframework.context.annotation.Bean;
+import org.springframework.stereotype.Component;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+
+@SpringBootApplication
+@Slf4j
+public class FallbackApplication {
+
+    public static void main(String[] args) {
+        SpringApplication.run(FallbackApplication.class, args);
+    }
+
+    @Autowired
+    private FeignClientTest feignClientTest;
+
+    @Bean
+    public ApplicationRunner test() {
+        return args -> {
+            String fromFakeUrl = feignClientTest.getFromFakeUrl();
+            log.info("{}", fromFakeUrl);
+        };
+    }
+
+    @FeignClient(name = "feignClientTest", url = "invalid.url", fallback = FallbackTest.class)
+    public interface FeignClientTest {
+
+        @RequestMapping(method = RequestMethod.GET, value = "/fake/url")
+        String getFromFakeUrl();
+    }
+
+    @Component
+    public class FallbackTest implements FeignClientTest {
+
+        @Override
+        public String getFromFakeUrl() {
+            log.debug("Fallback occurred for getFromFakeUrl");
+            return "Fallback";
+        }
+    }
+}

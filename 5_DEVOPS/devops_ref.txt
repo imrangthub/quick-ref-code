@@ -50,8 +50,6 @@ Show current space free memory size
 
 =>tail -n 10000 nohup.out | grep -a20 'PrematureCloseException'
 
-=>ab -s 3 -n 100 -c 10 http://localhost:80
-=>ab -s0.100   http://localhost:9990/ping
 
 
 =================================================
@@ -112,6 +110,15 @@ Check Connecton
 =================================================
 #http | connection | sockets | HTTP                
 ================================================= 
+
+ss -ta 
+ss -ta | grep CLOSE-WAIT
+ss -tap | grep CLOSE-WAIT
+ss -tap state CLOSE-WAIT
+OR
+netstat -an 1
+netstat -an 1 | find "xxx.xxx.62.89"
+Show the connection in local,remote and process id 
 
 sudo lsof -i -n -P | grep <PID>
 Check socket status by processId
@@ -528,6 +535,10 @@ server.tomcat.accept-count：The length of the waiting queue, with a default siz
 
 Apache Bench
 --------------------------------------------------
+=>ab -s 3 -n 100 -c 10 http://localhost:80
+=>ab -s0.100   http://localhost:9990/ping
+
+
 Let’s try it by using Apache Bench to execute 1000 parallel requests:
 ab -n 1000 -c 1000 http://localhost:8085/test
 
