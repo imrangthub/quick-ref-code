@@ -5310,6 +5310,47 @@ Compaction may occur to reduce fragmentation and ensure efficient memory usage.
 
 
 
+visualVM | Remote connect
+---------------------------------------------------
+
+/app/apihub/jdks/jdk-17.0.7/bin/java -Dcom.sun.management.jmxremote.port=9991  -Dcom.sun.management.jmxremote.ssl=false  -Dcom.sun.management.jmxremote.authenticate=false  -Xms1024m -Xmx1024m -jar integration-svc1-0.0.1-SNAPSHOT.jar
+
+
+
+
+java -Dcom.sun.management.jmxremote -Dcom.sun.management.jmxremote.port=8090 -Dcom.sun.management.jmxremote.authenticate=false -Dcom.sun.management.jmxremote.ssl=false -jar integration-svc1-0.0.1-SNAPSHOT.jar
+
+
+
+
+MaveBuildConnamd 
+mvn spring-boot:run -Dspring-boot.run.jvmArguments="-Xdebug -Dcom.sun.management.jmxremote -Dcom.sun.management.jmxremote.port=9010 -Dcom.sun.management.jmxremote.rmi.port=9010 -Dcom.sun.management.jmxremote.authenticate=false -Dcom.sun.management.jmxremote.ssl=false -Djava.rmi.server.hostname=localhost"
+
+
+
+How to set up remote visual VM
+
+We need set the below properties while running jar
+
+    -Dcom.sun.management.jmxremote=true 
+    -Dcom.sun.management.jmxremote.port=<PORT> 
+    -Dcom.sun.management.jmxremote.authenticate=false 
+    -Dcom.sun.management.jmxremote.ssl=false 
+    -Djava.rmi.server.hostname=<SEVER IP_ADDRESS> 
+    -Dcom.sun.management.jmxremote.rmi.port=<PORT>
+
+
+java -Dcom.sun.management.jmxremote=true -Dcom.sun.management.jmxremote.port=6001 -Dcom.sun.management.jmxremote.authenticate=false -Dcom.sun.management.jmxremote.ssl=false -Djava.rmi.server.hostname=192.168.251.9 -Dcom.sun.management.jmxremote.rmi.port=6001 -jar integration-svc1-0.0.1-SNAPSHOT.jar
+
+
+
+/app/apihub/jdks/jdk-17.0.7/bin/java -Dcom.sun.management.jmxremote=true -Dcom.sun.management.jmxremote.port=6001 -Dcom.sun.management.jmxremote.authenticate=false -Dcom.sun.management.jmxremote.ssl=false -Djava.rmi.server.hostname=172.16.254.122 -Dcom.sun.management.jmxremote.rmi.port=6001 -jar integration-svc1-0.0.1-SNAPSHOT.jar
+
+
+
+
+
+
 
 
 =================================================
@@ -5318,19 +5359,12 @@ Compaction may occur to reduce fragmentation and ensure efficient memory usage.
 https://github.com/eazybytes/spring
 
 
-SopWebService:
-https://github.com/in28minutes/spring-web-services/blob/master/soap-web-services/pom.xml
-https://github.com/in28minutes/spring-web-services/blob/master/3.0.0-upgrade-notes.md#soap-web-services-changes-for-spring-boot-3
-
-
-
-
-
 
 Gateway
 --------------------------------------------------
 @Bean
-public GatewayFilterFactory<RequestRateLimiterGatewayFilterFactory.Config> rateLimiterFilter() {
+public GatewayFilterFactory<RequestRateLimiterGatewayFilterFactory.
+Config> rateLimiterFilter() {
     return new RequestRateLimiterGatewayFilterFactory() {
         @Override
         public Mono<Void> denyResponse(ServerWebExchange exchange, String key) {
@@ -5498,36 +5532,8 @@ public class GatewayConfiguration {
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 #  SPRING SOAP SERVICE                                          
 ================================================= 
-UdamyCourse for SOAP Service:
-Master Java Web Services and REST API with Spring Boot
-
-
-
 https://medium.com/@extio/developing-soap-web-services-with-spring-boot-a-comprehensive-guide-1d4f89bc3127
 
 
@@ -5536,11 +5542,13 @@ http://localhost:8080/imranmadbar/ws/calculatorDemo.wsdl
 
 
 
+
+
 Create Soap Service:
 -------------------------------------
 Setp1: Define Request Response xml 
 setp2: Create .xsd file for validateion Request/response xml file
-Step3: For Get Java Pojo class for req/response from as .xsd file add JAXB library in pom file
+Step3: For generate Java Pojo class for req/response from as .xsd file add JAXB library in pom file
 
 
 

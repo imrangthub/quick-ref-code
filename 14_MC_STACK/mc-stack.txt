@@ -1625,3 +1625,166 @@ volumes:
 
 docker-compose up -d
 docker run --rm --network=kong_kong-net  -e "KONG_DATABASE=postgres"  -e "KONG_PG_HOST=kong-database"  -e "KONG_PG_PASSWORD=kongpass"  -e "KONG_PASSWORD=test" kong/kong-gateway:3.6.0.0 kong migrations bootstrap
+
+
+
+
+
+
+
+
+
+
+=================================================
+#XML Requst/Response | xml | 
+=================================================
+ XML-RPC (Remote Procedure Call) is a remote procedure call protocol that uses XML to encode its calls and HTTP as a 
+ transport mechanism. 
+ It's simpler in structure compared to SOAP and doesn't have the extensive envelope structure associated with SOAP.
+
+
+
+
+
+
+
+
+REST vs SOAP
+-----------------------------------------------
+REST vs SOAP are not really comparable. REST is an architectural style. SOAP is a message exchange format.
+
+Let’s compare the popular implementations of REST and SOAP styles.
+
+RESTful Sample Implementation : JSON over HTTP
+SOAP Sample Implementation : XML over SOAP over HTTP
+
+
+
+================================================= 
+#SOAP SERVICE    | soap service | web-service                                     
+================================================= 
+SopWebService:
+https://www.springboottutorial.com/creating-soap-web-service-with-spring-boot-web-services-starter
+https://github.com/in28minutes/spring-boot-examples/tree/master/spring-boot-tutorial-soap-web-services
+
+
+https://medium.com/@extio/developing-soap-web-services-with-spring-boot-a-comprehensive-guide-1d4f89bc3127
+
+UdamyCourse for SOAP Service:
+Master Java Web Services and REST API with Spring Boot
+
+
+
+
+
+
+What is SOAP Web Services ?
+	In short, a web service is a machine-to-machine, platform-independent service that allows communication over a network.
+	SOAP is a messaging protocol. Messages (requests and responses) are XML documents over HTTP. 
+	The XML contract is defined by the WSDL (Web Services Description Language). It provides a set of rules to define the messages, 
+	bindings, operations, and location of the service.
+
+Contract-First/Contract-Last Development Style OR Top-Down vs. Bottom-Up:
+	There are two possible approaches when creating a web service: Contract-Last and Contract-First. 
+	When we use a contract-last approach, we start with the Java code and generate the web service contract (WSDL) from the classes. 
+	When using contract-first, we start with the WSDL contract, from which we generate the Java classes.
+Spring-WS only supports the contract-first development style.
+
+	There are two ways of building SOAP web services. We can go with a top-down approach or a bottom-up approach.
+	In a top-down (contract-first) approach, a WSDL document is created, and the necessary Java classes are generated from the WSDL. 
+	In a bottom-up (contract-last) approach, the Java classes are written, and the WSDL is generated from the Java classes.
+
+
+WSDL
+WSDL is used to define the structure of Request and the Structure of Response xml.
+
+WSDL will explain:
+	What are the different services (operations) exposed by the server?
+	How can a service (operation) be called? What url to use? (also called End Point).
+	What should the structure of request xml?
+	What should be the structure of response xml?
+
+
+A SOAP service typically follows the SOAP message structure, which includes:
+	<SOAP-Envelope>: The root element that encapsulates the entire SOAP message.
+	<SOAP-Header> (optional): Contains header information such as authentication credentials or message routing details.
+	<SOAP-Body>: Contains the actual payload or data being sent.
+	<SOAP-Fault> (optional): Used to convey error information if a fault occurs during processing.
+
+
+
+
+
+
+Create Soap Service:
+-------------------------------------
+Setp1: Define Request Response xml 
+setp2: Create .xsd file for validateion Request/response xml file
+Step3: For generate Java Pojo class for req/response from as .xsd file add JAXB library in pom file
+
+
+
+Simple Soap Request:
+--------------------------------------
+
+<soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" 
+xmlns:cal="http://imranmadbar.com/types/calculator">
+	<soapenv:Header/>
+	<soapenv:Body>
+		<cal:SubtractionInput>
+			<cal:number1>10</cal:number1>
+			<cal:number2>4</cal:number2>
+		</cal:SubtractionInput>
+	</soapenv:Body>
+</soapenv:Envelope>
+
+<soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" xmlns:inh="http://com.imranmadbr/">
+   <soapenv:Header/>
+   <soapenv:Body>
+      <inh:opManager>
+         <!--Optional:-->
+         <version>2.0</version>
+         <service>xxx</service>
+         <method>xxx</method>
+         <param>xxxxxx</param>
+         <numberofparam>1</numberofparam>
+         <userid>xxxxxxx</userid>
+         <password>xxxxx</password>
+         <failclause>xxxx</failclause>
+      </inh:opManager>
+   </soapenv:Body>
+</soapenv:Envelope>
+
+
+
+<soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/"
+                  xmlns:us="http://imranmadbar.com/spring-boot-soap-service">
+    <soapenv:Header/>
+    <soapenv:Body>
+        <us:getUserRequest>
+            <us:name>imran</us:name>
+        </us:getUserRequest>
+    </soapenv:Body>
+</soapenv:Envelope>
+		
+Simple Soap Response:
+-------------------------------------
+
+<SOAP-ENV:Envelope xmlns:SOAP-ENV="http://schemas.xmlsoap.org/soap/envelope/">
+  <SOAP-ENV:Header/>
+  <SOAP-ENV:Body>
+	  <ns2:output xmlns:ns2="http://imranmadbar.com/types/calculator">
+		  <ns2:result>6</ns2:result>
+	  </ns2:output>
+  </SOAP-ENV:Body>
+</SOAP-ENV:Envelope>
+
+
+
+
+
+
+
+
+
+
