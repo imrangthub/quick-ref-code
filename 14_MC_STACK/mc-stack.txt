@@ -956,7 +956,7 @@ CREATE A TOPIC TO STORE YOUR EVENTS
 
 SetUp Kafka SingleCluster
 -------------------------------------------------
-Start up the Zookeeper.
+Start up the Zookeeper
 =>./zookeeper-server-start.sh ../config/zookeeper.properties
 
 Add the below properties in the server.properties
@@ -1085,37 +1085,45 @@ consumer group
 
 Kafka Info Doc:
 ---------------------------------------------------------
-
-Kafka 4mainComponent:
-  Broker: Stores and manages data.Its a java process, can incress horizontally.
-  ZooKeeper: Manages Kafka cluster's configuration and coordination.
-  Producer: Sends data to Kafka. Communicate with broker with tcp. Producer create record with partiation number attributes.
-  Consumer: Receives data from Kafka
+SpringKafka:
+https://gale.udemy.com/course/apache-kafka-for-developers-using-springboot/learn/lecture/37906902#overview
+udTut-repo:
+https://github.com/dilipsundarraj1/kafka-for-developers-using-spring-boot-v2/blob/main/SetUpKafkaDocker.md#set-up-broker-and-zookeeper
 
 
-Kafka-Records:
-  exist within Kafka topics. When data is produced to Kafka, it is encapsulated into records and appended to the 
-  log (partition) of the respective topic. Each record consists of a key, a value, headers, timestamp, offset,
-   and possibly other metadata. 
+Main Concepts and Terminology
+Events,records,message:
+  An event records the fact that "something happened" in the world or in your business. 
+  It is also called record or message in the documentation. When you read or write data to Kafka, you do this in the form of events. 
+  Conceptually, an event has a key, value, timestamp, and optional metadata headers. 
+
+Topics:
+  Events are organized and durably stored in topics. 
+  Very simplified, a topic is similar to a folder in a filesystem, and the events are the files in that folder. 
+
+Here's an example event:
+  Event key: "Alice"
+  Event value: "Made a payment of $200 to Bob"
+  Event timestamp: "Jun. 25, 2020 at 2:06 p.m."
+
+Topics in Kafka are always multi-producer and multi-subscriber: a topic can have zero, one, or many producers that write events to it, 
+as well as zero, one, or many consumers that subscribe to these events
+unlike traditional messaging systems, events are not deleted after consumption. 
+Instead, you define for how long Kafka should retain your events through a per-topic configuration setting, 
+after which old events will be discarded. 
+
+Partition:
+  Topics are partitioned, meaning a topic is spread over a number of "buckets" located on different Kafka brokers. 
+  This distributed placement of your data is very important for scalability because it allows client applications to 
+  both read and write the data from/to many brokers at the same time. 
+  When a new event is published to a topic, it is actually appended to one of the topic's partitions. 
+  Events with the same event key (e.g., a customer or vehicle ID) are written to the same partition, 
+  and Kafka guarantees that any consumer of a given topic-partition will always read that partition's events in exactly the same 
+  order as they were written.
 
 
-Record comprises several components:
-
-  Key: An optional identifier for the record.
-  Value: The main data payload.
-  Headers: Optional metadata associated with the record.
-  Timestamp: Indicates when the record was produced or ingested into Kafka.
-  Offset: A unique identifier assigned to each record within a partition.
-  Partition: Specifies the partition to which the record belongs.
-
-
-To Unique identify a reocrd use (partition+Offset) composit key number. 
-
-
-
-
-Replication Factor: Replication factor factor make partation duplicate.
-  If replication-factor=2 then every partation has two copy if three then the number of copy is 3.
+Partition offset:
+  Each partitioned message has a unique sequence id called as offset.
 
 
 
@@ -1123,6 +1131,22 @@ Replication Factor: Replication factor factor make partation duplicate.
 
 
 
+
+Kafka:
+  Kafka is a distributed event streaming platform that lets you read, write, store, and process events 
+  (also called records or messages in the documentation) across many machines.
+
+  These events are organized and stored in topics. 
+  A topic is similar to a folder in a filesystem, and the events are the files in that folder.
+So before you can write your first events, you must create a topic.
+
+
+
+A Kafka client communicates with the Kafka brokers via the network for writing (or reading) events. 
+Once received, the brokers will store the events in a durable and fault-tolerant manner for as long as you need—even forever.
+
+
+Events are durably stored in Kafka, they can be read as many times and by as many consumers as you want. 
 
 
 
@@ -1163,17 +1187,43 @@ Consumer have three option to reload
 
 
 
+Kafka 4 main Component:
+  Broker: Stores and manages data.Its a java process, can incress horizontally.
+  ZooKeeper: Manages Kafka cluster's configuration and coordination.
+  Producer: Sends data to Kafka. Communicate with broker with tcp. Producer create record with partiation number attributes.
+  Consumer: Receives data from Kafka
 
 
-SpringKafka:
-https://gale.udemy.com/course/apache-kafka-for-developers-using-springboot/learn/lecture/37906902#overview
+Kafka-Records:
+  exist within Kafka topics. When data is produced to Kafka, it is encapsulated into records and appended to the 
+  log (partition) of the respective topic. Each record consists of a key, a value, headers, timestamp, offset,
+   and possibly other metadata. 
+
+
+Record comprises several components:
+
+  Key: An optional identifier for the record.
+  Value: The main data payload.
+  Headers: Optional metadata associated with the record.
+  Timestamp: Indicates when the record was produced or ingested into Kafka.
+  Offset: A unique identifier assigned to each record within a partition.
+  Partition: Specifies the partition to which the record belongs.
+
+
+To Unique identify a reocrd use (partition+Offset) composit key number. 
+
+
+
+
+Replication Factor: Replication factor factor make partation duplicate.
+  If replication-factor=2 then every partation has two copy if three then the number of copy is 3.
 
 
 
 
 
-udTut-repo:https://github.com/dilipsundarraj1/kafka-for-developers-using-spring-boot-v2/blob/main/SetUpKafkaDocker.md#set-up-broker-and-zookeeper
-
+Example:
+=================================================
 Producer and Consume the Messages
 Let's going to the container by running the below command.
 docker exec -it kafka1 bash
