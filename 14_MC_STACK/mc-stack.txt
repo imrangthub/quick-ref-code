@@ -931,6 +931,16 @@ Headers Exchange (One-to-Many Relationship based on Message Attributes):
 =================================================
 #kafka | Message broker  | KAFKA                                        
 ================================================= 
+
+Docker:
+-------------------------------------------------
+docker pull apache/kafka:latest
+docker run --name my-kafka -pd 9092:9092 apache/kafka:latest
+docker exec -it 05e1154341ef bash
+bash kafka-topics.sh --version
+
+
+
 OfsetExpolar
 kafkalytic-intelejidea-pluging
 
@@ -945,13 +955,6 @@ Kafka with ZooKeeper
 $ bin/zookeeper-server-start.sh config/zookeeper.properties
 # Start the Kafka broker service
 $ bin/kafka-server-start.sh config/server.properties
-
-
-$ bin/kafka-topics.sh --create --topic quickstart-events --bootstrap-server localhost:9092
-CREATE A TOPIC TO STORE YOUR EVENTS
-
-=>cd /opt/apache-kafka/kafka3_6/bin
-
 
 
 SetUp Kafka SingleCluster
@@ -969,7 +972,7 @@ Start up the Kafka Broker
 
 
 Create a topic
-=>./kafka-topics.sh --create --topic test-topic --bootstrap-server localhost:9092 --partitions 4 --replication-factor 1
+=>./kafka-topics.sh --create --topic test-topic1 --bootstrap-server localhost:9092 --partitions 2 --replication-factor 1
 =>./kafka-topics.sh --list  --bootstrap-server localhost:9092
 
 
@@ -979,18 +982,37 @@ Create a topic
 
 
 Create Console Producer
-=>./kafka-console-producer.sh --broker-list localhost:9092 --topic test-topic
+=>./kafka-console-producer.sh --broker-list localhost:9092 --topic test-topic1
+=>./kafka-console-producer.sh --broker-list localhost:9092 --topic test-topic1 --property "partition=0"
 =>./kafka-console-producer.sh --broker-list localhost:9092 --topic test-topic --property "key.separator=-" --property "parse.key=true"
 
 Create Console Consumer
 =>./kafka-console-consumer.sh --bootstrap-server localhost:9092 --topic test-topic --from-beginning
+=>./kafka-console-consumer.sh --bootstrap-server localhost:9092 --topic test-topic1 --from-beginning   --partition 1
+=>./kafka-console-consumer.sh --bootstrap-server localhost:9092 --topic test-topic1 --from-beginning   --partition 1 --offset 23
 =>./kafka-console-consumer.sh --bootstrap-server localhost:9092 --topic test-topic --from-beginning -property "key.separator= - " --property "print.key=true"
+
+If a consumer don not mentation any partition onlhy topic name then the consumer reveived all pertation message,
+If consumer run with a partition number with topic then this consumer only reveived this mentationed  partition message.
+SameAs:
+If producer mentation partition number, its only gose to those partition, if not kafka defined a pertation number.
+
+
+
 
 
 
 
 Consumer Groups:
-=>./kafka-consumer-groups.sh --bootstrap-server localhost:9092 --list
+=>./kafka-consumer-groups.sh --bootstrap-server localhost:9092 --all-groups --describe
+Show all topic,pertation,and offset number
+
+=>./kafka-console-consumer.sh --bootstrap-server localhost:9092 --topic test-topic1 --group my-consumer-group
+
+
+
+
+
 
 
 
@@ -1083,23 +1105,24 @@ consumer group
 
 
 
-Kafka Info Doc:
+Kafka Info Doc: Main Concepts and Terminology
 ---------------------------------------------------------
+https://stackoverflow.com/questions/38024514/understanding-kafka-topics-and-partitions
 SpringKafka:
 https://gale.udemy.com/course/apache-kafka-for-developers-using-springboot/learn/lecture/37906902#overview
 udTut-repo:
 https://github.com/dilipsundarraj1/kafka-for-developers-using-spring-boot-v2/blob/main/SetUpKafkaDocker.md#set-up-broker-and-zookeeper
 
 
-Main Concepts and Terminology
 Events,records,message:
   An event records the fact that "something happened" in the world or in your business. 
-  It is also called record or message in the documentation. When you read or write data to Kafka, you do this in the form of events. 
-  Conceptually, an event has a key, value, timestamp, and optional metadata headers. 
+  It is also called record or message. an event has a key, value, timestamp, and optional metadata headers. 
 
 Topics:
   Events are organized and durably stored in topics. 
   Very simplified, a topic is similar to a folder in a filesystem, and the events are the files in that folder. 
+  Events are durably stored in Kafka, they can be read as many times and by as many consumers as you want. 
+
 
 Here's an example event:
   Event key: "Alice"
@@ -1120,33 +1143,55 @@ Partition:
   Events with the same event key (e.g., a customer or vehicle ID) are written to the same partition, 
   and Kafka guarantees that any consumer of a given topic-partition will always read that partition's events in exactly the same 
   order as they were written.
+Each partition can be considered an ordered sequence of records. These partitions allow for parallel processing of messages 
+within a topic.
 
 
 Partition offset:
   Each partitioned message has a unique sequence id called as offset.
+  Offsets only link to a single message within a single partition of a topic.There is no easy way to find the offset for a single message.
 
 
 
 
+Consumer Groups: 
+  They're logical groups of Kafka consumers. Each consumer in a group is assigned one or more partitions of a topic for processing. 
+  With multiple consumers in the same group, they can work together to process all the partitions, enabling parallel processing.
+Kafka keeps track of the last consumed message offset for each consumer group, so if you produce new messages, 
+they will only be consumed if they have a higher offset than the last consumed message.
+
+Consumer Groups How  Works:
+  Assignment: When a consumer joins a group, Kafka assigns it one or more partitions to consume from. 
+  The assignment is handled by the Kafka group coordinator.
+
+  Rebalancing: When a consumer leaves the group (due to failure or scaling down), Kafka rebalances the remaining consumers 
+  so that each partition is still covered.
+
+  Offset Storage: Kafka stores the offset of the last consumed message for each partition in the group. 
+  This can be stored in Kafka itself or in an external storage.
 
 
 
 
-Kafka:
-  Kafka is a distributed event streaming platform that lets you read, write, store, and process events 
-  (also called records or messages in the documentation) across many machines.
-
-  These events are organized and stored in topics. 
-  A topic is similar to a folder in a filesystem, and the events are the files in that folder.
-So before you can write your first events, you must create a topic.
+Producer:
+By default, the producer doesn't care about partitioning. 
+You have the option to use a customized partitioner to have a better control, but it's totally optional.
 
 
+Consumer:
+ Consumers join (or create if they're alone) a consumer group to share load. 
+ No two consumers in the same group will ever receive the same message.
 
-A Kafka client communicates with the Kafka brokers via the network for writing (or reading) events. 
-Once received, the brokers will store the events in a durable and fault-tolerant manner for as long as you need—even forever.
+Since this is a queue with an offset for each partition, is it responsibility of the consumer to specify which messages 
+it wants to read? Does it need to save its state?
+Yes, consumers save an offset per topic per partition. This is totally handled by Kafka, no worries about it.
 
 
-Events are durably stored in Kafka, they can be read as many times and by as many consumers as you want. 
+What happens when a message is deleted from the queue?
+If a consumer ever request an offset not available for a partition on the brokers (for example, due to deletion), 
+it enters an error mode, and ultimately reset itself for this partition to either the most recent or the oldest message available 
+(depending on the auto.offset.reset configuration value), and continue working.
+
 
 
 
