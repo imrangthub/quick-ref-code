@@ -5863,8 +5863,26 @@ public class FallbackApplication {
 
 
 
+DataJqp custom sequenceName
+========================================
+
+CREATE SEQUENCE custom_sequence START WITH 1 INCREMENT BY 1;
 
 
+
+import javax.persistence.*;
+
+@Entity
+@Table(name = "your_entity_table")
+public class YourEntity {
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "custom_sequence_generator")
+    @SequenceGenerator(name = "custom_sequence_generator", sequenceName = "custom_sequence", allocationSize = 1)
+    private Long id;
+
+    // Other entity attributes and methods...
+}
 
 
 

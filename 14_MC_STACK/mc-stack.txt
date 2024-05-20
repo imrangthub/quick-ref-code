@@ -481,7 +481,15 @@ echo never > /sys/kernel/mm/transparent_hugepage/enabled
 
 
 
+Redis Cluster Mode :
+=================================================
+In a Redis Cluster setup, the application does not explicitly differentiate between master and replica nodes. 
+Instead, Redis Cluster itself manages the distribution of read and write operations across the master and replica nodes 
+transparently to the client application. 
 
+Redis Cluster Mode: Horizontally scalable, suitable for large datasets and high throughput.
+Redis Sentinel Mode: Ensures high availability and fault tolerance, ideal for mission-critical applications with 
+single-master or master-replica setups.
 
 
 
@@ -665,9 +673,6 @@ services:
 
 
 
-
-
-
 Doc
 -------------------------
 https://docs.spring.io/spring-data/redis/reference/redis/connection-modes.html
@@ -760,6 +765,37 @@ public class RedisConfig {
     }
 }
 
+
+
+Read from replica:
+-------------------------------------
+mport org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.data.redis.connection.RedisSentinelConfiguration;
+import org.springframework.data.redis.connection.lettuce.LettuceClientConfiguration;
+import org.springframework.data.redis.connection.lettuce.LettuceConnectionFactory;
+import org.springframework.data.redis.repository.configuration.EnableRedisRepositories;
+import io.lettuce.core.ReadFrom;
+
+@Configuration
+@EnableRedisRepositories
+public class RedisConfig {
+
+    @Bean
+    public LettuceConnectionFactory redisConnectionFactory() {
+        RedisSentinelConfiguration sentinelConfig = new RedisSentinelConfiguration()
+            .master("mymaster")
+            .sentinel("host1", 26379)
+            .sentinel("host2", 26379)
+            .sentinel("host3", 26379);
+
+        LettuceClientConfiguration clientConfig = LettuceClientConfiguration.builder()
+            .readFrom(ReadFrom.REPLICA_PREFERRED)  // Configures reading from replicas
+            .build();
+
+        return new LettuceConnectionFactory(sentinelConfig, clientConfig);
+    }
+}
 
 
 
