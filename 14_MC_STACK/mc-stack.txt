@@ -967,6 +967,19 @@ Headers Exchange (One-to-Many Relationship based on Message Attributes):
 =================================================
 #kafka | Message broker  | KAFKA                                        
 ================================================= 
+MyUnntuKafkaLocation: 
+cd /usr/local/kafka
+sudo systemctl daemon-reload
+sudo systemctl start zookeeper
+sudo systemctl start kafka
+sudo systemctl status zookeeper
+sudo systemctl status kafka
+
+For Update Server config Edit this fiele:
+/usr/local/kafka/config/server.properties
+
+
+
 
 Docker:
 -------------------------------------------------
@@ -1014,7 +1027,7 @@ Create a topic
 
 =>./kafka-topics.sh --bootstrap-server localhost:9092 --describe
 =>./kafka-topics.sh --bootstrap-server localhost:9092 --describe --topic test-topic
-
+Check topic and its partation
 
 
 Create Console Producer
@@ -1044,6 +1057,8 @@ Consumer Groups:
 Show all topic,pertation,and offset number
 
 =>./kafka-console-consumer.sh --bootstrap-server localhost:9092 --topic test-topic1 --group my-consumer-group
+=>./kafka-console-consumer.sh --bootstrap-server localhost:9092 --topic test-topic1  --from-beginning
+=>./kafka-console-consumer.sh --bootstrap-server 172.16.8.132:9092 --topic topic_sms_notification  --from-beginning
 
 
 
@@ -1080,6 +1095,76 @@ Retention by Size:
 
 
 
+
+
+
+
+simple-Consumer:
+-------------------------------------------------------
+@Configuration
+@EnableKafka
+public class APIHUBKafkaConsumerConfig {
+
+    @Value("${apihub-kafka.producing-trigger-list:topic_sms_notification}")
+    private String consumingTgList;
+
+    @Value("${apihub-kafka.bootstrap-servers:172.16.8.132:9092}")
+    private List<String> apihubKafkaBootServers;
+
+    @Value("${apihub-kafka.consumer.group-id:default-group}")
+    private String groupId;
+
+    @Bean
+    public ConsumerFactory<String, APIHUBKafkaNotifyRecord> apihubConsumerFactory() {
+        Map<String, Object> props = new HashMap<>();
+        props.put(ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG, apihubKafkaBootServers);
+        props.put(ConsumerConfig.GROUP_ID_CONFIG, groupId);
+        props.put(ConsumerConfig.AUTO_OFFSET_RESET_CONFIG, "earliest"); // or "latest"
+        props.put(ConsumerConfig.ENABLE_AUTO_COMMIT_CONFIG, false); // Manual offset commit
+        props.put(ConsumerConfig.MAX_POLL_RECORDS_CONFIG, 100);
+        props.put(ConsumerConfig.HEARTBEAT_INTERVAL_MS_CONFIG, 3000);
+        props.put(ConsumerConfig.SESSION_TIMEOUT_MS_CONFIG, 10000);
+        props.put(ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG, ErrorHandlingDeserializer.class);
+        props.put(ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG, ErrorHandlingDeserializer.class);
+        props.put(ErrorHandlingDeserializer.VALUE_DESERIALIZER_CLASS, JsonDeserializer.class.getName());
+        props.put(JsonDeserializer.TRUSTED_PACKAGES, "*");
+        return new DefaultKafkaConsumerFactory<>(
+                props,
+                new ErrorHandlingDeserializer<>(),
+                new JsonDeserializer<>(APIHUBKafkaNotifyRecord.class)
+        );
+    }
+
+    @Bean
+    public ConcurrentKafkaListenerContainerFactory<String, APIHUBKafkaNotifyRecord> apihubKafkaListener() {
+        ConcurrentKafkaListenerContainerFactory<String, APIHUBKafkaNotifyRecord> factory = new ConcurrentKafkaListenerContainerFactory<>();
+        factory.setConsumerFactory(apihubConsumerFactory());
+        factory.setConcurrency(3); // Adjust based on your requirements
+        factory.getContainerProperties().setAckMode(ContainerProperties.AckMode.MANUAL); // Manual ack
+        return factory;
+    }
+}
+
+
+Manual Offset Commit
+------------------------------------------------
+Here's an example of how to handle manual offset commits in a Kafka listener:
+
+java
+Copy code
+@KafkaListener(topics = "${apihub-kafka.producing-trigger-list:topic_sms_notification}", groupId = "${apihub-kafka.consumer.group-id:default-group}")
+public void listen(APIHUBKafkaNotifyRecord record, Acknowledgment ack) {
+    try {
+        // Process the record
+        // ...
+
+        // Manually acknowledge the message
+        ack.acknowledge();
+    } catch (Exception e) {
+        // Log and handle exceptions
+        // Implement retry logic if needed
+    }
+}
 
 
 
