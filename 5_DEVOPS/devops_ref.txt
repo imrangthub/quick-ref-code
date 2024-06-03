@@ -542,7 +542,52 @@ taskkill /F /PID 2368
 =>sudo systemctl stop tomcat.service
 
 
-https://stackoverflow.com/questions/48938921/error-while-deploying-spring-boot-war-file-on-tomcat-server
+
+Tomcat Install
+=============================
+
+Download Tomcat as tar stract it and Configure Server properties:
+--------------------
+
+Port:
+sudo nano /opt/tomcat/conf/server.xml
+<Connector port="8080" protocol="HTTP/1.1"
+           connectionTimeout="20000"
+           redirectPort="8443" />
+
+
+
+Configure Users and Roles
+sudo nano /opt/tomcat/conf/tomcat-users.xml
+<role rolename="manager-gui"/>
+<role rolename="admin-gui"/>
+<user username="admin" password="password" roles="manager-gui,admin-gui"/>
+
+Restrict Access to the Manager and Host Manager Apps:Comment out the Valve element
+sudo nano /opt/tomcat/webapps/manager/META-INF/context.xml
+<!--
+<Valve className="org.apache.catalina.valves.RemoteAddrValve"
+       allow="127\.\d+\.\d+\.\d+|::1" />
+-->
+
+sudo nano /opt/tomcat/webapps/host-manager/META-INF/context.xml
+<!--
+<Valve className="org.apache.catalina.valves.RemoteAddrValve"
+       allow="127\.\d+\.\d+\.\d+|::1" />
+-->
+
+ 
+ 
+ 
+Start tomcat
+cd /opt/tomcat
+sudo ./bin/startup.sh
+OR
+create a service and:
+sudo systemctl restart tomcat
+
+
+
 
 #Config
 -------------------------------------------------
