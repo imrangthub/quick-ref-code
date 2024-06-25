@@ -108,6 +108,16 @@ Run a Redis Server using docker and install resis-toos for redis-cli in ubuntu
 Edit Config file, thne restart redis-service
 =>sudo systemctl restart redis-server
 
+Is reis run:
+=>ps -ef | grep redis
+=>ps aux | grep redis
+
+Find/Check redis in hostmachine:
+=>find / -name redis.conf 2>/dev/null
+sudo find / -type f -name "redis-server" 2>/dev/null
+sudo find / -type f -name "redis-cli" 2>/dev/null
+
+
 
 =>redis-cli ping
 =>redis-cli
@@ -979,6 +989,27 @@ For Update Server config Edit this fiele:
 /usr/local/kafka/config/server.properties
 
 
+Is kafka run:
+=>ps -ef | grep kafka
+
+
+
+Find kafka directory in hostmachine:
+=>find / -name server.properties 2>/dev/null
+=>sudo find / -type f -name "kafka-server-start.sh" 2>/dev/null
+=>sudo find / -type f -name "kafka-topics.sh" 2>/dev/null
+
+
+
+
+Describe Kafka Brokers
+./kafka-broker-api-versions.sh --bootstrap-server localhost:9092
+
+
+Describe Topic Configuration
+./kafka-topics.sh --describe --topic topic_sms_notification --bootstrap-server localhost:9092
+
+
 
 
 Docker:
@@ -1091,6 +1122,47 @@ Retention by Size:
 
 
 
+
+
+
+
+
+Steps to Execute Partition Reassignment
+================================================= 
+If Partation-replica not equal as active broker:
+Like: I hava 3 broker kafka cluster but topic design as:
+
+
+=>./kafka-broker-api-versions.sh --bootstrap-server 192.168.1.1:9092
+Check active kafka broker:
+
+=>./kafka-topics.sh --describe --topic topic_sms_notification --bootstrap-server 192.168.1.1:9092
+Topic: topic_sms_notification	TopicId: W32-rGmiQaytdaH6bWxnhQ	PartitionCount: 10	ReplicationFactor: 3	Configs: min.insync.replicas=2
+	Topic: topic_sms_notification	Partition: 0	Leader: 2	Replicas: 2,3,4	Isr: 2,3
+	Topic: topic_sms_notification	Partition: 1	Leader: 3	Replicas: 3,4,5	Isr: 3
+
+In this case 4,5 number broker not active in the cluster, so Now I have to reassignment it:
+
+=>vi topics-to-move.json
+{
+  "version": 1,
+  "topics": [
+    {
+      "topic": "topic_sms_notification"
+    }
+  ]
+}
+
+
+=>./kafka-reassign-partitions.sh --bootstrap-server 192.168.1.1:9092 --generate --topics-to-move-json-file topics-to-move.json --broker-list "1,2,3"
+Generate the Reassignment JSON
+this will output two json:
+Current partition replica assignment and Proposed partition reassignment configuration
+
+Create another json file proposed-reassignment.json with the json data of: Proposed partition reassignment configuration
+then run it, and done !
+
+=>./kafka-reassign-partitions.sh --bootstrap-server 192.168.1.1:9092--execute --reassignment-json-file proposed-reassignment.json
 
 
 
