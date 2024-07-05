@@ -1367,9 +1367,11 @@ Events,records,message:
   An event records the fact that "something happened" in the world or in your business. 
   It is also called record or message. an event has a key, value, timestamp, and optional metadata headers. 
 
+
+
 Topics:
   Events are organized and durably stored in topics. 
-  Very simplified, a topic is similar to a folder in a filesystem, and the events are the files in that folder. 
+  A topic is similar to a folder in a filesystem, and the events are the files in that folder. 
   Events are durably stored in Kafka, they can be read as many times and by as many consumers as you want. 
 
 
@@ -1384,14 +1386,24 @@ unlike traditional messaging systems, events are not deleted after consumption.
 Instead, you define for how long Kafka should retain your events through a per-topic configuration setting, 
 after which old events will be discarded. 
 
+
+
 Partition:
-  Topics are partitioned, meaning a topic is spread over a number of "buckets" located on different Kafka brokers. 
-  This distributed placement of your data is very important for scalability because it allows client applications to 
-  both read and write the data from/to many brokers at the same time. 
-  When a new event is published to a topic, it is actually appended to one of the topic's partitions. 
-  Events with the same event key (e.g., a customer or vehicle ID) are written to the same partition, 
-  and Kafka guarantees that any consumer of a given topic-partition will always read that partition's events in exactly the same 
-  order as they were written.
+  Partitation is where message linve inside the topic.
+  Each partition is independent of each other.
+
+Each Partition is an Order, inmmutable sequence of record.
+Each record is assigned a sequential number called offset.
+Order is guaranteed only at the partition leve.
+
+Topics are partitioned, meaning a topic is spread over a number of "buckets" located on different Kafka brokers. 
+This distributed placement of your data is very important for scalability because it allows client applications to 
+both read and write the data from/to many brokers at the same time. 
+When a new event is published to a topic, it is actually appended to one of the topic's partitions. 
+Events with the same event key (e.g., a customer or vehicle ID) are written to the same partition, 
+and Kafka guarantees that any consumer of a given topic-partition will always read that partition's events in exactly the same 
+order as they were written.
+
 Each partition can be considered an ordered sequence of records. These partitions allow for parallel processing of messages 
 within a topic.
 
@@ -1399,6 +1411,33 @@ within a topic.
 Partition offset:
   Each partitioned message has a unique sequence id called as offset.
   Offsets only link to a single message within a single partition of a topic.There is no easy way to find the offset for a single message.
+
+Partitation is where message linve inside the topic.
+Each partition is independent of each other.
+
+Each Partition is an Order, inmmutable sequence of record.
+Each record is assigned a sequential number called offset.
+Order is guaranteed only at the partition leve.
+
+
+
+
+Kafka-Records:
+  exist within Kafka topics. When data is produced to Kafka, it is encapsulated into records and appended to the 
+  log (partition) of the respective topic. Each record consists of a key, a value, headers, timestamp, offset,
+   and possibly other metadata. 
+
+
+Record comprises several components:
+  Key: An optional identifier for the record.
+  Value: The main data payload.
+  Headers: Optional metadata associated with the record.
+  Timestamp: Indicates when the record was produced or ingested into Kafka.
+  Offset: A unique identifier assigned to each record within a partition.
+  Partition: Specifies the partition to which the record belongs.
+
+
+To Unique identify a reocrd use (partition+Offset) composit key number. 
 
 
 
@@ -1446,24 +1485,6 @@ it enters an error mode, and ultimately reset itself for this partition to eithe
 
 
 
-
-
-Zookeeper:
- Manage the kafka broker, broker registred with zookeeper.
-
-Topic/Partation/Offset:
-  Kafka tpoic as database table.
-  Each topic will create with one or more partiation.
-
-  Partitation is where message linve inside the topic.
-  Each partition is independent of each other.
-
-  Each Partition is an Order, inmmutable sequence of record.
-  Each record is assigned a sequential number called offset.
-  Order is guaranteed only at the partition leve.
-All the records are persisted in acommit log in the files system where is kafka intalled.
-
-
 Message of Kafka retain inside in cluster after consumed, depending on retation prood.
 Kafka Message are byte insede kafka broker, then producer/consumer serisized this.
 
@@ -1486,26 +1507,6 @@ Kafka 4 main Component:
   ZooKeeper: Manages Kafka cluster's configuration and coordination.
   Producer: Sends data to Kafka. Communicate with broker with tcp. Producer create record with partiation number attributes.
   Consumer: Receives data from Kafka
-
-
-Kafka-Records:
-  exist within Kafka topics. When data is produced to Kafka, it is encapsulated into records and appended to the 
-  log (partition) of the respective topic. Each record consists of a key, a value, headers, timestamp, offset,
-   and possibly other metadata. 
-
-
-Record comprises several components:
-
-  Key: An optional identifier for the record.
-  Value: The main data payload.
-  Headers: Optional metadata associated with the record.
-  Timestamp: Indicates when the record was produced or ingested into Kafka.
-  Offset: A unique identifier assigned to each record within a partition.
-  Partition: Specifies the partition to which the record belongs.
-
-
-To Unique identify a reocrd use (partition+Offset) composit key number. 
-
 
 
 
