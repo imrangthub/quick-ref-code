@@ -54,6 +54,22 @@ Byuild image and push
 docker run -d -p 5000:5000 --restart=always --name registry registry
 docker build . -t localhost:5000/openapi-customer-information
 docker push localhost:5000/openapi-customer-information
+
+
+k8 default loging file 
+---------------------------------------
+/var/log/pods/*$1/*.log
+/var/log/pods/apihub-microservice_octopus-sms-6bff58b4cb-gjh48_53ed786a-4c06-46aa-828d-7c6997fb3060/octopus-sms/0.log
+
+Log Storage: 
+In Kubernetes, logs are stored on the node where the pod is running, typically under /var/log/ in a structured directory format.
+
+
+Each container within a pod streams its output to a log file, which Kubernetes manages. By default, this log file is stored at /var/log/pods/<namespace>_<pod-name>/<container-name>/<timestamp>.log on the node where the pod is running.
+
+
+
+
 =================================================
 Service:
 =================================================
