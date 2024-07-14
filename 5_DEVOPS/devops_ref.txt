@@ -2090,34 +2090,31 @@ Deploy war/ear to a container:
 ================================================= 
 
 
-Configure loki
-1.promtail configure
-->https://grafana.com/docs/loki/latest/send-data/promtail/
-2. Send to log loki
-3. virilization with grafana
-
-
-
 Grafana:
-Download: https://grafana.com/grafana/download
+  Download: https://grafana.com/grafana/download
 
-    Standalone Linux Binaries(64 Bit)SHA256:
-    wget https://dl.grafana.com/enterprise/release/grafana-enterprise-10.3.1.linux-amd64.tar.gz
-    tar -zxvf grafana-enterprise-10.3.1.linux-amd64.tar.gz
+      Standalone Linux Binaries(64 Bit)SHA256:
+      wget https://dl.grafana.com/enterprise/release/grafana-enterprise-10.3.1.linux-amd64.tar.gz
+      tar -zxvf grafana-enterprise-10.3.1.linux-amd64.tar.gz
 
-    ->cd /bin
-         ./grafana-server
+  Run-Grafana:
+      ->cd /bin
+          ./grafana-server
 
 
 
 
 Loki-Promtail (Unzip this agenet):
-Dowbload: https://github.com/grafana/loki/releases/
-    loki-linux-amd64.zip
-    promtail-linux-amd64.zip
+  Download: https://github.com/grafana/loki/releases/
+  Scroll down to the Assets section under the version that you want to install.
 
-download configfile:
-https://github.com/grafana/loki/blob/main/clients/cmd/promtail/promtail-local-config.yaml
+      loki-linux-amd64.zip
+      promtail-linux-amd64.zip
+
+  download configfile:
+  https://github.com/grafana/loki/blob/main/clients/cmd/promtail/promtail-local-config.yaml
+
+
 
 server:
   http_listen_port: 9080
@@ -2145,6 +2142,7 @@ https://raw.githubusercontent.com/grafana/loki/master/cmd/loki/loki-local-config
 
 
 Start loki and Promtal with config:
+
 ./loki-linux-amd64 -config.file=loki-local-config.yaml
 ./promtail-linux-amd64 -config.file=promtail-local-config.yaml
 
@@ -2233,6 +2231,19 @@ sudo firewall-cmd --reload
 
 
 
+
+
+Doc:
+-----------------------------------------
+
+How it Works:
+  Log Generation: An application generates log entries.
+  Log Collection: Promtail, running on the same machine as the application, collects these logs.
+  Labeling: Promtail attaches labels (metadata) to the log entries. 
+            Labels can include information like application name, environment, server, etc.
+  Log Shipping: Promtail sends the labeled logs to Loki.
+  Log Storage: Loki stores the logs and the labels.
+  Log Querying: Grafana is used to query and visualize the logs stored in Loki. Users can filter and search logs using the labels.
 
 
 
