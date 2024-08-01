@@ -1595,68 +1595,78 @@ DeleteDate
 =================================================
 #JWT | jwt                                   
 ================================================= 
-https://www.youtube.com/watch?v=BQwKZ6zfyk0&list=PLJq-63ZRPdBt-RFGwsJO9Pv6A8ZwYHua9
 
-VerifyJWT:
-https://dinochiesa.github.io/jwt/
+
+You can create a signature using various algorithms:
+  HMAC (HS256, HS384, HS512) are symmetric, meaning the same secret is used for both signing and verification. 
+  RSA and ECDSA algorithms are asymmetric, meaning they use a pair of keys (public and private).
+
+There are multiple algorithms available for creating a JWT signature.
+The most common algorithms are HS256, RS256, and ES256.
+
+
 
 Two type of encryption in jwt:
-- (Symetric) Same key use for encryption and decription
+-(Symetric) Same key use for encryption and decription
 -(Asymmetric) Differ key, private/public key
 
 
-generate a valid key pair using OpenSSL:
-=>openssl genpkey -algorithm RSA -out private_key.pem
-=>openssl rsa -pubout -in private_key.pem -out public_key.pem
 
-ExamplePython:
+Here is how you can generate a JWT step-by-step:
 -------------------------------------------------
-import jwt
 
-# Generate a JWT token using an asymmetric private key
-private_key = """
------BEGIN RSA PRIVATE KEY-----
-MIIEowIBAAKCAQEA1AmT5s8T1yPRX9YeCFBqA8T6r3XrI9ilfz3EiKXsReR7H1Vi
-... (your private key) ...
------END RSA PRIVATE KEY-----
-"""
-
-payload = {
-    "user_id": 123,
-    "username": "example_user",
-    "role": "admin",
+1)Encode the Header:
+{
+  "alg": "HS256",
+  "typ": "JWT"
 }
 
-# Sign the JWT token with the private key
-token = jwt.encode(payload, private_key, algorithm="RS256")
-
-print("JWT Token:")
-print(token)
-
-# Now, let's assume you have the public key for verification
-public_key = """
------BEGIN PUBLIC KEY-----
-MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEA1AmT5s8T1yPRX9YeCFBqA
-... (your public key) ...
------END PUBLIC KEY-----
-"""
-
-try:
-    # Verify the JWT token using the public key
-    decoded_payload = jwt.decode(token, public_key, algorithms=["RS256"])
-    print("\nDecoded Payload:")
-    print(decoded_payload)
-except jwt.ExpiredSignatureError:
-    print("\nJWT has expired.")
-except jwt.InvalidTokenError:
-    print("\nJWT is invalid or tampered with.")
+Base64Url encoding of the above JSON: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9
 
 
+2)Encode the Payload:
+{
+  "sub": "1234567890",
+  "name": "John Doe",
+  "iat": 1516239022
+}
+Base64Url encoding of the above JSON:eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ
+
+
+3)Create the Signature:
+HMACSHA256(
+  base64UrlEncode(header) + "." +
+  base64UrlEncode(payload),
+  secret)
+
+Resulting signature:   SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c
+
+
+Combine all parts:
+  eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c
 
 
 
+RS256:
+-------------------------------
+RS256 (RSA Signature with SHA-256) uses asymmetric encryption with a private key to sign the JWT and a public key to validate it.
 
-=================================================
+Step to create:
+    Generate RSA key pair using OpenSSL or any other tool.
+    Create the JWT using the private key.
+    Validate the JWT using the corresponding public key.
+
+
+Generating a Private Key
+=>openssl genpkey -algorithm RSA -out private_key.pem -pkeyopt rsa_keygen_bits:2048
+
+Generating a Public Key from the Private Key
+=>openssl rsa -pubout -in private_key.pem -out public_key.pem
+
+
+
+
+================================================
 #  keycloak                                          
 ================================================= 
 

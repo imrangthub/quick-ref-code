@@ -289,6 +289,53 @@ https://www.youtube.com/watch?v=1jCM4jKV68U
 
 application http to https (ssl implementation)
 ------------------------------------------------
+There are three main steps:
+  1) Generate a certificate file that can be imported and leveraged for the end-to-end communication.
+  2) Configure Spring Boot to use SSL and leverage the certificate generated.
+  3) Configure the channels to verify the SSL connection.
+
+
+Way02:
+======
+
+
+
+Way01:
+======
+Generate Keys and Certificates using keytool:
+
+=>keytool -genkeypair -alias myapp -keystore myapp-keystore.p12 -keypass secret -storeType PKCS12 -storepass secret -keyalg RSA -keysize 2048 -validity 365 -dname "C=Bangladesh, ST=Badda, L=Dhaka, O=madbarsoft.com, OU=YourUnit, CN=imran hossain" -ext "SAN=dns:madbarsoft.com"
+  
+  Desc:
+  -genkeypair: This option specifies that the keytool should generate a key pair (a public key and associated private key).
+  -alias myapp: Specifies an alias for the key pair. The alias is a name that you will use to refer to this entry within the keystore.
+  -keystore src/main/resources/myapp-keystore.p12: Specifies the name and location of the keystore file to be created. In this case, it is located at src/main/resources and named myapp-keystore.p12. The keystore file will be in PKCS12 format.
+  -keypass secret: Specifies the password for the private key. In this case, it's set to "secret."
+  -storeType PKCS12: Specifies the type of keystore to be created. PKCS12 is a widely used format for storing cryptographic objects.
+  -storepass secret: Specifies the password for the keystore itself. In this case, it's set to "secret."
+  -keyalg RSA: Specifies the key algorithm to be used, and in this case, it's RSA.
+  -keysize 2048: Specifies the size of the key pair. In this case, it's set to 2048 bits.
+  -validity 365: Specifies the validity period of the key pair in days. In this case, the key pair will be valid for 365 days.
+  -dname "C=CountryName, ST=StateName, L=CityName, O=OrganizationName, OU=UnitName, CN=localhost": Specifies the Distinguished Name (DN) fields for the entity (in this case, the server). It includes information such as the country (C), state (ST), locality (L), organization (O), organizational unit (OU), and common name (CN).
+  -ext "SAN=dns:localhost": Specifies the Subject Alternative Name (SAN) extension, which is used to specify additional host names for the certificate. In this case, it includes "dns:localhost" as a Subject Alternative Name.
+
+
+
+
+
+
+
+
+
+
+We’ll use either of the following certificate formats for Generating a Self-Signed Certificate:
+  PKCS12: Public Key Cryptographic Standards is a password protected format that can contain multiple certificates and keys; 
+          it’s an industry-wide used format.
+  JKS: Java KeyStore is similar to PKCS12; it’s a proprietary format and is limited to the Java environment.
+
+
+Generating a Keystore:
+
 
 
 
