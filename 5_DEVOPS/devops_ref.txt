@@ -72,7 +72,9 @@ Create a file with size of 5MB
 Show current space free memory size
 
 =>tail -n 10000 nohup.out | grep -a20 'PrematureCloseException'
-
+=>more fileName 
+=>more +/'no live' error.log.260624
+Read file page by page
 
 
 =================================================
@@ -276,16 +278,152 @@ Create repository with Maven group
 
 
 =================================================
-# SSH | SHALL | cmd                            
+# SSL/TLS | ssl | tls  | https                             
 ================================================= 
+https://www.youtube.com/watch?v=1jCM4jKV68U
 
-=>ssh imran@192.168.8.10
+
+
+
+
+
+application http to https (ssl implementation)
+------------------------------------------------
+
+
 
 
 
 =>Set-ExecutionPolicy Unrestricted
 -Dcom.sun.management.jmxremote.ssl=false
 -Dcom.sun.management.jmxremote.authenticate=false
+
+
+
+https - ssl/tls doc:
+------------------------------------------------
+For HTTPS key and certificate management, the choice of file format (.pem, .p12, or .jks) depends on the specific server 
+or application you are using and its requirements. 
+
+Choosing the Right Format:
+  .pem: Use for Apache, Nginx, and other similar servers. Good for direct use with many web servers.
+  .p12: Use for transporting certificates and keys between different systems, or when importing into applications that support PKCS#12.
+  .jks: Use for Java applications and servers like Tomcat. You may need to convert .pem or .p12 files to .jks for this purpose.
+
+Choosing the appropriate format ensures compatibility and security in your HTTPS configuration.
+
+
+
+The primary purpose of .pem, .p12, and .jks file formats is for managing cryptographic keys and certificates, 
+which are crucial for securing HTTPS communications. However, they are also used in other contexts where secure 
+communication and authentication are needed. 
+
+Converting .pem to .p12:
+openssl pkcs12 -export -out keystore.p12 -inkey privatekey.pem -in certificate.pem -certfile intermediate.pem
+
+Converting .p12 to .jks:
+keytool -importkeystore -srckeystore keystore.p12 -srcstoretype PKCS12 -destkeystore keystore.jks -deststoretype JKS
+
+Summary
+  .pem: Used for a variety of security protocols including HTTPS, SSH, VPNs, and application security.
+  .p12: Used for client authentication, email encryption, SSO, and mobile device security.
+  .jks: Primarily used in Java applications and enterprise security systems.
+
+
+
+
+
+HTTPS operates on port 443 by default.
+Https uses encryption protocols such as SSL/TLS to encrypt 
+
+
+HTTPS (Hypertext Transfer Protocol Secure) ensures secure communication over a computer network, 
+primarily the internet, by using SSL/TLS (Secure Sockets Layer/Transport Layer Security) protocols. 
+It ensures data integrity and confidentiality, making it secure against eavesdropping and man-in-the-middle attacks.
+
+
+How HTTPS with SSL/TLS Works:
+Connection Initiation:
+When a user connects to a website via HTTPS, the browser (client) sends a request to the web server to establish a secure connection.
+
+Server Responds:
+The server responds by sending its SSL/TLS certificate, which contains the server’s public key and other information about the server's identity.
+
+Certificate Verification:
+The browser verifies the server's certificate against a list of trusted Certificate Authorities (CAs).
+If the certificate is valid and trusted, the browser proceeds with the connection.
+
+Session Keys Generation:
+The client and server generate session keys using a process known as the TLS handshake.
+These session keys are symmetric keys, which means they are the same for both encryption and decryption.
+The handshake involves:
+
+Agreeing on encryption algorithms.
+Exchanging random numbers used in the key generation process.
+Using public key cryptography to securely share the session keys.
+Secure Communication:
+Once the handshake is complete, the client and server use the session keys to encrypt and decrypt data.
+This ensures that all data transmitted between the client and server is secure and cannot be intercepted or tampered with by third parties.
+
+
+
+
+Trust Stores:
+-------------------------------------------------
+Browsers and clients like Postman know about Certificate Authorities (CAs) and server certificates through a 
+combination of pre-installed trusted root certificates and a verification process. Here’s the logic behind it:
+
+1. Pre-installed Trusted Root Certificates:
+Browsers and Operating Systems:
+
+Web browsers (like Chrome, Firefox, Safari) and operating systems (like Windows, macOS, Linux) come with a 
+pre-installed list of trusted root certificates.
+These root certificates belong to trusted Certificate Authorities (CAs).
+The list is maintained and updated by the browser and OS vendors.
+Trust Chain:
+
+When a browser or Postman connects to a server via HTTPS, it receives the server’s SSL/TLS certificate.
+This certificate is part of a chain of certificates, starting from the server certificate to one or more intermediate 
+certificates, and ending at a root certificate.
+The browser or client checks if the root certificate is in its list of trusted root certificates.
+
+Check Certificate Validity:
+The client checks the validity of the server’s certificate, including:
+Expiration date: Ensures the certificate is not expired.
+Revocation status: Checks if the certificate has been revoked using methods like Certificate Revocation List (CRL) or Online 
+Certificate Status Protocol (OCSP).
+Domain name: Ensures the certificate’s domain matches the domain being accessed.
+
+
+
+
+
+Why .pem Files are Important:
+Multiple Items in One File: PEM files can contain multiple certificates (e.g., your certificate and intermediate certificates) 
+and even keys, making it easier to manage.
+
+like:
+=>cat yourdomain.crt intermediate.crt > fullchain.pem
+
+For HTTPS setup, you can use .crt files directly if your server supports them, but sometimes you might need to convert 
+them to .pem format or combine them into a single PEM file for convenience and compatibility.
+
+
+
+Example:
+Apache Configuration:
+  Apache can use .crt files directly if they are in PEM format:
+  SSLCertificateFile /path/to/yourdomain.crt
+  SSLCertificateKeyFile /path/to/yourdomain.key
+  SSLCertificateChainFile /path/to/intermediate.crt
+
+Nginx Configuration:
+  Nginx might use a single .pem file that includes your certificate and intermediate certificates:
+  ssl_certificate /path/to/fullchain.pem;    # fullchain.pem includes yourdomain.crt and intermediate.crt
+  ssl_certificate_key /path/to/privkey.pem;  # privkey.pem is yourdomain.key
+
+
+
 
 =================================================
 #                  Window | batch | .bat                                          
