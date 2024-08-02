@@ -280,7 +280,7 @@ Create repository with Maven group
 =================================================
 # SSL/TLS | ssl | tls  | https                             
 ================================================= 
-https://www.youtube.com/watch?v=1jCM4jKV68U
+=>keytool --help
 
 
 
@@ -295,13 +295,25 @@ There are three main steps:
   3) Configure the channels to verify the SSL connection.
 
 
-Way02:
-======
+Way02: | .jks
+=================
+keytool -genkeypair -alias spapp1 -keyalg RSA -keysize 4096 -storetype JKS -keystore myspringboot.jks -validity 3650 -storepass appsecpass -dname "C=Bangladesh, ST=Badda, L=Dhaka, O=madbarsoft.com, OU=YourUnit, CN=MD IMRAN HOSSAIN" -ext "SAN=dns:madbarsoft.com"
+
+=>keytool -list -v -keystore myspringboot.jks
+verify jks file
+
+
+=>keytool -importkeystore -srckeystore myspringboot.jks -destkeystore springboot.p12 -deststoretype pkcs12
+Convert a JKS keystore into PKCS12
+
+
+=>keytool -exportcert -alias myspringbootapp -keystore myspringboot.jks -storepass 123455 -keypass apppass -file myspringboot.cer
+Export certificate
 
 
 
-Way01:
-======
+Way01: | .p12
+=================
 Generate Keys and Certificates using keytool:
 
 =>keytool -genkeypair -alias myapp -keystore myapp-keystore.p12 -keypass secret -storeType PKCS12 -storepass secret -keyalg RSA -keysize 2048 -validity 365 -dname "C=Bangladesh, ST=Badda, L=Dhaka, O=madbarsoft.com, OU=YourUnit, CN=imran hossain" -ext "SAN=dns:madbarsoft.com"
@@ -322,6 +334,28 @@ Generate Keys and Certificates using keytool:
 
 
 
+=>keytool -list -v -keystore myspringboot.jks
+
+In a Java KeyStore (JKS), there are different types of entries that serve different purposes. 
+The two primary types are trustedCertEntry and PrivateKeyEntry. 
+
+TrustedCertEntry:
+  A trustedCertEntry contains only a public certificate, without the corresponding private key. 
+  Client Verification: Clients use trusted certificates to verify the server's certificate chain during an SSL/TLS handshake.
+
+PrivateKeyEntry:
+  A PrivateKeyEntry contains a private key and the corresponding public certificate (and optionally the certificate chain). 
+  This type of entry is essential for scenarios where the application needs to prove its identity or establish secure communication.
+
+
+Create a Trust Store:
+=>keytool -importcert -file certificate.crt -alias mytrustedcert -keystore mytruststore.jks
+java -Djavax.net.ssl.trustStore=path/to/mytruststore.jks -Djavax.net.ssl.trustStorePassword=truststorepassword -jar myapp.jar
+
+
+
+Extract an SSL certificate from a keystore
+=>keytool -export -keystore myapp-keystore.p12 -alias myapp -file myCertificate.crt
 
 
 
@@ -359,6 +393,7 @@ Choosing the Right Format:
 
 Choosing the appropriate format ensures compatibility and security in your HTTPS configuration.
 
+The two most common formats used for keystores are JKS, a proprietary format specific for Java, and PKCS12, an industry-standard format. 
 
 
 The primary purpose of .pem, .p12, and .jks file formats is for managing cryptographic keys and certificates, 
