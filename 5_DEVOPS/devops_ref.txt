@@ -282,6 +282,25 @@ Create repository with Maven group
 ================================================= 
 =>keytool --help
 
+Create a Trust Store:
+=>keytool -importcert -file certificate.crt -alias mytrustedcert -keystore mytruststore.jks
+
+
+java -Djavax.net.ssl.trustStore=path/to/mytruststore.jks -Djavax.net.ssl.trustStorePassword=truststorepassword -jar myapp.jar
+use it ij java app
+
+
+=>keytool -list -v -keystore myspringboot.jks
+Show details 
+
+
+=>keytool -export -keystore myapp-keystore.p12 -alias myapp -file myCertificate.crt
+Extract an SSL certificate from a keystore
+
+
+=>Set-ExecutionPolicy Unrestricted
+-Dcom.sun.management.jmxremote.ssl=false
+-Dcom.sun.management.jmxremote.authenticate=false
 
 
 
@@ -335,7 +354,6 @@ Generate Keys and Certificates using keytool:
 
 
 =>keytool -list -v -keystore myspringboot.jks
-
 In a Java KeyStore (JKS), there are different types of entries that serve different purposes. 
 The two primary types are trustedCertEntry and PrivateKeyEntry. 
 
@@ -348,41 +366,48 @@ PrivateKeyEntry:
   This type of entry is essential for scenarios where the application needs to prove its identity or establish secure communication.
 
 
-Create a Trust Store:
-=>keytool -importcert -file certificate.crt -alias mytrustedcert -keystore mytruststore.jks
-java -Djavax.net.ssl.trustStore=path/to/mytruststore.jks -Djavax.net.ssl.trustStorePassword=truststorepassword -jar myapp.jar
-
-
-
-Extract an SSL certificate from a keystore
-=>keytool -export -keystore myapp-keystore.p12 -alias myapp -file myCertificate.crt
 
 
 
 
 
 
-We’ll use either of the following certificate formats for Generating a Self-Signed Certificate:
-  PKCS12: Public Key Cryptographic Standards is a password protected format that can contain multiple certificates and keys; 
-          it’s an industry-wide used format.
-  JKS: Java KeyStore is similar to PKCS12; it’s a proprietary format and is limited to the Java environment.
-
-
-Generating a Keystore:
-
-
-
-
-
-
-=>Set-ExecutionPolicy Unrestricted
--Dcom.sun.management.jmxremote.ssl=false
--Dcom.sun.management.jmxremote.authenticate=false
 
 
 
 https - ssl/tls doc:
 ------------------------------------------------
+Minimum Requirements for https - ssl/tls :
+  Private Key:
+      A private key is used by the server to decrypt data and create digital signatures to prove its identity.
+  Public Certificate:
+      A public certificate, issued by a Certificate Authority (CA) or self-signed, is used by clients to 
+      encrypt data and verify the server's identity.
+      The certificate must be associated with the private key.
+
+
+Key Components:
+  Private Key and Certificate Pair:
+    This pair can be stored in a KeyStore with a PrivateKeyEntry.
+  KeyStore:
+    A Java KeyStore (JKS) or PKCS12 file containing the private key and public certificate.
+
+
+Additional Recommendations:
+  Intermediate Certificates:
+
+  If the certificate is issued by an intermediate CA, the intermediate certificates should be included in the certificate chain.
+  Trusted Root Certificates:
+  Clients should have a trust store containing the root certificates of trusted CAs to verify the server's certificate.
+
+Generate a Key Pair and Self-Signed Certificate (if not using a CA):
+  keytool -genkeypair -alias mykey -keyalg RSA -keysize 2048 -storetype JKS -keystore mykeystore.jks -validity 365
+
+
+
+
+
+
 For HTTPS key and certificate management, the choice of file format (.pem, .p12, or .jks) depends on the specific server 
 or application you are using and its requirements. 
 
@@ -416,36 +441,6 @@ Summary
 
 
 HTTPS operates on port 443 by default.
-Https uses encryption protocols such as SSL/TLS to encrypt 
-
-
-HTTPS (Hypertext Transfer Protocol Secure) ensures secure communication over a computer network, 
-primarily the internet, by using SSL/TLS (Secure Sockets Layer/Transport Layer Security) protocols. 
-It ensures data integrity and confidentiality, making it secure against eavesdropping and man-in-the-middle attacks.
-
-
-How HTTPS with SSL/TLS Works:
-Connection Initiation:
-When a user connects to a website via HTTPS, the browser (client) sends a request to the web server to establish a secure connection.
-
-Server Responds:
-The server responds by sending its SSL/TLS certificate, which contains the server’s public key and other information about the server's identity.
-
-Certificate Verification:
-The browser verifies the server's certificate against a list of trusted Certificate Authorities (CAs).
-If the certificate is valid and trusted, the browser proceeds with the connection.
-
-Session Keys Generation:
-The client and server generate session keys using a process known as the TLS handshake.
-These session keys are symmetric keys, which means they are the same for both encryption and decryption.
-The handshake involves:
-
-Agreeing on encryption algorithms.
-Exchanging random numbers used in the key generation process.
-Using public key cryptography to securely share the session keys.
-Secure Communication:
-Once the handshake is complete, the client and server use the session keys to encrypt and decrypt data.
-This ensures that all data transmitted between the client and server is secure and cannot be intercepted or tampered with by third parties.
 
 
 
