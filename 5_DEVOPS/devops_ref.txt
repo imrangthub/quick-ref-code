@@ -2365,20 +2365,12 @@ Deploy war/ear to a container:
 #Grafana| promtail | loki |Grafana Loki Promtail 
 ================================================= 
 
-
 Grafana:
   Download: https://grafana.com/grafana/download
 
       Standalone Linux Binaries(64 Bit)SHA256:
       wget https://dl.grafana.com/enterprise/release/grafana-enterprise-10.3.1.linux-amd64.tar.gz
       tar -zxvf grafana-enterprise-10.3.1.linux-amd64.tar.gz
-
-  Run-Grafana:
-      ->cd /bin
-          ./grafana-server
-
-
-
 
 Loki-Promtail (Unzip this agenet):
   Download: https://github.com/grafana/loki/releases/
@@ -2387,69 +2379,29 @@ Loki-Promtail (Unzip this agenet):
       loki-linux-amd64.zip
       promtail-linux-amd64.zip
 
-  download configfile:
+Download configfile:
   https://github.com/grafana/loki/blob/main/clients/cmd/promtail/promtail-local-config.yaml
+  https://raw.githubusercontent.com/grafana/loki/master/cmd/loki/loki-local-config.yaml
 
 
 
-server:
-  http_listen_port: 9080
-  grpc_listen_port: 0
 
-positions:
-  filename: /tmp/positions.yaml
-
-clients:
-  - url: http://localhost:3100/loki/api/v1/push
-
-scrape_configs:
-- job_name: system
-  static_configs:
-  - targets:
-      - localhost
-    labels:
-      job: varlogs
-      __path__: /var/log/*log
-
-
-https://raw.githubusercontent.com/grafana/loki/master/cmd/loki/loki-local-config.yaml
-
-
-
+Starting
+-----------------------------------------
+Run-Grafana:
+    ->cd /bin
+        ./grafana-server
 
 Start loki and Promtal with config:
-
-./loki-linux-amd64 -config.file=loki-local-config.yaml
-./promtail-linux-amd64 -config.file=promtail-local-config.yaml
-
-
-promtail-local-config.yaml
-server:
-  http_listen_port: 9080
-  grpc_listen_port: 0
-
-positions:
-  filename: /tmp/positions.yaml
-
-clients:
-  - url: http://localhost:3100/loki/api/v1/push
-
-scrape_configs:
-- job_name: system
-  static_configs:
-  - targets:
-      - localhost
-    labels:
-      job: varlogs
-      __path__: /var/log/*log
+=>./loki-linux-amd64 -config.file=loki-local-config.yaml
+=>./promtail-linux-amd64 -config.file=promtail-local-config.yaml
 
 
 
 
-loki-local-config.yaml
 
+$ cat loki-local-config.yaml 
 auth_enabled: false
-
 server:
   http_listen_port: 3100
   grpc_listen_port: 9096
@@ -2478,13 +2430,37 @@ schema_config:
     - from: 2020-10-24
       store: tsdb
       object_store: filesystem
-      schema: v12
+      schema: v13
       index:
         prefix: index_
         period: 24h
 
 ruler:
-  alertmanager_url: http://localhost:9093
+  alertmanager_url: http://localhost:909
+
+
+
+
+$ cat promtail-local-config.yaml 
+server:
+  http_listen_port: 9080
+  grpc_listen_port: 0
+
+positions:
+  filename: /tmp/positions.yaml
+
+clients:
+  - url: http://localhost:3100/loki/api/v1/push
+
+scrape_configs:
+- job_name: system
+  static_configs:
+  - targets:
+      - localhost
+    labels:
+      job: varlogs
+      __path__: /var/log/nginx/*log
+      stream: stdout
 
 
 
@@ -2508,18 +2484,18 @@ sudo firewall-cmd --reload
 
 
 
-
 Doc:
------------------------------------------
+==========================================
 
 How it Works:
   Log Generation: An application generates log entries.
-  Log Collection: Promtail, running on the same machine as the application, collects these logs.
+  Log Collection: Promtail running on the same machine beside application, collects these logs.
   Labeling: Promtail attaches labels (metadata) to the log entries. 
             Labels can include information like application name, environment, server, etc.
   Log Shipping: Promtail sends the labeled logs to Loki.
   Log Storage: Loki stores the logs and the labels.
   Log Querying: Grafana is used to query and visualize the logs stored in Loki. Users can filter and search logs using the labels.
+
 
 
 
