@@ -279,7 +279,79 @@ Create repository with Maven group
 
 =================================================
 # SSL/TLS | ssl | tls  | https                             
-================================================= 
+=================================================
+
+
+Self-signed Ceftificated | ssl | tls
+=================================================
+When you access a public website like https://www.google.com, you don't need to provide a certificate because:
+Google, like most public websites, uses a certificate issued by a globally recognized Certificate Authority (CA) 
+that is trusted by all major web browsers and operating systems.
+
+But
+
+Private or Self-Signed Certificates:
+The server at https://192.168.1.1:9090 likely uses a certificate that is either self-signed or issued by a 
+private CA that is not recognized by your system's default trust store. it requires you to provide the necessary certificate manually to establish trust.
+
+
+
+How To identify whether a server uses a public (globally trusted) 
+certificate or a private (self-signed or private CA) certificate:
+-------------------------------------------------
+=>openssl s_client -connect <server-ip-or-domain>:<port> -showcerts
+
+Inspect the Certificate: Look at the Issuer and Subject fields in the certificate details.
+  Public Certificate:
+    If the Issuer is a well-known CA (e.g., Let's Encrypt, DigiCert, GlobalSign), it’s a public certificate.
+  Private Certificate:
+    If the Issuer is the same as the Subject, it is likely a self-signed certificate.
+    If the Issuer is an organization you recognize as internal or private, it may be issued by a private CA.
+
+  Checking the Certificate Chain info:
+    Public CA: The chain will usually include intermediate and root certificates from a well-known CA.
+    Private CA or Self-Signed: The chain may only include the server's certificate itself, or the root CA may be an internal or unknown CA.
+
+
+
+Verify Self-signed Ceftificated | Check Server Certificate
+------------------------------------------------------------------
+Step1: Get server certificate, and copy to a file (server.crt) and save it
+      =>echo | openssl s_client -connect 10.13.48.90:7070 -showcerts
+
+Step2:  Extract Subject and Issuer and Compare Subject and Issuer with each other
+      =>openssl x509 -in server.crt -noout -subject -issuer
+      =>openssl x509 -in my-client.crt -noout -subject -issuer
+
+      Ensure They Match: The subject and issuer should match between the server certificate and your local .crt file if it is the correct CA certificate.
+      If the issuer and subject of your local certificate (e.g., my-client.crt) do not match the server’s certificate, they are not intended to be used together for mutual authentication.
+
+
+Step3:You can also Validate the public keys to ensure they match(Optional)
+      Extract Public Key and Compare Public Key
+    =>openssl x509 -in server.crt -pubkey -noout > server_pubkey.pem
+    =>openssl x509 -in my-client.crt -pubkey -noout > local_pubkey.pem
+    =>diff server_pubkey.pem local_pubkey.pem
+    If there’s no output from diff, the public keys match.
+
+
+Step4: Validate Certificate Key Pair
+      =>openssl rsa -in my-key.key -pubout > key_pubkey.pem
+      =>openssl x509 -in my-client.crt -pubkey -noout > cert_pubkey.pem
+      =>diff key_pubkey.pem cert_pubkey.pem
+
+
+Additional Debugging
+  Verify Certificate Chain: Ensure the entire chain is properly trusted if multiple CA certificates are involved.
+  Check Server Configuration: Verify the server’s SSL/TLS configuration to ensure it uses the expected certificates and keys.
+
+
+
+
+
+
+JKS 
+=============================================
 =>keytool --help
 
 Create a Trust Store:
@@ -301,6 +373,12 @@ Extract an SSL certificate from a keystore
 =>Set-ExecutionPolicy Unrestricted
 -Dcom.sun.management.jmxremote.ssl=false
 -Dcom.sun.management.jmxremote.authenticate=false
+
+
+
+
+
+
 
 
 
