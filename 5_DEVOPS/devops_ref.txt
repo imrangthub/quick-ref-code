@@ -281,6 +281,60 @@ Create repository with Maven group
 # SSL/TLS | ssl | tls  | https                             
 =================================================
 
+ExamplePEM (.crt, .key, .csr and .p12 ): 
+=>openssl req -new -newkey rsa:2048 -nodes -keyout myapp.key -out myapp.csr -subj "/C=bd/ST=Dhaka/L=Gulshan/O=MadbarSoft/OU=Software/CN=madbarsoft.com"
+=>openssl req -new -newkey rsa:2048 -nodes -keyout myapp.key -out myapp.csr -subj "/C=bd/ST=Dhaka/L=Gulshan/O=MadbarSoft/OU=Software/CN=localhost"
+=>openssl req -new -newkey rsa:2048 -nodes -keyout myapp.key -out myapp.csr -subj "/C=bd/ST=Dhaka/L=Gulshan/O=MadbarSoft/OU=Software/CN=192.168.1.5"
+=>openssl req -new -newkey rsa:2048 -nodes -keyout myapp.key -out myapp.csr -config openssl.cnf
+
+=>openssl x509 -req -in myapp.csr -signkey myapp.key -out myapp.crt -days 365
+=>openssl x509 -req -in myapp.csr -signkey myapp.key -out myapp.crt -days 365 -extfile openssl.cnf -extensions req_ext
+
+=>openssl pkcs12 -export -in myapp.crt -inkey myapp.key -out myapp.p12 -name myapp -CAfile myapp.crt -caname root -password pass:12345
+
+=>curl --cacert /home/bs960/imranMadbar/tempOps/myapp.crt https://192.168.1.5:8282/
+=>curl --cacert /home/bs960/imranMadbar/tempOps/myapp.crt https://localhost:8282/
+=>curl --cacert /home/bs960/imranMadbar/tempOps/myapp.crt https://madbarsoft.com:8282/
+
+
+
+=>sudo cp myapp.crt /usr/local/share/ca-certificates/
+=>sudo update-ca-certificates
+Add the Self-Signed Certificate to the Trusted CA Store (Secure) in Unbuntu
+
+
+
+openssl x509 -text -noout -in myapp.crt
+openssl s_client -showcerts -connect  192.168.1.5:8282 </dev/null
+Server and client cert info
+
+
+
+cat openssl.cnf
+[ req ]
+distinguished_name = req_distinguished_name
+req_extensions = req_ext
+prompt = no
+
+[ req_distinguished_name ]
+C = bd
+ST = Dhaka
+L = Gulshan
+O = GoroSoft
+OU = Software
+CN = 192.168.1.5
+
+[ req_ext ]
+subjectAltName = @alt_names
+
+[ alt_names ]
+IP.1 = 192.168.1.5
+DNS.1 = localhost
+DNS.2 = madbarsoft.com
+
+
+
+
 
 Self-signed Ceftificated | ssl | tls
 =================================================
@@ -488,6 +542,18 @@ PrivateKeyEntry:
 
 https - ssl/tls doc:
 ------------------------------------------------
+How the Private Key is Used in SSL/TLS
+  SSL/TLS Handshake:
+    During the SSL/TLS handshake, the server presents its certificate (containing the public key) to the client.
+    The client uses the public key to encrypt a piece of data (like a session key) and sends it to the server.
+    The server uses its private key to decrypt this data, proving it owns the corresponding private key.
+
+  Digital Signatures:
+    The server uses its private key to sign a piece of data, such as a certificate or message.
+    The client uses the public key to verify the signature, ensuring the data hasn’t been altered and confirming the server’s identity.
+
+
+
 Exmaple for a nginx-ssl-https proxy config:
 server {
     listen 9191 ssl;
@@ -2470,6 +2536,9 @@ Run-Grafana:
     ->cd /bin
         ./grafana-server
 
+http://localhost:3000/
+
+
 Start loki and Promtal with config:
 =>./loki-linux-amd64 -config.file=loki-local-config.yaml
 =>./promtail-linux-amd64 -config.file=promtail-local-config.yaml
@@ -2531,15 +2600,24 @@ clients:
   - url: http://localhost:3100/loki/api/v1/push
 
 scrape_configs:
-- job_name: system
+- job_name: business-svc
   static_configs:
   - targets:
       - localhost
     labels:
-      job: varlogs
+      job: my-app-varlogs
+      app: business-svc
       __path__: /var/log/nginx/*log
       stream: stdout
-
+      
+- job_name: nginx-error-log
+  static_configs:
+  - targets:
+      - localhost
+    labels:
+      job: nginx-err-log
+      slb: nginx-err-log
+      __path__: /var/log/nginx/error.log
 
 
 
