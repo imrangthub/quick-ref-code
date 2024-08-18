@@ -2508,7 +2508,7 @@ Deploy war/ear to a container:
 
 
 ================================================= 
-#Grafana| promtail | loki |Grafana Loki Promtail 
+#Grafana| promtail | loki | prometheus
 ================================================= 
 
 Grafana:
@@ -2529,23 +2529,43 @@ Download configfile:
   https://github.com/grafana/loki/blob/main/clients/cmd/promtail/promtail-local-config.yaml
   https://raw.githubusercontent.com/grafana/loki/master/cmd/loki/loki-local-config.yaml
 
+Download Prometheus:
+wget https://github.com/prometheus/prometheus/releases/download/v2.47.0/prometheus-2.47.0.linux-amd64.tar.gz
+
+Download Node Exporter:
+wget https://github.com/prometheus/node_exporter/releases/download/v1.6.1/node_exporter-1.6.1.linux-amd64.tar.gz
+
+
 
 
 
 Starting
 -----------------------------------------
-Run-Grafana:
-    ->cd /bin
-        ./grafana-server
-
-http://localhost:3000/
+Start Grafana:
+  ->cd /bin
+      ./grafana-server
+      
+  http://localhost:3000/
 
 
 Start loki and Promtal with config:
-=>./loki-linux-amd64 -config.file=loki-local-config.yaml
-=>./promtail-linux-amd64 -config.file=promtail-local-config.yaml
+  =>./loki-linux-amd64 -config.file=loki-local-config.yaml
+  =>./promtail-linux-amd64 -config.file=promtail-local-config.yaml
 
 
+Start Node Exporter:
+./node_exporter &
+http://localhost:9100/
+
+
+Start Prometheus:
+./prometheus --config.file=prometheus.yml &
+
+http://localhost:9090
+
+=>ps aux | grep prometheus
+=>pgrep prometheus
+Check the Running Status
 
 
 
@@ -2621,6 +2641,33 @@ scrape_configs:
       slb: nginx-err-log
       __path__: /var/log/nginx/error.log
 
+
+
+cat prometheus.yml
+global:
+  scrape_interval: 15s # How often to scrape targets
+
+scrape_configs:
+  - job_name: 'node_exporter' # Name of the job
+    static_configs:
+      - targets: ['localhost:9100'] # Target to scrape (Node Exporter)
+
+
+
+
+Grafana-Dashboard
+==========================================
+
+Dashboard01: Node-Exporter CPU Metrix with 
+Prometheus
+------------------------------------------
+
+Go to Create > Dashboard in Grafana.
+Click Add new panel.
+In the Query section, select your Prometheus data source.
+Metrics browser:
+  :node_cpu_seconds_total{mode="idle"}
+  :node_cpu_seconds_total{job="node_exporter", mode="idle"}
 
 
 
