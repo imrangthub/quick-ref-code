@@ -1704,6 +1704,14 @@ It provides a correct chain of timeouts: Setting an incremental chain of timeout
 ================================================= 
 #Nginx HA through Keepalived – Virtual IP vip
 ================================================= 
+Keepalived uses the Virtual Router Redundancy Protocol (VRRP) to manage the VIP and perform failover between the servers.
+
+
+=>which keepalived
+=>ps aux | grep keepalived
+=>systemctl cat keepalived
+Check where from running keep alive
+
 
 
 =>docker run -d --name slb1 --cap-add=NET_ADMIN --network mynet2 imranmadbar/nginx
@@ -2733,6 +2741,16 @@ scrape_configs:
   - job_name: 'my_spring_boot_application'
     static_configs:
       - targets: ['localhost:8282']  # Adjust to your actual address and port
+
+OR
+scrape_configs:
+  - job_name: 'my_application'
+    static_configs:
+      - targets: ['localhost:8282']
+    metrics_path: '/app-metrics-v1'
+
+
+
 
 
 A custom metrics using spring-app for Prometheus/Grafana:
