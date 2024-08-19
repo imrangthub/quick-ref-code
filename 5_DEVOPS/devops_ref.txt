@@ -2537,15 +2537,14 @@ wget https://github.com/prometheus/node_exporter/releases/download/v1.6.1/node_e
 
 
 
-
-
 Starting
 -----------------------------------------
 Start Grafana:
   ->cd /bin
       ./grafana-server
-      
   http://localhost:3000/
+
+=>ps aux | grep grafana-server
 
 
 Start loki and Promtal with config:
@@ -2557,10 +2556,11 @@ Start Node Exporter:
 ./node_exporter &
 http://localhost:9100/
 
+=>ps aux | grep node_exporter
+
 
 Start Prometheus:
 ./prometheus --config.file=prometheus.yml &
-
 http://localhost:9090
 
 =>ps aux | grep prometheus
@@ -2658,17 +2658,24 @@ scrape_configs:
 Grafana-Dashboard
 ==========================================
 
-Dashboard01: Node-Exporter CPU Metrix with 
-Prometheus
+Dashboard01: Pre-built Dashboards
 ------------------------------------------
+CPU Usage:
+Query: rate(node_cpu_seconds_total{mode!="idle"}[1m]) * 100
 
-Go to Create > Dashboard in Grafana.
-Click Add new panel.
-In the Query section, select your Prometheus data source.
-Metrics browser:
-  :node_cpu_seconds_total{mode="idle"}
-  :node_cpu_seconds_total{job="node_exporter", mode="idle"}
+RAM Usage:
+Query: node_memory_MemTotal_bytes - node_memory_MemAvailable_bytes
 
+Storage Usage:
+Query: node_filesystem_size_bytes{fstype!~"tmpfs|fuse.lxcfs"} - node_filesystem_free_bytes{fstype!~"tmpfs|fuse.lxcfs"}
+
+
+
+Dashboard02: Pre-built Dashboards
+------------------------------------------
+Pre-built Dashboards:
+Grafana has a library of pre-built dashboards. You can import a Node Exporter dashboard by going to 
+  Create > Import and using dashboard ID 1860.
 
 
 
@@ -2705,14 +2712,57 @@ How it Works:
 
 
 
+Prometheus:
+-----------------------------------------------
+Prometheus Working for Metrics Operation and Loki working for logg aggregation.
+Prometheus uses a text-based format for metrics, which is a simple key-value pair system with optional labels.
+
+
+scrape_interval: 15s # How often to scrape targets
+This interval determines how often Prometheus scrapes data from your application or any other targets.
+
+
+cat prometheus.yml
+global:
+  scrape_interval: 15s # How often to scrape targets
+
+scrape_configs:
+  - job_name: 'node_exporter' # Name of the job
+    static_configs:
+      - targets: ['localhost:9100'] # Target to scrape (Node Exporter)
+  - job_name: 'my_spring_boot_application'
+    static_configs:
+      - targets: ['localhost:8282']  # Adjust to your actual address and port
+
+
+A custom metrics using spring-app for Prometheus/Grafana:
+
+    @GetMapping(value = "/metrics", produces = "text/plain")
+    public void metrics(HttpServletResponse response) throws IOException {
+      // Replace these with actual values from your application's logic
+      boolean appReady = true; // Or whatever logic determines readiness
+      int appHealth = 80; // Your app's health metric
+
+      // Format the metrics in Prometheus text format
+      String metricsData = String
+          .format("# HELP app_ready Indicates if the application is ready (1 for true, 0 for false)\n"
+              + "# TYPE app_ready gauge\n" + "app_ready %d\n\n"
+              + "# HELP app_health Current health status of the application\n" + "# TYPE app_health gauge\n"
+              + "app_health %d\n", appReady ? 1 : 0, appHealth);
+
+      // Write the response
+      response.getWriter().write(metricsData);
+    }
 
 
 
+Prometheus:
+  if your primary goal is to monitor and alert based on system and application performance metrics. 
+  It is ideal for real-time performance monitoring and alerting.
 
-
-
-
-
+Loki:
+   if you need to aggregate, store, and query logs from multiple sources, especially if you want to correlate 
+   logs with metrics for troubleshooting and analysis.
 
 
 
