@@ -105,90 +105,6 @@ Copying directories from remote machine to local machine
 
 
 
-=================================================
-#CURL   | Telnet | connection testing                                   
-=================================================
-
-
-curl -XPOST -d "" http://172.16.254.122:8080/myservice
-Post Call
-
-curl https://www.cyberciti.biz/files/sticker/sticker_book.pdf --output output.pdf
-
-
-
-curl --location --request POST 'http://localhost:8080/auth/token' --header 'client_id: e828a561ac324ae1b4f7c2be757c24a9' --header 'Content-Type: application/json' --data-raw '{"email": "zhaque@banglalink.net", "password": "asdfasdf", "grant_type": "client_credentials"}'
-
-
-
-Telnet
------------------------------------------------------
-=>telnet 172.16.8.132 6600
-
-
-=>curl -vvv telnet://172.16.10.224:13146
-Check Connecton
-
-
-
-
-=================================================
-#http | connection | sockets | HTTP                
-================================================= 
-
-ss -ta 
-ss -ta | grep CLOSE-WAIT
-ss -tap | grep CLOSE-WAIT
-ss -tap state CLOSE-WAIT
-OR
-netstat -an 1
-netstat -an 1 | find "xxx.xxx.62.89"
-Show the connection in local,remote and process id 
-
-sudo lsof -i -n -P | grep <PID>
-Check socket status by processId
-
-netstat -an|grep ESTABLISHED | grep -w 8181
-find Socat with port
-
-
-
-=>netstat -an | awk '{print $5"-"$6}' | sort | uniq --repeated --count
-display network-related information. 
-The options used are:
--a: Show both listening and non-listening sockets.
--n: Show numerical addresses (do not resolve hostnames).
-
-=>netstat -ant |grep CLOSE_WAIT | wc -l
-
-=>lsof -i :portNumber
-=>lsof -i :7082
-Check which process/application make wait connection
-
-=>ps -p 92669
-=>ps -fC java17 | grep 92669
-Then grep the pid for find the application
-
-
-for tcp dump
-=>tcpdump -i <interface> port <port>
-
-
-
-
-
-
-
-
-
-Apache HTTP server benchmarking tool  
--------------------------------------------------
-=>ab -n 100 -c 10 https://www.google.com/
-
--n 100=>Number of request
--n 10=>Number of concurent request
-
-
 
 
 
@@ -1982,9 +1898,35 @@ In Windows Defender Firewall:
 
 
 
+=================================================
+#CURL   | Telnet | connection testing                                   
+=================================================
+
+
+curl -XPOST -d "" http://172.16.254.122:8080/myservice
+Post Call
+
+curl https://www.cyberciti.biz/files/sticker/sticker_book.pdf --output output.pdf
+
+
+
+curl --location --request POST 'http://localhost:8080/auth/token' --header 'client_id: e828a561ac324ae1b4f7c2be757c24a9' --header 'Content-Type: application/json' --data-raw '{"email": "zhaque@banglalink.net", "password": "asdfasdf", "grant_type": "client_credentials"}'
+
+
+
+Telnet
+-----------------------------------------------------
+=>telnet 192.168.8.132 6600
+
+
+=>curl -vvv telnet://172.16.10.224:13146
+Check Connecton
+
+
+
 
 =================================================
-# Network | packet analyzer | tcp | udp | http                                        
+# Network | tcpdump  | tcp dump | udp | http                                        
 ================================================= 
 https://www.youtube.com/watch?v=A0FUxfiYJ3s
 tcp state model
@@ -1999,15 +1941,70 @@ tshark -r capture.pcap -q -z conv,eth -z conv,ip -z conv,tcp
 
 
 
-tcpdump
+
+#http | connection | sockets | HTTP                
+================================================= 
+
+ss -ta 
+ss -ta | grep CLOSE-WAIT
+ss -tap | grep CLOSE-WAIT
+ss -tap state CLOSE-WAIT
+OR
+netstat -an 1
+netstat -an 1 | find "xxx.xxx.62.89"
+Show the connection in local,remote and process id 
+
+sudo lsof -i -n -P | grep <PID>
+Check socket status by processId
+
+netstat -an|grep ESTABLISHED | grep -w 8181
+find Socat with port
+
+
+=>netstat -an | awk '{print $5"-"$6}' | sort | uniq --repeated --count
+display network-related information. 
+The options used are:
+-a: Show both listening and non-listening sockets.
+-n: Show numerical addresses (do not resolve hostnames).
+
+=>netstat -ant |grep CLOSE_WAIT | wc -l
+
+=>lsof -i :portNumber
+=>lsof -i :7082
+Check which process/application make wait connection
+
+=>ps -p 92669
+=>ps -fC java17 | grep 92669
+Then grep the pid for find the application
+
+
+
+Apache HTTP server benchmarking tool  
 -------------------------------------------------
+=>ab -n 100 -c 10 https://www.google.com/
+
+-n 100=>Number of request
+-n 10=>Number of concurent request
+
+
+
+#tcpdump analysis | tcp dump 
+================================================= 
+=>ip addr
+wlo1: This is your wireless network interface.
+tun0: This is a VPN interface.
+
+
+=>tcpdump -i <interface> port <port>
+
 =>tcpdump -D
 Display available Net interfaces.
 
 =>sudo tcpdump 
 Start a capture
 
-=>sudo tcpdump wlo1
+=>sudo tcpdump -i tun0
+=>sudo tcpdump -i wlo1
 Select an interface
 
 =>sudo tcpdump -i any -c5 icmp
@@ -2018,7 +2015,8 @@ With number of packet and and protocol
 Check localhost all tcp activity
 
 =>sudo tcpdump -i tun0 dst port 9710
-=>sudo tcpdump -i tun0  host 172.16.8.132
+=>sudo tcpdump -i tun0 host 192.168.8.132
+=>sudo tcpdump -i tun0 host 192.16.8.132 and port 9710 -vvv
 Print dump wdith host and interface and port
 
 
@@ -2030,37 +2028,93 @@ Write to a file
 
 
 
+Possible Network Issues identify from TCP dump:
+----------------------------------------------------
+Packet Loss:
+            192.168.217.222.48620 > idp132.9710: Flags [P.], seq 1249:1457
+            idp132.9710 > 192.168.217.222.48620: Flags [ACK], ack 1457
+            192.168.217.222.48620 > idp132.9710: Flags [P.], seq 1249:1457  (repeated)
+Explanation: If a packet or acknowledgment is lost, the sender will retransmit the packet, indicated by the same sequence number reappearing. This can suggest packet loss or delays.
+
+High Latency:
+            17:08:00.922606 IP 192.168.217.222.48620 > idp132.9710: Flags [P.], seq 1249:1457
+            17:08:05.051876 IP idp132.9710 > 192.168.217.222.48620: Flags [P.], ack 1457
+Explanation: If the time difference between a sent packet and its acknowledgment or response is significant (more than usual), 
+it might indicate high network latency or congestion.
+
+Out-of-Order Packets:
+            192.168.217.222.48620 > idp132.9710: Flags [P.], seq 1457:1665
+            192.168.217.222.48620 > idp132.9710: Flags [P.], seq 1249:1457  (out-of-order)
+Explanation: If packets are received out of sequence, it can indicate issues with the network, such as load balancing problems or a congested route.
+
+Duplicate Acknowledgments (Dup ACKs):
+        17:08:00.922606 IP 192.168.217.222.48620 > idp132.9710: Flags [ACK], ack 1457
+        17:08:00.923606 IP 192.168.217.222.48620 > idp132.9710: Flags [ACK], ack 1457  (duplicate)
+Explanation: Duplicate ACKs usually indicate that the receiver is missing some data and is signaling the sender to 
+retransmit the missing segment. This often points to packet loss.
+
+TCP Retransmissions:
+        192.168.217.222.48620 > idp132.9710: Flags [P.], seq 1249:1457
+        192.168.217.222.48620 > idp132.9710: Flags [P.], seq 1249:1457  (retransmission)
+Explanation: TCP retransmissions happen when a packet isn't acknowledged within the expected time. 
+Retransmissions suggest network congestion, packet loss, or a problematic link.
+
+TCP Window Size Reduction:
+        win 501
+        win 150  (window size decreased)
+Explanation:  The window size in the TCP header decreases, often abruptly. 
+A sudden reduction in the TCP window size can indicate that the receiving side is overwhelmed or congested, 
+which might lead to communication delays.
+
+SACK (Selective Acknowledgment):
+        Signs: The use of SACK options indicates that certain packets were lost and that only specific segments are being acknowledged.
+        sack 1 {1543:1795}
+Explanation: SACK allows the receiver to inform the sender about all the segments that have been received successfully, allowing the sender to retransmit only the missing segments. Frequent use of SACK can indicate packet loss.
+
+
+Communication Without Issues:
+        Sequential ACKs: Every packet sent by the client is acknowledged in sequence without duplication or delay.
+
+        No Retransmissions: There are no retransmissions, indicating that all packets are being delivered successfully.
+
+        Stable Latency: The time intervals between packets are consistent and typical for the network's performance.
+
+        Consistent Window Size: The TCP window size remains stable or grows as expected, showing that the receiver is 
+        processing data without bottlenecks.
+
+
+
 Exam1(unexpected behavior):
-11:20:43.926491 IP BS-960.50300 > 172.16.8.132.9710: Flags [S], seq 2623079097, win 64240, options [mss 1460,sackOK,TS val 4239763764 ecr 0,nop,wscale 7], length 0
-11:20:44.042601 IP 172.16.8.132.9710 > BS-960.50300: Flags [S.], seq 2254210938, ack 2623079098, win 28960, options [mss 1357,sackOK,TS val 1296118935 ecr 4239763764,nop,wscale 7], length 0
-11:20:44.042662 IP BS-960.50300 > 172.16.8.132.9710: Flags [.], ack 1, win 502, options [nop,nop,TS val 4239763880 ecr 1296118935], length 0
-11:20:44.042888 IP BS-960.50300 > 172.16.8.132.9710: Flags [P.], seq 1:416, ack 1, win 502, options [nop,nop,TS val 4239763880 ecr 1296118935], length 415
-11:20:44.050804 IP 172.16.8.132.9710 > BS-960.50300: Flags [.], ack 416, win 235, options [nop,nop,TS val 1296119051 ecr 4239763880], length 0
-11:20:44.144854 IP 172.16.8.132.9710 > BS-960.50300: Flags [P.], seq 1:960, ack 416, win 235, options [nop,nop,TS val 1296119071 ecr 4239763880], length 959
-11:20:44.144898 IP BS-960.50300 > 172.16.8.132.9710: Flags [.], ack 960, win 501, options [nop,nop,TS val 4239763982 ecr 1296119071], length 0
-11:20:44.144917 IP 172.16.8.132.9710 > BS-960.50300: Flags [P.], seq 960:965, ack 416, win 235, options [nop,nop,TS val 1296119071 ecr 4239763880], length 5
-11:20:44.144924 IP BS-960.50300 > 172.16.8.132.9710: Flags [.], ack 965, win 501, options [nop,nop,TS val 4239763982 ecr 1296119071], length 0
+11:20:43.926491 IP BS-960.50300 > 192.168.8.132.9710: Flags [S], seq 2623079097, win 64240, options [mss 1460,sackOK,TS val 4239763764 ecr 0,nop,wscale 7], length 0
+11:20:44.042601 IP 192.168.8.132.9710 > BS-960.50300: Flags [S.], seq 2254210938, ack 2623079098, win 28960, options [mss 1357,sackOK,TS val 1296118935 ecr 4239763764,nop,wscale 7], length 0
+11:20:44.042662 IP BS-960.50300 > 192.168.8.132.9710: Flags [.], ack 1, win 502, options [nop,nop,TS val 4239763880 ecr 1296118935], length 0
+11:20:44.042888 IP BS-960.50300 > 192.168.8.132.9710: Flags [P.], seq 1:416, ack 1, win 502, options [nop,nop,TS val 4239763880 ecr 1296118935], length 415
+11:20:44.050804 IP 192.168.8.132.9710 > BS-960.50300: Flags [.], ack 416, win 235, options [nop,nop,TS val 1296119051 ecr 4239763880], length 0
+11:20:44.144854 IP 192.168.8.132.9710 > BS-960.50300: Flags [P.], seq 1:960, ack 416, win 235, options [nop,nop,TS val 1296119071 ecr 4239763880], length 959
+11:20:44.144898 IP BS-960.50300 > 192.168.8.132.9710: Flags [.], ack 960, win 501, options [nop,nop,TS val 4239763982 ecr 1296119071], length 0
+11:20:44.144917 IP 192.168.8.132.9710 > BS-960.50300: Flags [P.], seq 960:965, ack 416, win 235, options [nop,nop,TS val 1296119071 ecr 4239763880], length 5
+11:20:44.144924 IP BS-960.50300 > 192.168.8.132.9710: Flags [.], ack 965, win 501, options [nop,nop,TS val 4239763982 ecr 1296119071], length 0
 
 
-Describe: TCP (Transmission Control Protocol) communication session between two hosts, BS-960 and 172.16.8.132, over port 9710. Let's analyze each line:
+Describe: TCP (Transmission Control Protocol) communication session between two hosts, BS-960 and 192.168.8.132, over port 9710. Let's analyze each line:
 
-    11:20:43.926491: Host BS-960 initiates a TCP connection by sending a SYN packet (Flags [S]) to 172.16.8.132. The sequence number is 2623079097, and the window size is 64240. It also includes TCP options such as Maximum Segment Size (MSS), Selective Acknowledgment (SACK), Timestamp (TS), and Window Scale. The length of the packet is 0.
+    11:20:43.926491: Host BS-960 initiates a TCP connection by sending a SYN packet (Flags [S]) to 192.168.8.132. The sequence number is 2623079097, and the window size is 64240. It also includes TCP options such as Maximum Segment Size (MSS), Selective Acknowledgment (SACK), Timestamp (TS), and Window Scale. The length of the packet is 0.
 
-    11:20:44.042601: 172.16.8.132 responds with a SYN-ACK packet (Flags [S.]) indicating the start of a TCP connection. The sequence number is 2254210938, and it acknowledges the sequence number sent by BS-960. It also includes TCP options similar to the first packet. The length of the packet is 0.
+    11:20:44.042601: 192.168.8.132 responds with a SYN-ACK packet (Flags [S.]) indicating the start of a TCP connection. The sequence number is 2254210938, and it acknowledges the sequence number sent by BS-960. It also includes TCP options similar to the first packet. The length of the packet is 0.
 
-    11:20:44.042662: BS-960 acknowledges the SYN-ACK packet by sending an ACK packet (Flags [.], ack 1). This acknowledges the receipt of the SYN-ACK packet from 172.16.8.132.
+    11:20:44.042662: BS-960 acknowledges the SYN-ACK packet by sending an ACK packet (Flags [.], ack 1). This acknowledges the receipt of the SYN-ACK packet from 192.168.8.132.
 
     11:20:44.042888: BS-960 sends a TCP packet with the PUSH (P) flag set, indicating that it has data to transmit. The sequence number ranges from 1 to 416, and it acknowledges the receipt of the SYN-ACK packet. The packet has a payload length of 415.
 
-    11:20:44.050804: 172.16.8.132 acknowledges the receipt of data (ack 416) sent by BS-960.
+    11:20:44.050804: 192.168.8.132 acknowledges the receipt of data (ack 416) sent by BS-960.
 
-    11:20:44.144854: 172.16.8.132 sends a TCP packet with data (Flags [P.]). The sequence number ranges from 1 to 960, and it acknowledges the data sent by BS-960. The packet has a payload length of 959.
+    11:20:44.144854: 192.168.8.132 sends a TCP packet with data (Flags [P.]). The sequence number ranges from 1 to 960, and it acknowledges the data sent by BS-960. The packet has a payload length of 959.
 
-    11:20:44.144898: BS-960 acknowledges the receipt of data (ack 960) sent by 172.16.8.132.
+    11:20:44.144898: BS-960 acknowledges the receipt of data (ack 960) sent by 192.168.8.132.
 
-    11:20:44.144917: 172.16.8.132 sends another TCP packet with data, with a sequence number from 960 to 965. The packet has a payload length of 5.
+    11:20:44.144917: 192.168.8.132 sends another TCP packet with data, with a sequence number from 960 to 965. The packet has a payload length of 5.
 
-    11:20:44.144924: BS-960 acknowledges the receipt of data (ack 965) sent by 172.16.8.132.
+    11:20:44.144924: BS-960 acknowledges the receipt of data (ack 965) sent by 192.168.8.132.
 
 
 
@@ -2114,6 +2168,9 @@ FlagDetails:
 
 
 
+
+Other Communication Method
+----------------------------------------------------
 Java and JDBC communicates:
   The Java application communicates with the MySQL database using JDBC.
   JDBC internally uses the MySQL Connector/J driver.
