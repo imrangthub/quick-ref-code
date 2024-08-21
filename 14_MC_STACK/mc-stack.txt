@@ -1921,18 +1921,13 @@ What is SOAP Web Services ?
 	bindings, operations, and location of the service.
 
 Contract-First/Contract-Last Development Style OR Top-Down vs. Bottom-Up:
-	There are two possible approaches when creating a web service: Contract-Last and Contract-First. 
-	When we use a contract-last approach, we start with the Java code and generate the web service contract (WSDL) from the classes. 
-	When using contract-first, we start with the WSDL contract, from which we generate the Java classes.
-Spring-WS only supports the contract-first development style.
-
 	There are two ways of building SOAP web services. We can go with a top-down approach or a bottom-up approach.
 	In a top-down (contract-first) approach, a WSDL document is created, and the necessary Java classes are generated from the WSDL. 
 	In a bottom-up (contract-last) approach, the Java classes are written, and the WSDL is generated from the Java classes.
+Spring-WS only supports the contract-first development style.
 
 
-WSDL
-WSDL is used to define the structure of Request and the Structure of Response xml.
+WSDL: WSDL is used to define the structure of Request and Response xml.
 
 WSDL will explain:
 	What are the different services (operations) exposed by the server?
@@ -1949,12 +1944,9 @@ A SOAP service typically follows the SOAP message structure, which includes:
 
 
 
-
-
-
 Create Soap Service:
 -------------------------------------
-Setp1: Define Request Response xml 
+Setp1: Define Request and Response xml 
 setp2: Create .xsd file for validateion Request/response xml file
 Step3: For generate Java Pojo class for req/response from as .xsd file add JAXB library in pom file
 
@@ -2005,7 +1997,6 @@ xmlns:cal="http://imranmadbar.com/types/calculator">
 		
 Simple Soap Response:
 -------------------------------------
-
 <SOAP-ENV:Envelope xmlns:SOAP-ENV="http://schemas.xmlsoap.org/soap/envelope/">
   <SOAP-ENV:Header/>
   <SOAP-ENV:Body>
@@ -2019,8 +2010,44 @@ Simple Soap Response:
 
 
 
+Key Differences Between SOAP and REST Token Usage:
+  Security Model
+  SOAP: Provides message-level security, ensuring that the entire SOAP message, including the token, 
+  can be encrypted, signed, and protected even across multiple intermediaries.
+  REST: Primarily relies on transport-level security (HTTPS). Tokens are not typically encrypted within the message itself, 
+  making REST services more dependent on the secure transport layer.
+  
+  Complexity
+  SOAP: More complex, as it involves implementing WS-Security, managing XML-based tokens, and ensuring proper encryption 
+  and signing of messages.
+  REST: Simpler to implement, often using OAuth tokens and relying on HTTPS for securing tokens in transit.
+  
+  Flexibility
+  SOAP: Supports a wide range of security features and token types, including SAML and custom tokens, allowing for 
+  more tailored security implementations.
+  REST: Generally focuses on a narrower set of token standards, like OAuth, which are easier to implement but might offer less flexibility.
+
+Summary:
+While both SOAP and REST can use tokens for authorization, SOAP offers more granular and robust security options 
+through WS-Security, which provides message-level encryption, digital signatures, and other advanced security features. 
+REST typically relies on HTTPS for transport-level security and uses simpler token mechanisms like OAuth.
 
 
 
 
 
+
+
+================================================= 
+#gRPC
+================================================= 
+
+Summary
+gRPC is a modern RPC framework that excels in performance, efficiency, and flexibility, especially for microservices architectures. 
+It differs from REST and SOAP in terms of data format, transport protocol, communication style, and performance, 
+with gRPC being the most performant and suitable for low-latency, high-throughput scenarios.
+
+Use Cases:
+  gRPC: Ideal for microservices, low-latency communication, and complex interactions like streaming.
+  REST: Best suited for public APIs and scenarios where ease of use and human-readability are important.
+  SOAP: Common in enterprise applications requiring high security and transactional reliability.
