@@ -1666,13 +1666,107 @@ Generating a Public Key from the Private Key
 
 
 
+
+================================================
+#OAuth | OAuth 2.0 | OAuth 2.1  | 
+================================================
+
+OAuth2 roles:
+  Resource Owner: The resource owner is the user who authorizes the application to access their account or protected resources.
+
+  Client: A client is a piece of code that the user is interacting with; browsers, native apps or single-page applications are all clients.
+
+  Authorization Server: An OAuth server implements OAuth specifications. It has or can obtain information 
+    about which resources are available to clients. 
+    In the RFCs this application is called an Authorization Server. This is also known as an Identity Provider. 
+    Most users call it “the place I sign in”.
+
+  Resource Server: An application server doesn’t have any authentication functionality but instead delegates 
+    login requests to an OAuth server. It has an Id which allows the OAuth server to identify it.
+
+
+
+
+OAuth2Scopes:
+  Scopes are used to clearly define what the client can access from the resource server on behalf of the user. 
+  Rather than granting full account access, scopes limit what a client can do after getting access to a user’s 
+  resources (e.g. read vs write access, limiting access to sensitive information).
+
+
+
+OAuth grant types:
+    Authorization code
+    Client credentials
+    Device code
+
+Legacy grant types:
+    Implicit grant
+    Resource owner password credentials grant
+
+
+
+
+
+OAuth 2.1 
+================================================
+Proof Key for Code Exchange (PKCE) RFC 
+[OAuth 2.1] does not introduce any new features to what already exists in the OAuth 2.0 specifications being replaced.
+
+
+Removal of Deprecated Features:
+  Implicit Flow: OAuth 2.1 removes the Implicit Flow, which was used in OAuth 2.0 for single-page applications (SPAs).
+  Password Grant: The Resource Owner Password Credentials Grant (Password Grant) is removed in OAuth 2.1.
+
+Mandatory Use of PKCE (Proof Key for Code Exchange):
+  PKCE for All Clients: OAuth 2.1 mandates the use of 
+  PKCE in the Authorization Code Flow for all clients, not just public clients (e.g., SPAs or mobile apps). 
+
+Enhanced Security Requirements:
+  Redirect URIs: OAuth 2.1 requires that redirect URIs must be pre-registered with the authorization server, and wildcard redirect URIs are no longer allowed. 
+  State Parameter Usage: The state parameter, used to prevent CSRF (Cross-Site Request Forgery) attacks, is strongly recommended in OAuth 2.1. 
+  Token Binding
+
+
+
+
+
+
+OAuth and OpenID Connect (OIDC):
+  OpenID Connect (OIDC) is an open standard that runs on top of OAuth. While OAuth is used solely for authorization, 
+  OIDC is used for authentication. 
+  OIDC utilizes an additional token, called the ID token, that contains information about the user and their authentication status. 
+
+
+
+
 ================================================
 #  keycloak                                          
 ================================================= 
+mv keycloak-15.0.2 /opt/keycloak
+tar -xvzf keycloak-15.0.2.tar.gz
 
-https://www.tutorialsbuddy.com/keycloak-mysql-setup
-https://www.appsdeveloperblog.com/keycloak-configure-mysql-database/
-https://sunitkatkar.blogspot.com/2020/07/setting-up-keycloak-10-with-mysql-8-on.html
+
+CREATE DATABASE keycloak;
+CREATE USER 'keycloak'@'%' IDENTIFIED BY 'your_password';
+GRANT ALL PRIVILEGES ON keycloak.* TO 'keycloak'@'%';
+FLUSH PRIVILEGES;
+
+
+
+# conf/keycloak.conf
+
+# Database configuration
+db=mysql
+db-url=jdbc:mysql://localhost:3306/keycloakdb
+db-username=keycloak
+db-password=your_password
+
+
+Start:
+-------------------------------------------------
+sudo ./kc.sh start-dev
+
+
 
 
 #Mysql server with keycloak
@@ -1699,6 +1793,15 @@ Should output: default_storage_engine InnoDB
 =>SET GLOBAL default_storage_engine = 'InnoDB';
 If storage engine is not InnoDB, use this to set it
 
+
+
+
+
+
+https://green.cloud/docs/how-to-install-configure-keycloak-on-ubuntu-20-04/
+https://www.tutorialsbuddy.com/keycloak-mysql-setup
+https://www.appsdeveloperblog.com/keycloak-configure-mysql-database/
+https://sunitkatkar.blogspot.com/2020/07/setting-up-keycloak-10-with-mysql-8-on.html
 
 
 
