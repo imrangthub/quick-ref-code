@@ -3236,6 +3236,79 @@ DevSecOps:
 
 
 
+#Static Application Security Testing (SAST)
+================================================= 
+
+#SonarQube
+-------------------------------------------------
+ Running SonarQube with docker:
+=>docker run -d --name my-sonarqube-server -e SONAR_ES_BOOTSTRAP_CHECKS_DISABLE=true -p 9000:9000 sonarqube:latest
+
+
+add in spring boot project:
+<dependency>
+  <groupId>org.jacoco</groupId>
+  <artifactId>jacoco-maven-plugin</artifactId>
+  <version>0.8.10</version>
+</dependency>
+OR
+<build>
+    <pluginManagement>
+        <plugins>
+            <plugin>
+                <groupId>org.sonarsource.scanner.maven</groupId>
+                <artifactId>sonar-maven-plugin</artifactId>
+                <version>3.4.0.905</version>
+            </plugin>
+        </plugins>
+    </pluginManagement>
+</build>
+
+
+Run:
+  mvn sonar:sonar
+
+
+
+
+
+#Software Composition Analysis (SCA)
+================================================= 
+
+#OWASP ZAP (Zed Attack Proxy)
+-------------------------------------------------
+
+Spring Boot Project Dependency-Check using OWASP:
+
+Add plugin:
+
+            <!-- OWASP Dependency-Check Plugin -->
+            <plugin>
+                <groupId>org.owasp</groupId>
+                <artifactId>dependency-check-maven</artifactId>
+                <version>8.2.1</version> <!-- Check for the latest version -->
+                <executions>
+                    <execution>
+                        <goals>
+                            <goal>check</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+            
+            <!-- Other plugins -->
+
+Run:
+  mvn verify
+
+
+
+
+
+
+
+
+
 Screening code for security and vulnerabilities
 ================================================= 
 1. Static Application Security Testing (SAST)
