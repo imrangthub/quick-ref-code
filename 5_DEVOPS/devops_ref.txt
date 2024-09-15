@@ -3218,35 +3218,76 @@ DecimalMask	        SubnetBits(s)	HostBits(h)	   NumberifSubnets=2s	NumberofHost
 
 
 
-
-
-
-Key Responsibility
-
-Lead and manage a team of highly skilled offensive security professionals of DevSecOps having application security assessments in continuous software development cycle maintaining the quality delivery.
-Lead & participate in managing internal attack to internal/public facing systems, development of internal toolsets and applications to support the team.
-DevSecOps capability development - tools, techniques and tradecraft.
-Guide development team on secure software development as part of DevSecOps practice
-Organize, adapt & ensure DevSecOps best practice among the relevant stakeholders.
-End to end grip and control on the project deliveries, mostly focusing on the security/devsecops part
-Periodic security assessment following DevSecOps practices of the systems to identify any security loopholes and to plan the mitigation plan along with the relevant stakeholders.
- 
-
 ================================================= 
 ##DevSecOps | devsecops | dev security ops
 ================================================= 
-
-UdamyCourse
-https://gale.udemy.com/course/devsecops-fundamentals/learn/lecture/32105598#overview
-https://www.udemy.com/course/how-to-secure-web-application/?couponCode=SKILLS4SALEA
-
-
 
 DevSecOps:
   DevSecOps means thinking about application and infrastructure security from the start. 
 
   DevSecOps — a combination of development, security, and operations — is an approach to software development 
   hat integrates security throughout the development lifecycle.
+
+
+
+App Security:
+--------------------------------
+Single App DevSecOps:
+  Single App DevSecOps is a software development methodology that integrates security into the 
+  entire development lifecycle of a single application. It's a focused approach that aims to ensure the security of 
+  a specific application from the beginning to the end of its development and deployment.
+
+
+Key Activities in Single App DevSecOps:
+  Threat modeling: Identifying potential threats and vulnerabilities to the application.
+  Security testing: Conducting regular security testing throughout the development lifecycle.
+  Code review: Reviewing code for security vulnerabilities.
+  Configuration management: Ensuring that the application is configured securely.
+  Incident response: Having a plan in place to respond to security incidents.
+
+Tools for Single App DevSecOps
+  Static Application Security Testing (SAST): Analyzes source code for vulnerabilities without executing the code.
+  Examples: SonarQube, Checkmarx, Veracode
+  Dynamic Application Security Testing (DAST): Tests the running application to identify vulnerabilities in the runtime environment.
+  Examples: Burp Suite, OWASP ZAP, Acunetix
+  Interactive Application Security Testing (IAST): Combines SAST and DAST for more comprehensive testing.
+  Examples: Contrast Security, Checkmarx IAST
+  Security Orchestration, Automation, and Response (SOAR): Automates security workflows and incident response processes.
+  Examples: Palo Alto Networks Cortex XSOAR, IBM Security QRadar Advisor
+
+
+
+Application Layer Security
+  Secure Coding Practices: Follow OWASP Mobile Top 10 guidelines, avoid hardcoding sensitive data like API keys, and use secure libraries.
+  Code Obfuscation: Prevent reverse engineering by obfuscating code using tools like ProGuard.
+
+Data Security
+  Encryption: Encrypt sensitive data both in transit (using TLS/SSL) and at rest (using AES-256 or similar algorithms).
+  Secure Storage: Store sensitive information in secure containers like Keychain (iOS) or Keystore (Android).
+
+API Security
+  Authentication: Use strong methods like OAuth 2.0, JWT, or mutual TLS for securing API endpoints.
+  Rate Limiting: Implement API rate limiting to prevent denial-of-service (DoS) attacks.
+  Input Sanitization: Ensure all inputs coming from the mobile app to the API are sanitized.
+
+
+Static and Dynamic Code Analysis: Use tools like SonarQube or Fortify for code analysis to detect security flaws.
+Real-Time Threat Monitoring: Use SIEM tools (e.g., Splunk, QRadar) to monitor the app and network for real-time threat detection.
+
+
+
+Container Security: Ensure container security by scanning container images for vulnerabilities using tools 
+like Aqua Security, Twistlock, or Clair.
+
+
+
+
+Encryption vs Hashing vs Encoding
+---------------------------------------------
+Encryption is used to protect data confidentiality, and the process can be reversed with the correct key.
+Hashing is used to verify data integrity, and it’s a one-way process that cannot be reversed.
+Encoding is for converting data to a different format for transmission or compatibility, and it’s reversible but not secure.
+
 
 
 
@@ -3324,8 +3365,6 @@ Run:
 
 
 
-
-
 Screening code for security and vulnerabilities
 ================================================= 
 1. Static Application Security Testing (SAST)
@@ -3383,6 +3422,142 @@ Tools:
 
 
 
+
+One of the native Docker image scanning tools is Docker Scan (powered by Snyk). 
+It allows you to check your Docker images for vulnerabilities directly from the Docker CLI.
+
+
+
+
+
+TruffleHog
+----------------------------------------------------
+Cehck for any kind of secret in git commit hitstory: 
+TruffleHog is a security tool that scans code repositories for vulnerabilities related to secret keys, 
+such as private encryption keys and passwords.
+
+
+Source Composition Analysis (SCA) | Dependency Check
+------------------------------------------------------
+https://hub.docker.com/r/owasp/dependency-check
+
+
+
+Static application security testing (SAST) with SonarQube
+----------------------------------------------------
+Run sonarqubeqube server on Jenken Host server
+add plugin sonerqube -scaher for Jenken
+
+
+
+Dynamic Application Security Testing (DAST) With OWASP ZAP
+-------------------------------------------------
+https://www.zaproxy.org/docs/docker/about/
+
+
+
+Simple Jenkinsfile for devsecops
+-------------------------------------------------
+pipeline {
+  agent any 
+  tools {
+    maven 'Maven'
+  }
+  stages {
+    stage ('Initialize') {
+      steps {
+        sh '''
+                    echo "PATH = ${PATH}"
+                    echo "M2_HOME = ${M2_HOME}"
+            ''' 
+      }
+    }
+    
+    stage ('Check-Git-Secrets') {
+      steps {
+        sh 'rm trufflehog || true'
+        sh 'docker run gesellix/trufflehog --json https://github.com/cehkunal/webapp.git > trufflehog'
+        sh 'cat trufflehog'
+      }
+    }
+    
+    stage ('Source Composition Analysis') {
+      steps {
+         sh 'rm owasp* || true'
+         sh 'wget "https://raw.githubusercontent.com/cehkunal/webapp/master/owasp-dependency-check.sh" '
+         sh 'chmod +x owasp-dependency-check.sh'
+         sh 'bash owasp-dependency-check.sh'
+         sh 'cat /var/lib/jenkins/OWASP-Dependency-Check/reports/dependency-check-report.xml'
+        
+      }
+    }
+    
+    stage ('SAST') {
+      steps {
+        withSonarQubeEnv('sonar') {
+          sh 'mvn sonar:sonar'
+          sh 'cat target/sonar/report-task.txt'
+        }
+      }
+    }
+    
+    stage ('Build') {
+      steps {
+      sh 'mvn clean package'
+       }
+    }
+    
+    stage ('Deploy-To-Tomcat') {
+            steps {
+           sshagent(['tomcat']) {
+                sh 'scp -o StrictHostKeyChecking=no target/*.war ubuntu@13.232.202.25:/prod/apache-tomcat-8.5.39/webapps/webapp.war'
+              }      
+           }       
+    }
+    
+    
+    stage ('DAST') {
+      steps {
+        sshagent(['zap']) {
+         sh 'ssh -o  StrictHostKeyChecking=no ubuntu@13.232.158.44 "docker run -t owasp/zap2docker-stable zap-baseline.py -t http://13.232.202.25:8080/webapp/" || true'
+        }
+      }
+    }
+    
+  }
+}
+
+
+cat owasp-dependency-check.sh
+#!/bin/sh
+
+OWASPDC_DIRECTORY=$HOME/OWASP-Dependency-Check
+DATA_DIRECTORY="$OWASPDC_DIRECTORY/data"
+REPORT_DIRECTORY="$OWASPDC_DIRECTORY/reports"
+
+if [ ! -d "$DATA_DIRECTORY" ]; then
+    echo "Initially creating persistent directories"
+    mkdir -p "$DATA_DIRECTORY"
+    chmod -R 777 "$DATA_DIRECTORY"
+
+    mkdir -p "$REPORT_DIRECTORY"
+    chmod -R 777 "$REPORT_DIRECTORY"
+fi
+
+# Make sure we are using the latest version
+docker pull owasp/dependency-check
+
+docker run --rm \
+    --volume $(pwd):/src \
+    --volume "$DATA_DIRECTORY":/usr/share/dependency-check/data \
+    --volume "$REPORT_DIRECTORY":/report \
+    owasp/dependency-check \
+    --scan /src \
+    --format "ALL" \
+    --project "My OWASP Dependency Check Project" \
+    --out /report
+    # Use suppression like this: (/src == $pwd)
+    # --suppression "/src/security/dependency-check-suppression.xml"
 
 
 
