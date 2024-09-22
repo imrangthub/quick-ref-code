@@ -68,6 +68,10 @@ Get process id by port
 =>ps aux | grep keepalived
 =>systemctl cat keepalived
 Check where from a service running
+
+
+sudo cat /etc/sudoers
+check sudo
 =================================================
 #                  Basic                                          
 ================================================= 
@@ -213,6 +217,28 @@ Sort by Memory Usage: Shift + M while top is running.
 
 
 
+Troubleshooting:
+-------------------------------------------------
+=>ip link
+Check the network interface status (status UP)
+
+=>nslookup targetHostDns
+Check is that a valid ip 
+
+=>ping ip/dns
+check is ip with in network (some time disable icmp)
+
+=>traceroute 192.168.1.5
+this will show hop count source and destination, also is there any issu connections in between 
+
+from the remote host:
+=>netstat -an | grep 80 | grep -i LISTEN
+Check is web server is up or not
+
+=>ip link
+Check the interface of remote server is up or not
+
+
 =================================================
 #    Find | search    |    look up      
 ================================================= 
@@ -288,6 +314,7 @@ sudo unlink /etc/nginx/sites-enabled/redis-sentinel.conf
 # host| dns                               
 ================================================= 
 sudo cat /etc/resolv.conf
+=>sudo resolvectl status
 Dns Resulation Point
 
 =>sudo cat /etc/hosts

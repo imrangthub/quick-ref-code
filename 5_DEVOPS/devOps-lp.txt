@@ -5,76 +5,257 @@
 #kodekloud    | 17Sep2024                                      
 ================================================= 
 
+
+
+
 Step:01: Learn the basics of DevOps, Networking and Application
+================================================= 
 
-    DevOps Pre-Requisite Course
-    Fundamentals of DevOps
+DevOps Pre-Requisite Course
+-------------------------------------------------
 
-
-
-
-
-
-Step:02: Learn Programming and Scripting
-
-    Golang
-    Python Basics
-    Shell Scripts for Beginners
+Linux:
+======
+rpm vs yum
 
 
+Simple Service: /etc/systemd/system
 
-Step:03: Learn Version Control
+cat my_app.service
+[Unit]
+Description=My python web application
 
-    GIT for Beginners
+[Service]
+ExecStart=/usr/bin/python3 /opt/code/my_app.py
+
+ExecStartPre=/opt/code/configure_db.sh   
+
+ExecStartPost=/opt/code/email_status.sh
+
+Restart=always
+
+[Install]
+WantedBy=multi-user.target   
+
+
+Networking Basics
+==================
+
+Dns:
+bs960@BS-960:~$ cat /etc/hosts
+Every linux hostmachine its own dns entry, we can add as much as we can.
+But for many host its complext to add all to this file, in this case dns-resolution server or dns-server come.
+Whe we cna put all dns entry in a single point.
+
+and Your current hostmachine as its info in the file of resolve.conf:
+cat /etc/resolv.conf
+    nameserver 192.168.1.100
+
+OR
+cat /etc/resolv.conf
+    nameserver 127.0.0.53
+
+The local system sends DNS queries to 127.0.0.53, which then forwards them to the appropriate external DNS servers.
+
+
+Dns-processing:
+    Your application makes a DNS query (e.g., example.com).
+    The query goes to 127.0.0.53, which is managed by systemd-resolved.
+    systemd-resolved forwards the query to the appropriate DNS server, based on the current network configuration (private or public).
+    The external DNS server responds with the IP address for the queried domain.
+    systemd-resolved returns the IP address to the application.
+
+Private-Network dns :
+    The 127.0.0.53 address on your machine receives DNS queries from your applications (such as web browsers or command-line tools) 
+    and forwards these queries to the DNS servers provided by the router (typically assigned by DHCP). 
+    These DNS servers resolve the requested domain names into IP addresses.
+    If the DNS server is internal to your organization, it might return private network 
+    IP addresses (e.g., for internal services or devices).
+
+Public Network dns:
+    On a public network (such as a coffee shop's Wi-Fi or the Internet at large), 
+    your machine still uses 127.0.0.53 as the local DNS resolver. 
+    However, the DNS server provided by the public network may be different (e.g., the router of the public Wi-Fi might give Google DNS, 
+    Cloudflare DNS, or an ISP's DNS server).
+    The DNS queries sent to 127.0.0.53 are forwarded to these external DNS servers, which return public IP addresses for domain names.
+
+
+=>nslookup my-privateserver.com
+nslookup find domain name from the dns server not host /etc/hosts file.
+
+
+DNS-lab(Need to practice)
+
+
+
+
+Shell Scripts for Beginners
+================================================= 
+Command:
+
+$ bash create-and-launch-rocket.sh
+$ create-and-launch-rocket
+create-and-launch-rocket: command not found
+
+$ echo $PATH
+/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
+$ export PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/home/michael
+or
+$ export PATH=$PATH:/home/michael
 
 
 
 Step:04: Learn CI/CD Concepts
+================================================= 
+Jenkins
 
-    Jenkins
+bakcup:
+$JENKINS_HOME
+    Configuration File(config.xml)
+    Jobs
 
-
-
-
-Step:05: Ace Container Concepts
-
-    Docker Training Course for the Absolute Beginner
-
-
-
-
-Step:06: Learn Container Orchestration
-
-    Kubernetes for the Absolute Beginners - Hands-on Tutorial
-
+for backup use plugin thinBackup
 
 
 
 Step:07: Learn Automation
+================================================= 
 
-    Learn Ansible Basics - Beginners Course
+Learn Ansible Basics - Beginners Course
 
+Ansible:
+    Ansible is an open-source automation tool that simplifies configuration management and deployment 
+    tasks for IT infrastructure. 
+    It uses YAML syntax for playbooks, which are essentially scripts that describe the desired state of your systems. 
+    Ansible is agentless, meaning it doesn't require any software to be installed on the target machines.
+
+
+
+Installation on Ubuntu:
+    sudo apt update
+    sudo apt install ansible
+    ansible --version
+
+
+Ansible Configuration Files priorities:
+    1 $ANSIBLE_CONFIG=/opt/ansible-web.cfg
+    1 /opt/ansible-web.cfg
+    4 /etc/ansible/ansible.cfg
+
+    3 ansible.cfg
+
+    2 /opt/web-playbooks/ansible.cfg
+
+    2 /opt/db-playbooks/ansible.cfg
+
+    2 /opt/network-playbooks/ansible.cfg
+
+
+
+View Configuration:
+    $ ansible-config list # Lists all configurations
+    $ ansible-config view # Shows the current config file
+    $ ansible-config dump # Shows the current settings
+    $ export ANSIBLE_GATHERING=explicit
+    $ ansible-config dump | grep GATHERING
+    DEFAULT_GATHERING(env: ANSIBLE_GATHERING) = explicit
+
+
+Ansible playbook:
+
+cat playbook.yml
+    name: Play 1
+    hosts: localhost
+    tasks:
+    - name: Execute command ‘date’
+        command: date
+    - name: Execute script on server
+        script: test_script.sh
+    - name: Install httpd service
+        yum:
+        name: httpd
+        state: present
+    - name: Start web server
+        service:
+        name: httpd
+        state: started
+
+
+ansible- helloworld command:
+
+
+Bash:
+[osboxes@ansiblecontroller ~]$ mkdir test-project
+[osboxes@ansiblecontroller ~]$ cd test-project/
+[osboxes@ansiblecontroller test-project]$ cat inventory.txt
+targetl ansible_host=192.168.1.114 ansible_ssh_pass=osboxes.org
+[osboxes@ansiblecontroller test-project]$ cat inventory.txt
+targetl ansible_host=192.168.1.114 ansible_ssh_pass=osboxes.org
+[osboxes@ansiblecontroller test-project]$
+[osboxes@ansiblecontroller test-project]$
+[osboxes@ansiblecontroller test-project]$ ansible targetl ping 1 inventory.txt
+targetl | SUCCESS => {
+    "changed": false,
+    "ping": "pong"
+}
+
+Summary:
+    A new directory named test-project is created.
+    The current directory is changed to test-project.
+    The inventory.txt file is created or edited.
+    The content of inventory.txt is displayed:
+    targetl ansible_host=192.168.1.114 ansible_ssh_pass=osboxes.org
+    The ansible targetl ping 1 inventory.txt command is executed.
+    The output of the command shows that the ping to the target host (targetl) was successful.
+
+add second server:
+cat inventory.txt
+    targetl ansible_host=192.168.1.114 ansible_ssh_pass=osboxes.org
+    target2 ansible_host=192.168.1.115 ansible_ssh_pass-osboxes.org
 
 
 
 
 Step:08: Master Infrastructure as Code Concepts
-
+================================================= 
 Terraform Basics Training Course
 
 
+Configuration Management tools is:ansible
+Provisioning Tools: Terraform
+Server Templating: Docker
 
 
-Step:09: Master Observability and Monitoring
+Grafana Loki
+---------------------------------------------------
+What is Loki?
+    Loki is a log aggregation system designed to store and query logs
+    Designed to be cost effective and easy to operate
+    Loki does not index full text from logs (like Elasticsearch)
+    Loki only indexes labels (metadata) from logs
+    Makes it more cost effective and performant
+    Configuration and query language similar to Prometheus
+
 
 Prometheus Certified Associate (PCA)
-Grafana Loki
+---------------------------------------------------
+    Observability – The ability to understand and measure the state of a system based
+    upon data generated by the system
+    Observability allows you to generate actionable outputs from unexpected scenarios
+    in dynamic environments
+    Observability will help:
+    1. Give better insight into the internal workings of a system/application
+    2. Speed up troubleshooting
+    3. Detect hard to catch problems
+    4. Monitor performance of an application
+    5. Improve cross-team collaboration
 
 
 
+3 pillars of Observability
+How do we accomplish observability?
+    Logging
+    Metrics
+    Traces
 
 
-
-
-
-Step:10: Prepare for DevOps Interview

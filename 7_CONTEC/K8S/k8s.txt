@@ -103,14 +103,187 @@ ExposeService:
 
 
 
+=================================================
+k8 dns | DNS
+=================================================
+sudo apt update
+sudo apt install net-tools
+sudo apt install dnsutils
+
+
+
+pod->CoreDNS->hostDns->targetIP
+pod->CoreDNS->hostDns->NAT->hostEath0->hostIP->externalServer
+k8-dns-resolution-flow
+
+
+=>sudo cat /etc/resolv.conf
+=>sudo resolvectl status
+Check hostmachine dns server
+
+
+Troubleshooting DNS in Kubernetes
+-------------------------------------------------
+
+=>kubectl get pods -n kube-system -l k8s-app=kube-dns
+CoreDNS Pod Status: Ensure that the CoreDNS pods are running properly:
+
+=>kubectl logs -n kube-system coredns-565d847f94-g6c5t
+CoreDNS Logs: Check CoreDNS logs for any errors or misconfigurations:
+
+=>kubectl exec -it <pod-name> -- cat /etc/resolv.conf
+Pod DNS Configuration: Check if the pod’s /etc/resolv.conf is properly configured to use the CoreDNS service:
 
 
 
 
 
+add internal-dns-server for enteir cluster:
+---------------------------------------------------
+=>kubectl -n kube-system get configmap coredns -o yaml
+=>kubectl -n kube-system edit configmap coredns
+
+
+.:53 {
+    errors
+    health
+    kubernetes cluster.local in-addr.arpa ip6.arpa {
+        pods insecure
+        fallthrough in-addr.arpa ip6.arpa
+        ttl 30
+    }
+    forward . /etc/resolv.conf
+    cache 30
+    loop
+    reload
+    loadbalance
+}
+
+internal.company.com:53 {
+    forward . 192.168.1.100
+}
+OR
+.:53 {
+    errors
+    health
+    kubernetes cluster.local in-addr.arpa ip6.arpa {
+        pods insecure
+        fallthrough in-addr.arpa ip6.arpa
+        ttl 30
+    }
+    forward . 192.168.1.100
+    cache 30
+    loop
+    reload
+    loadbalance
+}
+
+
+For deployment a specific deployment or pod:
+      restartPolicy: Always
+      dnsPolicy: None
+      dnsConfig:
+        nameservers:
+          - 192.168.1.1
+          - 192.168.1.2
+          - 192.168.1.3
+        searches:
+          - my-microservice.svc.cluster.local
+          - svc.cluster.local
+          - cluster.local
+        options:
+          - name: ndots
+            value: '5'
+          - name: edns0
+      imagePullSecrets:
+        - name: regcred
+
+for pod:
+apiVersion: v1
+kind: Pod
+metadata:
+  name: nginx-pod
+spec:
+  containers:
+  - name: nginx
+    image: nginx
+  dnsPolicy: None
+  dnsConfig:
+    nameservers:
+      - 192.168.1.1    # Custom DNS server 1
+      - 192.168.1.2     # Custom DNS server 2
+      - 192.168.1.3     # Custom DNS server 3
+    searches:
+      - my-microservice.svc.cluster.local
+      - svc.cluster.local
+      - cluster.local
+    options:
+      - name: ndots
+        value: '5'
+      - name: edns0
 
 
 
+
+
+Key Impacts of dnsPolicy: None:
+  Kubernetes Service Discovery Disabled:
+    With dnsPolicy: None, the pod will not use Kubernetes' internal DNS system to resolve services or pod names.
+    This means the pod will not be able to resolve Kubernetes services or other pods by their 
+    DNS names (e.g., my-service.svc.cluster.local).
+
+  Custom DNS Resolution:
+    Instead of using the internal Kubernetes DNS (CoreDNS), the pod will use the custom DNS configuration you specify under dnsConfig.
+    You are responsible for providing external DNS servers (as you did with the IP addresses in the nameservers field), 
+    and these servers will be queried for DNS resolution.
+
+  No Access to Cluster DNS:
+    Since the pod will not use the Kubernetes-provided DNS, it won't have access to typical DNS entries 
+    like my-service.default.svc.cluster.local or any other service discovery mechanisms provided by Kubernetes.
+
+
+
+Use both:
+      dnsPolicy: ClusterFirst
+      dnsConfig:
+        nameservers:
+          - 192.168.1.1
+          - 192.168.1.2
+        searches:
+          - apihub-microservice.svc.cluster.local
+          - svc.cluster.local
+          - cluster.local
+        options:
+          - name: ndots
+            value: '5'
+          - name: edns0
+
+
+
+
+
+Doc:
+=================================================
+How CoreDNS Works in Kubernetes:
+  CoreDNS runs as a Kubernetes service and is typically deployed as pods in the kube-system namespace.
+  It watches the Kubernetes API for new or removed services and pods, and dynamically updates DNS records for them.
+  CoreDNS listens on a ClusterIP, and pods are configured to use this as their DNS server (via the /etc/resolv.conf file inside each pod).
+
+
+Kubernetes DNS Architecture:
+  CoreDNS Pods: CoreDNS is deployed as a set of pods, managed by a deployment in the kube-system namespace. These pods run on multiple nodes to ensure high availability.
+  ClusterIP Service: CoreDNS exposes a ClusterIP service inside the Kubernetes cluster. Each pod in the cluster uses this service as its DNS resolver.
+  Kubelet Configuration: The kubelet on each node automatically configures the DNS settings for each pod, pointing to the CoreDNS service.
+
+
+
+Network Flow Summary of POD:
+  Pod's Request:        Pod sends a request to access google.com.
+  DNS Resolution:       CoreDNS handles the DNS request and resolves the IP address.
+  Routing through Node: The pod’s internal IP address is translated to the node’s external IP via NAT.
+  Internet Access:      The packet exits the node and goes through the internet gateway (router or modem) to reach the external destination.
+  Response to Node:     The external server responds, and the traffic is routed back to the node’s external IP.
+  Reverse NAT:          The node translates the external response to the pod's internal IP and forwards it to the pod.
 
 
 
