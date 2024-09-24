@@ -181,9 +181,128 @@ alias k=kubectl
 =>source ~/.bashrc
 
 
-EnvSetting:
+EnvSetting | PATH | ENV | environment variable
+=================================================
+sudo update-alternatives --config java
+
+
+export PATH="$PATH:/opt/jdk/jdk8u202/bin"
+export PATH="/opt/jdk/jdk8u202/bin:$PATH"
+export PATH="$PATH:/opt/myapp/bin"
+export JAVA_HOME="/opt/jdk/jdk-17.0.8"
+
+Set PATH or VARIBALE temporarily:
+
+
+
+=>vi ~/.bashrc
+=>export JAVA_HOME="/opt/jdk/jdk-17.0.8/"
+=>export PATH=$PATH:$JAVA_HOME/bin
+
+=>alias java17="/opt/jdk/jdk-17.0.8/bin/java"
+=>alias java8="/opt/jdk/jdk8u202/bin/java"
+
+Set PATH or VARIBALE permanently(edit this file: ~/.bashrc):
+
+
+
+
+
+PATH (System-Wide Executable Locator):
+    Purpose: PATH is a system environment variable that tells the operating system where to look for executable files 
+    when a command is entered in the terminal.
+    PATH is a system-wide setting for locating executables.
+
+
+echo $PATH
+/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
+
+Common Use Case:	
+    Runs programs without needing to specify full paths.
+
+
+
+ if your PATH points to Java 8 and you run java -version, you’ll see Java 8. 
+ But if you run a command that uses sudo, it will use the Java version set by update-alternatives.
+
+
+Behavior of sudo update-alternatives --config java
+This command sets a symbolic link in /usr/bin/java to point to the selected Java version. 
+This means that regardless of your user-specific PATH or JAVA_HOME settings, the java command will 
+execute the version specified by update-alternatives
+
+
+
+
+SOME_HOME_VARIABLE (Application-Specific Location):
+    Purpose: Variables like JAVA_HOME, PYTHON_HOME, M2_HOME, etc., store the installation directory path 
+    of a specific application or tool.
+    Home variables like JAVA_HOME, PYTHON_HOME, etc., are used to configure specific 
+    applications or tools by pointing to their installation directories.
+
+
+Common Use Case:
+    Helps programs or tools locate their resources (e.g., JDK, Python).
+
+
+Exmale:
+    export JAVA_HOME="/opt/jdk/jdk-17.0.8"
+
+
+
+
+PATH and variables like JAVA_HOME are independent of each other, and you can indeed set them separately to achieve 
+different behaviors. This allows you to use one Java version for executing commands from the terminal and another 
+version for tools like Maven or Gradle.
+
+
+
+SimpleShellScript example:
+
+$ cat simpleShell
+        #!/bin/bash
+
+        # Function to display the current time
+        get_time() {
+            echo "Current Time: $(date +'%Y-%m-%d %H:%M:%S')"
+        }
+
+        # Function to display help instructions
+        show_help() {
+            echo "Usage: simpleShell [command]"
+            echo "Commands:"
+            echo "  gettime   Show the current time"
+            echo "  help      Display this help message"
+            echo "  -help     Display this help message"
+        }
+
+        # Check the first argument and call the appropriate function
+        case "$1" in
+            gettime)
+                get_time
+                ;;
+            help | -help)
+                show_help
+                ;;
+            *)
+                echo "Invalid command. Use 'help' for usage instructions."
+                ;;
+        esac
+
+
+
+$ export PATH="$PATH:/home/mypc/imranMadbar/myPROJECT/DevOpsWorkshop/shells-script"
+$ simpleShell gettime
+
+
+
+jdk priorities:
 ------------------------------------------------
-Variable Setting:
+sudo update-alternatives changes the system-wide Java version.
+PATH and JAVA_HOME affect your user session, but can be overridden by system settings.
+To ensure you use Java 17 regardless of update-alternatives, prioritize your PATH or create a manual alias.
+
+
 
 
 
