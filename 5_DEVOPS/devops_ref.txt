@@ -1752,6 +1752,115 @@ cd /etc/keepalived/
 
 
 
+
+Rate Limiting with NGINX
+================================================= 
+
+host-ip
+--------------------------------------------
+http {  
+	limit_req_zone $binary_remote_addr zone=limitreqsbyaddr:20m rate=2r/s;
+	limit_req_status 429;
+
+
+        upstream upstreamGroup {
+                server localhost:9191;
+        }
+
+        server {
+                listen       7171;
+                server_name  localhost;
+                limit_req zone=limitreqsbyaddr;
+
+        location / {
+                        proxy_pass   http://upstreamGroup;
+                }
+        }       
+}       
+
+Header base:
+---------------------------------------------
+http {
+    limit_req_zone $http_user_id zone=limitreqsbyheader:20m rate=2r/s;
+    limit_req_status 429;
+
+    upstream upstreamGroup {
+        server localhost:9191;
+    }
+
+    server {
+        listen       7171;
+        server_name  localhost;
+        limit_req zone=limitreqsbyheader;
+
+        location / {
+            proxy_pass   http://upstreamGroup;
+        }
+    }
+}
+
+
+Path base:
+-----------------------------------------------
+http {
+    limit_req_zone $binary_remote_addr zone=limitreqshome:20m rate=2r/s;
+    limit_req_status 429;
+
+    upstream upstreamGroup {
+        server localhost:9191;
+    }
+
+    server {
+        listen       7171;
+        server_name  localhost;
+
+        location /home {
+            limit_req zone=limitreqshome;
+            proxy_pass   http://upstreamGroup;
+        }
+
+        location / {
+            proxy_pass   http://upstreamGroup;
+        }
+    }
+}
+
+
+
+
+
+Nginx-plus jwt_claim_sub:
+-----------------------------------------
+http {
+    limit_req_zone $jwt_claim_sub zone=limitreqsbysub:20m rate=2r/s;
+    limit_req_status 429;
+
+    upstream upstreamGroup {
+        server localhost:9191;
+    }
+
+    server {
+        listen       7171;
+        server_name  localhost;
+
+        # JWT validation using NGINX Plus
+        auth_jwt_key_file /path/to/your/public.key;
+        auth_jwt "auth";
+
+        location /home {
+            limit_req zone=limitreqsbysub;
+            proxy_pass http://upstreamGroup;
+        }
+
+        location / {
+            proxy_pass http://upstreamGroup;
+        }
+    }
+}
+
+
+
+
 =================================================
 #Server Tuning | tuning                                         
 ================================================= 
@@ -3573,6 +3682,68 @@ docker run --rm \
     --out /report
     # Use suppression like this: (/src == $pwd)
     # --suppression "/src/security/dependency-check-suppression.xml"
+
+
+
+
+
+===============================================
+Zabbix | zabbix
+================================================
+
+Zabbix: Supports both pull and push-based monitoring:
+  Passive Checks (Pull):
+    The Zabbix Server pulls data from the Zabbix Agent on the monitored host.
+    The server initiates the connection on the agent's default port (10050) to request the data.
+  Active Checks (Push):
+    The Zabbix Agent actively pushes data to the Zabbix Server on port 10051.
+    The agent is responsible for sending the data periodically without the server requesting it.
+
+
+Agent is typically required for detailed monitoring:
+  The Zabbix Agent is installed on hosts to collect detailed system metrics like CPU, memory, disk usage, 
+  and application-specific metrics.
+  It can also perform custom checks (e.g., scripts, services) to extend monitoring.
+
+Agentless monitoring is possible:
+  Zabbix supports SNMP, IPMI, and JMX for monitoring devices and applications that don't use a Zabbix agent.
+  HTTP checks can also be used to monitor services (e.g., web application health endpoints).
+  However, the most common and feature-rich way to monitor a host in Zabbix is by using the agent.
+
+
+
+
+Prometheus
+----------------------------------------
+Prometheus: Pull-based monitoring only:
+  Prometheus uses a scraping model where it pulls metrics from the applications.
+  Applications expose their metrics via HTTP endpoints (usually /metrics).
+  Prometheus scrapes these endpoints at regular intervals to collect the data.
+
+
+No agent required:
+  Prometheus does not require a dedicated agent to be installed on monitored systems.
+  Instead, it uses a pull model where it scrapes metrics from endpoints exposed by the applications.
+  Applications (like Spring Boot) expose metrics in a format that Prometheus understands, usually via /metrics endpoints.
+
+Exporters for non-native systems:
+  To monitor systems or applications that don’t natively expose metrics in Prometheus 
+  format (e.g., Linux servers, MySQL, etc.), Prometheus uses exporters.
+  Exporters are lightweight programs that collect metrics and expose them in a format Prometheus can scrape.
+
+
+Key Differences:
+  Zabbix: Primarily agent-based but supports agentless monitoring for specific protocols (SNMP, HTTP, JMX).
+  Prometheus: Agentless in principle but uses exporters to monitor systems and services that don't natively expose metrics.
+
+
+
+
+Summary:
+  Zabbix supports both push (active checks) and pull (passive checks) for flexibility in monitoring.
+  Prometheus exclusively uses a pull-based model for collecting metrics, which fits well with modern 
+  cloud-native environments like Kubernetes.
+
 
 
 
