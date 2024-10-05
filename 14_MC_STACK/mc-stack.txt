@@ -2213,3 +2213,72 @@ Use Cases:
   gRPC: Ideal for microservices, low-latency communication, and complex interactions like streaming.
   REST: Best suited for public APIs and scenarios where ease of use and human-readability are important.
   SOAP: Common in enterprise applications requiring high security and transactional reliability.
+
+
+
+
+
+
+
+
+
+
+
+
+
+================================================= 
+#camel | Apache Camel | camel
+================================================= 
+
+
+Simplap maven app
+-------------------------------------------------
+<dependency>
+    <groupId>org.apache.camel</groupId>
+    <artifactId>camel-core</artifactId>
+    <version>3.20.0</version>
+</dependency>
+<dependency>
+    <groupId>org.apache.camel</groupId>
+    <artifactId>camel-file</artifactId>
+    <version>3.20.0</version>
+</dependency>
+
+
+
+import org.apache.camel.CamelContext;
+import org.apache.camel.builder.RouteBuilder;
+import org.apache.camel.impl.DefaultCamelContext;
+
+public class FileMoveExample {
+    public static void main(String[] args) throws Exception {
+        // Create Camel Context
+        CamelContext context = new DefaultCamelContext();
+        
+        // Define the route
+        context.addRoutes(new RouteBuilder() {
+            @Override
+            public void configure() throws Exception {
+                // Route definition: Move files from 'input' directory to 'output'
+                from("file:input")
+                    .to("file:output");
+            }
+        });
+        
+        // Start the context
+        context.start();
+        
+        // Keep the application running for a while to let the file processing happen
+        Thread.sleep(5000);
+        
+        // Stop the context
+        context.stop();
+    }
+}
+
+
+
+from("file:input"): This sets up a route that watches the input directory for new files.
+to("file:output"): Moves the files from input directory to output directory.
+
+

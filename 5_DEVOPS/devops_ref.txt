@@ -1843,6 +1843,9 @@ http {
         listen       7171;
         server_name  localhost;
 
+    limit_req_zone $jwt_claim_sub zone=limitreqsbysub:20m rate=2r/s;
+    limit_req_status 429;
+
         # JWT validation using NGINX Plus
         auth_jwt_key_file /path/to/your/public.key;
         auth_jwt "auth";
@@ -1857,6 +1860,40 @@ http {
         }
     }
 }
+
+
+http {
+
+    # Define an upstream group for proxying requests
+    upstream upstreamGroup {
+        server localhost:9191;
+    }
+
+    server {
+        listen 7171;
+        server_name localhost;
+
+        # Define rate limiting based on the JWT 'sub' claim for this server only
+        limit_req_zone $jwt_claim_sub zone=limitreqsbysub:20m rate=1r/s;  # Update to 1 request per second
+        limit_req_status 429;  # Status code to return on rate limit exceeded
+
+        # JWT validation with the public key
+        auth_jwt "auth";  # Enable JWT authorization
+        auth_jwt_key_file /path/to/your/public.key;  # Specify the public key for JWT validation
+
+        # Location block for '/home' with rate limiting
+        location /home {
+            limit_req zone=limitreqsbysub;  # Apply rate limiting for this server
+            proxy_pass http://upstreamGroup;  # Proxy pass to upstream group
+        }
+
+        # Catch-all location block for any other requests
+        location / {
+            proxy_pass http://upstreamGroup;  # Proxy pass to upstream group
+        }
+    }
+}
+
 
 
 
