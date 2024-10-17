@@ -279,7 +279,8 @@ But
 
 Private or Self-Signed Certificates:
 The server at https://192.168.1.1:9090 likely uses a certificate that is either self-signed or issued by a 
-private CA that is not recognized by your system's default trust store. it requires you to provide the necessary certificate manually to establish trust.
+private CA that is not recognized by your system's default trust store. 
+it requires you to provide the necessary certificate manually to establish trust.
 
 
 
@@ -287,6 +288,8 @@ How To identify whether a server uses a public (globally trusted)
 certificate or a private (self-signed or private CA) certificate:
 -------------------------------------------------
 =>openssl s_client -connect <server-ip-or-domain>:<port> -showcerts
+=>openssl s_client -connect linkedin.com:443 -showcerts
+=>
 
 Inspect the Certificate: Look at the Issuer and Subject fields in the certificate details.
   Public Certificate:
@@ -297,7 +300,31 @@ Inspect the Certificate: Look at the Issuer and Subject fields in the certificat
 
   Checking the Certificate Chain info:
     Public CA: The chain will usually include intermediate and root certificates from a well-known CA.
-    Private CA or Self-Signed: The chain may only include the server's certificate itself, or the root CA may be an internal or unknown CA.
+    Private CA or Self-Signed: The chain may only include the server's certificate itself, or the root CA 
+    may be an internal or unknown CA.
+
+
+
+
+Get publick key:
+----------------------------------------------------------------
+=>openssl s_client -connect linkedin.com:443 -showcerts > linkedin_cert.pem
+=>awk '/-----BEGIN CERTIFICATE-----/,/-----END CERTIFICATE-----/ {print}' linkedin_cert.pem > server_cert.pem
+
+This will save the certificate (or a chain of certificates) into linkedin_cert.pem
+and Identify the first certificate (usually the server certificate), in case multiple are included in the chain.
+
+
+=>openssl x509 -in server_cert.pem -pubkey -noout > public_key.pem
+=>cat public_key.pem
+Extract the public key from the server certificate:
+
+=>openssl x509 -in server_cert.pem -noout -subject
+Check publick key: The subject should match the domain name, e.g., CN=linkedin.com.
+
+
+
+
 
 
 
@@ -631,6 +658,39 @@ Nginx Configuration:
   Nginx might use a single .pem file that includes your certificate and intermediate certificates:
   ssl_certificate /path/to/fullchain.pem;    # fullchain.pem includes yourdomain.crt and intermediate.crt
   ssl_certificate_key /path/to/privkey.pem;  # privkey.pem is yourdomain.key
+
+
+What is Keystore?
+A keystore can be a repository where private keys, certificates and symmetric keys can be stored.
+
+Components of a Keystore:
+  Private Keys: A private key, also known as a secret key, is a variable in cryptography that is used with an 
+  algorithm to encrypt and decrypt data.   
+
+  Public Key Certificates: A public key certificate is a digital document that binds a public key to the identity of its owner, 
+  typically validated by a trusted third party known as a Certificate Authority (CA).
+
+  Certificate Chains: Certificate chain (or Chain of Trust) is made up of a list of certificates that start from a server's 
+  certificate and terminate with the root certificate.
+
+    
+
+Types of Keystore Formats:
+  JKS (Java KeyStore): Proprietary format used by Java applications. 
+  It stores private keys and certificates using a password-based encryption mechanism.
+
+  PKCS12: An industry-standard format for storing private keys and certificates. 
+  It is more flexible and widely supported across different systems than JKS.
+  PKCS12 files usually have a .p12 or .pfx extension.
+
+  PEM (Privacy Enhanced Mail): A base64-encoded format often used for storing certificates and keys as plain text files. 
+  Commonly used in environments like Apache and Nginx.
+
+
+
+
+
+
 
 
 
