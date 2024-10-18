@@ -208,27 +208,12 @@ Create repository with Maven group
 
 
 
+
+
+
 =================================================
 # SSL/TLS | ssl | tls  | https                             
 =================================================
-
-ExamplePEM (.crt, .key, .csr and .p12 ): 
-=>openssl req -new -newkey rsa:2048 -nodes -keyout myapp.key -out myapp.csr -subj "/C=bd/ST=Dhaka/L=Gulshan/O=MadbarSoft/OU=Software/CN=madbarsoft.com"
-=>openssl req -new -newkey rsa:2048 -nodes -keyout myapp.key -out myapp.csr -subj "/C=bd/ST=Dhaka/L=Gulshan/O=MadbarSoft/OU=Software/CN=localhost"
-=>openssl req -new -newkey rsa:2048 -nodes -keyout myapp.key -out myapp.csr -subj "/C=bd/ST=Dhaka/L=Gulshan/O=MadbarSoft/OU=Software/CN=192.168.1.5"
-=>openssl req -new -newkey rsa:2048 -nodes -keyout myapp.key -out myapp.csr -config openssl.cnf
-
-=>openssl x509 -req -in myapp.csr -signkey myapp.key -out myapp.crt -days 365
-=>openssl x509 -req -in myapp.csr -signkey myapp.key -out myapp.crt -days 365 -extfile openssl.cnf -extensions req_ext
-
-=>openssl pkcs12 -export -in myapp.crt -inkey myapp.key -out myapp.p12 -name myapp -CAfile myapp.crt -caname root -password pass:12345
-
-
-
-curl --cacert /home/bs960/imranMadbar/tempOps/myapp.crt https://192.168.1.5:8282/
-curl --cacert /home/bs960/imranMadbar/tempOps/myapp.crt https://localhost:8282/
-curl --cacert /home/bs960/imranMadbar/tempOps/myapp.crt https://madbarsoft.com:8282/
-
 
 
 =>sudo cp myapp.crt /usr/local/share/ca-certificates/
@@ -242,74 +227,31 @@ openssl s_client -showcerts -connect  192.168.1.5:8282 </dev/null
 Server and client cert info
 
 
+/etc/ssl/certs
+In Ubuntu, the local CA (Certificate Authority) store
 
-cat openssl.cnf
-[ req ]
-distinguished_name = req_distinguished_name
-req_extensions = req_ext
-prompt = no
+=>curl --cacert /path/to/custom/ca-certificates.crt https://example.com
+=>curl --cacert /home/bs960/imranMadbar/tempOps/localServer/server_cert.pem https://localhost:8282/home
+Manually Specifying Certificate Path with curl
 
-[ req_distinguished_name ]
-C = bd
-ST = Dhaka
-L = Gulshan
-O = GoroSoft
-OU = Software
-CN = 192.168.1.5
-
-[ req_ext ]
-subjectAltName = @alt_names
-
-[ alt_names ]
-IP.1 = 192.168.1.5
-DNS.1 = localhost
-DNS.2 = madbarsoft.com
+=>curl -k https://example.com
+Or-disable/skips validating the SSL certificate
 
 
 
 
-
-Self-signed Ceftificated | ssl | tls
-=================================================
-When you access a public website like https://www.google.com, you don't need to provide a certificate because:
-Google, like most public websites, uses a certificate issued by a globally recognized Certificate Authority (CA) 
-that is trusted by all major web browsers and operating systems.
-
-But
-
-Private or Self-Signed Certificates:
-The server at https://192.168.1.1:9090 likely uses a certificate that is either self-signed or issued by a 
-private CA that is not recognized by your system's default trust store. 
-it requires you to provide the necessary certificate manually to establish trust.
-
-
-
-How To identify whether a server uses a public (globally trusted) 
-certificate or a private (self-signed or private CA) certificate:
--------------------------------------------------
-=>openssl s_client -connect <server-ip-or-domain>:<port> -showcerts
-=>openssl s_client -connect linkedin.com:443 -showcerts
-=>
-
-Inspect the Certificate: Look at the Issuer and Subject fields in the certificate details.
-  Public Certificate:
-    If the Issuer is a well-known CA (e.g., Let's Encrypt, DigiCert, GlobalSign), it’s a public certificate.
-  Private Certificate:
-    If the Issuer is the same as the Subject, it is likely a self-signed certificate.
-    If the Issuer is an organization you recognize as internal or private, it may be issued by a private CA.
-
-  Checking the Certificate Chain info:
-    Public CA: The chain will usually include intermediate and root certificates from a well-known CA.
-    Private CA or Self-Signed: The chain may only include the server's certificate itself, or the root CA 
-    may be an internal or unknown CA.
 
 
 
 
 Get publick key:
 ----------------------------------------------------------------
+=>openssl s_client -connect linkedin.com:443 -showcerts
 =>openssl s_client -connect linkedin.com:443 -showcerts > linkedin_cert.pem
+=>openssl s_client -connect localhost:8282 -showcerts > local_cert.pem
+
 =>awk '/-----BEGIN CERTIFICATE-----/,/-----END CERTIFICATE-----/ {print}' linkedin_cert.pem > server_cert.pem
+=>awk '/-----BEGIN CERTIFICATE-----/,/-----END CERTIFICATE-----/ {print}' local_cert.pem > server_cert.pem
 
 This will save the certificate (or a chain of certificates) into linkedin_cert.pem
 and Identify the first certificate (usually the server certificate), in case multiple are included in the chain.
@@ -501,35 +443,40 @@ PrivateKeyEntry:
 
 
 https - ssl/tls doc:
-------------------------------------------------
-How the Private Key is Used in SSL/TLS
-  SSL/TLS Handshake:
-    During the SSL/TLS handshake, the server presents its certificate (containing the public key) to the client.
-    The client uses the public key to encrypt a piece of data (like a session key) and sends it to the server.
-    The server uses its private key to decrypt this data, proving it owns the corresponding private key.
-
-  Digital Signatures:
-    The server uses its private key to sign a piece of data, such as a certificate or message.
-    The client uses the public key to verify the signature, ensuring the data hasn’t been altered and confirming the server’s identity.
+=================================================
 
 
+How https make secure connunication:
+  In HTTPS communication, all data exchange happens using a session key that ensures security.
 
-Exmaple for a nginx-ssl-https proxy config:
-server {
-    listen 9191 ssl;
-    server_name your_domain.com;  # Replace with your domain
+Client Initiates Connection:
+  The client sends a Client Hello message listing supported encryption algorithms.
 
-    ssl_certificate /etc/nginx/ssl/nginx.crt;
-    ssl_certificate_key /etc/nginx/ssl/nginx-private.key;
+Server Responds:
+  The server sends a Server Hello along with its certificate containing its public key.
 
-    location / {
-        proxy_pass http://localhost:8181;
-        proxy_set_header Host $host;
-        proxy_set_header X-Real-IP $remote_addr;
-        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
-        proxy_set_header X-Forwarded-Proto $scheme;
-    }
-}
+Client Validates Certificate:
+  The client ensures the certificate is issued by a trusted CA.
+  If the certificate is valid, the handshake continues.
+
+
+Key Exchange and Pre-Master Secret Generation:
+  If RSA encryption is used, the client generates a pre-master secret and encrypts it with the server's public key.
+  If Diffie-Hellman (DH) is used, both client and server exchange partial keys to derive a shared secret.
+
+
+Server Uses Private Key:
+  The server uses its private key to decrypt the pre-master secret or participate in the DH exchange.
+
+Session Key Generation:
+  Both the client and server derive the same session key using the exchanged secrets.
+
+Data Encryption:
+  All subsequent data is encrypted using the session key.
+
+Why Not Use Public-Private Keys for All Data:
+  Asymmetric encryption (public-private key) is computationally expensive and slower.
+  After the handshake, symmetric encryption with the session key is used because it is much faster for large data transfers.
 
 
 Minimum Requirements for https - ssl/tls :
@@ -540,10 +487,6 @@ Minimum Requirements for https - ssl/tls :
       Issued by a Certificate Authority (CA) if you are using a certificate from a trusted CA like Let's Encrypt, or it is self-signed if you created it yourself.
       Used by clients (browsers, etc.) to verify the server's identity.
       The certificate must be associated with the private key.
-
-
-
-
 
 
 Key Components:
@@ -562,8 +505,6 @@ Additional Recommendations:
 
 Generate a Key Pair and Self-Signed Certificate (if not using a CA):
   keytool -genkeypair -alias mykey -keyalg RSA -keysize 2048 -storetype JKS -keystore mykeystore.jks -validity 365
-
-
 
 
 
@@ -601,6 +542,152 @@ Summary
 
 
 HTTPS operates on port 443 by default.
+
+
+
+What Happens with a Self-Signed Certificate?
+--------------------------------------------------
+  During Handshake: The client receives the self-signed certificate.
+
+  Validation Fails: Since the certificate isn’t issued by a trusted CA, the client shows a warning.
+
+  Client Options: The user can either ignore the warning or manually add the certificate to the trusted store.
+
+  Use Cases: Self-signed certificates are suitable for development, testing, or internal services but not for 
+  public-facing websites.
+
+Is It Secure if You Ignore the Warning?
+  Yes, the communication is still encrypted and secure in terms of data privacy and integrity, 
+  even with a self-signed certificate.
+
+  However, the lack of server identity validation introduces a risk of man-in-the-middle attacks because the 
+  client cannot confirm that it's talking to the correct server without the verification provided by a trusted CA.
+
+
+
+Why need to pass certificate on self-sign ceftificate, Not recomandade to ignore it:
+--------------------------------------------------------------
+=>curl --cacert /path/to/custom/ca-certificates.crt https://example.com
+Manually Specifying Certificate Path with curl
+
+Curl Validates the Server’s Certificate:
+  With the --cacert option, curl compares the server’s certificate with the provided CA certificate 
+  (or certificate chain) in /path/to/ca-cert.pem.
+  If the server’s certificate matches the provided CA certificate (either directly or through a certificate chain), 
+  the certificate is considered valid.
+
+Ensuring No MITM Attack:
+  Using --cacert prevents man-in-the-middle attacks by ensuring that only the server with the matching 
+  certificate can establish a secure connection.
+
+
+
+
+How to Make a Self-Signed or Custom CA Certificate Work in a Browser?
+------------------------------------------------------------------------
+Chrome on Linux:
+Open Chrome and go to:
+  Settings > Privacy and security > Security > Manage certificates
+Import the certificate under the Trusted Root Certification Authorities section.
+
+
+
+
+
+Self-signed Ceftificated | ssl | tls
+=================================================
+When you access a public website like https://www.google.com, you don't need to provide a certificate because:
+Google, like most public websites, uses a certificate issued by a globally recognized Certificate Authority (CA) 
+that is trusted by all major web browsers and operating systems.
+
+But
+
+Private or Self-Signed Certificates:
+The server at https://192.168.1.1:9090 likely uses a certificate that is either self-signed or issued by a 
+private CA that is not recognized by your system's default trust store. 
+it requires you to provide the necessary certificate manually to establish trust.
+
+
+
+How To identify whether a server uses a public (globally trusted) 
+certificate or a private (self-signed or private CA) certificate:
+-------------------------------------------------
+=>openssl s_client -connect <server-ip-or-domain>:<port> -showcerts
+=>openssl s_client -connect linkedin.com:443 -showcerts
+=>
+
+Inspect the Certificate: Look at the Issuer and Subject fields in the certificate details.
+  Public Certificate:
+    If the Issuer is a well-known CA (e.g., Let's Encrypt, DigiCert, GlobalSign), it’s a public certificate.
+  Private Certificate:
+    If the Issuer is the same as the Subject, it is likely a self-signed certificate.
+    If the Issuer is an organization you recognize as internal or private, it may be issued by a private CA.
+
+  Checking the Certificate Chain info:
+    Public CA: The chain will usually include intermediate and root certificates from a well-known CA.
+    Private CA or Self-Signed: The chain may only include the server's certificate itself, or the root CA 
+    may be an internal or unknown CA.
+
+
+
+
+
+ExamplePEM (.crt, .key, .csr and .p12 ): 
+=>openssl req -new -newkey rsa:2048 -nodes -keyout myapp.key -out myapp.csr -subj "/C=bd/ST=Dhaka/L=Gulshan/O=MadbarSoft/OU=Software/CN=madbarsoft.com"
+=>openssl req -new -newkey rsa:2048 -nodes -keyout myapp.key -out myapp.csr -subj "/C=bd/ST=Dhaka/L=Gulshan/O=MadbarSoft/OU=Software/CN=localhost"
+=>openssl req -new -newkey rsa:2048 -nodes -keyout myapp.key -out myapp.csr -subj "/C=bd/ST=Dhaka/L=Gulshan/O=MadbarSoft/OU=Software/CN=192.168.1.5"
+=>openssl req -new -newkey rsa:2048 -nodes -keyout myapp.key -out myapp.csr -config openssl.cnf
+
+=>openssl x509 -req -in myapp.csr -signkey myapp.key -out myapp.crt -days 365
+=>openssl x509 -req -in myapp.csr -signkey myapp.key -out myapp.crt -days 365 -extfile openssl.cnf -extensions req_ext
+
+=>openssl pkcs12 -export -in myapp.crt -inkey myapp.key -out myapp.p12 -name myapp -CAfile myapp.crt -caname root -password pass:12345
+
+
+cat openssl.cnf
+[ req ]
+distinguished_name = req_distinguished_name
+req_extensions = req_ext
+prompt = no
+
+[ req_distinguished_name ]
+C = bd
+ST = Dhaka
+L = Gulshan
+O = GoroSoft
+OU = Software
+CN = 192.168.1.5
+
+[ req_ext ]
+subjectAltName = @alt_names
+
+[ alt_names ]
+IP.1 = 192.168.1.5
+DNS.1 = localhost
+DNS.2 = madbarsoft.com
+
+
+
+
+
+Exmaple for a nginx-ssl-https proxy config:
+server {
+    listen 9191 ssl;
+    server_name your_domain.com;  # Replace with your domain
+
+    ssl_certificate /etc/nginx/ssl/nginx.crt;
+    ssl_certificate_key /etc/nginx/ssl/nginx-private.key;
+
+    location / {
+        proxy_pass http://localhost:8181;
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
+    }
+}
+
+
 
 
 
