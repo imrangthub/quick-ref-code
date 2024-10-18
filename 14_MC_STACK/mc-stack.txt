@@ -1672,37 +1672,70 @@ Generating a Public Key from the Private Key
 #OAuth | OAuth 2.0 | OAuth 2.1  | 
 ================================================
 
-OAuth2 roles:
-  Resource Owner: The resource owner is the user who authorizes the application to access their account or protected resources.
-
-  Client: A client is a piece of code that the user is interacting with; browsers, native apps or single-page applications are all clients.
-
-  Authorization Server: An OAuth server implements OAuth specifications. It has or can obtain information 
-    about which resources are available to clients. 
-    In the RFCs this application is called an Authorization Server. This is also known as an Identity Provider. 
-    Most users call it “the place I sign in”.
-
-  Resource Server: An application server doesn’t have any authentication functionality but instead delegates 
-    login requests to an OAuth server. It has an Id which allows the OAuth server to identify it.
 
 
 
 
-OAuth2Scopes:
-  Scopes are used to clearly define what the client can access from the resource server on behalf of the user. 
-  Rather than granting full account access, scopes limit what a client can do after getting access to a user’s 
-  resources (e.g. read vs write access, limiting access to sensitive information).
 
+
+Doc:
+================================================
+Key Components of OAuth 2.0
+  Resource Owner: The user who authorizes access to their data.
+
+  Client (Application): The third-party app requesting access (e.g., a weather app asking for your location data).
+
+  Resource Server: The server hosting the user’s data (e.g., Google’s servers).
+
+  Authorization Server: Issues access tokens after the user grants permission (e.g., Google Authorization Server).
 
 
 OAuth grant types:
     Authorization code
     Client credentials
     Device code
-
 Legacy grant types:
+    Password Grant (Resource Owner Password Credentials):
     Implicit grant
-    Resource owner password credentials grant
+
+
+Tokens in OAuth 2.0
+  Access Token:
+  A temporary token that grants access to the user’s resources for a specific scope (e.g., read-only access to email).
+
+  Refresh Token:
+  A token that allows the client to request a new access token without requiring the user to log in again.
+
+
+Scopes in OAuth 2.0
+  Scopes define the level of access requested by the client application. For example:
+    profile: Access to the user's public profile.
+    email: Permission to view the user's email address.
+    photos.readonly: Read-only access to the user’s photos.
+    The user must approve these scopes during the authorization process.
+
+
+
+
+
+Client credentials:
+================================================
+https://github.com/imrangthub/OAUTH2_CLIENT_CREDENTIALS_GRANT
+
+A backend service (client) wants to access a protected API (resource server) without a user’s involvement, 
+such as retrieving reports or monitoring data.
+
+
+Step-by-Step Flow:
+  The client sends a request to the authorization server with its client ID and client secret.
+  The authorization server verifies the credentials and issues an access token.
+  The client uses the access token to make requests to the resource server.
+
+
+
+
+
+
 
 
 
@@ -1712,6 +1745,7 @@ OAuth 2.1
 ================================================
 Proof Key for Code Exchange (PKCE) RFC 
 [OAuth 2.1] does not introduce any new features to what already exists in the OAuth 2.0 specifications being replaced.
+Adds security to the Authorization Code flow by preventing code interception attacks.
 
 
 Removal of Deprecated Features:
@@ -1736,6 +1770,18 @@ OAuth and OpenID Connect (OIDC):
   OpenID Connect (OIDC) is an open standard that runs on top of OAuth. While OAuth is used solely for authorization, 
   OIDC is used for authentication. 
   OIDC utilizes an additional token, called the ID token, that contains information about the user and their authentication status. 
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
