@@ -1674,6 +1674,54 @@ Generating a Public Key from the Private Key
 
 
 
+ClientCredentials:GrantType
+================================================
+
+curl --location 'http://localhost:9000/oauth2/token' \
+--header 'Content-Type: application/x-www-form-urlencoded' \
+--header 'Authorization: Basic b2lkYy1jbGllbnQ6c2VjcmV0' \
+--data-urlencode 'grant_type=client_credentials' \
+--data-urlencode 'scope=profile'
+
+http://localhost:9000/oauth2/authorize?response_type=code&client_id=myclientid&redirect_uri=http://127.0.0.1:8080/login/oauth2/code/myclient&scope=profile
+
+
+
+
+
+
+AuthorizationCode:GrantType
+================================================
+1) Request for code
+GET
+    http://localhost:9000/oauth2/authorize?
+      response_type=code
+      &client_id=myclientid
+      &redirect_uri=http://127.0.0.1:8080/login/oauth2/code/myclient
+      &scope=profile
+
+
+2)Response with code:
+
+    http://127.0.0.1:8080/login/oauth2/code/myclient?code=
+    0DfBufb2RNLkgE74lN3hEw92YuZ6IBnJXb9TrElJ_VW2EYY58gnYGhnOcN8QTf4blzeDI_Vog1pAkbDrTdfq4g0Vh-iAfh2IJXm_zVt70JAGn52eq5UWDXKYFju1GCWF
+
+
+
+3) Exchange the Authorization Code for token
+
+POST:
+    curl --location 'http://localhost:9000/oauth2/token' \
+    --header 'Content-Type: application/x-www-form-urlencoded' \
+    --header 'Authorization: Basic bXljbGllbnRpZDpteWNsaWVudHNlYw==' \
+    --header 'Cookie: JSESSIONID=28E4B4AA8867A380AC7B4873F6429708' \
+    --data-urlencode 'grant_type=authorization_code' \
+    --data-urlencode 'redirect_uri=http://127.0.0.1:8080/login/oauth2/code/myclient' \
+    --data-urlencode 'code=0DfBufb2RNLkgE74lN3hEw92YuZ6IBnJXb9TrElJ_VW2EYY58gnYGhnOcN8QTf4blzeDI_Vog1pAkbDrTdfq4g0Vh-iAfh2IJXm_zVt70JAGn52eq5UWDXKYFju1GCWF' \
+    --data-urlencode 'client_id=myclientid' \
+    --data-urlencode 'client_secret=myclientsec'
+
+
 
 
 
@@ -1716,12 +1764,66 @@ Scopes in OAuth 2.0
 
 
 
+Token type:
+--------------------------------------------------
+Access Token
+  Used to access protected resources.
+
+Refresh Token
+  Used to obtain a new access token when the old one expires.
+
+ID Token (in OpenID Connect)
+  Contains user identity information (e.g., name, email).
+
+Opaque Token (UUID Token)
+  A random, non-readable token that requires server-side validation (often represented as a UUID).
+
+Many modern implementations like Spring Authorization Server or Keycloak default to 
+JWT access tokens because they reduce the need for server-side lookups.
 
 
-Client credentials:
+ID Token is only issued as part of OpenID Connect (OIDC) flows, not in standard OAuth2 flows.
+ID Tokens are only issued in OpenID Connect flows (like Authorization Code with OIDC).
+Need to openid in client registry for id token (.scope("openid") // Required for ID Token).
+
+Get token as:
+  {
+      "access_token": "eyJraWQiOi...<snipped>...",
+      "refresh_token": "DixZHTK-PO..<UUID Token>",
+      "scope": "openid",
+      "id_token": "eyJhbGciOi...<OIDC ID Token JWT>...",
+      "token_type": "Bearer",
+      "expires_in": 299
+  }
+
+
+
+
+Choosing between UUID (opaque) tokens and JWT tokens depends on the security, use case, and architecture of your microservices. 
+
+When to Use UUID vs JWT in Microservices?
+  Use UUID (Opaque Tokens) if:
+    Your system has sensitive data that you do not want to expose to clients.
+    You can afford stateful token validation (centralized token store like Redis or database).
+    You need fine-grained control over token revocation and session management (e.g., logouts or invalidating sessions immediately).
+
+  Use JWT Tokens if:
+    Your microservices are stateless and distributed, making central token validation impractical.
+    You need high performance with minimal overhead (no need to query a token store).
+    Tokens need to carry identity information or roles for quick authorization.
+
+
+
+
+
+
+
+
+
+
+
+ClientCredentials:GrantType
 ================================================
-https://github.com/imrangthub/OAUTH2_CLIENT_CREDENTIALS_GRANT
-
 A backend service (client) wants to access a protected API (resource server) without a user’s involvement, 
 such as retrieving reports or monitoring data.
 
@@ -1730,6 +1832,8 @@ Step-by-Step Flow:
   The client sends a request to the authorization server with its client ID and client secret.
   The authorization server verifies the credentials and issues an access token.
   The client uses the access token to make requests to the resource server.
+
+
 
 
 
@@ -1782,8 +1886,108 @@ OAuth and OpenID Connect (OIDC):
 
 
 
+Simple code backup:
+------------------------------------------------
+package com.madbarsoft;
+
+import java.util.UUID;
+
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.core.annotation.Order;
+import org.springframework.http.MediaType;
+import org.springframework.security.config.Customizer;
+import org.springframework.security.config.annotation.web.builders.HttpSecurity;
+import org.springframework.security.core.userdetails.User;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.factory.PasswordEncoderFactories;
+import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.oauth2.core.AuthorizationGrantType;
+import org.springframework.security.oauth2.server.authorization.client.InMemoryRegisteredClientRepository;
+import org.springframework.security.oauth2.server.authorization.client.RegisteredClient;
+import org.springframework.security.oauth2.server.authorization.client.RegisteredClientRepository;
+import org.springframework.security.oauth2.server.authorization.config.annotation.web.configuration.OAuth2AuthorizationServerConfiguration;
+import org.springframework.security.oauth2.server.authorization.config.annotation.web.configurers.OAuth2AuthorizationServerConfigurer;
+import org.springframework.security.oauth2.server.authorization.settings.AuthorizationServerSettings;
+import org.springframework.security.provisioning.InMemoryUserDetailsManager;
+import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.authentication.LoginUrlAuthenticationEntryPoint;
+import org.springframework.security.web.util.matcher.MediaTypeRequestMatcher;
+
+@Configuration
+public class AuthorizationServerConfig {
+	
+	
+    @Bean
+    @Order(1)
+    public SecurityFilterChain authorizationServerSecurityFilterChain(HttpSecurity http) throws Exception {
+    	
+        OAuth2AuthorizationServerConfiguration.applyDefaultSecurity(http);
+        
+        http.getConfigurer(OAuth2AuthorizationServerConfigurer.class).oidc(Customizer.withDefaults()); // Enable OpenID Connect 1.0
+
+        http.exceptionHandling(exceptions -> exceptions.defaultAuthenticationEntryPointFor(
+                        new LoginUrlAuthenticationEntryPoint("/login"),
+                        new MediaTypeRequestMatcher(MediaType.TEXT_HTML)
+                )
+        ).oauth2ResourceServer(resourceServer -> resourceServer.jwt(Customizer.withDefaults()));
+
+        return http.build();
+    }
+
+    @Bean
+    @Order(2)
+    public SecurityFilterChain defaultSecurityFilterChain(HttpSecurity http) throws Exception {
+        http.authorizeHttpRequests(authorize -> authorize
+        		.anyRequest()
+        		.authenticated())
+            .formLogin(Customizer.withDefaults());
+        return http.build();
+    }
+    
+
+    @Bean
+    public UserDetailsService userDetailsService() {
+        PasswordEncoder encoder = PasswordEncoderFactories.createDelegatingPasswordEncoder();
+        UserDetails userDetails = User.withUsername("imran")
+                .password(encoder.encode("mypass"))
+                .roles("USER")
+                .build();
+        return new InMemoryUserDetailsManager(userDetails);
+    }
+
+    
+    
+    
+    @Bean
+    public RegisteredClientRepository registeredClientRepository() {
+        RegisteredClient registeredClient = RegisteredClient.withId(UUID.randomUUID().toString())
+                .clientId("myclientid")
+    			.clientSecret("{noop}myclientsec")
+                .authorizationGrantType(AuthorizationGrantType.AUTHORIZATION_CODE)
+                .authorizationGrantType(AuthorizationGrantType.REFRESH_TOKEN)
+                .authorizationGrantType(AuthorizationGrantType.CLIENT_CREDENTIALS)
+                .redirectUri("http://127.0.0.1:8080/login/oauth2/code/myclient")
+                .scope("profile")
+                .scope("read")
+                .scope("write")
+                .build();
+
+        return new InMemoryRegisteredClientRepository(registeredClient);
+    }
+    
+    
+    @Bean
+    public AuthorizationServerSettings authorizationServerSettings() {
+        return AuthorizationServerSettings.builder().build();
+    }
 
 
+
+
+}
 
 
 ================================================
