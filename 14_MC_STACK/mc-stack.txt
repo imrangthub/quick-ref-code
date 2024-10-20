@@ -1689,7 +1689,6 @@ http://localhost:9000/oauth2/authorize?response_type=code&client_id=myclientid&r
 
 
 
-
 AuthorizationCode:GrantType
 ================================================
 1) Request for code
@@ -1720,6 +1719,66 @@ POST:
     --data-urlencode 'code=0DfBufb2RNLkgE74lN3hEw92YuZ6IBnJXb9TrElJ_VW2EYY58gnYGhnOcN8QTf4blzeDI_Vog1pAkbDrTdfq4g0Vh-iAfh2IJXm_zVt70JAGn52eq5UWDXKYFju1GCWF' \
     --data-urlencode 'client_id=myclientid' \
     --data-urlencode 'client_secret=myclientsec'
+
+
+
+
+
+OAuth2.1 | AuthorizationCode with PKCE
+================================================
+As OAuth2.0 additional:
+First generates a random string to use for the state parameter. The client will need to store this to be used in the next step.
+
+1) Request for code
+GET
+    http://localhost:9000/oauth2/authorize?
+      response_type=code
+      &client_id=myclientid
+      &redirect_uri=http://localhost:8080/callback
+      &scope=profile+openid
+      &state=245EY6gkVPScY3AH
+
+
+
+2. Get code and Verify the state parameter
+
+Response:
+  http://localhost:8080/callback?code=oECNrOihYaHL2z97nW74Gr2Xbq7cLzzM0W-ypjgelR8Ql11PEACkloXJKFAdh2Hub06r2zt1Jxty-HhOZzhqVjV7
+  PdfORDcXUzZxHwlkMvxMezCP15euLUQ83g5s3A1J&state=245EY6gkVPScY3AH
+
+
+The user was redirected back to the client, and you'll notice a few additional query parameters in the URL:
+
+?state=245EY6gkVPScY3AH&code=oECNrOihYaHL2z97nW74Gr2Xbq7cLzzM0W-ypjgelR8Ql11PEACkloXJKFAdh2Hub06r2zt1Jxty-HhOZzhqVjV7
+You need to first verify that the state parameter matches the value stored in this user's 
+session so that you protect against CSRF attacks.
+
+Depending on how you've stored the state parameter (in a cookie, session, or some other way), 
+verify that it matches the state that you originally included in step 1. 
+Previously, we had stored the state in a cookie for this demo.
+
+
+3. Exchange the Authorization Code for Token
+Now you're ready to exchange the authorization code for an access token.
+The client builds a POST request to the token endpoint with the following parameters:
+
+POST:
+curl --location 'http://localhost:9000/oauth2/token' \
+--header 'Content-Type: application/x-www-form-urlencoded' \
+--header 'Authorization: Basic bXljbGllbnRpZDpteWNsaWVudHNlYw==' \
+--header 'Cookie: JSESSIONID=AC9D9CDDC3E7FCCA0353BAC41EB9EB09' \
+--data-urlencode 'grant_type=authorization_code' \
+--data-urlencode 'redirect_uri=http://localhost:8080/callback' \
+--data-urlencode 'code=T4wCzld83TA3dzffmULmv0-KXdK9KBWG-IEk6ZWboouYlos_1VguLfvgqKsiCnbmBYxc2RmoyLG6poZw-lxRT_tn_KZABre05ODFBQ1aTHFQvw1OFHK8NdJrlH0bg05t' \
+--data-urlencode 'client_id=myclientid' \
+--data-urlencode 'client_secret=myclientsec'
+
+Note that the client's credentials are included in the POST body in this example. 
+Other authorization servers may require that the credentials are sent as a HTTP Basic Authentication header.
+
+
+
+
 
 
 
@@ -1861,7 +1920,8 @@ Mandatory Use of PKCE (Proof Key for Code Exchange):
   PKCE in the Authorization Code Flow for all clients, not just public clients (e.g., SPAs or mobile apps). 
 
 Enhanced Security Requirements:
-  Redirect URIs: OAuth 2.1 requires that redirect URIs must be pre-registered with the authorization server, and wildcard redirect URIs are no longer allowed. 
+  Redirect URIs: OAuth 2.1 requires that redirect URIs must be pre-registered with the authorization server, 
+  and wildcard redirect URIs are no longer allowed. 
   State Parameter Usage: The state parameter, used to prevent CSRF (Cross-Site Request Forgery) attacks, is strongly recommended in OAuth 2.1. 
   Token Binding
 
