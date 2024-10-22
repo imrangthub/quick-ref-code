@@ -212,7 +212,7 @@ Create repository with Maven group
 
 
 =================================================
-# SSL/TLS | ssl | tls  | https                             
+#https SSL/TLS | ssl | tls  | https                             
 =================================================
 
 
@@ -334,7 +334,36 @@ Extract an SSL certificate from a keystore
 
 
 
+JKS vs https
+------------------------------------
+ There is a key difference between a Java Keystore (JKS) or Truststore and the public/private key certificates (e.g., .cer, .crt, .pem) used in HTTPS. T
 
+
+1. Java Keystore (JKS) and Truststore:
+JKS and Truststore are file formats used in Java-based applications to store certificates and keys.
+Keystore and Truststore serve different functions:
+  Keystore: Holds the server's private key and public certificate for establishing its identity.
+  Truststore: Holds trusted certificates (like root/intermediate CAs) to verify incoming connections.
+
+Keystore:
+  Purpose:
+  Used when a server needs to prove its identity during TLS/SSL handshake (e.g., an HTTPS web server).
+  Contains a private key and a public certificate.
+  File: Typically .jks or .p12 (PKCS12 format) containing:
+  Private Key + Public Certificate
+
+Truststore:
+  Purpose:
+  Used to validate certificates presented by other parties (like clients or other servers).
+  Contains trusted public certificates (root or intermediate CAs).
+  File: Also in .jks or .p12 format, but only holds public certificates (no private keys).
+
+Keystore vs Truststore Example:
+Keystore: Proves "I am example.com" with a public certificate and private key.
+Truststore: Verifies "Is the other party really example.org?" by checking if the presented certificate is signed by a trusted CA.
+
+
+The JKS you inspected is a truststore containing a root CA certificate, meant to validate other certificates during communication (e.g., in mutual TLS or inter-service communication).
 
 
 
@@ -379,6 +408,9 @@ There are three main steps:
   1) Generate a certificate file that can be imported and leveraged for the end-to-end communication.
   2) Configure Spring Boot to use SSL and leverage the certificate generated.
   3) Configure the channels to verify the SSL connection.
+
+
+
 
 
 Way02: | .jks
@@ -2066,6 +2098,7 @@ http {
         }
     }
 }
+
 
 
 
