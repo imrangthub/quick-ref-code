@@ -1671,9 +1671,82 @@ Generating a Public Key from the Private Key
 ================================================
 #OAuth | OAuth 2.0 | OAuth 2.1  | 
 ================================================
+https://gale.udemy.com/course/oauth2-in-spring-boot-applications/learn/lecture/20359891#overview
+https://gale.udemy.com/course/oauth-2-simplified/learn/lecture/23715618#overview
+
 https://www.geeksforgeeks.org/implementing-oauth2-with-spring-security-a-step-by-step-guide/
 https://auth0.com/blog/pkce-in-web-applications-with-spring-security/
 
+
+Tute
+================================================
+
+
+  location /5tps-server {
+      rewrite ^/5tps-server(.*)$ /$1 break;
+
+      limit_req zone=reqLimit5tps;
+      
+      proxy_pass http://openapikubernetes;
+      proxy_http_version 1.1;
+      add_header X-Custom-Header $jwt_claim_sub;
+      proxy_set_header X-Request-ID $request_id;
+      proxy_set_header Host $host:$server_port;
+      proxy_set_header X-Forwarded-Host $server_name;
+      proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+      proxy_set_header X-Real-IP $remote_addr;
+      proxy_set_header Upgrade $http_upgrade;
+      proxy_set_header Connection "upgrade";
+      proxy_connect_timeout 5;
+      proxy_read_timeout 10s;
+      if ($http_authorization = "") {
+          return 401;
+      }
+  }
+
+  location /10tps-server {
+      rewrite ^/10tps-server(.*)$ /$1 break;
+
+      limit_req zone=reqLimit10tps;
+      
+      proxy_pass http://openapikubernetes;
+      proxy_http_version 1.1;
+      add_header X-Custom-Header $jwt_claim_sub;
+      proxy_set_header X-Request-ID $request_id;
+      proxy_set_header Host $host:$server_port;
+      proxy_set_header X-Forwarded-Host $server_name;
+      proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+      proxy_set_header X-Real-IP $remote_addr;
+      proxy_set_header Upgrade $http_upgrade;
+      proxy_set_header Connection "upgrade";
+      proxy_connect_timeout 5;
+      proxy_read_timeout 10s;
+      if ($http_authorization = "") {
+          return 401;
+      }
+  }
+
+  location /20tps-server {
+      rewrite ^/20tps-server(.*)$ /$1 break;
+
+      limit_req zone=reqLimit20tps;
+      
+      proxy_pass http://openapikubernetes;
+      proxy_http_version 1.1;
+      add_header X-Custom-Header $jwt_claim_sub;
+      proxy_set_header X-Request-ID $request_id;
+      proxy_set_header Host $host:$server_port;
+      proxy_set_header X-Forwarded-Host $server_name;
+      proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+      proxy_set_header X-Real-IP $remote_addr;
+      proxy_set_header Upgrade $http_upgrade;
+      proxy_set_header Connection "upgrade";
+      proxy_connect_timeout 5;
+      proxy_read_timeout 10s;
+      if ($http_authorization = "") {
+          return 401;
+      }
+  }
 
 
 
@@ -1703,6 +1776,24 @@ GET
       &client_id=myclientid
       &redirect_uri=http://127.0.0.1:8080/login/oauth2/code/myclient
       &scope=profile
+OR
+    http://localhost:9000/oauth2/authorize?response_type=code&client_id=myclientid&redirect_uri=http://localhost:8081/callback&scope=profile%20openid%20read
+
+
+
+Github
+=================================================
+https://github.com/login/oauth/authorize?response_type=code&client_id=Ov23liX9o07z6ChoKznb&scope=read:user&state=34343434adsad&redirect_uri=http://localhost:7070/callback
+
+
+curl -H "Authorization: Bearer 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" \
+     -H "Accept: application/json" \
+     https://api.github.com/user
+
+
+
+
+
 
 
 2)Response with code:
@@ -2055,9 +2146,53 @@ public class AuthorizationServerConfig {
 }
 
 
+
+Key Difference: Social Login vs OIDC Servers
 ================================================
-#  keycloak                                          
+1. Social Login (GitHub, Google, LinkedIn) – User Info via Attributes Map:
+   Social login providers (like GitHub, Google, LinkedIn) return user information as a map of attributes, 
+   fetched via the User Info endpoint.
+
+2. OIDC-compliant Authorization Servers (Keycloak, Spring Authorization Server) – JWT Token
+   OIDC servers (like Keycloak or Spring Authorization Server) return user information as JWT tokens containing claims, 
+   which eliminates the need for a separate User Info call.
+
+
+
+Key Difference: Social Login vs OIDC Servers:
+|=================================================================================================================================================|
+| Aspect                    | Social Login (GitHub, Google, LinkedIn)             | OIDC-compliant Servers (Keycloak, Spring Auth Server)         |
+|---------------------------|-----------------------------------------------------|------------------------------------------------------------   |
+| User Info Format          | Map of attributes (JSON-like object)                | JWT (JSON Web Token) with standard/custom claims              |
+| Authentication Mechanism  | OAuth2: Only provides user information              | OIDC: Provides both user info and identity via tokens (JWT)   |
+|                           | (via the User Info endpoint)                        |                                                               |
+| Token Type                | Usually access token for API access                 | ID token (JWT): Holds authenticated user claims               |
+|                           | (not identity-bearing)                              |                                                               |
+| Where User Info Is        | By calling User Info endpoint with access token     | Decoded directly from JWT token                               |
+| Retrieved                 |                                                     | (ID token or access token)                                    |
+| Standardized Claims       | No (varies by provider: GitHub, Google, LinkedIn)   | Yes (OIDC defines standard claims like `sub`, `name`,         |
+|                           | all return different attributes)                    | `email`, etc.)                                                |
+| Primary Purpose           | Social login and API access                         | Full authentication, authorization, and identity exchange     |
+|-------------------------------------------------------------------------------------------------------------------------------------------------|
+
+
+
+
+
+
+
+================================================
+##keycloak |   keycloak                                          
 ================================================= 
+
+http://localhost:7070/oauth2/authorization/github
+
+
+http://localhost:8080/auth/realms/master/protocol/openid-connect/token
+
+http://localhost:8080/realms/master
+Get all url
+
 mv keycloak-15.0.2 /opt/keycloak
 tar -xvzf keycloak-15.0.2.tar.gz
 
