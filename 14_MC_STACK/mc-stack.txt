@@ -1671,85 +1671,6 @@ Generating a Public Key from the Private Key
 ================================================
 #OAuth | OAuth 2.0 | OAuth 2.1  | 
 ================================================
-https://gale.udemy.com/course/oauth2-in-spring-boot-applications/learn/lecture/20359891#overview
-https://gale.udemy.com/course/oauth-2-simplified/learn/lecture/23715618#overview
-
-https://www.geeksforgeeks.org/implementing-oauth2-with-spring-security-a-step-by-step-guide/
-https://auth0.com/blog/pkce-in-web-applications-with-spring-security/
-
-
-Tute
-================================================
-
-
-  location /5tps-server {
-      rewrite ^/5tps-server(.*)$ /$1 break;
-
-      limit_req zone=reqLimit5tps;
-      
-      proxy_pass http://openapikubernetes;
-      proxy_http_version 1.1;
-      add_header X-Custom-Header $jwt_claim_sub;
-      proxy_set_header X-Request-ID $request_id;
-      proxy_set_header Host $host:$server_port;
-      proxy_set_header X-Forwarded-Host $server_name;
-      proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
-      proxy_set_header X-Real-IP $remote_addr;
-      proxy_set_header Upgrade $http_upgrade;
-      proxy_set_header Connection "upgrade";
-      proxy_connect_timeout 5;
-      proxy_read_timeout 10s;
-      if ($http_authorization = "") {
-          return 401;
-      }
-  }
-
-  location /10tps-server {
-      rewrite ^/10tps-server(.*)$ /$1 break;
-
-      limit_req zone=reqLimit10tps;
-      
-      proxy_pass http://openapikubernetes;
-      proxy_http_version 1.1;
-      add_header X-Custom-Header $jwt_claim_sub;
-      proxy_set_header X-Request-ID $request_id;
-      proxy_set_header Host $host:$server_port;
-      proxy_set_header X-Forwarded-Host $server_name;
-      proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
-      proxy_set_header X-Real-IP $remote_addr;
-      proxy_set_header Upgrade $http_upgrade;
-      proxy_set_header Connection "upgrade";
-      proxy_connect_timeout 5;
-      proxy_read_timeout 10s;
-      if ($http_authorization = "") {
-          return 401;
-      }
-  }
-
-  location /20tps-server {
-      rewrite ^/20tps-server(.*)$ /$1 break;
-
-      limit_req zone=reqLimit20tps;
-      
-      proxy_pass http://openapikubernetes;
-      proxy_http_version 1.1;
-      add_header X-Custom-Header $jwt_claim_sub;
-      proxy_set_header X-Request-ID $request_id;
-      proxy_set_header Host $host:$server_port;
-      proxy_set_header X-Forwarded-Host $server_name;
-      proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
-      proxy_set_header X-Real-IP $remote_addr;
-      proxy_set_header Upgrade $http_upgrade;
-      proxy_set_header Connection "upgrade";
-      proxy_connect_timeout 5;
-      proxy_read_timeout 10s;
-      if ($http_authorization = "") {
-          return 401;
-      }
-  }
-
-
-
 
 
 ClientCredentials:GrantType
@@ -1777,23 +1698,8 @@ GET
       &redirect_uri=http://127.0.0.1:8080/login/oauth2/code/myclient
       &scope=profile
 OR
-    http://localhost:9000/oauth2/authorize?response_type=code&client_id=myclientid&redirect_uri=http://localhost:8081/callback&scope=profile%20openid%20read
-
-
-
-Github
-=================================================
-https://github.com/login/oauth/authorize?response_type=code&client_id=Ov23liX9o07z6ChoKznb&scope=read:user&state=34343434adsad&redirect_uri=http://localhost:7070/callback
-
-
-curl -H "Authorization: Bearer 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" \
-     -H "Accept: application/json" \
-     https://api.github.com/user
-
-
-
-
-
+    http://localhost:9000/oauth2/authorize?response_type=code&client_id=myclientid&redirect_uri=http://localhost:8081/
+    callback&scope=profile%20openid%20read
 
 
 2)Response with code:
@@ -1819,7 +1725,6 @@ POST:
 
 
 
-
 OAuth2.1 | AuthorizationCode with PKCE
 ================================================
 As OAuth2.0 additional:
@@ -1827,20 +1732,14 @@ First generates a random string to use for the state parameter. The client will 
 
 1) Request for code
 GET
-    http://localhost:9000/oauth2/authorize?
-      response_type=code
-      &client_id=myclientid
-      &redirect_uri=http://localhost:8080/callback
-      &scope=profile+openid
-      &state=245EY6gkVPScY3AH
-
+  http://localhost:9000/oauth2/authorize?response_type=code&client_id=spring-boot-client-app&redirect_uri=http://localhost:7070/
+  callback&scope=read+profile
 
 
 2. Get code and Verify the state parameter
 
 Response:
-  http://localhost:8080/callback?code=oECNrOihYaHL2z97nW74Gr2Xbq7cLzzM0W-ypjgelR8Ql11PEACkloXJKFAdh2Hub06r2zt1Jxty-HhOZzhqVjV7
-  PdfORDcXUzZxHwlkMvxMezCP15euLUQ83g5s3A1J&state=245EY6gkVPScY3AH
+  http://localhost:8080/callback?code=oECNrOihYaHL2z97nW74Gr2Xbq7cLzzM0W-ypjgel&state=245EY6gkVPScY3AH
 
 
 The user was redirected back to the client, and you'll notice a few additional query parameters in the URL:
@@ -1854,25 +1753,23 @@ verify that it matches the state that you originally included in step 1.
 Previously, we had stored the state in a cookie for this demo.
 
 
+
 3. Exchange the Authorization Code for Token
 Now you're ready to exchange the authorization code for an access token.
 The client builds a POST request to the token endpoint with the following parameters:
 
-POST:
-curl --location 'http://localhost:9000/oauth2/token' \
---header 'Content-Type: application/x-www-form-urlencoded' \
---header 'Authorization: Basic bXljbGllbnRpZDpteWNsaWVudHNlYw==' \
---header 'Cookie: JSESSIONID=AC9D9CDDC3E7FCCA0353BAC41EB9EB09' \
---data-urlencode 'grant_type=authorization_code' \
---data-urlencode 'redirect_uri=http://localhost:8080/callback' \
---data-urlencode 'code=T4wCzld83TA3dzffmULmv0-KXdK9KBWG-IEk6ZWboouYlos_1VguLfvgqKsiCnbmBYxc2RmoyLG6poZw-lxRT_tn_KZABre05ODFBQ1aTHFQvw1OFHK8NdJrlH0bg05t' \
---data-urlencode 'client_id=myclientid' \
---data-urlencode 'client_secret=myclientsec'
+POST:WITH-PKCE
+  curl --location 'http://localhost:9000/oauth2/token' \
+  --header 'Content-Type: application/x-www-form-urlencoded' \
+  --header 'Authorization: Basic c3ByaW5nLWJvb3QtY2xpZW50LWFwcDpzcHJpbmctYm9vdC1jbGllbnQtYXBwLXNlYw==' \
+  --data-urlencode 'grant_type=authorization_code' \
+  --data-urlencode 'redirect_uri=http://localhost:7070/callback' \
+  --data-urlencode 'code=RmlSYNYPOzjHk4ROKZSeiX0IpVeOVu-nkGlP9D-OdS1R]oXqv3RFAU8Tom49Y8rd_hl98Ti' \
+  --data-urlencode 'code_verifier=b0473b35778f41b987413c28db04b163'
+
 
 Note that the client's credentials are included in the POST body in this example. 
 Other authorization servers may require that the credentials are sent as a HTTP Basic Authentication header.
-
-
 
 
 
@@ -1970,13 +1867,6 @@ When to Use UUID vs JWT in Microservices?
 
 
 
-
-
-
-
-
-
-
 ClientCredentials:GrantType
 ================================================
 A backend service (client) wants to access a protected API (resource server) without a user’s involvement, 
@@ -1987,15 +1877,6 @@ Step-by-Step Flow:
   The client sends a request to the authorization server with its client ID and client secret.
   The authorization server verifies the credentials and issues an access token.
   The client uses the access token to make requests to the resource server.
-
-
-
-
-
-
-
-
-
 
 
 
@@ -2034,6 +1915,16 @@ OAuth and OpenID Connect (OIDC):
 
 
 
+
+PKCE Support in Spring Authorization Server
+================================================
+No  changes are required on your existing Spring Authorization Server to support PKCE.
+Just ensure that your clients support PKCE by sending the code challenge and code verifier with the request.
+The authorization server automatically handles PKCE verification, preventing the need for additional logic in your code.
+
+How Spring Authorization Server Handles PKCE:
+  The server automatically enforces PKCE when it detects the code_challenge parameter in the authorization request.
+  During token exchange, it verifies the code_verifier against the earlier code_challenge.
 
 
 
@@ -2179,11 +2070,43 @@ Key Difference: Social Login vs OIDC Servers:
 
 
 
+ID Token vs Access Token
+================================================
+
+ID Token:
+  Used only for authentication (identifying the user).
+  Passed between the client and the identity provider.
+
+Access Token:
+  Used to authorize access to APIs (e.g., getting user data from an API).
+  Passed between the client and the resource server.
+
+ID tokens are not sent to resource servers (APIs); they are used only between the client and the identity provider.
+
+
+
+
+UUID Token:
+  The UUID-based token was used as a reference token.
+  It acted like a session key or ID that had no meaningful data embedded inside it.
+  The actual token metadata (like user identity, roles, scopes, expiration) was stored in the authorization server’s database.
+  When a client used the token, the server looked it up in the database to get the associated data.
+  Non-Secure Tokens: UUIDs don’t carry any information; they are just unique strings.
+
+
+
+
+
+
+
 
 
 ================================================
-##keycloak |   keycloak                                          
+##keycloak |   Keycloak                                          
 ================================================= 
+
+http://localhost:8080/auth/realms/master/.well-known/openid-configuration
+Get Configi Url:
 
 http://localhost:7070/oauth2/authorization/github
 
@@ -2246,13 +2169,13 @@ If storage engine is not InnoDB, use this to set it
 
 
 
-
-
-
 https://green.cloud/docs/how-to-install-configure-keycloak-on-ubuntu-20-04/
 https://www.tutorialsbuddy.com/keycloak-mysql-setup
 https://www.appsdeveloperblog.com/keycloak-configure-mysql-database/
 https://sunitkatkar.blogspot.com/2020/07/setting-up-keycloak-10-with-mysql-8-on.html
+
+
+
 
 
 
