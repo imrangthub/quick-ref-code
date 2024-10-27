@@ -713,6 +713,287 @@ WHERE s.type != 'BACKGROUND';
 
 
 
+
+##Doc-SQL
+================================================= 
+What is a Relational Database?
+  A Relational Database stores data in a structured format using tables, where each table consists of 
+  rows (records) and columns (fields).
+  Data is organized based on relationships between tables, often connected using primary and foreign keys.
+  SQL (Structured Query Language) is the standard language used to interact with relational databases.
+Examples: MySQL, PostgreSQL, Oracle, Microsoft SQL Server, and SQLite.
+
+
+What is a Database Engine?
+  A Database Engine is the core software component of a database that handles the storage, processing, and querying of data. 
+  It manages how data is stored on disk, performs transactions, ensures concurrency, and maintains data integrity.
+  It is responsible for CRUD operations (Create, Read, Update, Delete).
+  Some databases allow you to switch between multiple engines to optimize for different use cases.
+
+
+
+Types of Database Engines:Storage Engines
+-------------------------------------------------
+Storage Engines (Specific to RDBMS like MySQL):
+  InnoDB: Supports transactions, foreign keys, and row-level locking.
+  MyISAM: Faster reads but lacks transactions and foreign key support.
+
+RDBMS Engines: These engines manage relational data.
+  MySQL: Lightweight and popular for web apps.
+  PostgreSQL: Advanced SQL compliance, supports complex queries.
+  Oracle Database: High-performance, often used for enterprise applications.
+  Microsoft SQL Server: Strong integration with Microsoft tools.
+
+NoSQL Engines (Non-relational but worth noting for comparison):
+  MongoDB: Document-based.
+  Redis: Key-value storage.
+  Cassandra: Wide-column storage.
+
+
+
+Database Engines are the software that runs the database, handling storage, transactions, and queries.
+Engines differ in terms of transactions, performance, scalability, and use cases.
+Each engine offers unique features, and the choice depends on your project’s requirements for speed, reliability, and complexity.
+
+
+
+
+How Does One Database Work with Multiple Engines? like MySQL:
+------------------------------------------------
+Storage Engines at the Table Level
+In a single MySQL database, each table can use a different storage engine.
+
+For example:
+  customers table → InnoDB (for transactions and foreign key constraints).
+  logs table → MyISAM (for fast reads without transactions).
+
+
+Declaration of Engine per Table
+When creating or altering a table, you can specify the storage engine:
+
+  CREATE TABLE customers (
+      id INT PRIMARY KEY,
+      name VARCHAR(50)
+  ) ENGINE=InnoDB;
+
+  CREATE TABLE logs (
+      id INT PRIMARY KEY,
+      message TEXT
+  ) ENGINE=MyISAM;
+
+
+Execution at the Database Layer:
+  The database server directs operations to the correct engine based on the table definition.
+  Each engine manages the tables it is responsible for independently—handling how data is stored, indexed, and queried.
+  Query Execution Plan: The database server combines results from tables, regardless of which engine manages them.
+
+
+Transaction Handling Across Engines:
+  Transactions involving only InnoDB tables can be committed or rolled back together.
+  If a query spans multiple engines (e.g., InnoDB and MyISAM), only the InnoDB part is transactional, 
+  while the MyISAM part won't support rollback.
+
+
+Other Examples of Multi-Engine Databases
+  MariaDB: Similar to MySQL, it supports multiple engines, including Aria (for temporary tables) and InnoDB.
+  PostgreSQL: While it primarily uses a single engine, extensions like TimescaleDB add specialized functionality 
+  for time-series data.
+
+
+
+Default Storage Engine for MySQL: (InnoDB, MySQL 5.5 and later. Before MySQL 5.5:MyISAM)
+How to Check the Default Storage Engine:
+  SHOW VARIABLES LIKE 'default_storage_engine';
+
+Storage engines are applied at the table level, giving you flexibility to choose different engines for different tables within the same database.
+
+
+
+
+
+MariaDB vs MySQL:
+MariaDB and MySQL are both relational database management systems (RDBMS) that share a common origin, but they have evolved 
+differently over time. MariaDB was created as a fork of MySQL in 2009, after Oracle acquired MySQL. 
+While they remain similar in many ways, there are notable differences in terms of features, licensing, performance, and ecosystem.
+
+
+
+=================================================
+##Oracle
+=================================================
+
+Storage Engines:
+  Oracle Database does not use multiple storage engines like MySQL or MariaDB but provides a unified, 
+  flexible storage layer with specialized options such as tablespaces, partitioning, in-memory tables, and ASM. 
+  This approach ensures performance, scalability, and manageability for a wide range of applications without 
+  requiring users to switch between engines.
+
+  So while Oracle doesn’t allow per-table storage engine selection, it offers more powerful storage management 
+  options than MySQL/MariaDB in a seamless, integrated manner.
+
+
+
+
+Oracle SQL VS MySQL SQL
+--------------------------------
+Oracle Database and MySQL use SQL (Structured Query Language) to interact with databases. 
+However, there are some differences between the SQL syntax, features, and implementations used by Oracle and MySQL 
+due to their design goals and database engines.
+
+  Basic CRUD Operations (Create, Read, Update, Delete): Both databases support standard SQL commands for manipulating data.
+  Joins: Both support SQL joins (e.g., INNER JOIN, LEFT JOIN, RIGHT JOIN).
+  Indexes: Both databases use indexes to speed up queries.
+  Transactions: Both Oracle and MySQL’s InnoDB engine support ACID transactions (though MySQL needs to explicitly use InnoDB for this).
+  Views and Stored Procedures: Both allow creating views, functions, and stored procedures.
+
+
+Both Oracle SQL and MySQL SQL are based on ANSI SQL, but they differ in syntax, features, and capabilities.
+  Oracle provides more advanced features like PL/SQL, advanced transaction handling, and clustering, making it ideal for l
+  arge-scale enterprise systems.
+  MySQL offers a simpler, more lightweight SQL implementation that’s better suited for web applications and smaller projects. 
+  However, MySQL is catching up with features like JSON support and transactional storage using InnoDB.
+
+
+
+PL/SQL 
+================================================
+PL/SQL (Procedural Language/Structured Query Language) is a procedural extension of SQL, 
+developed by Oracle Corporation for its database systems. 
+
+Key Features of PL/SQL:
+  Block Structure:Code is organized into logical blocks consisting of three parts:
+    Declaration Block: Define variables, constants, and cursors.
+    Executable Block: Contains SQL queries and procedural code.
+    Exception Block: Handles runtime errors.
+
+  Control Structures:
+    Supports loops (FOR, WHILE), conditional statements (IF-THEN-ELSE), and CASE statements.
+
+  Error Handling:
+    Provides exception handling to catch and handle errors gracefully.
+
+  Modularity:
+    Allows the creation of procedures, functions, and packages to structure and reuse code.
+
+  SQL Integration:
+    Fully integrates with SQL for querying and manipulating data within procedural code.
+
+  Triggers:
+    Supports database triggers, which automatically execute when a specific database event occurs (like INSERT, UPDATE, or DELETE).
+
+  High Performance:
+    Code is executed inside the Oracle database, reducing network overhead and improving performance for complex logic.
+
+
+
+PL/SQL and Other Databases(procedural extensions)
+--------------------------------------------------
+PL/SQL is specific to Oracle Database and was developed by Oracle Corporation. 
+Other relational databases, like MySQL, PostgreSQL, or Microsoft SQL Server, do not use PL/SQL. 
+However, many databases offer their own procedural extensions for SQL to provide similar functionality. 
+
+----------------------------------------------------------------------------------------------------------------------------------------
+Database             | Procedural Language                | Key Differences
+---------------------| -----------------------------------| ----------------------------------------------------------------------------
+Oracle               | PL/SQL                             | Natively integrated with SQL, providing a powerful and versatile procedural language.
+MySQL                | MySQL Stored Procedures (SQL/PSM)  | Supports stored procedures, but with a less robust feature set compared to PL/SQL.
+PostgreSQL           | PL/pgSQL                           | Offers a robust and flexible procedural language similar to PL/SQL, with additional features and capabilities.
+Microsoft SQL Server | T-SQL (Transact-SQL)               | Extends SQL with procedural features, tightly integrated with SQL Server, and provides a wide range of database management capabilities.
+MariaDB              | Stored Procedures                  | Similar to MySQL, offering stored procedures with additional features and functionality.
+-------------------------------------------------------------------------------------------------------------------------------------------
+
+
+
+
+2. Key Differences between Oracle SQL and MySQL SQL
+---------------------------------------------------------------------------------------------------------------------------------------------------
+Feature                         | Oracle SQL                                    | MySQL SQL
+------------------------------- |-----------------------------------------------|------------------------------------------------------------------
+SQL syntax for AUTO_INCREMENT   | Uses SEQUENCES to generate unique IDs.        | Uses AUTO_INCREMENT directly in table definition.
+Example                         | CREATE SEQUENCE seq_customer_id START WITH 1; | id INT AUTO_INCREMENT PRIMARY KEY;
+PL/SQL vs. MySQL SQL            | Oracle uses PL/SQL for stored procedures.     | MySQL uses stored procedures with standard SQL syntax, but lacks the full PL/SQL capabilities.
+Stored Procedure Example        | BEGIN ... END; syntax in PL/SQL.              | More basic SQL syntax for procedures.
+Transaction Handling            | More advanced features with savepoints and    | Limited, but InnoDB supports standard transactions.
+                                | finer-grained locks.                          | 
+Triggers                        | Oracle supports more complex triggers with    | MySQL supports triggers, but with some limitations (e.g., no multiple triggers on the same event).
+                                | PL/SQL logic.                                 | 
+Data Types                      | Oracle uses specific types like NUMBER,       | MySQL uses types like INT, VARCHAR, TEXT, etc.
+                                | VARCHAR2.                                     | 
+Limit Query Results             | Uses ROWNUM or FETCH FIRST N ROWS.            | Uses LIMIT keyword.
+Example                         | SELECT * FROM customers WHERE ROWNUM <= 10;   | SELECT * FROM customers LIMIT 10;
+Case Sensitivity                | Table and column names are case-sensitive.    | Case sensitivity depends on the OS and storage engine (e.g., MySQL on Windows is case-insensitive).
+NULL Handling                   | Oracle treats empty strings ('') as NULL.     | MySQL treats empty strings as empty (not NULL).
+Foreign Key Constraints         | Oracle enforces deferred constraints.         | MySQL's constraint checking is immediate (only in InnoDB).
+Recursive Queries               | Uses CONNECT BY for hierarchical queries.     | Uses WITH RECURSIVE syntax.
+JSON Support                    | Oracle offers advanced JSON features.         | MySQL has native JSON types, but features are evolving.
+User Management and Roles       | Advanced roles and privileges management.     | More basic privilege management system.
+---------------------------------------------------------------------------------------------------------------------------------------------------
+
+
+
+
+MySQL vs MariaDB vs PostgreSQL vs Oracle vs NoSQL:
+---------------------------------------------------------------------------------------------------------------------------------------------
+Database                    | Type                                | Best Use Cases                         | Strengths                                                              | Limitations
+----------------------------|-------------------------------------|----------------------------------------|------------------------------------------------------------------------|----------------
+MySQL                       | Relational (SQL)                    | Web apps, CMS (WordPress, Magento)     | Fast reads, easy to use, widely supported                              | Limited complex queries and transactions
+MariaDB                     | Relational (SQL)                    | Replacement for MySQL, web apps        | Open-source, faster improvements, MySQL-compatible                     | Newer features may lack maturity
+PostgreSQL                  | Relational (SQL)                    | Data analytics, complex queries, GIS   | Advanced SQL features, extensible (supports JSON, XML), ACID-compliant | Slightly slower than MySQL in some cases
+Oracle                      | Relational (SQL)                    | Enterprise apps, ERP, finance systems  | High performance, robust security, advanced features (PL/SQL, RAC)     | Expensive, proprietary
+NoSQL (MongoDB, Cassandra)  | Non-relational (document, key-value)| Big data, real-time apps, IoT          | Scalable, flexible schema, fast writes                                 | Not ideal for complex transactions or joins
+---------------------------------------------------------------------------------------------------------------------------------------------
+Summary:
+  MySQL: Great for simple, fast web applications.
+  MariaDB: Open-source fork of MySQL with added features and improvements.
+  PostgreSQL: Best for complex queries and data-heavy applications.
+  Oracle: Ideal for large enterprises needing robust, secure, and highly available systems.
+  NoSQL: Excellent for applications with dynamic data structures or high scalability needs.
+
+Licensing Models:
+  MySQL: Free for community use, but advanced features and official support require a license.
+  MariaDB: Free community version, with a paid enterprise version offering extra tools and support.
+  PostgreSQL: Completely free and open-source, but paid support is available through third parties.
+  Oracle: Limited free version (Oracle XE) and costly enterprise versions with premium features.
+  NoSQL: Free community versions available, but advanced tools and cloud services come with a cost.
+
+
+
+Key Differences in Data Types Across Databases:
+  Integer Handling:
+    MySQL/MariaDB: Use TINYINT for very small integers.
+    Oracle: Uses NUMBER for all numeric types, making it more flexible but heavier.
+    PostgreSQL: Supports native BIGINT and handles large integers efficiently.
+
+  String Types:
+    Oracle: Uses VARCHAR2 instead of VARCHAR to avoid potential ambiguity.
+    PostgreSQL: Handles large text efficiently with TEXT.
+
+  Boolean Values:
+    PostgreSQL: Has a native BOOLEAN type.
+    MySQL/MariaDB: Simulate boolean with TINYINT(1).
+    Oracle: Doesn’t have native boolean; uses NUMBER(1).
+
+  JSON Handling:
+    MongoDB: Stores native JSON-like documents.
+    PostgreSQL: Offers JSONB for faster operations.
+    MySQL/MariaDB: Have basic JSON support but less efficient than PostgreSQL.
+
+  Binary Data:
+    Oracle: Provides multiple types like RAW and BLOB.
+    PostgreSQL: Uses BYTEA.
+    MongoDB/Cassandra: Use Binary or blob for storing raw data.
+
+
+
+
+
+
+
+
+
+
+
+
 =================================================
 #      No-SQL  | CASSANDRA                                          
 ================================================= 
