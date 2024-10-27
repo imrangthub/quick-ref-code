@@ -1130,27 +1130,26 @@ Types of Logs
   Trace Files: Detailed logs for specific sessions or background processes. Each session can produce trace files.
   Redo Logs: Log changes made to the database; essential for recovery.
 
-
-
+Logging option on res:
 +------------------+-------------------+-----------------------------------+----------------------------+
 |    Ops           |     MySQL         |      PostgreSQL                   |          Oracle            |
 +------------------+-------------------+-----------------------------------+----------------------------+
-| **Types of Logs**| Error Log         | Error Log                         | Alert Log                  |
+| Types of Logs    | Error Log         | Error Log                         | Alert Log                  |
 |                  | General Query Log | General Log                       | Trace Files                |
 |                  | Binary Log        | Slow Query Log                    | Redo Logs                  |
 |                  | Slow Query Log    |                                   |                            |
 +------------------+-------------------+-----------------------------------+----------------------------+
-| **Log Locations**| /var/log/mysql/   | /var/lib/postgresql/              | $ORACLE_BASE/diag/rdbms/   |
+| Log Locations    | /var/log/mysql/   | /var/lib/postgresql/              | $ORACLE_BASE/diag/rdbms/   |
 |                  | error.log         | X.Y/main/pg_log/                  | <DB_NAME>/<INSTANCE_NAME>/ |
 |                  |                   |                                   | trace/alert_<DB_NAME>.log  |
 +------------------+-------------------+-----------------------------------+----------------------------+
-| **Log Levels**   | No specific levels| DEBUG5, DEBUG4,                   | No specific levels         |
+| Log Levels       | No specific levels| DEBUG5, DEBUG4,                   | No specific levels         |
 |                  |                   | DEBUG3, DEBUG2,                   |                            |
 |                  |                   | DEBUG1, INFO,                     |                            |
 |                  |                   | NOTICE, WARNING,                  |                            |
 |                  |                   | ERROR, FATAL, PANIC               |                            |
 +------------------+-------------------+-----------------------------------+----------------------------+
-| **Management**   | my.cnf config     | postgresql.conf config            | ALTER SESSION for tracing  |
+| Management       | my.cnf config     | postgresql.conf config            | ALTER SESSION for tracing  |
 |                  | SET GLOBAL        | logging_collector = on            | Automatic management       |
 |                  | expire_logs_days =| log_statement = 'all'             | Log rotation handled by DB |
 |                  | 7                 | log_min_duration_statement = 1000 |                            |
@@ -1279,6 +1278,204 @@ Zipkin With CASSANDRA
 =>describe keyspaces;
 =>use zipkin2;
 =>describe tables;
+
+
+
+
+##Doc - NoSQL
+=================================================
+What is NoSQL?
+  NoSQL (Not Only SQL) databases are non-relational databases that are designed to handle large volumes of data, 
+  distributed data structures, and dynamic schemas. 
+  Unlike traditional relational databases (RDBMS), NoSQL databases offer flexibility in data storage and management, 
+  enabling applications to store unstructured, semi-structured, and structured data.
+
+
+Types of NoSQL Databases:
+----------------------------------------------
+Document Databases:
+  Store data as JSON, BSON, or XML documents.
+  Example: MongoDB, CouchDB
+  Use Case: Content management systems, catalogs, or user profiles.
+
+Key-Value Stores:
+  Store data as key-value pairs, where a unique key is associated with a value.
+  Example: Redis, Amazon DynamoDB
+  Use Case: Caching, session management.
+
+Column-Family Stores:
+  Store data in columns rather than rows. They are highly efficient for read and write operations on large datasets.
+  Example: Apache Cassandra, HBase
+  Use Case: Analytics and real-time big data applications.
+
+Graph Databases:
+  Store data as nodes and edges, representing entities and their relationships.
+  Example: Neo4j, Amazon Neptune
+  Use Case: Social networks, recommendation engines, fraud detection.
+
+
+
+
+CRUD operations in NoSQL:(different Type of NoSQL)
+---------------------------------------------------
+1. Document Databases (e.g., MongoDB)
+  Create: Use methods like insertOne() or insertMany() to add new documents.
+  Read: Use find() to retrieve documents. Querying can be done with various filters.
+  Update: Use updateOne(), updateMany(), or replaceOne() to modify existing documents.
+  Delete: Use deleteOne() or deleteMany() to remove documents.
+
+
+Example (MongoDB Shell and SpringData):
+  // Create
+  db.collection.insertOne({ name: "John", age: 30 });
+    userRepository.save(new User("John Doe", 30, "john.doe@example.com"));
+
+  // Read
+  db.collection.find({ name: "John" });
+   User user = userRepository.findByName("John Doe");
+
+  // Update
+  db.collection.updateOne({ name: "John" }, { $set: { age: 31 } });
+    User user = userRepository.findById("userId").orElse(null);
+    user.setAge(31);
+    userRepository.save(user);
+
+  // Delete
+  db.collection.deleteOne({ name: "John" });
+    userRepository.deleteById("userId");
+
+
+
+2. Key-Value Stores (e.g., Redis)
+  Create: Use SET key value to add a new key-value pair.
+  Read: Use GET key to retrieve the value associated with a key.
+  Update: Use SET key value to update the value of an existing key.
+  Delete: Use DEL key to remove a key-value pair.
+Example (Redis):
+  # Create
+  SET user:1 "John"
+  userRepository.save(new User("1", "John"));
+
+
+  // Read
+  GET user:1
+  String name = redisTemplate.opsForValue().get("user:1");
+
+  HSET users:1 name "John Doe" age 30 email "john.doe@example.com"
+  userRepository.save(new User("1", "John Doe", 30, "john.doe@example.com"));
+
+
+
+  // Update
+  SET user:1 "John Doe"
+  redisTemplate.opsForValue().set("user:1", "John Doe");
+
+  HGETALL users:1
+  User user = userRepository.findByName("John Doe");
+
+
+
+  User user = userRepository.findById("1").orElse(null);
+  user.setAge(31);
+  userRepository.save(user);
+
+  HSET users:1 age 31
+
+
+
+
+  // Delete
+  DEL user:1
+  redisTemplate.delete("user:1");
+  userRepository.deleteById("1");
+
+
+
+Summary of Differences SET and HSET
+------------------------------------
+Data Structure:
+  SET is for simple key-value pairs.
+  HSET is for storing multiple fields under a single key.
+
+  Deletion:
+  redisTemplate.delete("user:1") removes a key from Redis, regardless of whether it is a simple string or a hash.
+  userRepository.deleteById("1") typically removes an entire hash corresponding to the User entity from the database.
+  Use Case:
+
+  Use SET for straightforward values where no complex structure is needed.
+  Use HSET when you want to keep related attributes grouped together, making retrieval and updates easier.
+
+
+
+
+
+3. Column-Family Stores (e.g., Cassandra)
+  Create: Use INSERT statements to add new rows.
+  Read: Use SELECT statements to retrieve rows.
+  Update: Use UPDATE statements to modify existing rows.
+  Delete: Use DELETE statements to remove rows.
+Example (Cassandra):
+  // Create
+  INSERT INTO users (user_id, name, age) VALUES (1, 'John', 30);
+  userRepository.save(new User("1", "John Doe", 30, "john.doe@example.com"));
+
+
+  // Read
+  SELECT * FROM users WHERE user_id = 1;
+    User user = userRepository.findByName("John Doe");
+
+
+  // Update
+  UPDATE users SET age = 31 WHERE user_id = 1;
+  User user = userRepository.findById("1").orElse(null);
+  user.setAge(31);
+  userRepository.save(user);
+
+
+  // Delete
+  DELETE FROM users WHERE user_id = 1;
+  userRepository.deleteById("1");
+
+
+
+4. Graph Databases (e.g., Neo4j)
+  Create: Use CREATE to add nodes and relationships.
+  Read: Use MATCH to retrieve nodes and relationships.
+  Update: Use SET to modify properties of nodes or relationships.
+  Delete: Use DELETE to remove nodes or relationships.
+Example (Neo4j):
+  // Create
+  CREATE (n:Person {name: 'John', age: 30});
+
+  // Read
+  MATCH (n:Person {name: 'John'}) RETURN n;
+
+  // Update
+  MATCH (n:Person {name: 'John'}) SET n.age = 31;
+
+  // Delete
+  MATCH (n:Person {name: 'John'}) DELETE n;
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
