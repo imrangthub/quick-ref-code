@@ -986,6 +986,179 @@ Key Differences in Data Types Across Databases:
 
 
 
+ACID in RDBMS:
+-------------------------------------------------
+A – Atomicity
+C – Consistency
+I – Isolation
+D – Durability
+Each property plays a critical role in ensuring that transactions behave predictably, even in cases of failure.
+
+1. Atomicity
+  Definition: A transaction must be treated as a single, indivisible unit. Either all operations in the transaction succeed, 
+  or none do.
+  Goal: Prevent partial updates.
+Example:
+  Suppose we transfer $100 from Account A to Account B. The transaction involves:
+  Debit $100 from Account A.
+  Credit $100 to Account B.
+  Atomicity ensures that either both operations complete or neither does.
+  If the system crashes after debiting Account A but before crediting Account B, the entire transaction is rolled back, 
+  and Account A is restored to its original state.
+
+
+2. Consistency
+  Definition: A transaction should take the database from one valid state to another, ensuring that 
+  data integrity rules are maintained throughout.
+  Goal: Maintain the correctness of the database.
+Example:
+  In a bank system:
+  Rule: Account balances cannot be negative.
+  If a user tries to withdraw $500 but only has $300 in their account:
+  Consistency ensures the transaction will fail, and the account balance will remain unchanged, 
+  ensuring the system adheres to defined constraints.
+
+
+3. Isolation
+Definition: Concurrent transactions should not interfere with each other.
+Each transaction must behave as if it’s the only transaction running at that time, even if multiple transactions are 
+executed concurrently.
+Example:
+  Imagine two transactions running at the same time:
+  Transaction 1: Transfers $100 from Account A to Account B.
+  Transaction 2: Checks the total balance of both accounts.
+  Isolation ensures that Transaction 2 will only see the consistent state (either before or after the transfer), not an intermediate state where Account A is debited, but Account B is not yet credited.
+
+In a relational database system, at any given moment, a single transaction or query can be processed on a specific piece of data (like a record in a table) to maintain isolation.
+
+
+
+
+
+4. Durability
+Definition: Once a transaction is committed, the changes are permanently recorded, even in case of power failure or crash.
+Goal: Ensure that committed transactions are not lost.
+Example:
+  After successfully transferring $100 from Account A to Account B, the system crashes.
+  Durability guarantees that after the system restarts, the transfer will still be reflected 
+  (i.e., Account A has $100 less, and Account B has $100 more).
+
+
+How work Durability: (Transaction Logging)
+Most DBMSs implement a mechanism called transaction logging or write-ahead logging (WAL). This involves several steps:
+  Log File:
+    Before making any changes to the database, the DBMS writes a record of the intended changes to a log file. 
+    This log entry includes details about the transaction, such as:
+      Transaction ID
+      Operation type (INSERT, UPDATE, DELETE)
+      A snapshot of the data before and after the change (for rollback purposes)
+
+  Commit Process:
+    Once all changes have been made, the transaction is committed, and a commit record is written to the log file.
+    The commit record indicates that the transaction has successfully completed.
+
+In summary, durability in a database system is achieved through the use of transaction logs, 
+which track the state of transactions. In the event of a power loss, the DBMS uses these logs to recover the 
+database to a consistent state by reapplying committed transactions and rolling back incomplete transactions.
+
+
+
+
+
+RDBMS-Vertical Scaling vs Horizontal Scaling
+=================================================
+Horizontally scaling an RDBMS is more challenging than vertically scaling it because relational databases are 
+inherently designed to be ACID-compliant, which requires careful handling of transactions, consistency, and relationships 
+between data.
+
+Vertical Scaling (Scale-Up):
+  Add more CPU, RAM, storage, etc., to the same database server.
+  It works well, but there's a limit to hardware capabilities.
+
+Horizontal Scaling (Scale-Out):
+  Distribute the database across multiple servers.
+  Requires techniques like sharding, replication, or distributed SQL.
+
+
+
+Handling Peak Load with Backpressure in Databases (MySQL, Oracle, PostgreSQL)
+---------------------------------------------------
+Connection Limits: Databases often set a maximum number of concurrent connections. 
+When the limit is reached, additional requests are queued or rejected until some connections are freed.
+Query Timeouts: If queries take too long, the database might terminate slow queries or throttle new ones.
+
+
+
+Connection pooling:
+-------------------------------------------------------
+Connection pooling is typically implemented at the application level or in the middleware layer.some supporting in DB.
+
+How Connection Pooling Works at the Application Level:
+  When the application starts, a pool of database connections is initialized.
+  On each request, the application borrows a connection from the pool.
+  If all connections are in use, new requests wait in a queue.
+  After the operation completes, the connection is returned to the pool.
+  If a connection becomes stale or broken, it is closed and replaced with a new one.
+
+
+
+
+
+RDS-Logging:
+================================================
+Database logging is a critical aspect of managing databases, as it helps track operations, 
+troubleshoot issues, and monitor performance.
+
+
+Types of Logs
+------------------------------------------------
+1. MySQL Logging
+  Error Log: Records server startup and shutdown events, as well as critical errors.
+  General Query Log: Logs all SQL statements received by the server.
+  Binary Log: Records all changes to the database (e.g., updates, inserts) for replication and recovery purposes.
+  Slow Query Log: Records queries that exceed a specified execution time, useful for performance tuning.
+
+2. PostgreSQL Logging
+  Error Log: Logs errors and warnings generated by the database.
+  General Log: Can log all queries or specific types based on configuration.
+  Slow Query Log: Captures queries that exceed a specified duration.
+
+
+3. Oracle Logging
+  Alert Log: Contains significant events such as startup and shutdown of the database, critical errors, 
+  and other important notifications.
+  Trace Files: Detailed logs for specific sessions or background processes. Each session can produce trace files.
+  Redo Logs: Log changes made to the database; essential for recovery.
+
+
+
++------------------+-------------------+-----------------------------------+----------------------------+
+|    Ops           |     MySQL         |      PostgreSQL                   |          Oracle            |
++------------------+-------------------+-----------------------------------+----------------------------+
+| **Types of Logs**| Error Log         | Error Log                         | Alert Log                  |
+|                  | General Query Log | General Log                       | Trace Files                |
+|                  | Binary Log        | Slow Query Log                    | Redo Logs                  |
+|                  | Slow Query Log    |                                   |                            |
++------------------+-------------------+-----------------------------------+----------------------------+
+| **Log Locations**| /var/log/mysql/   | /var/lib/postgresql/              | $ORACLE_BASE/diag/rdbms/   |
+|                  | error.log         | X.Y/main/pg_log/                  | <DB_NAME>/<INSTANCE_NAME>/ |
+|                  |                   |                                   | trace/alert_<DB_NAME>.log  |
++------------------+-------------------+-----------------------------------+----------------------------+
+| **Log Levels**   | No specific levels| DEBUG5, DEBUG4,                   | No specific levels         |
+|                  |                   | DEBUG3, DEBUG2,                   |                            |
+|                  |                   | DEBUG1, INFO,                     |                            |
+|                  |                   | NOTICE, WARNING,                  |                            |
+|                  |                   | ERROR, FATAL, PANIC               |                            |
++------------------+-------------------+-----------------------------------+----------------------------+
+| **Management**   | my.cnf config     | postgresql.conf config            | ALTER SESSION for tracing  |
+|                  | SET GLOBAL        | logging_collector = on            | Automatic management       |
+|                  | expire_logs_days =| log_statement = 'all'             | Log rotation handled by DB |
+|                  | 7                 | log_min_duration_statement = 1000 |                            |
++------------------+-------------------+-----------------------+----------------------------------------+
+
+
+
+
 
 
 
