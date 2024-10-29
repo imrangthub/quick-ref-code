@@ -5410,180 +5410,9 @@ java -Dcom.sun.management.jmxremote=true -Dcom.sun.management.jmxremote.port=600
 
 
 =================================================
-#Spring | spring boot | Spring Framework                                         
+##spring | spring boot | Spring Framework                                         
 ================================================= 
 https://github.com/eazybytes/spring
-
-
-
-Gateway
---------------------------------------------------
-@Bean
-public GatewayFilterFactory<RequestRateLimiterGatewayFilterFactory.
-Config> rateLimiterFilter() {
-    return new RequestRateLimiterGatewayFilterFactory() {
-        @Override
-        public Mono<Void> denyResponse(ServerWebExchange exchange, String key) {
-            ServerHttpResponse response = exchange.getResponse();
-            response.setStatusCode(HttpStatus.TOO_MANY_REQUESTS);
-            response.getHeaders().setContentType(MediaType.APPLICATION_JSON);
-            DataBuffer buffer = response.bufferFactory().wrap("{\"error\": \"RATE_LIMIT_EXCEEDED\", \"message\": \"Too many requests. Please try again later.\"}".getBytes());
-            return response.writeWith(Mono.just(buffer));
-        }
-    };
-}        
-
-
-@SuppressWarnings("unchecked")
-@Override
-public GatewayFilter apply(Config config) {
-  KeyResolver resolver = getOrDefault(config.keyResolver, defaultKeyResolver);
-  RateLimiter<Object> limiter = getOrDefault(config.rateLimiter, defaultRateLimiter);
-  boolean denyEmpty = getOrDefault(config.denyEmptyKey, this.denyEmptyKey);
-  HttpStatusHolder emptyKeyStatus = HttpStatusHolder.parse(getOrDefault(config.emptyKeyStatus, this.emptyKeyStatusCode));
-  return (exchange, chain) -> {
-    Route route = exchange.getAttribute(ServerWebExchangeUtils.GATEWAY_ROUTE_ATTR);
-    return resolver.resolve(exchange).defaultIfEmpty(EMPTY_KEY).flatMap(key -> {
-      if (EMPTY_KEY.equals(key)) {
-        if (denyEmpty) {
-          setResponseStatus(exchange, emptyKeyStatus);
-          return exchange.getResponse().setComplete();
-        }
-        return chain.filter(exchange);
-      }
-      return limiter.isAllowed(route.getId(), key).flatMap(response -> {
-        for (Map.Entry<String, String> header : response.getHeaders().entrySet()) {
-          exchange.getResponse().getHeaders().add(header.getKey(), header.getValue());
-        }
-        if (response.isAllowed()) {
-          return chain.filter(exchange);
-        }
-        setResponseStatus(exchange, config.getStatusCode());
-        return exchange.getResponse().setComplete();
-      });
-    });
-  };
-}
-
-
-
-import net.banglalink.apihub.openapi.edge.utils.JwtUtil;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.cloud.gateway.route.RouteLocator;
-import org.springframework.cloud.gateway.route.builder.RouteLocatorBuilder;
-import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Configuration;
-import org.springframework.cloud.gateway.filter.ratelimit.KeyResolver;
-import org.springframework.cloud.gateway.filter.ratelimit.RedisRateLimiter;
-
-
-import org.springframework.context.annotation.Primary;
-import org.springframework.core.annotation.Order;
-import reactor.core.publisher.Mono;
-
-
-@Configuration
-public class GatewayConfiguration {
-
-
-
-    @Bean
-    @Primary
-    public RedisRateLimiter customerInfoRateLimiter() {
-        return new RedisRateLimiter(1, 1, 1);
-    }
-
-    @Bean
-    public RedisRateLimiter customerInfoRateLimiter5Tps() {
-        return new RedisRateLimiter(5, 5, 1);
-    }
-
-
-//    @Bean
-//    public KeyResolver hostAddressKeyResolver() {
-//        return exchange -> {
-//            return Mono.just(exchange.getRequest().getRemoteAddress().getAddress().getHostAddress());
-//        };
-//    }
-
-    @Autowired
-    private JwtUtil jwtUtil;
-
-
-
-    @Autowired
-    private RateLimitConfigurationService rateLimitConfigurationService;
-
-    @Bean
-    public KeyResolver userKeyResolver() {
-        return exchange -> Mono.just("391673b2-5106-4f9b-a801-7b92c0329d77")
-                .map(user -> rateLimitConfigurationService.getRateLimitForUser("391673b2-5106-4f9b-a801-7b92c0329d77").toString());
-    }
-
-
-    @Bean
-    public CustomRateLimiter customRateLimiter() {
-        return new CustomRateLimiter();
-    }
-
-
-    @Bean
-    public RouteLocator myRoutes(RouteLocatorBuilder builder, KeyResolver userKeyResolver) {
-
-
-
-        return builder.routes()
-                .route(p -> p.path("/openapi-customer-information/5tps/**")
-                        .filters(f -> f
-                                .filter(customRateLimiter())
-                                .rewritePath("/openapi-customer-information/5tps/(?<segment>.*)", "/${segment}")
-                         )
-                        .uri("lb://openapi-customer-information"))
-                .route(p -> p.path("/openapi-customer-information/**")
-                        .filters(f -> f
-                                .rewritePath("/openapi-customer-information/(?<segment>.*)", "/${segment}")
-                                .requestRateLimiter(r -> r.setRateLimiter(customerInfoRateLimiter())
-                                        .setKeyResolver(userKeyResolver)
-                                ))
-                        .uri("lb://openapi-customer-information"))
-
-                .route(p -> p.path("/openapi-iris/**")
-                        .filters(f -> f
-                                .rewritePath("/openapi-iris/(?<segment>.*)", "/${segment}"))
-                        .uri("lb://openapi-iris"))
-                .route(p -> p.path("/openapi-cms/**")
-                        .filters(f -> f
-                                .rewritePath("/openapi-cms/(?<segment>.*)", "/${segment}"))
-                        .uri("lb://openapi-cms"))
-                .route(p -> p.path("/openapi-complaint-management/**")
-                        .filters(f -> f
-                                .rewritePath("/openapi-complaint-management/(?<segment>.*)", "/${segment}"))
-                        .uri("lb://openapi-complaint-management"))
-                .route(p -> p.path("/openapi-evservice/**")
-                        .filters(f -> f
-                                .rewritePath("/openapi-evservice/(?<segment>.*)", "/${segment}"))
-                        .uri("lb://openapi-evservice"))
-                .route(p -> p.path("/openapi-lms/**")
-                        .filters(f -> f
-                                .rewritePath("/openapi-lms/(?<segment>.*)", "/${segment}"))
-                        .uri("lb://openapi-lms"))
-                .route(p -> p.path("/openapi-otp/**")
-                        .filters(f -> f
-                                .rewritePath("/openapi-otp/(?<segment>.*)", "/${segment}"))
-                        .uri("lb://openapi-otp"))
-                .route(p -> p.path("/openapi-provisioning/**")
-                        .filters(f -> f
-                                .rewritePath("/openapi-provisioning/(?<segment>.*)", "/${segment}"))
-                        .uri("lb://openapi-provisioning"))
-                .route(p -> p.path("/openapi-usages-history/**")
-                        .filters(f -> f
-                                .rewritePath("/openapi-usages-history/(?<segment>.*)", "/${segment}"))
-                        .uri("lb://openapi-usages-history"))
-                .build();
-    }
-
-}
-
 
 
 
@@ -5952,24 +5781,267 @@ public class YourEntity {
 
 
 
+spring-doc:
+=================================================
+Spring Framework is a powerful, open-source framework for building Java-based applications. 
+
+Key Features of Spring Framework:
+	Dependency Injection (DI): Manages dependencies automatically to ensure loose coupling.
+	AOP (Aspect-Oriented Programming): Separates cross-cutting concerns like logging and security.
+	Transaction Management: Handles transactions declaratively without boilerplate code.
+	Spring MVC: Simplifies web development with the Model-View-Controller pattern.
+	Spring Boot: Speeds up setup with embedded servers and minimal configuration.
+	Data Access: Integrates with JDBC, JPA, Hibernate, and NoSQL databases.
+	Security: Offers authentication and authorization with Spring Security.
+	Spring Cloud: Provides tools for microservices, including service discovery and API gateways.
+
+
+Spring to build hybrid desktop applications where backend logic (e.g., data access, service management) is 
+handled by Spring, and the frontend is built with JavaFX or Swing.
+
+
+
+Spring Boot
+---------------------------------------
+Spring Boot builds on Spring Framework to provide a faster, easier way to develop applications with minimal setup.
+
+Spring Boot simplifies Java application development by providing auto-configuration, 
+embedded servers, and production-ready tools to accelerate the process.
+
+
+Key Features of Spring Boot
+	Auto-Configuration:
+		Automatically configures beans and settings based on project dependencies.
+		Reduces the need for manual configuration.
+
+	Starter Dependencies:
+		Pre-built starters simplify dependency management (e.g., spring-boot-starter-web).
+		Include all required libraries with minimal setup.
+
+	Embedded Servers:
+		Comes with embedded servers like Tomcat, Jetty, or Undertow.
+		Allows running applications without external server deployment.
+
+	Production-Ready Features:
+		Provides health checks, metrics, and logging via Spring Boot Actuator.
+		Simplifies monitoring and maintenance.
+
+
+
+
+Main Projects in the Spring Ecosystem:
+	Spring Framework – Core framework for DI and AOP.
+	Spring Boot – Simplifies app setup with auto-configuration and embedded servers.
+	Spring Cloud – Tools for building microservices and cloud-native apps.
+	Spring Security – Authentication and authorization support (OAuth2, JWT).
+	Spring Data – Simplifies database access for SQL and NoSQL.
+	Spring Batch – Handles batch processing and ETL jobs.
+	Spring Integration – Supports enterprise application integration.
+
+
+
+Annotations in Spring Boot
+----------------------------------------
+In Spring Boot, an annotation is a special form of metadata that provides information about how the 
+framework should handle classes, methods, or fields at runtime.
+
+
+Spring Boot annotations with brief descriptions:
+
+@SpringBootApplication
+Marks the main class of a Spring Boot application and combines @Configuration, @EnableAutoConfiguration, and @ComponentScan.
+
+@RestController
+Combines @Controller and @ResponseBody to create RESTful web services.
+
+@GetMapping / @PostMapping / @PutMapping / @DeleteMapping
+Used to map HTTP methods (GET, POST, PUT, DELETE) to controller methods.
+
+@RequestMapping
+General-purpose mapping annotation for defining paths and HTTP methods for controllers.
+
+@Autowired
+Injects dependencies automatically where required.
+
+@Component
+Marks a class as a Spring-managed bean. Used for general components.
+
+@Service
+Marks a class as a service, a specialized @Component.
+From a functional perspective, @Component and @Service are identical—both register the class as a 
+Spring-managed bean in the application context.
+
+@Repository
+Indicates that a class is responsible for data access, typically interacting with a database.
+@Repository not only marks a class as a Spring bean, but also enables exception(SQLException) translation to convert 
+database exceptions into Spring’s DataAccessException.
+
+
+
+@Entity
+Marks a class as a JPA entity to represent a table in a database.
+
+@Transactional
+Used to manage transactions at the method or class level.
+
+@Configuration
+Marks a class to define beans and configurations.
+It tells Spring to scan the class for @Bean methods and register those beans in the application context.
+
+@Value
+Injects values from application properties or environment variables into fields.
+
+@PathVariable
+Extracts values from URI path parameters.
+
+@RequestParam
+Extracts query parameters from HTTP requests.
+
+@RequestBody
+Maps the request body to a Java object.
+
+@ResponseBody
+Converts Java objects to HTTP responses, typically in JSON or XML.
+
+@Bean
+Defines a Spring-managed bean in a @Configuration class.
+Used to manually create and configure beans (e.g., for third-party libraries or when complex 
+logic is needed for initialization).
+
+
+@EnableAsync
+Enables asynchronous method execution.
+
+@EnableScheduling
+Activates scheduled tasks in the application.
+
+@CrossOrigin
+Enables cross-origin resource sharing (CORS) for a controller or method.
+
+
+
+@Bean crate imp**:
+----------------------------
+Best Practice: Always define @Bean methods inside a @Configuration class to ensure proper singleton handling and 
+lifecycle management.
+If you place @Bean outside @Configuration (e.g., in a @Component or @Service), be aware that multiple instances may
+ be created, which could lead to unexpected behavior.
+
+
+
+Scope and lifecycle behavior of @Configuration, @Component, @Service, and @Repository.
+-------------------------------------------------------------------------------------
+@Configuration:
+
+Always treated as a singleton.
+Uses CGLIB proxying to ensure beans are shared properly.
+@Component, @Service, @Repository:
+Singleton by default.
+Can be configured with other scopes like prototype, request, or session depending on the need.
+
+
+@Controller
+Purpose:
+Marks a class as a Spring MVC controller responsible for handling HTTP requests and returning views (e.g., HTML).
+Scope:
+Singleton by default (like @Component).
+
+
+@RestController
+Purpose:
+Specialized version of @Controller that combines @Controller + @ResponseBody.
+It is used to handle RESTful APIs by returning JSON/XML directly instead of rendering views.
+Scope:
+Singleton by default (like other Spring-managed beans).
+
+
+
+
+@Entity
+Purpose:
+	Marks a Java class as a JPA entity, meaning it represents a table in a relational database.
+	Each instance of this class corresponds to a row in the database.
+Scope:
+	Not a Spring-managed bean by default.
+	Instances are managed by JPA/Hibernate, not the Spring container.
+
+
+
+
+Overall Spring Boot Architecture
+==============================================
+	Tomcat:
+	Acts as the web server and servlet container, managing incoming HTTP requests and routing them to the appropriate Spring components.
+
+	Spring Framework:
+	Manages the Java beans, their lifecycle, and dependencies. It operates within the JVM, allowing for efficient memory and resource management.
+
+	JVM:
+	Provides the runtime environment for Java applications, handling memory allocation, garbage collection, and thread management.
 
 
 
 
 
+How Singleton Beans Handle Multiple Requests
+----------------------------------------------------------------------------------
+Singleton Beans:
+	Even though controllers and services are singletons, Spring handles concurrent requests by creating a new thread for each request.
+	Each request gets its own stack space to store local variables, ensuring thread safety.
+
+Local Variables and Method Parameters:
+	These are inherently thread-safe because they are isolated to each request’s thread.
+
+
+
+Scenario:
+	Two users, User A and User B, request employee info for ID 1 and ID 2 simultaneously.
+	Flow:
+		Spring assigns a separate thread for each request.
+		getEmployeeInfo(id) method is called with different IDs in separate threads.
+		Each request gets its own local variables (id and employee).
+		No data is shared between requests, ensuring thread safety.
+
+Spring’s built-in thread-per-request model ensures concurrent requests are handled properly without data conflicts.
 
 
 
 
+@Scope("session") // Each user gets their own instance:
+----------------------------------------------
+Each user will have their own instance of UserSession, allowing them to set and get their username without affecting other users.
+This ensures data isolation and avoids concurrency issues.
 
 
 
+How to handel Concurrent requst 
+-------------------------------------
+Spring Boot creates a new thread for each incoming request, and all processing for that request (controller, service, repository) occurs within that single thread.
+This architecture ensures that each request is isolated and that operations performed in one thread do not affect another thread's operations.
+For any shared data or state, be cautious and use appropriate scopes (like request or session) to ensure thread safety and data isolation.
 
 
 
+Spring Boot application, the creation, management, memory allocation, and CPU usage of threads are primarily handled by the underlying 
+web server (like Tomcat, Jetty, or Undertow) and the Java Thread Pool. 
+
+
+Memory Allocation:
+	Each thread consumes a certain amount of memory for its stack (used for method calls and local variables).
+	The JVM allocates memory for each thread when it is created, including space for its stack and any other data structures required for thread management.
+
+CPU Usage:
+	The operating system (OS) scheduler manages the allocation of CPU resources among threads.
+	Each thread will be scheduled by the OS based on priority and availability, allowing it to run when CPU resources are available.
 
 
 
+Configuring Thread Limits:
+	Web servers have default configurations that limit the number of threads. You may need to adjust these based on your application’s workload.
+Threads are created by the web server from a thread pool to handle incoming requests.
+Memory allocation and CPU usage are managed by the JVM and the operating system.
+The maximum number of threads is determined by server configuration and system resources, and there are inherent limitations based on JVM and OS capabilities.
+Proper tuning and monitoring are essential to optimize thread usage in a Spring Boot application.
 
 
 
