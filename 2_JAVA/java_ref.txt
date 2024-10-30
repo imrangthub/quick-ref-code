@@ -4856,9 +4856,490 @@ haddop Connection:
 ##doc-java
 =================================================
 
+Jave Free or Paid
+-------------------------------------------------
+Free Options: OpenJDK and various vendor distributions (like Amazon Corretto, Red Hat OpenJDK, etc.) are available for free.
+Paid Option: Oracle JDK is free for development but may require a paid subscription for commercial use.
 
 
 
+Java vs Other language Comparison
+-------------------------------------------------
+Comparison:Java "write once, run anywhere" vs PHP or Python
+	Java offers a more robust and consistent cross-platform execution model compared to Python and PHP, 
+	which depend more heavily on the specific interpreter environment.
+
+
+Consistency Across Platforms:
+	Java provides a more consistent execution environment through the JVM, which abstracts away many 
+	platform-specific differences.
+	This means that Java applications are less likely to encounter compatibility issues when moving between 
+	environments, as long as the JVM version supports the bytecode.
+
+	In contrast, Python and PHP, while capable of cross-platform development, may require more management of 
+	the execution environment, which can lead to potential discrepancies and increased maintenance efforts.
+
+
+
+
+The Java Collection Framework simplifies the handling of data structures, offering a variety of tools to manage 
+groups of objects. It helps write cleaner, more efficient code with minimal effort.
+
+Key Components of the Collection Framework:
+	Interfaces (Blueprints for collections):
+		Collection: Root interface for most collection types.
+		List: Ordered, allows duplicates. (e.g., ArrayList, LinkedList)
+		Set: No duplicates. (e.g., HashSet, TreeSet)
+		Queue: Elements processed in FIFO order. (e.g., PriorityQueue)
+		Map: Stores key-value pairs. (e.g., HashMap, TreeMap)
+
+	Classes (Concrete implementations):
+		ArrayList: Resizable array, good for random access.
+		LinkedList: Doubly linked list, good for frequent insertions/deletions.
+		HashSet: Unordered, unique elements.
+		HashMap: Key-value storage, allows fast lookups.
+
+	Algorithms:
+		Sorting: Sort elements (e.g., Collections.sort()).
+		Searching: Find elements (e.g., binarySearch()).
+
+
+
+
+Exception Handling
+===================================================
+Key Concepts in Exception Handling
+Exception: An object that represents an error or unexpected behavior in a program.
+Types of Exceptions:
+	Checked Exceptions: Exceptions that must be declared in the method signature or handled using a try-catch block.
+	Example: IOException, SQLException
+
+	Unchecked Exceptions: Runtime exceptions that do not need to be declared or caught. They usually indicate programming errors.
+	Example: NullPointerException, ArrayIndexOutOfBoundsException
+
+	Error
+	Definition: An error is a serious problem that a typical application should not try to catch. 
+	It indicates unrecoverable conditions, usually related to the environment or system.
+
+	Examples:
+	OutOfMemoryError: Thrown when the Java Virtual Machine (JVM) cannot allocate memory for an object.
+	StackOverflowError: Thrown when the stack depth exceeds its limit, typically due to deep or infinite recursion.
+	InternalError: Thrown when an internal error in the JVM occurs.
+
+
+
+Basic Syntax for Exception Handling:
+	Try-Catch Block: Used to catch exceptions.
+	try {
+		// Code that may throw an exception
+	} catch (ExceptionType e) {
+		// Code to handle the exception
+	}
+
+	Finally Block: A block that executes after the try-catch block, regardless of whether an exception was thrown or caught. 
+	It's typically used for resource cleanup.
+	finally {
+		// Code that always executes
+	}
+
+
+	Throw Statement: Used to explicitly throw an exception.
+	throw new ExceptionType("Error message");
+
+
+	Throws Keyword: Indicates that a method may throw a particular exception, allowing the caller to handle it.
+	public void method() throws ExceptionType {
+		// Method code
+	}
+
+
+
+
+Java Memory Management: Key Areas
+
+=================================================
+Heap Memory
+	Definition: Area for dynamic memory allocation for objects and arrays.
+	Characteristics:
+		Managed by garbage collection.
+		Shared among threads.
+		Default Behavior: Size can be set with -Xms (initial) and -Xmx (maximum).
+
+Stack Memory
+Definition: Used for method execution, storing local variables and method call information.
+Characteristics:
+	Fixed size per thread.
+	Follows a LIFO structure (Last In, First Out).
+	Default Behavior: Local variables are automatically deallocated after method execution.
+
+Method Area (Metaspace in Java 8+)
+Definition: Stores class metadata, method data, and constant pool information.
+Characteristics:
+	Shared across threads.
+	In Java 8+, dynamically allocated from native memory.
+	
+Native Memory
+Definition: Memory allocated outside the Java heap and stack, often for JNI calls.
+	Characteristics: Not managed by Java's garbage collector.
+
+
+
+
+
+JVM Tuning
+=================================================
+Each time you run a command like java -jar, it starts a new JVM instance, even though all those instances 
+come from the same JDK installed on your machine.
+
+How it Works:
+	Single JDK: The JDK provides the tools (like java command) and libraries needed to run JVMs.
+	New JVM per Command: Each time you run java -jar, a separate JVM process is created with its own memory, 
+	garbage collector, and configuration.
+
+	Isolated JVMs: These JVMs are independent, so one JVM’s settings or performance doesn’t affect the others.
+
+
+Example JVM Tuning Command
+java -Xms512m -Xmx2048m -Xss1m -XX:+UseG1GC -XX:MaxGCPauseMillis=200 -Xlog:gc*:file=gc.log:time,uptime -Dcom.sun.management.jmxremote -jar YourApplication.jar
+
+
+
+Best Practices for Running Multiple JVMs on One Host:
+Resource Management (CPU, Memory)
+	Divide Memory Appropriately:
+	Ensure that the total memory allocated to all JVMs doesn’t exceed the system’s RAM to avoid swapping.
+
+Limit CPU Usage:
+	Use taskset or cgroups (on Linux) to pin specific applications to certain CPU cores:
+	taskset -c 0-3 java -jar App1.jar
+	taskset -c 4-7 java -jar App2.jar
+
+
+4. Control Thread Counts
+	JVMs create multiple threads, which can exhaust the system’s thread pool.
+	Use -Xss to limit stack size and control thread usage:
+	-Xss512k
+
+
+5. File Descriptors and Ports
+	Each JVM uses sockets and open files. Increase ulimit to avoid "too many open files" errors:
+	ulimit -n 65536
+
+
+6. Logging Configuration
+Ensure that logs are written to different files per application to avoid conflict and manage disk space.
+Example:
+bash
+Copy code
+-Xlog:gc*:file=/var/log/app1/gc.log
+
+
+
+
+
+Running multiple JVMs on the same host requires proper resource allocation (memory, CPU, and threads), 
+different GC strategies, and monitoring tools to maintain performance. 
+
+
+
+
+Potential Issues Without Tuning:
+==============================================
+	OutOfMemoryError if multiple apps exhaust the available memory.
+		Memory Allocation:
+		Default Heap Size: The JVM sets heap size based on the host machine’s RAM (around 25% of total memory).
+		Initial Heap (-Xms): ~256 MB.
+		Max Heap (-Xmx): Up to 1/4 of available memory (in your case ~8 GB per JVM if not limited).
+	With 10 apps, the cumulative memory demand can exceed your 32 GB limit, leading to OutOfMemoryErrors or OS-level swapping.
+
+	High CPU usage due to multiple GC operations across all apps.
+	G1 GC is the default in Java 17.
+		Use G1 GC (default) or Parallel GC for CPU-heavy apps
+		java -XX:+UseParallelGC -Xms256m -Xmx512m -jar app3.jar
+
+	Too many open threads leading to "too many open files" errors.
+		Limit Thread Usage
+		Reduce stack size to prevent thread exhaustion:-Xss512k
+		java -Xss512k -jar app1.jar
+
+
+	Limit File Descriptors:
+	ulimit -n 65536
+
+
+    Monitor Your JVMs:
+		java -Dcom.sun.management.jmxremote.port=9010 -Dcom.sun.management.jmxremote -jar app1.jar
+
+Example Optimized Command for Each App:
+	java -Xms512m -Xmx1024m -Xss512k -XX:+UseG1GC -Xlog:gc*:file=gc.log:time,uptime -Dcom.sun.management.jmxremote.port=9010 -jar app1.jar
+
+
+
+
+
+
+
+
+=================================================
+Default bahavor of jvm and java-app
+=================================================
+Default JVM Memory Management:
+
+Initial and Maximum Heap Sizes:
+	Initial Heap Size (-Xms): Typically defaults to 1/64th of the physical memory. On a 32GB system, this would be around 512MB.
+	Maximum Heap Size (-Xmx): Typically defaults to 1/4th of the physical memory. On a 32GB system, this would be around 8GB.
+
+
+
+The default heap size settings of the JVM (Java Virtual Machine) apply to each individual Java application instance. 
+This means that each Java application you run on your host machine will have its own separate heap memory, 
+and the default settings will be applied individually to each application.
+
+Example: app1.jar and app2.jar run in a host machine with 32GB ram with out any vm option:
+	Running Applications Without Specified Heap Sizes:
+Application 1:
+	Initial Heap: 512MB
+	Maximum Heap: 8GB
+
+Application 2:
+	Initial Heap: 512MB
+	Maximum Heap: 8GB
+
+Memory Allocation:
+Each application (myapp1.jar and myapp2.jar) will have an initial heap size of around 512MB.
+Each application can grow its heap up to a maximum of around 8GB.
+
+
+
+When use Swap memory by java:
+---------------------------------------
+Swap usage despite available RAM can occur due to historical memory pressure, swappiness settings, long-running processes, and memory fragmentation.
+Adjust the swappiness value to control swap usage.
+Clear swap space by disabling and re-enabling it if necessary.
+Optimize Java applications to ensure efficient memory usage.
+Regularly monitor system memory and swap usage to identify any abnormal patterns or processes consuming excessive memory.
+
+
+
+=>cat /proc/sys/vm/swappiness
+current swappiness value:
+
+=>sudo sysctl vm.swappiness=10
+set swappindess:
+
+
+Clear Swap Space:
+sudo swapoff -a
+sudo swapon -a
+
+
+
+
+=================================================
+Approaches to Track Threads in a Java Application
+=================================================
+Find the Process ID (PID):
+=>jps -v
+
+Get Thread Dump:
+=>jcmd <PID> Thread.print > thread_dump.txt
+
+Thread.dump provides detailed information about all threads, their states (e.g., RUNNING, BLOCKED), and stack traces.
+Analyze the dump for high memory-consuming threads or blocked threads.
+
+
+
+
+
+
+
+=================================================
+JVM | jvm Monitoring | memory operation
+=================================================
+=>jps
+=>ps -fC java
+Show all java running applicaton
+
+=>jcmd pId
+Show all availabel jvm command
+
+=>java -XX:+PrintFlagsFinal
+=>java -XX:+PrintFlagsFinal -version | grep HeapSize
+Show all curretn(defautl) JVM setting with flag 
+
+
+=>jcmd 29286 VM.version
+=>jcmd 6056 VM.flags
+=>jcmd pId VM.flags
+Show runtime parameters that were used when starting for a specific Java process (Memory Unit Show In Byte)
+
+=>jstat -gc 6056
+Show garbage collection statistics, including the heap sizes.
+
+=>java -XX:+PrintFlagsFinal -version | grep HeapSize
+To find default Heap size in current java or jvm
+
+Show Memory and CPU uses by process pId
+=>top  (then press e for change mm unit)
+=>top -p pID
+=>ps -p 29286 -o rss= -o vsz= -o %mem= -o %cpu= -o comm=
+
+
+
+
+
+
+jconsole
+----------------------------------------------------
+=>jconsole
+For visual representation jvm
+
+For visualVM
+----------------------------------------------------
+Download and run it
+
+
+
+GC:
+-----------------------------------------------------
+In JDK 8 
+-verbose:gc
+
+YoungGeneartion=Eden
+OldGneration=OldGen
+jdk17
+java -Xlog:gc*:file=gc.log -jar your-application.jar
+Quick show Gurbase collecton, add this flag on VM argument
+
+
+
+
+Check JVM flag (if not set, its show default flag)
+------------------------------------------
+
+=>jinfo -flag UseAdapptiveSizePolicy pId
+=>jinfo -flag UseAdapptiveSizePolicy 224323
+Check curretn gc Policy
+
+=>jinfo -flag NewRation PID
+=>jinfo -flag NewRation 23223
+Show the ration of Young and Old Generation GC ration
+
+to set a new Ration add VM flag:
+-XX:NewRation=1
+
+
+=>jinfo -flag ServivorRation PID
+Show YouGC ration
+
+Set Servibe Ration in YGC add flag
+-XX:ServivorRation=5
+
+
+
+Java memory footprint of process | application
+----------------------------------------------------
+In Jvm Runtime the primary MemoryConsumer:
+- Java Heap
+- Class Loadeing
+- JIT Compiler
+- Threads
+
+=>top -o%MEM
+Show the process info, here `RES` show the req ram phical ram taken by thie process like 5gb.
+
+=>pmap -x pid
+Now the RES 5gb in details, show with this command.
+Every single class,jar, .os file etc. what is consume how much mamory showing using this command.
+
+
+=>jmap -histo:live pid 
+=>jmap -histo:live 26202 | grep com.imranmadbar
+Find Class/package using pid
+
+
+=>jcmd PID VM.classloader_status
+show how many class load and which class load
+
+=>jcmd PID GC.class_status
+Which class, field consume how much memory
+
+
+
+
+
+TypeOfGC:
+- Serial
+  -XX:+UseSerialGC
+- Parallel
+  -XX:+UseParallelGC
+- Mostly Concurrent
+  -XX:+UseG1GC
+
+
+ Vector v = new Vector();
+ while (true)
+ {
+     byte b[] = new byte[1048576];
+     v.add(b);
+ }
+This will continuously add a 1MB byte to a vector until it runs out of memory
+
+
+
+
+
+JVM performance tuning for large applications:  benchmark, Benchmark, BENCHMARK!
+
+VM. Enable monitoring:
+common Java tooling (JVisualVM, JMX, hprof, and some JVM flags).
+
+
+GC process
+-----------------------------------------
+1. Young Generation Collection:
+Allocation: New objects are allocated in the Young Generation. This area is further divided into three spaces: Eden and two Survivor spaces (S0 and S1).
+
+Minor Garbage Collection (Minor GC): When the Young Generation fills up, a minor GC is triggered. During this phase:
+
+
+2. Old Generation Collection:
+Promotion: Objects that survive multiple minor GCs are eventually promoted to the Old Generation.
+
+Major Garbage Collection (Major GC or Full GC): The Old Generation collection is more expensive but occurs less frequently. During a major GC:
+
+Live objects in the Old Generation are identified.
+Unused (garbage) objects are collected, and memory is reclaimed.
+Compaction may occur to reduce fragmentation and ensure efficient memory usage.
+
+
+
+
+visualVM | Remote connect
+---------------------------------------------------
+/app/apihub/jdks/jdk-17.0.7/bin/java -Dcom.sun.management.jmxremote.port=9991  -Dcom.sun.management.jmxremote.ssl=false  -Dcom.sun.management.jmxremote.authenticate=false  -Xms1024m -Xmx1024m -jar integration-svc1-0.0.1-SNAPSHOT.jar
+
+java -Dcom.sun.management.jmxremote -Dcom.sun.management.jmxremote.port=8090 -Dcom.sun.management.jmxremote.authenticate=false -Dcom.sun.management.jmxremote.ssl=false -jar integration-svc1-0.0.1-SNAPSHOT.jar
+
+MaveBuildConnamd 
+mvn spring-boot:run -Dspring-boot.run.jvmArguments="-Xdebug -Dcom.sun.management.jmxremote -Dcom.sun.management.jmxremote.port=9010 -Dcom.sun.management.jmxremote.rmi.port=9010 -Dcom.sun.management.jmxremote.authenticate=false -Dcom.sun.management.jmxremote.ssl=false -Djava.rmi.server.hostname=localhost"
+
+
+
+How to set up remote visual VM
+
+We need set the below properties while running jar
+
+    -Dcom.sun.management.jmxremote=true 
+    -Dcom.sun.management.jmxremote.port=<PORT> 
+    -Dcom.sun.management.jmxremote.authenticate=false 
+    -Dcom.sun.management.jmxremote.ssl=false 
+    -Djava.rmi.server.hostname=<SEVER IP_ADDRESS> 
+    -Dcom.sun.management.jmxremote.rmi.port=<PORT>
+
+
+java -Dcom.sun.management.jmxremote=true -Dcom.sun.management.jmxremote.port=6001 -Dcom.sun.management.jmxremote.authenticate=false -Dcom.sun.management.jmxremote.ssl=false -Djava.rmi.server.hostname=192.168.251.9 -Dcom.sun.management.jmxremote.rmi.port=6001 -jar integration-svc1-0.0.1-SNAPSHOT.jar
+/app/apihub/jdks/jdk-17.0.7/bin/java -Dcom.sun.management.jmxremote=true -Dcom.sun.management.jmxremote.port=6001 -Dcom.sun.management.jmxremote.authenticate=false -Dcom.sun.management.jmxremote.ssl=false -Djava.rmi.server.hostname=172.16.254.122 -Dcom.sun.management.jmxremote.rmi.port=6001 -jar integration-svc1-0.0.1-SNAPSHOT.jar
 
 
 
@@ -5037,276 +5518,6 @@ Example Usage:
 
 
 
-=================================================
-Default bahavor of jvm and java-app
-=================================================
-Default JVM Memory Management:
-
-Initial and Maximum Heap Sizes:
-	Initial Heap Size (-Xms): Typically defaults to 1/64th of the physical memory. On a 32GB system, this would be around 512MB.
-	Maximum Heap Size (-Xmx): Typically defaults to 1/4th of the physical memory. On a 32GB system, this would be around 8GB.
-
-
-
-The default heap size settings of the JVM (Java Virtual Machine) apply to each individual Java application instance. 
-This means that each Java application you run on your host machine will have its own separate heap memory, 
-and the default settings will be applied individually to each application.
-
-Example: app1.jar and app2.jar run in a host machine with 32GB ram with out any vm option:
-	Running Applications Without Specified Heap Sizes:
-Application 1:
-	Initial Heap: 512MB
-	Maximum Heap: 8GB
-
-Application 2:
-	Initial Heap: 512MB
-	Maximum Heap: 8GB
-
-Memory Allocation:
-Each application (myapp1.jar and myapp2.jar) will have an initial heap size of around 512MB.
-Each application can grow its heap up to a maximum of around 8GB.
-
-
-
-When use Swap memory by java:
----------------------------------------
-Swap usage despite available RAM can occur due to historical memory pressure, swappiness settings, long-running processes, and memory fragmentation.
-Adjust the swappiness value to control swap usage.
-Clear swap space by disabling and re-enabling it if necessary.
-Optimize Java applications to ensure efficient memory usage.
-Regularly monitor system memory and swap usage to identify any abnormal patterns or processes consuming excessive memory.
-
-
-
-=>cat /proc/sys/vm/swappiness
-current swappiness value:
-
-=>sudo sysctl vm.swappiness=10
-set swappindess:
-
-
-Clear Swap Space:
-sudo swapoff -a
-sudo swapon -a
-
-
-
-
-
-=================================================
-JVM | jvm Monitoring | memory operation
-=================================================
-=>jps
-=>ps -fC java
-Show all java running applicaton
-
-=>jcmd pId
-Show all availabel jvm command
-
-=>java -XX:+PrintFlagsFinal
-=>java -XX:+PrintFlagsFinal -version | grep HeapSize
-Show all curretn(defautl) JVM setting with flag 
-
-
-=>jcmd 29286 VM.version
-=>jcmd 6056 VM.flags
-=>jcmd pId VM.flags
-Show runtime parameters that were used when starting for a specific Java process (Memory Unit Show In Byte)
-
-=>jstat -gc 6056
-Show garbage collection statistics, including the heap sizes.
-
-=>java -XX:+PrintFlagsFinal -version | grep HeapSize
-To find default Heap size in current java or jvm
-
-Show Memory and CPU uses by process pId
-=>top  (then press e for change mm unit)
-=>top -p pID
-=>ps -p 29286 -o rss= -o vsz= -o %mem= -o %cpu= -o comm=
-
-
-
-
-
-
-jconsole
-----------------------------------------------------
-=>jconsole
-For visual representation jvm
-
-For visualVM
-----------------------------------------------------
-Download and run it
-
-
-
-GC:
------------------------------------------------------
-In JDK 8 
--verbose:gc
-
-YoungGeneartion=Eden
-OldGneration=OldGen
-jdk17
-java -Xlog:gc*:file=gc.log -jar your-application.jar
-Quick show Gurbase collecton, add this flag on VM argument
-
-
-
-
-Check JVM flag (if not set, its show default flag)
-------------------------------------------
-
-=>jinfo -flag UseAdapptiveSizePolicy pId
-=>jinfo -flag UseAdapptiveSizePolicy 224323
-Check curretn gc Policy
-
-=>jinfo -flag NewRation PID
-=>jinfo -flag NewRation 23223
-Show the ration of Young and Old Generation GC ration
-
-to set a new Ration add VM flag:
--XX:NewRation=1
-
-
-=>jinfo -flag ServivorRation PID
-Show YouGC ration
-
-Set Servibe Ration in YGC add flag
--XX:ServivorRation=5
-
-
-
-Java memory footprint of process | application
-----------------------------------------------------
-In Jvm Runtime the primary MemoryConsumer:
-- Java Heap
-- Class Loadeing
-- JIT Compiler
-- Threads
-
-=>top -o%MEM
-Show the process info, here `RES` show the req ram phical ram taken by thie process like 5gb.
-
-=>pmap -x pid
-Now the RES 5gb in details, show with this command.
-Every single class,jar, .os file etc. what is consume how much mamory showing using this command.
-
-
-=>jmap -histo:live pid 
-=>jmap -histo:live 26202 | grep com.imranmadbar
-Find Class/package using pid
-
-
-=>jcmd PID VM.classloader_status
-show how many class load and which class load
-
-=>jcmd PID GC.class_status
-Which class, field consume how much memory
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-TypeOfGC:
-- Serial
-  -XX:+UseSerialGC
-- Parallel
-  -XX:+UseParallelGC
-- Mostly Concurrent
-  -XX:+UseG1GC
-
-
- Vector v = new Vector();
- while (true)
- {
-     byte b[] = new byte[1048576];
-     v.add(b);
- }
-This will continuously add a 1MB byte to a vector until it runs out of memory
-
-
-
-
-
-JVM performance tuning for large applications:  benchmark, Benchmark, BENCHMARK!
-
-VM. Enable monitoring:
-common Java tooling (JVisualVM, JMX, hprof, and some JVM flags).
-
-
-GC process
------------------------------------------
-1. Young Generation Collection:
-Allocation: New objects are allocated in the Young Generation. This area is further divided into three spaces: Eden and two Survivor spaces (S0 and S1).
-
-Minor Garbage Collection (Minor GC): When the Young Generation fills up, a minor GC is triggered. During this phase:
-
-
-2. Old Generation Collection:
-Promotion: Objects that survive multiple minor GCs are eventually promoted to the Old Generation.
-
-Major Garbage Collection (Major GC or Full GC): The Old Generation collection is more expensive but occurs less frequently. During a major GC:
-
-Live objects in the Old Generation are identified.
-Unused (garbage) objects are collected, and memory is reclaimed.
-Compaction may occur to reduce fragmentation and ensure efficient memory usage.
-
-
-
-
-visualVM | Remote connect
----------------------------------------------------
-
-/app/apihub/jdks/jdk-17.0.7/bin/java -Dcom.sun.management.jmxremote.port=9991  -Dcom.sun.management.jmxremote.ssl=false  -Dcom.sun.management.jmxremote.authenticate=false  -Xms1024m -Xmx1024m -jar integration-svc1-0.0.1-SNAPSHOT.jar
-
-
-
-
-java -Dcom.sun.management.jmxremote -Dcom.sun.management.jmxremote.port=8090 -Dcom.sun.management.jmxremote.authenticate=false -Dcom.sun.management.jmxremote.ssl=false -jar integration-svc1-0.0.1-SNAPSHOT.jar
-
-
-
-
-MaveBuildConnamd 
-mvn spring-boot:run -Dspring-boot.run.jvmArguments="-Xdebug -Dcom.sun.management.jmxremote -Dcom.sun.management.jmxremote.port=9010 -Dcom.sun.management.jmxremote.rmi.port=9010 -Dcom.sun.management.jmxremote.authenticate=false -Dcom.sun.management.jmxremote.ssl=false -Djava.rmi.server.hostname=localhost"
-
-
-
-How to set up remote visual VM
-
-We need set the below properties while running jar
-
-    -Dcom.sun.management.jmxremote=true 
-    -Dcom.sun.management.jmxremote.port=<PORT> 
-    -Dcom.sun.management.jmxremote.authenticate=false 
-    -Dcom.sun.management.jmxremote.ssl=false 
-    -Djava.rmi.server.hostname=<SEVER IP_ADDRESS> 
-    -Dcom.sun.management.jmxremote.rmi.port=<PORT>
-
-
-java -Dcom.sun.management.jmxremote=true -Dcom.sun.management.jmxremote.port=6001 -Dcom.sun.management.jmxremote.authenticate=false -Dcom.sun.management.jmxremote.ssl=false -Djava.rmi.server.hostname=192.168.251.9 -Dcom.sun.management.jmxremote.rmi.port=6001 -jar integration-svc1-0.0.1-SNAPSHOT.jar
-/app/apihub/jdks/jdk-17.0.7/bin/java -Dcom.sun.management.jmxremote=true -Dcom.sun.management.jmxremote.port=6001 -Dcom.sun.management.jmxremote.authenticate=false -Dcom.sun.management.jmxremote.ssl=false -Djava.rmi.server.hostname=172.16.254.122 -Dcom.sun.management.jmxremote.rmi.port=6001 -jar integration-svc1-0.0.1-SNAPSHOT.jar
-
-
-
-
-
-
-
 
 
 =================================================
@@ -5315,6 +5526,54 @@ java -Dcom.sun.management.jmxremote=true -Dcom.sun.management.jmxremote.port=600
 
 All jdk features
 -------------------------------------------------
+
+Java 23
+Memory Optimizations: Better memory management.
+Virtual Threads Enhancements: Improved stability for lightweight threads.
+Scoped Values: Safely share data across threads.
+String Templates (Preview): Simplify string interpolation.
+Vector API Improvements: Faster mathematical operations.
+
+Java 21 (LTS)
+Virtual Threads: Lightweight, production-ready threads.
+Pattern Matching for switch: Easier, concise switch logic.
+Record Patterns: Extract data more cleanly from records.
+Sequenced Collections API: Operations for ordered collections.
+Deprecate Finalization: Moving away from the old finalize() method.
+
+Java 17 (LTS)
+Sealed Classes: Control which classes can extend others.
+Pattern Matching for instanceof: Automatic type casting after checks.
+Records: Immutable, concise data classes.
+Switch Expressions: Switch with return values and multiple labels.
+Enhanced Random Generators: Faster and more flexible random number generation.
+Deprecation of Security Manager: Marked for removal in future releases.
+ZGC Improvements: Low-latency garbage collection.
+
+
+
+#Java 23 (Planned)
+Memory Management Optimizations: Better handling of memory.
+Virtual Threads Enhancements: More stable and refined virtual threads.
+
+#Java 22
+Scoped Values: Safely share data across threads.
+
+#Java 21 (LTS)
+Virtual Threads: Lightweight threads for faster concurrency.
+Pattern Matching for switch: Cleaner and easier switch statements.
+Record Patterns: Extract data easily from record objects.
+Sequenced Collections API: New ways to manage ordered collections.
+
+
+#Java 20
+No new stable features (focused on previews and testing).
+
+#Java 19
+No stable features (introduced many experimental features).
+
+
+
 #Java 18 Features:
 - UTF-8 by Default
 - Simple Web Server
