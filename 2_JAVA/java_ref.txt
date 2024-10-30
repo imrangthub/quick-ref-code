@@ -6074,9 +6074,67 @@ Proper tuning and monitoring are essential to optimize thread usage in a Spring 
 
 
 
+A Http Request process: Responsibilities at Each Step (With JVM Status):
++----------------------------+---------------------------------------------------------------+-----------------------------------------------------------+
+| Component                  | Responsibility                                                | JVM Status                                                |
++----------------------------+---------------------------------------------------------------+-----------------------------------------------------------+
+| Client (Browser/Postman)   | Sends an HTTP GET request to the server.                      | N/A – Outside JVM                                         |
+| Tomcat Server              | Receives the request and delegates to DispatcherServlet.      | Thread allocated from pool (Runnable).                    |
+| DispatcherServlet (Spring) | Matches the request to the appropriate controller.  			 | Uses Spring context (Singleton beans) from heap.          |
+| Controller                 | Handles the request and calls the service layer.    			 | Temporary HTTP request/response objects created.          |
+| Service Layer              | Contains business logic and interacts with the repository.	 | Service bean reused, objects held in JVM heap.            |
+| Repository (JPA)           | Converts method calls into SQL queries using JPA.    		 | JPA session creates short-lived query objects in heap.    |
+| Hibernate                  | Translates between SQL and Java objects.           		     | Query cache checked if enabled; new entities stored.      |
+| MySQL Database             | Executes the SQL query and returns the result set.  			 | JVM thread waits/block until query completes.             |
+| Service Layer              | Receives the employee object from the repository.   			 | Employee object allocated in heap.                        |
+| Controller                 | Sends the response back to the DispatcherServlet.   			 | JSON serialization creates short-lived objects.           |
+| Tomcat Server              | Sends the final HTTP response back to the client.   			 | Thread terminated or returned to pool. GC collects temporary objects. |
++----------------------------+---------------------------------------------------------------+-----------------------------------------------------------+
 
 
 
+Detailed Communication Flow: Tomcat → DispatcherServlet
+-------------------------------------------------------------
+1. HTTP Request Received by Tomcat:
+   - Tomcat listens on a specific port (default: 8080) for incoming HTTP requests.
+   - Each request is processed in a separate thread (from Tomcat's thread pool).
+
+2. Request Handling in Tomcat:
+   - Tomcat wraps the HTTP request into an HttpServletRequest object, which follows the Java Servlet API specification.
+
+3. Dispatching to Spring's DispatcherServlet:
+   - Tomcat identifies the target servlet (in this case, DispatcherServlet) by analyzing the URL mapping.
+   - Spring Boot registers DispatcherServlet as the default servlet when the application starts.
+   - Tomcat forwards the request to DispatcherServlet by invoking the service() method defined in the HttpServlet class.
+   - Tomcat forwards requests to Spring's DispatcherServlet using Java Servlet API mechanisms.
+
+4. DispatcherServlet Processes the Request:
+   - DispatcherServlet inspects the request URL, selects the appropriate controller, and returns the response to Tomcat.
+
+5. Tomcat Sends the Response Back:
+   - After the controller processes the request, the response is returned to Tomcat.
+   - Tomcat sends the final HTTP response back to the client (e.g., browser or API consumer).
+
+
+
+
+DispatcherServlet registration is essential in both embedded and external Tomcat setups because it serves as the entry point for all HTTP requests in Spring.
+In embedded Tomcat, registration is done automatically by Spring Boot using programmatic bean registration.
+In external Tomcat, registration must be defined manually in web.xml or by extending SpringBootServletInitializer.
+Whether embedded or external, Tomcat and Spring work together inside the JVM to route requests and process them properly.
+
+
+
+
+How Tomcat Manages Multiple Applications (WAR Files)?
+-----------------------------------------------------------
+By default, Tomcat runs all applications on the same port (e.g., 8080). 
+All applications run on the same port (default: 8080).
+Each application is distinguished by its context path (like /app1, /app2).
+
+Example:
+	Place app1.war in /webapps/ → Available at http://localhost:8080/app1.
+	Place app2.war in /webapps/ → Available at http://localhost:8080/app2.
 
 
 
