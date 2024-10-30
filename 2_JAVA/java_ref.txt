@@ -5996,6 +5996,90 @@ Scope:
 
 
 
+@Transactional
+==============================================
+The @Transactional annotation in Spring Boot is used to manage transactions. 
+It ensures that a group of operations (like multiple database queries) are executed within a transaction 
+boundary — either all of them succeed or all of them fail (rollback).
+
+
+@Transactional works at both method level and class level, and the differences between them.
+
+
+1. @Transactional at Method Level
+	When applied at the method level, the transaction applies only to that specific method.
+
+2. @Transactional at Class Level
+	When applied at the class level, all public methods of the class will be wrapped in a transaction by default.
+	Private, protected, or package-private methods within the class will not be transactional unless explicitly marked.
+
+
+Important Considerations using @Transactional:
+	Proxy Mechanism in Spring:
+		Spring uses AOP proxies to manage transactions.
+		If you call a method within the same class, it won’t trigger the transactional behavior unless it 
+		is invoked from an external caller (because the proxy won't intercept internal calls).
+
+	Rollback Behavior:
+		By default, only unchecked exceptions (RuntimeException) cause a rollback.
+		You can customize the rollback behavior:
+			@Transactional(rollbackFor = Exception.class)
+			public void someMethod() {
+				// This will rollback even for checked exceptions.
+			}
+
+
+
+Important Rules for Rollback:
+---------------------------------------------
+Unchecked Exceptions (RuntimeExceptions) Cause Rollback:
+	By default, only unchecked exceptions (like RuntimeException or its subclasses) will trigger a rollback.
+	If someDatabaseCall() throws a checked exception (like IOException), the transaction will not roll back 
+	unless explicitly configured.
+
+Solution:
+@Transactional(rollbackFor = Exception.class)
+public void updateEmployeeInfo(Employee employee) {
+    employeeRepository.save(employee);
+    anotherService.someDatabaseCall();  // Even if this throws a checked exception, rollback will occur.
+}
+
+
+@Entity read only model
+----------------------------------
+@Entity
+@Table(name = "your_view_name") // Name of your database view
+@Immutable // Indicate that this entity is read-only
+
+@Immutable Annotation: This tells Hibernate that this entity is not intended to be modified. 
+While it doesn't enforce read-only behavior on the database level, it helps in signaling your intent, and 
+Hibernate may optimize access accordingly.
+
+@Transactional(readOnly = true): This annotation specifies that the method is read-only, which can improve performance
+ by avoiding unnecessary flushing of the persistence context.
+
+
+
+with out readOnly
+	Performance:
+	There may be additional overhead due to state management, including dirty checking and flushing changes to the database.
+
+With-Read only:
+	Performance:
+	Can provide performance benefits as Hibernate may skip certain operations, like dirty checking and flushing the 
+	persistence context.
+	Reduces overhead in managing the state of the entity.
+
+
+
+
+
+
+
+
+
+
+
 Overall Spring Boot Architecture
 ==============================================
 	Tomcat:
