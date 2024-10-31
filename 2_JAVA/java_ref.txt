@@ -156,6 +156,7 @@ Columns Explained:
 	#instances: The number of instances of each class that are currently alive in memory.
 	#bytes: The total amount of memory (in bytes) used by all instances of that class.
 	class name: The name of the class or type of object.
+The output will display a list of classes and their memory usage, which helps identify the classes consuming the most memory.
 
 
 
@@ -164,6 +165,40 @@ show how many class load and which class load
 
 =>jcmd PID GC.class_status
 Which class, field consume how much memory
+
+
+
+
+Java Thread Analysis
+=================================================
+=>jstack pid
+=>jstack 262119 | grep 'connect'
+Generate a Thread Dump
+
+
+=>jstack <pid> > thread_dump.txt
+Get thread dump
+Analyze Thread States:
+	RUNNABLE: Threads that are actively executing code.
+	BLOCKED: Threads waiting for a lock held by another thread.
+	WAITING: Threads waiting indefinitely for another thread to perform a particular action (e.g., Object.wait()).
+	TIMED_WAITING: Threads waiting for another thread to perform an action for up to a specified waiting time.
+
+
+=>jstack 262119 | grep 'WAITING'
+=>jstack 262119 | grep -C 2 'WAITING'
+
+
+Control Thread Counts:
+	Use -Xss to limit stack size and control thread usage:
+	-Xss512k
+
+
+
+
+=>jstack 354107 | grep 'MyCustomThread'
+get running thread
+
 
 
 
@@ -177,10 +212,12 @@ java -Dcom.sun.management.jmxremote -Dcom.sun.management.jmxremote.port=8090 -Dc
 MaveBuildConnamd 
 mvn spring-boot:run -Dspring-boot.run.jvmArguments="-Xdebug -Dcom.sun.management.jmxremote -Dcom.sun.management.jmxremote.port=9010 -Dcom.sun.management.jmxremote.rmi.port=9010 -Dcom.sun.management.jmxremote.authenticate=false -Dcom.sun.management.jmxremote.ssl=false -Djava.rmi.server.hostname=localhost"
 
+java -Dcom.sun.management.jmxremote=true -Dcom.sun.management.jmxremote.port=6001 -Dcom.sun.management.jmxremote.authenticate=false -Dcom.sun.management.jmxremote.ssl=false -Djava.rmi.server.hostname=192.168.251.9 -Dcom.sun.management.jmxremote.rmi.port=6001 -jar integration-svc1-0.0.1-SNAPSHOT.jar
+/app/apihub/jdks/jdk-17.0.7/bin/java -Dcom.sun.management.jmxremote=true -Dcom.sun.management.jmxremote.port=6001 -Dcom.sun.management.jmxremote.authenticate=false -Dcom.sun.management.jmxremote.ssl=false -Djava.rmi.server.hostname=172.16.254.122 -Dcom.sun.management.jmxremote.rmi.port=6001 -jar integration-svc1-0.0.1-SNAPSHOT.jar
+
 
 
 How to set up remote visual VM
-
 We need set the below properties while running jar
 
     -Dcom.sun.management.jmxremote=true 
@@ -190,9 +227,6 @@ We need set the below properties while running jar
     -Djava.rmi.server.hostname=<SEVER IP_ADDRESS> 
     -Dcom.sun.management.jmxremote.rmi.port=<PORT>
 
-
-java -Dcom.sun.management.jmxremote=true -Dcom.sun.management.jmxremote.port=6001 -Dcom.sun.management.jmxremote.authenticate=false -Dcom.sun.management.jmxremote.ssl=false -Djava.rmi.server.hostname=192.168.251.9 -Dcom.sun.management.jmxremote.rmi.port=6001 -jar integration-svc1-0.0.1-SNAPSHOT.jar
-/app/apihub/jdks/jdk-17.0.7/bin/java -Dcom.sun.management.jmxremote=true -Dcom.sun.management.jmxremote.port=6001 -Dcom.sun.management.jmxremote.authenticate=false -Dcom.sun.management.jmxremote.ssl=false -Djava.rmi.server.hostname=172.16.254.122 -Dcom.sun.management.jmxremote.rmi.port=6001 -jar integration-svc1-0.0.1-SNAPSHOT.jar
 
 
 
@@ -5396,14 +5430,17 @@ Determining Number Of Threads:
 ----------------------------------------------
 For CPU Intensive Tasks:
 
-	For CPU-bound tasks, You want to maximize CPU utilization without overwhelming the system with too many threads, which can lead to excessive context switching. A common rule of thumb is to use the number of CPU cores available
+	For CPU-bound tasks, You want to maximize CPU utilization without overwhelming the system with too many threads, 
+	which can lead to excessive context switching. A common rule of thumb is to use the number of CPU cores available
 
 	Real-Life Example: Video Encoding
 	Imagine you’re developing a video processing application. Video encoding is a CPU-bound task where you need to apply complex algorithms to compress a video file. You have a multi-core CPU available.
 
 	Determining the Number of Threads for CPU-Bound Tasks:
-	Count Available CPU Cores: Use Runtime.getRuntime().availableProcessors() in Java to determine the number of available CPU cores. Let's say you have 8 cores.
-	Create Thread Pool: Create a thread pool with a size close to or slightly less than the number of available CPU cores. In this case, you might choose 6 or 7 threads to leave some CPU capacity for other tasks and system processes.
+	Count Available CPU Cores: Use Runtime.getRuntime().availableProcessors() in Java to determine the number of available 
+	CPU cores. Let's say you have 8 cores.
+	Create Thread Pool: Create a thread pool with a size close to or slightly less than the number of available CPU cores. 
+	In this case, you might choose 6 or 7 threads to leave some CPU capacity for other tasks and system processes.
 
 
 
