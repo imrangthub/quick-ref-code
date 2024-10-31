@@ -25,7 +25,277 @@ Show all java running applicaton
 
 
 
-https://stackoverflow.com/questions/73676911/spring-unable-to-build-project-with-authentication-manager-bean-provided
+
+
+
+
+
+
+=================================================
+##jvm operation | JVM | JVM-MONITORING
+=================================================
+=>jps
+=>ps -fC java
+Show all java running applicaton
+
+=>jcmd pId
+Show all availabel jvm command
+
+=>java -XX:+PrintFlagsFinal
+=>java -XX:+PrintFlagsFinal -version | grep HeapSize
+Show all curretn(defautl) JVM setting with flag 
+
+
+=>jcmd 29286 VM.version
+=>jcmd 6056 VM.flags
+=>jcmd pId VM.flags
+Show runtime parameters that were used when starting for a specific Java process (Memory Unit Show In Byte)
+
+=>jstat -gc 6056
+Show garbage collection statistics, including the heap sizes.
+
+=>java -XX:+PrintFlagsFinal -version | grep HeapSize
+To find default Heap size in current java or jvm
+
+Show Memory and CPU uses by process pId
+=>top  (then press e for change mm unit)
+=>top -p pID
+=>ps -p 29286 -o rss= -o vsz= -o %mem= -o %cpu= -o comm=
+
+
+
+
+Find the Process ID (PID):
+=>jps -v
+
+Get Thread Dump:
+=>jcmd <PID> Thread.print > thread_dump.txt
+
+
+jconsole
+----------------------------------------------------
+=>jconsole
+For visual representation jvm
+
+For visualVM
+----------------------------------------------------
+Download and run it
+
+
+
+GC:
+-----------------------------------------------------
+In JDK 8 
+-verbose:gc
+
+YoungGeneartion=Eden
+OldGneration=OldGen
+jdk17
+java -Xlog:gc*:file=gc.log -jar your-application.jar
+Quick show Gurbase collecton, add this flag on VM argument
+
+
+
+
+Check JVM flag (if not set, its show default flag)
+------------------------------------------
+
+=>jinfo -flag UseAdapptiveSizePolicy pId
+=>jinfo -flag UseAdapptiveSizePolicy 224323
+Check curretn gc Policy
+
+=>jinfo -flag NewRation PID
+=>jinfo -flag NewRation 23223
+Show the ration of Young and Old Generation GC ration
+
+to set a new Ration add VM flag:
+-XX:NewRation=1
+
+
+=>jinfo -flag ServivorRation PID
+Show YouGC ration
+
+Set Servibe Ration in YGC add flag
+-XX:ServivorRation=5
+
+
+
+
+
+Java memory footprint of process | application
+=================================================
+In Jvm Runtime the primary MemoryConsumer:
+- Java Heap
+- Class Loadeing
+- JIT Compiler
+- Threads
+
+
+=>=>jps -v
+=>top -o%MEM
+Show the process info, here `RES` show the req  phical-ram taken by thie process like 5gb.
+Not all (VIRT)Virtual Memory is in Physical RAM: The amount shown in the VIRT column does not 
+mean that all of it is actively occupying physical RAM. 
+
+
+=>pmap -x pid
+Now the RES 5gb in details, show with this command.
+Every single class,jar, .os file etc. what is consume how much mamory showing using this command.
+
+
+=>jmap -histo:live pid 
+=>jmap -histo:live 26202 | grep com.imranmadbar
+=>jmap -histo:live 169638 | grep 'com.imranmadbar'
+=>jmap -histo:live 258096 | grep 'Connecti'
+=>jmap -histo:live 262119 | grep 'com.mysql.cj.jdbc.ConnectionImpl'
+=>jmap -histo:live <PID> | awk 'NR>3 {print $1, $2, $3, $4, $3/1024/1024 " MB", $3/1024/1024/1024 " GB"}'
+Find Class/package using pid show details memory uses
+
+Columns Explained:
+	num: The ranking of the class by the number of instances or memory usage (descending order).
+	#instances: The number of instances of each class that are currently alive in memory.
+	#bytes: The total amount of memory (in bytes) used by all instances of that class.
+	class name: The name of the class or type of object.
+
+
+
+=>jcmd PID VM.classloader_status
+show how many class load and which class load
+
+=>jcmd PID GC.class_status
+Which class, field consume how much memory
+
+
+
+
+VisualVM | Remote connect
+=================================================
+/app/apihub/jdks/jdk-17.0.7/bin/java -Dcom.sun.management.jmxremote.port=9991  -Dcom.sun.management.jmxremote.ssl=false  -Dcom.sun.management.jmxremote.authenticate=false  -Xms1024m -Xmx1024m -jar integration-svc1-0.0.1-SNAPSHOT.jar
+
+java -Dcom.sun.management.jmxremote -Dcom.sun.management.jmxremote.port=8090 -Dcom.sun.management.jmxremote.authenticate=false -Dcom.sun.management.jmxremote.ssl=false -jar integration-svc1-0.0.1-SNAPSHOT.jar
+
+MaveBuildConnamd 
+mvn spring-boot:run -Dspring-boot.run.jvmArguments="-Xdebug -Dcom.sun.management.jmxremote -Dcom.sun.management.jmxremote.port=9010 -Dcom.sun.management.jmxremote.rmi.port=9010 -Dcom.sun.management.jmxremote.authenticate=false -Dcom.sun.management.jmxremote.ssl=false -Djava.rmi.server.hostname=localhost"
+
+
+
+How to set up remote visual VM
+
+We need set the below properties while running jar
+
+    -Dcom.sun.management.jmxremote=true 
+    -Dcom.sun.management.jmxremote.port=<PORT> 
+    -Dcom.sun.management.jmxremote.authenticate=false 
+    -Dcom.sun.management.jmxremote.ssl=false 
+    -Djava.rmi.server.hostname=<SEVER IP_ADDRESS> 
+    -Dcom.sun.management.jmxremote.rmi.port=<PORT>
+
+
+java -Dcom.sun.management.jmxremote=true -Dcom.sun.management.jmxremote.port=6001 -Dcom.sun.management.jmxremote.authenticate=false -Dcom.sun.management.jmxremote.ssl=false -Djava.rmi.server.hostname=192.168.251.9 -Dcom.sun.management.jmxremote.rmi.port=6001 -jar integration-svc1-0.0.1-SNAPSHOT.jar
+/app/apihub/jdks/jdk-17.0.7/bin/java -Dcom.sun.management.jmxremote=true -Dcom.sun.management.jmxremote.port=6001 -Dcom.sun.management.jmxremote.authenticate=false -Dcom.sun.management.jmxremote.ssl=false -Djava.rmi.server.hostname=172.16.254.122 -Dcom.sun.management.jmxremote.rmi.port=6001 -jar integration-svc1-0.0.1-SNAPSHOT.jar
+
+
+
+
+
+
+
+JVM Tuning
+=================================================
+Each time you run a command like java -jar, it starts a new JVM instance, even though all those instances 
+come from the same JDK installed on your machine.
+
+How it Works:
+	Single JDK: The JDK provides the tools (like java command) and libraries needed to run JVMs.
+	New JVM per Command: Each time you run java -jar, a separate JVM process is created with its own memory, 
+	garbage collector, and configuration.
+
+	Isolated JVMs: These JVMs are independent, so one JVM’s settings or performance doesn’t affect the others.
+
+
+Example JVM Tuning Command
+java -Xms512m -Xmx2048m -Xss1m -XX:+UseG1GC -XX:MaxGCPauseMillis=200 -Xlog:gc*:file=gc.log:time,uptime -Dcom.sun.management.jmxremote -jar YourApplication.jar
+
+
+
+Best Practices for Running Multiple JVMs on One Host:
+Resource Management (CPU, Memory)
+	Divide Memory Appropriately:
+	Ensure that the total memory allocated to all JVMs doesn’t exceed the system’s RAM to avoid swapping.
+
+Limit CPU Usage:
+	Use taskset or cgroups (on Linux) to pin specific applications to certain CPU cores:
+	taskset -c 0-3 java -jar App1.jar
+	taskset -c 4-7 java -jar App2.jar
+
+
+4. Control Thread Counts
+	JVMs create multiple threads, which can exhaust the system’s thread pool.
+	Use -Xss to limit stack size and control thread usage:
+	-Xss512k
+
+
+5. File Descriptors and Ports
+	Each JVM uses sockets and open files. Increase ulimit to avoid "too many open files" errors:
+	ulimit -n 65536
+
+
+6. Logging Configuration
+Ensure that logs are written to different files per application to avoid conflict and manage disk space.
+Example:
+bash
+Copy code
+-Xlog:gc*:file=/var/log/app1/gc.log
+
+
+
+
+
+Running multiple JVMs on the same host requires proper resource allocation (memory, CPU, and threads), 
+different GC strategies, and monitoring tools to maintain performance. 
+
+
+
+
+Potential Issues Without Tuning:
+==============================================
+	OutOfMemoryError if multiple apps exhaust the available memory.
+		Memory Allocation:
+		Default Heap Size: The JVM sets heap size based on the host machine’s RAM (around 25% of total memory).
+		Initial Heap (-Xms): ~256 MB.
+		Max Heap (-Xmx): Up to 1/4 of available memory (in your case ~8 GB per JVM if not limited).
+	With 10 apps, the cumulative memory demand can exceed your 32 GB limit, leading to OutOfMemoryErrors or OS-level swapping.
+
+	High CPU usage due to multiple GC operations across all apps.
+	G1 GC is the default in Java 17.
+		Use G1 GC (default) or Parallel GC for CPU-heavy apps
+		java -XX:+UseParallelGC -Xms256m -Xmx512m -jar app3.jar
+
+	Too many open threads leading to "too many open files" errors.
+		Limit Thread Usage
+		Reduce stack size to prevent thread exhaustion:-Xss512k
+		java -Xss512k -jar app1.jar
+
+
+	Limit File Descriptors:
+	ulimit -n 65536
+
+
+    Monitor Your JVMs:
+		java -Dcom.sun.management.jmxremote.port=9010 -Dcom.sun.management.jmxremote -jar app1.jar
+
+Example Optimized Command for Each App:
+	java -Xms512m -Xmx1024m -Xss512k -XX:+UseG1GC -Xlog:gc*:file=gc.log:time,uptime -Dcom.sun.management.jmxremote.port=9010 -jar app1.jar
+
+
+
+
+
+
+
+
+
+
 =================================================
 #         Convater | Param  | Json                                        
 ================================================= 
@@ -4848,10 +5118,6 @@ haddop Connection:
 
 
 
-
-
-
-
 =================================================
 ##doc-java
 =================================================
@@ -4956,7 +5222,6 @@ Basic Syntax for Exception Handling:
 
 
 Java Memory Management: Key Areas
-
 =================================================
 Heap Memory
 	Definition: Area for dynamic memory allocation for objects and arrays.
@@ -4981,101 +5246,6 @@ Characteristics:
 Native Memory
 Definition: Memory allocated outside the Java heap and stack, often for JNI calls.
 	Characteristics: Not managed by Java's garbage collector.
-
-
-
-
-
-JVM Tuning
-=================================================
-Each time you run a command like java -jar, it starts a new JVM instance, even though all those instances 
-come from the same JDK installed on your machine.
-
-How it Works:
-	Single JDK: The JDK provides the tools (like java command) and libraries needed to run JVMs.
-	New JVM per Command: Each time you run java -jar, a separate JVM process is created with its own memory, 
-	garbage collector, and configuration.
-
-	Isolated JVMs: These JVMs are independent, so one JVM’s settings or performance doesn’t affect the others.
-
-
-Example JVM Tuning Command
-java -Xms512m -Xmx2048m -Xss1m -XX:+UseG1GC -XX:MaxGCPauseMillis=200 -Xlog:gc*:file=gc.log:time,uptime -Dcom.sun.management.jmxremote -jar YourApplication.jar
-
-
-
-Best Practices for Running Multiple JVMs on One Host:
-Resource Management (CPU, Memory)
-	Divide Memory Appropriately:
-	Ensure that the total memory allocated to all JVMs doesn’t exceed the system’s RAM to avoid swapping.
-
-Limit CPU Usage:
-	Use taskset or cgroups (on Linux) to pin specific applications to certain CPU cores:
-	taskset -c 0-3 java -jar App1.jar
-	taskset -c 4-7 java -jar App2.jar
-
-
-4. Control Thread Counts
-	JVMs create multiple threads, which can exhaust the system’s thread pool.
-	Use -Xss to limit stack size and control thread usage:
-	-Xss512k
-
-
-5. File Descriptors and Ports
-	Each JVM uses sockets and open files. Increase ulimit to avoid "too many open files" errors:
-	ulimit -n 65536
-
-
-6. Logging Configuration
-Ensure that logs are written to different files per application to avoid conflict and manage disk space.
-Example:
-bash
-Copy code
--Xlog:gc*:file=/var/log/app1/gc.log
-
-
-
-
-
-Running multiple JVMs on the same host requires proper resource allocation (memory, CPU, and threads), 
-different GC strategies, and monitoring tools to maintain performance. 
-
-
-
-
-Potential Issues Without Tuning:
-==============================================
-	OutOfMemoryError if multiple apps exhaust the available memory.
-		Memory Allocation:
-		Default Heap Size: The JVM sets heap size based on the host machine’s RAM (around 25% of total memory).
-		Initial Heap (-Xms): ~256 MB.
-		Max Heap (-Xmx): Up to 1/4 of available memory (in your case ~8 GB per JVM if not limited).
-	With 10 apps, the cumulative memory demand can exceed your 32 GB limit, leading to OutOfMemoryErrors or OS-level swapping.
-
-	High CPU usage due to multiple GC operations across all apps.
-	G1 GC is the default in Java 17.
-		Use G1 GC (default) or Parallel GC for CPU-heavy apps
-		java -XX:+UseParallelGC -Xms256m -Xmx512m -jar app3.jar
-
-	Too many open threads leading to "too many open files" errors.
-		Limit Thread Usage
-		Reduce stack size to prevent thread exhaustion:-Xss512k
-		java -Xss512k -jar app1.jar
-
-
-	Limit File Descriptors:
-	ulimit -n 65536
-
-
-    Monitor Your JVMs:
-		java -Dcom.sun.management.jmxremote.port=9010 -Dcom.sun.management.jmxremote -jar app1.jar
-
-Example Optimized Command for Each App:
-	java -Xms512m -Xmx1024m -Xss512k -XX:+UseG1GC -Xlog:gc*:file=gc.log:time,uptime -Dcom.sun.management.jmxremote.port=9010 -jar app1.jar
-
-
-
-
 
 
 
@@ -5113,7 +5283,8 @@ Each application can grow its heap up to a maximum of around 8GB.
 
 When use Swap memory by java:
 ---------------------------------------
-Swap usage despite available RAM can occur due to historical memory pressure, swappiness settings, long-running processes, and memory fragmentation.
+Swap usage despite available RAM can occur due to historical memory pressure, swappiness settings, long-running processes, 
+and memory fragmentation.
 Adjust the swappiness value to control swap usage.
 Clear swap space by disabling and re-enabling it if necessary.
 Optimize Java applications to ensure efficient memory usage.
@@ -5151,150 +5322,6 @@ Analyze the dump for high memory-consuming threads or blocked threads.
 
 
 
-
-
-=================================================
-JVM | jvm Monitoring | memory operation
-=================================================
-=>jps
-=>ps -fC java
-Show all java running applicaton
-
-=>jcmd pId
-Show all availabel jvm command
-
-=>java -XX:+PrintFlagsFinal
-=>java -XX:+PrintFlagsFinal -version | grep HeapSize
-Show all curretn(defautl) JVM setting with flag 
-
-
-=>jcmd 29286 VM.version
-=>jcmd 6056 VM.flags
-=>jcmd pId VM.flags
-Show runtime parameters that were used when starting for a specific Java process (Memory Unit Show In Byte)
-
-=>jstat -gc 6056
-Show garbage collection statistics, including the heap sizes.
-
-=>java -XX:+PrintFlagsFinal -version | grep HeapSize
-To find default Heap size in current java or jvm
-
-Show Memory and CPU uses by process pId
-=>top  (then press e for change mm unit)
-=>top -p pID
-=>ps -p 29286 -o rss= -o vsz= -o %mem= -o %cpu= -o comm=
-
-
-
-
-
-
-jconsole
-----------------------------------------------------
-=>jconsole
-For visual representation jvm
-
-For visualVM
-----------------------------------------------------
-Download and run it
-
-
-
-GC:
------------------------------------------------------
-In JDK 8 
--verbose:gc
-
-YoungGeneartion=Eden
-OldGneration=OldGen
-jdk17
-java -Xlog:gc*:file=gc.log -jar your-application.jar
-Quick show Gurbase collecton, add this flag on VM argument
-
-
-
-
-Check JVM flag (if not set, its show default flag)
-------------------------------------------
-
-=>jinfo -flag UseAdapptiveSizePolicy pId
-=>jinfo -flag UseAdapptiveSizePolicy 224323
-Check curretn gc Policy
-
-=>jinfo -flag NewRation PID
-=>jinfo -flag NewRation 23223
-Show the ration of Young and Old Generation GC ration
-
-to set a new Ration add VM flag:
--XX:NewRation=1
-
-
-=>jinfo -flag ServivorRation PID
-Show YouGC ration
-
-Set Servibe Ration in YGC add flag
--XX:ServivorRation=5
-
-
-
-Java memory footprint of process | application
-----------------------------------------------------
-In Jvm Runtime the primary MemoryConsumer:
-- Java Heap
-- Class Loadeing
-- JIT Compiler
-- Threads
-
-=>top -o%MEM
-Show the process info, here `RES` show the req ram phical ram taken by thie process like 5gb.
-
-=>pmap -x pid
-Now the RES 5gb in details, show with this command.
-Every single class,jar, .os file etc. what is consume how much mamory showing using this command.
-
-
-=>jmap -histo:live pid 
-=>jmap -histo:live 26202 | grep com.imranmadbar
-Find Class/package using pid
-
-
-=>jcmd PID VM.classloader_status
-show how many class load and which class load
-
-=>jcmd PID GC.class_status
-Which class, field consume how much memory
-
-
-
-
-
-TypeOfGC:
-- Serial
-  -XX:+UseSerialGC
-- Parallel
-  -XX:+UseParallelGC
-- Mostly Concurrent
-  -XX:+UseG1GC
-
-
- Vector v = new Vector();
- while (true)
- {
-     byte b[] = new byte[1048576];
-     v.add(b);
- }
-This will continuously add a 1MB byte to a vector until it runs out of memory
-
-
-
-
-
-JVM performance tuning for large applications:  benchmark, Benchmark, BENCHMARK!
-
-VM. Enable monitoring:
-common Java tooling (JVisualVM, JMX, hprof, and some JVM flags).
-
-
 GC process
 -----------------------------------------
 1. Young Generation Collection:
@@ -5315,35 +5342,7 @@ Compaction may occur to reduce fragmentation and ensure efficient memory usage.
 
 
 
-visualVM | Remote connect
----------------------------------------------------
-/app/apihub/jdks/jdk-17.0.7/bin/java -Dcom.sun.management.jmxremote.port=9991  -Dcom.sun.management.jmxremote.ssl=false  -Dcom.sun.management.jmxremote.authenticate=false  -Xms1024m -Xmx1024m -jar integration-svc1-0.0.1-SNAPSHOT.jar
-
-java -Dcom.sun.management.jmxremote -Dcom.sun.management.jmxremote.port=8090 -Dcom.sun.management.jmxremote.authenticate=false -Dcom.sun.management.jmxremote.ssl=false -jar integration-svc1-0.0.1-SNAPSHOT.jar
-
-MaveBuildConnamd 
-mvn spring-boot:run -Dspring-boot.run.jvmArguments="-Xdebug -Dcom.sun.management.jmxremote -Dcom.sun.management.jmxremote.port=9010 -Dcom.sun.management.jmxremote.rmi.port=9010 -Dcom.sun.management.jmxremote.authenticate=false -Dcom.sun.management.jmxremote.ssl=false -Djava.rmi.server.hostname=localhost"
-
-
-
-How to set up remote visual VM
-
-We need set the below properties while running jar
-
-    -Dcom.sun.management.jmxremote=true 
-    -Dcom.sun.management.jmxremote.port=<PORT> 
-    -Dcom.sun.management.jmxremote.authenticate=false 
-    -Dcom.sun.management.jmxremote.ssl=false 
-    -Djava.rmi.server.hostname=<SEVER IP_ADDRESS> 
-    -Dcom.sun.management.jmxremote.rmi.port=<PORT>
-
-
-java -Dcom.sun.management.jmxremote=true -Dcom.sun.management.jmxremote.port=6001 -Dcom.sun.management.jmxremote.authenticate=false -Dcom.sun.management.jmxremote.ssl=false -Djava.rmi.server.hostname=192.168.251.9 -Dcom.sun.management.jmxremote.rmi.port=6001 -jar integration-svc1-0.0.1-SNAPSHOT.jar
-/app/apihub/jdks/jdk-17.0.7/bin/java -Dcom.sun.management.jmxremote=true -Dcom.sun.management.jmxremote.port=6001 -Dcom.sun.management.jmxremote.authenticate=false -Dcom.sun.management.jmxremote.ssl=false -Djava.rmi.server.hostname=172.16.254.122 -Dcom.sun.management.jmxremote.rmi.port=6001 -jar integration-svc1-0.0.1-SNAPSHOT.jar
-
-
-
-
+JVM performance tuning for large applications:  benchmark, Benchmark, BENCHMARK!
 
 
 
