@@ -57,11 +57,10 @@ Show garbage collection statistics, including the heap sizes.
 =>java -XX:+PrintFlagsFinal -version | grep HeapSize
 To find default Heap size in current java or jvm
 
-Show Memory and CPU uses by process pId
 =>top  (then press e for change mm unit)
 =>top -p pID
 =>ps -p 29286 -o rss= -o vsz= -o %mem= -o %cpu= -o comm=
-
+Show Memory and CPU uses by process pId
 
 
 
@@ -151,7 +150,7 @@ Every single class,jar, .os file etc. what is consume how much mamory showing us
 =>jmap -histo:live <PID> | awk 'NR>3 {print $1, $2, $3, $4, $3/1024/1024 " MB", $3/1024/1024/1024 " GB"}'
 Find Class/package using pid show details memory uses
 
-Columns Explained:
+Columns Explained jmap command-output:
 	num: The ranking of the class by the number of instances or memory usage (descending order).
 	#instances: The number of instances of each class that are currently alive in memory.
 	#bytes: The total amount of memory (in bytes) used by all instances of that class.
@@ -5384,9 +5383,208 @@ JVM performance tuning for large applications:  benchmark, Benchmark, BENCHMARK!
 
 #thread | Java Thread Pool Optimization
 =================================================
-
 MediumLink:
 https://dip-mazumder.medium.com/how-to-determine-java-thread-pool-size-a-comprehensive-guide-4f73a4758273
+
+
+A Java Thread is like a virtual CPU that can execute your Java code - inside your Java application. 
+when a Java application is started its main() method is executed by the main thread - a special thread that is created by 
+the Java VM to run your application. 
+From inside your application you can create and start more threads which can execute parts of your 
+application code in parallel with the main thread.
+
+
+
+
+The Concept Of Multitasking:
+-------------------------------------
+Operating System accommodates users the privilege of multitasking, where users can perform multiple actions simultaneously 
+on the machine. This Multitasking can be enabled in two ways: 
+	Process-Based Multitasking 
+	Thread-Based Multitasking 
+
+1. Process-Based Multitasking (Multiprocessing)
+	In this type of Multitasking, processes are heavyweight and each process was allocated by a separate memory area. 
+	And as the process is heavyweight the cost of communication between processes is high and it takes a long time for 
+	switching between processes as it involves actions such as loading, saving in registers, updating maps, lists, etc. 
+
+2. Thread-Based Multitasking 
+	As we discussed above Threads are provided with lightweight nature and share the same address space, and the cost 
+	of communication between threads is also low. 
+	Thread communication between multiple threads at a Low Cost contributing to effective multi-tasking within 
+	a shared memory environment. 
+
+
+
+Life Cycle Of Thread:
+	New State
+	Active State
+	Waiting/Blocked State
+	Timed Waiting State
+	Terminated State
+
+
+	New: 
+		By default, a Thread will be in a new state,  in this state, code has not yet been run and the execution 
+		process is not yet initiated. 
+	Active State:
+		A Thread that is a new state by default gets transferred to Active state when it invokes the start() method, 
+		his Active state contains two sub-states namely:
+			Runnable State: In This State, The Thread is ready to run at any given time and it’s the job of the 
+				Thread Scheduler to provide the thread time for the runnable state preserved threads.
+			Running State: When The Thread Receives CPU allocated by Thread Scheduler, it transfers from the “Runnable” 
+				state to the “Running” state. and after the expiry of its given time slice session, 
+				it again moves back to the “Runnable” state and waits for its next time slice.
+	Blocked/Waiting: 
+		The thread is alive but paused, waiting for a resource or a signal.
+	Timed Waiting: 
+		The thread is paused for a specific time, like in sleep() or wait(timeout).
+	Terminated: 
+		The thread completes its task and dies.A terminated Thread means it is dead and no longer available.
+
+
+Example demonstrating a thread's life cycle:
+class MyThread extends Thread {
+    @Override
+    public void run() {
+        System.out.println("Thread is running...");
+        try {
+            Thread.sleep(1000); // Thread enters Timed Waiting state
+        } catch (InterruptedException e) {
+            System.out.println("Thread interrupted");
+        }
+        System.out.println("Thread finished execution.");
+    }
+}
+
+public class ThreadLifecycleExample {
+    public static void main(String[] args) {
+        MyThread thread = new MyThread(); // Thread is in New state
+        thread.start();                   // Thread enters Runnable state
+        try {
+            thread.join();                // Main thread waits for this thread to finish
+        } catch (InterruptedException e) {
+            System.out.println("Main thread interrupted");
+        }
+        System.out.println("Main thread finished.");
+    }
+}
+The thread goes through New, Runnable, Timed Waiting (during sleep()), and Terminated states.
+The main thread uses join() to wait, showing a typical use of the Waiting state
+
+
+
+In Java, threads can be either daemon or non-daemon:
+	Non-daemon threads ensure that MyThread continues to run independently of the main thread.
+	Daemon threads depend on the main thread's life cycle and terminate when it does.
+
+	In this example, MyThread is non-daemon, so the JVM will keep it running even after the main thread finishes:
+		MyThread thread = new MyThread();
+		thread.start();  // MyThread is a non-daemon thread by default
+
+	However, if you set MyThread as a daemon thread by calling thread.setDaemon(true); 
+	before start(), it will terminate when the main thread completes:
+		MyThread thread = new MyThread();
+		thread.setDaemon(true);  // Now MyThread will stop when the main thread finishes
+		thread.start();
+
+
+
+
+
+
+
+
+There are two ways to create a thread:
+	By extending Thread class
+	By implementing Runnable interface.
+
+	Thread thread = new Thread();
+	thread.start();
+
+This example doesn't specify any code for the thread to execute. Therfore the thread will stop again right away after it is started.
+There are two ways to specify what code the thread should execute. 
+
+The first is to create a subclass of Thread and override the run() method. 
+The second method is to pass an object that implements Runnable (java.lang.Runnable to the Thread constructor.
+
+Thread Subclass:
+------------------------------------------
+	public class MyThread extends Thread {
+		public void run(){
+		System.out.println("MyThread running");
+		}
+	}
+	MyThread myThread = new MyThread();
+	myTread.start();
+
+You can also create an anonymous subclass of Thread like this:
+  Thread thread = new Thread(){
+    public void run(){
+      System.out.println("Thread Running");
+    }
+  }
+
+  thread.start();
+
+The start() call will return as soon as the thread is started. It will not wait until the run() method is done. 
+The run() method will execute as if executed by a different CPU.
+
+
+
+Runnable Interface Implementation:
+----------------------------------------------
+public interface Runnable() {
+    public void run();
+}
+
+There are three ways to implement the Runnable interface:
+	Create a Java class that implements the Runnable interface.
+	Create an anonymous class that implements the Runnable interface.
+	Create a Java Lambda that implements the Runnable interface.
+
+
+Java Class Implements Runnable
+  public class MyRunnable implements Runnable {
+
+    public void run(){
+       System.out.println("MyRunnable running");
+    }
+  }
+
+Anonymous Implementation of Runnable
+
+Runnable myRunnable =
+    new Runnable(){
+        public void run(){
+            System.out.println("Runnable running");
+        }
+    }
+
+
+Java Lambda Implementation of Runnable	
+
+Runnable runnable =
+        () -> { System.out.println("Lambda Runnable running"); };
+
+
+
+Starting a Thread With a Runnable:
+	Runnable runnable = new MyRunnable(); // or an anonymous class, or lambda...
+	Thread thread = new Thread(runnable);
+	thread.start();
+
+
+
+
+
+
+
+
+
+
+
+
 
 
  Determining the number of CPU cores available on your server:
