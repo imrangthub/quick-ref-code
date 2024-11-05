@@ -5150,6 +5150,142 @@ haddop Connection:
 
 
 
+=================================================
+##reactive programming | Reactive programming
+=================================================
+
+Flux — From Array/List:
+	List<String> list = Arrays.asList("X", "Y", "Z").log();
+	Flux<String> fluxFromList = Flux.fromIterable(list);
+	fluxFromArray.subscribe(System.out::println);
+
+
+
+
+
+Mono & Flux:
+	Mono handles a single value or empty, while Flux handles multiple values.
+Mono: Mono.just("Hello") - Emits a single item "Hello".
+Flux: Flux.just("A", "B", "C") - Emits multiple items "A", "B", "C".
+
+
+
+
+
+What Reactive Programming  actually:
+----------------------------------------------------
+Ann wants to have a party on a Friday night. She has to invite her friends, clean the apartment, and cook dinner. 
+
+What options do we have here?
+
+	1.Ann finishes her work and calls her friends. Then she heads to the supermarket to buy food, waits in line to pay, 
+	and goes home. Once at home, she starts cooking. When dinner is ready, she cleans the apartment, gusts arrive, and 
+	most likely wait till Ann finishes all the work. The party starts later.
+
+	This is a description of a sync approach to the problem (request), as all the tasks are completed one after another. 
+	As a result, it will take a long time for the party to start.
+
+
+	2. Ann finishes her work and sends invitations to her friends. 
+	Then she orders food delivery online and heads home to clean the apartment. By the time the apartment is clean, 
+	food is delivered. Ann is having dinner without her friends.
+	This is an example of the async approach.
+
+	3. Ann finishes her work and sends invitations to her friends. She orders food delivery online and heads home to 
+	clean the apartment. She finishes cleaning and gets the delivery. 
+	But this time she waits for her friends to arrive and start the party.
+
+	The last option is a description of the reactive approach. That is to say. 
+	The RP is when you wait for async actions to complete (make a change) to proceed with further steps.
+
+
+In comparison with reactive and imperative programming:
+	 In imperative programming, you pull the data while in reactive, you push it.
+
+
+
+
+
+
+How Reactive Programming Works:
+	Define Data Streams (Observables):
+		For example, you might create a data stream for clicks on a button or a data feed from a sensor. 
+		Each stream emits data whenever there’s a new event.
+
+	Subscribe to Streams (Observers):
+		Observers subscribe to these streams. For example, a UI element might subscribe to a stream of data from an 
+		API so that it can display updated information whenever it arrives.
+
+	Apply Transformations (Operators):
+		You can use operators to transform the data before it reaches the Observers. For example, you might 
+		filter out certain values, merge multiple streams, or throttle the frequency of updates.
+
+	Handle Emissions and React to Changes:
+		When an event occurs (such as a new data item in the stream), Observers react immediately, executing their defined 
+		callback functions. This approach eliminates the need for polling, reducing CPU usage and improving responsiveness.
+
+
+Example:Stock prices Monitor App
+	1. Observables: The Stream of Stock Prices
+		Stock Price Observable: 100 -> 101 -> 102 -> 103 ...
+		Each price (100, 101, 102, etc.) is an event in this stream. This Observable is a source of data.
+
+
+	2. Observers: Subscribing to the Stock Price Stream
+		stockPriceObservable.subscribe(newPrice -> updateScreen(newPrice));
+		Here, updateScreen(newPrice) is called automatically each time a new stock price appears in the stream. 
+		We don’t have to check for new prices — we just react when they arrive.
+
+	3. Operators: Transforming the Stream
+	   stockPriceObservable
+		.filter(newPrice -> Math.abs(newPrice - previousPrice) > 1)
+		.subscribe(newPrice -> updateScreen(newPrice));
+
+
+	4. Scheduler: Controls which threads handle the filtering and screen updates.
+
+
+Traditional Polling Approach (Non-Reactive) vs Reactive Programming Solution (Event-Driven)
+-----------------------------------
+In a non-reactive setup:
+	Polling: You might set up a loop to call the API every second or few seconds, checking if the price has changed.
+	Updating the Screen: If there's a change, the app updates the screen.
+
+In a reactive setup:
+	Reactive programming, by contrast, is event-driven — it reacts to new data as soon as it arrives, 
+	without needing constant polling. In this approach:
+	Data Push Model: The system (e.g., stock price API) pushes updates whenever there is a change, instead of the app 
+		asking (polling) for updates. This way, new prices arrive immediately without unnecessary requests.
+	Observables: You create an Observable that represents the price stream, which "pushes" updates automatically 
+		when there’s a new price.
+	Automatic Screen Update: Whenever the Observable receives new data, the Observer (the screen) reacts and updates automatically.
+
+
+Reactive programmeing approach like Kfka:(Kafka vs Reactive)
+	Kafka:
+		When you need reliable event storage or replay.
+		When many services/clients need to consume the data.
+		If you need to process data asynchronously (e.g., analytics, delayed reactions).
+		If your data stream is high throughput and scalable.
+		When the app can tolerate some delay in data reception.
+		Use Push APIs (WebSockets/SSE)
+
+	Reactive:
+		When updates need to be reflected in real time.
+		For 1-to-1 or limited connections needing real-time data.
+		For immediate actions on every data change.
+		For low-latency, lightweight updates (e.g., notifications).
+		For immediate UI updates (e.g., live stock tickers).
+
+
+
+
+
+
+
+
+
+
 
 =================================================
 ##doc-java
@@ -5919,6 +6055,36 @@ Java 8 Features:
 - Unsigned Integer Arithmetic
 - Repeating annotations
 - New Date and Time API
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
