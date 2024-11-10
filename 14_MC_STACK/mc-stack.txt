@@ -667,22 +667,6 @@ services:
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 Doc
 -------------------------
 https://docs.spring.io/spring-data/redis/reference/redis/connection-modes.html
@@ -815,27 +799,26 @@ public class RedisConfig {
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 =================================================
-#Event-driven Architecture
+##Event-driven Architecture | EDA
 =================================================
 
 Event-driven Architecture alternate of loss cupling or temp-cuplinc(Synchronous communitation)
+
+Key Components of Event-driven Architecture:
+  Event Producers: Components or services that generate events based on changes in the system.
+  Event Consumers: Services that listen for and react to these events.
+  Event Brokers: Middleware that routes events from producers to consumers (e.g., Kafka, RabbitMQ).
+
+
+Example Use Case:
+Suppose an e-commerce application has the following components:
+  An Order Service that produces an event when a new order is placed.
+  A Payment Service that consumes the event to process the payment.
+  An Inventory Service that consumes the event to update stock levels.
+
+
+
 
 Two even-driven model/technology:
   1) Pub/sub model
@@ -845,12 +828,27 @@ Two even-driven model/technology:
   subscribers join later will not have acccess paset event.
 
 2)Event Streming model: this model events are writeen to a log in a sequential manner.
-Producer publish events as they occur, and these events are stored in a well-ordered fashion
-consumer have the ability to read from any part of the event stream.
+  Producer publish events as they occur, and these events are stored in a well-ordered fashion
+  consumer have the ability to read from any part of the event stream.
+
 One advantage of this model is thet events cna be replayed, allowing clients to join at 
 any time and received all past events.
 
 
+
+MQ-Types of Messaging:
+  Point to Point
+    In this type of communication, the broker sends messages to only one consumer, while the other consumers will wait till they get 
+  the messages from the broker. No consumer will get the same message.
+
+  If there are no consumers, the Broker will hold the messages till it gets a consumer (Queue based communication ). 
+  If there is more than one consumer, they may get the next message but they won’t get the same message as the other consumer.
+
+
+  Publish/Subscribe
+    In this type of communication, the Broker sends same copy of messages to all the active consumers. 
+    This type of communication is also known as Topic based communication where broker sends same message to all active 
+    consumer who has subscribed for particular Topic. 
 
 
 
@@ -860,7 +858,7 @@ any time and received all past events.
 The AMQP operates on the principales of exchanges and queues for all queue operation.
 
 RabitMQ design overview (4 actors):                              
-  publisher(producer) --> exchange ----(routes)--> queue --> subscriber(consumer)
+  publisher(producer) --------------> exchange(routes)-----------> queue ----------> subscriber(consumer)
 
 
 Installing and Run RabbitMQ: 
@@ -889,14 +887,62 @@ Now it will show Messsage(Ready)
 Received Msg from Quequ:
 Click Get Message from Quew
 
+OR
+Using console: sudo apt install rabbitmq-server
+
+Step 1:Create an Exchange:
+=>rabbitmqadmin declare exchange name=my_exchange type=direct
+=>rabbitmqadmin declare exchange name=imm-app-exc1 type=direct
+
+  First, you need to create an exchange in RabbitMQ. You can do this with the rabbitmqadmin tool.
+  name=my_exchange: The name of the exchange.
+  type=direct: The type of the exchange (you can also use fanout, topic, etc.).
+
+
+Step 2: Create a Queue
+=>rabbitmqadmin declare queue name=my_queue durable=true
+=>rabbitmqadmin declare queue name=imm-app-que1 durable=true
+  Next, declare a queue to which messages will be sent:
+  name=my_queue: The name of the queue.
+  durable=true: This makes the queue persistent, so it survives server restarts.
+
+
+Step 3: Bind the Queue to the Exchange
+=>rabbitmqadmin declare binding source=my_exchange destination=my_queue routing_key=my_routing_key
+=>rabbitmqadmin declare binding source=imm-app-exc1 destination=imm-app-que1 routing_key=imm-app-rut1
+  Now, bind the queue to the exchange:
+  source=my_exchange: The exchange we created.
+  destination=my_queue: The queue to bind.
+  routing_key=my_routing_key: A routing key for message filtering.
+
+
+Step 4: Send a Message
+=>rabbitmqadmin publish routing_key=my_routing_key exchange=my_exchange payload="Hello RabbitMQ!"
+=>rabbitmqadmin publish routing_key=imm-app-rut1 exchange=imm-app-exc1 payload="Hello RabbitMQ by imran"
+  Now, send a message to the exchange:
+  routing_key=my_routing_key: The routing key we bound the queue to.
+  exchange=my_exchange: The exchange where the message will be published.
+  payload="Hello RabbitMQ!": The message content.
+
+
+
+Step 5: Consume the Message
+=>rabbitmqadmin get queue=my_queue count=1 requeue=false
+=>rabbitmqadmin get queue=imm-app-que1 count=1
+  Finally, consume the message from the queue:
+  queue=my_queue: The name of the queue to consume from.
+  count=1: The number of messages to consume.
+  requeue=false: Whether to requeue the message after consumption (set to false to discard it after consumption).
+
+
+
 
 
 
 
 SimpleApp:
 http://localhost:8081/rabbitmq/sent-emp?empName=emp1&empId=emp001
-
-              
+  
 FanoutExchange:
 http://localhost:8083/rabbitmq/fanout/producer?exchangeName=fanout-exchange&messageData=HelloWorldMsg
 http://localhost:8084/rabbitmq/producer?empName=emp1&empId=emp001&salary=500000
@@ -909,29 +955,29 @@ http://localhost:8083/rabbitmq/direct/producer?exchangeName=direct-exchange&rout
 
 
 
-##rabitmq-doc
--------------------------------------------------
-Features of RabbitMQ:
-Connectivity Options:
-  RabbitMQ supports multiple messaging protocols and can be deployed in distributed/federated configurations to meet high availability, scalability requirements.
-Pluggable Architecture:
-  RabbitMQ allows to choose a persistence mechanism and also provides options to customize security for authentication and authorization as per the application needs.
+##RabbitMQ-doc
+=====================================================
+RabbitMQ is an open-source message broker software that facilitates communication between different services or applications. 
+It follows the Advanced Message Queuing Protocol (AMQP).
 
+In RabbitMQ, once a message is consumed and acknowledged, it is removed from the queue by default. 
 
-MQ-Types of Messaging
-
-Point to Point
-  In this type of communication, the broker sends messages to only one consumer, while the other consumers will wait till they get 
-the messages from the broker. No consumer will get the same message.
-
-If there are no consumers, the Broker will hold the messages till it gets a consumer (Queue based communication ). 
-If there is more than one consumer, they may get the next message but they won’t get the same message as the other consumer.
-
-
-Publish/Subscribe
-  In this type of communication, the Broker sends same copy of messages to all the active consumers. 
-  This type of communication is also known as Topic based communication where broker sends same message to all active 
-  consumer who has subscribed for particular Topic. 
+Core Components:
+  Broker: The RabbitMQ server that handles message delivery and manages queues.
+  Producer: Applications that send messages to RabbitMQ, publishing them to exchanges.
+  Consumer: Applications that receive messages from RabbitMQ queues to process them.
+  Queue: Buffers that store messages until consumers retrieve them.
+  Exchange: Routes messages to queues based on rules. Types include:
+    Direct: Matches routing keys exactly.
+    Fanout: Broadcasts to all queues.
+    Topic: Matches patterns in routing keys.
+    Headers: Uses headers for routing.
+  Binding: Links between exchanges and queues, defining routing rules.
+  Routing Key: Key used by producers to help exchanges route messages.
+  Virtual Hosts (vhosts): Isolated environments within RabbitMQ for secure multi-tenancy.
+  AMQP: The protocol RabbitMQ uses for message formatting and transfer.
+  Channels: Lightweight connections over a single TCP connection to handle multiple tasks.
+  Connections: Persistent TCP connections between producers/consumers and RabbitMQ.
 
 
 RabbitMQ supports several exchange types:
@@ -956,19 +1002,158 @@ RabbitMQ queue properties include:
 
 
 
+Data Types:
+RabbitMQ itself does not impose restrictions on the types of data you can send.
+RabbitMQ does not impose any limits on the type of data you send; it simply handles the data as byte arrays.
+
+
+
+
 RabbitMQ Exchange type:
 ------------------------------------------------
 Direct Exchange (One-to-One Relationship):
-  Like sending a letter to a specific person based on their address. Each message is routed to a single queue based on an exact match between the message's routing key and the queue's binding key.
+  Like sending a letter to a specific person based on their address. 
+  Each message is routed to a single queue based on an exact match between the message's routing key and the queue's binding key.
 
 Fanout Exchange (One-to-Many Relationship):
-  Like broadcasting a message on TV. Each message sent to a fanout exchange is delivered to all queues bound to that exchange, regardless of any routing keys or message attributes.
+  Like broadcasting a message on TV. Each message sent to a fanout exchange is delivered to all queues 
+  bound to that exchange, regardless of any routing keys or message attributes.
 
 Topic Exchange (One-to-Many Relationship with Conditions):
-  Like sending emails to different groups based on their interests or topics. Messages are routed to queues based on wildcard matches between routing keys and routing patterns specified by the queues. One message may be delivered to multiple queues if they match the routing pattern.
+  Like sending emails to different groups based on their interests or topics. 
+  Messages are routed to queues based on wildcard matches between routing keys and routing patterns specified by the queues. 
+  One message may be delivered to multiple queues if they match the routing pattern.
 
 Headers Exchange (One-to-Many Relationship based on Message Attributes):
-  Like sorting mail based on various attributes or metadata attached to each letter. Messages are routed to queues based on headers and their values instead of routing keys. One message may be delivered to multiple queues if their header values match the specified criteria.
+  Like sorting mail based on various attributes or metadata attached to each letter. 
+  Messages are routed to queues based on headers and their values instead of routing keys. 
+  One message may be delivered to multiple queues if their header values match the specified criteria.
+
+
+
+Message Flow in RabbitMQ:
+  Production: A producer sends a message with a specific routing key to an exchange.
+  Routing: The exchange evaluates the routing key and any associated binding rules to determine the target queue(s).
+  Queue Storage: Messages are stored in the designated queue(s) until consumed.
+  Consumption: Consumers fetch or receive messages from the queue(s) and process them.
+
+
+
+Additional Features of RabbitMQ:
+  Message Acknowledgment: Consumers acknowledge messages to RabbitMQ, confirming successful processing. 
+  If a consumer fails before acknowledgment, the message is re-queued for another consumer.
+
+  Dead Letter Exchange (DLX): Messages that cannot be processed (e.g., rejected or expired) 
+  can be sent to a DLX for special handling.
+
+  Delayed Messages: RabbitMQ supports delayed messaging, allowing messages to be held in a queue for a 
+  specific period before being delivered to consumers.
+
+  Transactional Messages: RabbitMQ can handle transactional message processing to ensure exactly-once delivery semantics.
+
+
+Features of RabbitMQ:
+Connectivity Options:
+  RabbitMQ supports multiple messaging protocols and can be deployed in distributed/federated configurations to meet 
+  high availability, scalability requirements.
+Pluggable Architecture:
+  RabbitMQ allows to choose a persistence mechanism and also provides options to customize security for 
+  authentication and authorization as per the application needs.
+
+
+
+RabbitMQ and Kafka Key Differences:
+----------------------------------------
+Message Model:
+  RabbitMQ: Traditional queuing. Messages go from producers to queues, then to consumers. 
+    Good for handling individual tasks and events.
+    Kafka: Log-based. Messages are stored in partitions, allowing consumers to replay them. 
+    Great for data streams and event history.
+
+Message Storage:
+  RabbitMQ: Short-term storage. Messages are removed after consumption.
+  Kafka: Long-term storage. Messages are kept for a set time, so consumers can reread them.
+
+Delivery Guarantees:
+  RabbitMQ: At-most-once or at-least-once delivery.
+  Kafka: Exactly-once processing for high accuracy.
+
+Throughput:
+  RabbitMQ: Low to moderate. Designed for real-time, quick responses.
+  Kafka: Very high. Handles large volumes of data smoothly.
+
+Use Cases:
+  RabbitMQ: Task queues, real-time notifications, complex routing.
+  Kafka: Data pipelines, analytics, event sourcing, log processing.
+
+Summary:
+RabbitMQ: Best for tasks and real-time applications with low to moderate message load.
+Kafka: Ideal for large data streams and when replaying event history is needed.
+
+RabbitMQ:
+  Message Retention: RabbitMQ can keep messages as long as there is no TTL set or until they are consumed, \
+  but it is optimized for short-term storage.
+  Message Size: By default, RabbitMQ can handle messages up to 128 MB, though this can be adjusted. 
+  For larger messages, external storage solutions are recommended.
+
+
+
+at-most-once, at-least-once, and exactly-once:
+  They define how many times a message can be delivered to a consumer and whether the message is guaranteed to 
+  be processed without duplicates.
+
+1. At-Most-Once Delivery
+  Definition: The message is delivered zero or one time. If there’s a failure during delivery, the message might be lost, 
+    and it will not be retried.
+  Pros:
+    Low overhead due to no retries.
+  Cons:
+    Potential message loss if a failure occurs.
+  Use case: Use when it's acceptable to lose messages occasionally, and you don’t want to risk processing the 
+    same message more than once (e.g., logging systems where missing a log entry is acceptable).
+
+2. At-Least-Once Delivery
+  Definition: The message is guaranteed to be delivered at least once, but it could be delivered multiple times 
+    in case of failures and retries.
+  Pros:
+    Message guaranteed to be processed, even in case of failure.
+  Cons:
+    Potential duplicate messages. Consumers need to handle deduplication.
+  Use case: Use when losing messages is not acceptable, but handling duplicates is manageable 
+    (e.g., payment systems where you need to ensure that every payment is processed, even if it might be processed twice).
+
+3. Exactly-Once Delivery
+  Definition: The message is guaranteed to be delivered exactly once, no more and no less, even in the event of failures and retries.
+  Pros:
+    No message loss or duplicates.
+  Cons:
+    Higher overhead and complexity, as the system needs to track and ensure that messages are not duplicated.
+  Use case: Use when both message loss and duplication are unacceptable (e.g., financial transactions, inventory 
+    systems, where you need strict message integrity).
+
+
+
+
+
+Key limitations and potential challenges:
+  Lack of Exactly-Once Semantics:
+    No Native Exactly-Once Delivery: RabbitMQ doesn’t have native support for exactly-once message 
+    delivery semantics (like Kafka does). The best you can do is at-least-once delivery, meaning 
+    a message might be delivered more than once in case of failure.
+
+  If your system has very high throughput, large message sizes, or requires strict ordering and exactly-once delivery 
+  guarantees, RabbitMQ may not be the best fit, and alternatives like Kafka or Apache Pulsar could be considered.
+
+
+
+Two Spring RabbitMQ library:
+  spring-boot-starter-amqp: is better suited for straightforward RabbitMQ integration with fine-grained 
+  control over the messaging process.
+
+  spring-cloud-starter-stream-rabbit: is more appropriate when you want a higher-level abstraction for 
+  stream-based or event-driven systems, especially when you're working in a cloud-native or microservices architecture.
+
+
 
 
 
