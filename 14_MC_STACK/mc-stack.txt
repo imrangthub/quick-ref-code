@@ -857,6 +857,15 @@ MQ-Types of Messaging:
 ================================================= 
 The AMQP operates on the principales of exchanges and queues for all queue operation.
 
+How RabbitMQ works:
+  A producer sends a message to an exchange.
+  The exchange, using a routing key (if provided) and its own type (e.g., direct, topic, fanout), decides how to route the message.
+  Bindings connect queues to the exchange. The routing key and binding determine which queues receive the message.
+  Consumers connected to those queues then consume the messages.
+  In summary, the producer sends a message to an exchange, the exchange routes it to bound queues, 
+  and the consumers of those queues consume the message.
+
+
 RabitMQ design overview (4 actors):                              
   publisher(producer) --------------> exchange(routes)-----------> queue ----------> subscriber(consumer)
 
@@ -887,8 +896,34 @@ Now it will show Messsage(Ready)
 Received Msg from Quequ:
 Click Get Message from Quew
 
+
 OR
+Command Line Tool
+=========================================
 Using console: sudo apt install rabbitmq-server
+
+=>sudo systemctl stop rabbitmq-server
+stop
+
+=>sudo systemctl start rabbitmq-server
+start
+
+
+Get a list of exchanges
+rabbitmqadmin -V test list exchanges
+
+=>rabbitmqadmin list queues vhost name node messages message_stats.publish_details.rate
+Get a list of queues, with some columns specified
+
+
+=>rabbitmqadmin -f long -d 3 list queues
+Get a list of queues, with all the detail we can take
+
+
+=>rabbitmqadmin -H myserver -u simon -p simon list vhosts
+Connect to another host as another user
+
+
 
 Step 1:Create an Exchange:
 =>rabbitmqadmin declare exchange name=my_exchange type=direct
@@ -1009,26 +1044,95 @@ RabbitMQ does not impose any limits on the type of data you send; it simply hand
 
 
 
-RabbitMQ Exchange type:
-------------------------------------------------
+RabbitMQ Exchange type with Example
+==========================================
 Direct Exchange (One-to-One Relationship):
   Like sending a letter to a specific person based on their address. 
   Each message is routed to a single queue based on an exact match between the message's routing key and the queue's binding key.
+
+Example:
+  rabbitmqadmin declare exchange name=direct_exchange type=direct
+  rabbitmqadmin declare queue name=direct_queue
+  rabbitmqadmin declare binding source=direct_exchange destination=direct_queue routing_key=direct_key
+Set Up Exchange and Queue:
+
+  rabbitmqadmin publish exchange=direct_exchange routing_key=direct_key payload="Message for direct_queue"
+Producer (Publish a Message)
+
+  rabbitmqadmin get queue=direct_queue requeue=false
+Consumer (Get a Message)
+  rabbitmqadmin get queue=direct_queue  ackmode=ack_requeue_false
+Consumer (Get a Message), with Auto-Acknowledgment
+
+  
+
 
 Fanout Exchange (One-to-Many Relationship):
   Like broadcasting a message on TV. Each message sent to a fanout exchange is delivered to all queues 
   bound to that exchange, regardless of any routing keys or message attributes.
 
+Example:
+  Set Up Exchange and Queues.
+    rabbitmqadmin declare exchange name=fanout_exchange type=fanout
+    rabbitmqadmin declare queue name=fanout_queue1
+    rabbitmqadmin declare queue name=fanout_queue2
+    rabbitmqadmin declare binding source=fanout_exchange destination=fanout_queue1
+    rabbitmqadmin declare binding source=fanout_exchange destination=fanout_queue2
+  
+  Producer (Publish a Message)
+    rabbitmqadmin publish exchange=fanout_exchange routing_key="" payload="Broadcast message to all fanout queues"
+
+  Consumer (Get a Message from Each Queue)
+    rabbitmqadmin get queue=fanout_queue1 count=2
+    rabbitmqadmin get queue=fanout_queue2
+    rabbitmqadmin get queue=fanout_queue2 ackmode=ack_requeue_false count=2
+
+
+
 Topic Exchange (One-to-Many Relationship with Conditions):
   Like sending emails to different groups based on their interests or topics. 
   Messages are routed to queues based on wildcard matches between routing keys and routing patterns specified by the queues. 
-  One message may be delivered to multiple queues if they match the routing pattern.
+  One message may be delivered to multiple queues if they match the routing pattern..
+
+Example:
+  Set Up Exchange and Queues
+    rabbitmqadmin declare exchange name=topic_exchange type=topic
+    rabbitmqadmin declare queue name=topic_queue_logs
+    rabbitmqadmin declare queue name=topic_queue_errors
+    rabbitmqadmin declare binding source=topic_exchange destination=topic_queue_logs routing_key="logs.*"
+    rabbitmqadmin declare binding source=topic_exchange destination=topic_queue_errors routing_key="*.error"
+
+  Producer (Publish a Message)
+    rabbitmqadmin publish exchange=topic_exchange routing_key="logs.info" payload="Log message for topic_queue_logs"
+    rabbitmqadmin publish exchange=topic_exchange routing_key="app.error" payload="Error message for topic_queue_errors"
+
+  Consumer (Get a Message from Each Queue)
+    rabbitmqadmin get queue=topic_queue_logs requeue=false
+    rabbitmqadmin get queue=topic_queue_errors requeue=false
+
 
 Headers Exchange (One-to-Many Relationship based on Message Attributes):
   Like sorting mail based on various attributes or metadata attached to each letter. 
   Messages are routed to queues based on headers and their values instead of routing keys. 
   One message may be delivered to multiple queues if their header values match the specified criteria.
+Example:
+  Set Up Exchange and Queues:
+    rabbitmqadmin declare exchange name=headers_exchange type=headers
+    rabbitmqadmin declare queue name=headers_queue
+    rabbitmqadmin declare binding source=headers_exchange destination=headers_queue arguments='{"x-match": "all", "format": "pdf", "type": "report"}'
 
+  Producer (Publish a Message with Headers)
+    curl -i -u guest:guest -H "content-type:application/json" -X POST \
+          -d'{"properties": {"headers": {"format": "pdf", "type": "report"}}, "routing_key": "", "payload": "PDF Report message", "payload_encoding": "string"}' \
+          http://localhost:15672/api/exchanges/%2f/headers_exchange/publish
+  Consumer (Get a Message):
+    rabbitmqadmin get queue=headers_queue requeue=false
+
+
+
+
+Routing keys are essential for routing messages from the exchange to the appropriate queues.
+Consumers don’t use routing keys when consuming from a queue; they consume messages already routed to that queue.
 
 
 Message Flow in RabbitMQ:
@@ -1036,6 +1140,14 @@ Message Flow in RabbitMQ:
   Routing: The exchange evaluates the routing key and any associated binding rules to determine the target queue(s).
   Queue Storage: Messages are stored in the designated queue(s) until consumed.
   Consumption: Consumers fetch or receive messages from the queue(s) and process them.
+
+
+Auto-Acknowledgment vs. Manual Acknowledgment: 
+  In auto-ack mode, messages are automatically acknowledged as soon as they’re delivered to the consumer, 
+  regardless of whether they’re processed successfully. 
+  In manual-ack mode, messages are only acknowledged when the consumer explicitly sends an ack.
+
+
 
 
 
@@ -1059,6 +1171,24 @@ Connectivity Options:
 Pluggable Architecture:
   RabbitMQ allows to choose a persistence mechanism and also provides options to customize security for 
   authentication and authorization as per the application needs.
+
+
+
+
+Multiple Quequ/Consumer Behavior with Fanout Exchange:
+--------------------------------------------------------------------
+fanout:
+  Broadcast to All Queues: A fanout exchange sends each message to all bound queues, ignoring routing keys.
+  Independent Consumption: Consumers on each queue receive their own copy of every message, allowing different processing.
+  Load Balancing: If multiple consumers are on the same queue, messages are distributed in a round-robin fashion.
+
+Example Scenario:
+Suppose you have a fanout exchange called logs_exchange with three queues bound to it: error_logs, info_logs, and debug_logs. 
+Any message sent to logs_exchange will be delivered to all three queues:
+  Queue 1 (error_logs): Might have consumers processing error messages.
+  Queue 2 (info_logs): Could have consumers processing general info logs.
+  Queue 3 (debug_logs): Could have consumers handling debug logs.
+
 
 
 
