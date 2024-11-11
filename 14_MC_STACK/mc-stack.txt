@@ -907,6 +907,8 @@ stop
 
 =>sudo systemctl start rabbitmq-server
 start
+=>sudo systemctl disable rabbitmq-server
+
 
 
 Get a list of exchanges
@@ -969,21 +971,6 @@ Step 5: Consume the Message
   count=1: The number of messages to consume.
   requeue=false: Whether to requeue the message after consumption (set to false to discard it after consumption).
 
-
-
-
-
-
-
-SimpleApp:
-http://localhost:8081/rabbitmq/sent-emp?empName=emp1&empId=emp001
-  
-FanoutExchange:
-http://localhost:8083/rabbitmq/fanout/producer?exchangeName=fanout-exchange&messageData=HelloWorldMsg
-http://localhost:8084/rabbitmq/producer?empName=emp1&empId=emp001&salary=500000
-
-DirectExchange:
-http://localhost:8083/rabbitmq/direct/producer?exchangeName=direct-exchange&routingKey=finance&messageData=HelloWorldMSG
 
 
 
@@ -1297,7 +1284,7 @@ Kafka: Ideal for large data streams and when replaying event history is needed.
 ##kafka | Message broker  | KAFKA                                        
 ================================================= 
 MyUnntuKafkaLocation: 
-cd /usr/local/kafka
+cd /usr/local/kafka/bin
 sudo systemctl daemon-reload
 sudo systemctl start zookeeper
 sudo systemctl start kafka
@@ -1340,11 +1327,10 @@ bash kafka-topics.sh --version
 
 
 
-OfsetExpolar
-kafkalytic-intelejidea-pluging
+OfsetExpolar with IntelejIdea:
+  kafkalytic-intelejidea-pluging
 
 Install and Run KafKa:
-
 $ tar -xzf kafka_2.13-3.6.1.tgz
 $ cd kafka_2.13-3.6.1
 
@@ -1371,12 +1357,13 @@ Start up the Kafka Broker
 
 
 Create a topic
-=>./kafka-topics.sh --create --topic test-topic1 --bootstrap-server localhost:9092 --partitions 2 --replication-factor 1
+=>./kafka-topics.sh --create --topic test-topic1 --bootstrap-server localhost:9092 --partitions 3 --replication-factor 1
+
 =>./kafka-topics.sh --list  --bootstrap-server localhost:9092
 =>./kafka-topics.sh --delete --topic test-topic1  --bootstrap-server localhost:9092
 
 =>./kafka-topics.sh --bootstrap-server localhost:9092 --describe
-=>./kafka-topics.sh --bootstrap-server localhost:9092 --describe --topic test-topic
+=>./kafka-topics.sh --bootstrap-server localhost:9092 --describe --topic test-topic1
 Check topic and its partation
 
 
@@ -1388,13 +1375,15 @@ Create Console Producer
 Create Console Consumer
 =>./kafka-console-consumer.sh --bootstrap-server localhost:9092 --topic test-topic --from-beginning
 =>./kafka-console-consumer.sh --bootstrap-server localhost:9092 --topic test-topic1 --from-beginning   --partition 1
-=>./kafka-console-consumer.sh --bootstrap-server localhost:9092 --topic test-topic1 --from-beginning   --partition 1 --offset 23
+
+=>./kafka-console-consumer.sh --bootstrap-server localhost:9092 --topic test-topic1 --partition 2 --offset 70 --max-messages 5
 =>./kafka-console-consumer.sh --bootstrap-server localhost:9092 --topic test-topic --from-beginning -property "key.separator= - " --property "print.key=true"
+Consume with specific partation and offset, also with key
 
 If a consumer don not mentation any partition onlhy topic name then the consumer reveived all pertation message,
 If consumer run with a partition number with topic then this consumer only reveived this mentationed  partition message.
 SameAs:
-If producer mentation partition number, its only gose to those partition, if not kafka defined a pertation number.
+If producer mentation partition number, its only gose to those partition if not, kafka defined a pertation number.
 
 
 
@@ -1407,8 +1396,16 @@ Consumer Groups:
 Show all topic,pertation,and offset number
 
 =>./kafka-console-consumer.sh --bootstrap-server localhost:9092 --topic test-topic1 --group my-consumer-group
-=>./kafka-console-consumer.sh --bootstrap-server localhost:9092 --topic test-topic1  --from-beginning
-=>./kafka-console-consumer.sh --bootstrap-server 172.16.8.132:9092 --topic topic_sms_notification  --from-beginning
+=>./kafka-console-consumer.sh --bootstrap-server localhost:9092 --topic test-topic1  --from-beginning --group my-consumer-group
+=>./kafka-console-consumer.sh --bootstrap-server 172.16.8.132:9092 --topic topic_sms_notification  --from-beginning --group my-consumer-group
+
+
+=>./kafka-consumer-groups.sh --bootstrap-server localhost:9092 --describe --group my-consumer-group
+Check offset number current
+
+The --group and --partition options cannot be used together in kafka-console-consumer.sh. 
+This is because --group is for consuming messages as part of a consumer group (which involves automatic partition assignment), 
+while --partition is used for manual partition assignment.
 
 
 
@@ -1541,8 +1538,6 @@ Manual Offset Commit
 ------------------------------------------------
 Here's an example of how to handle manual offset commits in a Kafka listener:
 
-java
-Copy code
 @KafkaListener(topics = "${apihub-kafka.producing-trigger-list:topic_sms_notification}", groupId = "${apihub-kafka.consumer.group-id:default-group}")
 public void listen(APIHUBKafkaNotifyRecord record, Acknowledgment ack) {
     try {
@@ -1681,21 +1676,24 @@ https://gale.udemy.com/course/apache-kafka-for-developers-using-springboot/learn
 udTut-repo:
 https://github.com/dilipsundarraj1/kafka-for-developers-using-spring-boot-v2/blob/main/SetUpKafkaDocker.md#set-up-broker-and-zookeeper
 
+Kafka 4 main Component:
+  Broker: Stores and manages data.Its a java process, can incress horizontally.
+  ZooKeeper: Manages Kafka cluster's configuration and coordination.
+  Producer: Sends data to Kafka. Communicate with broker with tcp. Producer create record with partiation number attributes.
+  Consumer: Receives data from Kafka
+
+Replication Factor: Replication factor make partation duplicate.
+  If replication-factor=2 then every partation has two copy if three then the number of copy is 3.
 
 
-
-
-Events,records,message:
-  An event records the fact that "something happened" in the world or in your business. 
+Events,Records,Message:
+  An event/records the fact that "something happened" in the world or in your business. 
   It is also called record or message. an event has a key, value, timestamp, and optional metadata headers. 
 
-
-
 Topics:
-  Events are organized and durably stored in topics. 
+  Events are stored in a organized and durably storage, this is called topics. 
   A topic is similar to a folder in a filesystem, and the events are the files in that folder. 
   Events are durably stored in Kafka, they can be read as many times and by as many consumers as you want. 
-
 
 Here's an example event:
   Event key: "Alice"
@@ -1711,12 +1709,11 @@ after which old events will be discarded.
 
 
 Partition:
-  Partitation is where message linve inside the topic.
-  Each partition is independent of each other.
+  Partitation is where message linve inside the topic. Each partition is independent of each other.
+  Each Partition is an Order, inmmutable sequence of record.
+  Each record is assigned a sequential number called offset.
+  Order is guaranteed only at the partition leve.
 
-Each Partition is an Order, inmmutable sequence of record.
-Each record is assigned a sequential number called offset.
-Order is guaranteed only at the partition leve.
 
 Topics are partitioned, meaning a topic is spread over a number of "buckets" located on different Kafka brokers. 
 This distributed placement of your data is very important for scalability because it allows client applications to 
@@ -1726,28 +1723,24 @@ Events with the same event key (e.g., a customer or vehicle ID) are written to t
 and Kafka guarantees that any consumer of a given topic-partition will always read that partition's events in exactly the same 
 order as they were written.
 
-Each partition can be considered an ordered sequence of records. These partitions allow for parallel processing of messages 
-within a topic.
+Each partition can be considered an ordered sequence of records. 
+These partitions allow for parallel processing of messages within a topic.
 
 
 Partition offset:
   Each partitioned message has a unique sequence id called as offset.
-  Offsets only link to a single message within a single partition of a topic.There is no easy way to find the offset for a single message.
+  Offsets only link to a single message within a single partition of a topic.
+  There is no easy way to find the offset for a single message.
 
-Partitation is where message linve inside the topic.
-Each partition is independent of each other.
 
-Each Partition is an Order, inmmutable sequence of record.
-Each record is assigned a sequential number called offset.
-Order is guaranteed only at the partition leve.
 
 
 
 
 Kafka-Records:
   exist within Kafka topics. When data is produced to Kafka, it is encapsulated into records and appended to the 
-  log (partition) of the respective topic. Each record consists of a key, a value, headers, timestamp, offset,
-   and possibly other metadata. 
+  log (partition) of the respective topic. 
+  Each record consists of a key, a value, headers, timestamp, offset, and possibly other metadata. 
 
 
 Record comprises several components:
@@ -1777,32 +1770,30 @@ Consumer Groups How  Works:
   Rebalancing: When a consumer leaves the group (due to failure or scaling down), Kafka rebalances the remaining consumers 
   so that each partition is still covered.
 
-  Offset Storage: Kafka stores the offset of the last consumed message for each partition in the group. 
+  Offset Storage: 
+    Kafka stores the offset of the last consumed message for each partition in the group. 
   This can be stored in Kafka itself or in an external storage.
 
 
 
 
 Producer:
-By default, the producer doesn't care about partitioning. 
-You have the option to use a customized partitioner to have a better control, but it's totally optional.
-
+  By default, the producer doesn't care about partitioning. 
+  You have the option to use a customized partitioner to have a better control, but it's totally optional.
 
 Consumer:
- Consumers join (or create if they're alone) a consumer group to share load. 
- No two consumers in the same group will ever receive the same message.
+  Consumers join (or create if they're alone) a consumer group to share load. 
+  No two consumers in the same group will ever receive the same message.
 
 Since this is a queue with an offset for each partition, is it responsibility of the consumer to specify which messages 
-it wants to read? Does it need to save its state?
-Yes, consumers save an offset per topic per partition. This is totally handled by Kafka, no worries about it.
+it wants to read? 
+
 
 
 What happens when a message is deleted from the queue?
 If a consumer ever request an offset not available for a partition on the brokers (for example, due to deletion), 
 it enters an error mode, and ultimately reset itself for this partition to either the most recent or the oldest message available 
 (depending on the auto.offset.reset configuration value), and continue working.
-
-
 
 
 
@@ -1824,17 +1815,17 @@ Consumer have three option to reload
 
 
 
-Kafka 4 main Component:
-  Broker: Stores and manages data.Its a java process, can incress horizontally.
-  ZooKeeper: Manages Kafka cluster's configuration and coordination.
-  Producer: Sends data to Kafka. Communicate with broker with tcp. Producer create record with partiation number attributes.
-  Consumer: Receives data from Kafka
 
+If the producer sends a message that cannot be mapped: a deserialization error will occur. By default:
+--------------------------------------------------------
+Retrying: Kafka will attempt to reprocess the message a configurable number of times if you have set up 
+retries in the KafkaListener container configuration.
 
+Error Handling: Without a custom error handler, the default behavior is for the listener to stop consuming from the topic. 
+To handle this more gracefully, you can configure an error handler that processes or skips bad messages.
 
-Replication Factor: Replication factor factor make partation duplicate.
-  If replication-factor=2 then every partation has two copy if three then the number of copy is 3.
-
+Dead-Letter Topic: You can also set up a dead-letter topic where failed messages can be sent for later analysis. 
+This is typically configured in the @KafkaListener container factory or using custom error handlers.
 
 
 
