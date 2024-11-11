@@ -1191,35 +1191,6 @@ Any message sent to logs_exchange will be delivered to all three queues:
 
 
 
-
-RabbitMQ and Kafka Key Differences:
-----------------------------------------
-Message Model:
-  RabbitMQ: Traditional queuing. Messages go from producers to queues, then to consumers. 
-    Good for handling individual tasks and events.
-    Kafka: Log-based. Messages are stored in partitions, allowing consumers to replay them. 
-    Great for data streams and event history.
-
-Message Storage:
-  RabbitMQ: Short-term storage. Messages are removed after consumption.
-  Kafka: Long-term storage. Messages are kept for a set time, so consumers can reread them.
-
-Delivery Guarantees:
-  RabbitMQ: At-most-once or at-least-once delivery.
-  Kafka: Exactly-once processing for high accuracy.
-
-Throughput:
-  RabbitMQ: Low to moderate. Designed for real-time, quick responses.
-  Kafka: Very high. Handles large volumes of data smoothly.
-
-Use Cases:
-  RabbitMQ: Task queues, real-time notifications, complex routing.
-  Kafka: Data pipelines, analytics, event sourcing, log processing.
-
-Summary:
-RabbitMQ: Best for tasks and real-time applications with low to moderate message load.
-Kafka: Ideal for large data streams and when replaying event history is needed.
-
 RabbitMQ:
   Message Retention: RabbitMQ can keep messages as long as there is no TTL set or until they are consumed, \
   but it is optimized for short-term storage.
@@ -1229,6 +1200,7 @@ RabbitMQ:
 
 
 at-most-once, at-least-once, and exactly-once:
+===============================================
   They define how many times a message can be delivered to a consumer and whether the message is guaranteed to 
   be processed without duplicates.
 
@@ -1283,6 +1255,37 @@ Two Spring RabbitMQ library:
   spring-cloud-starter-stream-rabbit: is more appropriate when you want a higher-level abstraction for 
   stream-based or event-driven systems, especially when you're working in a cloud-native or microservices architecture.
 
+
+
+
+
+RabbitMQ vs Kafka Key Differences:
+----------------------------------------
+Message Model:
+  RabbitMQ: Traditional queuing. Messages go from producers to queues, then to consumers. 
+    Good for handling individual tasks and events.
+    Kafka: Log-based. Messages are stored in partitions, allowing consumers to replay them. 
+    Great for data streams and event history.
+
+Message Storage:
+  RabbitMQ: Short-term storage. Messages are removed after consumption.
+  Kafka: Long-term storage. Messages are kept for a set time, so consumers can reread them.
+
+Delivery Guarantees:
+  RabbitMQ: At-most-once or at-least-once delivery.
+  Kafka: Exactly-once processing for high accuracy.
+
+Throughput:
+  RabbitMQ: Low to moderate. Designed for real-time, quick responses.
+  Kafka: Very high. Handles large volumes of data smoothly.
+
+Use Cases:
+  RabbitMQ: Task queues, real-time notifications, complex routing.
+  Kafka: Data pipelines, analytics, event sourcing, log processing.
+
+Summary:
+RabbitMQ: Best for tasks and real-time applications with low to moderate message load.
+Kafka: Ideal for large data streams and when replaying event history is needed.
 
 
 
