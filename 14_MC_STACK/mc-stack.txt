@@ -1222,6 +1222,20 @@ at-most-once, at-least-once, and exactly-once:
 
 
 
+ReTry and ErrorHandeling:
+=====================================
+Automatic Retries with Exponential Backoff:
+  Configured with RetryInterceptorBuilder for automatic retry attempts with exponential backoff.
+
+Dead-Letter Exchange: 
+  Routes failed messages to a separate DLX queue for analysis.
+
+Custom Error Handling: 
+  Allows for detailed error handling logic using ConditionalRejectingErrorHandler.
+
+
+
+
 
 
 Key limitations and potential challenges:
@@ -1816,16 +1830,17 @@ Consumer have three option to reload
 
 
 
+Retrying, Error Handling and Dead-Letter Topic:
+=====================================================
 If the producer sends a message that cannot be mapped: a deserialization error will occur. By default:
---------------------------------------------------------
-Retrying: Kafka will attempt to reprocess the message a configurable number of times if you have set up 
-retries in the KafkaListener container configuration.
+  Retrying: Kafka will attempt to reprocess the message a configurable number of times if you have set up 
+  retries in the KafkaListener container configuration.
 
-Error Handling: Without a custom error handler, the default behavior is for the listener to stop consuming from the topic. 
-To handle this more gracefully, you can configure an error handler that processes or skips bad messages.
+  Error Handling: Without a custom error handler, the default behavior is for the listener to stop consuming from the topic. 
+  To handle this more gracefully, you can configure an error handler that processes or skips bad messages.
 
-Dead-Letter Topic: You can also set up a dead-letter topic where failed messages can be sent for later analysis. 
-This is typically configured in the @KafkaListener container factory or using custom error handlers.
+  Dead-Letter Topic: You can also set up a dead-letter topic where failed messages can be sent for later analysis. 
+  This is typically configured in the @KafkaListener container factory or using custom error handlers.
 
 
 
