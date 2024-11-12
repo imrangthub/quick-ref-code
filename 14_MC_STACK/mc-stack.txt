@@ -1387,7 +1387,8 @@ Create Console Producer
 =>./kafka-console-producer.sh --broker-list localhost:9092 --topic test-topic --property "key.separator=-" --property "parse.key=true"
 
 Create Console Consumer
-=>./kafka-console-consumer.sh --bootstrap-server localhost:9092 --topic test-topic --from-beginning
+=>./kafka-console-consumer.sh --bootstrap-server localhost:9092 --topic test-topic1
+=>./kafka-console-consumer.sh --bootstrap-server localhost:9092 --topic test-topic1 --from-beginning
 =>./kafka-console-consumer.sh --bootstrap-server localhost:9092 --topic test-topic1 --from-beginning   --partition 1
 
 =>./kafka-console-consumer.sh --bootstrap-server localhost:9092 --topic test-topic1 --partition 2 --offset 70 --max-messages 5
@@ -1400,6 +1401,7 @@ SameAs:
 If producer mentation partition number, its only gose to those partition if not, kafka defined a pertation number.
 
 
+{"id":"101", "name":"Java"}
 
 
 
@@ -1832,6 +1834,11 @@ Consumer have three option to reload
 
 Retrying, Error Handling and Dead-Letter Topic:
 =====================================================
+https://dev.to/tharindufdo/introduction-to-apache-kafka-error-handling-springboot-in4
+
+{"id":"101", "name":"Java"}
+
+
 If the producer sends a message that cannot be mapped: a deserialization error will occur. By default:
   Retrying: Kafka will attempt to reprocess the message a configurable number of times if you have set up 
   retries in the KafkaListener container configuration.
@@ -1842,6 +1849,12 @@ If the producer sends a message that cannot be mapped: a deserialization error w
   Dead-Letter Topic: You can also set up a dead-letter topic where failed messages can be sent for later analysis. 
   This is typically configured in the @KafkaListener container factory or using custom error handlers.
 
+
+
+Message Deserialization error not retry by kafka !
+----------------------------------------------------
+If the consumer cannot deserialize the message correctly, it might treat it as null and fail immediately, 
+not triggering retries as expected. Ensure the message format and deserialization are correct.
 
 
 
