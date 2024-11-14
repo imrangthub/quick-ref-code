@@ -6,6 +6,28 @@
 
 
 
+http-server :
+=================================================
+http-server is a simple, lightweight command-line tool for quickly serving static files over HTTP.
+It’s commonly installed globally via Node.js and NPM.
+
+
+=>npm install -g http-server
+Install
+
+=>http-server
+=>http-server -p 3000
+Navigate to the directory containing the files you want to serve.
+
+
+=>http-server -a localhost -p 8181 -c-1
+Disables caching by setting the cache-control headers to no-cache.(-c-1)
+
+
+
+
+
+
 
 
 
@@ -36,12 +58,144 @@ Common Type UI/UX:
 
 
 
+=================================================
+##JavaScript | java script | js | ECMAScript
+=================================================
+
+The latest version of JavaScript is ECMAScript 2023 (ES14).
+
+JavaScript:
+    Initially developed for browsers, JavaScript now also runs on servers with the help of environments 
+    like Node.js, making it a versatile language for both client-side and server-side development.
+
+
+
+Example of JavaScript in Action:
+index.html:
+<!DOCTYPE html>
+<html>
+<head>
+    <title>JavaScript Example</title>
+</head>
+<body>
+    <button id="myButton">Click me</button>
+    <p id="displayText">Hello, World!</p>
+    <script src="script.js"></script>
+</body>
+</html>
+
+
+JavaScript (script.js):
+document.getElementById("myButton").addEventListener("click", function() {
+    document.getElementById("displayText").textContent = "Button Clicked!";
+});
+
+
+
+
+
 
 =================================================
 ##npm (Node Package Manager) | npm
 =================================================
 NPM (Node Package Manager) is the default package manager for Node.js, a JavaScript runtime. 
 It’s used for installing, sharing, and managing dependencies in JavaScript and Node.js applications.
+
+
+Install Bootstrap and jQuery using npm:
+-------------------------------------------------
+=>npm init -y
+=>npm install bootstrap
+=>npm install jquery
+Insert the project, This will add Bootstrap and jQuery as dependencies in your package.json file.
+
+
+
+Import Bootstrap and jQuery in Your Project index.html:
+--------------------------------------------------
+For index.js or app.js:
+    import 'bootstrap/dist/css/bootstrap.min.css'; // Import Bootstrap CSS
+    import 'bootstrap/dist/js/bootstrap.bundle.min.js'; // Import Bootstrap JS (includes Popper.js)
+    import $ from 'jquery'; // Import jQuery
+
+
+ForHtml:
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Hello World</title>
+  <!-- Link Bootstrap CSS -->
+  <link rel="stylesheet" href="node_modules/bootstrap/dist/css/bootstrap.min.css">
+</head>
+<body>
+  <div class="container">
+    <h1 class="text-center">Hello, World!</h1>
+    <button class="btn btn-primary" onclick="$('#myModal').modal('show')">Open Modal</button>
+    
+    <!-- Modal -->
+    <div class="modal" id="myModal" tabindex="-1">
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title">Example Modal</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+          </div>
+          <div class="modal-body">
+            <p>This is a Bootstrap modal using jQuery.</p>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Link jQuery -->
+  <script src="node_modules/jquery/dist/jquery.min.js"></script>
+  <!-- Link Bootstrap JS (includes Popper.js) -->
+  <script src="node_modules/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
+
+
+
+
+Run a Simple HTTP Server:
+=>npm install -g http-server
+=>http-server -p 8080
+
+
+Build the Project for Production Deployment:
+=>npm run build
+This command will create a dist (or similar output) folder with optimized files (HTML, CSS, JavaScript) that are ready for deployment. 
+
+
+
+Configure Nginx to Serve the Application:
+server {
+    listen 80;
+    server_name localhost;
+
+    root /path/to/your/project/dist; # Change this path to your build folder
+
+    index index.html;
+
+    location / {
+        try_files $uri /index.html; # This ensures all routes fall back to index.html (for single-page apps)
+    }
+
+    # Optional: Enable gzip compression for faster loading
+    gzip on;
+    gzip_types text/plain text/css application/json application/javascript text/xml application/xml application/xml+rss text/javascript;
+}
+
+=>sudo nginx -t
+=>sudo systemctl reload nginx
+GoTo: http://localhost:80
+
 
 
 
@@ -58,8 +212,8 @@ Node project:
 
 
 What is Node.js?
-Node.js is a runtime environment that allows JavaScript to run on the server, outside the browser. 
-Created in 2009, Node.js uses the V8 JavaScript engine from Google Chrome to execute JavaScript code. 
+Node.js is an open-source, cross-platform runtime environment that allows you to run JavaScript code outside of a web browser. 
+Built on Google Chrome’s V8 JavaScript engine, Node.js is primarily used for building fast, scalable server-side and network applications.
 It is known for being asynchronous and event-driven, which allows it to handle multiple requests at once, 
 making it highly efficient for scalable network applications.
 
@@ -78,67 +232,184 @@ Key Features of Node.js:
 
 
 
-
-Example: Building a Simple API with Node.js
-
-Initialize the Project: Create a new project directory and initialize NPM.
-    mkdir my-node-project
-    cd my-node-project
-    npm init -y
-
+Express:
+    Express is a lightweight, flexible web application framework for Node.js. 
+    It simplifies the process of building server-side applications by adding higher-level tools 
+    and abstractions on top of Node's core HTTP module, making it easier to handle routing, middleware, and other 
+    web functionalities.
 
 Install Express: Express is a popular framework for building APIs with Node.js.
     npm install express
 
-Create an API: Write a simple API in a file called app.js.
+
+
+
+
+Run a Node.js app:
+------------------------------------
+=>mkdir my-node-project
+=>cd my-node-project
+=>npm init -y
+
+=>touch app.js
+
+=>node app.js
+Run Your Node.js Application
+Open a web browser and go to http://127.0.0.1:3000/.
+
+
+Node.js without Express:(app.js)
+    const http = require('http');
+    const server = http.createServer((req, res) => {
+    if (req.url === '/' && req.method === 'GET') {
+        res.writeHead(200, { 'Content-Type': 'text/plain' });
+        res.end('Hello, World!');
+    } else if (req.url === '/about' && req.method === 'GET') {
+        res.writeHead(200, { 'Content-Type': 'text/plain' });
+        res.end('About page');
+    } else {
+        res.writeHead(404, { 'Content-Type': 'text/plain' });
+        res.end('Not Found');
+    }
+    });
+
+    server.listen(3000, () => {
+    console.log('Server running on http://localhost:3000');
+    });
+
+OR
+Node.js with Express:(app.js)
     const express = require('express');
     const app = express();
 
     app.get('/', (req, res) => {
-        res.send('Hello, World!');
+    res.send('Hello, World!');
+    });
+
+    app.get('/about', (req, res) => {
+    res.send('About page');
     });
 
     app.listen(3000, () => {
-        console.log('Server is running on port 3000');
+    console.log('Server running on http://localhost:3000');
     });
-
-Run the Server:
-    node app.js
-http://localhost:3000
-
-
 
 
 
 
 
 =================================================
-##JavaScript | java script | js | ECMAScript
+##angular | Angular
+=================================================
+NPM manages packages, Node.js provides a runtime for development tools, and TypeScript is the language used for Angular code.
+
+Angular main components of Angular are:
+    Modules (@NgModule): Organize the application into cohesive blocks of functionality.
+    Components: Define views and the logic behind the UI, consisting of TypeScript, HTML, and CSS.
+    Services: Contain business logic and provide reusable data across components.
+    Directives: Modify the behavior or appearance of DOM elements.
+
+How Angular work:
+    Webpack builds the code.
+    Node.js runs the development server.
+    NPM manages dependencies and libraries.
+    Angular CLI provides commands to interact with the development environment.
+
+
+
+
+
+Example-Hello-World:
+----------------------------------
+Step 1: Install Node.js and NPM
+=>node -v
+=>npm -v
+
+=>npm install -g @angular/cli
+=>ng version
+
+=>ng new hello-world-app
+Create project
+
+=>cd hello-world-app
+=>ng serve
+Run the project: http://localhost:4200
+
+
+
+Update:the main app component file: src/app/app.component.ts.
+import { Component } from '@angular/core';
+
+@Component({
+  selector: 'app-root',
+  templateUrl: './app.component.html',
+  styleUrls: ['./app.component.css']
+})
+export class AppComponent {
+  title = 'Hello World';
+}
+
+
+Update: src/app/app.component.html
+<h1>{{ title }}</h1>
+
+
+
+
+
+=================================================
+##react | React
 =================================================
 
-The latest version of JavaScript is ECMAScript 2023 (ES14).
-
-JavaScript:
-    Initially developed for browsers, JavaScript now also runs on servers with the help of environments 
-    like Node.js, making it a versatile language for both client-side and server-side development.
+React follows a similar setup to Angular in terms of development tools, but it has its own set of tools and concepts.
+React relies heavily on Webpack (through Create React App or custom configurations) to bundle the application, Node.js for the development server, and NPM for managing libraries and tools.
 
 
 
-Example of JavaScript in Action:
-    HTML:
-        <!DOCTYPE html>
-        <html>
-        <head>
-            <title>JavaScript Example</title>
-        </head>
-        <body>
-            <button id="myButton">Click me</button>
-            <p id="displayText">Hello, World!</p>
-            <script src="script.js"></script>
-        </body>
-        </html>
+How react work:
+    React Components: Define the UI and logic.
+    JSX: Allows HTML-like syntax inside JavaScript.
+    Node.js: Runs the development server and handles backend tasks.
+    Webpack: Bundles and optimizes code (via Create React App or custom setup).
+    NPM: Manages dependencies (libraries and tools).
+    React CLI (Create React App): Sets up the project with default configurations for building and running the app.
 
-JavaScript (script.js):
-    document.getElementById("myButton").addEventListener("click", function() {
-        document.getElementById("displayText").textContent = "Button Clicked!";
-    });
+
+
+
+Example-Hello-World:
+----------------------------------
+Step 1: Install Node.js and NPM
+=>node -v
+=>npm -v
+
+=>npx create-react-app hello-world-app
+Set Up a New React Project
+
+
+
+=>cd hello-world-app
+=>npm start
+Start the Development Server: http://localhost:3000
+
+
+Open and Mofify:  App.js file in the src folder for Hello-World
+
+=>vi src/App.js
+
+import React from 'react';
+
+function App() {
+  return (
+    <div className="App">
+      <h1>Hello, World!</h1>
+    </div>
+  );
+}
+export default App;
+
+
+goto: http://localhost:3000
+
+
+
