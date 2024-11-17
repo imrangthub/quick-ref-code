@@ -60,3 +60,1446 @@
 9) product app issue finding
 10) micaroservice error regiliency, concurrency user, 
 11) Optomize sisgin for new application application layer and db layer
+
+
+
+
+
+
+
+=================================================
+sr.Software Engineer | req skills
+=================================================     
+
+
+1	Core Java	
+=================================================
+Java Class, Fields, Methods and Objects
+Ans:
+    Class: A blueprint for creating objects, defining their properties and behaviors.
+    Fields: Variables declared inside a class to represent the properties of objects.
+    Methods: Functions within a class that define the behavior of its objects.
+    Objects: Instances of a class, created using the new keyword, representing real-world entities.
+
+
+Access Modifiers, Constructor, Object creation
+    Access Modifiers
+        Control the visibility of classes, fields, and methods:
+        Public: Accessible from anywhere.
+        Private: Accessible only within the same class.
+        Protected: Accessible within the same package and by subclasses.
+            The protected access modifier allows access to members within the same package and 
+            by subclasses (even if they are in different packages).
+            Restrictions: Non-subclass classes outside the package1 cannot directly access protected members.
+            Examlple:
+                Parent.java class has a protected method: protected void displayMessage();
+                Now a chile cllas in differenet package not able to accessa this displayMessage(); createing new object of Parent class
+                But able to access with in Child class if Clild class extedn Prant class as:
+                // Child class in package2
+                    package package2;
+
+                    import package1.Parent;
+
+                    public class Child extends Parent {
+                        public void show() {
+                            displayMessage(); // Accessible because Child is a subclass of Parent
+                        }
+                    }
+            But not as:
+                // Parent parent = new Parent();
+                // parent.displayMessage(); // Compilation error: displayMessage() is not accessible directly.
+        Default (no modifier): Accessible within the same package.
+    Constructor
+        A special method used to initialize objects.
+        It has the same name as the class.
+        It has no return type.
+        Can be overloaded.
+
+
+Java Record
+Ans:
+    A record is a special kind of class introduced in Java 14 (Preview) and finalized in Java 16.
+    It is designed to simplify the creation of immutable data objects by automatically generating constructors, 
+    getters, toString(), equals(), and hashCode() methods.
+
+    Example a Record:
+    public class Main {
+        public static void main(String[] args) {
+            // Creating a record object
+            Person person = new Person("Alice", 30);
+
+            // Accessing fields (no 'get' prefix)
+            System.out.println(person.name()); // Output: Alice
+            System.out.println(person.age());  // Output: 30
+
+            // Implicitly generated toString
+            System.out.println(person); // Output: Person[name=Alice, age=30]
+        }
+    }
+
+    // Record declaration
+    public record Person(String name, int age) {}
+
+    Limitations
+        Cannot extend other classes (records are implicitly final).
+        Cannot have mutable fields.
+        Designed only for data-carrying classes, not behavior-rich objects.
+
+
+OOP in Java - Abstraction, Polymorphism, Encapsulation, Inheritance
+Ans:
+    Abstraction:
+        Hides implementation details and shows only the essential features.
+        Achieved using abstract classes and interfaces.
+    Polymorphism
+        Allows one entity to take many forms (e.g., method overriding and overloading).
+        Example (Method Overriding):
+    Encapsulation
+        Restricts direct access to fields and methods using access modifiers.
+        Achieved by using private fields with public getters and setters.
+
+    Inheritance
+        Allows a class to inherit fields and methods from a parent class.
+        Achieved using the extends keyword.
+
+
+Java String, StringBuilder, String Buffer, Text Block
+String:
+    Immutable sequence of characters.
+    Operations like concatenation create new objects.
+    Example:
+    String str = "Hello";
+    str = str + " World"; // Creates a new String object
+
+StringBuilder:
+    Mutable and faster for single-threaded operations.(Not thread-safe)
+    Ideal for frequent string modifications.
+    Suitable for single-threaded operations.
+Example:
+    StringBuilder sb = new StringBuilder("Hello");
+    sb.append(" World"); // Modifies the same object
+
+StringBuffer:
+    Mutable and thread-safe (synchronized).
+    Slower than StringBuilder due to synchronization overhead.
+    Suitable for multi-threaded operations.
+    Example:
+        StringBuffer sb = new StringBuffer("Hello");
+        sb.append(" World");
+Both StringBuilder and StringBuffer are mutable classes for handling strings.
+
+Text Block:
+Introduced in Java 15, it simplifies multiline string creation.
+Uses triple quotes (""") for better readability.
+Example:
+java
+Copy code
+String json = """
+              {
+                  "name": "Alice",
+                  "age": 30
+              }
+              """;
+
+
+String Litterals, String creating with new keyworkd:
+Ans:
+    String Literals:
+        Strings created using double quotes ("") are stored in the String Pool.
+        If a literal already exists in the pool, the same reference is returned.
+        Memory efficient.
+    Example:
+        String s1 = "Hello"; // Stored in String Pool
+        String s2 = "Hello"; // Same reference as s1
+        System.out.println(s1 == s2); // Output: true
+
+    String with new Keyword:
+        Creates a new String object in heap memory, bypassing the String Pool.
+        Even if the content is the same, a new reference is created.
+    Example:
+        String s1 = new String("Hello"); // New object in the heap
+        String s2 = new String("Hello"); // Another new object
+        System.out.println(s1 == s2); // Output: false (different references)
+
+
+
+String constant pool, String comparison, Trim String:
+Ans:
+Key Points:
+    When a new string literal is created, Java first checks the pool to see if an equivalent string already exists.
+    If it exists, the new reference points to the existing object. Otherwise, a new object is created in the pool.
+    Strings created using new are stored in the heap, not in the pool.
+. String Comparison
+
+There are two ways to compare strings in Java:
+    Using ==:
+        Compares references, not content.
+        Only returns true if both references point to the same object.
+    Using .equals():
+        Compares the content of the strings.
+        Returns true if the actual text of the strings is identical
+
+Trim String:
+    It does not modify the original string (strings are immutable in Java).
+    Returns a new String without leading or trailing spaces.
+
+
+
+
+String matching, searching, convertion wiht valueOf(), String Concatanation
+Ans:
+String Matching:
+    equals(): Checks content equality (case-sensitive).
+    equalsIgnoreCase(): Ignores case during comparison.
+
+String Searching:
+    contains(): Checks if a string contains a sequence of characters.
+    indexOf(): Returns the index of the first occurrence of a substring.
+    startsWith() / endsWith(): Checks if the string starts/ends with a specific substring.
+
+Conversion with valueOf():
+    Converts data types (e.g., integers, floats, objects) into a String.
+    Example:
+        int num = 42;
+        String str = String.valueOf(num); // Converts int to String
+        System.out.println(str); // "42"
+
+String Concatenation:
+    Neither + nor .concat() modifies the original strings (s1, s2). 
+    Instead, they both create new String objects to store the result.
+
+Correct! StringBuilder and StringBuffer do not create a new String object for every modification.
+
+When +:
+    Handles implicit type conversions.
+    Readability is a priority: The + operator is more intuitive and easier to read.
+    Simple concatenations: When you're concatenating a few strings or literals.
+    Mixed types: When you need to concatenate non-String types (e.g., numbers, booleans).
+
+Use .concat() (String Method):
+    Explicit string operations are needed: Use .concat() when you want to emphasize you're working strictly with String objects.
+    Performance is not critical: Though .concat() is slightly faster than +.
+
+
+
+Why is the character array preferred over string for storing confidential information?
+Ans:
+    Sensitive data stored in a String (e.g., passwords) remains in memory until garbage collection clears it, which may not happen immediately.
+    This increases the risk of memory exposure (e.g., through memory dumps).
+
+    With a char[], you have full control over how long the data stays in memory and can clear it immediately after use.
+    A String's contents are outside your control and might stay in memory longer.
+    Memory Dump Risks
+
+    Strings are often stored in the String Pool (if created as literals), making them accessible for a longer duration.
+    Memory analysis tools can reveal sensitive information if it’s stored in a String.
+
+
+
+
+Replace character in string, Format String
+Ans:
+    Using replace()
+    Replaces all occurrences of a character or substring with another.
+    Using replaceAll()
+    Replaces all substrings that match a regular expression.
+    Using replaceFirst()
+    Replaces the first substring that matches a regular expression.
+
+    Use the String.format() method to format strings with placeholders.
+        %s: String
+        %d: Integer
+        %f: Floating-point number
+
+    Alignment and Padding:
+        Left-align: %-n
+        Right-align: %n
+
+
+
+
+Pass by Value and Pass by Reference:
+Ans:
+    Pass by value
+        A copy of the variable's value is passed to the function, and the function works on the copy. 
+        Changes made to the variable within the function will not affect the original variable.
+
+    Pass by reference
+        The memory address of the variable is shared with the function argument. 
+        This means that any changes made to the argument within the function will also affect the original variable.
+
+In Java, everything is passed by value.
+Java is always pass by value, but for objects, the "value" passed is the reference to the same object. 
+This is why it sometimes feels like "pass by reference."
+
+Pass by Value for Primitives:
+    For primitive types (int, double, etc.), the value is copied directly.
+    Changes to the parameter inside the method do not affect the original value.
+    Example:
+        public class Example {
+            public static void main(String[] args) {
+                int x = 10;
+                modifyPrimitive(x);
+                System.out.println("x after method call: " + x); // Output: 10
+            }
+
+            public static void modifyPrimitive(int num) {
+                num = 20; // Modifies the local copy, not the original
+            }
+        }
+
+Pass by Value for Objects:
+    For objects, the value of the reference (the memory address) is passed, not the object itself.
+    This means the method receives a copy of the reference, pointing to the same object.
+    You can modify the object's internal state, but you cannot reassign the original reference in the caller's scope.
+
+Example: Modifying Object State:
+        class Person {
+            String name;
+        }
+
+        public class Example {
+            public static void main(String[] args) {
+                Person person = new Person();
+                person.name = "Alice";
+                modifyObject(person);
+                System.out.println("Name after method call: " + person.name); // Output: Bob
+            }
+
+            public static void modifyObject(Person p) {
+                p.name = "Bob"; // Modifies the object itself
+            }
+        }
+Example: Reassigning Reference:
+    public class Example {
+        public static void main(String[] args) {
+            Person person = new Person();
+            person.name = "Alice";
+            reassignReference(person);
+            System.out.println("Name after method call: " + person.name); // Output: Alice
+        }
+
+        public static void reassignReference(Person p) {
+            p = new Person(); // Reassigns the local reference, not the original one
+            p.name = "Bob";
+        }
+    }
+
+
+Java Date & Time:
+Ans:
+    LocalDate, LocalTime, LocalDateTime (Java 8+)
+    For working with date, time, and both.
+    Format and parse with DateTimeFormatter.
+    Instant for timestamps, Duration for time differences.
+    Date and Calendar for older date handling(Legacy Classes)
+
+
+
+Java Interfaces and Abstract class, Java Enum, Java Iterator and Iterable
+Ans:
+    Interface
+        An interface is a reference type, similar to a class, that can contain only constants, method signatures, default methods, static methods, and nested types.
+        All methods in an interface are implicitly abstract (unless defined as default or static).
+        An interface defines a contract that a class must follow if it implements the interface, but it does not provide the method implementations.
+        A class can implement multiple interfaces, allowing for more flexible design (multiple inheritance).
+
+    Abstract Class:
+        An abstract class is a class that cannot be instantiated on its own and is intended to be subclassed.
+        It can contain both abstract methods (methods without a body) and concrete methods (methods with a body).
+        It can have fields, constructors, and method implementations, unlike interfaces.
+        A subclass of an abstract class must implement all the abstract methods unless it is also abstract.
+        Abstract classes are typically used to represent "shared" functionality for a group of related classes.
+
+    Enum
+        An enum in Java is a special class that represents a group of constants (unchangeable variables).
+        Enums are more powerful than simple constants because they can have fields, methods, and constructors.
+        They are implicitly final and cannot be subclassed.
+        Enums are useful when you have a fixed set of related constants, such as days of the week, directions, or status codes.
+
+
+Java Object class and its mehtod - wait(), notify(), toString(), equals(), hashCode() (Java Object Class and Its Methods)
+Ans:
+    In Java, every class implicitly inherits from the Object class, which is the root of the class hierarchy. 
+    The Object class provides several methods that are fundamental for all Java objects.
+    wait() and notify(): Used in multi-threading for inter-thread communication.
+    toString(): Helps in providing a string representation of the object.
+    equals() and hashCode(): Important for object comparison and hashing in collections. When you override equals(), you must also override hashCode() to maintain consistency.
+
+
+Object cloning in java, why it is needed ?
+Ans:
+    Object cloning in Java is the process of creating an exact copy of an object, usually with the same values and attributes, 
+    but in a different memory location. Java provides the clone() method, which is a part of the Object class.
+When you need to duplicate objects but retain their independent state.
+In situations where object immutability is required for safety, but cloning allows temporary modifications without altering the original object.
+
+Shallow vs. Deep Cloning
+    Shallow cloning: Only the references to objects are copied, so changes to the nested objects 
+    in the clone will affect the original object.
+    Deep cloning: Involves recursive cloning of nested objects, ensuring that the clone is fully independent of the original object.
+
+Cloneable Interface
+    Implementing the Cloneable interface is not enough for deep cloning. You often need to manually override clone() to 
+    handle deep cloning if required.
+
+Exceptions
+    Cloning can lead to CloneNotSupportedException if the class does not implement Cloneable. 
+    The clone() method must also handle exceptions appropriately.
+
+Object Cloning and Performance
+    Cloning is a relatively expensive operation. In some cases, creating a new object manually might be more efficient 
+    than cloning, especially for complex objects with deep structures.
+
+
+
+Java Collection Framework - List, Set, Map, ArrayList, HashMap, Hashtable, HashSet, LinkedList and different operations on collection
+
+Java Collection Framework:
+    The Java Collection Framework provides a set of interfaces and classes to handle groups of objects. 
+    It is part of the java.util package and includes 
+    three main types  interfaces, with concrete classes to handle groups of objects: List, Set, and Map.
+
+        1. List
+        What: Ordered, allows duplicates.
+        Example: ArrayList, LinkedList.
+        List<String> list = new ArrayList<>();
+        list.add("A");
+        list.add("B");
+
+        2. Set
+        What: Unordered, no duplicates.
+        Example: HashSet.
+        Set<String> set = new HashSet<>();
+        set.add("A");
+        set.add("B");
+
+        3. Map
+        What: Key-value pairs, unique keys.
+        Example: HashMap.
+        Map<String, Integer> map = new HashMap<>();
+        map.put("A", 1);
+        map.put("B", 2);
+
+
+
+
+How does the size of ArrayList grow dynamically? And also state how it is implemented internally.
+Internal Implementation of ArrayList
+    Backing Array:
+        Internally, an ArrayList uses an array to store its elements.
+        The array is initialized with a default size (10 elements) when the ArrayList is created.
+
+    Growth Mechanism:
+        When an element is added and the current capacity is full, a new array is created with twice the size of the original array.
+        This means if the initial size is 10, it will grow to 20, 40, 80, etc.
+
+    Array Resize Process:
+        Step 1: Create a new array with double the size.
+        Step 2: Copy all elements from the old array to the new array.
+        Step 3: Update the reference to point to the new array.
+
+    Efficiency Considerations:
+        This dynamic resizing ensures that the ArrayList can grow without worrying about its size upfront.
+        Although resizing can be an expensive operation (since it involves copying elements), 
+        it happens infrequently because the growth is exponential (doubling each time).
+
+
+How HashMap works internally and how to minimize hash collision
+Ans:
+Summary of How HashMap Works:
+    Uses an array of buckets to store key-value pairs.
+    Keys are hashed to determine the bucket index.
+    Handles collisions with a linked list or red-black tree.
+    Operations like put(), get(), and remove() rely on efficient bucket indexing and hashing.
+
+Ways to Minimize Collisions:
+    Use a good hashCode() implementation.
+    Ensure proper equals() method implementation.
+    Adjust the load factor and initial capacity to reduce frequent resizing.
+
+
+
+Sorting Java Collections, Comparing Java Custom Object, Comparable and Comperator
+Sorting a List
+    Using Collections.sort():
+    Sorts a list based on the natural ordering of its elements or a custom comparator.
+    The list must implement the Comparable interface, or you can use a custom Comparator.
+Using List.sort():
+    Available from Java 8, this method is equivalent to Collections.sort() but is called directly on the list.
+Sorting a Set
+    TreeSet: Automatically sorts elements upon insertion using the natural ordering or a comparator.
+
+Comparing Java Custom Objects:
+    To sort custom objects, you need to define how two objects are compared. 
+    You can achieve this through Comparable or Comparator interfaces.
+
+1) Comparable Interface:
+    What: Used when you want the class to have a natural order.
+    How: Implement the compareTo(T o) method in your class, which compares the current object (this) with the provided object (o).
+    Purpose: Define the default sorting behavior of the object.
+
+    class Person implements Comparable<Person> {
+        String name;
+        int age;
+        
+        public Person(String name, int age) {
+            this.name = name;
+            this.age = age;
+        }
+        
+        @Override
+        public int compareTo(Person other) {
+            return this.age - other.age;  // Sort by age in ascending order
+        }
+    }
+
+    List<Person> people = new ArrayList<>();
+    people.add(new Person("Alice", 30));
+    people.add(new Person("Bob", 25));
+    Collections.sort(people);  // Sorts by age (natural order)
+
+The compareTo() method returns:
+    Negative if this is less than other.
+    Zero if they are equal.
+    Positive if this is greater than other.
+
+2. Comparator Interface
+    What: Used when you want to define multiple sorting orders or external comparison logic.
+    How: Implement the compare(T o1, T o2) method in the comparator.
+    Purpose: Allows sorting based on different fields or criteria without modifying the object itself.
+    class Person {
+        String name;
+        int age;
+        
+        public Person(String name, int age) {
+            this.name = name;
+            this.age = age;
+        }
+    }
+
+    class NameComparator implements Comparator<Person> {
+        @Override
+        public int compare(Person p1, Person p2) {
+            return p1.name.compareTo(p2.name);  // Sort by name alphabetically
+        }
+    }
+
+    List<Person> people = new ArrayList<>();
+    people.add(new Person("Alice", 30));
+    people.add(new Person("Bob", 25));
+    people.sort(new NameComparator());  // Sorts by name
+
+Custom sorting using Comparator:
+Comparator can also be used with Collections.sort() or List.sort().
+
+
+
+
+
+Lamda Expression, Stream API, Functional Interface, Functional Programming
+Lambda Expression:
+    Introduced in Java 8, allows writing anonymous functions (compact code for functional-style programming).
+    Syntax: (parameters) -> {expression/body}.
+    Simplifies code, especially for functional interfaces.
+    Example:
+    List<Integer> numbers = Arrays.asList(1, 2, 3, 4);
+    numbers.forEach(n -> System.out.println(n));  // Print each number
+
+Stream API:
+    Introduced in Java 8, processes collections in a functional style.
+    Provides operations like filter(), map(), reduce(), sorted().
+    Supports lazy evaluation and promotes clean, declarative code.
+    Example:
+    List<Integer> numbers = Arrays.asList(1, 2, 3, 4);
+    List<Integer> evens = numbers.stream().filter(n -> n % 2 == 0).collect(Collectors.toList());
+
+Functional Interface:
+    An interface with one abstract method (e.g., Runnable, Callable).
+    Annotated with @FunctionalInterface for clarity.
+    Enables use of lambda expressions.
+    Example:
+    @FunctionalInterface
+    interface Calculator {
+        int calculate(int x, int y);
+    }
+    Calculator add = (a, b) -> a + b;  // Lambda implementing the interface
+
+Functional Programming:
+    A paradigm where computations are treated as evaluations of functions.
+    Focuses on immutability, pure functions, and statelessness.
+    Promoted in Java via lambda expressions, streams, and functional interfaces.
+    Benefits:
+        Cleaner, concise code.
+        Facilitates parallelism with streams.
+        Reduces side effects and enhances maintainability.
+
+
+Stream API - terminal operations, non terminal operations, Pure Function, Higher Order Funciton, 
+Function Composition, different built-in functional interface, different types of aggregation, build your own collector.
+Ans:
+Stream API
+    Non-Terminal Operations (Intermediate):
+        Return a Stream for further processing.
+        Lazy evaluated (executed only when a terminal operation is applied).
+        Examples: filter(), map(), flatMap(), sorted(), distinct().
+
+    Terminal Operations:
+        Trigger stream execution, producing a result (e.g., value, collection, side-effect).
+        Examples: collect(), reduce(), forEach(), count(), findFirst().
+
+Pure Function:
+    A function where the output depends only on its input and has no side effects (e.g., doesn't modify external state).
+    Ensures immutability and referential transparency.
+    Example: n -> n * 2 is pure since it depends solely on n.
+
+Higher-Order Function
+    A function that either:
+    Takes another function as input (e.g., map() accepts a lambda).
+    Returns a function as output.
+    Example:
+    Function<Integer, Function<Integer, Integer>> add = x -> y -> x + y;
+
+Function Composition:
+    Combines multiple functions into a single function.
+    In Java, achieved using methods like andThen() and compose() in Function.
+    Example:
+    Function<Integer, Integer> doubleIt = x -> x * 2;
+    Function<Integer, Integer> addTen = x -> x + 10;
+    Function<Integer, Integer> composed = doubleIt.andThen(addTen);  // (x * 2) + 10
+
+Built-in Functional Interfaces:
+    Predicate: boolean test(T t) for conditions (filter() uses it).
+    Example: Predicate<Integer> isEven = n -> n % 2 == 0;.
+    Function: R apply(T t) for transformations (map() uses it).
+    Consumer: void accept(T t) for side effects (forEach() uses it).
+    Supplier: T get() for supplying values.
+    BiFunction, UnaryOperator, BinaryOperator, etc., for specific use cases.
+
+Aggregation in Streams:
+    Summing: sum(), Collectors.summingInt().
+    Averaging: Collectors.averagingInt().
+    Counting: count().
+    Reducing: reduce().
+    Example:
+    int sum = numbers.stream().reduce(0, Integer::sum);  // Sum all nu
+
+
+Create custom functional interface and use it with Stream API
+Ans:
+    Creating a Custom Functional Interface:
+        Define a functional interface with a single abstract method.
+        Annotate it with @FunctionalInterface for clarity.
+
+Custom Functional Interface Simplified Example
+Here’s a streamlined example of a custom functional interface and its use in the Stream API:
+
+@FunctionalInterface
+interface Transformer<T, R> {
+    R transform(T input);  // Single abstract method
+}
+
+public class CustomInterfaceExample {
+    public static void main(String[] args) {
+        // List of numbers
+        List<Integer> numbers = List.of(1, 2, 3, 4, 5);
+
+        // Custom interface implementation using lambda
+        Transformer<Integer, String> toStringTransformer = n -> "Number: " + n;
+
+        // Use Stream API with the custom interface
+        List<String> transformedList = numbers.stream()
+                                              .map(toStringTransformer::transform) // Use custom method
+                                              .toList();
+
+        // Print the result
+        transformedList.forEach(System.out::println);
+    }
+}
+
+Explanation:
+    Define the Custom Interface:
+        Transformer<T, R> transforms an input of type T into a result of type R.
+    Lambda Implementation:
+        toStringTransformer converts an integer into a formatted string.
+    Stream API Integration:
+        map(toStringTransformer::transform) applies the custom transformation on each element.
+Output
+    Copy code
+    Number: 1
+    Number: 2
+    Number: 3
+    Number: 4
+    Number: 5
+    This example is simple yet demonstrates the power of custom functional interfaces with Stream API.
+
+
+
+
+
+Java JDBC, JDBC Batching, PreparedStatement, Connection Pooling
+Ans:
+Java JDBC:
+    Java Database Connectivity (JDBC) is an API for interacting with relational databases.
+    Provides methods to execute SQL queries and manage database connections.
+    Key Components
+        DriverManager: Manages database drivers and connections.
+        Connection: Represents a session with the database.
+        Statement: Used to execute SQL queries (Statement, PreparedStatement, CallableStatement).
+        ResultSet: Holds data retrieved from the database.
+
+PreparedStatement:
+    A precompiled SQL statement used to prevent SQL injection and improve performance.
+    Placeholders (?) are used for parameters.
+    Example:
+        PreparedStatement pstmt = connection.prepareStatement("INSERT INTO users (name, age) VALUES (?, ?)");
+        pstmt.setString(1, "John");
+        pstmt.setInt(2, 25);
+        pstmt.executeUpdate();
+
+JDBC Batching:
+    Batch processing sends multiple queries in a single database call, reducing round-trips and improving performance.
+    Supported by Statement and PreparedStatement.
+    Example:
+        PreparedStatement pstmt = connection.prepareStatement("INSERT INTO users (name, age) VALUES (?, ?)");
+        pstmt.setString(1, "Alice");
+        pstmt.setInt(2, 30);
+        pstmt.addBatch();
+
+        pstmt.setString(1, "Bob");
+        pstmt.setInt(2, 25);
+        pstmt.addBatch();
+
+        pstmt.executeBatch()
+Connection Pooling: Optimizes connection management for high-performance applications.
+
+
+
+Understanding JVM internals.
+Ans:
+The Java Virtual Machine (JVM) is an engine that executes Java bytecode, providing platform independence and memory management. Its main components are:
+
+Key Components:
+Class Loader Subsystem:
+    Loads .class files into memory.
+    Divided into: Bootstrap, Extension, and Application class loaders.
+
+Runtime Data Areas:
+    Method Area: Stores class metadata, static variables, and method code.
+    Heap: Stores objects and JRE classes. Managed by the Garbage Collector.
+    Stack: Stores local variables and method calls (stack frames).
+    Program Counter (PC) Register: Tracks the address of the next bytecode instruction.
+    Native Method Stack: Handles native method calls.
+
+Execution Engine:
+    Interpreter: Reads and executes bytecode line by line.
+    Just-In-Time (JIT) Compiler: Converts bytecode to native machine code for faster execution.
+
+Garbage Collector (GC):
+    Automatically manages memory by removing unused objects from the heap.
+    GC algorithms: Serial, Parallel, CMS, G1.
+
+Java Native Interface (JNI):
+    Enables Java to interact with native code (e.g., C, C++).
+
+
+
+
+Java Memory Model, Java Flight Recorder,JIT Compiler
+JMM: Defines rules for thread-safe memory access.
+The Java Memory Model (JMM) defines how threads interact through memory, ensuring predictable behavior in concurrent programming.
+    Key Concepts:
+    Main Memory: Shared memory accessed by all threads.
+    Working Memory: Thread-local copies of variables stored in CPU caches.
+    Happens-Before Relationship: Guarantees visibility and ordering of operations (e.g., locks, volatile, synchronized).
+
+
+JIT Compiler: Dynamically compiles bytecode to machine code for performance.
+    The JIT Compiler is part of the JVM Execution Engine, enhancing runtime performance by translating bytecode into native machine code.
+    Types of Compilation:
+    C1 (Client): Optimizes startup and UI responsiveness.
+    C2 (Server): Focuses on long-running applications for deeper optimization.
+
+JFR: Helps analyze runtime issues with low overhead.
+    JFR is a low-overhead performance monitoring and diagnostic tool integrated into the JVM.
+    Features:
+    Captures detailed runtime data (e.g., method execution, thread states, GC activity).
+    Minimal impact on application performance.
+
+
+
+
+
+JVM Monitoring Tools - VisualVM, JConsole, How to modify different JVM Flags
+VisualVM
+    What: A powerful, all-in-one monitoring and troubleshooting tool for JVM-based applications.
+    Features:
+    Monitor heap usage, GC activity, and thread states.
+    Profile CPU and memory usage.
+    Analyze thread dumps and heap dumps.
+
+2. JConsole
+    What: A lightweight GUI tool for monitoring and managing Java applications via JMX (Java Management Extensions).
+    Features:
+    Monitor heap, threads, and classes loaded.
+    Track custom JMX metrics.
+
+Modifying JVM Flags:
+JVM flags control runtime behavior such as memory allocation, GC, and debugging.
+    Types of JVM Flags:
+    Standard Options (e.g., -cp, -version): General commands like setting the classpath.
+    Non-Standard Options (start with -X) e.g., -Xmx, -Xms.
+    Advanced Options (start with -XX) e.g., -XX:+UseG1GC, -XX:MaxHeapFreeRatio
+Example:java -Xmx1024m -XX:+UseG1GC -jar MyApp.jar
+
+
+
+JVM CLI Tools to monitor JVM in realtime - jstack, jinfo, jmap, jhat, jstat, jps
+
+Concurrency vs Parallelism
+    Concurrency: Handling many tasks at once (may be interleaved).
+                Managing multiple tasks by quickly switching between them (e.g., multi-threading).
+    Parallelism: Performing many tasks at the same time (simultaneous execution).
+                A multi-core CPU running separate tasks simultaneously on different cores.
+
+
+
+Java Multi Threading, Creating threads in different ways
+    Thread Class: Simple but less flexible, suitable for single-threaded tasks.
+    Runnable Interface: Preferred when you need to extend another class or want to share the same task among multiple threads.
+    Lambda Expressions: Makes code more concise.
+    ExecutorService: Best for managing multiple threads efficiently with a thread pool.
+
+
+Runnable vs Thread, Thread Lifecycle, Thread Signaling, Thread Join, Volatile keyword, Thread Local, Java Virtual Thread
+    Thread Lifecycle
+    New: Thread created but not started.
+    Runnable: Ready to run, waiting for CPU.
+    Running: Actively executing.
+    Blocked/Waiting: Paused, waiting for resources/signals.
+    Terminated: Execution completed.
+
+
+Java Virtual Threads (Project Loom)
+    Lightweight threads introduced in Java 19.
+    Managed by the JVM for high scalability.
+    Simplifies concurrency with better resource efficiency.
+
+
+
+Race Condition, Deadlock, Deadlock Prevention
+Ans:
+Race Condition:
+    Definition: Occurs when multiple threads access shared resources simultaneously, 
+    and the outcome depends on the execution order.
+    Example: Two threads incrementing the same variable without proper synchronization may lead to incorrect results.
+    Solution: Use synchronization mechanisms (e.g., synchronized, Locks) to prevent concurrent access.
+
+Deadlock:
+    Definition: Happens when two or more threads are waiting for each other’s resources, resulting in an infinite wait state.
+    Example:
+    Thread A holds Resource 1 and waits for Resource 2.
+    Thread B holds Resource 2 and waits for Resource 1.
+
+Deadlock Prevention:
+    Resource Ordering:
+    Acquire resources in a consistent order across threads.
+
+    Avoid Nested Locks:
+    Minimize situations where locks are acquired within other locks.
+
+    Try-Lock Mechanism:
+    Use methods like tryLock() with a timeout to avoid indefinite blocking.
+
+    Release Locks Properly:
+    Always release locks in finally blocks to ensure they are freed, even during exceptions.
+
+    Avoid Circular Wait:
+    Ensure no thread holds one resource while waiting for another held by another thread.
+
+
+
+Locks in Java, Thread Safety, Critical Section, Synchronization
+Ans:
+Locks in Java
+    Definition: Explicit control mechanisms for thread synchronization.
+    Types:
+    ReentrantLock: A flexible, explicit lock allowing reentrant access.
+    ReadWriteLock: Optimizes read operations by allowing multiple readers but single writer.
+    StampedLock: Supports optimistic locking for better performance in read-heavy scenarios.
+
+Thread Safety:
+    Definition: Ensures consistent behavior of shared resources across threads.
+    How to Achieve:
+    Synchronization (e.g., synchronized block/method).
+    Locks for finer-grained control.
+    Atomic classes (e.g., AtomicInteger).
+
+Critical Section:
+    Definition: A part of the code that accesses shared resources.
+    Risk: Concurrent modification by threads without proper synchronization may lead to race conditions.
+    Solution: Protect critical sections using synchronized or locks.
+
+Synchronization:
+    Definition: Mechanism to control thread access to shared resources.
+    Types:
+    Synchronized Method: Locks the whole method on the object or class.
+    Synchronized Block: Locks a specific section of code or resource.
+    Example:
+    java
+    Copy code
+    synchronized (lock) {
+        // critical section
+    }
+    Drawback: Can lead to performance overhead if overused.
+
+
+
+
+
+
+Reentrant Locks, Mutex, Semaphore, and Monitor
+
+Reentrant Locks:
+    Definition: A lock allowing the same thread to acquire it multiple times without causing a deadlock.
+    Key Features:
+    Explicit locking/unlocking (lock()/unlock()).
+    Provides advanced features like tryLock() with timeout and interruptible locks.
+Example:
+ReentrantLock lock = new ReentrantLock();
+lock.lock();
+try {
+    // critical section
+} finally {
+    lock.unlock();
+}
+
+
+Mutex:
+    Definition: A synchronization primitive ensuring only one thread accesses a resource at a time.
+    Java Implementation: Achieved using synchronized or ReentrantLock.
+
+Semaphore:
+    Definition: A counter-based synchronization tool controlling access to a limited number of permits.
+    Use Case: Limit simultaneous access to resources like a connection pool.
+    Types:
+    Binary Semaphore (acts like a mutex).
+    Counting Semaphore (allows multiple permits).
+    Example:
+        Semaphore semaphore = new Semaphore(3); // 3 permits
+        semaphore.acquire();
+        try {
+            // critical section
+        } finally {
+            semaphore.release();
+        }
+
+
+Monitor:
+    Definition: A concurrency construct that combines mutual exclusion and thread signaling.
+    Java Implementation:
+    Implicit monitors via synchronized.
+    Provides wait/notify mechanisms.
+Example:
+    synchronized (lock) {
+        lock.wait();  // Wait for signal
+        lock.notify();  // Notify waiting threads
+    }
+
+
+
+
+Executor Framework, Thread Pool, and Blocking Queues
+Ans:
+Executor Framework
+    Purpose: Manages thread execution, replacing manual thread creation.
+    Key Interfaces:
+    Executor: Basic task execution.
+    ExecutorService: Advanced features like thread pools and task scheduling.
+    ScheduledExecutorService: Executes tasks periodically or after a delay.
+Thread Pool
+    Definition: A pool of reusable threads to handle tasks efficiently.
+    Advantages:
+    Reduces overhead of thread creation.
+    Manages a fixed number of threads to optimize resource usage.
+    Types:
+    Fixed thread pool (Executors.newFixedThreadPool()): Fixed number of threads.
+    Cached thread pool (Executors.newCachedThreadPool()): Dynamically growing thread pool.
+    Single thread executor (Executors.newSingleThreadExecutor()): Executes tasks sequentially.
+Blocking Queues
+    Definition: Thread-safe queues used for inter-thread communication.
+    Purpose: Blocks threads during enqueue or dequeue when the queue is full or empty.
+    Common Implementations:
+    ArrayBlockingQueue: Fixed size, FIFO order.
+    LinkedBlockingQueue: Dynamically growing size.
+    PriorityBlockingQueue: Orders elements based on priority.
+
+
+
+Fork/Join Framework, How Java parallel stream use this fromework ?
+Ans:
+Fork/Join Framework
+Purpose: Breaks a large task into smaller subtasks (fork), processes them in parallel, and combines the results (join).
+
+Key Classes:
+    ForkJoinPool: Manages worker threads.
+    RecursiveTask: For tasks that return results.
+    RecursiveAction: For tasks that don't return results.
+    Example Use: Divide-and-conquer algorithms like mergesort or recursive sum.
+    How Java Parallel Stream Uses Fork/Join Framework
+    Implementation: Parallel streams internally use a common ForkJoinPool to execute stream operations in parallel.
+
+Process:
+    Splits the data source into chunks.
+    Executes tasks in parallel across available threads in the ForkJoinPool.
+    Merges the results at the end.
+    Advantages: Simplifies parallel processing with minimal code.
+
+Example:
+List<Integer> numbers = List.of(1, 2, 3, 4, 5);
+int sum = numbers.parallelStream().reduce(0, Integer::sum); // Uses Fork/Join internally
+
+
+
+Thread safe collections, copy on write collections, and how it works
+Ans:
+Thread-Safe Collections
+    Definition: Collections designed for safe concurrent access by multiple threads.
+    Examples:
+    Vector: Synchronized alternative to ArrayList.
+    Hashtable: Synchronized alternative to HashMap.
+    Concurrent Collections:
+    ConcurrentHashMap: Efficient thread-safe HashMap alternative using fine-grained locks.
+    CopyOnWriteArrayList: Thread-safe alternative to ArrayList for read-heavy operations.
+
+Copy-On-Write Collections
+    Definition: Collections that create a new copy of the data structure on modification (e.g., add/remove).
+
+    Examples:
+
+    CopyOnWriteArrayList
+    CopyOnWriteArraySet
+    How It Works:
+
+    Read Operations: Directly access the immutable snapshot of the collection.
+    Write Operations: Create a new copy, modify it, and replace the old reference.
+    Ideal for scenarios where reads greatly outnumber writes.
+
+
+IO Bound vs CPU Bound applicaiton
+Ans:
+I/O-Bound Application
+    Definition: Performance is limited by input/output operations (e.g., reading/writing files, network calls).
+    Key Focus: Optimize waiting time (use asynchronous/non-blocking I/O).
+    Examples: Web servers, database queries.
+CPU-Bound Application
+    Definition: Performance is limited by CPU computations (e.g., mathematical calculations, data processing).
+    Key Focus: Optimize processing efficiency (use multi-core processors, parallel algorithms).
+
+
+
+Java Happens Before Guarantee
+Thread Starvation and Fairness
+Java CompletableFuture
+    appens-Before Guarantee	Ensures visibility and ordering between threads.
+    Thread Starvation	When threads are denied CPU time due to higher priority tasks, causing delays.
+    Fairness	Ensures equal resource allocation to all threads, preventing starvation.
+    CompletableFuture	Allows non-blocking asynchronous execution and chaining of tasks.
+
+
+Understanding different types of GC - Serial, Parallel, Mark and Sweep, G1, Epsilon. What is stop the word in java
+
+Types of Garbage Collection (GC) in Java
+Serial GC:
+Uses a single thread for garbage collection.
+Best for single-threaded applications.
+Stop-the-world: The application is paused during GC.
+
+Parallel GC:
+Uses multiple threads for garbage collection.
+Suitable for multi-threaded environments.
+Stop-the-world: Application pauses during GC, but multiple threads are used to reduce pause time.
+
+Mark and Sweep GC:
+Mark Phase: Identifies live objects.
+Sweep Phase: Removes unused objects.
+Can lead to fragmentation if not followed by compaction.
+
+G1 (Garbage-First) GC:
+Designed for large heaps and low-latency applications.
+Divides the heap into regions and prioritizes GC work to minimize pause times.
+Stop-the-world: Occurs but is optimized for shorter durations.
+
+Epsilon GC:
+A no-op garbage collector that does not reclaim memory.
+Primarily used for benchmarking or applications where GC is handled manually.
+
+Stop-the-World
+    Definition: A phase during garbage collection where all application threads are paused to allow the garbage collector to perform its task.
+    Cause: During GC operations like marking, sweeping, or compacting, the JVM halts all application threads temporarily.
+    Impact: Can cause latency spikes, especially in high-performance or real-time applications.
+
+
+
+Java Generics, Type Erasure, Generic Method and Class, Wildcard Type, Upper Bounded Wildcard, Lower Bounded Wildcard, Bounded Type
+
+Java Generics
+    Definition: Allows you to define classes, interfaces, and methods with type parameters, 
+    enabling type safety while maintaining flexibility.
+    Benefits:
+        Provides compile-time type checking.
+        Eliminates the need for casting when retrieving elements from collections.
+
+Type Erasure
+    Definition: The process by which the generic type information is removed at runtime. After type erasure, the generic type is replaced with its raw type, and type parameters are replaced with bounds (if any).
+    List<Integer> list = new ArrayList<>();
+    // After type erasure: List becomes List<Object> at runtime
+
+Generic Method and Class:
+Generic Method:
+    A method that can operate on any type.
+    Syntax: <T> returnType methodName(T parameter) { ... }
+    Example:
+    public <T> void printArray(T[] array) {
+        for (T element : array) {
+            System.out.println(element);
+        }
+    }
+
+Generic Class:
+    A class with a type parameter.
+    Syntax: class ClassName<T> { ... }
+    Example:
+        class Box<T> {
+            private T value;
+            public T getValue() {
+                return value;
+            }
+            public void setValue(T value) {
+                this.value = value;
+            }
+        }
+
+Wildcard Type:
+    Definition: A placeholder for an unknown type, used in method arguments to increase flexibility.
+    Syntax: <?> (Unknown type)
+    Example:
+    public void printList(List<?> list) { ... }
+
+
+Bounded Type:
+Definition: Specifies the upper or lower bound of a generic type to restrict the types that can be used.
+
+Upper Bounded Wildcard:
+    Definition: Restricts the wildcard to types that are subtypes of a specific class or interface.
+    Syntax: <? extends T>
+    Example:
+    public void printNumbers(List<? extends Number> list) { ... }
+
+Lower Bounded Wildcard:
+    Definition: Restricts the wildcard to types that are supertypes of a specific class.
+    Syntax: <? super T>
+    Example:
+    public void addIntegers(List<? super Integer> list) { ... }
+
+
+
+
+
+Java Exception and Error Handling
+Ans:
+    Exceptions represent conditions that can be handled programmatically.
+    Errors represent serious issues that generally cannot be handled.
+    Use try-catch-finally blocks to handle exceptions and clean up resources.
+    Use throw to throw an exception and throws to declare potential exceptions in a method.
+    Handle exceptions gracefully and avoid over-catching them.
+
+Java Metadata programming - Annotation Processing, and Java Reflection API 
+Annotations are used to add metadata to classes, methods, or fields in your code.
+Annotation Processors are tools that can read annotations and generate additional code or resources during the compilation process.
+
+Types of Annotations:
+    Built-in Annotations: Examples include @Override, @Deprecated, @SuppressWarnings.
+    Custom Annotations: You can define your own annotations to add metadata specific to your project.
+    @interface MyCustomAnnotation {
+        String value() default "defaultValue";
+    }
+Annotation Processing:
+You can create a custom annotation processor that extends AbstractProcessor and override the process() method.
+How to run: Annotation processors are invoked automatically during compilation by the Java compiler
+
+Java Reflection API
+    Definition: The Java Reflection API allows you to inspect and manipulate classes, methods, fields, and other 
+    elements of the Java program at runtime, even if they are private or not directly accessible.
+    Core Concepts:
+        Class: Represents the class or interface at runtime.
+        Method: Represents methods of the class.
+        Field: Represents fields (variables) of the class.
+        Constructor: Represents constructors of the class.
+
+Reflection Operations:
+Field Manipulation: Access and modify field values dynamically.
+Method Invocation: Call methods of a class without knowing them at compile-time.
+Annotations: Retrieve and process annotations at runtime.
+
+Annotation Processing:
+    Allows you to process annotations at compile-time to generate code or perform validations.
+    It is commonly used for generating boilerplate code, dependency injection, and validation.
+Reflection API:
+    Provides runtime capabilities to inspect and manipulate classes, methods, fields, and other class members.
+    Commonly used in frameworks, dynamic proxies, and testing.
+    Can have performance overhead and should be used carefully, especially in production environments.
+
+
+
+
+
+Java Logging 
+Java provides a logging API to help developers log messages for monitoring, debugging, and troubleshooting applications. 
+The Java Logging API is part of the java.util.logging package
+
+Logging with External Libraries:
+    While Java's built-in logging is suitable for many applications, many developers prefer more feature-rich 
+    logging libraries, such as:
+        Log4j: Apache's logging framework, which offers additional features like advanced configuration, log levels, and appenders.
+        SLF4J: Simple Logging Facade for Java, which provides a common interface to different logging l
+        ibraries (e.g., Log4j, java.util.logging).
+
+
+
+
+Java Cryptography:
+    Java provides a robust set of cryptographic tools through its Java Cryptography Architecture (JCA) and 
+    Java Cryptography Extension (JCE) to implement encryption, decryption, secure communication, and data integrity checks. 
+    By using cryptographic classes like Cipher, MessageDigest, Signature, and KeyPairGenerator, 
+    you can secure sensitive information effectively. Proper use of key management, secure random number generation, 
+    and algorithm selection is essential for building secure Java applications.
+
+
+Java Performance - JMH 
+JMH is the go-to tool for accurate and reliable microbenchmarking in Java. It is designed to eliminate JVM optimizations 
+and background factors that could otherwise skew performance results. By using JMH, developers can benchmark and 
+optimize specific parts of their code with confidence.
+
+
+Java Internationalization 
+
+    Java Internationalization (i18n)
+    Java Internationalization refers to designing applications that can adapt to various languages, regions, and cultural conventions.
+
+    Key Concepts:
+    Locale: Represents a specific geographical, cultural, or political region. It includes language, country, and variant.
+    Locale locale = new Locale("en", "US");
+
+    Why i18n?
+
+    Expands software usability across different regions.
+    Reduces costs by avoiding redesigns for multiple markets.
+
+
+Java IO vs NIO
+Java IO (Input/Output):
+    Stream-based: Reads/writes data as bytes (InputStream/OutputStream) or characters (Reader/Writer).
+    Blocking: IO operations block the thread until completion.
+    Simpler API: Easy to use but less efficient for high-performance tasks.
+
+
+Java NIO (New IO):
+    Buffer-based: Data is read into buffers for non-blocking operations.
+    Non-blocking: Threads can continue executing while IO operations are performed in the background.
+    Selectors: Enables monitoring of multiple channels (e.g., sockets).
+    Scalable: Suitable for high-performance applications like servers.
+
+Use IO for simple, single-threaded applications.
+Use NIO for high-performance, multi-threaded applications.
+
+
+
+
+
+
+
+
+2	Framework & Web	
+What is spring bean ?
+What are the bean scopes available in spring
+What is spring IoC ? What is it responsible for ?
+Dependency Injection in Spring? How many ways one can inject objects ?
+Differnet ways of creating spring bean
+Circular Dependency - How to solve this ?
+Different stereotypes in spring and purpose of the stereotypes
+Injecting Prototype Beans into a Singleton Instance in Spring
+DI Exceptions - UnsatisfiedDependencyException, Circular Dependency Exception, NoSuchBeanDefinitionException
+Injecting Collections, Generic Objects
+Use of @Primary, @Qualifier, @Order, @Lazy, and @Lookup
+Spring Cloud, Service Discovery, and Gateway
+What is Servlet ? Life cycle of Servlet. What is Dispetcher Servlets ?
+Servlet Filters and Listener
+Spring Security: What is security filter chain ?
+Spring Security: Session Based Authentication
+Spring Security: Token Based Authentication
+Spring Security: Role-Permission Management
+Spring Security: Filter Chain
+Spring @Transactional with Different types of Transaction Propagation
+Structuring Spring Project
+Spring Boot vs Spring Framework
+How to enable actuator endpoints
+Use of @ConfigurationProperties, Usages of Environment Variables in Spring Boot’s Properties Files
+AOP - Point Cut, Advice, Joint Point
+Unit Testion - JUnit Jupiter
+JSP, Thymeleaf, Javascript, Ajax
+
+
+
+3	Web Server	Understanding Web Server: Apache Tomcat, Nginx
+Thread per request vs Event loop. What are the advantages and disadvantages of them.
+Install and configure Apache Tomcat for JAR and WAR File
+Configure SSL Certificate in Tomcat and Nginx
+What is truststore and keystore and how to configure it
+Configure Virtual Host in Apache Tomcat
+Apache Tomcat Load Balancing with MOD_JK
+Apache Tomcat HTTP Request Interception Using Valves
+Apache Tomcat - Memory Optimization - Heap & Metaspace
+Apache Tomcat - Connectors and Executor Thread Optimization, Enabling HTTP Response Compression, Setting Up Monitoring
+Understanding different logs in Tomcat and Nginx
+What is reverse proxy ?
+Configuring L4, L7 LoadBalancer with Nginx
+Configure Nginx HA with keepalived
+Static Load Balancing Algorithm - Round Robin, Weight Round Robin, IP Hash
+Dynamic Load Balancing Algorithm - Least Connection, Weighted Least Connection, Weighted Response time
+Nginx Redirects and Rewrites
+Understanding Nginx Worker Process and Worker Connections
+How to cache static content in nginx
+Compress Response in nginx, Enabling HTTP/2, Enabling Server Push
+Understanding Apache Tomcat Session Replication
+
+
+4	Web, HTTP and Other Communication Protocols	HTTP, HTTPS, SSL, TLS
+HTTP Methods - GET, POST, PUT, PATCH, DELETE. HTTP Method Idempotency
+HTTP Status Codes - 2xx, 3xx, 4xx, 5xx
+HTTP Request, Response Format
+HTTP Cookies vs Sessions
+TCP Flow Control and Congestion Controlling
+Low Latency Handshake: QUIC
+URL vs URI, and URL Encoding
+HTTP Long Pooling, Short Pooling, Websocket, Server Sent Event
+HTTP Streaming: Transfer Encoding: chunked
+What is CORS
+HTTP Security: Content Security Policy, Strict-Transport-Security
+HTTP Basic Authentication
+HTTP Content Negotiation
+What is HTTP Keep alive, Why is it needed ?
+HTTP Multiplexing
+Understanding HTTP 1.1, 2, 3 differences
+Understanding UDP
+Others Protocol - gRPC, Apache Thrift, MQTT, AMQP
+Understanding Chrome Developer Tools
+Writing RESTful API
+What is Ajax? Sync, Async Ajax call
+Basic Javascript, DOM Manipulation, and Event Handling, Form Validation
+
+
+5	Basic Networking	Understanding Network Layer, TCP/IP Stack
+What is DNS ? How it works
+What is DHCP, CIDR
+Network Interface - Physical and Virtual Interface
+Understading IPTables, and Routing Table
+L2, and L3 Devices
+NATing, Static & Dynamic Routing
+BGP Routing Protocol
+Virtual Private Network, Secure Tunnel
+Container Networking - Docker
+
+
+
+6	Database & ORM	DB Design and Best Practices
+DB Normalization
+ACID Properties
+DDL, DML Query
+Joins, Aggregation
+Group By, Having, where, and IN clause
+Query Optimization, Database Indexing
+SELECT statement best practices
+Primary Key, Foreign Key, Unique Key
+What is JPA and Hibernate ?
+JPA - Enity Life Cycle
+ID Generation Strategies
+EntityManager vs EntityManagerFactory
+Entity Relationship - One to One, One to Many, Many To Many
+ORM relationship best practices
+JPA Cascading Type
+JPA Fetching Strategy 
+JPA Annotations - @Embeddable, @Embedded, @EmbeddedId, @Transient, @Lob, @Basic, @Cacheable
+Spring Data JPA - @Query, @Modify
+Spring Data JPA - Specifications
+Spring Data JPA - Query Creation from Method Names
+Spring Data JPA - Accessing EntityManager
+Spring Data JPA - Multitenancy
+JPA - Locking: Optimistic and Pessimistic Lock
+JPA - First Level and Second Level Caching
+JPA Auditing
+JPA Listeners
+N+1 problem in ORM
+JPQL, HQL
+Handling money in database
+Writing Native Query in Spring Data Jpa
+Different Transaction Isloation
+Different Read Phenomenon
+Result Transformation to DTO, Data JPA Projections
+JPA/Hibernate Exceptions - LazyInitializationException, NonUniqueResultException, SQLGrammarException, OptimisticLockException, PersistentObjectException: Detached Entity Passed to Persist, DataAccessException
+
+
+7	Version Control	What is git ?
+Git branching strategies 
+Git Merging and rebase
+Git merging conflict resoulation
+Git cherrypic
+Git Tag, Stash
+Different git commands
+What is git head reset ?
+
+8	Software Engineering	SOLID Principle, DRY, YAGNI, KISS
+SDLC Life Cycle 
+Hexagonal Architecture
+Coupling vs Cohesion
+Composition vs Association, IS-A vs HAS-A relationship
+Design Patterns - Proxy, Observer, Adapter, Singletone, Factory
+Waterfall Model
+Agile Model
+Software Testing - Unit Testing vs Integration Testing
+Code Review Process
+
+9	Basic Linux	Understanding Linux OS
+Understanding Command Line
+Understanding File System
+Package Management Basic
+Shell Scripting Introduction
+CLI Tools & Commands - ps, top, htop, kill, netstat, nc, nmap, tcpdump, iftop, telnet, ping, vim, nano, tail, lsof, iotop, iostat
+SSH - Accessing Remote Server
+VPN
+Firewall, and Port Forwarding
+
+10	Distributed System	Communication, Different Types of Communication Pattern
+Service Discovery, Client Side Loadbalancing
+Cordination & Synchronization
+Scalability, High Availability
+Resiliency, Common Failure, Upstream and Downstream Resiliency
+Cloud Computing
+Event Driven Architecture
+Microservice Architecture
+Data Management in Microservice
+CAP Theorem, PACLEC Theorem
+Distributed Transaction
+Transaction Outbox Pattern
+SAGA Pattern
+CQRS
+Leader Election - Paxos, Raft
+Data Replication - Single Leader Replication, Multi Leader Replication, Leaderless Replication
+Maintainability - Testing, CI/CD, Monitoring, Osbservability
+Casual Consistency, Eventual Consistency
+API Idempotency
+
+
+
+
+
