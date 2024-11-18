@@ -1659,27 +1659,487 @@ JSP, Thymeleaf, Javascript, Ajax
 
 
 
+
+
+
+
 3	Web Server	Understanding Web Server: Apache Tomcat, Nginx
+A web server handles HTTP requests and serves static content or forwards dynamic requests to application servers.
+
+Apache Tomcat: Serves Java-based applications (Servlets, JSPs).
+Nginx: High-performance server for static files, load balancing, and reverse proxy.
+
+
 Thread per request vs Event loop. What are the advantages and disadvantages of them.
+Ans
+`    Thread-per-request
+    Advantages:
+
+    Easy to implement and debug.
+    Each request is independent, avoiding shared state issues.
+    Disadvantages:
+
+    High memory usage (1 thread/request).
+    Poor scalability under high load (thread overhead).
+    Event loop
+    Advantages:
+
+    Lightweight and highly scalable.
+    Handles many requests with fewer resources.
+    Disadvantages:
+
+    Complex implementation (e.g., managing async I/O).
+    Harder debugging and error handling.`
+
+
 Install and configure Apache Tomcat for JAR and WAR File
+Ans:
+    WAR File:
+    Directly deployable in Tomcat.
+    Place it in the webapps/ folder, and Tomcat auto-deploys the app.
+
+    JAR File:
+    Not directly deployable in Tomcat.
+    JAR files are for standalone Java apps.
+    Use a Spring Boot JAR with embedded Tomcat if deploying standalone.
+
+
+
 Configure SSL Certificate in Tomcat and Nginx
+    Configure SSL in Tomcat
+    Generate Keystore:
+    keytool -genkey -alias tomcat -keyalg RSA -keystore keystore.jks
+
+    Edit server.xml:
+    Add/update <Connector> for HTTPS:
+    <Connector port="8443" protocol="HTTP/1.1" SSLEnabled="true" 
+            keystoreFile="conf/keystore.jks" keystorePass="yourpassword" 
+            scheme="https" secure="true" />
+
+    Configure SSL in Nginx
+    server {
+        listen 443 ssl;
+        ssl_certificate /etc/nginx/ssl/cert.pem;
+        ssl_certificate_key /etc/nginx/ssl/privkey.pem;
+        server_name yourdomain.com;
+        
+        location / {
+            proxy_pass http://localhost:8080;
+        }
+    }
+
+
 What is truststore and keystore and how to configure it
+Ans:
+Keystore (For server authentication)
+Create Keystore:
+keytool -genkeypair -alias myserver -keyalg RSA -keystore keystore.jks -storepass password
+
+Add Certificate to Keystore:
+keytool -importcert -file server.crt -alias myserver -keystore keystore.jks
+
+Tomcat Configuration:
+Add to server.xml:
+<Connector port="8443" SSLEnabled="true"
+           keystoreFile="conf/keystore.jks"
+           keystorePass="password" />
+
+
+Truststore (For client authentication)
+Create Truststore:
+keytool -importcert -file client.crt -alias client-cert -keystore truststore.jks -storepass password
+
+Specify in Java:
+Add JVM options:
+-Djavax.net.ssl.trustStore=truststore.jks -Djavax.net.ssl.trustStorePassword=password
+
+Summary
+Keystore secures the server's identity.
+Truststore validates client/server certificates.
+Both are essential for secure SSL/TLS communication.
+
+
+
+
+
+
+
+
+
 Configure Virtual Host in Apache Tomcat
+Key Points:
+Virtual Hosts are defined in the server.xml file.
+Each virtual host can serve a different web application based on the domain or subdomain.
+Host Name: The domain or subdomain used to identify a specific virtual host.
+AppBase: The directory where the web application files are stored for that virtual host.
+Example:
+You can have two applications running on the same Tomcat server:
+
+www.example1.com -> Serves example1.war
+www.example2.com -> Serves example2.war
+Benefits:
+Resource Efficiency: Multiple applications on one server.
+
+Example configuration: Configure Virtual Hosts in Apache Tomcat
+Locate server.xml
+
+<Engine name="Catalina" defaultHost="localhost">
+    <!-- Virtual Host 1 -->
+    <Host name="www.example1.com" appBase="webapps/example1" unpackWARs="true" autoDeploy="true">
+        <Alias>example1.com</Alias>
+        <Context path="" docBase="example1" />
+    </Host>
+
+    <!-- Virtual Host 2 -->
+    <Host name="www.example2.com" appBase="webapps/example2" unpackWARs="true" autoDeploy="true">
+        <Alias>example2.com</Alias>
+        <Context path="" docBase="example2" />
+    </Host>
+</Engine>
+
+
+
+
+
 Apache Tomcat Load Balancing with MOD_JK
+Apache Tomcat Load Balancing with mod_jk is a method for distributing incoming HTTP requests across multiple Tomcat servers to improve scalability and reliability. The mod_jk module connects the Apache HTTP Server with Apache Tomcat, acting as a load balancer for Tomcat instances.
+
 Apache Tomcat HTTP Request Interception Using Valves
+Apache Tomcat HTTP Request Interception Using Valves allows you to intercept and process HTTP requests and responses at various stages of the request-response lifecycle within Tomcat. Valves are used to add custom logic, such as logging, security, authentication, or request manipulation, before or after the request reaches a servlet or before it is sent to the client.
+
+
+
 Apache Tomcat - Memory Optimization - Heap & Metaspace
+By tuning the Heap and Metaspace memory settings in the CATALINA_OPTS environment variable, you can optimize Tomcat’s performance and ensure it efficiently uses memory.
+
+Purpose of CATALINA_OPTS:
+It allows you to specify various JVM options such as heap size, garbage collection, and Metaspace settings, among others, which help in memory optimization for Tomcat.
+These options are used when Tomcat starts up to configure how the JVM should handle memory and performance.
+
+
+Heap Memory Optimization:
+    -Xms: Initial heap size (amount of memory allocated when Tomcat starts).
+    -Xmx: Maximum heap size (maximum memory Tomcat can use).
+    export CATALINA_OPTS="-Xms512m -Xmx2g"
+
+
+Garbage Collection Optimization:
+
+    -XX:+UseG1GC: Enables the G1 garbage collector.
+    -XX:MaxGCPauseMillis=200: Sets the max garbage collection pause time.
+    export CATALINA_OPTS="-XX:+UseG1GC -XX:MaxGCPauseMillis=200"
+
+
+
 Apache Tomcat - Connectors and Executor Thread Optimization, Enabling HTTP Response Compression, Setting Up Monitoring
+Optimizing Connectors:
+
+You can configure the HTTP Connector to adjust the number of threads, keep-alive settings, etc., for better performance under high load.
+Example (in server.xml):
+<Connector port="8080" 
+           protocol="HTTP/1.1"
+           connectionTimeout="20000"
+           maxThreads="200"
+           minSpareThreads="25"
+           maxKeepAliveRequests="100"
+           enableLookups="false"
+           disableUploadTimeout="true"/>
+
+
+2. Executor Thread Optimization
+Executor threads handle HTTP requests. Optimizing these helps improve Tomcat's responsiveness.
+In server.xml, define an Executor to manage threads across multiple connectors:
+<Executor name="tomcatThreadPool" 
+          namePrefix="httpWorker-" 
+          maxThreads="200" 
+          minSpareThreads="25"/>
+
+3. Enabling HTTP Response Compression
+HTTP Response Compression reduces the size of the response sent from Tomcat to clients, improving performance, especially for text-based content.
+To enable compression, modify the HTTP Connector in server.xml:
+<Connector port="8080" protocol="HTTP/1.1" 
+           compression="on" 
+           compressableMimeType="text/html,text/xml,text/plain,application/json,application/xml" 
+           compressionMinSize="2048"/>
+
+
+Tomcate Access Logging:
+Enable detailed logging of HTTP requests by configuring the Access Log Valve in server.xml:
+<Valve className="org.apache.catalina.valves.AccessLogValve" 
+       directory="logs" 
+       prefix="localhost_access_log" 
+       suffix=".log" 
+       pattern="%h %l %u %t &quot;%r&quot; %s %b"/>
+
+This logs each HTTP request with details such as client IP, request, status code, and response size.
+
+
+Summary:
+    Connectors and Executors optimize how Tomcat handles requests by managing threads and resources.
+    HTTP Response Compression reduces bandwidth usage and improves client-side load times by compressing responses.
+    Monitoring using JMX, access logs, and the Manager app helps you keep track of Tomcat’s health and performance.
+
+
+
+
+
+
+
 Understanding different logs in Tomcat and Nginx
+Tomcat Logs:
+    catalina.out: Main log for Tomcat startup, shutdown, and general errors.
+    catalina.<date>.log: Logs Tomcat server activity, including errors and exceptions.
+    localhost_access_log: Logs HTTP requests to the default host.
+    manager.<date>.log: Logs activities of the Tomcat Manager app (deployments).
+    access_log: Tracks HTTP request details like client IP and response status.
+
+Nginx Logs:
+    access.log: Logs incoming HTTP requests (IP, method, status, etc.).
+    error.log: Logs errors like configuration issues or failed requests.
+    slow.log: Logs requests that take too long to process (if configured).
+    Both servers provide essential logging for monitoring and troubleshooting.
+
+
 What is reverse proxy ?
+A reverse proxy is a server that sits between client devices and a web server. It forwards client requests to one or more backend servers and then returns the response from the backend server(s) to the client.
+
+
 Configuring L4, L7 LoadBalancer with Nginx
+Layer 4 (L4) Load Balancing with Nginx
+L4 load balancing operates at the transport layer (TCP/UDP), where Nginx forwards traffic without inspecting the application layer protocols like HTTP.
+
+Basic TCP Load Balancing: For L4 load balancing, configure Nginx to proxy TCP traffic to backend servers.
+stream {
+    upstream tcp_backend {
+        server backend1.example.com:8080;
+        server backend2.example.com:8080;
+    }
+
+    server {
+        listen 12345;  # Incoming port for TCP traffic
+        proxy_pass tcp_backend;  # Forward to upstream TCP servers
+    }
+}
+
+
+
+Layer 7 (L7) Load Balancing with Nginx
+L7 load balancing operates at the application layer (HTTP/HTTPS), where Nginx can inspect the HTTP headers and URLs, and make decisions based on that.
+
+Basic HTTP Load Balancing: For L7 load balancing, configure Nginx to proxy HTTP requests to backend web servers.
+http {
+    upstream http_backend {
+        server backend1.example.com;
+        server backend2.example.com;
+    }
+
+    server {
+        listen 80;  # HTTP port
+        server_name example.com;
+
+        location / {
+            proxy_pass http://http_backend;  # Forward HTTP requests to upstream backend servers
+            proxy_set_header Host $host;
+            proxy_set_header X-Real-IP $remote_addr;
+            proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        }
+    }
+}
+
+
+Key Features of stream in Nginx:
+In Nginx, the stream block is used to handle TCP and UDP traffic, which operates at Layer 4 (L4) of the OSI model. This block enables Nginx to act as a reverse proxy for non-HTTP protocols, allowing it to distribute traffic to backend servers for services that use TCP or UDP, such as databases, mail servers, or custom applications.
+
+Basic Example of stream Block (TCP Load Balancing):
+    stream {
+        upstream tcp_backend {
+            server backend1.example.com:3306;
+            server backend2.example.com:3306;
+        }
+
+        server {
+            listen 3306;  # Listen on TCP port 3306 (MySQL)
+            proxy_pass tcp_backend;  # Forward requests to upstream backend servers
+        }
+    }
+
+
+
+
+
+
+
+
+
 Configure Nginx HA with keepalived
+1. Install Nginx and Keepalived:
+    sudo apt-get install nginx keepalived
+
+2. Configure Keepalived:
+On both servers, configure Keepalived to create a virtual IP (VIP) and enable failover.
+
+/etc/keepalived/keepalived.conf:
+vrrp_instance VI_1 {
+    state MASTER  # Use BACKUP on the secondary node
+    interface eth0
+    virtual_router_id 51
+    priority 101  # Higher priority for the MASTER node
+    advert_int 1
+    virtual_ipaddress {
+        192.168.1.100  # Virtual IP (VIP) for Nginx HA
+    }
+}
+
+
+Enable and Start Services:
+sudo systemctl enable nginx keepalived
+sudo systemctl start nginx keepalived
+
+Summary:
+    Keepalived manages the failover of the Virtual IP (VIP).
+    Nginx handles the load balancing, distributing traffic to backend servers.
+    Keepalived ensures high availability by switching to the backup server if the primary server fails.
+
+
+
 Static Load Balancing Algorithm - Round Robin, Weight Round Robin, IP Hash
+Round Robin:
+    Description: Distributes requests evenly across all backend servers in a circular order.
+    Use case: Simple load balancing with no regard for server load.
+upstream backend {
+    server backend1.example.com;
+    server backend2.example.com;
+}
+
+
+Weight Round Robin:
+Description: Distributes requests based on server weights (higher weight means more traffic).
+Use case: Useful when backend servers have different capacities.
+upstream backend {
+    server backend1.example.com weight=3;
+    server backend2.example.com weight=1;
+}
+
+
+IP Hash:
+Description: Routes requests from the same client IP to the same backend server, ensuring session persistence.
+Use case: Useful for applications that require session stickiness.
+upstream backend {
+    ip_hash;
+    server backend1.example.com;
+    server backend2.example.com;
+}
+
+
+
+
+
 Dynamic Load Balancing Algorithm - Least Connection, Weighted Least Connection, Weighted Response time
+Least Connection:
+Description: Routes traffic to the server with the fewest active connections.
+Use case: Useful when backend servers have varying connection loads.
+upstream backend {
+    least_conn;
+    server backend1.example.com;
+    server backend2.example.com;
+}
+
+
+Weighted Least Connection:
+Description: Routes traffic to the server with the fewest active connections, considering each server's weight.
+Use case: Useful for servers with different capacities.
+upstream backend {
+    least_conn;
+    server backend1.example.com weight=3;
+    server backend2.example.com weight=1;
+}
+
+Weighted Response Time:
+Description: Routes traffic to the server with the fastest response time, considering the weight of each server.
+Use case: Prioritizes faster servers while balancing traffic.
+upstream backend {
+    server backend1.example.com weight=3;
+    server backend2.example.com weight=1;
+}
+# Requires third-party module for response time-based balancing
+
+
+
+
+
 Nginx Redirects and Rewrites
+    Redirects send clients to a new URL (e.g., 301 for permanent).
+    Description: Sends an HTTP response to the client to request a new URL.
+
+    Rewrites modify URLs internally on the server.
+    Description: Changes the requested URL internally without informing the client.
+
+
 Understanding Nginx Worker Process and Worker Connections
+    Worker Connections:
+    Description: Defines how many connections each worker process can handle simultaneously.
+worker_processes 4;  # 4 worker processes
+
+    Worker Connections:
+    Description: Defines how many connections each worker process can handle simultaneously.
+events {
+    worker_connections 1024;  # Each worker can handle 1024 connections
+}
+
+
 How to cache static content in nginx
+1. Using expires Directive (Simple Caching):
+server {
+    location /assets/ {
+        root /var/www/html;
+        expires 30d;  # Cache for 30 days
+        add_header Cache-Control "public";
+    }
+}
+
+
+2. Using proxy_cache (Advanced Caching):
+This caches responses from a backend server or proxy.
+http {
+    proxy_cache_path /tmp/cache levels=1:2 keys_zone=static_cache:10m max_size=1g inactive=60m;
+    
+    server {
+        location / {
+            proxy_pass http://backend;
+            proxy_cache static_cache;
+            proxy_cache_valid 200 1h;  # Cache 200 responses for 1 hour
+            proxy_cache_use_stale error timeout updating;  # Serve stale cache if backend fails
+        }
+    }
+}
+
+
+Summary:
+Simple caching: Use expires to set cache duration for static content.
+Advanced caching: Use proxy_cache for more control over caching behavior.
+
+
+
+
 Compress Response in nginx, Enabling HTTP/2, Enabling Server Push
+    Compression: Use gzip to reduce response sizes.
+    HTTP/2: Enable http2 in the listen directive for faster communication.
+    Server Push: Use the Link header to push resources to clients in HTTP/2.
+
 Understanding Apache Tomcat Session Replication
+Session replication in Tomcat ensures that session data is shared and available across multiple Tomcat instances in a cluster, enhancing application availability and reliability.
+
+Apache Tomcat Session Replication:
+    Purpose: Ensures user session data is shared across multiple Tomcat instances for high availability and fault tolerance.
+    How it works: When a session is created or updated, Tomcat replicates the session to other nodes in the cluster.
+
+Types:
+    In-memory: Fast but loses data on server failure.
+    Persistent: Saves session data to disk, survives restarts, but slower.
+
+
+
+
 
 
 4	Web, HTTP and Other Communication Protocols	HTTP, HTTPS, SSL, TLS
