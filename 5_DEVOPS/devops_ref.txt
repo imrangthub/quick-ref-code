@@ -2198,24 +2198,90 @@ metrics: false
 
 
 
+================================================= 
+##doc-nginx
+================================================= 
+Nginx is a web server that can also be used as a reverse proxy, load balancer, mail proxy and HTTP cache.
+
+
+Nginx rate limiting is based on two primary modules:
+  limit_req_module: Limits the number of requests per second.
+  limit_conn_module: Limits the number of simultaneous connections.
+
+
+http {
+    limit_req_zone $binary_remote_addr zone=one:10m rate=10r/s;
+
+    server {
+        location /api/ {
+            limit_req zone=one burst=20 nodelay;
+        }
+    }
+}
+
+
+Requests Take Time to Clear:
+  The queue can take multiple seconds to clear depending on the burst size and rate limit.
+  For example, with burst=10 and rate=5r/s, it can take up to 2 seconds to process the entire queue (10 requests at 5r/s)
+
+New Requests Compete for Queue Space:
+  If the queue is not fully processed when new requests arrive, the remaining space in the queue (if any) is used for new requests.
+  If the queue is full, new requests are rejected.
+
+
+
+
+How ratelimit Work
+==========================================
+Rate: 5 requests/second.
+Burst: 10 extra requests.
+
+With nodelay
+-----------------------------------
+First Second (20 requests arrive):
+  Allowed: 15 requests are processed immediately (rate + burst = 5 + 10).
+  Rejected: 5 requests are rejected (429).
+
+Second Second (16 requests arrive):
+  Allowed: 15 requests are processed immediately.
+  Rejected: 1 request is rejected (429).
+
+Without nodelay
+------------------------------------
+  First Second (20 requests arrive):
+    Allowed Immediately: 5 requests are processed (based on the rate = 5r/s).
+    Queued: 10 requests are placed in the queue (up to the burst size = 10).
+    Rejected: 5 requests are rejected because the queue is full.
+    Second Second (10 requests arrive):
+
+  Queue Processing:
+    5 requests are processed from the queue (at the rate of 5r/s).
+    New Requests:
+    5 new requests are placed in the queue.
+    The queue reaches its limit (10 requests), so:
+    Rejected: 5 requests are rejected because the queue is full.
+    Third Second (5 requests arrive):
+
+  Queue Processing:
+    5 requests are processed from the queue.
+    New Requests:
+    5 new requests are placed in the queue.
+    Rejected: None, as the queue is not overfilled.
+
+
+
+
+
+
+
+
+
+
+
 
 =================================================
 #  APP TESTING |  MEMORY CHECK | jvm                                          
 ================================================= 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 view how much of memory consumption in spring boot app

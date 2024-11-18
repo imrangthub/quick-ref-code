@@ -1318,36 +1318,344 @@ Use NIO for high-performance, multi-threaded applications.
 
 
 
-
-
 2	Framework & Web	
 What is spring bean ?
-What are the bean scopes available in spring
+Ans:
+A Spring Bean is an object managed by the Spring IoC container, created, configured, and wired as part of the application's runtime.
+Managed by the Spring container, with lifecycle and dependency injection handled automatically.
+
+
 What is spring IoC ? What is it responsible for ?
+Spring IoC (Inversion of Control) is a design principle where the Spring container manages object creation, configuration, and dependency injection.
+Responsibilities:
+    Creating and managing beans.
+    Injecting dependencies automatically.
+    Managing bean lifecycle.
+
+
+
+What are the bean scopes available in spring
+Spring bean scopes:
+    Singleton (default): One instance per Spring container.
+    Prototype: A new instance for each request.
+    Request: One instance per HTTP request (web apps).
+    Session: One instance per HTTP session (web apps).
+    Application: One instance per ServletContext (web apps).
+    WebSocket: One instance per WebSocket session.
+
+
 Dependency Injection in Spring? How many ways one can inject objects ?
-Differnet ways of creating spring bean
+Ans:
+Dependency Injection in Spring allows the container to provide required objects to a class.
+Ways to inject objects:
+    Constructor Injection: Passing dependencies via the constructor.
+    Setter Injection: Using setter methods to set dependencies.
+    Field Injection: Directly injecting into fields using @Autowired (not recommended for testing).
+
+
+Default Injection Way: Spring does not enforce a default; constructor injection is recommended for required dependencies.
+@Autowired
+private SimpleService simpleService; (This is field injection)
+
+What is ue when?
+Field Injection:
+Issue: Harder to test because dependencies can't be set manually without reflection.
+Use Case: Simple cases or legacy code (not recommended).
+
+Setter Injection:
+Issue: Allows changing dependencies after object creation, which can lead to inconsistent state.
+Use Case: Optional dependencies.
+
+Constructor Injection (Preferred):
+Issue: Slightly more verbose, but no major downsides.
+Use Case: Required dependencies. Ensures immutability and easy testing.
+
+
+
+
+
+Differnet ways of creating spring bean?
+XML Configuration:
+Define beans in an XML configuration file.
+
+<bean id="myBean" class="com.example.MyBean"/>
+Annotation-Based Configuration:
+Use @Component and related annotations (@Service, @Repository, @Controller) to mark classes as beans.
+@Component
+public class MyBean {
+}
+
+Java-based Configuration:
+Use @Configuration and @Bean annotations in a configuration class.
+@Configuration
+public class AppConfig {
+    @Bean
+    public MyBean myBean() {
+        return new MyBean();
+    }
+}
+
+Component Scanning:
+Enable component scanning to automatically detect beans in the package.
+@Configuration
+@ComponentScan(basePackages = "com.example")
+public class AppConfig {
+}
+
+Factory Method:
+Use a static factory method to create a bean.
+@Bean
+public MyBean myBean() {
+    return MyBean.createInstance();
+}
+
+
 Circular Dependency - How to solve this ?
+Ans:
+Circular Dependency occurs when two or more beans depend on each other, causing an infinite loop of dependencies. This can happen in Spring if Bean A depends on Bean B, and Bean B depends on Bean A.
+Solutions:
+    Setter Injection:
+    Use setter injection to break the circular dependency.
+
+    Use @Lazy Annotation:
+    Use @Lazy to delay the initialization of one of the beans, allowing Spring to break the circular dependency.
+
+
 Different stereotypes in spring and purpose of the stereotypes
+Stereotypes in Spring refer to annotations that are used to define different types of beans with specific roles in the application. These annotations help Spring automatically detect and manage beans based on their responsibilities, making the code more readable and maintainable.
+Key Stereotype Annotations:
+    @Component: Marks a generic bean, usually for utility or general-purpose components.
+    @Service: A specialized @Component for service layer beans, typically holding business logic.
+    @Repository: A specialized @Component for DAO (Data Access Object) classes, often used for database interaction.
+    @Controller: A specialized @Component for Spring MVC controllers that handle HTTP requests.
+    @RestController: A combination of @Controller and @ResponseBody, used for REST APIs where the response is typically in JSON or XML format.
+
 Injecting Prototype Beans into a Singleton Instance in Spring
+Injecting a prototype bean into a singleton bean in Spring can be tricky due to the way Spring manages bean lifecycles. A singleton bean is created once and shared across the application, while a prototype bean is created each time it is requested.
+
+Problem:
+If you inject a prototype bean directly into a singleton, the singleton bean will hold a reference to a single instance of the prototype bean, which violates the intended lifecycle (the prototype bean should be created fresh each time).
+
+Solutions:
+Using @Lookup Annotation:
+
+Using ApplicationContext:
+You can explicitly request a new instance of the prototype bean from the ApplicationContext inside the singleton.
+
+Using ObjectFactory or Provider:
+
+
+
 DI Exceptions - UnsatisfiedDependencyException, Circular Dependency Exception, NoSuchBeanDefinitionException
+    UnsatisfiedDependencyException:
+    Cause: This exception occurs when Spring cannot satisfy a bean's dependency during injection. 
+    It typically happens if the required bean is not found or not correctly configured.
+
+    CircularDependencyException:
+    Cause: This happens when two or more beans depend on each other, leading to a circular reference.
+
+    NoSuchBeanDefinitionException:
+    Cause: This exception occurs when Spring cannot find a bean definition for a requested type or name.
+
+
 Injecting Collections, Generic Objects
+Spring can inject lists, sets, maps, and arrays into beans using @Autowired.
+You can inject generic beans using @Qualifier if you have multiple beans of the same generic type.
+You can also inject a collection of generic objects into a single bean.
+
+
 Use of @Primary, @Qualifier, @Order, @Lazy, and @Lookup
+    @Primary: Use it when you want one bean to be the default choice when there are multiple beans of the same type.
+    @Qualifier: Use it to specify exactly which bean to inject when there are multiple candidates of the same type.
+    @Order: Use it to define the order in which beans are processed or injected.
+    @Lazy: Use it to delay the initialization of a bean until it is actually needed.
+    @Lookup: Use it to inject a new instance of a prototype bean into a singleton bean.
+
+
 Spring Cloud, Service Discovery, and Gateway
-What is Servlet ? Life cycle of Servlet. What is Dispetcher Servlets ?
-Servlet Filters and Listener
+Spring Cloud provides a comprehensive set of tools for building and managing microservices.
+Service Discovery enables automatic service registration and discovery via tools like Eureka, so services don’t need static configurations.
+Spring Cloud Gateway acts as a reverse proxy or API Gateway, providing routing, load balancing, and filtering, and integrates seamlessly with service discovery to route traffic to available services.
+
+
+What is Servlet ? Life cycle of Servlet. What is Dispetcher Servlets, Servlet Filters and Listener ?
+    Servlet: A Java class that processes HTTP requests and responses. It has a lifecycle consisting of init(), service(), and destroy() methods.
+    DispatcherServlet: In Spring, it acts as the front controller, handling incoming requests and routing them to appropriate controllers.
+    Servlet Filters: Used to process requests and responses (e.g., logging, authentication) before or after they reach a servlet.
+    Servlet Listeners: Listen for specific events in the servlet container, such as context or session creation/destruction, to perform necessary actions.
+
+
 Spring Security: What is security filter chain ?
-Spring Security: Session Based Authentication
-Spring Security: Token Based Authentication
+The Security Filter Chain in Spring Security is a set of filters that are applied to incoming HTTP requests to perform security-related tasks such as authentication, authorization, and logging. 
+
+Default Filters:
+    Some common filters included in the default Spring Security filter chain are:
+    UsernamePasswordAuthenticationFilter: Handles login requests with a username and password.
+    BasicAuthenticationFilter: Processes HTTP Basic authentication.
+    CSRFFilter: Protects against Cross-Site Request Forgery (CSRF) attacks.
+    ExceptionTranslationFilter: Handles security exceptions and redirects or returns appropriate responses.
+    SecurityContextPersistenceFilter: Handles storing and retrieving security context information (e.g., the current authenticated user).
+    FilterSecurityInterceptor: The last filter in the chain, responsible for checking if the authenticated user has the necessary permissions to access a resource.
+
+
+Spring Security: Session Based Authentication, Token Based Authentication
+Both Session-Based Authentication and Token-Based Authentication are common methods for securing web applications, 
+but they differ in how user authentication and session management are handled.
+
+Session Based Authentication,
+--------------------------------
+Session-Based Authentication is simple and stateful, where the server keeps track of the user's session, making it suitable for traditional web applications.
+
+Disadvantages:
+Scalability: Storing session data on the server can become a bottleneck, especially in distributed environments. You may need session replication or sticky sessions in load-balanced environments.
+Stateful: The server needs to maintain state, which can be resource-intensive, especially for a large number of users.
+
+Token-Based Authentication
+--------------------------------
+Token-Based Authentication is stateless, making it ideal for distributed systems, APIs, and microservices, 
+offering greater scalability and flexibility, especially in environments like SPAs and mobile apps.
+Token interception (must use HTTPS)
+
+
+
 Spring Security: Role-Permission Management
-Spring Security: Filter Chain
+1. Basic Concepts:
+    Roles: A role is a high-level concept representing a user's responsibility or job. Typically, roles are associated with permissions, allowing users to access resources.
+    Example: ROLE_USER, ROLE_ADMIN.
+    Permissions: A permission represents the actual rights a user has to access certain resources or perform specific actions.
+    Example: READ_PRIVILEGE, WRITE_PRIVILEGE.
+
+You can use annotations like @PreAuthorize or @Secured to protect methods based on roles or permissions.
+@PreAuthorize is more flexible and allows you to use SpEL (Spring Expression Language) for more complex authorization rules.
+@Secured is simpler and restricts method access to users with the specified role.
+
+Roles are broad categories that group permissions.
+Permissions are granular rights that control access to specific resources.
+Spring Security provides different ways to manage both roles and permissions, including annotations (@Secured, @PreAuthorize), HTTP security configuration, and database-driven authorization.
+RBAC focuses on user roles, while PBAC (Permission-Based Access Control) offers fine-grained access control.
+
+
+
 Spring @Transactional with Different types of Transaction Propagation
+In Spring, the @Transactional annotation is used to manage transactions in a declarative way. It ensures that methods are executed within a transaction context, and the transaction can be rolled back or committed based on certain conditions.
+
+Transaction Propagation Types:
+Spring provides different propagation types that define how transactions are handled when multiple transactions are involved. The propagation attribute of the @Transactional annotation specifies how the current transaction should behave with respect to an existing transaction.
+
+1. REQUIRED (Default Propagation)
+Behavior: If there is an existing transaction, the method will join the existing transaction. If there is no transaction, a new one will be created.
+Use Case: This is the default behavior and is used for most transactional methods.
+Example:
+
+@Transactional(propagation = Propagation.REQUIRED)
+public void someMethod() {
+    // Method logic
+}
+
+2. REQUIRES_NEW
+Behavior: A new transaction is always created, and if there is an existing transaction, it is suspended until the new transaction completes.
+Use Case: Used when you want to ensure that the method runs in its own independent transaction, regardless of the existing transaction.
+Example:
+
+@Transactional(propagation = Propagation.REQUIRES_NEW)
+public void someMethod() {
+    // Method logic in a new transaction
+}
+
+3. SUPPORTS
+Behavior: If there is an existing transaction, the method will join it. If there is no transaction, the method will execute without a transaction.
+Use Case: Used for operations that are not critical but should participate in a transaction if one exists.
+
+4. MANDATORY
+Behavior: If there is an existing transaction, the method will join it. If there is no existing transaction, an exception (TransactionRequiredException) is thrown.
+Use Case: Used when the method must always run inside an existing transaction.
+
+
+NEVER, NOT_SUPPORTEDER,NESTED
+
+
+
+
 Structuring Spring Project
-Spring Boot vs Spring Framework
+1. Project Structure
+my-spring-project/
+│
+├── src/
+│   ├── main/
+│   │   ├── java/com/example/
+│   │   │   ├── config/      (config classes)
+│   │   │   ├── controller/  (REST controllers)
+│   │   │   ├── service/     (business logic)
+│   │   │   ├── repository/  (data access)
+│   │   │   ├── model/       (entities, DTOs)
+│   │   │   └── MySpringApplication.java (main class)
+│   │   └── resources/
+│   │       ├── application.properties
+│   │       ├── static/      (static resources)
+│   │       └── templates/   (Thymeleaf templates)
+│
+├── pom.xml (or build.gradle)
+└── src/test/ (unit tests)
+
+
+
+
 How to enable actuator endpoints
+1. Add Spring Boot Actuator Dependency
+Add the spring-boot-starter-actuator dependency to your pom.xml (for Maven) or build.gradle (for Gradle).
+
+2. Configure Actuator Endpoints in application.properties or application.yml
+By default, some actuator endpoints are enabled, but you can customize which ones are enabled or exposed using the configuration file.
+By adding the spring-boot-starter-actuator dependency and configuring the application.properties or application.yml, you can enable and customize the actuator endpoints in your Spring Boot application.
+
+
+
 Use of @ConfigurationProperties, Usages of Environment Variables in Spring Boot’s Properties Files
+1. @ConfigurationProperties in Spring Boot
+@ConfigurationProperties is a Spring annotation used to bind external configuration properties (e.g., from application.properties or application.yml) to a Java bean. This approach provides a strongly-typed way to handle configuration properties instead of using @Value for individual properties.
+
+Spring Boot Environment Variable Resolution
+Precedence Order: The order of precedence is:
+Command-line arguments (highest priority)
+Environment variables
+Java system properties
+application.properties / application.yml (lowest priority)
+
+
+
 AOP - Point Cut, Advice, Joint Point
+Pointcut: Specifies where (which methods) the advice will be applied.
+Advice: Defines the action to take at the join points (e.g., log, validate, modify behavior).
+Join Point: A specific point in program execution (usually a method execution) where advice can be applied.
+
+
 Unit Testion - JUnit Jupiter
+JUnit Jupiter is the new programming model and extension model for JUnit 5, which provides a modern and flexible way to write and run tests.
+Key Features:
+Annotations:
+@Test: Marks a method as a test case.
+@BeforeEach: Runs before each test method.
+@AfterEach: Runs after each test method.
+@BeforeAll: Runs once before all tests in the class.
+@AfterAll: Runs once after all tests in the class.
+@ParameterizedTest: Used for running the same test with different inputs.
+Assertions:
+
+assertEquals(), assertTrue(), assertFalse(), assertNull(), etc.
+Assertions Library:
+
+Includes fluent assertions like assertThat(), assertThrows() for exception testing.
+Test Lifecycle:
+
+Supports test lifecycle hooks for initialization and cleanup using @BeforeEach, @AfterEach, etc.
+JUnit Jupiter is the foundation of JUnit 5 and is designed to be more extensible and flexible compared to older versions.
+
 JSP, Thymeleaf, Javascript, Ajax
+    JSP: Java-based view technology for dynamic web pages (outdated compared to newer technologies).
+    Thymeleaf: A more modern templating engine, often used with Spring Boot.
+    JavaScript: Client-side scripting language for interactive functionality.
+    AJAX: Technique for making asynchronous requests to update page content without a full reload.
+
 
 
 
@@ -1397,6 +1705,8 @@ Understanding Chrome Developer Tools
 Writing RESTful API
 What is Ajax? Sync, Async Ajax call
 Basic Javascript, DOM Manipulation, and Event Handling, Form Validation
+
+
 
 
 5	Basic Networking	Understanding Network Layer, TCP/IP Stack
