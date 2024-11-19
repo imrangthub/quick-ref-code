@@ -3169,15 +3169,216 @@ Software Testing - Unit Testing vs Integration Testing, Code Review Process
 
 
 
-9	Basic Linux	Understanding Linux OS
+9Basic Linux	Understanding Linux OS
+
 Understanding Command Line
+SH (Shell):
+    A shell is a command-line interface that allows users to interact with the operating system by typing commands.
+    SH specifically refers to the Bourne Shell (/bin/sh), which was one of the first Unix shells. It's basic and was the default shell on many Unix-like systems.
+
+Bash (Bourne Again Shell):
+    Bash is an enhanced version of the Bourne Shell and stands for "Bourne Again Shell".
+    It includes additional features like command history, job control, improved scripting capabilities, and more user-friendly options.
+    Bash is the default shell on most Linux distributions and macOS (before macOS Catalina).
+
+Key Differences:
+    Bash has more features and improvements than sh, such as command-line editing, job control, and arrays.
+    SH is more minimalist and compatible with older systems, whereas Bash is more feature-rich and modern.
+
+
 Understanding File System
+Linux File System/Directory:
+
+Root Directory (/):
+The top-level directory in the Linux file system.
+
+Home Directory (/home/username):
+User-specific directories where personal files and settings are stored.
+
+Bin Directory (/bin):
+Contains essential system binary executables (e.g., ls, cp).
+
+Etc Directory (/etc):
+Contains system configuration files.
+
+Var Directory (/var):
+Stores variable files, such as logs and databases.
+
+Usr Directory (/usr):
+Contains user programs, libraries, and documentation.
+
+Dev Directory (/dev):
+Contains device files for hardware like hard drives and terminals.
+
+Tmp Directory (/tmp):
+Stores temporary files created by applications
+
+
 Package Management Basic
+
+Package Manager:
+A tool used to install, update, and remove software packages in Linux.
+
+Common Package Managers:
+APT (Debian/Ubuntu): sudo apt install <package>, sudo apt update, sudo apt remove <package>
+YUM/DNF (Red Hat/CentOS/Fedora): sudo yum install <package>, sudo yum update, sudo yum remove <package>
+Pacman (Arch Linux): sudo pacman -S <package>, sudo pacman -R <package>
+
+Package Formats:
+    .deb (Debian/Ubuntu)
+    .rpm (Red Hat/CentOS/Fedora)
+
+Repositories:
+    Centralized storage of software packages that can be accessed by the package manager to install software.
+
+Updating Packages:
+    sudo apt upgrade (APT)
+    sudo yum update (YUM/DNF)
+    sudo pacman -Syu (Pacman)
+
+Searching for Packages:
+    apt search <package> (APT)
+    yum search <package> (YUM)
+    pacman -Ss <package> (Pacman)
+
+
 Shell Scripting Introduction
+Shell Scripting Introduction:
+
+Shell Scripting:
+A way to automate tasks in Linux/Unix using commands written in a script file.
+
+Basic Syntax:
+
+A shell script typically starts with a "shebang" (#!/bin/bash) indicating the shell to use.
+Commands are written as you would type them in the terminal.
+Variables:
+
+Variables store data: name="John"
+Access variables with $: echo $name
+Control Flow:
+
+If statements: if [ condition ]; then ... fi
+Loops: for, while loops to repeat actions.
+Functions:
+
+Define reusable code:
+bash
+Copy code
+myfunc() { echo "Hello"; }
+File Permissions:
+
+Make scripts executable: chmod +x script.sh
+Run scripts: ./script.sh
+Redirection & Piping:
+
+Redirect output to a file: echo "Hello" > file.txt
+Pipe commands together: cat file.txt | grep "word"
+Common Use Cases:
+Automating backups, managing system tasks, processing files, and batch jobs.
+
+
 CLI Tools & Commands - ps, top, htop, kill, netstat, nc, nmap, tcpdump, iftop, telnet, ping, vim, nano, tail, lsof, iotop, iostat
-SSH - Accessing Remote Server
-VPN
-Firewall, and Port Forwarding
+
+CLI Tools & Commands:
+
+ps:
+
+Displays current running processes.
+Example: ps aux
+top:
+
+Shows system processes and resource usage in real-time.
+Example: top
+htop:
+
+An enhanced, interactive version of top for process monitoring.
+Example: htop
+kill:
+
+Sends a signal to terminate processes.
+Example: kill <PID>
+netstat:
+
+Displays network connections, routing tables, and interface statistics.
+Example: netstat -tuln
+nc (Netcat):
+
+Used for network communication (sending/receiving data).
+Example: nc <hostname> <port>
+nmap:
+
+A network scanning tool to discover hosts and services.
+Example: nmap <IP>
+tcpdump:
+
+Captures network traffic for analysis.
+Example: tcpdump -i eth0
+iftop:
+
+Displays real-time network bandwidth usage by host.
+Example: iftop
+telnet:
+
+Used for remote communication with a server.
+Example: telnet <hostname>
+ping:
+
+Tests network connectivity by sending ICMP packets.
+Example: ping <hostname/IP>
+vim:
+
+A powerful text editor for editing files.
+Example: vim file.txt
+nano:
+
+A simple text editor for easy file editing.
+Example: nano file.txt
+tail:
+
+Displays the last few lines of a file (useful for logs).
+Example: tail -f /var/log/syslog
+lsof:
+
+Lists open files and associated processes.
+Example: lsof
+iotop:
+
+Displays real-time I/O usage by processes.
+Example: iotop
+iostat:
+
+Provides statistics about CPU and I/O devices.
+Example: iostat
+
+
+SSH - Accessing Remote Server, Linux VPN, Linux Firewall, and Port Forwarding
+Linux SSH - Accessing Remote Server:
+
+SSH (Secure Shell): A protocol used to securely access remote servers.
+Command: ssh username@hostname_or_ip
+Example: ssh user@192.168.1.10
+Key-based Authentication: Use SSH keys for secure and password-less login.
+Linux VPN:
+
+A VPN (Virtual Private Network) allows secure connections to remote networks over the internet.
+Tools: OpenVPN, WireGuard, strongSwan for creating VPNs on Linux.
+Command for connecting to OpenVPN: sudo openvpn --config /path/to/config.ovpn
+Linux Firewall:
+
+iptables and firewalld are common Linux firewall tools for managing network traffic.
+Basic Commands:
+iptables -L: List current rules.
+firewalld: sudo firewall-cmd --zone=public --add-port=80/tcp --permanent
+Port Forwarding:
+
+Redirect network traffic from one port to another, often used for accessing internal services.
+Example with iptables:
+sudo iptables -t nat -A PREROUTING -p tcp --dport 8080 -j REDIRECT --to-port 80
+This forwards traffic from port 8080 to port 80.
+
+
+
 
 
 
