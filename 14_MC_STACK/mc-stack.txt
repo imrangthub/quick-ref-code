@@ -97,7 +97,7 @@ Vikas Kumar Jha
 
 https://www.youtube.com/playlist?list=PLVCgi5HZ0-YtWh-PD8LUCbdsG7oDIfGlD
 =================================================
-#redis | Redis                                     
+##redis | Redis                                     
 ================================================= 
 =>sudo apt install redis-tools
 =>redis-cli --version
@@ -117,7 +117,8 @@ Find/Check redis in hostmachine:
 sudo find / -type f -name "redis-server" 2>/dev/null
 sudo find / -type f -name "redis-cli" 2>/dev/null
 
-
+=>cat /etc/redis/redis.conf | grep requirepass
+Check pass
 
 =>redis-cli ping
 =>redis-cli
@@ -125,6 +126,11 @@ sudo find / -type f -name "redis-cli" 2>/dev/null
 
 redis-server -v
 redis-server --check-system
+
+
+
+
+
 
 
 =>CONFIG GET "port"
@@ -212,6 +218,26 @@ redis-cli -p 8181
 
 #Redis Sentinel 
 =================================================
+
+=>redis-cli -h 192.168.1.1 -p 6379 -a 'mysuperpass'
+loginc with password
+
+=>SENTINEL get-master-addr-by-name mymaster
+getMaster from sentanal
+
+
+=>SENTINEL masters
+List all monitored masters:
+
+
+=>SENTINEL slaves mymaster
+Get details of replicas (workers) by this master
+
+
+=>SENTINEL sentinels mymaster
+List all Sentinel instances monitoring by this master
+
+
 
 Create Doecker Network:
 docker network create redis-net
@@ -388,7 +414,7 @@ except Exception as e:
 
 
 ==============================================
-#Redis Performance Benchmarking | Tuning
+##Redis Performance Benchmarking | Tuning
 ==============================================
 
 
@@ -473,17 +499,6 @@ sudo vim /etc/rc.local
 
 # Add this line before exit 0
 echo never > /sys/kernel/mm/transparent_hugepage/enabled
-
-
-
-
-
-
-
-
-
-
-
 
 
 
