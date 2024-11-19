@@ -2258,97 +2258,914 @@ TCP Congestion Control
 
 
 Low Latency Handshake: QUIC
+Low Latency Handshake in QUIC (Quick UDP Internet Connections) refers to the protocol's ability to establish a secure connection with minimal delay, significantly improving the performance of applications that require fast response times, such as video streaming, gaming, or real-time communications.
+
 URL vs URI, and URL Encoding
+URL vs URI
+    URI (Uniform Resource Identifier): Identifies a resource, either by location, name, or both.
+    Example: http://example.com, mailto:user@example.com, urn:isbn:0451450523.
+    URL (Uniform Resource Locator): A type of URI that specifies the location of a resource and the protocol to access it.
+    Example: http://example.com/page.html.
+    All URLs are URIs, but not all URIs are URLs.
+
+URL Encoding
+    Purpose: Encodes characters in a URL to ensure they are transmitted safely over the internet.
+    Use Cases:
+    Encoding query parameters: https://example.com/search?q=hello%20world.
+    Safeguarding data in GET requests or APIs.
+
 HTTP Long Pooling, Short Pooling, Websocket, Server Sent Event
+HTTP Long Polling
+    Definition: A technique where the client requests information from the server, and the server holds the connection open until new data is available.
+    How It Works:
+    The client sends a request.
+    The server delays the response until new data is available or a timeout occurs.
+    After the response, the client immediately sends another request.
+    Use Cases: Chat applications, live notifications.
+
+HTTP Short Polling
+    Definition: The client regularly sends requests to the server at fixed intervals to check for updates.
+    How It Works:
+    The client sends requests at intervals (e.g., every 5 seconds).
+    The server responds immediately with the current state, even if no updates are available.
+    Use Cases: Simple applications where low latency is not critical.
+
+WebSockets
+    Definition: A full-duplex communication protocol that allows continuous data exchange between client and server over a single TCP connection.
+    How It Works:
+    The client establishes a WebSocket handshake via HTTP, then upgrades to a persistent TCP connection.
+    Both client and server can send messages at any time without additional requests.
+    Use Cases: Real-time games, stock price updates, live chat.
+
+Server-Sent Events (SSE)
+    Definition: A unidirectional communication protocol where the server pushes updates to the client using HTTP.
+    How It Works:
+    The client opens an HTTP connection to the server.
+    The server sends data updates as events over the connection.
+    Use Cases: Real-time notifications, dashboards, live feeds.
+
+
+
 HTTP Streaming: Transfer Encoding: chunked
+    HTTP Streaming using Transfer-Encoding: chunked is a technique where data is sent to the client in chunks as it becomes available, rather than waiting for the entire response to be ready.
+    Client Support: Most modern browsers and HTTP clients support chunked transfer.
+    Server Configuration: Many servers (e.g., Nginx, Apache) support this by default, but it may require explicit configuration.
+
+
+
 What is CORS
+Origin: Defined by the combination of:
+    Protocol (e.g., http, https)
+    Domain (e.g., example.com)
+    Port (e.g., :8080)
+    Example: https://example.com:443 is different from http://example.com:80.
+
+    Same-Origin Policy: By default, web browsers block requests from a web page to a different origin for security reasons.
+    CORS: Provides a way for servers to specify which domains (origins) are allowed to access their resources.
+
+Common Issues:
+    CORS Error: Occurs when a server does not include the appropriate CORS headers for a cross-origin request.
+    Credentials Blocked: If Access-Control-Allow-Credentials is not set and credentials are included in the request.
+
+
+
+
 HTTP Security: Content Security Policy, Strict-Transport-Security
+1. Content Security Policy (CSP)
+    Purpose:
+
+    Mitigate cross-site scripting (XSS) and other injection attacks.
+    Control which resources (scripts, styles, images, etc.) are allowed to load.
+    How it Works:
+
+    CSP is implemented using the Content-Security-Policy HTTP header.
+    You specify directives that dictate the sources and types of content that browsers are allowed to load.
+
+2. Strict-Transport-Security (HSTS)
+Purpose:
+    Enforce the use of HTTPS to prevent man-in-the-middle (MITM) attacks and downgrade attacks.
+    How it Works:
+
+    HSTS is implemented using the Strict-Transport-Security HTTP header.
+    Once a browser receives this header, it only communicates with the site over HTTPS.
+
+
+
 HTTP Basic Authentication
+HTTP Basic Authentication is a simple authentication mechanism that encodes user credentials (username and password) in a Base64 format and includes them in the Authorization header of HTTP requests.
+
 HTTP Content Negotiation
+HTTP Content Negotiation is a mechanism that allows the client and server to communicate and decide on the most appropriate representation of a resource (e.g., format, language, or encoding). This is achieved through HTTP request headers and server responses.
+
+
+
 What is HTTP Keep alive, Why is it needed ?
+Definition:
+HTTP Keep-Alive is a mechanism that allows a single TCP connection to remain open for multiple HTTP requests and responses, rather than opening a new connection for each request. 
+
+Example Without Keep-Alive
+    For a webpage with 10 resources:
+    The client opens and closes a separate TCP connection for each resource (e.g., HTML, CSS, JS).
+    This results in 10 TCP handshakes, increasing latency and resource usage.
+
+Example With Keep-Alive
+    For the same webpage with Keep-Alive enabled:
+    The client reuses a single TCP connection for all 10 resources.
+    Only one handshake is needed, significantly improving performance.
+
+Reduces Latency:
+    Avoids the overhead of repeatedly establishing and tearing down TCP connections.
+    Faster communication because the handshake for new connections is skipped.
+Saves Resources:
+    Reduces CPU and memory usage on both client and server.
+    Fewer TCP connections lead to less network congestion.
+
+
+
+
 HTTP Multiplexing
+HTTP Multiplexing, introduced in HTTP/2, revolutionizes web communication by enabling multiple requests and responses to be sent over a single TCP connection simultaneously. This results in improved performance, reduced latency, and more efficient use of network resources compared to HTTP/1.x. It plays a significant role in enhancing the user experience for modern web applications.
+
+
+
 Understanding HTTP 1.1, 2, 3 differences
-Understanding UDP
+The most widely used versions today are HTTP/1.1, HTTP/2, and HTTP/3.
+HTTP/1.1 is the legacy version and is still widely used today, but it has performance limitations such as head-of-line blocking and inefficient use of TCP connections.
+HTTP/2 introduced important improvements such as multiplexing and header compression, offering better performance for most modern websites. However, it still uses TCP, which suffers from head-of-line blocking.
+HTTP/3 takes the biggest leap by using QUIC (UDP-based), offering even lower latency, improved performance, and security. It's especially advantageous in scenarios with high network congestion or unreliable connections. However, it's still in the process of widespread adoption.
+
+
+
+
+
+
+Understanding UDP,
+    Use Cases for UDP
+    Due to its characteristics, UDP is often used in applications where speed is more important than reliability, such as:
+    Real-time communication:
+    Voice over IP (VoIP), video conferencing, online gaming.
+    Streaming:
+    Video and audio streaming where timely delivery is prioritized over occasional packet loss.
+    DNS (Domain Name System):
+    DNS queries typically use UDP to speed up the process of looking up domain names.
+    Broadcast and multicast:
+    Broadcasting to multiple clients, as in IP television or network management.
+
+    UDP is a fast, lightweight, and connectionless protocol used for communication in many real-time applications.
+    However, the application using UDP must be capable of handling potential issues like packet loss, out-of-order delivery, or duplication.
+
+
+
 Others Protocol - gRPC, Apache Thrift, MQTT, AMQP
+    gRPC:
+    Type: RPC framework.
+    Use Case: High-performance microservices communication, real-time services.
+
+    Apache Thrift:
+    Type: RPC framework.
+    Use Case: Cross-language services and data serialization.
+
+    MQTT:
+    Type: Publish/Subscribe messaging.
+    Use Case: IoT and real-time messaging.
+
+    AMQP:
+    Type: Message queuing.
+
+
 Understanding Chrome Developer Tools
+Chrome Developer Tools (DevTools) is a set of web development tools built into Google Chrome that helps developers inspect, debug, and optimize websites.
+These tools help developers debug, test, and improve website performance directly in the browser.
+
+
 Writing RESTful API
+REST, an architectural style for distributed systems. It defines a set of rules for how clients and servers communicate over HTTP, focusing on stateless interactions, scalability, and resource-based operations.
+
+For an API to be considered RESTful, it must follow a few core principles of REST:
+Statelessness:
+    Every request is treated independently.
+Client-Server Architecture:
+    The client and the server are separate entities.  
+
+Uniform Interface:
+RESTful APIs have a consistent, standardized set of conventions for interacting with resources, using HTTP methods and status codes.
+Resources (data) are identified via URIs (Uniform Resource Identifiers).
+Clients interact with resources using standard HTTP methods: GET, POST, PUT, DELETE.
+
+Resource-Based:
+Everything is a resource (e.g., user, product, order) identified by a URI.
+
+Representation of Resources:
+
+Resources are transferred between client and server in various formats, typically JSON or XML
+
+
+
+Best Practices
+    Use versioning in API paths (e.g., /v1/users).
+    Keep URLs noun-based (e.g., /users, /products).
+    Use plural for resource names (e.g., /users instead of /user).
+    Be consistent with HTTP methods and status codes.
+    Implement pagination for large data sets (e.g., /users?page=1&size=10).
+
+
 What is Ajax? Sync, Async Ajax call
+AJAX (Asynchronous JavaScript and XML) is a technique used in web development to create dynamic, interactive web pages
+    AJAX uses the following components:
+        JavaScript: The scripting language to make the request.
+        XMLHttpRequest (XHR): An API used to send and receive data asynchronously.
+        JSON or XML: Common data formats used for exchange (although other formats like HTML can also be used).
+
+Modern Alternative: Fetch API
+    In modern JavaScript, the Fetch API is often used as an alternative to XMLHttpRequest. 
+    It provides a cleaner, promise-based interface for making AJAX requests and supports both synchronous and asynchronous operations.
+    The Fetch API is asynchronous by default and returns a promise.
+
+
 Basic Javascript, DOM Manipulation, and Event Handling, Form Validation
+    JavaScript allows you to create interactive web pages by manipulating the DOM and handling events.
+    DOM Manipulation allows you to modify HTML content, change styles, and add/remove elements dynamically.
+    Event Handling enables you to respond to user actions (e.g., clicks, keypresses) by adding event listeners to elements.
+    Form Validation helps ensure that users submit valid data, such as required fields, correct email formats, and strong passwords.
+
+
+
+5Basic Networking	Understanding Network Layer, TCP/IP Stack
+TCP/IP Stack:
+    The TCP/IP Stack is the foundational model for network communication. It consists of four layers:
+    Application Layer (Layer 4): Deals with application-specific protocols like HTTP, FTP, SMTP.
+    Transport Layer (Layer 3): Ensures reliable data transfer. Protocols include TCP (Transmission Control Protocol) for connection-oriented communication and UDP (User Datagram Protocol) for connectionless communication.
+    Internet Layer (Layer 2): Handles routing and addressing using IP (Internet Protocol).
+    Link Layer (Layer 1): Manages the physical network hardware and protocols like Ethernet.
+    The TCP/IP stack is widely used for internet communication and is the foundation of most modern networking.
+
+What is DNS ? How it works, What is DHCP, CIDR
+    DNS (Domain Name System):
+    DNS translates human-readable domain names (like www.example.com) into IP addresses (like 192.168.1.1).
+    It works by using a hierarchical system with multiple levels of servers: local DNS resolver, root servers, and authoritative DNS servers.
+
+    DHCP (Dynamic Host Configuration Protocol):
+    DHCP automatically assigns IP addresses and other network configuration details (like subnet mask, gateway) to devices on a network.
+
+CIDR (Classless Inter-Domain Routing):
+CIDR is a method for allocating IP addresses and routing that replaces traditional class-based IP addressing (e.g., Class A, B, C).
+It uses a prefix notation (e.g., 192.168.1.0/24), where /24 indicates how many bits are
 
 
 
 
-5	Basic Networking	Understanding Network Layer, TCP/IP Stack
-What is DNS ? How it works
-What is DHCP, CIDR
 Network Interface - Physical and Virtual Interface
+A Network Interface is the point of connection between a computer/device and a network. It enables communication over the network using either physical or virtual interfaces.
+
+Physical Interface:
+    Physical Interface refers to the hardware components used to connect a device to a network.
+    Examples include:
+    Ethernet ports (wired network connections)
+    Wi-Fi adapters (wireless network connections)
+    Network Interface Cards (NICs) in computers or servers
+
+Virtual Interface:
+    Virtual Interface is a software-defined network interface that exists logically rather than physically.
+    Examples include:
+    Virtual LAN (VLAN) interfaces: Logical segmentation of networks.
+    Virtual Network Interface Cards (vNICs): Used in virtual machines (VMs) or containers.
+    Loopback interface: A special virtual interface used for internal communication within a device (e.g., 127.0.0.1 for localhost).
+
+
 Understading IPTables, and Routing Table
+
+IPTables:
+    IPTables is a Linux tool to control network traffic via rules that specify how to handle incoming, outgoing, and forwarded packets.
+    Chains define rules (e.g., INPUT, OUTPUT), and tables group them (e.g., filter, nat, mangle).
+    Common commands include:
+        iptables -L: List rules
+        iptables -A: Add rule
+        iptables -D: Delete rule
+
+Routing Table:
+    A Routing Table stores network paths for directing data packets.
+    It includes information about:
+        Destination IP: Network destination
+        Gateway: Next-hop IP
+        Interface: Network interface
+        Metric: Route preference
+    Commands:
+        route -n: View routing table
+        ip route show: View routing table
+
+
 L2, and L3 Devices
-NATing, Static & Dynamic Routing
-BGP Routing Protocol
+L2 devices handle local communication within the same network, while L3 devices manage communication between different networks.
+
+NATing, Static & Dynamic Routing, BGP Routing Protocol
+NATing (Network Address Translation):
+    NAT is a method used to modify the source or destination IP addresses in packet headers.
+    It enables multiple devices on a private network to share a single public IP address for internet access.
+    Types:
+    Source NAT (SNAT): Modifies the source IP.
+    Destination NAT (DNAT): Modifies the destination IP (e.g., port forwarding).
+
+Static & Dynamic Routing:
+    Static Routing: Routes are manually configured by an administrator, providing fixed paths for traffic.
+    Dynamic Routing: Routes are automatically learned and updated using routing protocols (e.g., RIP, OSPF, BGP).
+
+BGP Routing Protocol:
+    BGP (Border Gateway Protocol) is a dynamic, path-vector protocol used to exchange routing information between different autonomous systems (ASes) on the internet.
+
+
+
 Virtual Private Network, Secure Tunnel
+Virtual Private Network (VPN):
+    VPN is a secure connection that allows users to access a private network over the internet.
+    It encrypts data traffic, ensuring confidentiality and protecting against unauthorized access.
+    Common uses include:
+    Remote access for employees
+    Securing internet traffic on public networks
+
+Secure Tunnel:
+    A Secure Tunnel refers to an encrypted communication channel between two endpoints (e.g., between a device and a VPN server).
+    It ensures that data passing through the tunnel is protected from eavesdropping and tampering.
+    Common tunneling protocols include:
+    IPsec (for secure internet protocol communication)
+    SSL/TLS (used in VPNs like OpenVPN or SSL VPN)
+
+
+
+
 Container Networking - Docker
+Docker Networking allows containers to communicate with each other and with external systems.
+Key types of Docker networks:
+    Bridge: Default network, containers on the same host can communicate.
+    Host: Container shares the host’s network stack.
+    Overlay: Enables communication between containers on different hosts, often used in Docker Swarm or Kubernetes.
+    None: No network connectivity for the container.
+    Docker uses network drivers to manage container-to-container and container-to-host communication.
 
 
 
-6	Database & ORM	DB Design and Best Practices
+
+6Database & ORM	DB Design and Best Practices
+Ans:
+Normalization: Organize data to reduce redundancy and ensure data integrity by applying normal forms (up to 3NF, or higher if needed).
+
+Indexing: Use indexes to speed up query performance, especially on columns used in WHERE clauses, JOINs, and ORDER BY.
+
+Relationships: Properly define relationships (One-to-One, One-to-Many, Many-to-Many) between entities in the database schema.
+
+Foreign Keys: Use foreign keys to maintain referential integrity between related tables.
+
+Data Types: Choose appropriate data types for columns based on the data they store to optimize storage and performance.
+
+Transactions: Ensure that critical database operations are wrapped in transactions to maintain consistency (ACID properties).
+
+ORM Best Practices:
+
+Lazy Loading vs. Eager Loading: Use lazy loading for large data sets, eager loading when you need related data immediately.
+Avoid N+1 Problem: Optimize queries to avoid the N+1 query problem by using proper fetching strategies.
+Use DTOs: Use Data Transfer Objects (DTOs) for better separation of concerns and to avoid unnecessary database queries.
+Database Security: Implement access control, encryption for sensitive data, and regular backups.
+
+Denormalization: Consider denormalization for performance optimization in read-heavy applications, but weigh the trade-offs carefully.
+
+Avoid Hardcoding SQL: Use parameterized queries or ORM frameworks (e.g., Hibernate, JPA) to prevent SQL injection attacks.
+
+
+
 DB Normalization
+DB Normalization (Short Version)
+Database normalization organizes data to reduce redundancy and improve integrity through normal forms (NF):
+1NF: Each cell contains a single value; no repeating groups.
+2NF: In 1NF; remove partial dependencies (attributes depend on the whole primary key).
+3NF: In 2NF; eliminate transitive dependencies (non-key attributes depend only on the primary key).
+BCNF: In 3NF; ensure every determinant is a candidate key.
+4NF: In BCNF; eliminate multi-valued dependencies.
+5NF: In 4NF; eliminate join dependenc
+
+
 ACID Properties
-DDL, DML Query
-Joins, Aggregation
-Group By, Having, where, and IN clause
-Query Optimization, Database Indexing
-SELECT statement best practices
-Primary Key, Foreign Key, Unique Key
-What is JPA and Hibernate ?
-JPA - Enity Life Cycle
-ID Generation Strategies
+ACID ensures database transactions are processed reliably:
+
+Atomicity: All operations in a transaction are completed; if one fails, the entire transaction is rolled back.
+Consistency: Transactions bring the database from one valid state to another, maintaining integrity.
+Isolation: Transactions are executed independently, without interference from others.
+Durability: Once a transaction is committed, its changes are permanent, even in the event of a system failure.
+
+
+
+DDL, DML Query, Query Optimization, Database Indexing
+    DDL (Data Definition Language):
+    Defines and manages database structures.
+
+    Examples: CREATE, ALTER, DROP.
+    DML (Data Manipulation Language):
+    Manipulates data within tables.
+
+    Examples: SELECT, INSERT, UPDATE, DELETE.
+    Query Optimization:
+    Improves query performance by choosing the most efficient execution plan.
+
+    Techniques: Indexing, caching, and query rewriting.
+    Database Indexing:
+    Speeds up data retrieval by creating a structured reference to table data.
+
+    Types: B-tree, Hash, and Full-text indexes.
+
+
+
+
+Joins, Aggregation, Group By, Having, where, and IN clause, SELECT statement best practices, Primary Key, Foreign Key, Unique Key
+Ans:
+    Joins:
+    Combine data from two or more tables based on a related column.
+
+    Types: INNER JOIN, LEFT JOIN, RIGHT JOIN, FULL JOIN.
+    Aggregation:
+    Perform calculations on a set of values to return a single result.
+
+    Examples: SUM(), AVG(), COUNT(), MIN(), MAX().
+    Group By:
+    Groups rows that have the same values in specified columns.
+
+    Used with aggregation functions.
+    Having:
+    Filters groups after GROUP BY (like WHERE, but for aggregated results).
+
+    WHERE:
+    Filters records before any grouping or aggregation.
+
+    Used for condition checks on individual rows.
+    IN Clause:
+    Checks if a value is within a set of specified values.
+
+    Example: WHERE column IN (1, 2, 3).
+    SELECT Statement Best Practices:
+
+    Use specific column names instead of SELECT *.
+    Use LIMIT to control the result size.
+    Avoid unnecessary complex subqueries.
+    Primary Key:
+    A unique identifier for a table, cannot be NULL.
+
+    Foreign Key:
+    A column that links to the primary key of another table, ensuring referential integrity.
+
+    Unique Key:
+    Ensures all values in a column (or set of columns) are unique, but allows NULL values.
+
+
+What is JPA and Hibernate ? JPA - Enity Life Cycle ? ID Generation Strategies?
+Ans:
+    JPA (Java Persistence API):
+    A specification for managing relational data in Java applications. It defines how Java objects can be persisted into a relational database.
+
+    Hibernate:
+    An open-source ORM (Object-Relational Mapping) framework that implements JPA and simplifies database interaction by mapping Java objects to database tables.
+
+    JPA - Entity Life Cycle:
+    The lifecycle of an entity in JPA includes the following stages:
+
+    New/Transient: Entity is created but not yet persisted.
+    Managed: Entity is persisted and tracked by the EntityManager.
+    Detached: Entity is no longer managed but still has data.
+    Removed: Entity is marked for deletion.
+    ID Generation Strategies:
+    AUTO: Let the JPA provider choose the strategy (e.g., Hibernate uses IDENTITY or SEQUENCE).
+    IDENTITY: Database auto-generates the ID (e.g., AUTO_INCREMENT in MySQL).
+    SEQUENCE: Uses a database sequence to generate IDs (e.g., Oracle).
+    TABLE: Uses a special table to generate IDs.
+
+
+
 EntityManager vs EntityManagerFactory
-Entity Relationship - One to One, One to Many, Many To Many
-ORM relationship best practices
-JPA Cascading Type
-JPA Fetching Strategy 
+EntityManager:
+Manages the lifecycle of entities, handles CRUD operations, and queries against the database. It's used for interacting with the persistence context.
+
+EntityManagerFactory:
+Creates EntityManager instances. It's a heavyweight, thread-safe object used to set up the persistence context and is typically created once per application.
+
+
+Entity Relationship - One to One, One to Many, Many To Many, ORM relationship best practices
+Ans:
+    Entity Relationships:
+
+    One to One:
+    One entity is related to exactly one other entity.
+    Example: Person has one Passport.
+
+    One to Many:
+    One entity is related to multiple entities.
+    Example: Department has many Employees.
+
+    Many to Many:
+    Multiple entities are related to multiple other entities.
+    Example: Student can enroll in many Courses, and each Course can have many Students.
+
+ORM Relationship Best Practices:
+    Use @OneToOne, @OneToMany, @ManyToMany annotations correctly.
+    Fetch Strategy: Choose between Lazy or Eager loading based on use case (e.g., avoid Eager loading in large datasets).
+    Avoid N+1 Problem: Use JOIN FETCH to optimize queries in One to Many and Many to Many.
+    Cascade Operations: Use cascade types (PERSIST, MERGE, REMOVE) judiciously to propagate changes to related entities.
+
+
+JPA Cascading Type, JPA Fetching Strategy 
+
+JPA Cascading Types:
+
+Cascading allows related entities to be automatically persisted or deleted when the parent entity is persisted or deleted. Common cascade types are:
+PERSIST: Cascade the persist operation to related entities.
+MERGE: Cascade the merge operation to related entities.
+REMOVE: Cascade the remove operation to related entities.
+REFRESH: Cascade the refresh operation to related entities.
+DETACH: Cascade the detach operation to related entities.
+ALL: Apply all cascade operations (PERSIST, MERGE, REMOVE, etc.).
+
+JPA Fetching Strategy:
+JPA defines two main fetching strategies for loading associated entities:
+
+Lazy Loading:
+        The associated entity is loaded only when it is accessed. This is the default for most relationships (@OneToMany, @ManyToMany).
+    @OneToMany(fetch = FetchType.LAZY)
+    private Set<Order> orders;
+
+
+Eager Loading:
+    The associated entity is loaded immediately along with the parent entity. This can be specified with FetchType.EAGER.
+    @OneToMany(fetch = FetchType.EAGER)
+    private Set<Order> orders;
+
+Lazy loading is generally preferred for performance, especially with large datasets, but be mindful of the N+1 query problem.
+Use Eager loading only when you need the related data immediately.
+
+
+
+
 JPA Annotations - @Embeddable, @Embedded, @EmbeddedId, @Transient, @Lob, @Basic, @Cacheable
-Spring Data JPA - @Query, @Modify
-Spring Data JPA - Specifications
-Spring Data JPA - Query Creation from Method Names
-Spring Data JPA - Accessing EntityManager
-Spring Data JPA - Multitenancy
+Ans:
+
+    @Embeddable:
+    Marks a class whose instances can be embedded in other entities as part of their state.
+
+    @Embedded:
+    Defines an embedded object, typically used with @Embeddable class to include its fields in the parent entity.
+
+    @EmbeddedId:
+    Defines a composite primary key as an embedded object, typically a class with @Embeddable.
+
+    @Transient:
+    Marks a field to be ignored by JPA (not persisted in the database).
+
+    @Lob:
+    Marks a field to be treated as a large object (e.g., BLOB or CLOB), used for storing large data like images or text.
+
+    @Basic:
+    Specifies the default fetch strategy (LAZY or EAGER) and whether the field is required to be persisted.
+
+    @Cacheable:
+    Marks an entity as eligible for caching to improve performance by storing query results in the cache.
+
+
+Spring Data JPA - @Query, @Modify,Specifications, Query Creation from Method Names
+@Query:
+Used to define custom JPQL (Java Persistence Query Language) or SQL queries for repository methods.
+Example:
+    @Query("SELECT e FROM Employee e WHERE e.salary > ?1")
+    List<Employee> findEmployeesWithSalaryGreaterThan(double salary);
+
+@Modifying:
+Marks a method that modifies the database (e.g., UPDATE, DELETE). It should be used with @Query for operations that change the database state.
+Example:
+    @Modifying
+    @Query("UPDATE Employee e SET e.salary = :salary WHERE e.id = :id")
+    int updateEmployeeSalary(@Param("salary") double salary, @Param("id") Long id);
+
+Specifications:
+Provides a way to create dynamic queries using the Specification interface, allowing complex queries with conditions.
+
+Query Creation from Method Names:
+Spring Data JPA can automatically generate queries based on method names.
+Example:
+    List<Employee> findByLastName(String lastName);
+    List<Employee> findBySalaryGreaterThan(double salary);
+    Spring Data JPA interprets these method names to generate the corresponding SQL queries.
+
+
+Spring Data JPA - Accessing EntityManager,  Multitenancy
+    Spring Data JPA - Accessing EntityManager:
+    EntityManager is used to interact with the persistence context. In Spring, it's typically injected into repositories or services using @PersistenceContext.
+    Example:
+        @PersistenceContext
+        private EntityManager entityManager;
+
+Multitenancy:
+    Multitenancy in Spring Data JPA allows a single application to support multiple tenants (e.g., customers or clients), each with its own data.
+    Single Database: Tenants share the same database but with separate schemas or tables.
+    Separate Databases: Each tenant has its own database. Spring can be configured to manage this through a custom DataSource and tenant identifier strategy.
+
+
+
 JPA - Locking: Optimistic and Pessimistic Lock
+Optimistic Locking:
+    Assumes no conflicts. It uses a version field to check if the entity has been changed by another transaction.
+    Example:
+    @Version
+    private Long version;
+
+Pessimistic Locking:
+    Locks the entity to prevent other transactions from changing it while the current transaction is ongoing.
+    Example:
+
+    @Lock(LockModeType.PESSIMISTIC_WRITE)
+    Employee findByIdWithLock(Long id);
+
 JPA - First Level and Second Level Caching
-JPA Auditing
-JPA Listeners
-N+1 problem in ORM
-JPQL, HQL
-Handling money in database
+First Level Cache:
+    Built-in, automatic cache in the EntityManager for the current session.
+    Stores entities that are retrieved or persisted during a session.
+    Only available within the same session or transaction.
+
+Second Level Cache:
+    Cache shared across sessions, typically managed by a cache provider (e.g., Ehcache, Hazelcast).
+    Stores entities that are frequently accessed and not modified often, improving performance across multiple sessions.
+    Can be configured and used for specific entities.
+
+
+JPA Auditing, JPA Listeners, JPQL, HQL, N+1 problem in ORM
+Ans:
+JPA Auditing:
+    Automatically tracks entity changes like creation and modification times.
+    Example:
+    @CreatedDate
+    private LocalDateTime createdDate;
+JPA Listeners:
+    Allows executing logic before or after entity operations (e.g., insert, update).
+    Example:
+    @EntityListeners(AuditingEntityListener.class)
+    public class Employee { ... }
+
+JPQL (Java Persistence Query Language):
+A query language similar to SQL but operates on entity objects, not database tables.
+Example:
+SELECT e FROM Employee e WHERE e.salary > 50000
+
+
+HQL (Hibernate Query Language):
+    Similar to JPQL but specific to Hibernate, it also works with entity objects.
+
+N+1 Problem in ORM:
+    Occurs when multiple database queries are executed unnecessarily, especially when loading related entities.
+    Solution: Use JOIN FETCH or Eager loading to optimize.
+
+
 Writing Native Query in Spring Data Jpa
-Different Transaction Isloation
-Different Read Phenomenon
+Ans:
+    Writing Native Query in Spring Data JPA:
+    Native queries are SQL queries directly executed on the database. They are defined using @Query with nativeQuery = true.
+
+Example:
+    @Query(value = "SELECT * FROM employee WHERE salary > ?1", nativeQuery = true)
+    List<Employee> findEmployeesWithSalaryGreaterThan(double salary);
+    nativeQuery = true tells Spring Data JPA to treat the query as native SQL.
+    Can be used for complex queries not easily expressed in JPQL
+
+
+Different Transaction Isloation, Different Read Phenomenon
+
+Transaction Isolation Levels:
+    READ UNCOMMITTED:
+    Allows dirty reads (reading uncommitted data).
+    READ COMMITTED:
+    Prevents dirty reads, but allows non-repeatable reads.
+    REPEATABLE READ:
+    Prevents dirty and non-repeatable reads, but allows phantom reads.
+    SERIALIZABLE:
+    Prevents dirty, non-repeatable, and phantom reads by fully isolating transactions.
+
+Read Phenomena:
+    Dirty Read:
+    Reading data that is not yet committed (can change if the transaction is rolled back).
+
+    Non-repeatable Read:
+    A value is read, but it changes when read again within the same transaction.
+
+    Phantom Read:
+    New rows are added or removed between reads, causing inconsistent results.
+
+
 Result Transformation to DTO, Data JPA Projections
+
+Result Transformation to DTO:
+In JPA, the process of converting query results into a Data Transfer Object (DTO) is called result transformation. This is often done using constructor expressions or custom queries to retrieve specific data.
+Example:
+@Query("SELECT new com.example.dto.EmployeeDTO(e.id, e.name) FROM Employee e WHERE e.salary > :salary")
+List<EmployeeDTO> findEmployeesWithSalaryGreaterThan(@Param("salary") double salary);
+
+
+JPA Projections:
+Projections in JPA allow retrieving specific columns (fields) of an entity or a DTO rather than the full entity. 
+
+There are two types:
+    Interface-based Projections: Using interfaces to define getter methods for selected fields. Example:
+    public interface EmployeeProjection {
+        String getName();
+        double getSalary();
+    }
+
+    Class-based Projections: Using DTO classes to map the result.
+Both techniques help improve performance by fetching only necessary data.
+
+
+
 JPA/Hibernate Exceptions - LazyInitializationException, NonUniqueResultException, SQLGrammarException, OptimisticLockException, PersistentObjectException: Detached Entity Passed to Persist, DataAccessException
+Ans:
+    LazyInitializationException:
+    Occurs when an uninitialized lazy-loaded association is accessed outside the session context.
+
+    NonUniqueResultException:
+    Thrown when a query that expects a single result returns more than one.
+
+    SQLGrammarException:
+    Happens when there is a syntax error in the SQL query (e.g., invalid SQL).
+
+    OptimisticLockException:
+    Triggered when an optimistic lock conflict occurs (version mismatch while updating).
+
+    PersistentObjectException: Detached Entity Passed to Persist:
+    Occurs when a detached entity is passed to persist(), which should be merged instead.
+
+    DataAccessException:
+    A generic exception indicating issues with data access operations, often related to Spring's DAO layer.
+
+
+Handling money in database
+    Data Type:
+    Use DECIMAL or NUMERIC for precision.
+    Example: DECIMAL(10, 2) for two decimal places.
+
+    Precision & Scale:
+    Define total digits (precision) and digits after the decimal (scale).
+
+    Currency Representation:
+    Store currency code separately (e.g., currency_code CHAR(3)).
+
+    Avoid Floating-Point:
+    Use DECIMAL to prevent rounding issues.
+
+    Calculations:
+    Perform calculations in the app or DB, ensuring proper rounding.
+
+    Currency Conversion:
+    Use a separate table for exchange rates when handling multiple currencies.
+
+
+
 
 
 7	Version Control	What is git ?
-Git branching strategies 
-Git Merging and rebase
-Git merging conflict resoulation
-Git cherrypic
-Git Tag, Stash
-Different git commands
-What is git head reset ?
+What is Git?
+A distributed version control system for tracking changes in code.
+
+Git Branching Strategies
+Approaches for managing branches, like Git Flow or GitHub Flow.
+
+Git Merging and Rebase
+
+Merge: Combines branches while preserving history.
+Rebase: Applies changes from one branch onto another, rewriting history.
+Git Merging Conflict Resolution
+Resolving conflicts when changes in branches contradict.
+
+Git Cherry-pick
+Applies specific commits from one branch to another.
+
+Git Tag and Stash
+
+Tag: Marks specific commits, often for releases.
+Stash: Temporarily saves changes to work on something else.
+Different Git Commands
+Common commands: git clone, git pull, git commit, git push, git status, git log.
+
+What is Git HEAD Reset?
+git reset changes the HEAD to point to a different commit, either keeping or discarding changes.
+
+
 
 
 
 8	Software Engineering	SOLID Principle, DRY, YAGNI, KISS
-SDLC Life Cycle 
-Hexagonal Architecture
+SOLID:
+A set of five design principles for creating maintainable and scalable software:
+    S: Single Responsibility Principle
+    O: Open/Closed Principle
+    L: Liskov Substitution Principle
+    I: Interface Segregation Principle
+    D: Dependency Inversion Principle
+
+DRY (Don’t Repeat Yourself):
+    Avoid code duplication by reusing logic and abstractions.
+
+YAGNI (You Aren’t Gonna Need It):
+    Don’t implement functionality until it is necessary.
+
+KISS (Keep It Simple, Stupid):
+    Simplify solutions to avoid unnecessary complexity.
+
+
+SDLC Life Cycle , Hexagonal Architecture
+SDLC Life Cycle:
+The Software Development Life Cycle (SDLC) outlines the stages in developing software:
+    Planning: Define project scope and objectives.
+    Design: Architecture and system design.
+    Development: Coding and implementation.
+    Testing: Verify functionality and fix bugs.
+    Deployment: Release to production.
+    Maintenance: Ongoing updates and bug fixes.
+
+Hexagonal Architecture:
+    A design pattern focusing on isolating the core logic of an application from external systems (e.g., databases, APIs) through interfaces or ports, ensuring flexibility and testability.
+    Core logic interacts with external systems via Adapters.
+
+
 Coupling vs Cohesion
+Coupling:
+    Refers to the degree of dependence between different modules or classes.
+    Low coupling is preferred for easier maintenance and flexibility (modules should be independent).
+
+Cohesion:
+    Refers to how closely related the responsibilities of a single module or class are.
+    High cohesion is preferred, meaning a class should have related functions that belong together.
+
+
 Composition vs Association, IS-A vs HAS-A relationship
+
+Composition vs Association:
+    Composition:
+    A strong "has-a" relationship where one object owns or contains another.
+    Example: A Car has Engine (if the car is destroyed, the engine is too).
+
+    Association:
+    A weaker relationship where objects are related but don’t own each other.
+    Example: Teacher and Student (a teacher can have many students, but students exist independently).
+
+IS-A vs HAS-A Relationship:
+    IS-A:
+    Inheritance relationship where one class is a subtype of another.
+    Example: Dog IS-A Animal.
+
+    HAS-A:
+    Represents a relationship where one class has an object of another class.
+    Example: Car HAS-A Engine.
+
+
 Design Patterns - Proxy, Observer, Adapter, Singletone, Factory
-Waterfall Model
-Agile Model
-Software Testing - Unit Testing vs Integration Testing
-Code Review Process
+Ans:
+Design Patterns:
+
+Proxy:
+Provides a surrogate or placeholder for another object, controlling access to it.
+Example: A Proxy for a remote service.
+
+Observer:
+Defines a one-to-many dependency where one object (subject) notifies others (observers) of changes.
+Example: A Subject notifying multiple Observers of an event.
+
+Adapter:
+Converts one interface to another, making incompatible interfaces compatible.
+Example: Adapter converting a legacy system’s interface to work with a modern one.
+
+Singleton:
+Ensures a class has only one instance and provides a global point of access to it.
+Example: A Logger class that is shared across the application.
+
+Factory:
+Creates objects without specifying the exact class of object to be created.
+Example: A Factory for creating different types of Product objects.
+
+
+Waterfall Model, Agile Model
+Waterfall Model:
+    A linear and sequential software development process.
+    Each phase must be completed before moving to the next.
+    Best for projects with well-defined requirements.
+
+Agile Model:
+    An iterative and flexible approach to software development.
+    Divides the project into small, manageable parts (sprints).
+    Emphasizes collaboration, customer feedback, and adapting to change.
+
+Software Testing - Unit Testing vs Integration Testing, Code Review Process
+    Unit Testing:
+    Tests individual components or functions in isolation.
+    Ensures the correctness of small, specific parts of the code.
+
+    Integration Testing:
+    Tests how different modules or systems work together.
+    Ensures that combined components function correctly.
+
+    Code Review Process:
+    A practice where developers review each other's code for errors, improvements, and adherence to standards.
+    Helps catch issues early, improve code quality, and ensure consistency.
+
+
 
 
 
