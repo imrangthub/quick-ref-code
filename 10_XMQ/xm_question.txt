@@ -2143,11 +2143,120 @@ Types:
 
 
 4	Web, HTTP and Other Communication Protocols	HTTP, HTTPS, SSL, TLS
+Web protocols enable communication between clients (e.g., browsers) and servers on the internet.
+The most common protocol for web communication is HTTP.
+
+HTTP (HyperText Transfer Protocol)
+    Purpose: Defines how messages are formatted and transmitted on the web.
+    Key Characteristics:
+    Operates at the application layer.
+    Uses the request-response model.
+    Stateless: Each request is independent.
+
+SSL (up to version 3.0) is considered insecure and replaced by TLS.
+
+How They Work Together
+HTTP + TLS = HTTPS: Provides secure web browsing.
+During an HTTPS session:
+A TLS/SSL handshake establishes a secure channel.
+HTTP messages are encrypted and transmitted over this channel.
+
+
 HTTP Methods - GET, POST, PUT, PATCH, DELETE. HTTP Method Idempotency
+
+HTTP Methods
+GET: Retrieve data (read-only).
+POST: Send data to the server (e.g., create resources).
+PUT: Replace an entire resource.
+PATCH: Update part of a resource.
+DELETE: Remove a resource.
+
+Example:
+GET /resource/1 → Always fetches the same data.
+POST /resource → Creates a new resource each time it's called.
+
+
+
 HTTP Status Codes - 2xx, 3xx, 4xx, 5xx
+Ans
+    HTTP Status Codes
+    2xx: Success
+    200 OK: Request succeeded.
+    201 Created: Resource created successfully.
+    204 No Content: Request succeeded, no content to return.
+    3xx: Redirection
+    301 Moved Permanently: Resource moved to a new URL.
+    302 Found: Temporary redirection.
+    304 Not Modified: Cached version is still valid.
+    4xx: Client Errors
+    400 Bad Request: Invalid request.
+    401 Unauthorized: Authentication required.
+    403 Forbidden: Access denied.
+    404 Not Found: Resource not found.
+    5xx: Server Errors
+    500 Internal Server Error: Generic server issue.
+    502 Bad Gateway: Invalid response from upstream server.
+    503 Service Unavailable: Server temporarily unavailable.
+
+
 HTTP Request, Response Format
+    HTTP Request Format
+        An HTTP request consists of:
+        Request Line: Specifies the method, URL, and HTTP version.
+        <METHOD> <URL> <HTTP-VERSION>
+        Example: GET /index.html HTTP/1.1
+        Headers: Metadata about the request (key-value pairs).
+        Host: example.com
+        User-Agent: Mozilla/5.0
+        Body (Optional): Data sent with the request (e.g., for POST, PUT).
+
+    HTTP Response Format
+        An HTTP response consists of:
+        Status Line: Indicates the HTTP version, status code, and reason phrase.
+        <HTTP-VERSION> <STATUS-CODE> <REASON-PHRASE>
+        Example: HTTP/1.1 200 OK
+        Headers: Metadata about the response.
+        Content-Type: text/html
+        Content-Length: 1234
+        Body (Optional): The actual content (e.g., HTML, JSON).
+
+
 HTTP Cookies vs Sessions
+    Storage:
+    Cookies are stored on the client-side.
+    Sessions are stored on the server-side.
+
+    Data Size:
+    Cookies have a size limit (~4KB).
+    Sessions can store more data, depending on the server.
+
+    Lifetime:
+    Cookies can persist after the browser is closed.
+    Sessions end when the browser or session expires.
+
+    Security:
+    Cookies are less secure since they are client-stored.
+    Sessions are more secure as they are server-stored.
+
+    Use Cases:
+    Cookies are used to remember user preferences.
+    Sessions are used to track user login states.
+
 TCP Flow Control and Congestion Controlling
+TCP Flow Control
+    Ensures the sender doesn't overload the receiver.
+    Uses the receiver's advertised window size to limit data transmission.
+
+TCP Congestion Control
+    Prevents network overload.
+    Key mechanisms:
+    Slow Start: Start small, increase exponentially.
+    Congestion Avoidance: Additive increase, multiplicative decrease (AIMD).
+    Fast Retransmit: Quickly resend lost packets.
+    Fast Recovery: Reduce speed temporarily after congestion.
+
+
+
 Low Latency Handshake: QUIC
 URL vs URI, and URL Encoding
 HTTP Long Pooling, Short Pooling, Websocket, Server Sent Event
@@ -2228,6 +2337,8 @@ Git Tag, Stash
 Different git commands
 What is git head reset ?
 
+
+
 8	Software Engineering	SOLID Principle, DRY, YAGNI, KISS
 SDLC Life Cycle 
 Hexagonal Architecture
@@ -2239,6 +2350,8 @@ Agile Model
 Software Testing - Unit Testing vs Integration Testing
 Code Review Process
 
+
+
 9	Basic Linux	Understanding Linux OS
 Understanding Command Line
 Understanding File System
@@ -2248,6 +2361,8 @@ CLI Tools & Commands - ps, top, htop, kill, netstat, nc, nmap, tcpdump, iftop, t
 SSH - Accessing Remote Server
 VPN
 Firewall, and Port Forwarding
+
+
 
 10	Distributed System	Communication, Different Types of Communication Pattern
 Service Discovery, Client Side Loadbalancing
