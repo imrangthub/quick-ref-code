@@ -174,7 +174,7 @@ List all wireless network profiles:
 
 
 =================================================
-# Nexus | Sonatype Nexus Repository Manager                            
+##Nexus | Sonatype Nexus Repository Manager                            
 ================================================= 
 .\nexus.exe /run
 
@@ -208,6 +208,68 @@ Create repository with Maven group
 
 
 
+Install with Docker(Nexus)
+=================================================
+
+=>sudo apt-get install -y postgresql-client
+=>psql --version 
+PostgreSQL Client
+
+=>docker network create nexus-network
+Create a network for Nexus and PostgreSQL to communicate:
+
+
+docker run -d \
+  --name nexus-postgres \
+  --network nexus-network \
+  -e POSTGRES_USER=nexus_user \
+  -e POSTGRES_PASSWORD=secure_password \
+  -e POSTGRES_DB=nexus_db \
+  -v nexus-postgres-data:/var/lib/postgresql/data \
+  -p 5432:5432 \
+  postgres:15
+Run PostgreSQL
+
+
+
+docker run -d \
+  --name nexus \
+  --network nexus-network \
+  -e JAVA_OPTS="-Xms1200m -Xmx1200m -XX:MaxDirectMemorySize=2g -Ddb.vendor=postgresql -Ddb.url=jdbc:postgresql://nexus-postgres:5432/nexus_db -Ddb.username=nexus_user -Ddb.password=secure_password" \
+  -v nexus-data:/nexus-data \
+  -p 8081:8081 \
+  sonatype/nexus3:latest
+
+=>docker logs -f nexus
+Check Nexus startup  Logs:
+
+
+Username: admin
+Password: =>docker exec nexus cat /nexus-data/admin.password
+
+
+Run Nexus with PostgreSQL Configuration
+  Explanation of Environment Variables:
+  JAVA_OPTS: Configures Nexus to use PostgreSQL. Replace nexus-postgres, nexus_db, nexus_user, and secure_password with your PostgreSQL setup details.
+  -v nexus-data: Maps the Nexus data volume.
+
+
+
+
+
+
+
+GUI
+------------------------------------------
+Which GuiClient to Choose?
+pgAdmin: Best for PostgreSQL-specific features and web-based GUI.
+DBeaver: Versatile, supports multiple databases, and has excellent performance.
+TablePlus: Lightweight and modern UI.
+
+
+For a web-based GUI:
+sudo apt install pgadmin4-web
+http://127.0.0.1/pgadmin4
 
 
 
