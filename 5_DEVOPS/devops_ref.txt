@@ -243,6 +243,8 @@ docker run -d \
 =>docker logs -f nexus
 Check Nexus startup  Logs:
 
+Go to:
+http://localhost:8081/
 
 Username: admin
 Password: =>docker exec nexus cat /nexus-data/admin.password
@@ -270,6 +272,60 @@ TablePlus: Lightweight and modern UI.
 For a web-based GUI:
 sudo apt install pgadmin4-web
 http://127.0.0.1/pgadmin4
+
+
+
+
+
+Config maven-public
+=================================================
+Name: maven-public
+Format: maven2
+Type: group
+URL: http://localhost:8081/repository/maven-public/
+Online: true (Checked, the repository accepts incoming requests)
+
+Maven 2
+- Version Policy: Mixed
+- Layout Policy: Strict
+- Content Disposition: Inline (Add Content-Disposition header as "Attachment" to disable some content from being inline in a browser)
+
+Storage
+- Blob Store: default
+- Strict Content Type Validation: true (Validate that all content uploaded to this repository is of a MIME type appropriate for the repository format)
+
+Group
+- Member Repositories:
+  - maven-releases
+  - maven-snapshots
+  - maven-central
+  - com.madbarsoft
+
+
+
+CreateCustom repository
+=================================================
+SimpleExample:
+Name: com.madbarsoft
+Format: maven2
+Type: hosted
+URL: http://localhost:8081/repository/com.madbarsoft
+Online: If checked, the repository accepts incoming requests
+
+Maven 2
+Version policy: Mixed
+Layout policy: Strict
+
+Storage
+Blob store: default
+Strict Content Type Validation: 
+  Validate that all content uploaded to this repository is of a MIME type appropriate for the repository format
+
+Hosted
+Deployment policy: Allow redeploy
+
+Cleanup Policy
+Available cleanup policies: None
 
 
 
