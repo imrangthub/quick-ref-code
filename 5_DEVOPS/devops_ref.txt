@@ -219,6 +219,15 @@ PostgreSQL Client
 Create a network for Nexus and PostgreSQL to communicate:
 
 
+
+Run Nexus with PostgreSQL Configuration
+  Explanation of Environment Variables:
+  JAVA_OPTS: Configures Nexus to use PostgreSQL. Replace nexus-postgres, nexus_db, nexus_user, and secure_password with your PostgreSQL setup details.
+  -v nexus-data: Maps the Nexus data volume.
+
+
+Run PostgreSQL
+---------------------------------
 docker run -d \
   --name nexus-postgres \
   --network nexus-network \
@@ -228,10 +237,23 @@ docker run -d \
   -v nexus-postgres-data:/var/lib/postgresql/data \
   -p 5432:5432 \
   postgres:15
-Run PostgreSQL
+
+
+TestDbConnection:
+=>psql -h localhost -U nexus_user -d nexus_db
 
 
 
+Run Nexus
+--------------------------------
+docker run -d \
+  --name nexus2 \
+  --network nexus-network \
+  -e JAVA_OPTS="-Xms1200m -Xmx1200m -XX:MaxDirectMemorySize=2g -Ddb.vendor=postgresql" \
+  -p 8082:8081 \
+  sonatype/nexus3:latest
+
+OR
 docker run -d \
   --name nexus \
   --network nexus-network \
@@ -239,6 +261,24 @@ docker run -d \
   -v nexus-data:/nexus-data \
   -p 8081:8081 \
   sonatype/nexus3:latest
+
+
+
+
+docker run -d \
+  --name nexus2 \
+  --network host \
+  -e JAVA_OPTS="-Xms1200m -Xmx1200m -XX:MaxDirectMemorySize=2g \
+  -Dnexus.datastore.enabled \
+  -Ddb.vendor=postgresql \
+  -Dnexus.datastore.nexus.jdbcUrl=jdbc:postgresql://nexus-postgres:5432/nexus_db \
+  -Dnexus.datastore.nexus.username=nexus_user \
+  -Dnexus.datastore.nexus.password=secure_password" \
+  -v nexus-data:/nexus-data \
+  sonatype/nexus3:latest
+
+
+
 
 =>docker logs -f nexus
 Check Nexus startup  Logs:
@@ -248,13 +288,6 @@ http://localhost:8081/
 
 Username: admin
 Password: =>docker exec nexus cat /nexus-data/admin.password
-
-
-Run Nexus with PostgreSQL Configuration
-  Explanation of Environment Variables:
-  JAVA_OPTS: Configures Nexus to use PostgreSQL. Replace nexus-postgres, nexus_db, nexus_user, and secure_password with your PostgreSQL setup details.
-  -v nexus-data: Maps the Nexus data volume.
-
 
 
 
@@ -274,6 +307,28 @@ sudo apt install pgadmin4-web
 http://127.0.0.1/pgadmin4
 
 
+
+
+
+
+Copy library Nexus-to-Nexus server
+=================================================
+Migrate the unavailable library from your old Nexus repository to your new Nexus.
+
+
+
+Automate Artifact Migration (Curl)
+-------------------------------------------------
+curl -u admin:123456 --upload-file dependency-management-1.0.11.RELEASE.jar http://localhost:8082/repository/maven-public/io/spring/dependency-management/1.0.11.RELEASE/
+curl -u admin:123456  --upload-file dependency-management-1.0.11.RELEASE.pom http://localhost:8082/repository/maven-public/io/spring/dependency-management/1.0.11.RELEASE/
+
+
+
+
+
+
+// https://mvnrepository.com/artifact/io.spring.dependency-management/io.spring.dependency-management.gradle.plugin
+implementation group: 'io.spring.dependency-management', name: 'io.spring.dependency-management.gradle.plugin', version: '1.0.12.RELEASE', ext: 'pom'
 
 
 
@@ -299,7 +354,6 @@ Group
   - maven-releases
   - maven-snapshots
   - maven-central
-  - com.madbarsoft
 
 
 
