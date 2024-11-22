@@ -71,10 +71,9 @@
 @@##sr.Software Engineer | req skills
 =================================================     
 
-
-1	Core Java	
+##Core Java	
 =================================================
-Java Class, Fields, Methods and Objects
+1) Java Class, Fields, Methods and Objects
 Ans:
     Class: A blueprint for creating objects, defining their properties and behaviors.
     Fields: Variables declared inside a class to represent the properties of objects.
@@ -82,33 +81,36 @@ Ans:
     Objects: Instances of a class, created using the new keyword, representing real-world entities.
 
 
-Access Modifiers, Constructor, Object creation
-    Access Modifiers
-        Control the visibility of classes, fields, and methods:
-        Public: Accessible from anywhere.
-        Private: Accessible only within the same class.
-        Protected: Accessible within the same package and by subclasses.
-            The protected access modifier allows access to members within the same package and 
-            by subclasses (even if they are in different packages).
-            Restrictions: Non-subclass classes outside the package1 cannot directly access protected members.
-            Examlple:
-                Parent.java class has a protected method: protected void displayMessage();
-                Now a chile cllas in differenet package not able to accessa this displayMessage(); createing new object of Parent class
-                But able to access with in Child class if Clild class extedn Prant class as:
-                // Child class in package2
-                    package package2;
+2) Access Modifiers, Constructor, Object creation
+Ans:
+Access Modifiers
+Control the visibility of classes, fields, and methods:
+Public: Accessible from anywhere.
+Private: Accessible only within the same class.
+Protected: Accessible within the same package and by subclasses.
+    The protected access modifier allows access to members within the same package and 
+    by subclasses (even if they are in different packages).
+    Restrictions: Non-subclass classes outside the package1 cannot directly access protected members.
+    Examlple:
+        Parent.java class has a protected method: protected void displayMessage();
+        Now a chile cllas in differenet package not able to accessa this displayMessage(); createing new object of Parent class
+        But able to access with in Child class if Clild class extedn Prant class as:
 
-                    import package1.Parent;
+         // Child class in package2
+            package package2;
+            import package1.Parent;
 
-                    public class Child extends Parent {
-                        public void show() {
-                            displayMessage(); // Accessible because Child is a subclass of Parent
-                        }
-                    }
-            But not as:
-                // Parent parent = new Parent();
-                // parent.displayMessage(); // Compilation error: displayMessage() is not accessible directly.
-        Default (no modifier): Accessible within the same package.
+            public class Child extends Parent {
+                public void show() {
+                    displayMessage(); // Accessible because Child is a subclass of Parent
+                }
+            }
+
+    But not as:
+        // Parent parent = new Parent();
+        // parent.displayMessage(); // Compilation error: displayMessage() is not accessible directly.
+Default (no modifier): Accessible within the same package.
+
     Constructor
         A special method used to initialize objects.
         It has the same name as the class.
@@ -116,54 +118,60 @@ Access Modifiers, Constructor, Object creation
         Can be overloaded.
 
 
-Java Record
+3) Java Record
 Ans:
     A record is a special kind of class introduced in Java 14 (Preview) and finalized in Java 16.
     It is designed to simplify the creation of immutable data objects by automatically generating constructors, 
     getters, toString(), equals(), and hashCode() methods.
 
     Example a Record:
-    public class Main {
-        public static void main(String[] args) {
-            // Creating a record object
-            Person person = new Person("Alice", 30);
+        // Record declaration
+        public record Person(String name, int age) {}
+        
+        public class Main {
+            public static void main(String[] args) {
+                // Creating a record object
+                Person person = new Person("Alice", 30);
 
-            // Accessing fields (no 'get' prefix)
-            System.out.println(person.name()); // Output: Alice
-            System.out.println(person.age());  // Output: 30
+                // Accessing fields (no 'get' prefix)
+                System.out.println(person.name()); // Output: Alice
+                System.out.println(person.age());  // Output: 30
 
-            // Implicitly generated toString
-            System.out.println(person); // Output: Person[name=Alice, age=30]
+                // Implicitly generated toString
+                System.out.println(person); // Output: Person[name=Alice, age=30]
+            }
         }
-    }
 
-    // Record declaration
-    public record Person(String name, int age) {}
 
     Limitations
         Cannot extend other classes (records are implicitly final).
         Cannot have mutable fields.
         Designed only for data-carrying classes, not behavior-rich objects.
 
+Enum vs Records:
+Use Records for immutable data structures with a focus on simplicity and reduced boilerplate.
+Use Enums for defining a fixed set of constants with optional, shared, or custom behavior.
 
-OOP in Java - Abstraction, Polymorphism, Encapsulation, Inheritance
+
+
+4) OOP in Java - Abstraction, Polymorphism, Encapsulation, Inheritance
 Ans:
-    Abstraction:
-        Hides implementation details and shows only the essential features.
-        Achieved using abstract classes and interfaces.
-    Polymorphism
-        Allows one entity to take many forms (e.g., method overriding and overloading).
-        Example (Method Overriding):
-    Encapsulation
-        Restricts direct access to fields and methods using access modifiers.
-        Achieved by using private fields with public getters and setters.
+Abstraction:
+    Hides implementation details and shows only the essential features.
+    Achieved using abstract classes and interfaces.
+Polymorphism
+    Allows one entity to take many forms (e.g., method overriding and overloading).
+    Example (Method Overriding):
+Encapsulation
+    Restricts direct access to fields and methods using access modifiers.
+    Achieved by using private fields with public getters and setters.
+Inheritance
+    Allows a class to inherit fields and methods from a parent class.
+    Achieved using the extends keyword.
 
-    Inheritance
-        Allows a class to inherit fields and methods from a parent class.
-        Achieved using the extends keyword.
 
 
-Java String, StringBuilder, String Buffer, Text Block
+5) JavaString, StringBuilder, StringBuffer, TextBlock
 String:
     Immutable sequence of characters.
     Operations like concatenation create new objects.
@@ -186,32 +194,31 @@ StringBuffer:
     Example:
         StringBuffer sb = new StringBuffer("Hello");
         sb.append(" World");
+        
 Both StringBuilder and StringBuffer are mutable classes for handling strings.
 
-Text Block:
+TextBlock:
 Introduced in Java 15, it simplifies multiline string creation.
 Uses triple quotes (""") for better readability.
 Example:
-java
-Copy code
-String json = """
-              {
-                  "name": "Alice",
-                  "age": 30
-              }
-              """;
+    String json = """
+                {
+                    "name": "Alice",
+                    "age": 30
+                }
+                """;
 
 
-String Litterals, String creating with new keyworkd:
+6) StringLitterals, String creating with new keyworkd:
 Ans:
-    String Literals:
-        Strings created using double quotes ("") are stored in the String Pool.
+    StringLiterals:
+        Strings created using double quotes ("") are stored in the String Pool,  is located in the heap memory.
         If a literal already exists in the pool, the same reference is returned.
         Memory efficient.
-    Example:
-        String s1 = "Hello"; // Stored in String Pool
-        String s2 = "Hello"; // Same reference as s1
-        System.out.println(s1 == s2); // Output: true
+        Example:
+            String s1 = "Hello"; // Stored in String Pool
+            String s2 = "Hello"; // Same reference as s1
+            System.out.println(s1 == s2); // Output: true
 
     String with new Keyword:
         Creates a new String object in heap memory, bypassing the String Pool.
@@ -223,14 +230,14 @@ Ans:
 
 
 
-String constant pool, String comparison, Trim String:
+7) String constant pool, String comparison, TrimString:
 Ans:
 Key Points:
     When a new string literal is created, Java first checks the pool to see if an equivalent string already exists.
     If it exists, the new reference points to the existing object. Otherwise, a new object is created in the pool.
     Strings created using new are stored in the heap, not in the pool.
-. String Comparison
 
+String Comparison
 There are two ways to compare strings in Java:
     Using ==:
         Compares references, not content.
@@ -239,14 +246,14 @@ There are two ways to compare strings in Java:
         Compares the content of the strings.
         Returns true if the actual text of the strings is identical
 
-Trim String:
+TrimString:
     It does not modify the original string (strings are immutable in Java).
     Returns a new String without leading or trailing spaces.
 
 
 
 
-String matching, searching, convertion wiht valueOf(), String Concatanation
+8) StringMatching, Searching, convertion wiht valueOf(), String Concatanation
 Ans:
 String Matching:
     equals(): Checks content equality (case-sensitive).
@@ -264,12 +271,12 @@ Conversion with valueOf():
         String str = String.valueOf(num); // Converts int to String
         System.out.println(str); // "42"
 
-String Concatenation:
+StringConcatenation:
     Neither + nor .concat() modifies the original strings (s1, s2). 
     Instead, they both create new String objects to store the result.
 
 Correct! StringBuilder and StringBuffer do not create a new String object for every modification.
-
+ASDEFGH
 When +:
     Handles implicit type conversions.
     Readability is a priority: The + operator is more intuitive and easier to read.
