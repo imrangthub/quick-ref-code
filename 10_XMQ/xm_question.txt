@@ -289,27 +289,23 @@ Use .concat() (String Method):
 
 
 
-Why is the character array preferred over string for storing confidential information?
+9) Why is the character array preferred over string for storing confidential information?
 Ans:
-    Sensitive data stored in a String (e.g., passwords) remains in memory until garbage collection clears it, which may not happen immediately.
+    Sensitive data stored in a String (e.g., passwords) remains in memory until garbage collection clears it, 
+    which may not happen immediately.
     This increases the risk of memory exposure (e.g., through memory dumps).
-
     With a char[], you have full control over how long the data stays in memory and can clear it immediately after use.
     A String's contents are outside your control and might stay in memory longer.
-    Memory Dump Risks
-
-    Strings are often stored in the String Pool (if created as literals), making them accessible for a longer duration.
-    Memory analysis tools can reveal sensitive information if it’s stored in a String.
 
 
-
-
-Replace character in string, Format String
+10) Replace character in string, Format String
 Ans:
-    Using replace()
+    Using replace() : Example: "hello".replace("l", "x") → "hexxo"
     Replaces all occurrences of a character or substring with another.
-    Using replaceAll()
+    Using replaceAll() : Example: "hello123".replaceAll("\\d", "x") → "helloxxx"
     Replaces all substrings that match a regular expression.
+Use replace() for simple replacements and replaceAll() for regex-based replacements.
+
     Using replaceFirst()
     Replaces the first substring that matches a regular expression.
 
@@ -324,8 +320,7 @@ Ans:
 
 
 
-
-Pass by Value and Pass by Reference:
+11) Pass by Value and Pass by Reference:
 Ans:
     Pass by value
         A copy of the variable's value is passed to the function, and the function works on the copy. 
@@ -335,7 +330,8 @@ Ans:
         The memory address of the variable is shared with the function argument. 
         This means that any changes made to the argument within the function will also affect the original variable.
 
-In Java, everything is passed by value.
+"In Java, everything is passed by value"
+
 Java is always pass by value, but for objects, the "value" passed is the reference to the same object. 
 This is why it sometimes feels like "pass by reference."
 
@@ -393,7 +389,7 @@ Example: Reassigning Reference:
     }
 
 
-Java Date & Time:
+12) Java Date & Time:
 Ans:
     LocalDate, LocalTime, LocalDateTime (Java 8+)
     For working with date, time, and both.
@@ -403,15 +399,18 @@ Ans:
 
 
 
-Java Interfaces and Abstract class, Java Enum, Java Iterator and Iterable
+13) Java Interfaces and Abstract class, Java Enum, Java Iterator and Iterable
 Ans:
     Interface
-        An interface is a reference type, similar to a class, that can contain only constants, method signatures, default methods, static methods, and nested types.
+        An interface is a reference type, similar to a class, that can contain only constants, method signatures, 
+        default methods, static methods, and nested types.
         All methods in an interface are implicitly abstract (unless defined as default or static).
-        An interface defines a contract that a class must follow if it implements the interface, but it does not provide the method implementations.
+        An interface defines a contract that a class must follow if it implements the interface, 
+        but it does not provide the method implementations.
         A class can implement multiple interfaces, allowing for more flexible design (multiple inheritance).
 
     Abstract Class:
+        Abstract class: Animal cannot be instantiated directly.
         An abstract class is a class that cannot be instantiated on its own and is intended to be subclassed.
         It can contain both abstract methods (methods without a body) and concrete methods (methods with a body).
         It can have fields, constructors, and method implementations, unlike interfaces.
@@ -425,21 +424,24 @@ Ans:
         Enums are useful when you have a fixed set of related constants, such as days of the week, directions, or status codes.
 
 
-Java Object class and its mehtod - wait(), notify(), toString(), equals(), hashCode() (Java Object Class and Its Methods)
+
+14) Java Object class and its mehtod - wait(), notify(), toString(), equals(), hashCode() (Java Object Class and Its Methods)
 Ans:
     In Java, every class implicitly inherits from the Object class, which is the root of the class hierarchy. 
     The Object class provides several methods that are fundamental for all Java objects.
     wait() and notify(): Used in multi-threading for inter-thread communication.
     toString(): Helps in providing a string representation of the object.
-    equals() and hashCode(): Important for object comparison and hashing in collections. When you override equals(), you must also override hashCode() to maintain consistency.
+    equals() and hashCode(): Important for object comparison and hashing in collections. 
+    When you override equals(), you must also override hashCode() to maintain consistency.
 
 
-Object cloning in java, why it is needed ?
+15) Object cloning in java, why it is needed ?
 Ans:
     Object cloning in Java is the process of creating an exact copy of an object, usually with the same values and attributes, 
     but in a different memory location. Java provides the clone() method, which is a part of the Object class.
 When you need to duplicate objects but retain their independent state.
-In situations where object immutability is required for safety, but cloning allows temporary modifications without altering the original object.
+In situations where object immutability is required for safety, but cloning allows temporary modifications 
+without altering the original object.
 
 Shallow vs. Deep Cloning
     Shallow cloning: Only the references to objects are copied, so changes to the nested objects 
@@ -457,6 +459,7 @@ Exceptions
 Object Cloning and Performance
     Cloning is a relatively expensive operation. In some cases, creating a new object manually might be more efficient 
     than cloning, especially for complex objects with deep structures.
+
 
 
 
