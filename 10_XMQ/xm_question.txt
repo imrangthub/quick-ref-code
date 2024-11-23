@@ -463,12 +463,15 @@ Object Cloning and Performance
 
 
 
-Java Collection Framework - List, Set, Map, ArrayList, HashMap, Hashtable, HashSet, LinkedList and different operations on collection
-
+16) Java Collection Framework - List, Set, Map, ArrayList, HashMap, Hashtable, HashSet, LinkedList and different operations on collection
+Ans:
 Java Collection Framework:
     The Java Collection Framework provides a set of interfaces and classes to handle groups of objects. 
     It is part of the java.util package and includes 
     three main types  interfaces, with concrete classes to handle groups of objects: List, Set, and Map.
+
+List, Set, and Map are interfaces.
+ArrayList, LinkedList, HashSet, HashMap, and Hashtable are classes that implement these interfaces.
 
         1. List
         What: Ordered, allows duplicates.
@@ -476,6 +479,8 @@ Java Collection Framework:
         List<String> list = new ArrayList<>();
         list.add("A");
         list.add("B");
+No default sorting order.
+Elements maintain insertion order.
 
         2. Set
         What: Unordered, no duplicates.
@@ -483,6 +488,9 @@ Java Collection Framework:
         Set<String> set = new HashSet<>();
         set.add("A");
         set.add("B");
+No default sorting order.
+Elements are unordered.
+Use a TreeSet instead if you need sorted elements (natural order or custom Comparator).
 
         3. Map
         What: Key-value pairs, unique keys.
@@ -491,10 +499,15 @@ Java Collection Framework:
         map.put("A", 1);
         map.put("B", 2);
 
+No default sorting order.
+Keys are unordered.
+For sorting, use TreeMap (sorted by keys in natural order or custom Comparator) or LinkedHashMap (preserves insertion order).
 
 
 
-How does the size of ArrayList grow dynamically? And also state how it is implemented internally.
+
+
+17) How does the size of ArrayList grow dynamically? And also state how it is implemented internally.
 Internal Implementation of ArrayList
     Backing Array:
         Internally, an ArrayList uses an array to store its elements.
@@ -503,11 +516,10 @@ Internal Implementation of ArrayList
     Growth Mechanism:
         When an element is added and the current capacity is full, a new array is created with twice the size of the original array.
         This means if the initial size is 10, it will grow to 20, 40, 80, etc.
-
-    Array Resize Process:
-        Step 1: Create a new array with double the size.
-        Step 2: Copy all elements from the old array to the new array.
-        Step 3: Update the reference to point to the new array.
+        Array Resize Process:
+            Step 1: Create a new array with double the size.
+            Step 2: Copy all elements from the old array to the new array.
+            Step 3: Update the reference to point to the new array.
 
     Efficiency Considerations:
         This dynamic resizing ensures that the ArrayList can grow without worrying about its size upfront.
@@ -515,7 +527,8 @@ Internal Implementation of ArrayList
         it happens infrequently because the growth is exponential (doubling each time).
 
 
-How HashMap works internally and how to minimize hash collision
+
+18) How HashMap works internally and how to minimize hash collision?
 Ans:
 Summary of How HashMap Works:
     Uses an array of buckets to store key-value pairs.
@@ -530,7 +543,8 @@ Ways to Minimize Collisions:
 
 
 
-Sorting Java Collections, Comparing Java Custom Object, Comparable and Comperator
+19)Sorting Java Collections, Comparing Java Custom Object, Comparable and Comperator
+ans:
 Sorting a List
     Using Collections.sort():
     Sorts a list based on the natural ordering of its elements or a custom comparator.
@@ -544,7 +558,8 @@ Comparing Java Custom Objects:
     To sort custom objects, you need to define how two objects are compared. 
     You can achieve this through Comparable or Comparator interfaces.
 
-1) Comparable Interface:
+
+a) Comparable Interface:
     What: Used when you want the class to have a natural order.
     How: Implement the compareTo(T o) method in your class, which compares the current object (this) with the provided object (o).
     Purpose: Define the default sorting behavior of the object.
@@ -574,7 +589,7 @@ The compareTo() method returns:
     Zero if they are equal.
     Positive if this is greater than other.
 
-2. Comparator Interface
+b) Comparator Interface
     What: Used when you want to define multiple sorting orders or external comparison logic.
     How: Implement the compare(T o1, T o2) method in the comparator.
     Purpose: Allows sorting based on different fields or criteria without modifying the object itself.
@@ -607,22 +622,22 @@ Comparator can also be used with Collections.sort() or List.sort().
 
 
 
-Lamda Expression, Stream API, Functional Interface, Functional Programming
+20) Lamda Expression, Stream API, Functional Interface, Functional Programming
 Lambda Expression:
     Introduced in Java 8, allows writing anonymous functions (compact code for functional-style programming).
     Syntax: (parameters) -> {expression/body}.
     Simplifies code, especially for functional interfaces.
     Example:
-    List<Integer> numbers = Arrays.asList(1, 2, 3, 4);
-    numbers.forEach(n -> System.out.println(n));  // Print each number
+        List<Integer> numbers = Arrays.asList(1, 2, 3, 4);
+        numbers.forEach(n -> System.out.println(n));  // Print each number
 
 Stream API:
     Introduced in Java 8, processes collections in a functional style.
     Provides operations like filter(), map(), reduce(), sorted().
     Supports lazy evaluation and promotes clean, declarative code.
     Example:
-    List<Integer> numbers = Arrays.asList(1, 2, 3, 4);
-    List<Integer> evens = numbers.stream().filter(n -> n % 2 == 0).collect(Collectors.toList());
+        List<Integer> numbers = Arrays.asList(1, 2, 3, 4);
+        List<Integer> evens = numbers.stream().filter(n -> n % 2 == 0).collect(Collectors.toList());
 
 Functional Interface:
     An interface with one abstract method (e.g., Runnable, Callable).
@@ -645,7 +660,7 @@ Functional Programming:
         Reduces side effects and enhances maintainability.
 
 
-Stream API - terminal operations, non terminal operations, Pure Function, Higher Order Funciton, 
+21) Stream API - terminal operations, non terminal operations, Pure Function, Higher Order Funciton, 
 Function Composition, different built-in functional interface, different types of aggregation, build your own collector.
 Ans:
 Stream API
@@ -695,7 +710,36 @@ Aggregation in Streams:
     int sum = numbers.stream().reduce(0, Integer::sum);  // Sum all nu
 
 
-Create custom functional interface and use it with Stream API
+Closure:
+    Closure: Inline, lightweight, and can capture variables from its surrounding context.
+    Function: Defined explicitly and doesn’t inherently capture its surrounding variables
+
+Java supports closures through lambdas and anonymous classes but requires captured variables to be effectively final 
+for safety and consistency.
+
+Example:
+    Closure:
+    let simpleClosure = {
+        print("Hello, Closure")
+    }
+    simpleClosure() // Call the closure
+
+    Equivalent Function:
+    func simpleFunction() {
+        print("Hello, Function")
+    }
+    simpleFunction() // Call the function
+
+Difference Between Function and Closure:
+- Functions are declared using the func keyword, while closures don't require it.
+- Functions always have a name, whereas closures don't necessarily need one.
+- Functions don't use the in keyword, while closures use it to separate the return type and statements inside.
+
+
+
+
+
+22) Create custom functional interface and use it with Stream API
 Ans:
     Creating a Custom Functional Interface:
         Define a functional interface with a single abstract method.
@@ -747,7 +791,7 @@ Output
 
 
 
-Java JDBC, JDBC Batching, PreparedStatement, Connection Pooling
+23) Java JDBC, JDBC Batching, PreparedStatement, Connection Pooling
 Ans:
 Java JDBC:
     Java Database Connectivity (JDBC) is an API for interacting with relational databases.
@@ -781,48 +825,49 @@ JDBC Batching:
         pstmt.addBatch();
 
         pstmt.executeBatch()
+
 Connection Pooling: Optimizes connection management for high-performance applications.
 
 
 
-Understanding JVM internals.
+24) Understanding JVM internals.
 Ans:
-The Java Virtual Machine (JVM) is an engine that executes Java bytecode, providing platform independence and memory management. Its main components are:
+The Java Virtual Machine (JVM) is an engine that executes Java bytecode, providing platform independence and memory management. 
 
 Key Components:
-Class Loader Subsystem:
-    Loads .class files into memory.
-    Divided into: Bootstrap, Extension, and Application class loaders.
+    I) Class Loader Subsystem:
+            Loads .class files into memory.
+            Divided into: Bootstrap, Extension, and Application class loaders.
 
-Runtime Data Areas:
-    Method Area: Stores class metadata, static variables, and method code.
-    Heap: Stores objects and JRE classes. Managed by the Garbage Collector.
-    Stack: Stores local variables and method calls (stack frames).
-    Program Counter (PC) Register: Tracks the address of the next bytecode instruction.
-    Native Method Stack: Handles native method calls.
+    II) Runtime Data Areas:
+            Method Area: Stores class metadata, static variables, and method code.
+            Heap: Stores objects and JRE classes. Managed by the Garbage Collector.
+            Stack: Stores local variables and method calls (stack frames).
+            Program Counter (PC) Register: Tracks the address of the next bytecode instruction.
+            Native Method Stack: Handles native method calls.
 
-Execution Engine:
-    Interpreter: Reads and executes bytecode line by line.
-    Just-In-Time (JIT) Compiler: Converts bytecode to native machine code for faster execution.
+    III) Execution Engine:
+            Interpreter: Reads and executes bytecode line by line.
+            Just-In-Time (JIT) Compiler: Converts bytecode to native machine code for faster execution.
 
-Garbage Collector (GC):
-    Automatically manages memory by removing unused objects from the heap.
-    GC algorithms: Serial, Parallel, CMS, G1.
+    IV) Garbage Collector (GC):
+            Automatically manages memory by removing unused objects from the heap.
+            GC algorithms: Serial, Parallel, CMS, G1.
 
-Java Native Interface (JNI):
-    Enables Java to interact with native code (e.g., C, C++).
-
-
+    V) Java Native Interface (JNI):
+            Enables Java to interact with native code (e.g., C, C++).
 
 
-Java Memory Model, Java Flight Recorder,JIT Compiler
-JMM: Defines rules for thread-safe memory access.
-The Java Memory Model (JMM) defines how threads interact through memory, ensuring predictable behavior in concurrent programming.
-    Key Concepts:
-    Main Memory: Shared memory accessed by all threads.
-    Working Memory: Thread-local copies of variables stored in CPU caches.
-    Happens-Before Relationship: Guarantees visibility and ordering of operations (e.g., locks, volatile, synchronized).
 
+
+25) Java Memory Model(JMM), Java Flight Recorder,JIT Compiler
+Ans:
+    JMM: Defines rules for thread-safe memory access.
+    The Java Memory Model (JMM) defines how threads interact through memory, ensuring predictable behavior in concurrent programming.
+        Key Concepts:
+            Main Memory: Shared memory accessed by all threads.
+            Working Memory: Thread-local copies of variables stored in CPU caches.
+            Happens-Before Relationship: Guarantees visibility and ordering of operations (e.g., locks, volatile, synchronized).
 
 JIT Compiler: Dynamically compiles bytecode to machine code for performance.
     The JIT Compiler is part of the JVM Execution Engine, enhancing runtime performance by translating bytecode into native machine code.
@@ -840,7 +885,8 @@ JFR: Helps analyze runtime issues with low overhead.
 
 
 
-JVM Monitoring Tools - VisualVM, JConsole, How to modify different JVM Flags
+26) JVM Monitoring Tools - VisualVM, JConsole, How to modify different JVM Flags
+Ans:
 VisualVM
     What: A powerful, all-in-one monitoring and troubleshooting tool for JVM-based applications.
     Features:
@@ -848,7 +894,7 @@ VisualVM
     Profile CPU and memory usage.
     Analyze thread dumps and heap dumps.
 
-2. JConsole
+JConsole
     What: A lightweight GUI tool for monitoring and managing Java applications via JMX (Java Management Extensions).
     Features:
     Monitor heap, threads, and classes loaded.
@@ -857,16 +903,23 @@ VisualVM
 Modifying JVM Flags:
 JVM flags control runtime behavior such as memory allocation, GC, and debugging.
     Types of JVM Flags:
-    Standard Options (e.g., -cp, -version): General commands like setting the classpath.
-    Non-Standard Options (start with -X) e.g., -Xmx, -Xms.
-    Advanced Options (start with -XX) e.g., -XX:+UseG1GC, -XX:MaxHeapFreeRatio
+        Standard Options (e.g., -cp, -version): General commands like setting the classpath.
+        Non-Standard Options (start with -X) e.g., -Xmx, -Xms.
+        Advanced Options (start with -XX) e.g., -XX:+UseG1GC, -XX:MaxHeapFreeRatio
 Example:java -Xmx1024m -XX:+UseG1GC -jar MyApp.jar
 
 
+With JVM Flag (e.g., Debug/Verbose Logging Enabled) do some Performance Impact like: 
+    Increased I/O Operations and Garbage Collection Pressure.
+
+When to Use JVM Flags?
+Use JVM flags like -Xlog, -verbose:gc, or debugging flags during development or troubleshooting.
+Avoid enabling these in production unless absolutely necessary, as they can significantly degrade performance.
 
 JVM CLI Tools to monitor JVM in realtime - jstack, jinfo, jmap, jhat, jstat, jps
 
-Concurrency vs Parallelism
+
+27) Concurrency vs Parallelism
     Concurrency: Handling many tasks at once (may be interleaved).
                 Managing multiple tasks by quickly switching between them (e.g., multi-threading).
     Parallelism: Performing many tasks at the same time (simultaneous execution).
@@ -874,20 +927,19 @@ Concurrency vs Parallelism
 
 
 
-Java Multi Threading, Creating threads in different ways
-    Thread Class: Simple but less flexible, suitable for single-threaded tasks.
-    Runnable Interface: Preferred when you need to extend another class or want to share the same task among multiple threads.
-    Lambda Expressions: Makes code more concise.
-    ExecutorService: Best for managing multiple threads efficiently with a thread pool.
-
+28) Java Multi Threading, Creating threads in different ways.
+        Thread Class: Simple but less flexible, suitable for single-threaded tasks.
+        Runnable Interface: Preferred when you need to extend another class or want to share the same task among multiple threads.
+        Lambda Expressions: Makes code more concise.
+        ExecutorService: Best for managing multiple threads efficiently with a thread pool.
 
 Runnable vs Thread, Thread Lifecycle, Thread Signaling, Thread Join, Volatile keyword, Thread Local, Java Virtual Thread
-    Thread Lifecycle
-    New: Thread created but not started.
-    Runnable: Ready to run, waiting for CPU.
-    Running: Actively executing.
-    Blocked/Waiting: Paused, waiting for resources/signals.
-    Terminated: Execution completed.
+    Thread Lifecycle:
+        New: Thread created but not started.
+        Runnable: Ready to run, waiting for CPU.
+        Running: Actively executing.
+        Blocked/Waiting: Paused, waiting for resources/signals.
+        Terminated: Execution completed.
 
 
 Java Virtual Threads (Project Loom)
@@ -897,7 +949,7 @@ Java Virtual Threads (Project Loom)
 
 
 
-Race Condition, Deadlock, Deadlock Prevention
+29) Race Condition, Deadlock, Deadlock Prevention.
 Ans:
 Race Condition:
     Definition: Occurs when multiple threads access shared resources simultaneously, 
@@ -929,7 +981,7 @@ Deadlock Prevention:
 
 
 
-Locks in Java, Thread Safety, Critical Section, Synchronization
+30) Locks in Java, Thread Safety, Critical Section, Synchronization
 Ans:
 Locks in Java
     Definition: Explicit control mechanisms for thread synchronization.
@@ -956,19 +1008,14 @@ Synchronization:
     Synchronized Method: Locks the whole method on the object or class.
     Synchronized Block: Locks a specific section of code or resource.
     Example:
-    java
-    Copy code
-    synchronized (lock) {
-        // critical section
-    }
+        synchronized (lock) {
+            // critical section
+        }
     Drawback: Can lead to performance overhead if overused.
 
 
 
-
-
-
-Reentrant Locks, Mutex, Semaphore, and Monitor
+31) Reentrant Locks, Mutex, Semaphore, and Monitor
 
 Reentrant Locks:
     Definition: A lock allowing the same thread to acquire it multiple times without causing a deadlock.
@@ -976,14 +1023,13 @@ Reentrant Locks:
     Explicit locking/unlocking (lock()/unlock()).
     Provides advanced features like tryLock() with timeout and interruptible locks.
 Example:
-ReentrantLock lock = new ReentrantLock();
-lock.lock();
-try {
-    // critical section
-} finally {
-    lock.unlock();
-}
-
+    ReentrantLock lock = new ReentrantLock();
+    lock.lock();
+    try {
+        // critical section
+    } finally {
+        lock.unlock();
+    }
 
 Mutex:
     Definition: A synchronization primitive ensuring only one thread accesses a resource at a time.
@@ -1004,7 +1050,6 @@ Semaphore:
             semaphore.release();
         }
 
-
 Monitor:
     Definition: A concurrency construct that combines mutual exclusion and thread signaling.
     Java Implementation:
@@ -1019,7 +1064,7 @@ Example:
 
 
 
-Executor Framework, Thread Pool, and Blocking Queues
+32) Executor Framework, Thread Pool, and Blocking Queues
 Ans:
 Executor Framework
     Purpose: Manages thread execution, replacing manual thread creation.
@@ -1046,7 +1091,7 @@ Blocking Queues
 
 
 
-Fork/Join Framework, How Java parallel stream use this fromework ?
+33) Fork/Join Framework, How Java parallel stream use this fromework ?
 Ans:
 Fork/Join Framework
 Purpose: Breaks a large task into smaller subtasks (fork), processes them in parallel, and combines the results (join).
@@ -1071,7 +1116,7 @@ int sum = numbers.parallelStream().reduce(0, Integer::sum); // Uses Fork/Join in
 
 
 
-Thread safe collections, copy on write collections, and how it works
+34) Thread safe collections, copy on write collections, and how it works
 Ans:
 Thread-Safe Collections
     Definition: Collections designed for safe concurrent access by multiple threads.
@@ -1082,43 +1127,46 @@ Thread-Safe Collections
     ConcurrentHashMap: Efficient thread-safe HashMap alternative using fine-grained locks.
     CopyOnWriteArrayList: Thread-safe alternative to ArrayList for read-heavy operations.
 
+List myList = new ArrayList();
+    ArrayList is not thread-safe by default.
+
 Copy-On-Write Collections
     Definition: Collections that create a new copy of the data structure on modification (e.g., add/remove).
-
     Examples:
+        CopyOnWriteArrayList
+        CopyOnWriteArraySet
 
-    CopyOnWriteArrayList
-    CopyOnWriteArraySet
     How It Works:
+        Read Operations: Directly access the immutable snapshot of the collection.
+        Write Operations: Create a new copy, modify it, and replace the old reference.
+        Ideal for scenarios where reads greatly outnumber writes.
 
-    Read Operations: Directly access the immutable snapshot of the collection.
-    Write Operations: Create a new copy, modify it, and replace the old reference.
-    Ideal for scenarios where reads greatly outnumber writes.
 
-
-IO Bound vs CPU Bound applicaiton
+35) IO Bound vs CPU Bound applicaiton
 Ans:
 I/O-Bound Application
     Definition: Performance is limited by input/output operations (e.g., reading/writing files, network calls).
     Key Focus: Optimize waiting time (use asynchronous/non-blocking I/O).
     Examples: Web servers, database queries.
+    When you make an HTTP request in Java, for example using libraries like HttpURLConnection, HttpClient, or 
+    frameworks like Spring Web The JVM will perform network I/O.
 CPU-Bound Application
     Definition: Performance is limited by CPU computations (e.g., mathematical calculations, data processing).
     Key Focus: Optimize processing efficiency (use multi-core processors, parallel algorithms).
 
 
 
-Java Happens Before Guarantee
-Thread Starvation and Fairness
-Java CompletableFuture
-    appens-Before Guarantee	Ensures visibility and ordering between threads.
-    Thread Starvation	When threads are denied CPU time due to higher priority tasks, causing delays.
-    Fairness	Ensures equal resource allocation to all threads, preventing starvation.
-    CompletableFuture	Allows non-blocking asynchronous execution and chaining of tasks.
+36) Java Happens Before Guarantee, Thread Starvation and Fairness Java CompletableFuture
+Ans:
+    Happens-Before Guarantee:	Ensures visibility and ordering between threads.
+    Thread Starvation:	When threads are denied CPU time due to higher priority tasks, causing delays.
+    Fairness:	Ensures equal resource allocation to all threads, preventing starvation.
+    CompletableFuture:	Allows non-blocking asynchronous execution and chaining of tasks.
 
 
-Understanding different types of GC - Serial, Parallel, Mark and Sweep, G1, Epsilon. What is stop the word in java
 
+37) Understanding different types of GC - Serial, Parallel, Mark and Sweep, G1, Epsilon. What is stop the word in java
+Ans
 Types of Garbage Collection (GC) in Java
 Serial GC:
 Uses a single thread for garbage collection.
@@ -1145,13 +1193,15 @@ A no-op garbage collector that does not reclaim memory.
 Primarily used for benchmarking or applications where GC is handled manually.
 
 Stop-the-World
-    Definition: A phase during garbage collection where all application threads are paused to allow the garbage collector to perform its task.
+    Definition: A phase during garbage collection where all application threads are paused to allow the garbage collector 
+    to perform its task.
     Cause: During GC operations like marking, sweeping, or compacting, the JVM halts all application threads temporarily.
     Impact: Can cause latency spikes, especially in high-performance or real-time applications.
 
 
 
-Java Generics, Type Erasure, Generic Method and Class, Wildcard Type, Upper Bounded Wildcard, Lower Bounded Wildcard, Bounded Type
+38) Java Generics, Type Erasure, Generic Method and Class, Wildcard Type, Upper Bounded Wildcard,
+ Lower Bounded Wildcard, Bounded Type.
 
 Java Generics
     Definition: Allows you to define classes, interfaces, and methods with type parameters, 
@@ -1161,9 +1211,11 @@ Java Generics
         Eliminates the need for casting when retrieving elements from collections.
 
 Type Erasure
-    Definition: The process by which the generic type information is removed at runtime. After type erasure, the generic type is replaced with its raw type, and type parameters are replaced with bounds (if any).
-    List<Integer> list = new ArrayList<>();
-    // After type erasure: List becomes List<Object> at runtime
+    Definition: The process by which the generic type information is removed at runtime. 
+    After type erasure, the generic type is replaced with its raw type, and type parameters are replaced with bounds (if any).
+        List<Integer> list = new ArrayList<>();
+        // After type erasure: 
+        List becomes List<Object> at runtime
 
 Generic Method and Class:
 Generic Method:
@@ -1216,7 +1268,7 @@ Lower Bounded Wildcard:
 
 
 
-Java Exception and Error Handling
+39) Java Exception and Error Handling
 Ans:
     Exceptions represent conditions that can be handled programmatically.
     Errors represent serious issues that generally cannot be handled.
@@ -1224,16 +1276,18 @@ Ans:
     Use throw to throw an exception and throws to declare potential exceptions in a method.
     Handle exceptions gracefully and avoid over-catching them.
 
-Java Metadata programming - Annotation Processing, and Java Reflection API 
+
+40) Java Metadata programming - Annotation Processing, and Java Reflection API 
 Annotations are used to add metadata to classes, methods, or fields in your code.
 Annotation Processors are tools that can read annotations and generate additional code or resources during the compilation process.
 
 Types of Annotations:
     Built-in Annotations: Examples include @Override, @Deprecated, @SuppressWarnings.
     Custom Annotations: You can define your own annotations to add metadata specific to your project.
-    @interface MyCustomAnnotation {
-        String value() default "defaultValue";
-    }
+        @interface MyCustomAnnotation {
+            String value() default "defaultValue";
+        }
+        
 Annotation Processing:
 You can create a custom annotation processor that extends AbstractProcessor and override the process() method.
 How to run: Annotation processors are invoked automatically during compilation by the Java compiler
