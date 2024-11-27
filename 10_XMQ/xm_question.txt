@@ -1383,20 +1383,18 @@ Use NIO for high-performance, multi-threaded applications.
 ##Framework & Web	| sec2
 ==================================================
 
-What is spring bean ?
+1) What is spring bean ?
 Ans:
 A Spring Bean is an object managed by the Spring IoC container, created, configured, and wired as part of the application's runtime.
 Managed by the Spring container, with lifecycle and dependency injection handled automatically.
 
-
 What is spring IoC ? What is it responsible for ?
-Spring IoC (Inversion of Control) is a design principle where the Spring container manages object creation, configuration, and dependency injection.
+Spring IoC (Inversion of Control) is a design principle where the Spring container manages object creation, configuration, 
+and dependency injection.
 Responsibilities:
     Creating and managing beans.
     Injecting dependencies automatically.
     Managing bean lifecycle.
-
-
 
 What are the bean scopes available in spring
 Spring bean scopes:
@@ -1417,7 +1415,9 @@ Ways to inject objects:
     Field Injection: Directly injecting into fields using @Autowired (not recommended for testing).
 
 
-Default Injection Way: Spring does not enforce a default; constructor injection is recommended for required dependencies.
+Default Injection Way: Spring does not enforce a default; 
+constructor injection is recommended for required dependencies.
+
 @Autowired
 private SimpleService simpleService; (This is field injection)
 
@@ -1437,12 +1437,12 @@ Use Case: Required dependencies. Ensures immutability and easy testing.
 
 
 
+2) Differnet ways of creating spring bean?
 
-Differnet ways of creating spring bean?
 XML Configuration:
 Define beans in an XML configuration file.
-
 <bean id="myBean" class="com.example.MyBean"/>
+
 Annotation-Based Configuration:
 Use @Component and related annotations (@Service, @Repository, @Controller) to mark classes as beans.
 @Component
@@ -1474,31 +1474,63 @@ public MyBean myBean() {
 }
 
 
-Circular Dependency - How to solve this ?
+3) Circular Dependency - How to solve this ?
 Ans:
-Circular Dependency occurs when two or more beans depend on each other, causing an infinite loop of dependencies. This can happen in Spring if Bean A depends on Bean B, and Bean B depends on Bean A.
+Circular Dependency occurs when two or more beans depend on each other, causing an infinite loop of dependencies. 
+This can happen in Spring if Bean A depends on Bean B, and Bean B depends on Bean A.
 Solutions:
     Setter Injection:
     Use setter injection to break the circular dependency.
+        @Component
+        public class BeanA {
+            private BeanB beanB;
+
+            @Autowired
+            public void setBeanB(BeanB beanB) {
+                this.beanB = beanB;
+            }
+
+            public void doSomething() {
+                System.out.println("BeanA is doing something with BeanB.");
+            }
+        }
 
     Use @Lazy Annotation:
     Use @Lazy to delay the initialization of one of the beans, allowing Spring to break the circular dependency.
+        @Component
+        public class BeanA {
+            private final BeanB beanB;
 
+            @Autowired
+            public BeanA(@Lazy BeanB beanB) {
+                this.beanB = beanB;
+            }
 
-Different stereotypes in spring and purpose of the stereotypes
-Stereotypes in Spring refer to annotations that are used to define different types of beans with specific roles in the application. These annotations help Spring automatically detect and manage beans based on their responsibilities, making the code more readable and maintainable.
+            public void doSomething() {
+                System.out.println("BeanA is doing something with BeanB.");
+            }
+        }
+
+4) Different stereotypes in spring and purpose of the stereotypes
+Stereotypes in Spring refer to annotations that are used to define different types of beans with specific roles in the application. 
+These annotations help Spring automatically detect and manage beans based on their responsibilities, 
+making the code more readable and maintainable.
 Key Stereotype Annotations:
     @Component: Marks a generic bean, usually for utility or general-purpose components.
     @Service: A specialized @Component for service layer beans, typically holding business logic.
     @Repository: A specialized @Component for DAO (Data Access Object) classes, often used for database interaction.
     @Controller: A specialized @Component for Spring MVC controllers that handle HTTP requests.
-    @RestController: A combination of @Controller and @ResponseBody, used for REST APIs where the response is typically in JSON or XML format.
+    @RestController: A combination of @Controller and @ResponseBody, used for REST APIs where the response is 
+    typically in JSON or XML format.
 
-Injecting Prototype Beans into a Singleton Instance in Spring
-Injecting a prototype bean into a singleton bean in Spring can be tricky due to the way Spring manages bean lifecycles. A singleton bean is created once and shared across the application, while a prototype bean is created each time it is requested.
+
+5) Injecting Prototype Beans into a Singleton Instance in Spring
+Injecting a prototype bean into a singleton bean in Spring can be tricky due to the way Spring manages bean lifecycles. 
+A singleton bean is created once and shared across the application, while a prototype bean is created each time it is requested.
 
 Problem:
-If you inject a prototype bean directly into a singleton, the singleton bean will hold a reference to a single instance of the prototype bean, which violates the intended lifecycle (the prototype bean should be created fresh each time).
+If you inject a prototype bean directly into a singleton, the singleton bean will hold a reference to a single instance 
+of the prototype bean, which violates the intended lifecycle (the prototype bean should be created fresh each time).
 
 Solutions:
 Using @Lookup Annotation:
@@ -1510,47 +1542,196 @@ Using ObjectFactory or Provider:
 
 
 
-DI Exceptions - UnsatisfiedDependencyException, Circular Dependency Exception, NoSuchBeanDefinitionException
-    UnsatisfiedDependencyException:
-    Cause: This exception occurs when Spring cannot satisfy a bean's dependency during injection. 
-    It typically happens if the required bean is not found or not correctly configured.
+6) DI Exceptions - UnsatisfiedDependencyException, Circular Dependency Exception, NoSuchBeanDefinitionException
+        UnsatisfiedDependencyException:
+            Cause: This exception occurs when Spring cannot satisfy a bean's dependency during injection. 
+            It typically happens if the required bean is not found or not correctly configured.
 
-    CircularDependencyException:
-    Cause: This happens when two or more beans depend on each other, leading to a circular reference.
+        CircularDependencyException:
+            Cause: This happens when two or more beans depend on each other, leading to a circular reference.
 
-    NoSuchBeanDefinitionException:
-    Cause: This exception occurs when Spring cannot find a bean definition for a requested type or name.
-
-
-Injecting Collections, Generic Objects
-Spring can inject lists, sets, maps, and arrays into beans using @Autowired.
-You can inject generic beans using @Qualifier if you have multiple beans of the same generic type.
-You can also inject a collection of generic objects into a single bean.
+        NoSuchBeanDefinitionException:
+            Cause: This exception occurs when Spring cannot find a bean definition for a requested type or name.
 
 
-Use of @Primary, @Qualifier, @Order, @Lazy, and @Lookup
+7) Injecting Collections, Generic Objects
+    Spring can inject lists, sets, maps, and arrays into beans using @Autowired.
+    You can inject generic beans using @Qualifier if you have multiple beans of the same generic type.
+    You can also inject a collection of generic objects into a single bean.
+
+Inject the Collection:
+    private final List<Object> services;
+    @Autowired
+    public ServiceManager(List<Object> services) {
+        this.services = services;
+    }
+
+Define a Generic Class:
+    @Component
+    public class GenericService<T> {
+        private T value;
+
+        public void setValue(T value) {
+            this.value = value;
+        }
+
+        public T getValue() {
+            return value;
+        }
+    }
+Generaic Metod:
+    public class GenericMethodExample {
+
+        // Generic method to display a single value
+        public static <T> void display(T value) {
+            System.out.println("Value: " + value);
+        }
+
+        public static void main(String[] args) {
+            // Using the generic method with different types
+            display(42);           // Integer
+            display("Hello");      // String
+            display(3.14);         // Double
+            display(true);         // Boolean
+        }
+    }
+
+
+
+
+
+8) Use of @Primary, @Qualifier, @Order, @Lazy, and @Lookup
     @Primary: Use it when you want one bean to be the default choice when there are multiple beans of the same type.
     @Qualifier: Use it to specify exactly which bean to inject when there are multiple candidates of the same type.
     @Order: Use it to define the order in which beans are processed or injected.
     @Lazy: Use it to delay the initialization of a bean until it is actually needed.
     @Lookup: Use it to inject a new instance of a prototype bean into a singleton bean.
 
+// @Primary: Marks a bean as the default when multiple candidates exist for autowiring.
+    @Component
+    @Primary
+    public class ServiceA implements MyService {
+        public String serve() {
+            return "ServiceA is serving!";
+        }
+    }
 
-Spring Cloud, Service Discovery, and Gateway
-Spring Cloud provides a comprehensive set of tools for building and managing microservices.
-Service Discovery enables automatic service registration and discovery via tools like Eureka, so services don’t need static configurations.
-Spring Cloud Gateway acts as a reverse proxy or API Gateway, providing routing, load balancing, and filtering, and integrates seamlessly with service discovery to route traffic to available services.
+    @Component
+    public class ServiceB implements MyService {
+        public String serve() {
+            return "ServiceB is serving!";
+        }
+    }
+
+    @Component
+    public class Client {
+        @Autowired
+        private MyService myService;
+
+        public void process() {
+            System.out.println(myService.serve()); // Output: ServiceA is serving!
+        }
+    }
 
 
-What is Servlet ? Life cycle of Servlet. What is Dispetcher Servlets, Servlet Filters and Listener ?
-    Servlet: A Java class that processes HTTP requests and responses. It has a lifecycle consisting of init(), service(), and destroy() methods.
-    DispatcherServlet: In Spring, it acts as the front controller, handling incoming requests and routing them to appropriate controllers.
-    Servlet Filters: Used to process requests and responses (e.g., logging, authentication) before or after they reach a servlet.
+
+// @Qualifier: Specifies which bean to inject when multiple candidates exist.
+Overriding @Primary with @Qualifier:
+    @Component
+    @Primary
+    public class ServiceA implements MyService {
+        public String serve() {
+            return "ServiceA is serving!";
+        }
+    }
+
+    @Component
+    public class ServiceB implements MyService {
+        public String serve() {
+            return "ServiceB is serving!";
+        }
+    }
+
+    @Component
+    public class Client {
+        @Autowired
+        @Qualifier("serviceB") // Explicitly specify ServiceB
+        private MyService myService;
+
+        public void process() {
+            System.out.println(myService.serve()); // Output: ServiceB is serving!
+        }
+    }
+
+
+
+
+
+// @Order: Sets the priority order of beans when they are injected into a collection or executed.
+    @Component
+    @Order(1)
+    public class FirstTask implements Task { }
+
+    @Component
+    @Order(2)
+    public class SecondTask implements Task { }
+
+    // @Lazy: Delays bean initialization until it’s needed.
+    @Component
+    @Lazy
+    public class LazyService { }
+    // @Lookup: Injects a new instance of a prototype-scoped bean into a singleton bean.
+    @Component
+    public class SingletonService {
+        @Lookup
+        public PrototypeService getPrototypeService() {
+            return null; // Spring overrides this method
+        }
+    }
+
+
+
+
+
+9) Spring Cloud, Service Discovery, and Gateway
+        Spring Cloud provides a comprehensive set of tools for building and managing microservices.
+        Service Discovery enables automatic service registration and discovery via tools like Eureka, 
+        so services don’t need static configurations.
+        Spring Cloud Gateway acts as a reverse proxy or API Gateway, providing routing, load balancing, 
+        and filtering, and integrates seamlessly with service discovery to route traffic to available services.
+
+
+
+10) What is Servlet ? Life cycle of Servlet. What is Dispetcher Servlets, Servlet Filters and Listener ?
+    Servlet: A Java class that processes HTTP requests and responses. 
+    It has a lifecycle consisting of init(), service(), and destroy() methods.
+
+    DispatcherServlet: In Spring, it acts as the front controller, 
+    handling incoming requests and routing them to appropriate controllers.
+
+    ServletFilters: Used to process requests and responses (e.g., logging, authentication) before or after they reach a servlet.
     Servlet Listeners: Listen for specific events in the servlet container, such as context or session creation/destruction, to perform necessary actions.
 
+HttpRequest processing:
+---------------------------------------------
+    Request Reception:
+    A user sends an HTTP request to the web server (e.g., GET /home).
 
-Spring Security: What is security filter chain ?
-The Security Filter Chain in Spring Security is a set of filters that are applied to incoming HTTP requests to perform security-related tasks such as authentication, authorization, and logging. 
+    Routing to DispatcherServlet:
+    The web server (like Tomcat) receives the request and forwards it to the DispatcherServlet, 
+    which is mapped to a specific URL pattern in the web.xml or Java configuration.
+
+    Handler Mapping:
+    DispatcherServlet consults the HandlerMapping to find the appropriate controller method based on the request URL. 
+    For example, it may map /home to the HomeController.
+
+
+
+
+
+11) Spring Security: What is security filter chain ?
+The Security Filter Chain in Spring Security is a set of filters that are applied to incoming HTTP 
+requests to perform security-related tasks such as authentication, authorization, and logging. 
 
 Default Filters:
     Some common filters included in the default Spring Security filter chain are:
@@ -1562,16 +1743,18 @@ Default Filters:
     FilterSecurityInterceptor: The last filter in the chain, responsible for checking if the authenticated user has the necessary permissions to access a resource.
 
 
-Spring Security: Session Based Authentication, Token Based Authentication
-Both Session-Based Authentication and Token-Based Authentication are common methods for securing web applications, 
-but they differ in how user authentication and session management are handled.
+12) Spring Security: Session Based Authentication, Token Based Authentication
+    Both Session-Based Authentication and Token-Based Authentication are common methods for securing web applications, 
+    but they differ in how user authentication and session management are handled.
 
 Session Based Authentication,
 --------------------------------
-Session-Based Authentication is simple and stateful, where the server keeps track of the user's session, making it suitable for traditional web applications.
+Session-Based Authentication is simple and stateful, where the server keeps track of the user's session, 
+making it suitable for traditional web applications.
 
 Disadvantages:
-Scalability: Storing session data on the server can become a bottleneck, especially in distributed environments. You may need session replication or sticky sessions in load-balanced environments.
+Scalability: Storing session data on the server can become a bottleneck, especially in distributed environments. 
+You may need session replication or sticky sessions in load-balanced environments.
 Stateful: The server needs to maintain state, which can be resource-intensive, especially for a large number of users.
 
 Token-Based Authentication
@@ -1583,11 +1766,12 @@ Token interception (must use HTTPS)
 
 
 Spring Security: Role-Permission Management
-1. Basic Concepts:
-    Roles: A role is a high-level concept representing a user's responsibility or job. Typically, roles are associated with permissions, allowing users to access resources.
-    Example: ROLE_USER, ROLE_ADMIN.
+Basic Concepts:
+    Roles: A role is a high-level concept representing a user's responsibility or job. 
+    Typically, roles are associated with permissions, allowing users to access resources.
+        Example: ROLE_USER, ROLE_ADMIN.
     Permissions: A permission represents the actual rights a user has to access certain resources or perform specific actions.
-    Example: READ_PRIVILEGE, WRITE_PRIVILEGE.
+        Example: READ_PRIVILEGE, WRITE_PRIVILEGE.
 
 You can use annotations like @PreAuthorize or @Secured to protect methods based on roles or permissions.
 @PreAuthorize is more flexible and allows you to use SpEL (Spring Expression Language) for more complex authorization rules.
@@ -1595,53 +1779,115 @@ You can use annotations like @PreAuthorize or @Secured to protect methods based 
 
 Roles are broad categories that group permissions.
 Permissions are granular rights that control access to specific resources.
-Spring Security provides different ways to manage both roles and permissions, including annotations (@Secured, @PreAuthorize), HTTP security configuration, and database-driven authorization.
+Spring Security provides different ways to manage both roles and permissions, 
+including annotations (@Secured, @PreAuthorize), HTTP security configuration, and database-driven authorization.
 RBAC focuses on user roles, while PBAC (Permission-Based Access Control) offers fine-grained access control.
 
 
 
-Spring @Transactional with Different types of Transaction Propagation
-In Spring, the @Transactional annotation is used to manage transactions in a declarative way. It ensures that methods are executed within a transaction context, and the transaction can be rolled back or committed based on certain conditions.
+13) Spring @Transactional with Different types of Transaction Propagation
+    In Spring, the @Transactional annotation is used to manage transactions in a declarative way. 
+    It ensures that methods are executed within a transaction context, and the transaction can be rolled 
+    back or committed based on certain conditions.
+
+How @Transactional Works in Spring:
+    The @Transactional annotation in Spring is used to manage transactions declaratively. 
+    It ensures that a series of operations within a method or class are executed as a single unit of work. 
+    If any operation fails, the transaction is rolled back, and the database is returned to its previous consistent state.
+
+Key Concepts:
+    Transaction Boundary:
+        @Transactional defines the scope of a transaction. By default, Spring opens a transaction at the beginning of 
+        the method and commits it at the end.
+
+    Commit:
+        If the method completes successfully without exceptions, the transaction is committed, meaning changes are saved to the database.
+
+    Rollback:
+        If the method throws a RuntimeException (or any checked exception specified in the @Transactional settings), 
+        the transaction is rolled back, meaning all changes made during the transaction are undone.
+
+Example of @Transactional:
+    @Transactional
+    public void processOrder(Order order) {
+        orderRepository.save(order);  // Persist order data
+        inventoryService.updateInventory(order);  // Update inventory
+        paymentService.processPayment(order);  // Process payment
+    }
+If any part of the above method fails (e.g., paymentService.processPayment throws an exception), 
+the changes in orderRepository.save and inventoryService.updateInventory will be rolled back.
+
+
+By default, Spring only rolls back for unchecked exceptions (RuntimeException and its subclasses). 
+You can customize it to rollback on specific checked exceptions too.
+
+Specify which exceptions should trigger a rollback.
+    @Transactional(rollbackFor = Exception.class)
+    public void someMethod() { ... }
+
+Rollback Mechanism:
+    If a RuntimeException (or any exception specified) occurs, Spring marks the transaction for rollback.
+    Spring then instructs the underlying database to undo any changes (rollback the transaction) by issuing a 
+    rollback command to the database.
+
+
+
+
 
 Transaction Propagation Types:
-Spring provides different propagation types that define how transactions are handled when multiple transactions are involved. The propagation attribute of the @Transactional annotation specifies how the current transaction should behave with respect to an existing transaction.
+Spring provides different propagation types that define how transactions are handled when multiple transactions are involved. 
+The propagation attribute of the @Transactional annotation specifies how the current transaction should behave with 
+respect to an existing transaction.
+
+
+When to Use:
+    REQUIRED: Use when you want multiple methods to share the same transaction (e.g., if one method fails, you 
+        want all changes to roll back).
+    REQUIRES_NEW: Use when you want a method to always run in its own transaction, regardless of any existing transaction. 
+        This is useful when you need a method to complete independently (e.g., logging or audit operations).
+
+
 
 1. REQUIRED (Default Propagation)
-Behavior: If there is an existing transaction, the method will join the existing transaction. If there is no transaction, a new one will be created.
+Behavior: If there is an existing transaction, the method will join the existing transaction. 
+If there is no transaction, a new one will be created.
 Use Case: This is the default behavior and is used for most transactional methods.
-Example:
 
-@Transactional(propagation = Propagation.REQUIRED)
-public void someMethod() {
-    // Method logic
-}
+Example:
+    @Transactional(propagation = Propagation.REQUIRED)
+    public void someMethod() {
+        // Method logic
+    }
 
 2. REQUIRES_NEW
-Behavior: A new transaction is always created, and if there is an existing transaction, it is suspended until the new transaction completes.
-Use Case: Used when you want to ensure that the method runs in its own independent transaction, regardless of the existing transaction.
-Example:
+Behavior: A new transaction is always created, and if there is an existing transaction, it is suspended until 
+the new transaction completes.
+Use Case: Used when you want to ensure that the method runs in its own independent transaction, 
+regardless of the existing transaction.
 
-@Transactional(propagation = Propagation.REQUIRES_NEW)
-public void someMethod() {
-    // Method logic in a new transaction
-}
+Example:
+    @Transactional(propagation = Propagation.REQUIRES_NEW)
+    public void someMethod() {
+        // Method logic in a new transaction
+    }
 
 3. SUPPORTS
-Behavior: If there is an existing transaction, the method will join it. If there is no transaction, the method will execute without a transaction.
+Behavior: If there is an existing transaction, the method will join it. If there is no transaction, 
+the method will execute without a transaction.
 Use Case: Used for operations that are not critical but should participate in a transaction if one exists.
 
 4. MANDATORY
-Behavior: If there is an existing transaction, the method will join it. If there is no existing transaction, an exception (TransactionRequiredException) is thrown.
+Behavior: If there is an existing transaction, the method will join it. 
+If there is no existing transaction, an exception (TransactionRequiredException) is thrown.
 Use Case: Used when the method must always run inside an existing transaction.
 
 
-NEVER, NOT_SUPPORTEDER,NESTED
+5)NEVER, NOT_SUPPORTEDER,NESTED
 
 
 
+14) Structuring Spring Project
 
-Structuring Spring Project
-1. Project Structure
 my-spring-project/
 │
 ├── src/
@@ -1663,48 +1909,90 @@ my-spring-project/
 
 
 
-
-How to enable actuator endpoints
+15) How to enable actuator endpoints
 1. Add Spring Boot Actuator Dependency
 Add the spring-boot-starter-actuator dependency to your pom.xml (for Maven) or build.gradle (for Gradle).
 
 2. Configure Actuator Endpoints in application.properties or application.yml
-By default, some actuator endpoints are enabled, but you can customize which ones are enabled or exposed using the configuration file.
-By adding the spring-boot-starter-actuator dependency and configuring the application.properties or application.yml, you can enable and customize the actuator endpoints in your Spring Boot application.
+By default, some actuator endpoints are enabled, but you can customize which ones are enabled or 
+exposed using the configuration file.
+By adding the spring-boot-starter-actuator dependency and configuring the application.properties or application.yml, 
+you can enable and customize the actuator endpoints in your Spring Boot application.
 
 
-
-Use of @ConfigurationProperties, Usages of Environment Variables in Spring Boot’s Properties Files
+16) Use of @ConfigurationProperties, Usages of Environment Variables in Spring Boot’s Properties Files
 1. @ConfigurationProperties in Spring Boot
-@ConfigurationProperties is a Spring annotation used to bind external configuration properties (e.g., from application.properties or application.yml) to a Java bean. This approach provides a strongly-typed way to handle configuration properties instead of using @Value for individual properties.
+@ConfigurationProperties is a Spring annotation used to bind external configuration 
+properties (e.g., from application.properties or application.yml) to a Java bean. 
+This approach provides a strongly-typed way to handle configuration properties instead of using @Value for individual properties.
 
-Spring Boot Environment Variable Resolution
+
+17) Spring Boot Environment Variable Resolution
 Precedence Order: The order of precedence is:
-Command-line arguments (highest priority)
-Environment variables
-Java system properties
-application.properties / application.yml (lowest priority)
+    Command-line arguments (highest priority)
+    Environment variables
+    Java system properties
+    application.properties / application.yml (lowest priority)
 
 
 
-AOP - Point Cut, Advice, Joint Point
-Pointcut: Specifies where (which methods) the advice will be applied.
-Advice: Defines the action to take at the join points (e.g., log, validate, modify behavior).
-Join Point: A specific point in program execution (usually a method execution) where advice can be applied.
+18) AOP - Point Cut, Advice, Joint Point
+    Pointcut: Specifies where (which methods) the advice will be applied.
+    Advice: Defines the action to take at the join points (e.g., log, validate, modify behavior).
+    Join Point: A specific point in program execution (usually a method execution) where advice can be applied.
 
 
-Unit Testion - JUnit Jupiter
-JUnit Jupiter is the new programming model and extension model for JUnit 5, which provides a modern and flexible way to write and run tests.
+
+Exmple:
+    public class MyService {
+        public void methodA() {
+            System.out.println("Inside methodA");
+        }
+    }
+
+
+// Aspect definition for logging
+    @Aspect
+    @Component
+    public class LoggingAspect {
+
+        // Define a pointcut that matches only the method methodA() in MyService
+        @Pointcut("execution(void com.example.MyService.methodA())")
+        public void methodAPointcut() {}
+
+        // Define an advice: Log before executing methodA()
+        @Before("methodAPointcut()")
+        public void logBeforeMethodA(JoinPoint joinPoint) {
+            System.out.println("Executing methodA()");
+        }
+    }
+
+
+
+Explanation:
+    Pointcut (methodAPointcut): The pointcut expression execution(void com.example.MyService.methodA())
+         matches only the execution of methodA() in the MyService class.
+        void means the return type of methodA() (you can change it to match other return types if necessary).
+        com.example.MyService.methodA() specifies the exact method to match.
+    Advice (logBeforeMethodA): This advice is executed before methodA() is called and logs "Executing methodA()".
+    Join Point: The execution of methodA() in MyService.
+
+
+
+
+19) Unit Testion - JUnit Jupiter
+JUnit Jupiter is the new programming model and extension model for JUnit 5, which provides a modern and flexible 
+way to write and run tests.
 Key Features:
 Annotations:
-@Test: Marks a method as a test case.
-@BeforeEach: Runs before each test method.
-@AfterEach: Runs after each test method.
-@BeforeAll: Runs once before all tests in the class.
-@AfterAll: Runs once after all tests in the class.
-@ParameterizedTest: Used for running the same test with different inputs.
-Assertions:
+    @Test: Marks a method as a test case.
+    @BeforeEach: Runs before each test method.
+    @AfterEach: Runs after each test method.
+    @BeforeAll: Runs once before all tests in the class.
+    @AfterAll: Runs once after all tests in the class.
+    @ParameterizedTest: Used for running the same test with different inputs.
 
+Assertions:
 assertEquals(), assertTrue(), assertFalse(), assertNull(), etc.
 Assertions Library:
 
@@ -1714,11 +2002,13 @@ Test Lifecycle:
 Supports test lifecycle hooks for initialization and cleanup using @BeforeEach, @AfterEach, etc.
 JUnit Jupiter is the foundation of JUnit 5 and is designed to be more extensible and flexible compared to older versions.
 
-JSP, Thymeleaf, Javascript, Ajax
-    JSP: Java-based view technology for dynamic web pages (outdated compared to newer technologies).
-    Thymeleaf: A more modern templating engine, often used with Spring Boot.
-    JavaScript: Client-side scripting language for interactive functionality.
-    AJAX: Technique for making asynchronous requests to update page content without a full reload.
+
+
+20) JSP, Thymeleaf, Javascript, Ajax
+        JSP: Java-based view technology for dynamic web pages (outdated compared to newer technologies).
+        Thymeleaf: A more modern templating engine, often used with Spring Boot.
+        JavaScript: Client-side scripting language for interactive functionality.
+        AJAX: Technique for making asynchronous requests to update page content without a full reload.
 
 
 
@@ -1726,37 +2016,40 @@ JSP, Thymeleaf, Javascript, Ajax
 
 
 
-
-3	Web Server	Understanding Web Server: Apache Tomcat, Nginx
+##protocol |  Web Server | http https etc
+===========================================
+1) Web Server	Understanding Web Server: Apache Tomcat, Nginx
 A web server handles HTTP requests and serves static content or forwards dynamic requests to application servers.
 
 Apache Tomcat: Serves Java-based applications (Servlets, JSPs).
 Nginx: High-performance server for static files, load balancing, and reverse proxy.
 
 
-Thread per request vs Event loop. What are the advantages and disadvantages of them.
+
+2) Thread per request vs Event loop. What are the advantages and disadvantages of them.
 Ans
-`    Thread-per-request
-    Advantages:
+    Thread-per-request:
+        Advantages:
+        Easy to implement and debug.
+        Each request is independent, avoiding shared state issues.
 
-    Easy to implement and debug.
-    Each request is independent, avoiding shared state issues.
-    Disadvantages:
+        Disadvantages:
+        High memory usage (1 thread/request).
+        Poor scalability under high load (thread overhead).
 
-    High memory usage (1 thread/request).
-    Poor scalability under high load (thread overhead).
-    Event loop
-    Advantages:
+    Event loop:
+        Advantages:
+        Lightweight and highly scalable.
+        Handles many requests with fewer resources.
 
-    Lightweight and highly scalable.
-    Handles many requests with fewer resources.
-    Disadvantages:
+        Disadvantages:
+        Complex implementation (e.g., managing async I/O).
+        Harder debugging and error handling.
 
-    Complex implementation (e.g., managing async I/O).
-    Harder debugging and error handling.`
+    
 
 
-Install and configure Apache Tomcat for JAR and WAR File
+3) Install and configure Apache Tomcat for JAR and WAR File
 Ans:
     WAR File:
     Directly deployable in Tomcat.
@@ -1768,76 +2061,134 @@ Ans:
     Use a Spring Boot JAR with embedded Tomcat if deploying standalone.
 
 
+4) Configure SSL Certificate in Tomcat and Nginx
+    Configure SSL in Tomcat:
+        Generate Keystore:
+        keytool -genkey -alias tomcat -keyalg RSA -keystore keystore.jks
 
-Configure SSL Certificate in Tomcat and Nginx
-    Configure SSL in Tomcat
-    Generate Keystore:
-    keytool -genkey -alias tomcat -keyalg RSA -keystore keystore.jks
+        Edit server.xml:
+        Add/update <Connector> for HTTPS:
+        <Connector port="8443" protocol="HTTP/1.1" SSLEnabled="true" 
+                keystoreFile="conf/keystore.jks" keystorePass="yourpassword" 
+                scheme="https" secure="true" />
 
-    Edit server.xml:
-    Add/update <Connector> for HTTPS:
-    <Connector port="8443" protocol="HTTP/1.1" SSLEnabled="true" 
-            keystoreFile="conf/keystore.jks" keystorePass="yourpassword" 
-            scheme="https" secure="true" />
-
-    Configure SSL in Nginx
-    server {
-        listen 443 ssl;
-        ssl_certificate /etc/nginx/ssl/cert.pem;
-        ssl_certificate_key /etc/nginx/ssl/privkey.pem;
-        server_name yourdomain.com;
-        
-        location / {
-            proxy_pass http://localhost:8080;
+    Configure SSL in Nginx:
+        server {
+            listen 443 ssl;
+            ssl_certificate /etc/nginx/ssl/cert.pem;
+            ssl_certificate_key /etc/nginx/ssl/privkey.pem;
+            server_name yourdomain.com;
+            
+            location / {
+                proxy_pass http://localhost:8080;
+            }
         }
-    }
 
 
 What is truststore and keystore and how to configure it
 Ans:
-Keystore (For server authentication)
-Create Keystore:
-keytool -genkeypair -alias myserver -keyalg RSA -keystore keystore.jks -storepass password
+Keystore (For server authentication):
+    Create Keystore:
+    keytool -genkeypair -alias myserver -keyalg RSA -keystore keystore.jks -storepass password
 
-Add Certificate to Keystore:
-keytool -importcert -file server.crt -alias myserver -keystore keystore.jks
+    Add Certificate to Keystore:
+    keytool -importcert -file server.crt -alias myserver -keystore keystore.jks
 
-Tomcat Configuration:
-Add to server.xml:
-<Connector port="8443" SSLEnabled="true"
-           keystoreFile="conf/keystore.jks"
-           keystorePass="password" />
+    Tomcat Configuration:
+    Add to server.xml:
+    <Connector port="8443" SSLEnabled="true"
+            keystoreFile="conf/keystore.jks"
+            keystorePass="password" />
 
 
-Truststore (For client authentication)
-Create Truststore:
-keytool -importcert -file client.crt -alias client-cert -keystore truststore.jks -storepass password
+Truststore (For client authentication):
+    Create Truststore:
+    keytool -importcert -file client.crt -alias client-cert -keystore truststore.jks -storepass password
 
-Specify in Java:
-Add JVM options:
--Djavax.net.ssl.trustStore=truststore.jks -Djavax.net.ssl.trustStorePassword=password
-
-Summary
-Keystore secures the server's identity.
-Truststore validates client/server certificates.
-Both are essential for secure SSL/TLS communication.
+    Specify in Java:
+    Add JVM options:
+    -Djavax.net.ssl.trustStore=truststore.jks -Djavax.net.ssl.trustStorePassword=password
 
 
 
+Truststore vs Keystore and Their Relation to SSL:
+---------------------------------------------------------
+In the context of SSL (Secure Sockets Layer) and encryption, 
+truststore and keystore are both used to manage cryptographic keys and certificates, but they serve different purposes.
+
+1. Keystore:
+    What it is: A keystore is a storage file that holds private keys and certificates.
+    Purpose: It is primarily used by a server to prove its identity by presenting a private key.
+
+    What it contains:
+    Private Key: This key is used to sign data (e.g., for digital signatures) and decrypt incoming data.
+    Certificate: The public key certificate that identifies the entity and is shared publicly.
+
+    In SSL: When an SSL server (like a web server) communicates with clients, it needs a private key and a certificate 
+    (often obtained from a Certificate Authority). These are stored in a keystore.
+
+2. Truststore:
+    What it is: A truststore is a storage file that contains a list of trusted public certificates (usually the root CA certificates).
+    Purpose: It is used to verify that the certificate presented by the other party (server/client) 
+    in an SSL connection is trusted. 
+    If a client is connecting to a server, it checks the server’s certificate against the truststore.
+
+    What it contains:
+    Public Certificates: These certificates belong to trusted certificate authorities (CAs). 
+    The truststore doesn't contain private keys.
+
+    In SSL: When a client connects to an SSL server, it checks the server's certificate against its truststore to ensure that 
+    the certificate is signed by a trusted authority. If the certificate is not trusted, the SSL connection fails.
+
+
+Example in SSL Communication:
+    Server Side:
+    The server has a keystore containing its private key and public certificate.
+    When the client connects, the server sends its public certificate to the client.
+
+    Client Side:
+    The client has a truststore containing trusted root CA certificates.
+    The client checks if the server’s certificate is signed by a trusted CA from its truststore.
+    If both sides trust each other (via certificates in keystore and truststore), the SSL handshake succeeds, and the secure connection is established.
+
+
+SSL/TLS Handshake: The process of securing the connection involves several steps:
+    Step 1: The client (e.g., a web browser) requests a secure connection to the server.
+    Step 2: The server sends its public certificate (stored in the keystore) to the client.
+    Step 3: The client verifies the server's certificate against its truststore (checks if it trusts the certificate).
+    Step 4: The client and server exchange keys and generate a shared secret (called a session key).
+    This shared secret will be used to encrypt/decrypt the actual data during the session.
+
+
+Why Self-Signed Certificates Need to be Manually Added to the Truststore:
+    Truststore: The truststore is a file or database that contains the list of trusted public certificates 
+    (typically from well-known CAs) or self-signed certificates (if you choose to trust them).
+    For Self-Signed Certificates: Since self-signed certificates are not issued by a trusted Certificate Authority (CA), 
+    the client has no way of knowing if the certificate is trustworthy unless explicitly told. That's why:
+    The self-signed public certificate must be manually added to the truststore (either on the client or in a trusted location).
+    This tells the client that you trust the self-signed certificate and the server it belongs to.
+
+
+Manual Trust:
+    To trust the self-signed certificate, the client needs to manually add the public certificate 
+    (or the certificate authority that issued it, if it's self-signed with its own CA) to its truststore.
+    This ensures that the client accepts the certificate and establishes a secure SSL/TLS connection.
+
+SSL/TLS encryption procedure is the same for both self-signed and public CA certificates, 
+the difference is that self-signed certificates require manual intervention (adding them to the truststore) 
+to be trusted by clients.
 
 
 
 
-
-
-Configure Virtual Host in Apache Tomcat
-Key Points:
-Virtual Hosts are defined in the server.xml file.
-Each virtual host can serve a different web application based on the domain or subdomain.
-Host Name: The domain or subdomain used to identify a specific virtual host.
-AppBase: The directory where the web application files are stored for that virtual host.
-Example:
-You can have two applications running on the same Tomcat server:
+5) Configure Virtual Host in Apache Tomcat
+    Key Points:
+    Virtual Hosts are defined in the server.xml file.
+    Each virtual host can serve a different web application based on the domain or subdomain.
+    Host Name: The domain or subdomain used to identify a specific virtual host.
+    AppBase: The directory where the web application files are stored for that virtual host.
+    Example:
+    You can have two applications running on the same Tomcat server:
 
 www.example1.com -> Serves example1.war
 www.example2.com -> Serves example2.war
@@ -1863,29 +2214,33 @@ Locate server.xml
 
 
 
+6) Apache Tomcat Load Balancing with MOD_JK
+Apache Tomcat Load Balancing with mod_jk is a method for distributing incoming HTTP requests across 
+multiple Tomcat servers to improve scalability and reliability. 
+The mod_jk module connects the Apache HTTP Server with Apache Tomcat, acting as a load balancer for Tomcat instances.
 
 
-Apache Tomcat Load Balancing with MOD_JK
-Apache Tomcat Load Balancing with mod_jk is a method for distributing incoming HTTP requests across multiple Tomcat servers to improve scalability and reliability. The mod_jk module connects the Apache HTTP Server with Apache Tomcat, acting as a load balancer for Tomcat instances.
+7)  Apache Tomcat HTTP Request Interception Using Valves
+    Apache Tomcat HTTP Request Interception Using Valves allows you to intercept and process HTTP 
+    requests and responses at various stages of the request-response lifecycle within Tomcat. 
+    Valves are used to add custom logic, such as logging, security, authentication, or request manipulation, 
+    before or after the request reaches a servlet or before it is sent to the client.
 
-Apache Tomcat HTTP Request Interception Using Valves
-Apache Tomcat HTTP Request Interception Using Valves allows you to intercept and process HTTP requests and responses at various stages of the request-response lifecycle within Tomcat. Valves are used to add custom logic, such as logging, security, authentication, or request manipulation, before or after the request reaches a servlet or before it is sent to the client.
 
 
-
-Apache Tomcat - Memory Optimization - Heap & Metaspace
-By tuning the Heap and Metaspace memory settings in the CATALINA_OPTS environment variable, you can optimize Tomcat’s performance and ensure it efficiently uses memory.
+8) Apache Tomcat - Memory Optimization - Heap & Metaspace
+By tuning the Heap and Metaspace memory settings in the CATALINA_OPTS environment variable, 
+you can optimize Tomcat’s performance and ensure it efficiently uses memory.
 
 Purpose of CATALINA_OPTS:
-It allows you to specify various JVM options such as heap size, garbage collection, and Metaspace settings, among others, which help in memory optimization for Tomcat.
+It allows you to specify various JVM options such as heap size, garbage collection, and Metaspace settings, 
+among others, which help in memory optimization for Tomcat.
 These options are used when Tomcat starts up to configure how the JVM should handle memory and performance.
-
 
 Heap Memory Optimization:
     -Xms: Initial heap size (amount of memory allocated when Tomcat starts).
     -Xmx: Maximum heap size (maximum memory Tomcat can use).
     export CATALINA_OPTS="-Xms512m -Xmx2g"
-
 
 Garbage Collection Optimization:
 
@@ -1895,10 +2250,11 @@ Garbage Collection Optimization:
 
 
 
-Apache Tomcat - Connectors and Executor Thread Optimization, Enabling HTTP Response Compression, Setting Up Monitoring
-Optimizing Connectors:
+9) Apache Tomcat - Connectors and Executor Thread Optimization, Enabling HTTP Response Compression, Setting Up Monitoring
 
-You can configure the HTTP Connector to adjust the number of threads, keep-alive settings, etc., for better performance under high load.
+Optimizing Connectors:
+You can configure the HTTP Connector to adjust the number of threads, keep-alive settings, etc., 
+for better performance under high load.
 Example (in server.xml):
 <Connector port="8080" 
            protocol="HTTP/1.1"
@@ -1947,9 +2303,7 @@ Summary:
 
 
 
-
-
-Understanding different logs in Tomcat and Nginx
+10) Understanding different logs in Tomcat and Nginx
 Tomcat Logs:
     catalina.out: Main log for Tomcat startup, shutdown, and general errors.
     catalina.<date>.log: Logs Tomcat server activity, including errors and exceptions.
@@ -1961,16 +2315,24 @@ Nginx Logs:
     access.log: Logs incoming HTTP requests (IP, method, status, etc.).
     error.log: Logs errors like configuration issues or failed requests.
     slow.log: Logs requests that take too long to process (if configured).
-    Both servers provide essential logging for monitoring and troubleshooting.
+Both servers provide essential logging for monitoring and troubleshooting.
 
 
-What is reverse proxy ?
-A reverse proxy is a server that sits between client devices and a web server. It forwards client requests to one or more backend servers and then returns the response from the backend server(s) to the client.
+11) What is reverse proxy ?
+    A reverse proxy is a server that sits between client devices and a web server. 
+    It forwards client requests to one or more backend servers and then returns the response from the backend server(s) to the client.
 
 
-Configuring L4, L7 LoadBalancer with Nginx
-Layer 4 (L4) Load Balancing with Nginx
-L4 load balancing operates at the transport layer (TCP/UDP), where Nginx forwards traffic without inspecting the application layer protocols like HTTP.
+
+12) Configuring L4, L7 LoadBalancer with Nginx
+
+Used for: TCP and UDP traffic (like MySQL, database connections, etc.).
+Works at: The Transport Layer (Layer 4) of the OSI model.
+How it works: Nginx performs load balancing based on IP address and port without inspecting the content of the data being transmitted.
+    For example, with MySQL, Nginx can distribute requests from clients to multiple backend MySQL servers based solely on the connection's IP address and port (default 3306 for MySQL).
+    Since Nginx does not inspect the packet contents, it does not require knowledge of the application-layer protocol (like HTTP).
+
+
 
 Basic TCP Load Balancing: For L4 load balancing, configure Nginx to proxy TCP traffic to backend servers.
 stream {
@@ -1987,8 +2349,13 @@ stream {
 
 
 
-Layer 7 (L7) Load Balancing with Nginx
-L7 load balancing operates at the application layer (HTTP/HTTPS), where Nginx can inspect the HTTP headers and URLs, and make decisions based on that.
+L7 Load Balancing (Layer 7 - Application Layer): 
+Used for: HTTP(S) traffic (web applications, APIs, etc.).
+Works at: The Application Layer (Layer 7) of the OSI model.
+How it works: Nginx performs load balancing by inspecting the content of HTTP requests (e.g., URL path, headers, cookies) and can make decisions based on this data.
+For example, Nginx can route HTTP traffic to different backend servers depending on the URL path or use advanced features like SSL termination, cookie-based session persistence, etc.
+
+
 
 Basic HTTP Load Balancing: For L7 load balancing, configure Nginx to proxy HTTP requests to backend web servers.
 http {
@@ -2010,9 +2377,16 @@ http {
     }
 }
 
+Key Differences:
+    L4 Load Balancing is used for non-HTTP protocols (like MySQL, SSH, etc.) and makes decisions based on IP and port.
+    L7 Load Balancing is used for HTTP/HTTPS traffic and makes decisions based on the application layer (like URLs, headers, cookies).
+
 
 Key Features of stream in Nginx:
-In Nginx, the stream block is used to handle TCP and UDP traffic, which operates at Layer 4 (L4) of the OSI model. This block enables Nginx to act as a reverse proxy for non-HTTP protocols, allowing it to distribute traffic to backend servers for services that use TCP or UDP, such as databases, mail servers, or custom applications.
+In Nginx, the stream block is used to handle TCP and UDP traffic, which operates at Layer 4 (L4) of the OSI model. 
+This block enables Nginx to act as a reverse proxy for non-HTTP protocols, 
+allowing it to distribute traffic to backend servers for services that use TCP or UDP, such as databases, 
+mail servers, or custom applications.
 
 Basic Example of stream Block (TCP Load Balancing):
     stream {
@@ -2032,10 +2406,7 @@ Basic Example of stream Block (TCP Load Balancing):
 
 
 
-
-
-
-Configure Nginx HA with keepalived
+13) Configure Nginx HA with keepalived
 1. Install Nginx and Keepalived:
     sudo apt-get install nginx keepalived
 
