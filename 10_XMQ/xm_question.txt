@@ -2437,7 +2437,7 @@ Summary:
 
 
 
-Static Load Balancing Algorithm - Round Robin, Weight Round Robin, IP Hash
+14) Static Load Balancing Algorithm - Round Robin, Weight Round Robin, IP Hash
 Round Robin:
     Description: Distributes requests evenly across all backend servers in a circular order.
     Use case: Simple load balancing with no regard for server load.
@@ -2469,7 +2469,7 @@ upstream backend {
 
 
 
-Dynamic Load Balancing Algorithm - Least Connection, Weighted Least Connection, Weighted Response time
+15) Dynamic Load Balancing Algorithm - Least Connection, Weighted Least Connection, Weighted Response time
 Least Connection:
 Description: Routes traffic to the server with the fewest active connections.
 Use case: Useful when backend servers have varying connection loads.
@@ -2502,17 +2502,16 @@ upstream backend {
 
 
 
-Nginx Redirects and Rewrites
-    Redirects send clients to a new URL (e.g., 301 for permanent).
-    Description: Sends an HTTP response to the client to request a new URL.
+16) Nginx Redirects and Rewrites
+        Redirects send clients to a new URL (e.g., 301 for permanent).
+        Description: Sends an HTTP response to the client to request a new URL.
 
-    Rewrites modify URLs internally on the server.
-    Description: Changes the requested URL internally without informing the client.
+        Rewrites modify URLs internally on the server.
+        Description: Changes the requested URL internally without informing the client.
 
 
-Understanding Nginx Worker Process and Worker Connections
-    Worker Connections:
-    Description: Defines how many connections each worker process can handle simultaneously.
+17) Understanding Nginx Worker Process and Worker Connections
+
 worker_processes 4;  # 4 worker processes
 
     Worker Connections:
@@ -2522,31 +2521,31 @@ events {
 }
 
 
-How to cache static content in nginx
-1. Using expires Directive (Simple Caching):
-server {
-    location /assets/ {
-        root /var/www/html;
-        expires 30d;  # Cache for 30 days
-        add_header Cache-Control "public";
-    }
-}
-
-
-2. Using proxy_cache (Advanced Caching):
-This caches responses from a backend server or proxy.
-http {
-    proxy_cache_path /tmp/cache levels=1:2 keys_zone=static_cache:10m max_size=1g inactive=60m;
-    
+18) How to cache static content in nginx
+    1. Using expires Directive (Simple Caching):
     server {
-        location / {
-            proxy_pass http://backend;
-            proxy_cache static_cache;
-            proxy_cache_valid 200 1h;  # Cache 200 responses for 1 hour
-            proxy_cache_use_stale error timeout updating;  # Serve stale cache if backend fails
+        location /assets/ {
+            root /var/www/html;
+            expires 30d;  # Cache for 30 days
+            add_header Cache-Control "public";  
         }
     }
-}
+
+
+    2. Using proxy_cache (Advanced Caching):
+    This caches responses from a backend server or proxy.
+    http {
+        proxy_cache_path /tmp/cache levels=1:2 keys_zone=static_cache:10m max_size=1g inactive=60m;
+        
+        server {
+            location / {
+                proxy_pass http://backend;
+                proxy_cache static_cache;
+                proxy_cache_valid 200 1h;  # Cache 200 responses for 1 hour
+                proxy_cache_use_stale error timeout updating;  # Serve stale cache if backend fails
+            }
+        }
+    }
 
 
 Summary:
@@ -2556,13 +2555,14 @@ Advanced caching: Use proxy_cache for more control over caching behavior.
 
 
 
-Compress Response in nginx, Enabling HTTP/2, Enabling Server Push
+19) Compress Response in nginx, Enabling HTTP/2, Enabling Server Push
     Compression: Use gzip to reduce response sizes.
     HTTP/2: Enable http2 in the listen directive for faster communication.
     Server Push: Use the Link header to push resources to clients in HTTP/2.
 
-Understanding Apache Tomcat Session Replication
-Session replication in Tomcat ensures that session data is shared and available across multiple Tomcat instances in a cluster, enhancing application availability and reliability.
+20) Understanding Apache Tomcat Session Replication
+Session replication in Tomcat ensures that session data is shared and available across multiple 
+Tomcat instances in a cluster, enhancing application availability and reliability.
 
 Apache Tomcat Session Replication:
     Purpose: Ensures user session data is shared across multiple Tomcat instances for high availability and fault tolerance.
@@ -2576,17 +2576,19 @@ Types:
 
 
 
-
-4	Web, HTTP and Other Communication Protocols	HTTP, HTTPS, SSL, TLS
+4
+##Web, HTTP and Other Communication Protocols	
+=====================================================
+1) HTTP, HTTPS, SSL, TLS
 Web protocols enable communication between clients (e.g., browsers) and servers on the internet.
 The most common protocol for web communication is HTTP.
 
 HTTP (HyperText Transfer Protocol)
     Purpose: Defines how messages are formatted and transmitted on the web.
     Key Characteristics:
-    Operates at the application layer.
-    Uses the request-response model.
-    Stateless: Each request is independent.
+        Operates at the application layer.
+        Uses the request-response model.
+        Stateless: Each request is independent.
 
 SSL (up to version 3.0) is considered insecure and replaced by TLS.
 
@@ -2599,39 +2601,55 @@ HTTP messages are encrypted and transmitted over this channel.
 
 HTTP Methods - GET, POST, PUT, PATCH, DELETE. HTTP Method Idempotency
 
-HTTP Methods
-GET: Retrieve data (read-only).
-POST: Send data to the server (e.g., create resources).
-PUT: Replace an entire resource.
-PATCH: Update part of a resource.
-DELETE: Remove a resource.
+HTTP Methods:
+    GET: Retrieve data (read-only).
+    POST: Send data to the server (e.g., create resources).
+    PUT: Replace an entire resource.
+    PATCH: Update part of a resource.
+    DELETE: Remove a resource.
 
 Example:
 GET /resource/1 → Always fetches the same data.
 POST /resource → Creates a new resource each time it's called.
 
+In HTTP, an "idempotent method" refers to a request that can be executed multiple times with the same parameters, 
+resulting in the same outcome.
+
+Examples of idempotent methods: GET, HEAD, PUT, DELETE, OPTIONS, TRACE 
+Non-idempotent method: POST - sending a POST request multiple times can create multiple resources on the server 
 
 
-HTTP Status Codes - 2xx, 3xx, 4xx, 5xx
+
+SSH (Secure Shell):
+    SSH is a protocol used to securely connect to and manage remote systems over an encrypted network.
+    It allows secure communication, file transfers, and command execution.
+
+    Typical usage:
+    ssh user@host (to log in to a remote machine).
+
+
+
+
+2) HTTP Status Codes - 2xx, 3xx, 4xx, 5xx
 Ans
     HTTP Status Codes
     2xx: Success
-    200 OK: Request succeeded.
-    201 Created: Resource created successfully.
-    204 No Content: Request succeeded, no content to return.
+        200 OK: Request succeeded.
+        201 Created: Resource created successfully.
+        204 No Content: Request succeeded, no content to return.
     3xx: Redirection
-    301 Moved Permanently: Resource moved to a new URL.
-    302 Found: Temporary redirection.
-    304 Not Modified: Cached version is still valid.
+        301 Moved Permanently: Resource moved to a new URL.
+        302 Found: Temporary redirection.
+        304 Not Modified: Cached version is still valid.
     4xx: Client Errors
-    400 Bad Request: Invalid request.
-    401 Unauthorized: Authentication required.
-    403 Forbidden: Access denied.
-    404 Not Found: Resource not found.
+        400 Bad Request: Invalid request.
+        401 Unauthorized: Authentication required.
+        403 Forbidden: Access denied.
+        404 Not Found: Resource not found.
     5xx: Server Errors
-    500 Internal Server Error: Generic server issue.
-    502 Bad Gateway: Invalid response from upstream server.
-    503 Service Unavailable: Server temporarily unavailable.
+        500 Internal Server Error: Generic server issue.
+        502 Bad Gateway: Invalid response from upstream server.
+        503 Service Unavailable: Server temporarily unavailable.
 
 
 HTTP Request, Response Format
@@ -2656,7 +2674,7 @@ HTTP Request, Response Format
         Body (Optional): The actual content (e.g., HTML, JSON).
 
 
-HTTP Cookies vs Sessions
+3) HTTP Cookies vs Sessions
     Storage:
     Cookies are stored on the client-side.
     Sessions are stored on the server-side.
@@ -2677,7 +2695,8 @@ HTTP Cookies vs Sessions
     Cookies are used to remember user preferences.
     Sessions are used to track user login states.
 
-TCP Flow Control and Congestion Controlling
+
+4) TCP Flow Control and Congestion Controlling
 TCP Flow Control
     Ensures the sender doesn't overload the receiver.
     Uses the receiver's advertised window size to limit data transmission.
@@ -2685,71 +2704,88 @@ TCP Flow Control
 TCP Congestion Control
     Prevents network overload.
     Key mechanisms:
-    Slow Start: Start small, increase exponentially.
-    Congestion Avoidance: Additive increase, multiplicative decrease (AIMD).
-    Fast Retransmit: Quickly resend lost packets.
-    Fast Recovery: Reduce speed temporarily after congestion.
+        Slow Start: Start small, increase exponentially.
+        Congestion Avoidance: Additive increase, multiplicative decrease (AIMD).
+        Fast Retransmit: Quickly resend lost packets.
+        Fast Recovery: Reduce speed temporarily after congestion.
 
 
 
-Low Latency Handshake: QUIC
-Low Latency Handshake in QUIC (Quick UDP Internet Connections) refers to the protocol's ability to establish a secure connection with minimal delay, significantly improving the performance of applications that require fast response times, such as video streaming, gaming, or real-time communications.
+5) Low Latency Handshake: QUIC
+    QUIC (Quick UDP Internet Connections) is a transport protocol designed for low-latency connections.
+    It achieves this by combining TLS encryption and transport-layer handshake into a single step, 
+    reducing round trips compared to TCP.
+    Ideal for real-time applications like streaming and gaming.
 
-URL vs URI, and URL Encoding
+
+6) URL vs URI, and URL Encoding
 URL vs URI
     URI (Uniform Resource Identifier): Identifies a resource, either by location, name, or both.
-    Example: http://example.com, mailto:user@example.com, urn:isbn:0451450523.
+        Example: http://example.com, mailto:user@example.com, urn:isbn:0451450523.
     URL (Uniform Resource Locator): A type of URI that specifies the location of a resource and the protocol to access it.
-    Example: http://example.com/page.html.
+        Example: http://example.com/page.html.
     All URLs are URIs, but not all URIs are URLs.
 
-URL Encoding
+URL Encoding:
     Purpose: Encodes characters in a URL to ensure they are transmitted safely over the internet.
     Use Cases:
     Encoding query parameters: https://example.com/search?q=hello%20world.
     Safeguarding data in GET requests or APIs.
 
-HTTP Long Pooling, Short Pooling, Websocket, Server Sent Event
+A short URL is a condensed version of a long web address.
+    It redirects users to the original URL while being easier to share and remember.
+    Example:
+    Original: https://example.com/very/long/url
+    Shortened: https://bit.ly/abc123
+
+How it works:
+    User submits a long URL to a URL shortening(free or paid) service.
+    The service generates a unique, shorter identifier for the URL.
+    When users click the short URL, it redirects them to the original long URL stored in the service's database.
+
+
+7) HTTP Long Pooling, Short Pooling, Websocket, Server Sent Event
 HTTP Long Polling
-    Definition: A technique where the client requests information from the server, and the server holds the connection open until new data is available.
+    Definition: A technique where the client requests information from the server, and the server holds the 
+    connection open until new data is available.
     How It Works:
-    The client sends a request.
-    The server delays the response until new data is available or a timeout occurs.
-    After the response, the client immediately sends another request.
-    Use Cases: Chat applications, live notifications.
+        The client sends a request.
+        The server delays the response until new data is available or a timeout occurs.
+        After the response, the client immediately sends another request.
+        Use Cases: Chat applications, live notifications.
 
 HTTP Short Polling
     Definition: The client regularly sends requests to the server at fixed intervals to check for updates.
     How It Works:
-    The client sends requests at intervals (e.g., every 5 seconds).
-    The server responds immediately with the current state, even if no updates are available.
-    Use Cases: Simple applications where low latency is not critical.
+        The client sends requests at intervals (e.g., every 5 seconds).
+        The server responds immediately with the current state, even if no updates are available.
+        Use Cases: Simple applications where low latency is not critical.
 
 WebSockets
-    Definition: A full-duplex communication protocol that allows continuous data exchange between client and server over a single TCP connection.
+    Definition: A full-duplex communication protocol that allows continuous data exchange between 
+    client and server over a single TCP connection.
     How It Works:
-    The client establishes a WebSocket handshake via HTTP, then upgrades to a persistent TCP connection.
-    Both client and server can send messages at any time without additional requests.
-    Use Cases: Real-time games, stock price updates, live chat.
+        The client establishes a WebSocket handshake via HTTP, then upgrades to a persistent TCP connection.
+        Both client and server can send messages at any time without additional requests.
+        Use Cases: Real-time games, stock price updates, live chat.
 
 Server-Sent Events (SSE)
     Definition: A unidirectional communication protocol where the server pushes updates to the client using HTTP.
     How It Works:
-    The client opens an HTTP connection to the server.
-    The server sends data updates as events over the connection.
-    Use Cases: Real-time notifications, dashboards, live feeds.
-
-
+        The client opens an HTTP connection to the server.
+        The server sends data updates as events over the connection.
+        Use Cases: Real-time notifications, dashboards, live feeds.
 
 HTTP Streaming: Transfer Encoding: chunked
-    HTTP Streaming using Transfer-Encoding: chunked is a technique where data is sent to the client in chunks as it becomes available, rather than waiting for the entire response to be ready.
+    HTTP Streaming using Transfer-Encoding: chunked is a technique where data is sent to the client in chunks 
+    as it becomes available, rather than waiting for the entire response to be ready.
     Client Support: Most modern browsers and HTTP clients support chunked transfer.
     Server Configuration: Many servers (e.g., Nginx, Apache) support this by default, but it may require explicit configuration.
 
 
 
-What is CORS
-Origin: Defined by the combination of:
+8) What is CORS
+A Origin: Defined by the combination of:
     Protocol (e.g., http, https)
     Domain (e.g., example.com)
     Port (e.g., :8080)
@@ -2765,38 +2801,39 @@ Common Issues:
 
 
 
-HTTP Security: Content Security Policy, Strict-Transport-Security
+9) HTTP Security: Content Security Policy, Strict-Transport-Security
 1. Content Security Policy (CSP)
     Purpose:
-
     Mitigate cross-site scripting (XSS) and other injection attacks.
     Control which resources (scripts, styles, images, etc.) are allowed to load.
     How it Works:
-
-    CSP is implemented using the Content-Security-Policy HTTP header.
-    You specify directives that dictate the sources and types of content that browsers are allowed to load.
+        CSP is implemented using the Content-Security-Policy HTTP header.
+        You specify directives that dictate the sources and types of content that browsers are allowed to load.
 
 2. Strict-Transport-Security (HSTS)
 Purpose:
     Enforce the use of HTTPS to prevent man-in-the-middle (MITM) attacks and downgrade attacks.
     How it Works:
-
-    HSTS is implemented using the Strict-Transport-Security HTTP header.
-    Once a browser receives this header, it only communicates with the site over HTTPS.
-
-
-
-HTTP Basic Authentication
-HTTP Basic Authentication is a simple authentication mechanism that encodes user credentials (username and password) in a Base64 format and includes them in the Authorization header of HTTP requests.
-
-HTTP Content Negotiation
-HTTP Content Negotiation is a mechanism that allows the client and server to communicate and decide on the most appropriate representation of a resource (e.g., format, language, or encoding). This is achieved through HTTP request headers and server responses.
+        HSTS is implemented using the Strict-Transport-Security HTTP header.
+        Once a browser receives this header, it only communicates with the site over HTTPS.
 
 
 
-What is HTTP Keep alive, Why is it needed ?
+10) HTTP Basic Authentication
+HTTP Basic Authentication is a simple authentication mechanism that encodes user credentials (username and password) 
+in a Base64 format and includes them in the Authorization header of HTTP requests.
+
+HTTP Content Negotiation:
+    HTTP Content Negotiation is a mechanism that allows the client and server to communicate and decide on the most 
+    appropriate representation of a resource (e.g., format, language, or encoding). 
+    This is achieved through HTTP request headers and server responses.
+
+
+
+11) What is HTTP Keep alive, Why is it needed ?
 Definition:
-HTTP Keep-Alive is a mechanism that allows a single TCP connection to remain open for multiple HTTP requests and responses, rather than opening a new connection for each request. 
+HTTP Keep-Alive is a mechanism that allows a single TCP connection to remain open for multiple HTTP requests and responses, 
+rather than opening a new connection for each request. 
 
 Example Without Keep-Alive
     For a webpage with 10 resources:
@@ -2818,43 +2855,48 @@ Saves Resources:
 
 
 
-HTTP Multiplexing
-HTTP Multiplexing, introduced in HTTP/2, revolutionizes web communication by enabling multiple requests and responses to be sent over a single TCP connection simultaneously. This results in improved performance, reduced latency, and more efficient use of network resources compared to HTTP/1.x. It plays a significant role in enhancing the user experience for modern web applications.
+12) HTTP Multiplexing:
+    HTTP Multiplexing, introduced in HTTP/2, revolutionizes web communication by enabling multiple 
+    requests and responses to be sent over a single TCP connection simultaneously. 
+    This results in improved performance, reduced latency, and more efficient use of network resources compared to HTTP/1.x. 
+    It plays a significant role in enhancing the user experience for modern web applications.
+
+Understanding HTTP 1.1, 2, 3 differences:
+    HTTP/1.1 is the legacy version and is still widely used today, 
+        but it has performance limitations such as head-of-line blocking and inefficient use of TCP connections.
+    HTTP/2 introduced important improvements such as multiplexing and header compression, 
+        offering better performance for most modern websites. 
+        However, it still uses TCP, which suffers from head-of-line blocking.
+    HTTP/3 takes the biggest leap by using QUIC (UDP-based), offering even lower latency, improved performance, and security. 
+    It's especially advantageous in scenarios with high network congestion or unreliable connections. 
+    However, it's still in the process of widespread adoption.
 
 
 
-Understanding HTTP 1.1, 2, 3 differences
-The most widely used versions today are HTTP/1.1, HTTP/2, and HTTP/3.
-HTTP/1.1 is the legacy version and is still widely used today, but it has performance limitations such as head-of-line blocking and inefficient use of TCP connections.
-HTTP/2 introduced important improvements such as multiplexing and header compression, offering better performance for most modern websites. However, it still uses TCP, which suffers from head-of-line blocking.
-HTTP/3 takes the biggest leap by using QUIC (UDP-based), offering even lower latency, improved performance, and security. It's especially advantageous in scenarios with high network congestion or unreliable connections. However, it's still in the process of widespread adoption.
 
-
-
-
-
-
-Understanding UDP,
+13) Understanding UDP,
     Use Cases for UDP
-    Due to its characteristics, UDP is often used in applications where speed is more important than reliability, such as:
-    Real-time communication:
-    Voice over IP (VoIP), video conferencing, online gaming.
-    Streaming:
-    Video and audio streaming where timely delivery is prioritized over occasional packet loss.
-    DNS (Domain Name System):
-    DNS queries typically use UDP to speed up the process of looking up domain names.
-    Broadcast and multicast:
-    Broadcasting to multiple clients, as in IP television or network management.
+        Due to its characteristics, UDP is often used in applications where speed is more important than reliability, such as:
+        Real-time communication:
+        Voice over IP (VoIP), video conferencing, online gaming.
+        Streaming:
+        Video and audio streaming where timely delivery is prioritized over occasional packet loss.
+        DNS (Domain Name System):
+            DNS queries typically use UDP to speed up the process of looking up domain names.
+        Broadcast and multicast:
+            Broadcasting to multiple clients, as in IP television or network management.
 
     UDP is a fast, lightweight, and connectionless protocol used for communication in many real-time applications.
-    However, the application using UDP must be capable of handling potential issues like packet loss, out-of-order delivery, or duplication.
+    However, the application using UDP must be capable of handling potential issues like packet loss, 
+    out-of-order delivery, or duplication.
 
 
 
-Others Protocol - gRPC, Apache Thrift, MQTT, AMQP
+14) Others Protocol - gRPC, Apache Thrift, MQTT, AMQP
     gRPC:
     Type: RPC framework.
     Use Case: High-performance microservices communication, real-time services.
+    Without explicit configuration, gRPC communication will not use HTTPS. Always enable TLS for secure communication.
 
     Apache Thrift:
     Type: RPC framework.
@@ -2868,33 +2910,32 @@ Others Protocol - gRPC, Apache Thrift, MQTT, AMQP
     Type: Message queuing.
 
 
-Understanding Chrome Developer Tools
-Chrome Developer Tools (DevTools) is a set of web development tools built into Google Chrome that helps developers inspect, debug, and optimize websites.
-These tools help developers debug, test, and improve website performance directly in the browser.
+15) Understanding Chrome Developer Tools
+    Chrome Developer Tools (DevTools) is a set of web development tools built into Google Chrome that helps developers 
+    inspect, debug, and optimize websites.
+    These tools help developers debug, test, and improve website performance directly in the browser.
 
 
-Writing RESTful API
-REST, an architectural style for distributed systems. It defines a set of rules for how clients and servers communicate over HTTP, focusing on stateless interactions, scalability, and resource-based operations.
-
+16) Writing RESTful API:
+        REST, an architectural style for distributed systems. It defines a set of rules for how clients and servers 
+        communicate over HTTP, focusing on stateless interactions, scalability, and resource-based operations.
 For an API to be considered RESTful, it must follow a few core principles of REST:
-Statelessness:
-    Every request is treated independently.
-Client-Server Architecture:
-    The client and the server are separate entities.  
+    Statelessness:
+        Every request is treated independently.
+    Client-Server Architecture:
+        The client and the server are separate entities.  
 
 Uniform Interface:
-RESTful APIs have a consistent, standardized set of conventions for interacting with resources, using HTTP methods and status codes.
-Resources (data) are identified via URIs (Uniform Resource Identifiers).
-Clients interact with resources using standard HTTP methods: GET, POST, PUT, DELETE.
+    RESTful APIs have a consistent, standardized set of conventions for interacting with resources, 
+    using HTTP methods and status codes.
+    Resources (data) are identified via URIs (Uniform Resource Identifiers).
+    Clients interact with resources using standard HTTP methods: GET, POST, PUT, DELETE.
 
 Resource-Based:
 Everything is a resource (e.g., user, product, order) identified by a URI.
 
 Representation of Resources:
-
 Resources are transferred between client and server in various formats, typically JSON or XML
-
-
 
 Best Practices
     Use versioning in API paths (e.g., /v1/users).
@@ -2904,7 +2945,8 @@ Best Practices
     Implement pagination for large data sets (e.g., /users?page=1&size=10).
 
 
-What is Ajax? Sync, Async Ajax call
+
+17) What is Ajax? Sync, Async Ajax call
 AJAX (Asynchronous JavaScript and XML) is a technique used in web development to create dynamic, interactive web pages
     AJAX uses the following components:
         JavaScript: The scripting language to make the request.
@@ -2925,7 +2967,11 @@ Basic Javascript, DOM Manipulation, and Event Handling, Form Validation
 
 
 
-5Basic Networking	Understanding Network Layer, TCP/IP Stack
+
+
+##5Basic Networking	
+=============================================================
+Understanding Network Layer, TCP/IP Stack
 TCP/IP Stack:
     The TCP/IP Stack is the foundational model for network communication. It consists of four layers:
     Application Layer (Layer 4): Deals with application-specific protocols like HTTP, FTP, SMTP.
