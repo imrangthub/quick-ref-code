@@ -3093,43 +3093,96 @@ Docker uses network drivers to manage container-to-container and container-to-ho
 
 
 ##6
-Database & ORM	DB Design and Best Practices
+Database & ORM	
 ========================================================
+1)DB Design and Best Practices
 Ans:
-Normalization: Organize data to reduce redundancy and ensure data integrity by applying normal forms (up to 3NF, or higher if needed).
-
+Normalization: Organize data to reduce redundancy and ensure data integrity by applying normal 
+forms (up to 3NF, or higher if needed).
 Indexing: Use indexes to speed up query performance, especially on columns used in WHERE clauses, JOINs, and ORDER BY.
+    Read vs. Write Trade-offs:
+        Read-heavy workloads benefit from more indexes to speed up query performance.
+        Write-heavy workloads may suffer due to the overhead of maintaining indexes during INSERT, UPDATE, or DELETE operations.
 
 Relationships: Properly define relationships (One-to-One, One-to-Many, Many-to-Many) between entities in the database schema.
 
 Foreign Keys: Use foreign keys to maintain referential integrity between related tables.
 
-Data Types: Choose appropriate data types for columns based on the data they store to optimize storage and performance.
+DataTypes: Choose appropriate data types for columns based on the data they store to optimize storage and performance.
 
 Transactions: Ensure that critical database operations are wrapped in transactions to maintain consistency (ACID properties).
 
 ORM Best Practices:
+    Lazy Loading vs. Eager Loading: Use lazy loading for large data sets, eager loading when you need related data immediately.
+    Avoid N+1 Problem: Optimize queries to avoid the N+1 query problem by using proper fetching strategies.
+    Use DTOs: Use Data Transfer Objects (DTOs) for better separation of concerns and to avoid unnecessary database queries.
+    Database Security: Implement access control, encryption for sensitive data, and regular backups.
 
-Lazy Loading vs. Eager Loading: Use lazy loading for large data sets, eager loading when you need related data immediately.
-Avoid N+1 Problem: Optimize queries to avoid the N+1 query problem by using proper fetching strategies.
-Use DTOs: Use Data Transfer Objects (DTOs) for better separation of concerns and to avoid unnecessary database queries.
-Database Security: Implement access control, encryption for sensitive data, and regular backups.
-
-Denormalization: Consider denormalization for performance optimization in read-heavy applications, but weigh the trade-offs carefully.
-
-Avoid Hardcoding SQL: Use parameterized queries or ORM frameworks (e.g., Hibernate, JPA) to prevent SQL injection attacks.
-
+    Denormalization: Consider denormalization for performance optimization in read-heavy applications, 
+    but weigh the trade-offs carefully.
+    Avoid Hardcoding SQL: Use parameterized queries or ORM frameworks (e.g., Hibernate, JPA) to prevent SQL injection attacks.
 
 
-DB Normalization
+Candidate Key(uniqueness):
+    Any column or combination of columns that can uniquely identify a row.
+    A table can have multiple candidate keys.
+    Example: email or phone_number.
+
+Composite Key(uniqueness-with two or more column):
+    A type of candidate key made up of two or more columns.
+    Used when a single column isn’t sufficient for uniqueness.
+    Example: order_id + product_id.
+
+Key Point: All composite keys are candidate keys, but not all candidate keys are composite keys.
+
+Composite Key has maded must two or more column(Candidate Key), but Candidate Key may konly one column.
+
+
+
+
+DB Key type:
+1. Non-key:
+    A column that is not part of any key.
+    It does not uniquely identify a row.
+    Example: In a table of employees, name or age could be non-key columns.
+2. Candidate Key:
+    A column (or combination of columns) that can uniquely identify a row.
+    There can be multiple candidate keys in a table.
+    Example: email and phone_number might both be candidate keys in a user table.
+3. Primary Key:
+    A chosen candidate key to uniquely identify rows in a table.
+    Must be unique and not null.
+    Example: id is often used as the primary key.
+4. Composite Key:
+    A combination of two or more columns that together uniquely identify a row.
+    Used when a single column is insufficient to create uniqueness.
+    Example: order_id + product_id together form a composite key in an order details table.
+
+
+2)DB Normalization
 DB Normalization (Short Version)
 Database normalization organizes data to reduce redundancy and improve integrity through normal forms (NF):
-1NF: Each cell contains a single value; no repeating groups.
-2NF: In 1NF; remove partial dependencies (attributes depend on the whole primary key).
-3NF: In 2NF; eliminate transitive dependencies (non-key attributes depend only on the primary key).
-BCNF: In 3NF; ensure every determinant is a candidate key.
-4NF: In BCNF; eliminate multi-valued dependencies.
-5NF: In 4NF; eliminate join dependenc
+    First Normal Form (1NF)
+        The simplest level of normalization, which ensures that each table has a primary key and each column has atomic values. 
+        A single cell cannot contain multiple values like "Red, Blue." Split them into separate rows.
+    Second Normal Form (2NF)
+        Must be in 1NF.
+        Eliminates partial dependencies by ensuring that non-key attributes depend only on the primary key. 
+        What this means, in essence, is that there should be a direct relationship between each column and the primary key, 
+        and not between other columns.
+    Third Normal Form (3NF): 
+        Remove transitive dependency (non-key columns should not depend on other non-key columns).
+        3NF builds on 2NF by requiring that all non-key attributes are independent of each other. 
+        This means that each column should be directly related to the primary key, and not to any other columns in the same table.
+        If column A depends on column B, and B depends on the primary key, move A to another table.
+    Boyce-Codd Normal Form (BCNF)
+        This is a more strict version of 3NF that addresses additional anomalies. 
+        At this normalization level, every determinant is a candidate key.
+    Fourth Normal Form (4NF)
+        This is a normalization level that builds on BCNF by dealing with multi-valued dependencies.
+    Fifth Normal Form (5NF)
+        5NF is the highest normalization level that addresses join dependencies. 
+        It is used in specific scenarios to further minimize redundancy by breaking a table into smaller tables.
 
 
 ACID Properties
