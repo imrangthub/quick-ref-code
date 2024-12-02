@@ -815,6 +815,73 @@ differently over time. MariaDB was created as a fork of MySQL in 2009, after Ora
 While they remain similar in many ways, there are notable differences in terms of features, licensing, performance, and ecosystem.
 
 
+Database pages:
+Database pages are the internal basic structure to organize the data in the database files.
+A page is a memory block in which multiple records (for a single table) are stored, the indexing algorithm can take 
+a random page of the table (i.e. the records stored in any page of the table) to make some assumptions about all 
+the records in the table. 
+
+page in os memory means part of virtual memory. It may reside on disk 'cause this block of virtual 
+memory is not being used, so it's not loaded into main memory now;
+page in mysql means part of mysql items of a table. It may reside on disk 'cause this block of items is not being used, 
+so it's not loaded into main memory now;
+
+
+
+
+When and How SQL Locks Happen:
+SQL locks occur when multiple transactions attempt to access the same database resources (like rows, pages, or tables) 
+simultaneously. Locks are used by the database management system (DBMS) to ensure data integrity and consistency 
+by preventing conflicting operations.
+
+Common Scenarios Where Locks Occur:
+  Read and Write Conflicts:
+  When a transaction reads data while another is updating the same data.
+  Write and Write Conflicts:
+  When two transactions attempt to update or delete the same data simultaneously.
+  Schema Changes:
+  When a schema-modifying operation (e.g., adding a column) is attempted while the table is in use.
+  Explicit Locks:
+  When a query explicitly locks resources using SQL commands like LOCK TABLE or SELECT ... FOR UPDATE.
+
+Types of SQL Locks:
+By Scope:
+  Row-level Locks:
+  Locks a specific row in a table.
+  Ideal for high-concurrency environments.
+  Page-level Locks:
+  Locks a database page containing multiple rows.
+  Provides a balance between performance and concurrency.
+  Table-level Locks:
+  Locks the entire table.
+  Used for operations like bulk updates or schema changes.
+  Database-level Locks:
+  Locks the entire database.
+By Mode:
+  Shared Lock (S):
+  Exclusive Lock (X):
+  Update Lock (U):
+  Intent Locks:
+  Schema Locks:
+  Bulk Update Lock:
+
+
+
+
+
+The default locking configuration in MySQL depends on the storage engine being used.
+InnoDB, which is also the default storage engine in modern MySQL versions. 
+
+MySQL Default Locking Behavior with InnoDB:
+  Row-level locking by default.
+  MVCC ensures non-blocking consistent reads.
+  Deadlock detection prevents resource starvation.
+  Gap locking prevents phantom reads at REPEATABLE READ
+
+
+
+
+
 
 =================================================
 ##Oracle
