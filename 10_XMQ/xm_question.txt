@@ -3574,27 +3574,83 @@ Version Control	What is git ?
 =============================================
 What is Git?
 A distributed version control system for tracking changes in code.
+GitLab,GitHub: A web-based DevOps platform with Git repository hosting.
+Both GitLab and GitHub are built around Git but add features for collaboration, automation, and deployment.
 
-Git Branching Strategies
+Git Branching Strategies:
 Approaches for managing branches, like Git Flow or GitHub Flow.
 
 Git Merging and Rebase
-Merge: Combines branches while preserving history.
-Rebase: Applies changes from one branch onto another, rewriting history.
+    Merge: Combines branches while preserving history.
+    Rebase: Applies changes from one branch onto another, rewriting history.
+
+"Git rebase" is a Git command that allows you to "reapply" a series of commits from one branch onto another.
+Exmaple:
+ Current History:
+    A---B---C  (main)
+         \
+          D---E (feature)
+
+Rebasing feature onto main:
+git checkout feature
+git rebase main
+Result:
+    A---B---C---D'---E'  (feature)
+
+Comparison with Rebase:
+    git merge (pull)	Maintains branch history with a merge commit.
+    git rebase	Creates a linear history by replaying commits.
+
+
 Git Merging Conflict Resolution
 Resolving conflicts when changes in branches contradict.
 
 Git Cherry-pick
-Applies specific commits from one branch to another.
+git cherry-pick is a Git command that allows you to apply a specific commit from one branch to another branch, without merging the entire branch. 
+Why Use git cherry-pick?
+    To bring specific bug fixes or features into another branch without merging unrelated changes.
+    To apply a commit to multiple branches (e.g., apply a hotfix to both the main branch and a release branch).
+Example Scenario:
+    A---B---C   (main)
+         \
+          D---E---F   (feature)
+
+Let’s say commit E in the feature branch fixes a bug that you want to include in main.
+Cherry-pick Commit
+You can cherry-pick commit E into main like this:
+# Switch to the main branch
+git checkout main
+
+# Cherry-pick the commit
+git cherry-pick <commit-hash>
+Replace <commit-hash> with the hash of commit E. You can find this using git log.
+
+Resulting History
+After the cherry-pick, the commit from feature is applied to main, creating a new commit with the same changes:
+    A---B---C---E'   (main)
+         \
+          D---E---F   (feature)
+
+
+Note: The cherry-picked commit (E') will have a different hash than the original commit (E) because it is applied in a different branch.
+
+
 
 Git Tag and Stash
 Tag: Marks specific commits, often for releases.
 Stash: Temporarily saves changes to work on something else.
+
 Different Git Commands
 Common commands: git clone, git pull, git commit, git push, git status, git log.
 
 What is Git HEAD Reset?
 git reset changes the HEAD to point to a different commit, either keeping or discarding changes.
+Types of Git Reset:
+--soft: Moves HEAD to a different commit but keeps changes staged.
+--mixed (default): Moves HEAD and un-stages changes (but keeps them in the working directory).
+--hard: Moves HEAD, un-stages, and discards all changes in the working directory.
+
+
 
 
 
