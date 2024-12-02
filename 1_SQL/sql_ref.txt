@@ -880,6 +880,83 @@ MySQL Default Locking Behavior with InnoDB:
 
 
 
+Overview of NULL in SQL
+-------------------------------------------------
+n SQL, NULL represents a missing, undefined, or unknown value. It is not the same as zero (0), an empty string (''), 
+or any other default value. 
+
+Definition:
+  NULL is a placeholder for unknown or missing data.
+  It is used in fields where the value is optional or unknown.
+
+Properties of NULL:
+  NULL is not equal to anything, not even itself (NULL ≠ NULL).
+  Any arithmetic operation involving NULL results in NULL.
+  Comparisons with NULL require special handling (e.g., IS NULL, IS NOT NULL).
+
+
+
+Operations Involving NULL:
+### NULL in SQL: Quick Reference
+
+- NULL = Missing or undefined data.
+- NULL ≠ 0, empty string (`''`), or FALSE.
+
+---
+
+### Rules
+1. NULL ≠ NULL → Use `IS NULL` or `IS NOT NULL` to check.
+2. Any operation with NULL → Results in NULL.
+   Example: `5 + NULL = NULL`.
+
+---
+
+### Boolean Logic
+- TRUE AND NULL → NULL
+- FALSE AND NULL → FALSE
+- TRUE OR NULL → TRUE
+- FALSE OR NULL → NULL
+
+---
+
+### Operations
+- Arithmetic: `NULL + 5 → NULL`
+- String: `NULL || 'Hello' → NULL`
+- Aggregates ignore NULL: `SUM(1, NULL, 2) → 3`
+- UNIQUE allows multiple NULLs.
+
+---
+
+### Handling NULL
+1. Check for NULL:
+   `WHERE column IS NULL`
+2. Replace NULL:
+   `COALESCE(column, 'default')`
+3. Avoid NULL:
+   Use `NOT NULL` in table design.
+
+---
+
+### Common Issues
+- `WHERE column = NULL` → Always FALSE.
+- NULLs in indexes may not behave as expected.
+
+---
+
+### Examples
+1. Check:
+   `SELECT * FROM table WHERE column IS NULL;`
+2. Replace:
+   `SELECT COALESCE(column, 'default') FROM table;`
+3. Ignore in Aggregates:
+   `SELECT AVG(column) FROM table;`
+
+
+
+
+
+
+
 
 
 
