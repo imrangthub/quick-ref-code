@@ -1625,6 +1625,42 @@ proxy_ignore_client_abort on;
 =>nginx -V 2>&1 | grep --color=auto stream
 Chck Stream 
 
+
+Get/Find Nginx current host installed Info
+============================================
+Locate the Nginx Binary:
+$ which nginx
+/usr/sbin/nginx
+
+Verify the Nginx version (to confirm it’s Nginx Plus):
+$ nginx -v
+nginx version: nginx/1.23.2 (nginx-plus-r28)
+
+Check status/Get location where from run/user permission
+ps aux | grep nginx
+systemctl status nginx
+service nginx status
+
+Locate the Configuration File:
+nginx -t
+
+Check the Logs setting:
+grep -i 'log' /etc/nginx/nginx.conf
+
+Installed Package Details:
+nginx -V
+
+Check Open Ports:
+netstat -tulnp | grep nginx
+
+List Installed Files:To locate all files related to the Nginx package
+dpkg -L nginx-plus  # On Debian/Ubuntu
+rpm -ql nginx-plus  # On CentOS/Red Hat
+
+
+
+
+
 #Reverse Proxy
 -------------------------------------------------
 http {
