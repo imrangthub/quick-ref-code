@@ -3417,12 +3417,28 @@ Optimistic Locking:
     Example:
     @Version
     private Long version;
+        How It Works:
+        A version field (annotated with @Version) is used to track the state of an entity.
+        When a transaction reads an entity, it retrieves the current version number.
+        Before committing an update, JPA compares the current version in the database with the version originally read.
+        If they match, the update proceeds, and the version is incremented. If not, a OptimisticLockException is thrown.
 
 Pessimistic Locking:
     Locks the entity to prevent other transactions from changing it while the current transaction is ongoing.
     Example:
     @Lock(LockModeType.PESSIMISTIC_WRITE)
     Employee findByIdWithLock(Long id);
+    Locks are acquired directly in the database when the entity is accessed.
+    Other transactions attempting to access the locked entity will be blocked or fail, depending on the lock type.
+        Lock types:
+        PESSIMISTIC_READ: Prevents updates but allows reads.
+        PESSIMISTIC_WRITE: Prevents both reads and updates.
+        PESSIMISTIC_FORCE_INCREMENT: Similar to PESSIMISTIC_WRITE but also increments the version field.
+
+Use Optimistic Locking where conflicts are rare, and the application can handle retries on failures.
+Use Pessimistic Locking for critical operations where conflicts are expected and must be avoided.
+
+
 
 
 
@@ -3498,6 +3514,28 @@ Read Phenomena:
 
     Phantom Read:
     New rows are added or removed between reads, causing inconsistent results.
+
+Serializable:
+    Description: The highest level of isolation, ensuring complete consistency by serializing transactions as if they were executed one after another.
+    Phenomena Allowed: None (no Dirty Reads, Non-Repeatable Reads, or Phantom Reads).
+    How It Works:
+    Locks the entire range of data accessed to prevent updates, inserts, or deletes by others.
+    Use Case: Applications requiring absolute consistency, such as financial systems.
+
+
+
+Best Practices:
+    Choose the isolation level based on requirements:
+    Use Read Committed for general applications where consistency is needed but concurrency is high.
+    Use Repeatable Read or Serializable for critical transactions requiring high consistency.
+    Minimize transaction duration to reduce locking contention.
+
+Consider database vendor implementations:
+    Some databases (e.g., PostgreSQL, Oracle) implement higher isolation levels (like Serializable) using MVCC, 
+    reducing locking overhead.
+
+
+
 
 
 22) Result Transformation to DTO, Data JPA Projections
