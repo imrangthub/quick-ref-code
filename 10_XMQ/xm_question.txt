@@ -688,6 +688,34 @@ Functional Programming:
         Reduces side effects and enhances maintainability.
 
 
+Many Stream API methods (like filter, map, forEach) require functional interfaces as arguments. 
+Examples include Predicate, Function, Consumer, etc.
+    import java.util.Arrays;
+    import java.util.List;
+
+    public class StreamFunctionalInterface {
+        public static void main(String[] args) {
+            List<Integer> numbers = Arrays.asList(1, 2, 3, 4, 5);
+
+            // Using Predicate (functional interface)
+            numbers.stream()
+                .filter(n -> n % 2 == 0) // Predicate: n -> n % 2 == 0
+                .forEach(System.out::println); // Consumer: System.out::println
+            // Output: 2, 4
+        }
+    }
+Built-in Functional Interfaces:
+    Java provides several built-in functional interfaces that are commonly used:
+
+    Runnable: Represents a task with no return value.
+    Callable: Represents a task with a return value.
+    Comparator: Used to compare objects.
+    Predicate, Function, Consumer, etc., for Stream API operations.
+
+
+
+
+
 21) Stream API - terminal operations, non terminal operations, Pure Function, Higher Order Funciton, 
 Function Composition, different built-in functional interface, different types of aggregation, build your own collector.
 Ans:
@@ -814,6 +842,104 @@ Output
     Number: 4
     Number: 5
     This example is simple yet demonstrates the power of custom functional interfaces with Stream API.
+
+Exmple2:
+@FunctionalInterface
+interface StringProcessor {
+    String process(String input);
+}
+
+
+import java.util.Arrays;
+import java.util.List;
+import java.util.stream.Collectors;
+
+public class CustomFunctionalInterfaceExample {
+    public static void main(String[] args) {
+
+        // Define a list of strings
+        List<String> names = Arrays.asList("john", "alice", "bob");
+
+        // Custom Functional Interface Implementation using Lambda
+        StringProcessor toUpperCaseProcessor = input -> input.toUpperCase();
+
+        // Using the custom functional interface with Stream API
+        List<String> processedNames = names.stream()
+                                           .map(toUpperCaseProcessor::process) // Apply the custom interface
+                                           .collect(Collectors.toList());
+
+        // Print the processed list
+        System.out.println(processedNames); // Output: [JOHN, ALICE, BOB]
+    }
+}
+
+
+
+
+
+JVM GC-Comparison Across jdk Versions:
+--------------------------------------------
+Java 8
+Default: Parallel GC.
+STW/Impact: Significant, especially for large heaps.
+Optional: G1 GC for improved pause times, but requires tuning.
+Java 17
+Default: G1 GC.
+STW/Impact: Lower than Parallel GC; predictable with proper configuration.
+Optional: ZGC and Shenandoah for ultra-low-latency.(Z Garbage Collector (ZGC) )
+Java 23
+Default: Likely G1 GC, with further improvements to ZGC and Shenandoah.
+STW/Impact: Minimal with ZGC or Shenandoah; configurable with G1.
+
+
+How to Check or Change the GC:
+=>java -XX:+PrintCommandLineFlags -version
+Check Default GC: Use -XX:+PrintCommandLineFlags to see the default GC:
+
+Change GC: Specify the GC explicitly:
+    G1 GC: -XX:+UseG1GC
+    Parallel GC: -XX:+UseParallelGC
+    ZGC: -XX:+UseZGC
+    Shenandoah: -XX:+UseShenandoahGC
+
+Why ZGC is Not the Default GC:
+    Target Use Cases:
+        ZGC is designed for low-latency applications, where pause times need to be extremely short (e.g., <10ms).
+        It is not optimized for throughput or general-purpose workloads, which are common in most applications.
+        G1 GC, the default, strikes a balance between pause time and throughput, making it more versatile.
+    Heap Size Considerations:
+        ZGC is optimized for large heaps (from a few GB to TBs in size).
+        For small heap sizes, its benefits are less pronounced, and simpler GCs like G1 GC or Parallel GC may perform be
+
+Enabling ZGC:
+    java -XX:+UnlockExperimentalVMOptions -XX:+UseZGC -Xms4G -Xmx4G -jar myapp.jar
+
+When to Use ZGC:
+    Your application requires consistent low-latency (e.g., trading systems, real-time analytics).
+    You work with large heap sizes (e.g., TB-level heaps).
+    Predictable response times are more important than maximizing throughput.
+
+
+
+What is we use G1 GC  or ZGC(Throughput vs. Latency):
+    Imagine two applications:
+    Application 1 (High Throughput GC like Parallel GC):
+        Handles 1,000 user requests per second.
+        GC Behavior:
+        GC runs in fewer, longer pauses (e.g., 100ms each), allowing the application to process batches of objects in bulk.
+        Total time spent in GC is 5% of the application's runtime.
+        Impact:
+        High overall throughput (e.g., processes 1,000,000 requests in 10 minutes).
+        Long pauses (100ms) are tolerable for batch jobs or non-interactive systems.
+    Application 2 (Low Latency GC like ZGC):
+        Handles real-time user interactions, e.g., an online gaming server.
+        GC Behavior:
+        GC runs concurrently with the application, performing small incremental work to avoid long pauses.
+        Pause times are under 10ms.
+        Total time spent in GC is higher (e.g., 15% of runtime), as the GC is always running in the background.
+        Impact:
+        Predictable response times for user actions (no noticeable freezes or delays).
+        Lower overall throughput compared to Application 1 (e.g., processes 950,000 requests in 10 minutes).
 
 
 
