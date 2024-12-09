@@ -434,6 +434,26 @@ Ans:
     equals() and hashCode(): Important for object comparison and hashing in collections. 
     When you override equals(), you must also override hashCode() to maintain consistency.
 
+hashCode:
+To maek unique key inseide HashMap object as key need override hash-code of thwi object.
+Overriding hashCode (along with equals) is critical for situations where you need to use custom objects as keys in 
+hash-based collections (like HashMap, HashSet, and Hashtable). 
+
+Optimizing Performance in Hash-based Caching:
+Why it's needed: When using a hash-based cache (like ConcurrentHashMap), hashCode is used to quickly look up objects. 
+If hashCode and equals are not properly overridden, the cache may fail to correctly identify existing entries, leading to poor performance or incorrect cache lookups.
+
+
+Implementing Data Integrity in Custom Data Structures
+Why it's needed: If you're building your own data structure (such as a custom map or set) that needs to store objects based on content equality, overriding hashCode and equals ensures that your structure works correctly.
+Example: If you're building a custom EmployeeRegistry that stores Employee objects based on employeeId, you need to implement hashCode and equals to ensure that the registry behaves correctly when checking for duplicates or updating existing entries.
+
+Without these overrides, you may encounter bugs such as duplicate entries in a Set, incorrect lookups in a Map, or inefficient performance due to poor object comparison.
+
+
+
+
+
 
 15) Object cloning in java, why it is needed ?
 Ans:
@@ -459,6 +479,9 @@ Exceptions
 Object Cloning and Performance
     Cloning is a relatively expensive operation. In some cases, creating a new object manually might be more efficient 
     than cloning, especially for complex objects with deep structures.
+
+
+
 
 
 
@@ -617,6 +640,11 @@ b) Comparator Interface
 
 Custom sorting using Comparator:
 Comparator can also be used with Collections.sort() or List.sort().
+
+
+String class in Java overrides the hashCode method from the Object class.
+This is why String objects work efficiently as keys in hash-based collections like HashMap or HashSet, 
+ensuring proper hash-based behavior.
 
 
 
