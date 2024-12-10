@@ -678,15 +678,6 @@ Functional Interface:
     }
     Calculator add = (a, b) -> a + b;  // Lambda implementing the interface
 
-Functional Programming:
-    A paradigm where computations are treated as evaluations of functions.
-    Focuses on immutability, pure functions, and statelessness.
-    Promoted in Java via lambda expressions, streams, and functional interfaces.
-    Benefits:
-        Cleaner, concise code.
-        Facilitates parallelism with streams.
-        Reduces side effects and enhances maintainability.
-
 
 Many Stream API methods (like filter, map, forEach) require functional interfaces as arguments. 
 Examples include Predicate, Function, Consumer, etc.
@@ -713,6 +704,68 @@ Built-in Functional Interfaces:
     Predicate, Function, Consumer, etc., for Stream API operations.
 
 
+Functional Programming:
+    With functinal programming we cna do old style code more compact and easy to read less coded.
+    Helper implementation for Stream api and Lambda Expressions.
+    Instead of writing a lot of loops and if statements, you use functions (like filter, map, reduce) to process data.
+    It avoids changing variables or objects (this is called immutability).
+    Functions are treated like "values," so you can pass them around, store them in variables, or return them.
+
+Exmaple:Old Way (Using Loops) vs Functional way
+
+    public class OldWayExample {
+        public static void main(String[] args) {
+            List<Integer> numbers = List.of(1, 2, 3, 4, 5, 6);
+            List<Integer> evenNumbers = new ArrayList<>();
+
+            for (int n : numbers) {
+                if (n % 2 == 0) {
+                    evenNumbers.add(n);
+                }
+            }
+
+            System.out.println("Even Numbers: " + evenNumbers);
+        }
+    }
+
+vS:Functional Way (Using Streams)
+
+    public class FunctionalWayExample {
+        public static void main(String[] args) {
+            List<Integer> numbers = List.of(1, 2, 3, 4, 5, 6);
+
+            List<Integer> evenNumbers = numbers.stream()
+                                            .filter(n -> n % 2 == 0) // Keep even numbers
+                                            .collect(Collectors.toList());
+
+            System.out.println("Even Numbers: " + evenNumbers);
+        }
+    }
+
+
+What is Functional Programming in Java?
+    Functional Programming is a programming paradigm where functions are treated as first-class citizens, meaning they 
+    can be assigned to variables, passed as arguments, or returned from other functions. 
+    It emphasizes immutability and avoids changing states and mutable data.
+
+    In Java, functional programming became prominent with Java 8, introducing features like lambdas, 
+    streams, and the java.util.function package.
+
+Why use Functional programming:
+    Functional Programming helps you write cleaner and more readable code.
+    It is useful for data processing and scenarios where you process large amounts of data.
+    Streams and Lambda expressions are the most common tools in Java for functional programming.
+    The focus is on describing what to do (like filtering and mapping) rather than how to do it (like writing loops).
+
+
+Where to Use Functional Programming?
+    Data Processing: When working with collections (e.g., filtering, mapping, reducing).
+    Event-driven Applications: Handling events in a clean and declarative way.
+    Asynchronous Programming: Functional programming complements reactive programming paradigms.
+    Parallel Processing: Operations on data that can be run in parallel with streams.
+    Streams API: Provides a functional way to process collections.
+    Operations: filter, map, reduce, sorted, distinct, etc.
+    Immutability: Avoid modifying existing objects.
 
 
 
@@ -1096,10 +1149,135 @@ Runnable vs Thread, Thread Lifecycle, Thread Signaling, Thread Join, Volatile ke
         Terminated: Execution completed.
 
 
-Java Virtual Threads (Project Loom)
-    Lightweight threads introduced in Java 19.
-    Managed by the JVM for high scalability.
-    Simplifies concurrency with better resource efficiency.
+Java Virtual Threads (Project Loom):
+    Traditional Threads:
+        Java's standard Thread is mapped to an operating system thread.
+        These are heavyweight and limited because the OS manages them.
+        Handling thousands of threads (e.g., for concurrent users) is inefficient.
+
+    Virtual Threads:
+        Introduced in Project Loom, virtual threads are lightweight threads managed by the JVM, not the OS.
+        They enable you to create millions of threads with minimal overhead.
+        Each virtual thread runs tasks like a normal thread but consumes far fewer resources.
+
+Non-blocking I/O: Virtual threads make waiting (like for a database query) efficient, as the thread can pause and 
+resume without tying up system resources.
+Virtual Threads make it cheap and easy to scale Java applications by allowing you to handle many tasks simultaneously 
+without complex workarounds!
+
+Example:
+    Before Loom:
+        // Traditional thread
+        Thread thread = new Thread(() -> {
+            System.out.println("Hello from thread!");
+        });
+        thread.start();
+
+    With Loom:
+        // Virtual thread
+        Thread thread = Thread.ofVirtual().start(() -> {
+            System.out.println("Hello from virtual thread!");
+        })
+
+
+Microservice:Scalability: Handle More Concurrent Requests
+    Traditional Threads:
+        Each request typically corresponds to a thread.
+        Limited by the operating system’s thread capacity (thousands at best).
+        High memory and context-switching overhead.
+    With Virtual Threads:
+        Lightweight threads allow creating millions of threads.
+        Each API call or microservice operation can have its own thread without worrying about resource limits.
+        Handles high-concurrency scenarios like thousands of simultaneous API users with ease.
+
+Example (Before Loom):
+    CompletableFuture.runAsync(() -> {
+        // Non-blocking call
+        fetchDataFromDatabase();
+    });
+
+With Loom:
+    Thread.startVirtualThread(() -> {
+        // Synchronous but efficient
+        fetchDataFromDatabase();
+    });
+
+
+Microservices often perform I/O-heavy tasks(Improved Performance for Blocking Operations):
+    Querying databases
+    Calling other APIs
+    Writing logs
+Blocking I/O in traditional threads ties up OS resources.
+Virtual threads can block without significant resource costs because the JVM parks and resumes them efficiently.
+Enable massive scalability.
+Reduce costs and resource usage. This makes them a game-changer for modern microservice architectures!
+Enable massive scalability.
+Reduce costs and resource usage. This makes them a game-changer for modern microservice architectures!
+
+
+Optimal Resource Utilization:
+    Traditional threads consume ~1MB of memory per thread.
+    Virtual threads use only a few kilobytes.
+    This means:
+    Reduced hardware requirements.
+    Cost savings on cloud infrastructure (e.g., fewer containers, smaller VMs).
+
+
+The API handles concurrent requests with minimal memory and performance overhead, even under heavy load:
+    @RestController
+    public class MyController {
+
+        @GetMapping("/data")
+        public String fetchData() {
+            Thread.ofVirtual().start(() -> {
+                callAnotherService();
+                queryDatabase();
+            });
+            return "Request handled with Virtual Threads!";
+        }
+
+        private void callAnotherService() {
+            // Simulated API call
+        }
+
+        private void queryDatabase() {
+            // Simulated DB query
+        }
+    }
+
+
+Feign Clietn with Vertual Thread:
+    Feign uses an underlying Executor to handle its HTTP requests. By default, it uses threads from the thread pool, 
+    but you can replace this with virtual threads. uses an underlying Executor to handle its HTTP requests. 
+    By default, it uses threads from the thread pool, but you can replace this with virtual threads.
+ 
+Configure Feign Client Executor
+    You need to set up an Executor for Feign that uses virtual threads.
+    Integrate Virtual Threads in Feign Builder
+    Provide the custom executor to the Feign client configuration.
+
+Define the Feign client as usual:
+    @FeignClient(name = "remoteService", url = "http://example.com")
+    public interface RemoteServiceClient {
+        @GetMapping("/data")
+        String getData();
+    }
+Custom Feign Configuration with Virtual Threads:
+    @Configuration
+    public class FeignVirtualThreadConfig {
+
+        @Bean
+        public Feign.Builder feignBuilder() {
+            // Create an executor that uses virtual threads
+            Executor executor = Thread.ofVirtual().factory().newThreadExecutor();
+            
+            // Use the executor in Feign's async execution
+            return Feign.builder()
+                        .executor(executor)
+                        .options(new Request.Options(5000, 10000)); // Set timeouts
+        }
+    }
+
 
 
 
