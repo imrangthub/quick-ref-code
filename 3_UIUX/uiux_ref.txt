@@ -5,30 +5,89 @@
 
 
 
-
-http-server :
+##row-javaSctpt project with npm,Node.js Webpack
 =================================================
-http-server is a simple, lightweight command-line tool for quickly serving static files over HTTP.
-It’s commonly installed globally via Node.js and NPM.
+
+Inatall Node and npm:
+
+mkdir simple-row-javascript-app
+cd simple-row-javascript-app/
+
+npm init -y
+npm install jquery bootstrap
+npm install http-server --save-dev
 
 
-=>npm install -g http-server
-Install
-
-=>http-server
-=>http-server -p 3000
-Navigate to the directory containing the files you want to serve.
-
-
-=>http-server -a localhost -p 8181 -c-1
-Disables caching by setting the cache-control headers to no-cache.(-c-1)
+Files and structure your projec:
+  simple-row-javascript-app/
+  │
+  ├── node_modules/      # Installed npm modules (created by npm install)
+  ├── package.json       # npm package descriptor (created by npm init)
+  ├── index.html         # HTML file
+  ├── app.js             # JavaScript for handling API calls
+  └── style.css          # Optional: Custom CSS (if you want to add any)
 
 
+npx http-server .  
+Use npx to run http-server without installing globally
+run app
+
+
+Build the App for Production:
+npm install --save-dev webpack webpack-cli webpack-dev-server
+Install Webpack (optional but recommended):
+
+
+vi webpack.config.js
+Create a Webpack Configuration: If you choose to use Webpack, create a webpack.config.js file in your project root. 
+
+npx webpack --config webpack.config.js
+Run Webpack to Build the App:
+
+
+Now create a directory as:
+dist/
+
+and deploy it with index.html file
+
+
+Deployto Nginx:
+
+server {
+    listen 7172;
+    server_name localhost;
+
+    location / {
+        root /home/bs960/imranMadbar/myPROJECT/uiux-technology-workshop/javaScriptProjects/withNpmNodeWebpack/simple-row-javascript-app;  # Directory containing static files
+        index index.html;
+        try_files $uri $uri/ =404;  # Serve 404 if file not found
+    }
+}
+
+
+Add css and js file to the project:
+Full Example Directory After Webpack:
+project/
+├── dist/               // Contains production build
+│   ├── bundle.js       // Webpack output
+├── node_modules/
+├── src/                // Source files
+│   ├── styles.css
+│   ├── main.js
+├── index.html
+├── package.json
+├── package-lock.json
+├── webpack.config.js
 
 
 
+then:
+npm install webpack webpack-cli style-loader css-loader babel-loader @babel/core @babel/preset-env --save-dev
+Install the necessary dependencies
 
 
+npx webpack
+Build for Production
 
 
 
@@ -54,6 +113,194 @@ Common Type UI/UX:
 
     Desktop Applications:
         Cross-Platform Frameworks: Frameworks like Electron and Qt allow developers to create desktop apps with web technologies that run on multiple operating systems (Windows, macOS, and Linux). 
+
+
+
+http-server :
+=================================================
+http-server is a simple, lightweight command-line tool for quickly serving static files over HTTP.
+It’s commonly installed globally via Node.js and NPM.
+
+
+=>npm install -g http-server
+Install
+
+=>http-server
+=>http-server -p 3000
+Navigate to the directory containing the files you want to serve.
+
+
+=>http-server -a localhost -p 8181 -c-1
+Disables caching by setting the cache-control headers to no-cache.(-c-1)
+
+
+
+JavaScript, jQuery, npm, Node.js, Angular, and React:
+-----------------------------------------------------
+1.JavaScript
+  What it is: A programming language.
+  Purpose: Enables dynamic and interactive web content.
+  Where it works:
+    In browsers (client-side).
+    In servers using platforms like Node.js.
+  Examples:
+    Adding animations to a webpage.
+    Validating form inputs in a browser.
+    Making HTTP requests to APIs using fetch or axios.
+
+2.jQuery
+  What it is: A JavaScript library.
+  Purpose: Simplifies DOM manipulation, event handling, and AJAX.
+  Where it works: Client-side, in browsers.
+  Why it exists: To make it easier to write cross-browser JavaScript.
+  Examples:
+    $("#id").hide(); hides an element.
+    $.ajax({url: "api.com", success: function(result){...}}); makes an API call.
+  Difference from JavaScript:
+    jQuery is written in JavaScript.
+    It's less commonly used today due to modern JavaScript features and frameworks like React and Angular.
+
+3.npm (Node Package Manager)
+  What it is: A package manager for JavaScript.
+  Purpose: Manages libraries, tools, and dependencies for JavaScript projects.
+  Where it works: Installed as part of Node.js; works in development environments.
+  Why it exists: To help developers reuse existing code and manage project dependencies easily.
+  Examples:
+    Installing a library: npm install axios.
+    Running a script: npm start.
+
+npm can manage libraries for all types of JavaScript applications, including plain JavaScript 
+(raw/vanilla JS), React, Angular, and any other JavaScript-based frameworks or libraries.
+It’s a universal package manager for the entire JavaScript ecosystem.
+
+
+
+4. Node.js
+  What it is: A runtime environment for executing JavaScript on servers.
+  Purpose: Enables server-side programming with JavaScript.
+  Where it works: On the server.
+  Why it exists: To allow developers to use JavaScript for backend development, providing a unified language 
+  for both client and server.
+  Examples:
+    Building REST APIs.
+    Creating server-side rendered web pages.
+
+
+Purpose of Node.js?
+Node.js is a JavaScript runtime environment that allows JavaScript to run on the server side, outside of the browser. 
+  1. For Running Development Tools
+    Node.js is required for tools like Angular CLI, Webpack, Babel, and npm.
+    These tools help:
+    Compile TypeScript to JavaScript.
+    Bundle JavaScript and CSS files.
+    Start development servers (e.g., ng serve).
+  2. To Build Server-Side Applications
+    Traditionally, JavaScript was only used for client-side programming (in browsers).
+    Node.js allows JavaScript to run on the server, enabling full-stack development with a single language.
+    Example use cases:
+    Building REST APIs.
+    Real-time applications (e.g., chat apps with WebSockets).
+    Serving static files (e.g., with Express.js).
+    Running server-side logic for dynamic content generation.
+  3. As a Package Manager Host
+    Node.js includes npm (Node Package Manager), which manages JavaScript libraries and dependencies for all 
+    kinds of JavaScript applications (e.g., Angular, React, Vue, Node.js-based backends).
+
+
+
+
+5. Angular(For Enterprise apps)
+  What it is: A front-end web framework developed by Google.
+  Purpose: Helps build large-scale, single-page applications (SPAs).
+  Where it works: In the browser (client-side).
+  Why it exists: To provide a structured way to build complex front-end applications.
+  Examples:
+    Data binding between UI and code using {{ }} syntax.
+    Routing and navigation between views.
+    Difference from JavaScript:
+    Angular uses JavaScript/TypeScript but adds structure, features, and tools for developing SPAs.
+
+Can render HTML on the server using Angular Universal.
+  Default Behavior: Runs in the browser (client-side).
+  Optional Behavior:Can render HTML on the server using Angular Universal.
+
+Simplified Workflow:
+  Developer writes code in TypeScript (Angular components, services, etc.).
+  Angular CLI (with Webpack) compiles and bundles the code into plain JavaScript, HTML, and CSS.
+  Browser receives and executes the bundled JavaScript and renders the HTML.
+
+
+BuildAngularApp:
+  ng serve is for development: It uses Webpack to bundle and serve the app in memory with live reload.
+  When you run ng serve, Webpack Dev Server bundles your code and serves it directly from memory (RAM) instead of writing it to disk.
+
+  ng build --prod is for production: It creates fully optimized static files in the dist folder for deployment. 
+  Both use Webpack under the hood but have different configurations to suit development or production needs.
+
+
+Environment for Angular:
+  Development Environment (e.g., ng serve)
+    Webpack Dev Server:
+    When you run ng serve, the Angular CLI uses Webpack Dev Server to create a temporary, in-memory server for 
+    serving your Angular app during development.
+    This server is only meant for local development, providing features like live reload and hot module replacement (HMR).
+    Node.js is required to run Angular CLI and Webpack Dev Server because these tools are written in JavaScript and 
+    depend on Node.js as their runtime environment.
+  Production Environment:
+    When your Angular app is built for production using ng build, it outputs static files (index.html, main.js, etc.) into the dist folder.
+    To serve these static files:
+      You can use any web server, such as:
+      Apache or Nginx.
+      Node.js-based servers (e.g., using the Express framework).
+      Cloud platforms like AWS S3, Firebase Hosting, or Vercel.
+    The web server simply serves the static files to users; no special server environment is created by Angular itself in production.
+
+Webpack itself does not create a server; its primary function is bundling assets (JavaScript, CSS, HTML, etc.). 
+However, the confusion arises because the Angular CLI uses Webpack Dev Server (which is a separate tool built on top of Webpack) 
+to provide a development server.
+
+Angular not use http-server library:
+  Webpack: Bundles your code; does not create a server.
+  Webpack Dev Server: A Node.js-based development server that serves files from memory, used in ng serve.
+  http-server: A simple server for serving static files, often used with dist files after ng build.
+
+
+Node.js  in Angular:
+  Node.js is not part of the Angular app itself.
+  It does not run in the browser.
+  It does not directly affect how the Angular app works in production.
+  Instead, it powers the tools (CLI, Webpack, TypeScript) that developers use to build the Angular app.
+
+Node.js acts as the runtime environment to execute JavaScript-based tools required during Angular app development. These include:
+  Angular CLI (ng commands)
+  The Angular CLI (ng serve, ng build, etc.) is built with Node.js.
+  Starting the Webpack Dev Server for local development (ng serve).
+  npm (which comes bundled with Node.js) manages the dependencies of your Angular application, such as:
+  npm (Node Package Manager) runs on top of Node.js. 
+
+
+
+6. React (Widely used)
+  What it is: A JavaScript library developed by Facebook.
+  Purpose: Builds user interfaces, especially for SPAs.
+  Where it works: In the browser (client-side) or on the server (with server-side rendering).
+  Why it exists: To create reusable UI components and manage state efficiently.
+  Examples:
+    Creating components: function App() { return <h1>Hello, World!</h1>; }.
+    Handling state: useState and useEffect.
+    Difference from Angular:
+    React is a library focusing only on UI, while Angular is a full-fledged framework.
+
+React was designed to handle client-side rendering (CSR) by default.
+It can also handle server-side rendering (SSR) using libraries like Next.js or React's built-in methods like renderToString().
+
+
+Angular:
+  Default: Runs in the browser.
+  Can render on the server with Angular Universal.
+React:
+  Default: Runs in the browser.
+  Can render on the server with tools like Next.js.
 
 
 
@@ -213,7 +460,8 @@ Node project:
 
 What is Node.js?
 Node.js is an open-source, cross-platform runtime environment that allows you to run JavaScript code outside of a web browser. 
-Built on Google Chrome’s V8 JavaScript engine, Node.js is primarily used for building fast, scalable server-side and network applications.
+Built on Google Chrome’s V8 JavaScript engine, Node.js is primarily used for building fast, scalable server-side 
+and network applications.
 It is known for being asynchronous and event-driven, which allows it to handle multiple requests at once, 
 making it highly efficient for scalable network applications.
 
@@ -322,6 +570,8 @@ How Angular work:
 Example-Hello-World:
 ----------------------------------
 Step 1: Install Node.js and NPM
+Angular requires Node.js and npm (Node Package Manager). npm comes bundled with Node.js.
+
 =>node -v
 =>npm -v
 
@@ -362,7 +612,8 @@ Update: src/app/app.component.html
 =================================================
 
 React follows a similar setup to Angular in terms of development tools, but it has its own set of tools and concepts.
-React relies heavily on Webpack (through Create React App or custom configurations) to bundle the application, Node.js for the development server, and NPM for managing libraries and tools.
+React relies heavily on Webpack (through Create React App or custom configurations) to bundle the application, 
+Node.js for the development server, and NPM for managing libraries and tools.
 
 
 
@@ -379,6 +630,7 @@ How react work:
 
 Example-Hello-World:
 ----------------------------------
+Just like Angular, React also requires Node.js and npm (Node Package Manager) to run
 Step 1: Install Node.js and NPM
 =>node -v
 =>npm -v
