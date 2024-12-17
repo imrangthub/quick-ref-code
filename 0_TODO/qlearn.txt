@@ -362,35 +362,19 @@ III) Exclent coden
 
 
 
-6) High level architecture of for the system.
+6) High level architecture of for the software system.
+    From the BottomLayer:
+        We use MySQL and Oracle database for data persistence, and consume a large number of service APIs from 
+        various internal and external services. 
+        Actually, these services are the backbone and the main component of this entire system; we treat them as big-data and  data warehouse.
+        Our Integration services are built on top of this layer and we call is Integration Layer.
+        Then Business services consume the integration services through REST APIs using Feign clients, with dynamic service discovery mechanism.
+        We expose all the APIs through a central API Gateway, which simplifies access, 
+        and Nginx is used as a proxy to manage communication between the clients and services.
 
-Our application's high-level architecture is designed with scalability and security in mind:
-
-Persistence Layer: At the bottom, we use MySQL or Oracle databases for data storage.
-Integration Layer: We integrate with third-party APIs, and our integration services are built on top of this layer.
-Business Layer: Business services consume the integration services through REST APIs using Feign clients, leveraging a Discovery Service for dynamic service discovery.
-API Gateway: A central API Gateway serves as a unified entry point for all service APIs, ensuring efficient routing and security.
-Nginx Proxy: On top of this, we use Nginx as a proxy service to manage client requests. The client applications communicate with our services through this Nginx proxy.
-We provide APIs for two types of clients:
-
-Internal Clients: These include our mobile apps and corporate solutions, where security is a key focus.
-External Clients: These are third-party clients, such as sales and partners, who consume APIs for operations like product offers. For this, we implement OAuth2 for secure authentication and authorization.
-This architecture ensures secure, efficient, and seamless communication between clients and services, while allowing us to scale and integrate with external systems as needed.
-
-
-
-v2
- At the bottom, we use MySQL or Oracle for data persistence. On top of that, we have integration services that consume third-party APIs. 
- Our business services interact with these integration services through REST APIs, using Feign clients and a 
- Discovery Service for dynamic routing.
-
-We expose all the APIs through a central API Gateway, which simplifies access, and Nginx is used as a proxy to manage 
-communication between the clients and services.
-
-We support two types of clients:
-
-Internal clients, like our mobile app and corporate solutions, which are secured.
-External clients, like third parties (e.g., sales partners) consuming APIs for product offers, with security handled via OAuth2.
+    We can broadly categorize our service clients into two types or we can say, this system works for two types of clients:
+        Internal clients, like our mobile app and corporate solutions.
+        External clients, like third parties/sales partners consuming secure APIs with OAuth2.
 
 
 
@@ -413,6 +397,7 @@ Do you have any Query:
                                                            
 5) This project doesn’t align with my interests. Do you have any other opportunities where I could get involved?
    Actually, Interest is prohibited in Islam.
+
 
 
 
