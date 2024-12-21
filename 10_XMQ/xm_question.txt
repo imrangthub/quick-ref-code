@@ -170,6 +170,11 @@ Inheritance
     Achieved using the extends keyword.
 
 
+In Java, overloading can be broadly categorized into three types, each serving a specific purpose:
+    1. Method Overloading
+    2. Constructor Overloading
+    3. Operator Overloading (Limited to Built-in Operators)
+
 
 5) JavaString, StringBuilder, StringBuffer, TextBlock
 String:
@@ -237,7 +242,7 @@ Key Points:
     If it exists, the new reference points to the existing object. Otherwise, a new object is created in the pool.
     Strings created using new are stored in the heap, not in the pool.
 
-String Comparison
+String Comparison:
 There are two ways to compare strings in Java:
     Using ==:
         Compares references, not content.
@@ -276,8 +281,9 @@ StringConcatenation:
     Instead, they both create new String objects to store the result.
 
 Correct! StringBuilder and StringBuffer do not create a new String object for every modification.
-ASDEFGH
-When +:
+
+
+Use +:
     Handles implicit type conversions.
     Readability is a priority: The + operator is more intuitive and easier to read.
     Simple concatenations: When you're concatenating a few strings or literals.
@@ -373,7 +379,7 @@ Example: Modifying Object State:
                 p.name = "Bob"; // Modifies the object itself
             }
         }
-Example: Reassigning Reference:
+Example: Re-assigning Reference:
     public class Example {
         public static void main(String[] args) {
             Person person = new Person();
@@ -410,7 +416,6 @@ Ans:
         A class can implement multiple interfaces, allowing for more flexible design (multiple inheritance).
 
     Abstract Class:
-        Abstract class: Animal cannot be instantiated directly.
         An abstract class is a class that cannot be instantiated on its own and is intended to be subclassed.
         It can contain both abstract methods (methods without a body) and concrete methods (methods with a body).
         It can have fields, constructors, and method implementations, unlike interfaces.
@@ -423,9 +428,17 @@ Ans:
         They are implicitly final and cannot be subclassed.
         Enums are useful when you have a fixed set of related constants, such as days of the week, directions, or status codes.
 
+Interface:
+    Used to define a contract (behavior) that multiple classes can implement.
+    Focuses on "what to do" rather than "how to do it."
+Abstract Class:
+    Serves as a base class for other classes.
+    Can define common functionality while leaving some methods abstract for subclasses to implemen
 
 
-14) Java Object class and its mehtod - wait(), notify(), toString(), equals(), hashCode() (Java Object Class and Its Methods)
+
+
+14) Java Object class and its mehtod: - wait(), notify(), toString(), equals(), hashCode()
 Ans:
     In Java, every class implicitly inherits from the Object class, which is the root of the class hierarchy. 
     The Object class provides several methods that are fundamental for all Java objects.
@@ -440,15 +453,20 @@ Overriding hashCode (along with equals) is critical for situations where you nee
 hash-based collections (like HashMap, HashSet, and Hashtable). 
 
 Optimizing Performance in Hash-based Caching:
-Why it's needed: When using a hash-based cache (like ConcurrentHashMap), hashCode is used to quickly look up objects. 
-If hashCode and equals are not properly overridden, the cache may fail to correctly identify existing entries, leading to poor performance or incorrect cache lookups.
+    Why it's needed: When using a hash-based cache (like ConcurrentHashMap), hashCode is used to quickly look up objects. 
+    If hashCode and equals are not properly overridden, the cache may fail to correctly identify existing entries, 
+    leading to poor performance or incorrect cache lookups.
 
 
-Implementing Data Integrity in Custom Data Structures
-Why it's needed: If you're building your own data structure (such as a custom map or set) that needs to store objects based on content equality, overriding hashCode and equals ensures that your structure works correctly.
-Example: If you're building a custom EmployeeRegistry that stores Employee objects based on employeeId, you need to implement hashCode and equals to ensure that the registry behaves correctly when checking for duplicates or updating existing entries.
+Implementing Data Integrity in Custom Data Structures:
+    Why it's needed: If you're building your own data structure (such as a custom map or set) that needs to 
+    store objects based on content equality, overriding hashCode and equals ensures that your structure works correctly.
+    Example: If you're building a custom EmployeeRegistry that stores Employee objects based on employeeId, 
+    you need to implement hashCode and equals to ensure that the registry behaves correctly when checking for 
+    duplicates or updating existing entries.
 
-Without these overrides, you may encounter bugs such as duplicate entries in a Set, incorrect lookups in a Map, or inefficient performance due to poor object comparison.
+Without these overrides, you may encounter bugs such as duplicate entries in a Set, 
+incorrect lookups in a Map, or inefficient performance due to poor object comparison.
 
 
 
@@ -466,13 +484,14 @@ without altering the original object.
 Shallow vs. Deep Cloning
     Shallow cloning: Only the references to objects are copied, so changes to the nested objects 
     in the clone will affect the original object.
-    Deep cloning: Involves recursive cloning of nested objects, ensuring that the clone is fully independent of the original object.
+    Deep cloning: Involves recursive cloning of nested objects, ensuring that the clone is fully independent 
+    of the original object.
 
 Cloneable Interface
     Implementing the Cloneable interface is not enough for deep cloning. You often need to manually override clone() to 
     handle deep cloning if required.
 
-Exceptions
+Exceptions:
     Cloning can lead to CloneNotSupportedException if the class does not implement Cloneable. 
     The clone() method must also handle exceptions appropriately.
 
@@ -486,7 +505,9 @@ Object Cloning and Performance
 
 
 
-16) Java Collection Framework - List, Set, Map, ArrayList, HashMap, Hashtable, HashSet, LinkedList and different operations on collection
+16) Java Collection Framework - List, Set, Map, ArrayList, HashMap, Hashtable, HashSet, 
+LinkedList and different operations on collection.
+
 Ans:
 Java Collection Framework:
     The Java Collection Framework provides a set of interfaces and classes to handle groups of objects. 
@@ -549,6 +570,9 @@ Internal Implementation of ArrayList
         Although resizing can be an expensive operation (since it involves copying elements), 
         it happens infrequently because the growth is exponential (doubling each time).
 
+When remove element of array call trimToSize  cos:
+alling trimToSize() ensures that the internal array's capacity matches the list's actual size, minimizing memory usage.
+
 
 
 18) How HashMap works internally and how to minimize hash collision?
@@ -584,7 +608,8 @@ Comparing Java Custom Objects:
 
 a) Comparable Interface:
     What: Used when you want the class to have a natural order.
-    How: Implement the compareTo(T o) method in your class, which compares the current object (this) with the provided object (o).
+    How: Implement the compareTo(T o) method in your class, which compares the current object (this) with the 
+    provided object (o).
     Purpose: Define the default sorting behavior of the object.
 
     class Person implements Comparable<Person> {
@@ -728,7 +753,9 @@ Exmaple:Old Way (Using Loops) vs Functional way
         }
     }
 
-vS:Functional Way (Using Streams)
+vS:
+
+Functional Way (Using Streams)
 
     public class FunctionalWayExample {
         public static void main(String[] args) {
@@ -1059,7 +1086,7 @@ Key Components:
 
     IV) Garbage Collector (GC):
             Automatically manages memory by removing unused objects from the heap.
-            GC algorithms: Serial, Parallel, CMS, G1.
+            GC algorithms: Serial, Parallel, CMS, G1, ZGC.
 
     V) Java Native Interface (JNI):
             Enables Java to interact with native code (e.g., C, C++).
@@ -1070,14 +1097,16 @@ Key Components:
 25) Java Memory Model(JMM), Java Flight Recorder,JIT Compiler
 Ans:
     JMM: Defines rules for thread-safe memory access.
-    The Java Memory Model (JMM) defines how threads interact through memory, ensuring predictable behavior in concurrent programming.
+    The Java Memory Model (JMM) defines how threads interact through memory, 
+    ensuring predictable behavior in concurrent programming.
         Key Concepts:
             Main Memory: Shared memory accessed by all threads.
             Working Memory: Thread-local copies of variables stored in CPU caches.
             Happens-Before Relationship: Guarantees visibility and ordering of operations (e.g., locks, volatile, synchronized).
 
 JIT Compiler: Dynamically compiles bytecode to machine code for performance.
-    The JIT Compiler is part of the JVM Execution Engine, enhancing runtime performance by translating bytecode into native machine code.
+    The JIT Compiler is part of the JVM Execution Engine, enhancing runtime performance by translating 
+    bytecode into native machine code.
     Types of Compilation:
     C1 (Client): Optimizes startup and UI responsiveness.
     C2 (Server): Focuses on long-running applications for deeper optimization.
@@ -1753,7 +1782,7 @@ constructor injection is recommended for required dependencies.
 @Autowired
 private SimpleService simpleService; (This is field injection)
 
-What is ue when?
+What is use when?
 Field Injection:
 Issue: Harder to test because dependencies can't be set manually without reflection.
 Use Case: Simple cases or legacy code (not recommended).
@@ -1851,6 +1880,8 @@ Key Stereotype Annotations:
     @Component: Marks a generic bean, usually for utility or general-purpose components.
     @Service: A specialized @Component for service layer beans, typically holding business logic.
     @Repository: A specialized @Component for DAO (Data Access Object) classes, often used for database interaction.
+                 also makes the class eligible for exception translation, meaning Spring will 
+    automatically convert database-related exceptions (like SQLException) into Spring's DataAccessException.
     @Controller: A specialized @Component for Spring MVC controllers that handle HTTP requests.
     @RestController: A combination of @Controller and @ResponseBody, used for REST APIs where the response is 
     typically in JSON or XML format.
@@ -1865,12 +1896,12 @@ If you inject a prototype bean directly into a singleton, the singleton bean wil
 of the prototype bean, which violates the intended lifecycle (the prototype bean should be created fresh each time).
 
 Solutions:
-Using @Lookup Annotation:
+    Using @Lookup Annotation:
 
-Using ApplicationContext:
-You can explicitly request a new instance of the prototype bean from the ApplicationContext inside the singleton.
+    Using ApplicationContext:
+    You can explicitly request a new instance of the prototype bean from the ApplicationContext inside the singleton.
 
-Using ObjectFactory or Provider:
+    Using ObjectFactory or Provider:
 
 
 
@@ -2021,7 +2052,13 @@ Overriding @Primary with @Qualifier:
         }
     }
 
+ @Component vs @Configuration
+    Key Behavior of @Component:
+        If you call the @Bean method directly on the AppConfig(anoted with @Component) class (like appConfig.userService()), 
+        you bypass Spring’s context, and a new instance is created.
 
+    Key Behavior of @Configuration with Proxying:
+        Even if you access the @Bean method using the @Configuration class reference, the proxy ensures singleton behavior.
 
 
 
@@ -2113,7 +2150,8 @@ Roles are broad categories that group permissions.
 Permissions are granular rights that control access to specific resources.
 Spring Security provides different ways to manage both roles and permissions, 
 including annotations (@Secured, @PreAuthorize), HTTP security configuration, and database-driven authorization.
-RBAC focuses on user roles, while PBAC (Permission-Based Access Control) offers fine-grained access control.
+    RBAC focuses on user roles, while 
+    PBAC (Permission-Based Access Control) offers fine-grained access control.
 
 
 
@@ -2133,7 +2171,8 @@ Key Concepts:
         the method and commits it at the end.
 
     Commit:
-        If the method completes successfully without exceptions, the transaction is committed, meaning changes are saved to the database.
+        If the method completes successfully without exceptions, the transaction is committed
+        meaning changes are saved to the database.
 
     Rollback:
         If the method throws a RuntimeException (or any checked exception specified in the @Transactional settings), 
@@ -2173,8 +2212,8 @@ respect to an existing transaction.
 
 
 When to Use:
-    REQUIRED: Use when you want multiple methods to share the same transaction (e.g., if one method fails, you 
-        want all changes to roll back).
+    REQUIRED(Default Propagation): Use when you want multiple methods to share the same transaction 
+    (e.g., if one method fails, you want all changes to roll back).
     REQUIRES_NEW: Use when you want a method to always run in its own transaction, regardless of any existing transaction. 
         This is useful when you need a method to complete independently (e.g., logging or audit operations).
 
@@ -2273,6 +2312,17 @@ Precedence Order: The order of precedence is:
     Advice: Defines the action to take at the join points (e.g., log, validate, modify behavior).
     Join Point: A specific point in program execution (usually a method execution) where advice can be applied.
 
+1. Join Point
+    A Join Point represents a point in the execution of a program where an aspect can be applied.
+    It can be:
+    Method execution
+    Constructor call
+    Exception handling
+    Field access, etc.
+    Example: When a method is executed, it is a join point.
+
+    Spring AOP Limitation: Only method execution join points are supported.
+
 
 
 Exmple:
@@ -2355,6 +2405,72 @@ A web server handles HTTP requests and serves static content or forwards dynamic
 
 Apache Tomcat: Serves Java-based applications (Servlets, JSPs).
 Nginx: High-performance server for static files, load balancing, and reverse proxy.
+
+
+How They Work Together
+    A web server can serve as the entry point. If a request requires dynamic processing, the web server 
+    forwards it to an application server.
+    The application server processes the request, often leveraging a servlet container to handle servlet or JSP execution.
+    The servlet container is part of the application server or web server (e.g., Tomcat is both).
+
+Examples in Real-world Setups
+    Web Server + Servlet Container:
+        Apache HTTP Server + Apache Tomcat.
+
+    Nginx + Jetty.
+        Web Server + Application Server:
+
+    Apache HTTP Server + JBoss/WildFly.
+        Nginx + GlassFish.
+
+
+Request Flow in a Java Web Application:
+Web Server → Servlet Container → Application Server (for Dynamic Content):
+
+The web server (e.g., Apache HTTP Server or Nginx) receives the HTTP request from the client (e.g., browser).
+If the request requires Java-based dynamic processing (like invoking a servlet or JSP), the web server 
+forwards it to the servlet container (e.g., Tomcat, Jetty).
+The servlet container processes the request (via servlets or JSPs). If additional business logic or 
+enterprise features (like transactions or EJBs) are needed, it may forward the request to an 
+application server (e.g., WildFly, WebSphere).
+
+
+
+
+All-in-one:
+    Apache Tomcat (acts as both servlet container and lightweight application server).
+    Client → Servlet Container (Tomcat acting as Web Server + Application Server)
+
+With Web Server, Servlet Container, and Application Server:
+    Client → Web Server (Nginx) → Servlet Container (Tomcat) → Application Server (WildFly)
+
+
+
+Tomcat as a Servlet Container:
+    Handles the lifecycle of servlets (e.g., initialization, request handling, destruction).
+    Processes HTTP requests and maps them to servlet methods (e.g., doGet, doPost).
+    Provides support for Java Servlet API and JSP specifications.
+
+
+Tomcat as a Lightweight Application Server:
+    Although Tomcat is primarily a servlet container, it can act as an application server by providing some 
+    basic application-level features:
+
+Java EE Component Support (Partial):
+    Supports key components like:
+    Servlets
+    JSPs
+    WebSocket APIs
+    Does not support full Java EE features like EJBs, JCA (Java Connector Architecture), or JPA out of the box.
+
+
+Summary:
+    Tomcat handles HTTP and forwards requests to the Spring DispatcherServlet.
+    Spring processes the request using its MVC architecture (Controller → Service → Repository).
+    Tomcat sends the processed response back to the client.
+    By combining Tomcat and Spring, you're effectively using Tomcat as a servlet container while 
+    relying on Spring to act as the "application server" for advanced logic and application features.
+
 
 
 
@@ -2481,7 +2597,8 @@ Example in SSL Communication:
     Client Side:
     The client has a truststore containing trusted root CA certificates.
     The client checks if the server’s certificate is signed by a trusted CA from its truststore.
-    If both sides trust each other (via certificates in keystore and truststore), the SSL handshake succeeds, and the secure connection is established.
+    If both sides trust each other (via certificates in keystore and truststore), the SSL handshake succeeds, 
+    and the secure connection is established.
 
 
 SSL/TLS Handshake: The process of securing the connection involves several steps:
@@ -2652,7 +2769,8 @@ Both servers provide essential logging for monitoring and troubleshooting.
 
 11) What is reverse proxy ?
     A reverse proxy is a server that sits between client devices and a web server. 
-    It forwards client requests to one or more backend servers and then returns the response from the backend server(s) to the client.
+    It forwards client requests to one or more backend servers and then returns the response from the backend 
+    server(s) to the client.
 
 
 
@@ -2660,9 +2778,12 @@ Both servers provide essential logging for monitoring and troubleshooting.
 
 Used for: TCP and UDP traffic (like MySQL, database connections, etc.).
 Works at: The Transport Layer (Layer 4) of the OSI model.
-How it works: Nginx performs load balancing based on IP address and port without inspecting the content of the data being transmitted.
-    For example, with MySQL, Nginx can distribute requests from clients to multiple backend MySQL servers based solely on the connection's IP address and port (default 3306 for MySQL).
-    Since Nginx does not inspect the packet contents, it does not require knowledge of the application-layer protocol (like HTTP).
+How it works: Nginx performs load balancing based on IP address and port without inspecting the content of 
+the data being transmitted.
+    For example, with MySQL, Nginx can distribute requests from clients to multiple backend MySQL servers 
+    based solely on the connection's IP address and port (default 3306 for MySQL).
+    Since Nginx does not inspect the packet contents, it does not require knowledge of the application-layer 
+    protocol (like HTTP).
 
 
 
@@ -2711,7 +2832,8 @@ http {
 
 Key Differences:
     L4 Load Balancing is used for non-HTTP protocols (like MySQL, SSH, etc.) and makes decisions based on IP and port.
-    L7 Load Balancing is used for HTTP/HTTPS traffic and makes decisions based on the application layer (like URLs, headers, cookies).
+    L7 Load Balancing is used for HTTP/HTTPS traffic and makes decisions based on the application layer 
+    (like URLs, headers, cookies).
 
 
 Key Features of stream in Nginx:

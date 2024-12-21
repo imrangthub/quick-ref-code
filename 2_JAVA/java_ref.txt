@@ -6111,6 +6111,25 @@ Java 8 Features:
 https://github.com/eazybytes/spring
 
 
+Spring Shared Libraries Are Not Scanned by Default:
+ When you move ApplicationFilter to a library, it will no longer be scanned unless you:
+
+Explicitly include its package in @ComponentScan (not ideal for reusable libraries).
+Use Spring's @Bean registration in an @Configuration or @AutoConfiguration class.
+
+
+
+When @Component Alone is Enough:
+	If you still want to rely solely on @Component, you need to ensure that Spring can scan the library package. For example:
+	@SpringBootApplication
+	@ComponentScan(basePackages = {"com.example.logging", "your.application.package"})
+	public class YourApplication {
+	}
+
+
+
+
+
 
 
 #  SPRING SOAP SERVICE                                          
