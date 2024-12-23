@@ -14,13 +14,15 @@
 
 
 
-#BRAC IT Services Limited | Sr. Software Engineer, JAVA
+#BRAC IT Services Limited | Sr. Software Engineer, JAVA,
 =========================================================
 
 1) What is Java Private Class activity
 2) Runtime polymorphism
 3) Java String = new String(getName()) in a Loop ?
 4) Java String = getName() in a Loop ?
+String concatenation in a loop can lead to high memory usage because strings in Java are immutable. Each concatenation creates a new String object.
+Use StringBuilder or StringBuffer for concatenation in loops.
 5) obj1 == obj2 how will retrun true for different object.
 6) Spring Been Scope
 7) What is Singleton been and Other been in Spring ?
@@ -32,7 +34,6 @@
 
 #WaltonGroup | Fullstack Software Engineer
 ===========================================
-
 1) What king of helping hand you need to develope a complate application development ?
 2) Why app Performance slower ?
 3) How to prevent multiple hit or too many hit a api on your application.
@@ -45,7 +46,6 @@
 
 #Seirion Software Engineer | Ahsanullah University 
 ==================================================
-
 1) Stirng memory Lack
 2) Java volatile keyword
 3) Generate randol number withh our builin 
@@ -62,6 +62,15 @@
 11) Optomize sisgin for new application application layer and db layer
 
 
+
+#adcty
+==================================================
+1) What is component of microservices?
+2) Microserive reqeust flow.
+3) How manage zero downtime for deployment microserice.
+4) Waht is JavaStriem api, how it make faster ? diffn between normal loop an striem.
+5) How spring boot autoconfig work.
+6) MyslQuery: a cutomer,order,orderitem table, now fine then cusname, order id and total amount of item.
 
 
 
@@ -280,7 +289,7 @@ StringConcatenation:
     Neither + nor .concat() modifies the original strings (s1, s2). 
     Instead, they both create new String objects to store the result.
 
-Correct! StringBuilder and StringBuffer do not create a new String object for every modification.
+StringBuilder and StringBuffer do not create a new String object for every modification.
 
 
 Use +:
@@ -670,6 +679,25 @@ Comparator can also be used with Collections.sort() or List.sort().
 String class in Java overrides the hashCode method from the Object class.
 This is why String objects work efficiently as keys in hash-based collections like HashMap or HashSet, 
 ensuring proper hash-based behavior.
+
+
+Java is used to sort elements in a list. It relies on either:
+The natural ordering of the elements (if the elements implement the Comparable interface).
+A custom ordering provided by a Comparator.
+
+Sorting a List of Numbers:
+    When sorting a list of numbers, the natural ordering is used (ascending order). 
+    Java's wrapper classes for numbers (like Integer, Double, etc.) implement the Comparable interface
+
+Sorting a List of Strings:
+    Strings are sorted based on their lexicographical (dictionary) order because the String class implements Comparable<String>.
+    Mechanism: The String.compareTo method compares characters in the string by their Unicode values.
+
+Sorting a List of Custom Objects:
+    For custom objects, the sorting behavior depends on:
+
+    Whether the object implements Comparable.
+    Whether you provide a Comparator.
 
 
 
@@ -1065,8 +1093,10 @@ Connection Pooling: Optimizes connection management for high-performance applica
 
 
 24) Understanding JVM internals.
-Ans:
-The Java Virtual Machine (JVM) is an engine that executes Java bytecode, providing platform independence and memory management. 
+    The Java Virtual Machine (JVM) is an engine that executes Java bytecode, providing platform independence and memory management. 
+    in Java, every time you run a Java application using commands like:java -jar app1.jar
+    each command creates a new JVM instance.Each java -jar command starts its own separate JVM process.
+
 
 Key Components:
     I) Class Loader Subsystem:
