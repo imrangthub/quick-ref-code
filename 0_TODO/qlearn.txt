@@ -381,20 +381,64 @@ III) Exclent coden
 
 
 
-7) How do you maintain HighAvailable ?
-
-    Nginx HighAvailable:
-    Service HighAvailable:
-
-
-8) How do you mantain service resiliency ?
-
-
-9) How do you monitor you system ?
+7) How do you maintain HighAvailable Interviewer: How do you handle scalability and unexpected traffic surges?
+    We use auto-scaling to dynamically adjust the number of service instances based on traffic.
+    To protect backend services during surges, we enforce rate limiting and throttling.
 
 
 
-10) How you receive and Delivery CR ?  How do you interect with Business Team?
+8) How do you maintain service resiliency?
+   How do you maintain HighAvailable?
+   How do you handle scalability and unexpected traffic surges?
+
+    In a microservices architecture, we focus on several key strategies to ensure resiliency:
+    Design Principles:
+    We use redundancy by running multiple instances of critical services, so there’s no single point of failure.
+    For failover mechanisms, we rely on load balancers and strategies like active-passive or active-active setups to ensure continuous service availability.
+    We also apply the circuit breaker pattern to prevent cascading failures by temporarily halting calls to failing services.
+    To minimize the impact of failures, we use the bulkhead pattern, which isolates components so that one service failure doesn’t 
+    bring down the entire system.
+    Additionally, we set API timeouts to ensure requests don’t hang and impact other processes.
+
+
+9) How do you monitor and observe the system?
+    We implement health checks to constantly monitor the status of each service using tools like Prometheus and Grafana.
+    If there’s any anomaly or performance degradation, alerting systems like sms, notify us immediately.
+    We also leverage distributed tracing with tools like OpenTelemetry to track the flow of requests across services, 
+    making it easier to identify bottlenecks or issues.
+
+
+
+10) How do you handle receiving and delivering Change Requests (CRs) / How do you interect with Business Team?
+    When a CR comes in, the business team usually shares it through meetings or tools like JIRA. 
+    I make sure the requirements are clear by asking questions if needed. 
+    Then, we analyze the impact, estimate the effort, and share a plan.
+    Once approved, we develop the changes, test them thoroughly, and deliver them. Finally, 
+    I update the business team with release notes or demos.
+
+
+Interviewer: How do you manage stakeholders effectively in your projects?
+Candidate: 
+    Stakeholder management is all about communication and collaboration. 
+    I start by identifying the key stakeholders, understanding their roles, and prioritizing based on their influence and needs.
+
+Interviewer: How do you keep stakeholders informed?
+Candidate: 
+    I ensure clear communication through regular updates via meetings, emails, or tools like JIRA and Confluence. 
+    I focus on setting realistic expectations upfront and provide timely updates if there are any changes or challenges.
+
+Interviewer: How do you handle conflicts or disagreements with stakeholders?
+Candidate: 
+    I address conflicts constructively by listening to their concerns and finding common ground. 
+    The goal is to align their priorities with the overall project objectives and keep everyone on the same page.
+
+
+
+
+
+
+
+
 
 
 
