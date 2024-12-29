@@ -1773,6 +1773,7 @@ queries, improve application performance, and decrease response times.
 
 Hibernate supports two levels of caching:
   First-Level Cache:
+    It is automatically enabled and cannot be disabled.
     Definition: The first-level cache is associated with the Session object. 
     It is enabled by default and caches entities within a single session.
     Scope: It is session-scoped; once the session is closed, the cache is cleared.
@@ -1780,10 +1781,10 @@ Hibernate supports two levels of caching:
     Subsequent requests for the same entity within the same session will fetch it from the cache instead of hitting the database.
 
   Second-Level Cache:
-    Definition: The second-level cache is optional and shared across sessions. I
-    t can be used to cache entities, collections, and query results.
+    The second-level cache is optional and shared across multiple sessions.
+    It can be used to cache entities, collections, and query results.
     Configuration: Requires configuration and is not enabled by default.
-    Providers: Various caching providers can be used (e.g., Ehcache, Hazelcast, Infinispan).
+    Providers: Various caching providers can be used (e.g., Ehcache, Hazelcast, Redis).
 
 Cache Behavior Summary:
 The first-level cache (session scope) is always checked first.
@@ -1821,20 +1822,19 @@ The cache is entity-based rather than user-specific.
 
 
 Cache Data is Shared Across Sessions and Users: The second-level cache stores entities, not tied to any specific user or session.
-Stateless Requests: Each request creates a new session, but the second-level cache works across sessions, ensuring efficient data retrieval.
-
-
+Stateless Requests: Each request creates a new session, but the second-level cache works across sessions, 
+ensuring efficient data retrieval.
 
 
 
 How avoid Data incustance of CacheData:
 ---------------------------------------------------------
-If the database is updated directly, the second-level cache will serve stale data until the cache entry expires or 
+If the database is updated directly, the second-level cache will serve old data until the cache entry expires or 
 is manually evicted.
 If the update is done through Hibernate, the cache will be automatically invalidated.
 Solutions include manual eviction, using shorter TTL, or leveraging synchronization mechanisms to avoid stale data issues.
 If Hibernate manages the updates, the second-level cache is automatically invalidated or updated.
-If external updates bypass Hibernate, the cache won't know, and stale data might be served unless you manually evict the cache.
+If external updates bypass Hibernate, the cache won't know, and old data might be served unless you manually evict the cache.
 
 
 
