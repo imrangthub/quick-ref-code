@@ -7184,6 +7184,125 @@ Bean Scopes:
 	WebSocket: A new instance of the bean is created for each WebSocket session.   
 
 
+All Spring beans are Singleton by default.
+Beans with Non-Singleton Scope Without Explicit Developer Specification:
+-----------------------------------------------
+Request Scope (@RequestScope):
+@ControllerAdvice
+Lifecycle: A new instance is created for every HTTP request.
+Example:
+	@RestController
+	public class MyController {
+		@Autowired
+		private HttpServletRequest request; // This is request-scoped
+	}
+
+
+Session Scope (@SessionScope):
+Lifecycle: A new instance is created for each HTTP session.
+Example:
+@RestController
+public class MyController {
+    @Autowired
+    private HttpSession session; // This is session-scoped
+}
+
+
+Application Scope:
+Scenario: Spring components like ServletContext beans are bound to the Application scope automatically.
+Lifecycle: These beans last for the lifetime of the web application.
+Example:
+@RestController
+public class MyController {
+    @Autowired
+    private ServletContext servletContext; // Application-scoped
+}
+
+Prototype Scope with Proxies:
+Example:
+@Service
+@Scope("prototype")
+public class PrototypeService {
+    public void doSomething() {
+        System.out.println("Prototype instance");
+    }
+}
+
+
+Specialized Spring Beans with Non-Singleton Scopes:
+@RequestMapping and @RestController Parameters
+Parameters like @RequestParam or @PathVariable in controller methods are request-scoped by default.
+Example:
+	@GetMapping("/greet")
+	public String greet(@RequestParam String name) {
+		return "Hello " + name; // 'name' is request-scoped
+	}
+
+
+@Configuration:
+Application-level scope: This annotation marks a class as a Spring configuration class.
+Beans defined within this class are typically singletons, meaning a single instance is created and shared throughout the application.
+	@Configuration
+	public class MySecAddpter extends WebSecurityConfigurerAdapter {
+		// Custom configurations
+	}
+
+Most beans like WebSecurityConfigurerAdapter, WebMvcConfigurer, and security handlers (BCryptPasswordEncoder, 
+CustomAuthenticationFailureHandler, CustomAccessDeniedHandler) are Singleton by default, 
+as they typically don't need to change across requests.
+This means a single instance of each class is created and used throughout the entire application's lifecycle.
+
+
+ Singleton vs Application Scope
+ ------------------------------------
++-----------------------+-------------------------------------------------------+-------------------------------------------------------+
+| Aspect                | Singleton Scope                                       | Application Scope                                     |
++-----------------------+-------------------------------------------------------+-------------------------------------------------------+
+| Definition            | Creates one instance per Spring Application Context.  | Creates one instance per ServletContext (broader     |
+|                       |                                                       | than Spring).                                         |
++-----------------------+-------------------------------------------------------+-------------------------------------------------------+
+| Managed By            | The Spring container (Spring Application Context).    | The web application context (ServletContext).        |
++-----------------------+-------------------------------------------------------+-------------------------------------------------------+
+| Use Case              | Used for Spring-managed beans, default for most       | Used in Java EE or hybrid environments where a bean  |
+|                       | Spring applications.                                  | needs to align with the entire web application       |
+|                       |                                                       | lifecycle.                                           |
++-----------------------+-------------------------------------------------------+-------------------------------------------------------+
+| Accessibility         | Accessible globally within the Spring Application     | Accessible globally across the entire web            |
+|                       | Context.                                              | application (even outside Spring).                   |
++-----------------------+-------------------------------------------------------+-------------------------------------------------------+
+| Lifecycle             | Tied to the Spring Application Context lifecycle.     | Tied to the ServletContext lifecycle.                |
++-----------------------+-------------------------------------------------------+-------------------------------------------------------+
+| Default in Spring?    | Yes, it is the default scope for all Spring beans     | No, it must be explicitly defined using              |
+|                       | unless explicitly changed.                            | `@Scope("application")`.                             |
++-----------------------+-------------------------------------------------------+-------------------------------------------------------+
+| Context Dependency    | Purely Spring-dependent, no need for ServletContext.  | Requires a ServletContext (broader than Spring).     |
++-----------------------+-------------------------------------------------------+-------------------------------------------------------+
+| How to Define         | Default, or explicitly via `@Scope("singleton")`.     | Explicitly defined using `@Scope("application")`.    |
++-----------------------+-------------------------------------------------------+-------------------------------------------------------+
+
+
+
+
+ScopeSummary:
+===========================================
++---------------------+---------------------------------------------+-----------+---------------------------------------------------------------+
+| Scope               | Example Components                          | Explicit | Notes                                                          |
++---------------------+---------------------------------------------+-----------+---------------------------------------------------------------+
+| Singleton (default) | @Controller, @Service, @Repository          | No        | Default for all Spring-managed beans unless explicitly changed|
++---------------------+---------------------------------------------+-----------+---------------------------------------------------------------+
+| Request             | HttpServletRequest, @RequestMapping params  | No        | Automatically bound to the HTTP request lifecycle.            |
++---------------------+---------------------------------------------+-----------+---------------------------------------------------------------+
+| Session             | HttpSession, @SessionAttributes             | No        | Automatically bound to the HTTP session lifecycle.            |
++---------------------+---------------------------------------------+-----------+---------------------------------------------------------------+
+| Application         | ServletContext                              | No        | Automatically bound to the application context.               |
++---------------------+---------------------------------------------+-----------+---------------------------------------------------------------+
+| Prototype           | Manual setup, but proxies may trigger this  | Yes       | New instance created per method call when injected into       |
+|                     |                                             |           | singletons.                                                   |
++---------------------+---------------------------------------------+-----------+---------------------------------------------------------------+
+| Lazy                | @Lazy annotation                            | Yes       | Not scope but defers initialization.                          |
++---------------------+---------------------------------------------+-----------+---------------------------------------------------------------+
+
+
 
 
 
