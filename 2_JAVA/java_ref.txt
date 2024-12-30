@@ -5287,8 +5287,58 @@ Reactive programmeing approach like Kfka:(Kafka vs Reactive)
 
 
 
+Java Summary of Annotation:
+=================================================
+Target				ElementType					Example
+Class/Interface		ElementType.TYPE			@Entity class MyClass {}
+Method				ElementType.METHOD			@Test public void myMethod() {}
+Field				ElementType.FIELD			@NotNull private String name;
+Constructor			ElementType.CONSTRUCTOR		@Inject public Example() {}
+Parameter			ElementType.PARAMETER		public void setName(@NotNull String n)
+Local Variable		ElementType.LOCAL_VARIABLE	@SuppressWarnings("unused") int x;
+Package				ElementType.PACKAGE			package-info.java
+Annotation			ElementType.ANNOTATION_TYPE	Custom meta-annotations
+Type Use			ElementType.TYPE_USE		@NonNull String name;
+Module				ElementType.MODULE			module-info.java
 
 
+
+Custom annotations can be defined on three levels:
+	Class Level
+	Field Level
+	Method Level
+
+Types of Annotation
+	There are three types of annotations.
+	Marker Annotation
+	Single-Value Annotation
+	Multi-Value Annotation
+
+
+
+Points to remember for java custom annotation signature:
+	Method should not have any throws clauses
+	Method should return one of the following: primitive data types, String, Class, enum or array of these data types.
+	Method should not have any parameter.
+	We should attach @ just before interface keyword to define annotation.
+	It may assign a default value to the method.
+
+
+
+Built-in Annotations used in custom annotations in java:
+	@Target
+	@Retention
+	@Inherited
+	@Documented
+
+
+@Target(ElementType.TYPE)
+This specifies where the annotation can be applied.
+	ElementType.TYPE means this annotation can be applied to:
+	Classes
+	Interfaces
+	Enums
+	It cannot be applied to methods, fields, parameters, or other elements.
 
 
 
@@ -5439,6 +5489,56 @@ Basic Syntax for Exception Handling:
 	public void method() throws ExceptionType {
 		// Method code
 	}
+
+
+
+
+
+=================================================
+##Jakarta
+=================================================
+Jakarta is a collection of open-source APIs and technologies for building enterprise-level Java applications. 
+It is not part of the JDK (Java Development Kit).
+Jakarta EE is the new name for Java EE (after Oracle donated Java EE to the Eclipse Foundation).
+
+Is Jakarta Part of JDK 17 or JDK 21/23? No, Jakarta is not part of the JDK.
+	The JDK is the standard Java Development Kit that includes the Java SE (Standard Edition) libraries and tools for general-purpose programming.
+	Jakarta EE provides additional libraries for enterprise-level application development, which are not bundled with the JDK.
+
+
+
+How to Use Jakarta in Your Application?
+<dependency>
+    <groupId>jakarta.validation</groupId>
+    <artifactId>jakarta.validation-api</artifactId>
+    <version>3.0.2</version>
+</dependency>
+
+
+Runtime Libraries:
+	To run Jakarta EE applications, you need a compatible application server like:
+	Apache Tomcat
+	WildFly
+	Payara Server
+	Jakarta-compatible runtimes like Eclipse GlassFish
+
+Key Jakarta APIs and Their Uses:
+
+Jakarta Servlet:			For web applications and HTTP handling	<artifactId>jakarta.servlet-api</artifactId>
+Jakarta Persistence (JPA):	For database operations using ORM	<artifactId>jakarta.persistence-api</artifactId>
+Jakarta Validation:			For validating bean properties and method arguments	<artifactId>jakarta.validation-api</artifactId>
+
+
+wtih Spring Boot:
+	Spring Boot abstracts Jakarta EE APIs: The starters already include and configure the Jakarta EE libraries that are 
+	required for enterprise functionality.
+	Spring Boot manages versions: The Jakarta EE versions are pre-configured in the Spring Boot BOM (Bill of Materials), 
+	so you don't need to manually specify or manage them.
+
+
+
+
+
 
 
 
@@ -7067,6 +7167,28 @@ Proper tuning and monitoring are essential to optimize thread usage in a Spring 
 
 
 
+
+Spring Bean Scope
+==========================================
+What is Bean Scope?
+Bean scope defines the lifecycle and visibility of a bean within the Spring container. 
+It determines how many instances of a bean should be created and how long they should be available. 
+
+
+Bean Scopes:
+	Singleton Scope:In this scope, only one instance of the bean is created for the entire application.
+	Prototype: A new instance of the bean is created each time it's requested.   
+	Request: A new instance of the bean is created for each HTTP request.   
+	Session: A new instance of the bean is created for each HTTP session.   
+	Application: A single instance of the bean is created per web application runtime.
+	WebSocket: A new instance of the bean is created for each WebSocket session.   
+
+
+
+
+
+
+
 A Http Request process: Responsibilities at Each Step (With JVM Status):
 +----------------------------+---------------------------------------------------------------+-----------------------------------------------------------+
 | Component                  | Responsibility                                                | JVM Status                                                |
@@ -7128,6 +7250,7 @@ Each application is distinguished by its context path (like /app1, /app2).
 Example:
 	Place app1.war in /webapps/ → Available at http://localhost:8080/app1.
 	Place app2.war in /webapps/ → Available at http://localhost:8080/app2.
+
 
 
 
