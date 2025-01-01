@@ -5373,9 +5373,145 @@ Consistency Across Platforms:
 
 
 
+##Thread
+==============================================
+Thread-safe:
+	Thread-safe in Java means that a piece of code, object, or class can be safely accessed or modified by 
+	multiple threads simultaneously without leading to race conditions or data corruption. 
+	Thread-safety ensures consistency and correctness in a multithreaded environment by implementing proper synchronization mechanisms.
+Thread-Safe Prevents data corruption in a multithreaded environment using synchronization, atomic variables, or concurrent collections.
 
-The Java Collection Framework simplifies the handling of data structures, offering a variety of tools to manage 
-groups of objects. It helps write cleaner, more efficient code with minimal effort.
+Non-thread-safe:
+	Non-thread-safe means that an object or code does not have built-in mechanisms to prevent concurrent access issues. 
+	If multiple threads access or modify such an object simultaneously, it can result in unpredictable behavior, 
+	data inconsistencies, or program crashes.
+Non-Thread-Safe  May cause unpredictable behavior or errors when accessed by multiple threads simultaneously.
+
+Use Cases: Thread safety is critical in concurrent programming but incurs a performance cost due to synchronization overhead. 
+Only use it when necessary.
+
+
+Race condition:
+	A race condition happens when two or more threads access and change the same resource. 
+	As a result, all threads experience data loss or an unexpected state of the resource. 
+	Race conditions are something that must be avoided, especially when we want to build applications related to banking.
+
+
+
+Thread-Safe Mechanisms:
+1. Synchronization
+	Synchronization ensures that only one thread can access a critical section of code or a shared resource at a time.
+	Synchronized Methods: A synchronized method locks the entire object, ensuring only one thread can execute
+	any synchronized method on the object at a time.
+	Synchronized Blocks: More fine-grained control by locking only a specific block of code or resource.
+	Static Synchronization: Used for class-level synchronization.
+
+2. Volatile Keyword
+The volatile keyword ensures visibility of changes to a variable across threads without locking.
+
+3. Atomic Variables
+Classes in the java.util.concurrent.atomic package (e.g., AtomicInteger, AtomicLong) provide low-level thread-safe 
+operations without explicit synchronization.
+
+4. Lock Mechanism
+Locks provide explicit control over thread synchronization, allowing more flexibility than synchronized.
+
+5. Thread-Safe Collections
+Collections in java.util.concurrent (e.g., ConcurrentHashMap, CopyOnWriteArrayList) are designed for concurrent access 
+by multiple threads.
+
+Example: ConcurrentHashMap
+	Allows multiple threads to read and write without blocking each other.
+	Uses bucket-level locking (a fine-grained locking mechanism) for better performance.
+
+6. Immutable Objects
+Immutable objects are inherently thread-safe because their state cannot be changed after creation.
+
+7. Thread Coordination
+Thread coordination ensures threads work in harmony using constructs like:
+wait(), notify(), and notifyAll(): These methods enable threads to communicate and synchronize actions.
+
+
+How It Works:
+	When a thread enters a synchronized block/method, it acquires a lock (monitor) on the object.
+	Other threads trying to access synchronized code must wait until the lock is released.
+	This prevents concurrent modifications and ensures data consistency.
+
+Summary:
+	Without Thread Safety: Simultaneous modifications to a List by multiple threads can cause data inconsistencies and runtime exceptions.
+	Thread-Safe Solutions:
+	Use Collections.synchronizedList for basic synchronization.
+	Use CopyOnWriteArrayList for better performance in read-heavy situations.
+
+
+
+
+
+##Collection Framework
+==============================================
+Java Collection Framework (JCF) is a set of classes and interfaces in the java.util package designed to handle collections of objects. 
+It provides data structures and algorithms to manipulate, store, and retrieve data efficiently. 
+
+
+Hierarchy Diagram
+-----------------------------------------------
+Collection
+  |-- List
+  |     |-- ArrayList
+  |     |-- LinkedList
+  |     |-- Vector
+  |
+  |-- Set
+  |     |-- HashSet
+  |     |-- LinkedHashSet
+  |     |-- TreeSet
+  |
+  |-- Queue
+        |-- PriorityQueue
+        |-- ArrayDeque
+
+Map
+  |-- HashMap
+  |-- LinkedHashMap
+  |-- TreeMap
+  |-- Hashtable
+
+
+
+
+1. List
+	Definition: Ordered collection of elements; allows duplicates.
+	Key Features:
+		Maintains insertion order.
+		Can access elements by index.
+	Use Case: When you need to maintain the order of elements or allow duplicates.
+	Examples:
+		Thread-Safe: Vector, CopyOnWriteArrayList.
+		Non-Thread-Safe: ArrayList, LinkedList.
+
+
+2. Set
+	Definition: Collection of unique elements; no duplicates allowed.
+	Key Features:
+		Does not maintain order (except LinkedHashSet and TreeSet).
+		Efficient for checking existence of an element.
+	Use Case: When you need unique elements or need to perform operations like union, intersection, etc.
+	Examples:
+		Thread-Safe: CopyOnWriteArraySet, ConcurrentSkipListSet.
+		Non-Thread-Safe: HashSet, TreeSet.
+
+3. Map
+	Definition: Key-value pairs; keys must be unique.
+	Key Features:
+		Allows fast lookup by key.
+		Keys must be unique, but values can be duplicated.
+	Use Case: When you need to map keys to values, like a dictionary.
+	Examples:
+		Thread-Safe: Hashtable, ConcurrentHashMap, ConcurrentSkipListMap.
+		Non-Thread-Safe: HashMap, TreeMap.
+		.
+
+
 
 Key Components of the Collection Framework:
 	Interfaces (Blueprints for collections):
@@ -5394,6 +5530,115 @@ Key Components of the Collection Framework:
 	Algorithms:
 		Sorting: Sort elements (e.g., Collections.sort()).
 		Searching: Find elements (e.g., binarySearch()).
+
+
+
+
+
+
+Java Collections Beyond List, Set, and Map:
+-----------------------------------------------
+1. Queue
+	FIFO Order: Processes elements in the order they were added.
+	Examples: LinkedList, PriorityQueue.
+	Use: Task scheduling.
+2. Deque (Double-Ended Queue)
+	Both Ends: Add/remove from both ends.
+	Examples: ArrayDeque, LinkedList.
+	Use: Stack (LIFO) or Queue (FIFO) replacement.
+3. Stack
+	LIFO Order: Last-in, first-out.
+	Examples: Legacy Stack, modern Deque.
+	Use: Undo, expression evaluation.
+4. Navigable Collections
+	Sorted and Navigable: Traverse in sorted order or find ranges.
+	Examples: TreeSet, TreeMap, ConcurrentSkipListMap.
+	Use: Sorted storage, range queries.
+5. Specialized Collections, For specific performance or memory needs.
+	WeakHashMap: Keys are garbage-collected.
+	IdentityHashMap: Compares keys by reference.
+	EnumSet/EnumMap: Optimized for enums.
+
+Utilities
+	Collections Class: Provides utility methods (e.g., sort, reverse, synchronizedList, etc.).
+	Arrays Class: Used for working with arrays (e.g., converting to lists, sorting).
+	Stream API: Part of Java 8+ for functional-style operations (e.g., filtering, mapping, reducing).
+
+
+
+
+
+
+
+Thread Ops in Collections:
+================================================
+
+In the Java Collection Framework, some classes are thread-safe, while others are not thread-safe. Here's a categorized breakdown:
+
+1. Thread-Safe Collections
+Legacy Thread-Safe Classes
+	Vector: Thread-safe alternative to ArrayList.
+	Stack: Extends Vector and provides LIFO operations.
+	Hashtable: Thread-safe alternative to HashMap.
+
+Synchronized Wrappers:
+You can make a collection thread-safe using the Collections.synchronizedXXX methods:
+	Collections.synchronizedList(List list): Thread-safe wrapper for ArrayList, LinkedList, etc.
+	Collections.synchronizedMap(Map map): Thread-safe wrapper for HashMap.
+	Collections.synchronizedSet(Set set): Thread-safe wrapper for HashSet.
+
+Concurrent Collections (Modern Thread-Safe Classes):
+Introduced in the java.util.concurrent package, these classes are optimized for performance in multithreaded environments:
+	CopyOnWriteArrayList: Thread-safe list with better performance for read-heavy workloads.
+	CopyOnWriteArraySet: Thread-safe set similar to CopyOnWriteArrayList.
+	ConcurrentHashMap: Thread-safe alternative to HashMap with finer-grained locking.
+	ConcurrentSkipListMap: Thread-safe map with sorted keys.
+	ConcurrentSkipListSet: Thread-safe set with sorted elements.
+	BlockingQueue (e.g., LinkedBlockingQueue, ArrayBlockingQueue, PriorityBlockingQueue): Thread-safe queues for producer-consumer scenarios.
+
+
+
+2. Non-Thread-Safe Collections
+	ArrayList: Non-thread-safe alternative to Vector.
+	LinkedList: Non-thread-safe list implementation.
+	HashMap: Non-thread-safe key-value store.
+	HashSet: Non-thread-safe set implementation.
+	TreeMap: Non-thread-safe sorted map.
+	TreeSet: Non-thread-safe sorted set.
+
+
+
+
+Thread-Safe(In a short):
+	List:
+		Vector (Legacy).
+		CopyOnWriteArrayList (Modern, better for reads).
+		Collections.synchronizedList(List) (Wrapper).
+
+	Set:
+		CopyOnWriteArraySet (Modern, better for reads).
+		Collections.synchronizedSet(Set) (Wrapper).
+		ConcurrentSkipListSet (Sorted, thread-safe).
+
+	Map:
+		Hashtable (Legacy).
+		ConcurrentHashMap (Modern, highly efficient).
+		Collections.synchronizedMap(Map) (Wrapper).
+		ConcurrentSkipListMap (Sorted, thread-safe).
+
+
+Non-Thread-Safe(In a short):
+	List:
+		ArrayList.
+		LinkedList.
+	Set:
+		HashSet.
+		TreeSet.
+	Map:
+		HashMap.
+		TreeMap.
+
+
 
 
 
