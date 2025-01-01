@@ -5569,6 +5569,132 @@ Utilities
 
 
 
+Internal data structures of Java Collections Framework 
+================================================
+
+--------------------------------------------------------------------------------------------
+Class           | Internal Data Structure             | Optimized For
+--------------------------------------------------------------------------------------------
+ArrayList       | Resizable Array                    | Fast random access and iteration.
+--------------------------------------------------------------------------------------------
+LinkedList      | Doubly Linked List                 | Frequent insertions/deletions.
+--------------------------------------------------------------------------------------------
+HashSet         | Hash Table (via HashMap)           | Fast lookups and no duplicates.
+--------------------------------------------------------------------------------------------
+TreeSet         | Red-Black Tree                     | Sorted elements.
+--------------------------------------------------------------------------------------------
+HashMap         | Hash Table + Linked List/TreeMap   | Fast key-based lookups.
+--------------------------------------------------------------------------------------------
+TreeMap         | Red-Black Tree                     | Sorted key-value pairs.
+--------------------------------------------------------------------------------------------
+PriorityQueue   | Binary Heap                        | Priority-based processing.
+--------------------------------------------------------------------------------------------
+ArrayDeque      | Circular Array                     | Efficient double-ended operations.
+--------------------------------------------------------------------------------------------
+
+
+
+Details:
+-------------------------------------------
+1. ArrayList
+	Internal Data Structure: Resizable Array
+	ArrayList uses a dynamically resized array to store elements.
+	When the array reaches its capacity, it is resized (usually by 1.5 times its current size).
+
+
+VisualRepresentations:
+======================
+[0] -> [1] -> [2] -> [3] -> [4] ...
+
+
+2. LinkedList
+Internal Data Structure: Doubly Linked List
+Each element (node) contains:
+	A reference to the previous node.
+	A reference to the next node.
+	The data itself.
+
+VisualRepresentations:
+======================
+HEAD <-> Node1 <-> Node2 <-> Node3 <-> TAIL
+
+
+
+
+3. HashSet
+	Internal Data Structure: Hash Table (via HashMap)
+	Backed by a HashMap, where:
+		Keys represent the elements in the set.
+		Values are dummy objects (typically Boolean.TRUE).
+	Uses hash codes to store and retrieve elements efficiently.
+
+VisualRepresentations:
+======================
+
+4. TreeSet
+	Internal Data Structure: Red-Black Tree (Self-Balancing Binary Search Tree)
+	Elements are stored in sorted order.
+	Operations like add, remove, and search maintain the tree's balance.
+
+VisualRepresentations:
+======================
+
+5. HashMap
+	Internal Data Structure: Hash Table + Linked List (or TreeMap for collision handling)
+	Each key-value pair is stored in a "bucket."
+	Buckets are managed using a hash function.
+	For hash collisions:
+		In earlier Java versions, collisions were handled using a Linked List.
+		Since Java 8, buckets switch to a TreeMap structure when the number of elements exceeds a threshold (default: 8).
+
+VisualRepresentations: HashMap (with collisions)
+======================
+Bucket[0]: Node(key1, value1) -> Node(key2, value2)
+Bucket[1]: Node(key3, value3)
+Bucket[2]: Empty
+
+
+
+
+6. TreeMap
+	Internal Data Structure: Red-Black Tree
+	Keys are sorted based on their natural ordering or a custom comparator.
+
+VisualRepresentations:
+======================
+
+       10
+      /  \
+     5   20
+    / \    \
+   3   7    25
+
+
+
+7. PriorityQueue
+	Internal Data Structure: Binary Heap (Min-Heap by default)
+	Elements are arranged to maintain the heap property:
+		The smallest (or highest priority) element is at the root.
+		Child nodes have a value greater than or equal to their parent.
+
+VisualRepresentations:
+======================
+
+8. ArrayDeque
+	Internal Data Structure: Resizable Array
+	Uses a circular array to implement a double-ended queue.
+	Automatically resizes when full.
+
+
+
+
+
+
+
+
+
+
+
 
 Thread Ops in Collections:
 ================================================
