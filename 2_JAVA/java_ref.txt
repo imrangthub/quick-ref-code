@@ -5401,6 +5401,22 @@ Key Components of the Collection Framework:
 		Searching: Find elements (e.g., binarySearch()).
 
 
+Why Interface and Classes:
+	Interface like List defines the contract for ordered collections, but it does not specify how elements should be stored or accessed. 
+	Concrete implementations like ArrayList, LinkedList, and Vector provide flexibility, efficiency, 
+	and thread-safety options, empowering developers to choose the best-fit implementation for their specific requirements.
+Same for all other Interface List: Set, Map.
+
+Why Multiple Implementations:
+	Performance trade-offs: Depending on whether insertion order, sorting, or fast lookups are more important, developers can choose the appropriate implementation.
+	Memory usage: TreeSet might use more memory than HashSet due to the tree structure.
+	Functional differences: LinkedHashSet offers insertion order while TreeSet provides sorting, which might not be interchangeable.
+
+
+
+
+
+
 Hierarchy Diagram
 -----------------------------------------------
 Collection
@@ -5518,66 +5534,308 @@ ArrayDeque      | Circular Array                     | Efficient double-ended op
 Details:
 -----------------------------------------------------|
 1. ArrayList
-	Internal Data Structure: Resizable Array
-	ArrayList uses a dynamically resized array to store elements.
-	When the array reaches its capacity, it is resized (usually by 1.5 times its current size).
+============
+	Internal Data Structure: Resizable Array.
+		If the number of elements exceeds the capacity of the array, the ArrayList creates a new, larger array and copies all the elements from the old array to the new one.
+		This process makes the ArrayList dynamic, as it can grow in size automatically.
+
+	Fast Random Access to Elements (O(1)):
+		Random access means you can access any element in the list using its index without needing to traverse the list.
+		Arrays store elements in contiguous memory locations.
+		When you access an element at index i, the system computes the memory address as: 
+			base_address + (i * size_of_element)
+		This is why retrieving an element by index is fast and does not depend on the size of the list.
 
 VisualRepresentations:
-======================
-[0] -> [1] -> [2] -> [3] -> [4] ...
+----------------------
+Initial State (Empty ArrayList):
+
+	ArrayList: [null, null, null, null, null, null, null, null, null, null]
+	Capacity: 10
+	Size: 0 (no elements yet)
+
+Adding Elements:
+list.add("Apple");
+
+	ArrayList: ["Apple", null, null, null, null, null, null, null, null, null]
+	Capacity: 10
+	Size: 1
+
+AccessingElement:
+list.get(1)
+
+ArrayList: ["Apple", "Banana", null, null, null, null, null, null, null, null]
+Index:       0        1
+String fruit = list.get(1); // Returns "Banana"
+
+
+Exmaple:
+	ArrayList<String> list = new ArrayList<>();
+	list.add("Apple");
+	list.add("Banana");
+	list.add("Cherry");
+	System.out.println(list.get(1)); // Accesses "Banana" in O(1) time
+
+
+Performance Impact of Resizing:
+	Resizing is a relatively expensive operation because it involves:
+	Allocating a new array.
+	Copying all existing elements to the new array.
+
+
+
 
 
 2. LinkedList
+=============
 Internal Data Structure: Doubly Linked List
-Each element (node) contains:
-	A reference to the previous node.
-	A reference to the next node.
-	The data itself.
+	A doubly linked list is a sequence of nodes where:
+	Each node contains:
+		Data: The value stored in the node.
+		Next: A pointer/reference to the next node in the sequence.
+		Previous: A pointer/reference to the previous node in the sequence.
+	The LinkedList has:
+		Head: Points to the first node.
+		Tail: Points to the last node
 
-VisualRepresentations:
-======================
-HEAD <-> Node1 <-> Node2 <-> Node3 <-> TAIL
+
+Visualization of a Doubly Linked List:
+Head -> [null <- Node1(Data: "A") -> Node2] <-> [Node1 <- Node2(Data: "B") -> Node3] <-> [Node2 <- Node3(Data: "C") -> null] <- Tail
+
+null represents the absence of a reference at the start or end.
+Each node links to both its predecessor and successor.
+
+Oops:
+Efficient for Frequent Insertions/Deletions (O(1) in some cases):
+	Adding or removing elements at the start or end is very efficient:
+		Update the pointers of the affected nodes.
+	Insertions/deletions in the middle:
+		Locate the target node (O(n) for traversal).
+		Update pointers without shifting other elements
+
+	Example:
+	LinkedList<String> list = new LinkedList<>();
+	list.add("A"); // Add to the end (efficient)
+	list.addFirst("B"); // Add to the start (efficient)
+	list.add(1, "C"); // Add at index 1 (locate and insert)
+
+Sequential Access (No Random Access):
+	LinkedList does not support constant time random access like ArrayList.
+	Accessing an element by index requires traversal:
+	Start from the head for the first half of the list.
+	Start from the tail for the second half of the list.
+
+	Example:
+	System.out.println(list.get(2)); // Traverses the list to find the 2nd index
+
+Dynamically Sized:
+	Similar to ArrayList, it can grow or shrink dynamically.
+	Unlike ArrayList, it does not require resizing or memory copying since it doesn't rely on an underlying array.
+
+
+Example Visualization:
+----------------------
+Initial Empty List
+	Head -> null
+	Tail -> null
+
+Add Elements:
+	list.add("A");
+	list.add("B");
+	list.addFirst("C");
+Head -> [null <- Node(C) -> Node(A)] <-> [Node(C) <- Node(A) -> Node(B)] <-> [Node(A) <- Node(B) -> null] <- Tail
+
+Remove an Element:
+list.remove("A");
+Head -> [null <- Node(C) -> Node(B)] <-> [Node(C) <- Node(B) -> null] <- Tail
+
+
+
+-----------------------------------------------------------------------------------------
+Operation                  | Time Complexity | Explanation
+---------------------------|-----------------|-------------------------------------------
+Add at the start (addFirst)| O(1)           | Update pointers of the head node.
+Add at the end (addLast)   | O(1)           | Update pointers of the tail node.
+Add at a specific index    | O(n)           | Traverse to the position and update pointers (O(1)).
+Remove at the start        | O(1)           | Update head pointer and detach the first node.
+(removeFirst)              |                |
+Remove at the end          | O(1)           | Update tail pointer and detach the last node.
+(removeLast)               |                |
+Remove at a specific index | O(n)           | Traverse to the position and update pointers.
+Access an element by index | O(n)           | Traverse the list from the head or tail to reach the desired index.
+Iterate through the list   | O(n)           | Requires visiting each node sequentially.
+
+
 
 
 3. HashSet
-	Internal Data Structure: Hash Table (via HashMap)
-	Backed by a HashMap, where:
-		Keys represent the elements in the set.
-		Values are dummy objects (typically Boolean.TRUE).
-	Uses hash codes to store and retrieve elements efficiently.
+=============
+A HashSet is a collection in Java that ensures no duplicate elements and is fast for adding, removing, and checking elements.
+Internally, a HashSet uses a Hash Table via a HashMap.
+It calculates a hash code to decide where to store the element.
+It uses equals() to ensure no duplicate elements are added.
+Internal Data Structure: Hash Table (via HashMap)
 
-VisualRepresentations:
-======================
+
+HashSet uses a Hash Table via a HashMap: 
+	it means that the internal working of a HashSet is based on a HashMap.
+
+How Does HashSet Work with HashMap?
+	A HashSet does not maintain its own separate data structure; instead, it relies on a HashMap to store its elements. Here's how:
+
+	Every Element in a HashSet is a Key in a HashMap:
+		When you add an element to a HashSet, it is stored as a key in an internal HashMap.
+		The corresponding value in the HashMap is a dummy object (often Boolean.TRUE).
+
+	Hash Codes and Buckets:
+		The HashMap uses the hash code of the key (the element in the HashSet) to decide which bucket to use.
+		This mechanism ensures efficient storage and retrieval.
+
+	Ensuring Uniqueness:
+		Because a HashMap cannot have duplicate keys, the HashSet automatically ensures that duplicate elements are not adde.
+
+
+Bucket Visualization:
+Suppose we have 5 buckets (array size = 5):
+Buckets: [0]  [1]  [2]  [3]  [4]
+          ↑    ↑    ↑    ↑    ↑
+
+Adding Objects:
+	Add "Apple". hashCode("Apple") % 5 = 3, so "Apple" goes into bucket [3].
+	Add "Banana". hashCode("Banana") % 5 = 1, so "Banana" goes into bucket [1].
+	Add "Orange". hashCode("Orange") % 5 = 3, so "Orange" goes into bucket [3] (collision handled).
+After adding, it looks like:
+Buckets: [0]  [1: Banana]  [2]  [3: Apple -> Orange]  [4]
+
+
+What Happens When Adding Elements?
+	Add "Apple":
+	HashSet calls HashMap.put("Apple", Boolean.TRUE).
+	A hash code for "Apple" is computed.
+	"Apple" is stored in the appropriate bucket.
+
+Add "Banana":
+	HashSet calls HashMap.put("Banana", Boolean.TRUE).
+	A hash code for "Banana" is computed.
+	"Banana" is stored in another bucket.
+
+Add Duplicate "Apple":
+	HashSet calls HashMap.put("Apple", Boolean.TRUE) again.
+	HashMap finds that "Apple" already exists (using equals() and hash code).
+	"Apple" is not added again.
+
+
+How hashCode() and equals() Work Together:
+	hashCode(): Determines the bucket (the location in the hash table).
+		Two objects with the same hash code end up in the same bucket.
+	equals(): Compares two objects within the same bucket to check if they are the same element logically 
+	(even if they have the same hash code).
+		Only if the objects have the same hash code and equals() returns false, the new element is added.
+
+
+
+
+Features of HashSet:
+===================================================================================
+Feature                | Explanation
+-----------------------|-----------------------------------------------------------
+Unique Elements        | Ensures no duplicate elements by checking hashCode() and equals().
+Unordered Collection   | Does not guarantee any specific order of elements.
+Efficient Operations   | Add, remove, and search operations are average O(1) (constant time), assuming a good hash function.
+Null Support           | Allows a single null element since null has its own hash code and equality rules.
+
+
+Operations and Their Complexity:
+====================================================================================================
+Operation                   | Time Complexity | Explanation
+----------------------------|-----------------|--------------------------------------------------------
+Add an element (add)        | O(1) (average)  | Calculates the hash, finds the bucket, and inserts the key.
+Remove an element (remove)  | O(1) (average)  | Calculates the hash, finds the bucket, and removes the key.
+Check if exists (contains)  | O(1) (average)  | Calculates the hash, finds the bucket, and checks for existence.
+Iterate through elements    | O(n)            | Iterates over all the buckets and their elements.
+
+
 
 4. TreeSet
+======================
 	Internal Data Structure: Red-Black Tree (Self-Balancing Binary Search Tree)
 	Elements are stored in sorted order.
 	Operations like add, remove, and search maintain the tree's balance.
 
-VisualRepresentations:
-======================
+
+
 
 5. HashMap
+======================
+Internally uses a hash table (an array of buckets).
+Each bucket is a container for storing key-value pairs, and the location of the bucket is determined by the hash code of the key.
+
+Buckets: [0]  [1: Banana]  [2]  [3: Apple -> Orange]  [4] thias way
+
 	Internal Data Structure: Hash Table + Linked List (or TreeMap for collision handling)
-	Each key-value pair is stored in a "bucket."
-	Buckets are managed using a hash function.
-	For hash collisions:
-		In earlier Java versions, collisions were handled using a Linked List.
-		Since Java 8, buckets switch to a TreeMap structure when the number of elements exceeds a threshold (default: 8).
+		A HashMap stores key-value pairs where each key is associated with a value.
+		These pairs are organized in buckets, and each bucket's location is determined by a hash code.
+
+Adding a Key-Value Pair:
+	Let's say you add "A" -> 1 to the HashMap:
+	The hashCode() method calculates a hash value for "A".
+	The hash value is used to determine the bucket index.
+	If the bucket at that index is empty, the key-value pair is placed there.
+	If the bucket already has a key-value pair (collision), the equals() method is used to check if the existing key is the same as the new key. If not, the new key-value pair is added.
+
+Summary of Key Concepts:
+	Hash Table: Stores key-value pairs in buckets based on their hash code.
+	Buckets: Containers for key-value pairs, indexed by a hash value.
+	Collisions: Occur when multiple keys map to the same bucket.
+	Handling Collisions:
+			Before Java 8: Linked List.
+			After Java 8: TreeMap when the bucket exceeds a threshold.
+		Efficiency:
+			Before Java 8: Collisions were handled with linear search (Linked List).
+			After Java 8: TreeMap improves search efficiency with logarithmic time complexity.
+
+Keys in a HashMap must be unique.
+Values can be duplicate, i.e., multiple keys can have the same value.
+If you try to insert a duplicate key, the value will be overwritten with the new one.
+
+
+Example:
+	import java.util.HashMap;
+
+	public class Main {
+		public static void main(String[] args) {
+			HashMap<String, Integer> map = new HashMap<>();
+			
+			map.put("A", 1);  // Adds key "A" with value 1
+			map.put("B", 2);  // Adds key "B" with value 2
+			map.put("A", 10); // Updates the value for key "A" to 10
+
+			System.out.println(map); // Output: {A=10, B=2}
+		}
+	}
+
+
+
+
+
+
 
 VisualRepresentations: HashMap (with collisions)
-======================
+
 Bucket[0]: Node(key1, value1) -> Node(key2, value2)
 Bucket[1]: Node(key3, value3)
 Bucket[2]: Empty
 
 
+
+
 6. TreeMap
+======================
 	Internal Data Structure: Red-Black Tree
 	Keys are sorted based on their natural ordering or a custom comparator.
 
 VisualRepresentations:
-======================
+-------------------------
 
        10
       /  \
@@ -5588,13 +5846,14 @@ VisualRepresentations:
 
 
 7. PriorityQueue
+======================
 	Internal Data Structure: Binary Heap (Min-Heap by default)
 	Elements are arranged to maintain the heap property:
 		The smallest (or highest priority) element is at the root.
 		Child nodes have a value greater than or equal to their parent.
 
 VisualRepresentations:
-======================
+-------------------------
 
 8. ArrayDeque
 	Internal Data Structure: Resizable Array
