@@ -5758,9 +5758,133 @@ Iterate through elements    | O(n)            | Iterates over all the buckets an
 
 4. TreeSet
 ======================
-	Internal Data Structure: Red-Black Tree (Self-Balancing Binary Search Tree)
-	Elements are stored in sorted order.
-	Operations like add, remove, and search maintain the tree's balance.
+When you add elements to a TreeSet, they are automatically sorted based on their natural order (ascending order for Integer).
+
+Internal Data Structure: Red-Black Tree (Self-Balancing Binary Search Tree)
+Sorted Order: Elements are stored in ascending order by default.
+Unique Elements: No duplicates allowed.
+
+
+Sorted Order:
+	Elements in a TreeSet are stored in ascending order by default. This order can be customized by providing a Comparator when creating the set.
+	The set uses the natural ordering of elements or the specified comparator to determine the sorting order.
+
+Unique Elements:
+A TreeSet does not allow duplicate elements. Any duplicate insertion will be rejected.
+
+
+Here’s how it works step by step:
+	set.add(5):
+	The set initially is empty. The number 5 is added as the first element.
+	The set becomes: [5].
+
+	set.add(7):
+	The number 7 is added. Since 7 is greater than 5, it is placed after 5 in the sorted order.
+	The set becomes: [5, 7].
+
+	set.add(3):
+	Since 3 is less than both 5 and 7, it will be placed at the beginning of the set.
+	The set becomes: [3, 5, 7].
+
+
+Benefits:
+	Fast Operations: Logarithmic time complexity for add, remove, and search.
+	Sorted Elements: Automatically keeps elements ordered.
+
+
+Drawbacks:
+	Memory Overhead:
+		The Red-Black Tree structure adds some memory overhead compared to other simple collections like HashSet.
+	Slower than HashSet:
+		While operations are logarithmic, they are typically slower than the average constant-time performance 
+		of a HashSet due to the additional balancing operations required in a Red-Black Tree.
+
+
+
+VisualRepresentations:
+------------------------
+TreeSet: Step-by-Step Addition: Adding Order: 5, 7, 3, 4, 1, 9, 8, 10, 6
+
+     5
+    / \
+   3   7
+  / \  / \
+ 1   4 6  9
+           / \
+          8  10
+
+Initial Tree (Empty):
+(empty)
+Add 5:
+
+5 is added as the root.
+Tree:
+5
+Add 7:
+
+7 > 5, so it is added as the right child of 5.
+Tree:
+5
+ \
+  7
+Add 3:
+
+3 < 5, so it is added as the left child of 5.
+  5
+ / \
+3   7
+Add 4:
+
+4 < 5 and 4 > 3, so it is added as the right child of 3.
+  5
+ / \
+3   7
+ \
+  4
+Add 1:
+
+1 < 5 and 1 < 3, so it is added as the left child of 3.
+  5
+ / \
+3   7
+
+.......... and more
+
+
+
+Adding Order2 (string):
+Banana, Apple, Mango, Orange, Anar, Bamboo, Cat, Dog.
+
+Sorted Order will as:
+[Anar, Apple, Bamboo, Banana, Cat, Dog, Mango, Orange].
+
+
+Step-by-Step Addition:
+Add "Banana"
+"Banana" is added as the root.
+Tree:
+Copy code
+Banana
+Add "Apple"
+"Apple" < "Banana", so "Apple" is added as the left child of "Banana".
+
+
+
+
+Final Tree Structure:
+       Banana
+      /     \
+   Apple   Mango
+     \     /   \
+   Anar  Cat   Orange
+     \     \
+  Bamboo  Dog
+
+
+
+HashSet is generally faster than TreeSet because HashSet operations are constant time, 
+whereas TreeSet requires logarithmic time (O(log n)) for most operations due to its Red-Black Tree structure.
+
 
 
 
@@ -5770,7 +5894,11 @@ Iterate through elements    | O(n)            | Iterates over all the buckets an
 Internally uses a hash table (an array of buckets).
 Each bucket is a container for storing key-value pairs, and the location of the bucket is determined by the hash code of the key.
 
-Buckets: [0]  [1: Banana]  [2]  [3: Apple -> Orange]  [4] thias way
+Buckets: [0]  [1]  [2]  [3]  [4]
+          ↑    ↑    ↑    ↑    ↑
+Buckets: [0]  [1: Banana]  [2]  [3: Apple -> Orange]  [4]
+
+
 
 	Internal Data Structure: Hash Table + Linked List (or TreeMap for collision handling)
 		A HashMap stores key-value pairs where each key is associated with a value.
@@ -5814,12 +5942,6 @@ Example:
 		}
 	}
 
-
-
-
-
-
-
 VisualRepresentations: HashMap (with collisions)
 
 Bucket[0]: Node(key1, value1) -> Node(key2, value2)
@@ -5831,34 +5953,46 @@ Bucket[2]: Empty
 
 6. TreeMap
 ======================
-	Internal Data Structure: Red-Black Tree
-	Keys are sorted based on their natural ordering or a custom comparator.
+Internal Data Structure: Red-Black Tree (Self-Balancing Binary Search Tree).
+Keys Sorted: Keys are stored in a sorted order based on their natural ordering or a custom comparator.
+Operations: Provides operations like add, remove, search, and range queries on the keys.
 
-VisualRepresentations:
--------------------------
+A TreeMap stores key-value pairs, similar to other map implementations like HashMap or LinkedHashMap.
+The keys are sorted according to their natural ordering or a custom comparator.
+Values are associated with those keys and can be retrieved, updated, or removed based on the key.
 
-       10
-      /  \
-     5   20
-    / \    \
-   3   7    25
+Internal Sorting: The sorting of the keys (not the values) is done according to the natural ordering of the keys or 
+based on a custom comparator.
+
+
+How TreeMap works with key-value pairs:
+	Insertion: When you insert a key-value pair using put(key, value), the TreeMap places the key in its Red-Black 
+	Tree based on the sorted order of the key, while storing the corresponding value in that position.
+	Retrieval: When you retrieve a value using get(key), it performs a search in the Red-Black Tree for the specified key 
+	and returns the associated value.
+	Removal: When you remove a key-value pair using remove(key), it removes the key and its associated value from the Red-Black 
+	Tree, maintaining the sorted structure of the keys.
+
+Sorted by Key: TreeMap keeps the keys sorted. Values are not sorted, just paired with their keys.
+
+TreeMap is slower than HashMap, but it is useful when you need sorted keys or need to perform range queries.
+For faster lookups with no need for sorting, HashMap is the better choice.
 
 
 
 7. PriorityQueue
 ======================
-	Internal Data Structure: Binary Heap (Min-Heap by default)
-	Elements are arranged to maintain the heap property:
-		The smallest (or highest priority) element is at the root.
-		Child nodes have a value greater than or equal to their parent.
+Internal Data Structure: Binary Heap (Min-Heap by default)
+Elements are arranged to maintain the heap property:
+	The smallest (or highest priority) element is at the root.
+	Child nodes have a value greater than or equal to their parent.
 
-VisualRepresentations:
--------------------------
 
 8. ArrayDeque
-	Internal Data Structure: Resizable Array
-	Uses a circular array to implement a double-ended queue.
-	Automatically resizes when full.
+=====================
+Internal Data Structure: Resizable Array
+Uses a circular array to implement a double-ended queue.
+Automatically resizes when full.
 
 
 
