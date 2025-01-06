@@ -6448,8 +6448,8 @@ JVM performance tuning for large applications:  benchmark, Benchmark, BENCHMARK!
 =================================================
 ##thread | Java Thread Pool Optimization
 =================================================
-MediumLink:
-https://dip-mazumder.medium.com/how-to-determine-java-thread-pool-size-a-comprehensive-guide-4f73a4758273
+ThreadPool:
+https://blog.devops.dev/how-to-determine-java-thread-pool-size-a-comprehensive-guide-4f73a4758273
 
 
 A Java Thread is like a virtual CPU that can execute your Java code - inside your Java application. 
@@ -6458,26 +6458,135 @@ the Java VM to run your application.
 From inside your application you can create and start more threads which can execute parts of your 
 application code in parallel with the main thread.
 
+Mastering threads is essential for advanced programming in Java, especially in real-time or multi-tasking applications.
+
+
+In Java, threads can be either daemon or non-daemon:
+	Daemon threads depend on the main thread's life cycle and terminate when it does.
+	Non-daemon threads ensure that MyThread continues to run independently of the main thread.
+
+	In this example, MyThread is non-daemon, so the JVM will keep it running even after the main thread finishes:
+		MyThread thread = new MyThread();
+		thread.start();  // MyThread is a non-daemon thread by default
+
+	However, if you set MyThread as a daemon thread by calling thread.setDaemon(true); 
+	before start(), it will terminate when the main thread completes:
+		MyThread thread = new MyThread();
+		thread.setDaemon(true);  // Now MyThread will stop when the main thread finishes
+		thread.start();
 
 
 
 The Concept Of Multitasking:
 -------------------------------------
 Operating System accommodates users the privilege of multitasking, where users can perform multiple actions simultaneously 
-on the machine. This Multitasking can be enabled in two ways: 
-	Process-Based Multitasking 
-	Thread-Based Multitasking 
+on the machine. 
+Definition: A computer performs multiple tasks (like running apps, playing music, downloading files) simultaneously 
+by sharing its resources (CPU, memory, etc.) among different processes.
 
-1. Process-Based Multitasking (Multiprocessing)
-	In this type of Multitasking, processes are heavyweight and each process was allocated by a separate memory area. 
-	And as the process is heavyweight the cost of communication between processes is high and it takes a long time for 
-	switching between processes as it involves actions such as loading, saving in registers, updating maps, lists, etc. 
+How it Works:
+	The CPU switches rapidly between tasks, giving the impression that everything happens simultaneously.
+	This switching process is managed by the Operating System.
 
-2. Thread-Based Multitasking 
-	As we discussed above Threads are provided with lightweight nature and share the same address space, and the cost 
-	of communication between threads is also low. 
-	Thread communication between multiple threads at a Low Cost contributing to effective multi-tasking within 
-	a shared memory environment. 
+
+Type of Multitasking:
+---------------------------------------
+1. Preemptive Multitasking
+	Definition: The OS decides which task gets CPU time and can interrupt a running task to switch to another.
+	How it Works:
+		The CPU is allocated to a task for a short, fixed time (called a time slice).
+		After the time slice expires, the OS can preempt (interrupt) the current task and switch to another.
+	Advantages:
+		Fair sharing of CPU time among tasks.
+		Ensures that no single task monopolizes the CPU.
+	Examples:
+		Modern operating systems like Windows, Linux, macOS.
+
+2. Cooperative Multitasking
+	Definition: Tasks themselves decide when to give up control of the CPU.
+	How it Works:
+		A task runs until it voluntarily yields control (e.g., during I/O operations or at specific checkpoints).
+	Advantages:
+		Simpler to implement.
+	Disadvantages:
+		If a task does not yield control, other tasks are blocked.
+	Examples:
+	Early operating systems like Windows 3.x, Classic Mac OS.
+
+3. Process-Based Multitasking
+	Definition: The OS runs multiple processes (independent programs) at the same time.
+	Process-Based  do Context Switching as:
+		When the CPU switches from one process to another, it performs a context switch:
+		Saves the state of the current process.
+		Loads the state of the next process to be executed.
+		Context switching involves overhead but allows efficient multitasking.
+	How it Works:
+		Each process is assigned its own memory and resources.
+		The OS switches between processes to give the illusion of simultaneous execution.
+	Examples:
+	Running a browser, a text editor, and a video player concurrently.
+
+4. Thread-Based Multitasking
+	Definition: A single process is divided into multiple threads, which can run concurrently.
+	Threads are lightweight, smaller units of execution within a single process that share the same memory space but run independently.
+	How it Works:
+		Threads within the same process share memory and resources.
+		This allows faster context switching compared to process-based multitasking.
+	Examples:
+	A web browser where one thread handles user input while another fetches web pages.
+
+Key Concepts:
+	Process vs. Thread:
+		A process is an independent program with its own memory and resources.
+		A thread is a smaller unit within a process. It shares the process's memory, file descriptors, 
+		and resources but has its own execution path.
+		A process can contain one or more threads (multithreading).
+	Multithreading:
+		Multithreading is the ability of a CPU or a single process to manage multiple threads concurrently.
+		Threads can perform separate tasks simultaneously, such as reading data, processing it, and displaying output in parallel.
+
+
+How Thread-Based Multitasking Works:
+	Thread Creation:
+		A process starts with a single thread (main thread).
+		Additional threads can be created by the application or operating system.
+
+	Shared Resources:
+		All threads within the same process share the same memory and resources (e.g., heap, global variables).
+		Each thread has its own stack, program counter, and registers, enabling independent execution.
+
+	Scheduling:
+		Threads are scheduled by the operating system using thread schedulers.
+		On multicore processors, threads can run truly in parallel if sufficient cores are available.
+		On single-core systems, the OS switches rapidly between threads (time-slicing).
+
+	Communication:
+		Threads communicate via shared memory since they belong to the same process.
+		Proper synchronization (e.g., mutexes, semaphores) is needed to avoid race conditions and ensure thread safety.
+
+How Process-Based and Thread-Based Multitasking Act with Single-Core and Multi-Core CPUs:		
+	On a single-core CPU, both process-based and thread-based multitasking rely on rapid context switching, 
+	with threads being more efficient due to shared memory.
+
+	On a multi-core CPU, processes and threads can execute in parallel, improving performance. 
+	Threads are more lightweight and suitable for tasks requiring frequent communication, while processes provide 
+	better isolation and fault tolerance.
+
+
+5. Asynchronous Multitasking
+	Definition: Tasks are executed without waiting for other tasks to complete.
+	How it Works:
+		The OS manages tasks that can run independently, such as I/O operations.
+		While one task waits (e.g., for file read), the CPU is assigned to another task.
+	Examples:
+	Reading a file while downloading a webpage.
+
+6. Real-Time Multitasking
+	Definition: The OS prioritizes tasks that must meet strict timing constraints.
+	How it Works:
+		Tasks are scheduled to ensure critical tasks are executed within a deadline.
+	Examples:
+	Embedded systems in medical devices, automotive control systems.
 
 
 
@@ -6508,51 +6617,21 @@ Life Cycle Of Thread:
 		The thread completes its task and dies.A terminated Thread means it is dead and no longer available.
 
 
-Example a thread's life cycle:
-class MyThread extends Thread {
-    @Override
-    public void run() {
-        System.out.println("Thread is running...");
-        try {
-            Thread.sleep(1000); // Thread enters Timed Waiting state
-        } catch (InterruptedException e) {
-            System.out.println("Thread interrupted");
-        }
-        System.out.println("Thread finished execution.");
-    }
-}
-
-public class ThreadLifecycleExample {
-    public static void main(String[] args) {
-        MyThread thread = new MyThread(); // Thread is in New state
-        thread.start();                   // Thread enters Runnable state
-        try {
-            thread.join();                // Main thread waits for this thread to finish
-        } catch (InterruptedException e) {
-            System.out.println("Main thread interrupted");
-        }
-        System.out.println("Main thread finished.");
-    }
-}
-The thread goes through New, Runnable, Timed Waiting (during sleep()), and Terminated states.
-The main thread uses join() to wait, showing a typical use of the Waiting state
+Thread Control Methods:
+	start(): Starts the thread.
+	run(): Contains the thread's task (invoked automatically by start()).
+	sleep(milliseconds): Pauses the thread for a specified time.
+	join(): Waits for a thread to finish before proceeding.
+	yield(): Suggests to the scheduler to let other threads execute.
+	interrupt(): Signals a thread to stop, typically used for cleanup before termination.
 
 
 
-In Java, threads can be either daemon or non-daemon:
-	Non-daemon threads ensure that MyThread continues to run independently of the main thread.
-	Daemon threads depend on the main thread's life cycle and terminate when it does.
-
-	In this example, MyThread is non-daemon, so the JVM will keep it running even after the main thread finishes:
-		MyThread thread = new MyThread();
-		thread.start();  // MyThread is a non-daemon thread by default
-
-	However, if you set MyThread as a daemon thread by calling thread.setDaemon(true); 
-	before start(), it will terminate when the main thread completes:
-		MyThread thread = new MyThread();
-		thread.setDaemon(true);  // Now MyThread will stop when the main thread finishes
-		thread.start();
-
+Challenges in Using Threads:
+	Thread Synchronization: Preventing multiple threads from accessing shared resources simultaneously to avoid conflicts.
+		Use synchronized keyword or Lock objects.
+	Deadlocks: Threads get stuck waiting for each other indefinitely.
+	Complexity: Debugging and maintaining multithreaded programs can be challenging.
 
 
 
@@ -6717,12 +6796,10 @@ Starting a Thread With a Runnable:
 Thread Start Timing(Thread not folwo sequece as it write in code):
 ----------------------------------
 Thread Scheduler:The JVM relies on the operating system's thread scheduler to manage thread execution.
-When you call start() on a thread, it doesn’t immediately mean that the thread will begin executing right away. Instead, it transitions to the runnable state and waits for the JVM to allocate CPU time to it.
-Thread 3 may not always start first because, after calling start() on it, the JVM may choose to run Thread 1 or Thread 2 first, depending on the current state of the system.
-
-
-
-
+When you call start() on a thread, it doesn’t immediately mean that the thread will begin executing right away. 
+Instead, it transitions to the runnable state and waits for the JVM to allocate CPU time to it.
+Thread 3 may not always start first because, after calling start() on it, the JVM may choose to run Thread 1 or Thread 2 first, 
+depending on the current state of the system.
 
 
  Determining the number of CPU cores available on your server:
@@ -6733,7 +6810,8 @@ Thread 3 may not always start first because, after calling start() on it, the JV
  -I/O Intensive Tasks:
 
 
-CPU-intensive tasks are those that require a lot of processing power, such as performing complex calculations or running simulations. These tasks are often limited by the speed of the CPU, rather than the speed of the I/O device.
+CPU-intensive tasks are those that require a lot of processing power, such as performing complex calculations or running simulations.
+These tasks are often limited by the speed of the CPU, rather than the speed of the I/O device.
 	Encoding or decoding audio or video files
 	Compiling and linking software
 	Running complex simulations
@@ -6743,7 +6821,8 @@ CPU-intensive tasks are those that require a lot of processing power, such as pe
 	Multi-threading and parallelism: Parallel processing is a technique used to divide a larger task into smaller subtasks and distribute these subtasks across multiple CPU cores or processors to take advantage of concurrent execution and improve overall performance
 
 
-IO-intensive tasks are those that interact with storage devices (e.g., reading/writing files), network sockets (e.g., making API calls), or user input (e.g., user interactions in a graphical user interface).
+IO-intensive tasks are those that interact with storage devices (e.g., reading/writing files), 
+network sockets (e.g., making API calls), or user input (e.g., user interactions in a graphical user interface).
 	Reading or writing large files to disk (e.g., saving a video file, loading a database)
 	Downloading or uploading files over the network (e.g., browsing the web, watching a streaming video)
 	Sending and receiving email
@@ -6770,7 +6849,9 @@ For CPU Intensive Tasks:
 	which can lead to excessive context switching. A common rule of thumb is to use the number of CPU cores available
 
 	Real-Life Example: Video Encoding
-	Imagine you’re developing a video processing application. Video encoding is a CPU-bound task where you need to apply complex algorithms to compress a video file. You have a multi-core CPU available.
+	Imagine you’re developing a video processing application. 
+	Video encoding is a CPU-bound task where you need to apply complex algorithms to compress a video file. 
+	You have a multi-core CPU available.
 
 	Determining the Number of Threads for CPU-Bound Tasks:
 	Count Available CPU Cores: Use Runtime.getRuntime().availableProcessors() in Java to determine the number of available 
@@ -6809,14 +6890,20 @@ public class VideoEncodingApp {
 
 
 For I/O Intensive Tasks:
-	For I/O-bound tasks, the optimal number of threads is often determined by the nature of the I/O operations and the expected latency. You want to have enough threads to keep the I/O devices busy without overloading them. The ideal number may not necessarily be equal to the number of CPU cores.
+	For I/O-bound tasks, the optimal number of threads is often determined by the nature of the I/O operations and the expected latency.
+	You want to have enough threads to keep the I/O devices busy without overloading them. 
+	The ideal number may not necessarily be equal to the number of CPU cores.
 
 	Real-Life Example: Web Page Crawling
-	Consider building a web page crawler that downloads web pages and extracts information. This involves making HTTP requests, which are I/O-bound tasks due to network latency.
+	Consider building a web page crawler that downloads web pages and extracts information. 
+	This involves making HTTP requests, which are I/O-bound tasks due to network latency.
 
 	Determining the Number of Threads for I/O-Bound Tasks:
-	Analyze I/O Latency: Estimate the expected I/O latency, which depends on the network or storage. For example, if each HTTP request takes around 500 milliseconds to complete, you may want to accommodate for some overlap in I/O operations.
-	Create Thread Pool: Create a thread pool with a size that balances parallelism with the expected I/O latency. You don’t necessarily need one thread per task; instead, you can have a smaller pool that efficiently manages I/O-bound tasks.
+	Analyze I/O Latency: Estimate the expected I/O latency, which depends on the network or storage. 
+	For example, if each HTTP request takes around 500 milliseconds to complete, you may want to accommodate 
+	for some overlap in I/O operations.
+	Create Thread Pool: Create a thread pool with a size that balances parallelism with the expected I/O latency. 
+	You don’t necessarily need one thread per task; instead, you can have a smaller pool that efficiently manages I/O-bound tasks.
 
 
 import java.util.concurrent.ExecutorService;
@@ -6861,15 +6948,20 @@ public class WebPageCrawler {
 Can We Follow a Concrete Formula?
 The formula for determining thread pool size can be written as follows:
 	Number of threads = Number of Available Cores * Target CPU utilization * (1 + Wait time / Service time)
-	Number of Available Cores: This is the number of CPU cores available to your application. It is important to note that this is not the same as the number of CPUs, as each CPU may have multiple cores.
+	Number of Available Cores: This is the number of CPU cores available to your application. 
+	It is important to note that this is not the same as the number of CPUs, as each CPU may have multiple cores.
 
 
-Target CPU utilization: This is the percentage of CPU time that you want your application to use. If you set the target CPU utilization too high, your application may become unresponsive. If you set it too low, your application will not be able to fully utilize the available CPU resources.
-Wait time: This is the amount of time that threads spend waiting for I/O operations to complete. This can include waiting for network responses, database queries, or file operations.
+Target CPU utilization: This is the percentage of CPU time that you want your application to use. 
+If you set the target CPU utilization too high, your application may become unresponsive. 
+If you set it too low, your application will not be able to fully utilize the available CPU resources.
+Wait time: This is the amount of time that threads spend waiting for I/O operations to complete. 
+This can include waiting for network responses, database queries, or file operations.
 
 Service time: This is the amount of time that threads spend performing computation.
-
-Blocking coefficient: This is the ratio of wait time to service time. It is a measure of how much time threads spend waiting for I/O operations to complete relative to the amount of time they spend performing computation.
+Blocking coefficient: This is the ratio of wait time to service time. 
+It is a measure of how much time threads spend waiting for I/O operations to complete relative to the amount of 
+time they spend performing computation.
 
 
 
@@ -6878,15 +6970,18 @@ Example Usage:
 
 	Your application has two classes of tasks: I/O-intensive tasks and CPU-intensive tasks.
 
-	The I/O-intensive tasks have a blocking coefficient of 0.5, meaning that they spend 50% of their time waiting for I/O operations to complete.
+	The I/O-intensive tasks have a blocking coefficient of 0.5, meaning that they spend 50% of their 
+	time waiting for I/O operations to complete.
 
 	Number of threads = 4 cores * 0.5 * (1 + 0.5) = 3 threads
 
-	The CPU-intensive tasks have a blocking coefficient of 0.1, meaning that they spend 10% of their time waiting for I/O operations to complete.
+	The CPU-intensive tasks have a blocking coefficient of 0.1, meaning that they spend 10% of their time waiting 
+	for I/O operations to complete.
 
 	Number of threads = 4 cores * 0.5 * (1 + 0.1) = 2.2 threads
 
-	In this example, you would create two thread pools, one for the I/O-intensive tasks and one for the CPU-intensive tasks. The I/O-intensive thread pool would have 3 threads and the CPU-intensive thread pool would have 2 threads.
+	In this example, you would create two thread pools, one for the I/O-intensive tasks and one for the CPU-intensive tasks. 
+	The I/O-intensive thread pool would have 3 threads and the CPU-intensive thread pool would have 2 threads.
 
 
 
