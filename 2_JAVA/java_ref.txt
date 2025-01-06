@@ -6591,12 +6591,12 @@ How Process-Based and Thread-Based Multitasking Act with Single-Core and Multi-C
 
 
 Life Cycle Of Thread:
+---------------------------------------
 	New State
 	Active State
 	Waiting/Blocked State
 	Timed Waiting State
 	Terminated State
-
 
 	New: 
 		By default, a Thread will be in a new state,  in this state, code has not yet been run and the execution 
@@ -6635,8 +6635,8 @@ Challenges in Using Threads:
 
 
 
-How thread work:
-=============================================
+How Thread-safe work:
+------------------------------------------
 Thread-safe:
 	Thread-safe in Java means that a piece of code, object, or class can be safely accessed or modified by 
 	multiple threads simultaneously without leading to race conditions or data corruption. 
@@ -6669,47 +6669,40 @@ Thread-Safe Mechanisms:
 	Static Synchronization: Used for class-level synchronization.
 
 2. Volatile Keyword
-The volatile keyword ensures visibility of changes to a variable across threads without locking.
+	The volatile keyword ensures visibility of changes to a variable across threads without locking.
 
 3. Atomic Variables
-Classes in the java.util.concurrent.atomic package (e.g., AtomicInteger, AtomicLong) provide low-level thread-safe 
-operations without explicit synchronization.
+	Classes in the java.util.concurrent.atomic package (e.g., AtomicInteger, AtomicLong) provide low-level thread-safe 
+	operations without explicit synchronization.
 
 4. Lock Mechanism
-Locks provide explicit control over thread synchronization, allowing more flexibility than synchronized.
+	Locks provide explicit control over thread synchronization, allowing more flexibility than synchronized.
 
 5. Thread-Safe Collections
-Collections in java.util.concurrent (e.g., ConcurrentHashMap, CopyOnWriteArrayList) are designed for concurrent access 
-by multiple threads.
+	Collections in java.util.concurrent (e.g., ConcurrentHashMap, CopyOnWriteArrayList) are designed for concurrent access 
+	by multiple threads.
 
-Example: ConcurrentHashMap
-	Allows multiple threads to read and write without blocking each other.
-	Uses bucket-level locking (a fine-grained locking mechanism) for better performance.
+	Example: ConcurrentHashMap
+		Allows multiple threads to read and write without blocking each other.
+		Uses bucket-level locking (a fine-grained locking mechanism) for better performance.
 
 6. Immutable Objects
-Immutable objects are inherently thread-safe because their state cannot be changed after creation.
+	Immutable objects are inherently thread-safe because their state cannot be changed after creation.
 
 7. Thread Coordination
-Thread coordination ensures threads work in harmony using constructs like:
-wait(), notify(), and notifyAll(): These methods enable threads to communicate and synchronize actions.
-
+	Thread coordination ensures threads work in harmony using constructs like:
+	wait(), notify(), and notifyAll(): These methods enable threads to communicate and synchronize actions.
 
 How It Works:
 	When a thread enters a synchronized block/method, it acquires a lock (monitor) on the object.
 	Other threads trying to access synchronized code must wait until the lock is released.
 	This prevents concurrent modifications and ensures data consistency.
 
-Summary:
-	Without Thread Safety: Simultaneous modifications to a List by multiple threads can cause data inconsistencies and runtime exceptions.
-	Thread-Safe Solutions:
-	Use Collections.synchronizedList for basic synchronization.
-	Use CopyOnWriteArrayList for better performance in read-heavy situations.
 
 
 
-
-
-
+Thread Ops
+----------------------------------------------------
 There are two ways to create a thread:
 	By extending Thread class
 	By implementing Runnable interface.
@@ -6718,10 +6711,14 @@ There are two ways to create a thread:
 	thread.start();
 
 This example doesn't specify any code for the thread to execute. Therfore the thread will stop again right away after it is started.
-There are two ways to specify what code the thread should execute. 
+This start() method begins the execution of the run() method in a new thread.
 
-The first is to create a subclass of Thread and override the run() method. 
-The second method is to pass an object that implements Runnable (java.lang.Runnable to the Thread constructor.
+There are two ways to specify what code the thread should execute:
+	The first is to create a subclass of Thread and override the run() method. 
+	You can create a custom thread by extending the Thread class and overriding its run() method.
+
+	The second method is to pass an object that implements Runnable (java.lang.Runnable to the Thread constructor.
+
 
 Thread Subclass:
 ------------------------------------------
@@ -6739,11 +6736,9 @@ You can also create an anonymous subclass of Thread like this:
       System.out.println("Thread Running");
     }
   }
+thread.start();
 
-  thread.start();
 
-The start() call will return as soon as the thread is started. It will not wait until the run() method is done. 
-The run() method will execute as if executed by a different CPU.
 
 
 
@@ -6758,7 +6753,6 @@ There are three ways to implement the Runnable interface:
 	Create an anonymous class that implements the Runnable interface.
 	Create a Java Lambda that implements the Runnable interface.
 
-
 Java Class Implements Runnable
   public class MyRunnable implements Runnable {
 
@@ -6767,20 +6761,19 @@ Java Class Implements Runnable
     }
   }
 
+
 Anonymous Implementation of Runnable
+	Runnable myRunnable =
+		new Runnable(){
+			public void run(){
+				System.out.println("Runnable running");
+			}
+		}
 
-Runnable myRunnable =
-    new Runnable(){
-        public void run(){
-            System.out.println("Runnable running");
-        }
-    }
 
-
-Java Lambda Implementation of Runnable	
-
-Runnable runnable =
-        () -> { System.out.println("Lambda Runnable running"); };
+Java Lambda Implementation of Runnable		
+	Runnable runnable =
+			() -> { System.out.println("Lambda Runnable running"); };
 
 
 
@@ -6788,6 +6781,160 @@ Starting a Thread With a Runnable:
 	Runnable runnable = new MyRunnable(); // or an anonymous class, or lambda...
 	Thread thread = new Thread(runnable);
 	thread.start();
+
+
+
+
+Memory Managing by Thread
+-------------------------------------------
+Java threads are managed by the Java Virtual Machine (JVM). Each thread is allocated a stack and shares the heap 
+memory with other threads.
+	Stack Memory: Each thread has its own stack that stores method calls, local variables, and partial results. 
+	This is where the thread's execution occurs.
+
+	Heap Memory: All threads share this memory, which holds the dynamic objects (objects created with new keyword) 
+	accessible by any thread.
+
+Thread Memory Management:
+	Creating a Thread: The thread consumes memory for its stack.
+	Thread Execution: While running, the thread consumes CPU time and shares memory with other threads.
+	Thread Termination: When a thread finishes its execution, its stack is cleaned up and the memory is freed.
+
+
+
+Thread Pools in Java
+-------------------------------
+A Thread Pool is a collection of worker threads used to perform a number of tasks in parallel. 
+Instead of creating new threads for every task, you reuse threads from the pool, which improves performance and resource management.
+
+
+Creating a Thread Pool (Using ExecutorService):
+	The ExecutorService interface provides a simple way to manage a pool of threads. 
+	You can create a thread pool using the Executors utility class.
+
+Example:
+	import java.util.concurrent.*;
+
+	public class Main {
+		public static void main(String[] args) {
+			// Create a thread pool with 3 threads
+			ExecutorService executor = Executors.newFixedThreadPool(3);
+
+			// Submit tasks to the executor
+			executor.submit(() -> {
+				System.out.println("Task 1 is running");
+			});
+			executor.submit(() -> {
+				System.out.println("Task 2 is running");
+			});
+			executor.submit(() -> {
+				System.out.println("Task 3 is running");
+			});
+
+			// Shutdown the executor after tasks are done
+			executor.shutdown();
+		}
+	}
+
+Executors.newFixedThreadPool(int) creates a pool with a fixed number of threads.
+submit() schedules a task for execution in the pool.
+shutdown() gracefully shuts down the thread pool when all tasks are completed.
+
+
+Use Case of Thread Pool:
+-------------------------------------
+Example: Handling Web Requests in a Server
+	A server might handle multiple incoming requests. Instead of creating a new thread for each request, 
+	a thread pool can be used to reuse threads, ensuring the server handles a large number of requests 
+	efficiently without running out of resources.
+
+Exmaple:
+import java.util.concurrent.*;
+
+public class WebServer {
+    private ExecutorService threadPool;
+
+    public WebServer(int numThreads) {
+        threadPool = Executors.newFixedThreadPool(numThreads);
+    }
+
+    public void handleRequest(Runnable request) {
+        threadPool.submit(request);
+    }
+
+    public void shutdown() {
+        threadPool.shutdown();
+    }
+
+    public static void main(String[] args) {
+        WebServer server = new WebServer(10); // Pool with 10 threads
+
+        // Simulate handling 1000 requests
+        for (int i = 1; i <= 1000; i++) {
+            server.handleRequest(() -> {
+                System.out.println("Processing request: " + Thread.currentThread().getName());
+            });
+        }
+
+        server.shutdown();
+    }
+}
+
+Here, the server can handle up to 10 requests concurrently, thanks to the thread pool. 
+Once the requests are done, the threads are returned to the pool for reuse.
+
+
+
+
+Thread Exceptions handeling in Java
+----------------------------------------
+Threads run independently, so managing exceptions in multi-threaded applications can be tricky. Each thread can throw exceptions that should be handled properly to avoid the program crashing.
+
+1. Handling Exceptions in run() Method
+The run() method doesn't throw checked exceptions, so they must be handled within the method.
+Exmaple:
+class MyThread extends Thread {
+    public void run() {
+        try {
+            int result = 10 / 0;  // This will cause an ArithmeticException
+        } catch (Exception e) {
+            System.out.println("Exception in thread: " + e.getMessage());
+        }
+    }
+}
+
+public class Main {
+    public static void main(String[] args) {
+        MyThread t1 = new MyThread();
+        t1.start();
+    }
+}
+
+
+2. Using UncaughtExceptionHandler
+If a thread throws an uncaught exception, you can set an uncaught exception handler to catch and handle those exceptions globally.
+This handler will catch any uncaught exceptions thrown by the threads.
+
+Exmaple:
+class MyThread extends Thread {
+    public void run() {
+        throw new RuntimeException("Something went wrong!");
+    }
+}
+
+public class Main {
+    public static void main(String[] args) {
+        Thread.setDefaultUncaughtExceptionHandler((t, e) -> {
+            System.out.println("Uncaught exception in thread: " + t.getName() + " -> " + e.getMessage());
+        });
+
+        MyThread t1 = new MyThread();
+        t1.start();
+    }
+}
+
+
+
 
 
 
