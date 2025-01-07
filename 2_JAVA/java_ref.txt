@@ -7941,6 +7941,30 @@ OpenTelemetry:
 	features and standards. It also creates spans and traces to represent and monitor distributed systems. 
 	However, it is designed as a vendor-neutral and extensible standard for observability, covering tracing, metrics, and logs.
 
+Key Features:
+	Automatic Instrumentation:
+	Automatically instruments popular Java libraries and frameworks like Spring, Hibernate, Kafka, etc., without requiring code changes.
+	Captures distributed traces, spans, and context propagation across services.
+
+	Manual Instrumentation:
+	Developers can use OpenTelemetry SDK APIs to manually create spans, traces, and metrics for custom application logic.
+
+	Context Propagation:
+	Ensures that context (like trace IDs) is propagated correctly across threads, services, and libraries using W3C Trace Context standards.
+
+	Exporters:
+	Supports multiple backends like Jaeger, Zipkin, Prometheus, and vendor-specific platforms for exporting telemetry data.
+
+Example:
+	Using OpenTelemetry Java Instrumentation with a Spring Boot application:
+	java -javaagent:opentelemetry-javaagent.jar \
+		-Dotel.exporter.otlp.endpoint=http://collector:4317 \
+		-jar my-springboot-app.jar
+
+This setup automatically instruments the Spring Boot application, collects telemetry data, and exports it to an OpenTelemetry Collector.
+
+
+
 1. Trace:
 	A trace tracks the entire journey of a request through multiple services.
 	Example Object:
