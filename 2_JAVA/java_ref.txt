@@ -8030,12 +8030,52 @@ Exporters                        Multiple (Jaeger, Zipkin, etc.)       Limited t
 
 
 
+Start With Docker
+================================================= 
+
+With Java Agent
+------------------------------------------
+Download the OpenTelemetry Java Agent
+wget https://github.com/open-telemetry/opentelemetry-java-instrumentation/releases/download/v1.29.0/opentelemetry-javaagent.jar
+
+docker run -d --name jaeger \
+  -e COLLECTOR_ZIPKIN_HTTP_PORT=9411 \
+  -p 5775:5775/udp \
+  -p 6831:6831/udp \
+  -p 6832:6832/udp \
+  -p 5778:5778 \
+  -p 16686:16686 \
+  -p 14268:14268 \
+  -p 14250:14250 \
+  -p 9411:9411 \
+  jaegertracing/all-in-one:latest
 
 
 
-https://reflectoring.io/spring-boot-tracing/
+java -javaagent:./opentelemetry-javaagent.jar \
+  -Dotel.service.name=spring-boot-app \
+  -Dotel.exporter.otlp.endpoint=http://localhost:4317 \
+  -Dotel.traces.exporter=jaeger \
+  -jar ./integration-svc1-0.0.1-SNAPSHOT.jar
 
-https://grafana.com/blog/2022/05/04/how-to-capture-spring-boot-metrics-with-the-opentelemetry-java-instrumentation-agent/
+
+
+
+
+
+
+
+
+Start Jaeger with Docker:
+docker pull jaegertracing/all-in-one:latest
+
+docker run -d --name jaeger -e COLLECTOR_OTLP_ENABLED=true -p 16686:16686 -p 4317:4317 jaegertracing/all-in-one:latest
+
+
+Run OpenTelemetry Collector (Optional)
+
+docker run -d --name otel-collector -p 4317:4317 -p 55681:55681 otel/opentelemetry-collector:latest
+
 
 
 
