@@ -74,6 +74,436 @@ Use StringBuilder or StringBuffer for concatenation in loops.
 
 
 
+=================================================
+@@##ex-solution
+=================================================  
+https://www.datacamp.com/blog/top-sql-interview-questions-and-answers-for-beginners-and-intermediate-practitioners
+https://www.interviewbit.com/sql-interview-questions/
+
+
+
+
+================================================= 
+##Enosis exam
+================================================= 
+Problem solving
+Java basics
+SQL basics
+JavaScript basics
+
+expire on 25 Dec 2024 11:59 PM +06 (Asia - Dhaka). 90 mins from the time you start.
+
+
+
+
+Basic programming, analytical, testing and debugging questions 
+1. Find the duplicates elements among arrays. 
+
+String right alignment , 
+Map Vector Tree related problems.You are asked to write the code for 
+right-aligning a text in a text-box.
+
+
+
+1. Reverse string ( input=abc, output=cba) 
+3. Check duplicate elements... etc Testing Question: 
+1. They will give a picture of a software and tell you to find the testing features 
+2. Finding errors from code
+
+
+
+ (1) Write a function that will receive a string as an input and will return the string in reverse order. 
+ (2) Write a function that will print the following series of numbers using only one loop: "1,2,3,4,5,6,7,8,9,10,9,8,7,6,5,4,3,2,1" 
+ (3) Write a function that will print all the multiples of 3 between 1-200 ( in reverse order ) There were other programming questions as well but of the same difficulty level.
+ 
+4. print multiples of 3 from 200 to 1 etc coding test : give a window size .
+
+ 
+1. there is some basic questions from math like simple probability finding, finding age of father from son's age, angle finding, perimeter, circle related problem. very easy questions. it may have 1-2 mcq. 2. Then there is coding questions. first questions will be - what are the basic concepts of OOP and write a code to implement them. after this there will be some coding problem- like string reverse etc. 
+
+sql queries:
+	find the max, 2nd max salary, swap two columns of two table etc. 
+	
+	practice some query. it may have 1-2 mcq. 4. then there will be questions from QA. like difference among white,black, gray box testing. 
+	then there will be picture find out diff in those pictures, then there will be some scenario - you have to write how will you test it or how you will you improve it. 
+	very easy questions. write as your wish. last questions will be what is your most memorable achievement,
+ 
+ 
+ Write code of 1st 100 Prime number series, Fibonnaci series. Testing related questions.
+ 
+ 
+
+
+
+=================================================================
+##javaScript
+=================================================================
+https://builtin.com/software-engineering-perspectives/javascript-interview-questions
+
+
+
+<html>
+<style>
+h2 {
+  color: red;
+}
+
+.pcls {
+  text-align: right;
+  color: red;
+}
+</style>
+<body>
+
+
+<h1 id="hid1">Hello </h1>
+
+<h2 id="hid1">Hello </h2>
+
+<p class="pcls">This is simple prapgrap</p>
+
+<p id="p2id" style="color: red"></p>
+
+<div id="p3id"></div>
+
+<input type="text" id="inpid"></input>
+
+<button id="btn1">ClickMe</button>
+
+
+
+<script>
+
+console.log("app ready=============");
+
+const btn1 = document.getElementById("btn1");
+const p2 = document.getElementById("p2id");
+
+
+btn1.addEventListener("click", function(){
+      var text = document.getElementById("inpid").value;
+      console.log(text);
+      document.getElementById("p2id").innerText=text;
+      
+      document.getElementById("p3id").innerHTML='<h1>'+text+'</h1>';
+});
+
+
+
+</script>
+</body>
+</html>
+
+
+
+
+
+
+Loop:
+------------
+let rsVal = 0;
+let incCal = 1;
+
+for( let i=1; i<=19; i++){
+    if(rsVal==10){
+      incCal=-1;
+    }
+    rsVal+=incCal;
+    console.log(rsVal);
+}
+
+
+----------
+
+let myArr = [2,3,3,4,5,5,6,7,7]
+let dupArr = [];
+let mySet = new Set();
+let myStr = 'Md Imran Hossain';
+
+console.log(myStr.split(" "))
+
+myArr.forEach(item => {
+  // console.log(item);
+});
+
+for(myit of myArr){
+  mySet.add(myit);
+}
+
+let uniqArr = [...mySet];
+console.log(uniqArr);
+
+let duplicates = myArr.filter((item, index) => myArr.indexOf(item) !== index);
+console.log(duplicates);
+
+
+    
+
+
+
+=================================================================
+Mysql
+==================================================================
+SqL:
+select floor(avg(price)) from book
+select truncate(avg(price),3) from book
+select round(avg(price),2) from book
+
+StringOps:
+select reverse(name) from book
+select lpad(name,100,"*") from book
+select repeat(name,10) from book
+select LOCATE("g",name) from book
+select distinct type from book
+
+
+
+
+
+1) price is maximum:
+select max(price) as maxData from book;
+
+select * from book
+where price=(select max(price) from book)
+
+
+
+2)Find the Second Maximum Salary	
+select max(price) as maxData from book
+where price<(select max(price) from book)
+
+select * from book
+order by price desc
+limit 1 offset 1;
+
+select * from book
+order by id desc
+limit 1 offset 2
+
+
+3)Find Employees Who Earn More Than the Average Salary
+select * from book
+where price> (select avg(price) from book)
+
+
+GroupBy:
+select type, count(id) from book
+group by type
+
+
+select depid, count(depid) from std_tbl
+group by depid
+
+
+select type, count(id), max(price) from book
+group by type
+
+
+
+SELECT type, GROUP_CONCAT(name SEPARATOR ', ') as names, COUNT(*) as count 
+FROM book 
+GROUP BY type;
+
+
+
+
+addColumn:
+ALTER TABLE std_tbl ADD COLUMN depid INT;
+alter table std_tbl add column dep int default 1;
+
+alter table std_tbl drop column depid2;
+
+
+
+Update:
+update std_tbl set dep=2 where id in (1,2,3)
+update std_tbl set dep=2 where id between 1 and 10 
+
+
+
+select * from std_tbl 
+where gender like 'M%'
+
+SwapColumnDametabl:
+UPDATE std_tbl
+SET
+ bookid = (@temp := bookid),
+ bookid=depid,
+ depid=@temp
+ where id =1
+ 
+
+
+UPDATE employees
+SET salary = salary * 1.10
+WHERE department = 'Sales';
+
+
+
+##sql - SQL basics
+=================================================================
+ROUND(): Rounds to the nearest value, based on the fractional part.
+TRUNCATE(): Removes the fractional part, without rounding.
+FLOOR(): Always rounds down to the nearest integer less than or equal to the number.
+
+
+
+SELECT LOWER(name) AS lowercase_name 
+FROM book;
+
+
+SELECT LENGTH(name) AS name_length 
+FROM book;
+
+
+SELECT REVERSE(name) AS reversed_name 
+FROM book;
+
+
+
+sedondLeargetvalue:
+------------------------
+select max(id) as secondLg from book
+where id<(select max(id) from book)
+
+select * from book
+order by id desc
+limit 1 offset 1;
+
+Leargest
+select max(id) as secondLg from book
+
+select * from book
+order by id desc
+limit 1;
+
+
+
+
+
+
+	
+select COUNTRY.Continent, floor(avg(CITY.Population))
+from city
+join country on
+CITY.CountryCode = COUNTRY.Code 
+group by COUNTRY.Continent
+
+
+
+select round(LONG_W, 4) from  station
+where lat_n=
+(select min(lat_n) from station where  lat_n>38.7780)
+
+
+
+
+select round((long_w), 4) from station
+where 
+    lat_n=
+    (select max(lat_n) from station where lat_n<137.2345)
+    
+    
+    
+
+select TRUNCATE(max(lat_n),4) as GreatestLatitude
+from station
+where lat_n<137.2345
+
+
+
+select round(sum(lat_n),4) from station
+where lat_n>38.7880 and lat_n<137.2345
+
+
+
+
+select floor(avg(population)) from city;
+
+
+
+SELECT * FROM Customers WHERE CustomerID IN (SELECT CustomerID FROM Orders);
+
+
+
+(SELECT CITY, LENGTH(CITY) AS CITY_LENGTH
+ FROM STATION
+ WHERE LENGTH(CITY) = (SELECT MIN(LENGTH(CITY)) FROM STATION)
+ ORDER BY CITY
+ LIMIT 1)
+ 
+UNION ALL
+ 
+(SELECT CITY, LENGTH(CITY) AS CITY_LENGTH
+ FROM STATION
+ WHERE LENGTH(CITY) = (SELECT MAX(LENGTH(CITY)) FROM STATION)
+ ORDER BY CITY
+ LIMIT 1);
+
+
+
+select distinct city from station
+where 
+lower(left(city,1)) not in ('a', 'e', 'i', 'o', 'u')
+
+
+
+
+SELECT NAME
+FROM STUDENTS
+WHERE MARKS > [Marks]
+ORDER BY RIGHT(NAME, 3), ID ASC;
+
+
+
+select sum(population) from city
+where 
+district='California'
+
+
+
+
+BACKUP DATABASE testDB
+TO DISK = 'D:\backups\testDB.bak';
+
+
+
+
+
+Give some examples of common SQL commands of each type.
+	DDL: CREATE, ALTER TABLE, DROP, TRUNCATE, and ADD COLUMN
+	DML: UPDATE, DELETE, and INSERT
+	DCL: GRANT and REVOKE
+	TCL: COMMIT, SET TRANSACTION, ROLLBACK, and SAVEPOINT
+	DQL: – SELECT
+	 
+
+
+SELECT CONCAT(name, ' - ', department) AS employee_info
+FROM employees;
+
+
+
+
+13. What is the order of appearance of the common statements in the SELECT query?
+SELECT – FROM – JOIN – ON – WHERE – GROUP BY – HAVING – ORDER BY – LIMIT
+
+14. In which order the interpreter executes the common statements in the SELECT query?
+FROM – JOIN – ON – WHERE – GROUP BY – HAVING – SELECT – ORDER BY – LIMIT
+
+
+
+
+SELECT * FROM table_name
+WHERE MOD(ID_column, 2) = 0;
+
+
+
+
+
+
+
+
 
 =================================================
 @@##sr.Software Engineer | req skills

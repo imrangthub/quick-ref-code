@@ -7936,6 +7936,158 @@ Setup: Add spring-cloud-starter-sleuth to your Spring Boot app. Sleuth initializ
 ##OpenTelemetry
 ================================================= 
 
+With Java Agent
+------------------------------------------
+Download the OpenTelemetry Java Agent
+wget https://github.com/open-telemetry/opentelemetry-java-instrumentation/releases/download/v1.29.0/opentelemetry-javaagent.jar
+
+docker run -d --name jaeger \
+  -e COLLECTOR_ZIPKIN_HTTP_PORT=9411 \
+  -p 5775:5775/udp \
+  -p 6831:6831/udp \
+  -p 6832:6832/udp \
+  -p 5778:5778 \
+  -p 16686:16686 \
+  -p 14268:14268 \
+  -p 14250:14250 \
+  -p 9411:9411 \
+  jaegertracing/all-in-one:latest
+
+Run Jaeger
+
+
+java -javaagent:./opentelemetry-javaagent.jar \
+  -Dotel.service.name=spring-boot-app \
+  -Dotel.traces.exporter=jaeger \
+  -Dotel.exporter.jaeger.endpoint=http://localhost:14250 \
+  -jar ./integration-svc1-0.0.1-SNAPSHOT.jar
+
+Run app with java agent
+
+
+
+
+Data Flow with Direct Export:
+------------------------------
+[Application with OpenTelemetry Java Agent]
+    |
+    |  Jaeger Exporter - Port 14250 (gRPC)
+    |
+[Jaeger Backend]
+    |
+    |  Data stored for visualization
+    |
+[Jaeger UI] (http://localhost:16686)
+
+
+
+
+
+
+OpenTelemetry with javaagent and otel-Collector
+===================================================
+=>cat otel-collector-config.yaml
+receivers:
+  otlp:
+    protocols:
+      grpc:
+        endpoint: 0.0.0.0:4317
+      http:
+        endpoint: 0.0.0.0:4318
+
+exporters:
+  jaeger:
+    endpoint: "http://jaeger:14250"
+
+service:
+  pipelines:
+    traces:
+      receivers: [otlp]
+      exporters: [jaeger]
+
+
+=>docker run -d --name otel-collector \
+  -p 4317:4317 \
+  -p 4318:4318 \
+  otel/opentelemetry-collector \
+  --config /etc/otel/otel-collector-config.yaml
+
+Run the OpenTelemetry Collector:
+OR
+docker run -d --name otel-collector \
+  -p 4317:4317 \
+  -p 4318:4318 \
+  otel/opentelemetry-collector \
+  --set receivers.otlp.protocols.grpc.endpoint=0.0.0.0:4317 \
+  --set receivers.otlp.protocols.http.endpoint=0.0.0.0:4318 \
+  --set exporters.jaeger.endpoint=http://jaeger:14250 \
+  --set service.pipelines.traces.receivers=otlp \
+  --set service.pipelines.traces.exporters=jaeger
+
+
+
+
+
+
+=>docker network create otel-network
+
+=>docker run -d --name jaeger \
+  --network otel-network \
+  -e COLLECTOR_ZIPKIN_HTTP_PORT=9411 \
+  -p 5775:5775/udp \
+  -p 6831:6831/udp \
+  -p 6832:6832/udp \
+  -p 5778:5778 \
+  -p 16686:16686 \
+  -p 14268:14268 \
+  -p 14250:14250 \
+  -p 9411:9411 \
+  jaegertracing/all-in-one:latest
+
+Run Jaeger
+
+
+
+
+
+=>java -javaagent:./opentelemetry-javaagent.jar \
+  -Dotel.service.name=spring-boot-app \
+  -Dotel.traces.exporter=jaeger \
+  -Dotel.exporter.jaeger.endpoint=http://localhost:14250 \
+  -jar ./integration-svc1-0.0.1-SNAPSHOT.jar
+
+Run the Application with the OpenTelemetry Java Agent
+
+
+
+
+
+
+Data Flow Visualization:
+========================
+[Application]
+    |
+    |  OTLP (gRPC/HTTP)
+    |
+[OpenTelemetry Collector]
+    |
+    |  Jaeger gRPC Exporter (http://jaeger:14250)
+    |
+[Jaeger Backend]
+    |
+    |  Jaeger UI (http://localhost:16686)
+
+
+
+
+
+
+
+
+
+
+Doc
+=========================================
 OpenTelemetry:
 	OpenTelemetry works similarly to traditional tracing frameworks like Spring Cloud Sleuth but with some additional 
 	features and standards. It also creates spans and traces to represent and monitor distributed systems. 
@@ -7945,6 +8097,7 @@ Key Features:
 	Automatic Instrumentation:
 	Automatically instruments popular Java libraries and frameworks like Spring, Hibernate, Kafka, etc., without requiring code changes.
 	Captures distributed traces, spans, and context propagation across services.
+	জাভা এজেন্ট লাইব্রেরি এবং ফ্রেমওয়ার্ক (যেমন, স্প্রিং, জেডিবিসি, এইচটিটিপি ক্লায়েন্ট) ব্যবহার করে স্প্যানগুলি স্বয়ংক্রিয়ভাবে ক্যাপচার করে।
 
 	Manual Instrumentation:
 	Developers can use OpenTelemetry SDK APIs to manually create spans, traces, and metrics for custom application logic.
@@ -8028,53 +8181,6 @@ Context Propagation              W3C-compliant headers                 Often cus
 Exporters                        Multiple (Jaeger, Zipkin, etc.)       Limited to specific backends
 
 
-
-
-Start With Docker
-================================================= 
-
-With Java Agent
-------------------------------------------
-Download the OpenTelemetry Java Agent
-wget https://github.com/open-telemetry/opentelemetry-java-instrumentation/releases/download/v1.29.0/opentelemetry-javaagent.jar
-
-docker run -d --name jaeger \
-  -e COLLECTOR_ZIPKIN_HTTP_PORT=9411 \
-  -p 5775:5775/udp \
-  -p 6831:6831/udp \
-  -p 6832:6832/udp \
-  -p 5778:5778 \
-  -p 16686:16686 \
-  -p 14268:14268 \
-  -p 14250:14250 \
-  -p 9411:9411 \
-  jaegertracing/all-in-one:latest
-
-
-
-java -javaagent:./opentelemetry-javaagent.jar \
-  -Dotel.service.name=spring-boot-app \
-  -Dotel.exporter.otlp.endpoint=http://localhost:4317 \
-  -Dotel.traces.exporter=jaeger \
-  -jar ./integration-svc1-0.0.1-SNAPSHOT.jar
-
-
-
-
-
-
-
-
-
-Start Jaeger with Docker:
-docker pull jaegertracing/all-in-one:latest
-
-docker run -d --name jaeger -e COLLECTOR_OTLP_ENABLED=true -p 16686:16686 -p 4317:4317 jaegertracing/all-in-one:latest
-
-
-Run OpenTelemetry Collector (Optional)
-
-docker run -d --name otel-collector -p 4317:4317 -p 55681:55681 otel/opentelemetry-collector:latest
 
 
 
