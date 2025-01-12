@@ -6573,13 +6573,7 @@ How Process-Based and Thread-Based Multitasking Act with Single-Core and Multi-C
 	better isolation and fault tolerance.
 
 
-5. Asynchronous Multitasking
-	Definition: Tasks are executed without waiting for other tasks to complete.
-	How it Works:
-		The OS manages tasks that can run independently, such as I/O operations.
-		While one task waits (e.g., for file read), the CPU is assigned to another task.
-	Examples:
-	Reading a file while downloading a webpage.
+
 
 6. Real-Time Multitasking
 	Definition: The OS prioritizes tasks that must meet strict timing constraints.
@@ -7298,6 +7292,43 @@ Java 8 Features:
 - Repeating annotations
 - New Date and Time API
 
+
+JDK 8 introduced significant features like Lambda Expressions, Stream API, and Date/Time API, making it a major 
+leap towards functional programming and modern development practices compared to JDK 7.
+Also in jdk8 Introduced (Consumer, Predicate, etc.).
+
+Consumer and Predicate in Java:
+	Both Consumer and Predicate are functional interfaces introduced in Java 8 as part of the java.util.function package. 
+	They are designed for use with functional programming concepts like lambda expressions and method references.
+
+1. Consumer<T>
+	Purpose: Represents an operation that accepts a single input argument and performs an action, but does not return a result.
+	Method: void accept(T t)
+	Use Case: Used for operations like printing, modifying, or processing data.
+
+Example:
+	import java.util.function.Consumer;
+	public class Main {
+		public static void main(String[] args) {
+			Consumer<String> printConsumer = s -> System.out.println("Hello, " + s);
+			printConsumer.accept("World");  // Output: Hello, World
+		}
+	}
+
+
+2. Predicate<T>
+	Purpose: Represents a condition or test on an input and returns a boolean (true or false).
+	Method: boolean test(T t)
+	Use Case: Used for filtering or matching data.
+Example:
+	import java.util.function.Predicate;
+	public class Main {
+		public static void main(String[] args) {
+			Predicate<Integer> isEven = n -> n % 2 == 0;
+			System.out.println(isEven.test(4));  // Output: true
+			System.out.println(isEven.test(5));  // Output: false
+		}
+	}
 
 
 

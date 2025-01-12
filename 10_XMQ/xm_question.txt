@@ -5,7 +5,7 @@
 1) Describe about Microserive, discovery, configserver ?
 2) What is Asynchronous and How we can achive Asynchronous ?
 3) How is MultiThradding work? How to achive multithreading ?
-4) How many we can create thread in java ? what is Thrad pool ?
+4) How many way can create thread in java ? what is Thrad pool ?
 5) Jdk7 vs jdk8
 6) TCP vs Http
 7) Ready to deal with older webservice integration ?
@@ -1923,6 +1923,30 @@ Blocking Queues
     PriorityBlockingQueue: Orders elements based on priority.
 
 
+Advantages of Thread Pool
+    Efficiency: Reuses threads, avoiding the cost of thread creation and destruction.
+    Better Resource Management: Controls the number of concurrent threads.
+    Prevention of Overhead: Limits excessive thread creation that can cause CPU thrashing.
+    Simplified API: Managed via the ExecutorService.
+
+Common Types of Thread Pools:
+    Fixed Thread Pool
+        Fixed number of threads for consistent task execution.
+        ExecutorService fixedPool = Executors.newFixedThreadPool(3);
+
+    Cached Thread Pool
+        Dynamically adjusts threads for short-lived tasks.
+        ExecutorService cachedPool = Executors.newCachedThreadPool();
+
+    Single Thread Pool
+        Ensures tasks execute sequentially in a single thread.
+        ExecutorService singlePool = Executors.newSingleThreadExecutor();
+
+    Scheduled Thread Pool
+        Executes tasks after a delay or periodically.
+        ScheduledExecutorService scheduledPool = Executors.newScheduledThreadPool(2);
+
+
 
 33) Fork/Join Framework, How Java parallel stream use this fromework ?
 Ans:
@@ -1986,6 +2010,64 @@ I/O-Bound Application
 CPU-Bound Application
     Definition: Performance is limited by CPU computations (e.g., mathematical calculations, data processing).
     Key Focus: Optimize processing efficiency (use multi-core processors, parallel algorithms).
+
+
+What is Asynchronous Programming?
+    Asynchronous programming in Java allows a program to perform tasks without blocking the execution of other tasks. 
+    It helps in improving performance, especially when dealing with time-consuming operations like I/O-bound tasks 
+    (e.g., file access, API calls, database queries).
+
+    In synchronous programming, tasks are executed sequentially, and each task must wait for the previous one to complete. 
+    In contrast, asynchronous programming lets multiple tasks run independently, reducing the time required to complete operations.
+
+Ways to Achieve Asynchronous Programming in Java:
+Threads
+    Execute tasks in a new thread.
+    new Thread(() -> System.out.println("Task in thread")).start();
+ExecutorService
+    Use a thread pool for better thread management.
+        import java.util.concurrent.ExecutorService;
+        import java.util.concurrent.Executors;
+
+        public class AsyncWithExecutor {
+            public static void main(String[] args) {
+                ExecutorService executor = Executors.newSingleThreadExecutor();
+                executor.submit(() -> {
+                    System.out.println("Task running asynchronously using ExecutorService");
+                });
+                executor.shutdown();
+                System.out.println("Main thread continues...");
+            }
+        }
+CompletableFuture (Preferred)
+    Handle async tasks with functional programming.
+    CompletableFuture.runAsync(() -> System.out.println("Task in CompletableFuture"));
+Reactive Programming
+    Use frameworks like Project Reactor or RxJava.For advanced asynchronous programming, especially when dealing with streams of data.
+    Mono.just("Reactive Task").subscribe(System.out::println);
+Spring’s @Async
+    Enable @Async for declarative async execution in Spring.
+    @Async
+    public void asyncTask() { 
+        System.out.println("Task with @Async");
+         }
+
+
+
+Asynchronous with Database, Queue, or Kafka:
+    Database
+        Store tasks in a table; background jobs poll and process them.
+        Simple but can have latency due to polling.
+
+    Message Queues (e.g., RabbitMQ)
+        Producers send tasks to a queue; consumers process them independently.
+        Reliable and scalable for moderate use cases.
+
+    Kafka
+        Producers publish events to topics; consumers process asynchronously.
+        Best for high-throughput, distributed systems.
+
+
 
 
 
@@ -3634,6 +3716,133 @@ TCP Congestion Control
         Congestion Avoidance: Additive increase, multiplicative decrease (AIMD).
         Fast Retransmit: Quickly resend lost packets.
         Fast Recovery: Reduce speed temporarily after congestion.
+
+
+
+TCP vs HTTP
+---------------------------------
+TCP is a low-level protocol that handles reliable data transmission between devices, ensuring ordered and error-free delivery.
+HTTP is an application layer protocol built on top of TCP, used for requesting and receiving data on the web. 
+It is stateless and focused on web communication, but relies on TCP for secure, reliable data transport.
+
+
+TCP (Transmission Control Protocol):
+    Transport Layer (Layer 4)
+    Purpose: Ensures reliable, error-free data transmission.
+    How It Works: Establishes a connection using a three-way handshake, then transfers data in segments. Ensures delivery, order, and error checking.
+    Security: No built-in security; uses SSL/TLS for encryption (e.g., HTTPS).
+    Use Cases: File transfer, email, video streaming, online gaming, remote access.
+
+HTTP (Hypertext Transfer Protocol):
+    Application Layer(Layer 7)
+    Purpose: Web communication protocol for requesting and receiving data (HTML, JSON, etc.).
+    How It Works: Request-response model; stateless, but supports persistent connections (HTTP/1.1 and beyond).
+    Security: Secured with HTTPS (HTTP over SSL/TLS) for encryption and authentication.
+
+
+
+Steps-flow: TCP handshake → 2. HTTP request → 3. Server processes → 4. HTTP response → 5. TCP connection termination.
+
+Operational Steps of HTTP over TCP:
+----------------------------------------------
+    TCP Connection Establishment (Three-Way Handshake)
+        Step 1: The client (e.g., a browser) sends a SYN (synchronize) packet to the server to initiate the connection.
+        Step 2: The server responds with a SYN-ACK (synchronize-acknowledgment) packet to confirm the request.
+        Step 3: The client sends an ACK (acknowledgment) packet to confirm the server’s response. The TCP connection is now established.
+
+    HTTP Request
+        Once the TCP connection is established, the client sends an HTTP request to the server. This includes:
+        Request line: Method (e.g., GET, POST), URL, and HTTP version.
+        Headers: Information like user-agent, content type, and cookies.
+        Body: Optional data for POST/PUT requests.
+
+
+MySQL Connection: Type and Details:
+    A MySQL connection is a client-server connection used to communicate with a MySQL database server. 
+    The connection can be established over a network (TCP/IP) or locally using a Unix socket file. 
+    MySQL uses a client-server architecture where:
+
+    Client: The application or user that sends queries and receives results.
+    Server: The MySQL server that processes queries, performs actions, and returns results.
+
+
+How MySQL Makes a Connection on Top of TCP:
+    MySQL uses the TCP/IP protocol to establish a connection between the client and server. Here's a simplified process:
+
+    TCP Handshake:
+        The client sends a SYN (synchronize) packet to the MySQL server.
+        The server responds with a SYN-ACK (synchronize-acknowledge) packet.
+        The client sends an ACK (acknowledgment) packet back to complete the handshake and establish the connection.
+
+    MySQL Protocol:
+        After the TCP connection is established, MySQL uses its own protocol on top of TCP to manage the communication.
+
+MySQL Protocol Steps:
+    Handshake: Client and server agree on the connection parameters.
+    Authentication: Client sends credentials, and the server verifies them.
+    Query Processing: Client sends queries; the server processes and returns results.
+    Data Transfer: Results are sent in a structured format.
+    Termination: The connection is closed once the work is done.
+
+MySQL Protocol works on top of TCP/IP just like HTTP works on top of TCP.
+
+How MySQL Protocol Works on Top of TCP:
+    TCP/IP is responsible for ensuring reliable data transfer between the client and server.
+    MySQL Protocol is built on top of TCP/IP to handle MySQL-specific operations like authentication, 
+    query execution, and result handling.
+    It structures the data in specific formats (binary) and ensures that SQL queries and results are correctly 
+    exchanged between the client and server.
+
+Do MySQL and Oracle Use the Same Protocol?
+    No, MySQL and Oracle Database do not use the same protocol. While both use TCP/IP for data transport, 
+    each database system has its own unique protocol for client-server communication.
+
+MySQL Protocol: A custom protocol designed specifically for interacting with MySQL databases. 
+    It is lightweight and optimized for MySQL operations.
+
+Oracle Protocol (SQL*Net): Oracle has its own protocol called SQL*Net (also known as Oracle Net Services) 
+    for communication between Oracle databases and clients. SQL*Net is more feature-rich and complex compared 
+    to MySQL's protocol, as it supports advanced features like advanced security and connection pooling.
+
+
+
+TCP/IP:
+============
+1. TCP Connection Establishment:
+    TCP is responsible for establishing a connection between your client (e.g., web browser) and the server.
+    The client wants to connect to the server using an IP address and port number (e.g., http://192.168.1.1:80).
+    TCP uses the IP address to locate the server on the network and the port (e.g., 80 for HTTP) to identify the application or service running on the server.
+    A three-way handshake is initiated to establish a connection between the client and server:
+    The client sends a SYN packet to the server.
+    The server responds with a SYN-ACK packet.
+    The client sends an ACK packet back to the server, confirming the connection.
+2. IP Routing:
+    Once the connection is established, the IP protocol is responsible for routing the data packets across the network to the correct destination.
+    IP routing ensures that the data reaches the correct server by forwarding packets through routers and networks until it reaches the server’s IP address.
+    The port number helps the server determine which service or application should handle the incoming request 
+    (for example, HTTP uses port 80, HTTPS uses port 443).
+3. Data Transfer:
+    After the connection is established, TCP takes care of data segmentation, ensuring that data is divided into small packets and transmitted reliably to the server.
+    Each packet contains both the destination IP address (for routing) and the destination port (for the correct application).
+    The server uses the port to process the request (e.g., a web server listening on port 80 will handle HTTP requests).
+
+4. Closing the Connection:
+    Once the data exchange is complete, TCP ensures that the connection is properly terminated (e.g., using the FIN and ACK packets).
+
+
+TCP:
+    TCP cannot function on its own without IP because it needs an IP address to identify the destination machine. 
+    It would have no way to know where to send or receive data.
+
+
+IP:
+    TCP doesn't have a built-in mechanism to route data between devices. IP provides the necessary addressing to ensure 
+    that data can reach the correct machine (host).
+
+TCP and IP work together to enable communication over the internet or any network. 
+IP handles addressing and routing, and TCP ensures that data is reliably transferred to the correct destination.
+
+
 
 
 
