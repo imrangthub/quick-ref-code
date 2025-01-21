@@ -3588,14 +3588,10 @@ If you want to trace additional methods (e.g., service or repository layers), yo
 
 
 
-
-
-
-
 With Java Agent
 ------------------------------------------
 Download the OpenTelemetry Java Agent
-wget https://github.com/open-telemetry/opentelemetry-java-instrumentation/releases/download/v1.29.0/opentelemetry-javaagent.jar
+wget https://github.com/open-telemetry/opentelemetry-java-instrumentation/releases/download/v2.12.0/opentelemetry-javaagent.jar
 
 docker run -d --name jaeger \
   -e COLLECTOR_ZIPKIN_HTTP_PORT=9411 \
@@ -3608,10 +3604,6 @@ docker run -d --name jaeger \
   -p 14250:14250 \
   -p 9411:9411 \
   jaegertracing/all-in-one:latest
-
-
-
-
 Run Jaeger
 GoTo: http://localhost:16686/
 
@@ -3622,18 +3614,35 @@ java -javaagent:./opentelemetry-javaagent.jar -Dotel.service.name=integration-sv
 java -javaagent:./opentelemetry-javaagent.jar -Dotel.service.name=business-svc1 -Dotel.traces.exporter=jaeger \
   -Dotel.exporter.jaeger.endpoint=http://localhost:14250 -jar ./business-svc1-0.0.1-SNAPSHOT.jar
 
-Run app with java agent
+Run app with java agent and Jaeger’s native gRPC protocol for direct communication.
+
 
 
 java -javaagent:./opentelemetry-javaagent.jar \
-  -Dotel.service.name=business-svc1 \
+  -Dotel.service.name=integration-svc1 \
   -Dotel.traces.exporter=jaeger \
   -Dotel.exporter.jaeger.endpoint=http://localhost:14250 \
   -Dotel.traces.sampler=traceidratio \
   -Dotel.traces.sampler.arg=0.5 \
-  -jar ./business-svc1-0.0.1-SNAPSHOT.jar
+  -jar ./integration-svc1-0.0.1-SNAPSHOT.jar
+OR
+java -javaagent:./opentelemetry-javaagent.jar \
+  -Dotel.service.name=integration-svc1 \
+  -Dotel.traces.sampler=traceidratio \
+  -Dotel.traces.sampler.arg=0.5 \
+  -jar ./integration-svc1-0.0.1-SNAPSHOT.jar
 
 Limit ration set limit
+
+
+
+New:
+==============================================
+docker run -d --name jaeger -p 16686:16686 -p 4318:4318 -p 4317:4317 jaegertracing/all-in-one:latest
+java -javaagent:./opentelemetry-javaagent.jar -Dotel.service.name=integration-svc1 -jar ./integration-svc1-0.0.1-SNAPSHOT.jar
+
+
+
 
 
 Data Flow with Direct Export:
@@ -3651,8 +3660,11 @@ Data Flow with Direct Export:
 
 
 
-java -javaagent:./opentelemetry-javaagent.jar -Dotel.service.name=integration-svc1 -Dotel.traces.exporter=jaeger \
-  -Dotel.exporter.jaeger.endpoint=http://localhost:4318/v1/traces -jar ./integration-svc1-0.0.1-SNAPSHOT.jar
+
+
+Embed extensions in the OpenTelemetry Agent
+https://github.com/open-telemetry/opentelemetry-java-instrumentation/tree/main/examples/extension
+
 
 Without javaagent
 ============================================
