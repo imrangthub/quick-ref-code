@@ -3216,64 +3216,200 @@ pipeline {
 
 
 
+pipeline {
+    agent any
+
+    parameters {
+        booleanParam(name: 'showReportLink', defaultValue: false, description: 'Select true to serve the HTML report file')
+    }
+
+    environment {
+        workingDir = '/home/bs960/imranMadbar/devOpsDir/jenkinsCicd'
+        collectionPath = "${workingDir}/apiAutomation.postman_collection.json"
+        reportPath = "${workingDir}/index.html"
+    }
+
+    stages {
+        stage('Execute Bash Script') {
+            steps {
+                script {
+                    sh "bash ${workingDir}/echo_date.sh"
+                }
+            }
+        }
+        stage('Run Newman Tests') {
+            steps {
+                script {
+                    // Capture the exit status of the Newman command
+                    def exitCode = sh(script: "newman run ${collectionPath} -r htmlextra,cli --reporter-htmlextra-export ${reportPath}", returnStatus: true)
+                    
+                    // Print the summary only if there is an exit status
+                    if (exitCode == 0) {
+                        echo "Newman tests ran successfully."
+                    } else {
+                        echo "Newman tests failed with exit code: ${exitCode}."
+                    }
+
+                    // Optionally, print the report link if parameter 'showReportLink' is true
+                    if (params.showReportLink) {
+                        echo "HTML report is available at: ${reportPath}"
+                    }
+                }
+            }
+        }
+    }
+}
 
 
-uTutJenking
+
+condationalPipline
+======================================
+pipeline {
+    agent any
+
+    parameters {
+        booleanParam(name: 'showReportLink', defaultValue: false, description: 'Select true to serve the HTML report file')
+    }
+
+    environment {
+        workingDir = '/home/bs960/imranMadbar/devOpsDir/jenkinsCicd'
+        collectionPath = "${workingDir}/apiAutomation.postman_collection.json"
+        reportPath = "${workingDir}/newman-report.html"
+    }
+    stages {
+        stage('Execute Bash Script') {
+            steps {
+                script {
+                    sh "bash ${workingDri}/echo_date.sh"
+                }
+            }
+        }
+        stage('showReportLink') {
+            when {
+                expression { return params.showReportLink == true }
+            }
+            steps {
+                script {
+                    echo "${workingDri}/index.html"
+                }
+            }
+        }
+    }
+}
+
+
+skipError
+============================
+pipeline {
+    agent any
+
+    parameters {
+        booleanParam(name: 'showReportLink', defaultValue: false, description: 'Select true to serve the HTML report file')
+    }
+
+    environment {
+        workingDir = '/home/bs960/imranMadbar/devOpsDir/jenkinsCicd'
+        collectionPath = "${workingDir}/apiAutomation.postman_collection.json"
+        reportPath = "${workingDir}/index.html"
+    }
+
+    stages {
+        stage('Execute Bash Script') {
+            steps {
+                script {
+                    sh "bash ${workingDir}/echo_date.sh"
+                }
+            }
+        }
+        stage('Run Newman Tests') {
+            steps {
+                script {
+                    // Capture the exit status of the Newman command
+                    def exitCode = sh(script: "newman run ${collectionPath} -r htmlextra,cli --reporter-htmlextra-export ${reportPath}", returnStatus: true)
+                    
+                    // Print the summary only if there is an exit status
+                    if (exitCode == 0) {
+                        echo "Newman tests ran successfully."
+                    } else {
+                        echo "Newman tests failed with exit code: ${exitCode}."
+                    }
+
+                    // Optionally, print the report link if parameter 'showReportLink' is true
+                    if (params.showReportLink) {
+                        echo "HTML report is available at: ${reportPath}"
+                    }
+                }
+            }
+        }
+    }
+}
+
+
+OR
+pipeline {
+    agent any
+
+    parameters {
+        booleanParam(name: 'doRegressionTest', defaultValue: false, description: 'Select true to Regression test')
+    }
+
+    environment {
+        workingDir = '/home/bs960/imranMadbar/devOpsDir/jenkinsCicd'
+        collectionPath = "${workingDir}/apiAutomation.postman_collection.json"
+        reportPath = "${workingDir}/index.html"
+    }
+    stages {
+        stage('Execute Bash Script') {
+            steps {
+                script {
+                    sh "bash ${workingDir}/echo_date.sh"
+                }
+            }
+        }
+        stage('regressionTestStage') {
+            when {
+                expression { return params.doRegressionTest == true }
+            }
+            steps {
+                script {
+
+                    def exitCode = sh(script: "newman run ${collectionPath} -r htmlextra,cli --reporter-htmlextra-export ${reportPath}", returnStatus: true)
+                    
+                    if (exitCode == 0) {
+                        echo "Regression tests ran successfully."
+                    } else {
+                        echo "Regression tests failed with exit code: ${exitCode}."
+                    }
+                    
+                    echo "HTML report is available at: ${reportPath}"
+                }
+            }
+        }
+    }
+}
+
+
+
+
+Install Jenkins(Ubuntu)
 --------------------------------------------------
 
-wget -O /etc/yum.repos.d/jenkins.repo http://pkg.jenkins-ci.org/redhat/jenkins.repo
-rpm --import https://jenkins-ci.org/redhat/jenkins-ci.org.key
-yum install jenkins
-
-service jenkins start
-cat /var/lib/jenkins/secrets/initialAdminPassword
-service jenkins start
-
-yum remove jenkins
-rm -rf /var/lib/jenkins
-All jenking plugins and library in this folder, if you uninstall jening remove this or it will keep jening old info
+UsingRepository:
+==============================
+https://pkg.origin.jenkins.io/debian-stable/
 
 
 
-Java Path:
-/lib/jvm/java-1.8.0-openjdk-1.8.0.242.b08-0.amzn2.0.1.x86_64
-
-Maven Path:
-
-/usr/share/maven
-
-Git Path:
-
-/usr/bin/git
-
-Assign Root User and Permissions:
-
-vi /etc/sysconfig/jenkins
-
-chown -R root:root /var/lib/jenkins
-chown -R root:root /var/cache/jenkins
-chown -R root:root /var/log/jenkins
-
-service jenkins restart
+Manually
+============
+wget https://pkg.jenkins.io/debian-stable/binary/jenkins_2.414.1_all.deb
+sudo dpkg -i jenkins_2.414.1_all.deb
+sudo apt --fix-broken install -y
 
 
-Tomcat Installation and Integration:
 
-yum install tomcat
-
-yum install tomcat-webapps tomcat-admin-webapps 
-
-vi /usr/share/tomcat/conf/tomcat-users.xml
-
-Uncomment Admin roles and user and Add:
-
-<user username="deployer" password="deployer" roles="manager-script" />
-
-Deploy war/ear to a container:
-
-**/java-web-project.war
-
-
+sudo cat /var/lib/jenkins/secrets/initialAdminPassword
+Retrieve the initial admin password
 
 
 
@@ -4918,14 +5054,14 @@ Summary:
 
 
 ===============================================
-##qa | api testing | selenium testing
+##qa | api testing
 ===============================================
 
 
 
 
-
-selenium
+===============================================
+##selenium
 ===============================================
 Selenium is an open-source automation tool used for automating web applications. 
 It allows developers and testers to perform functional and regression testing of web applications by simulating 
@@ -4946,3 +5082,18 @@ Use Cases:
   Web Scraping: Although not its primary purpose, Selenium is sometimes used to extract data from websites.
 
 
+
+
+
+===============================================
+##regression testing | newman
+===============================================
+
+		
+sudo npm install -g newman	
+sudo npm install -g newman-reporter-htmlextra		
+Install need Node and npm
+
+
+newman run ./api-collection.json -r htmlextra,cli --reporter-htmlextra-export /tmp/regression-test/otp-report.html
+run for report
