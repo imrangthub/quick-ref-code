@@ -3094,7 +3094,7 @@ in gradle user home (defined by the GRADLE_USER_HOME environment variable, which
 
 
 =================================================
-#jenkins |  JENKING  | jenkins                                        
+##jenkins |  JENKING  | jenkins                                        
 ================================================= 
 By default, Jenkins' home directory is located at /var/lib/jenkins on Ubuntu systems.
 Jenkins stores its data in its home directory.
@@ -3116,6 +3116,37 @@ For Change default port number
 
 
 
+
+Node config
+===============================================
+configure a new node (agent) in Jenkins to run pipelines:
+Manage Jenkins > Manage Nodes and Clouds.
+# of executors, set the desired number (e.g., 2)
+In Jenkins, the "# of executors" setting determines how many builds a node (agent) can run in parallel.
+set per-core 1;
+
+Set java path on Agent-Config and lunch to check.
+
+Run Pipeline:
+---------------------------------
+pipeline {
+    agent {
+        node {
+            label 'apihub'
+        }
+    }
+    stages {
+        stage('Build') {
+            steps {
+                sh 'echo Running on remote agent'
+                sh 'hostname'
+                sh 'hostname -i'
+                sh 'pwd'
+                sh 'ls -l'
+            }
+        }
+    }
+}
 
 
 
@@ -3180,39 +3211,56 @@ TypeOfPipeline:
 
 PipLineOne:
 --------------------------------------------------
-Run jar in background in hostmachine:
-pipeline {
-    agent any
-    stages {
-        stage("Start Building") {
-            steps {
-                echo "File copy......"
-                sh 'scp -i /home/admin/.ssh/id_rsa /opt/jenkins_WORKSHOP/spring-boot-simple-web.jar admin@192.268.1.1:/app/archive/testApp/'
-            }
-        }
-        
-        stage("Build") {
-            steps {
-                script {
-                    def remoteCommand = '''
-                        cd /app/archive/testApp/
-                        nohup java -jar spring-boot-simple-web.jar >> nohup.out 2>&1 &
-                    '''
-                        sh "ssh -i /home/admin/.ssh/id_rsa admin@192.268.1.1 '${remoteCommand}'"
-                }
-            }
-        }
-        
-        stage("Deploy") {
-            steps {
-                echo "Deploy done!"
-            }
+stage('Regression Test Stage') {
+    when {
+        expression { return params.doRegressionTest }
+    }
+      steps {
+        script {
+            sh """
+                ls
+                pwd
+                hostname -I
+                hostname -i
+            """
         }
     }
 }
 
+UserInput:
+---------------------------------------
+pipeline {
+    agent any
 
+    parameters {
+        booleanParam(name: 'showReportLink', defaultValue: false, description: 'Select true to serve the HTML report file')
+    }
 
+    environment {
+        workingDir = '/home/bs960/imranMadbar/devOpsDir/jenkinsCicd'
+        collectionPath = "${workingDir}/apiAutomation.postman_collection.json"
+        reportPath = "${workingDir}/newman-report.html"
+    }
+    stages {
+        stage('Execute Bash Script') {
+            steps {
+                script {
+                    sh "bash ${workingDri}/echo_date.sh"
+                }
+            }
+        }
+        stage('showReportLink') {
+            when {
+                expression { return params.showReportLink == true }
+            }
+            steps {
+                script {
+                    echo "${workingDri}/index.html"
+                }
+            }
+        }
+    }
+}
 
 
 
