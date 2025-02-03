@@ -1328,28 +1328,204 @@ os.rmdir("myfolder")
 
 
 
+===========================================
+Python Modules
+===========================================
 
 
 
 
 
+##NumPy Tutorial
+==========================================
+https://github.com/numpy/numpy
+
+NumPy is a Python library.
+NumPy is used for working with arrays.
+NumPy is short for "Numerical Python".
+It also has functions for working in domain of linear algebra, fourier transform, and matrices.
+
+
+Why Use NumPy?
+In Python we have lists that serve the purpose of arrays, but they are slow to process.
+NumPy aims to provide an array object that is up to 50x faster than traditional Python lists.
+The array object in NumPy is called ndarray, it provides a lot of supporting functions that make working with ndarray very easy.
+Arrays are very frequently used in data science, where speed and resources are very important.
+
+
+=>pip install numpy
+
+import numpy as np
+arr = np.array([1, 2, 3, 4, 5])
+print(arr)
+print(type(arr))
+
+Rs:
+[1 2 3 4 5]
+`<class 'numpy.ndarray'>`
+
+
+
+Check how many dimensions the arrays have:
+import numpy as np
+
+a = np.array(42)
+b = np.array([1, 2, 3, 4, 5])
+c = np.array([[1, 2, 3], [4, 5, 6]])
+d = np.array([[[1, 2, 3], [4, 5, 6]], [[1, 2, 3], [4, 5, 6]]])
+
+print(a.ndim)
+print(b.ndim)
+print(c.ndim)
+print(d.ndim)
+
+
+Higher Dimensional Arrays:
+import numpy as np
+arr = np.array([1, 2, 3, 4], ndmin=5)
+print(arr)
+print('number of dimensions :', arr.ndim)
+
+
+Access 2-D Arrays:
+import numpy as np
+arr = np.array([[1,2,3,4,5], [6,7,8,9,10]])
+print('2nd element on 1st row: ', arr[0, 1])
+
+Negative Indexing:
+import numpy as np
+arr = np.array([[1,2,3,4,5], [6,7,8,9,10]])
+print('Last element from 2nd dim: ', arr[1, -1])
+
+
+
+Slicing arrays:
+    Slicing in python means taking elements from one given index to another given index.
+    We pass slice instead of index like this: [start:end].
+    We can also define the step, like this: [start:end:step].
+    If we don't pass start its considered 0
+    If we don't pass end its considered length of array in that dimension
+    If we don't pass step its considered 1
+
+import numpy as np
+arr = np.array([1, 2, 3, 4, 5, 6, 7])
+print(arr[1:5])
+
+
+
+Data Types in NumPy:
+    NumPy has some extra data types, and refer to data types with one character, like i for integers, u for unsigned integers etc.
+    Below is a list of all data types in NumPy and the characters used to represent them.
+
+i - integer
+b - boolean
+u - unsigned integer
+f - float
+c - complex float
+m - timedelta
+M - datetime
+O - object
+S - string
+U - unicode string
+V - fixed chunk of memory for other type ( void )
+
+
+Create an array with data type 4 bytes integer:
+import numpy as np
+
+arr = np.array([1, 2, 3, 4], dtype='i4')
+
+print(arr)
+print(arr.dtype)
+
+
+NumPy Array Copy vs View:
+The main difference between a copy and a view of an array is that the copy is a new array, and the view is just a view of the original array.
+The copy owns the data and any changes made to the copy will not affect original array, and any changes made to the original array will not affect the copy.
+The view does not own the data and any changes made to the view will affect the original array, 
+and any changes made to the original array will affect the view.
 
 
 
 
+Get the Shape of an Array:
+NumPy arrays have an attribute called shape that returns a tuple with each index having the number of corresponding elements.
+
+import numpy as np
+arr = np.array([[1, 2, 3], [5, 6, 7]])
+print(arr.shape)
+
+
+
+NumPy Array Reshaping:
+By reshaping we can add or remove dimensions or change number of elements in each dimension.
+
+Convert the following 1-D array with 12 elements into a 2-D array.
+The outermost dimension will have 4 arrays, each with 3 elements:
+import numpy as np
+
+arr = np.array([1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12])
+
+newarr = arr.reshape(4, 3)
+
+print(newarr)
+
+
+Reshape From 1-D to 3-D:
+import numpy as np
+arr = np.array([1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12])
+newarr = arr.reshape(2, 3, 2)
+print(newarr)
+
+
+
+NumPy Array Iterating:
+import numpy as np
+arr = np.array([1, 2, 3])
+for x in arr:
+  print(x)
+
+
+
+Joining NumPy Arrays:
+import numpy as np
+arr1 = np.array([1, 2, 3])
+arr2 = np.array([4, 5, 6]
+arr = np.concatenate((arr1, arr2))
+print(arr)
+
+
+Splitting NumPy Arrays:
+import numpy as np
+arr = np.array([1, 2, 3, 4, 5, 6])
+newarr = np.array_split(arr, 3)
+print(newarr)
 
 
 
 
+Searching Arrays:
+You can search an array for a certain value, and return the indexes that get a match.
+To search an array, use the where() method
+
+import numpy as np
+arr = np.array([1, 2, 3, 4, 5, 4, 4])
+x = np.where(arr == 4)
+print(x)
 
 
 
+Sort the array:
+import numpy as np
+arr = np.array([3, 2, 0, 1])
+print(np.sort(arr))
 
 
 
-
-
-
-
-
-
+Filtering Arrays:
+import numpy as np
+arr = np.array([41, 42, 43, 44])
+filter_arr = arr > 42
+newarr = arr[filter_arr]
+print(filter_arr)
+print(newarr)
