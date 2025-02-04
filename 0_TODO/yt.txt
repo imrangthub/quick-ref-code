@@ -568,11 +568,233 @@ including how Docker manages containers, images, networks, and volumes.
 4) Docker in Depth 
 ====================================
 
+00:00-to-1:50
+=========================
+In this section we talk about docker internal architecture with:
+    Docker Architecture
+    Docker Components
+    Namespaces
+    Control Groups (cGroups)
 
+
+First of Docker Architecture: docker actually working as client/server mode
+we provide docker command using cli, here cli is the client and docker Engine is the server.
+When we provide a command using cli docker engind receive this command and execute it return a response what we see in this cli black screen.
+
+Dash board also a client what is show data from inter engind and show it.
+
+
+1:50-to-3:00
+======================
+We can use doker client in local also from any remote cli.
+
+
+3:00-to-3:00
+=========================
+Now taling about docker componet, there are 4 to 5 componet of docker inter componetn as:
+Docker Daemons: Its crea continer manage voluem etc.
+Docker Client: pass commad to docker Engin or server.
+Docker Image: its a read only file for create contener
+Conteiner: a run time container of image. We will ses more datails about docker image and contienr in leter video
+
+
+Docker-Registry: its a public repository of docker image, its have officeal image, we can also push you custome image to it.
+
+This is my accoutn in docker hub, here i already push some my custome image, you can also push image and shared with other.
+
+For any company its self software or product its cna possible manage a private docker regirstru for internal use only.
+
+
+So when we install docker in our machine this componetn all install on this time and work all togetehr.
+
+
+Here i give thsi link or docker hub, you cna explore ti how it looks like and starting using image from here.
+its give awesome documentation about all image .
+
+Like we see about mysql official image now thsi way, here how use this image all details description are avialable in this docker.
+
+
+
+
+09:10-to-17:00 
+===========================
+Now we taling about Namespace and cGroup.
+
+Namespace: this for isolated a contiener and like a process.
+Same software or same image we can run multiple time what is not interact with other, 
+all contienr run its context.
+every process/Conteiner is isolated and run independently, ther process id different.
+
+
+cGroup: When we run a container cGroup assign its resource like cpu, memory etc. 
+How much resoruce a contaiber consume what is define by cGrpup.
+
+I in a host we buget 50% of resoruce for app a and 50% for B, we can define how much what app able to use
+this how manage by cGrpup.
+
+
+
+
+
+17:00 -to - End
+===========================
+This is overal ide of docker architecure and component how actually docker work.
+You dont need to spend so many time here jsut take a highlevel view of docker internal componsents.
+
+When we pass a docker command using cli then docker internal sercer receive thsi command 
+and give instruction to docker engin to run this perticular image ad contiaenr,
+if the container already not presetn insede docker then docekr pull it form regiistry and then run it.
+
+Next vide we will see Image and contaiener operation, how build image how to run it as contienr etc.
+how create and modify custome image and upload it to docker hub.
 
 
 
 5) Docker Image and Containers
+======================================
+
+00-3:00
+=============
+HeyGuys in this tutoruyal we gonna see image and continer operation.
+
+Image: Image its a exuectable file or package including every this you need to run ap perticular application like nginx.
+
+We can download our required image like java, mysql and redis or we cna also create our own image.
+
+Actually Image a template of contiener.
+Here you see we crate two java app from a single image and threed redis app form one redis image.
+This is how we can create as much as image as we need.
+
+Lets take look on docker pubhlik registry docker-hub...
+Here a lot of official and custome image, we cna also upload our own image here we will just after a few moment.
+
+this is how we cna keep oru public image on public registry if we need mantain private registry for a company
+we cna also do it and share to other teamp and run it as app.
+
+
+3:00--
+====================
+Now see some of frequently uses docker image command.
+first:
+dokcer image ls
+thsi comand show the list of image in you current docker host.
+
+reposity: this is thei image reposity.
+Tag: tag actually image version. let me go in docker hub explore a tag form ther.
+
+Check a image, ubuty.
+see the show ubutn image tag this is actually  thsi is the release version.
+
+
+Now check one of my custome image wha i build and release with different version as tag.
+In reql-world project thsi is you can mangain app relsaversion as tag
+
+
+Now we see uses of tag, how to we can run a docker image with specific version or tag.
+I am gonn pull a ubuntu image with a specific tag
+If some one dosnot mentation any tag then by defautl it pull the latest version form docker hub
+
+Another note: tag latest dosnot mean thsi will be the most latest version of thsi app/os 
+the latest tag mamy assign on a specific version what is may not the most recent release or version.
+
+
+List we run a ubutu image with latest tag but see its run 22.04 but most latesr version is 23.xx
+so tag latest dosnot mean then most recent latest version.
+You can find the version wiath tag with latest on docker hub image documetnation..
+
+ImageId: its  a auto generate of id , then show create date of ite and then size of image.
+
+
+10:20
+=====================
+Now we see base from from image build and how to build a image.
+
+For that we need to know base image, Waht is actually base image, Its a actually prant image of all officeal image and custome image.
+I mean all image creagte from a image call base image.
+
+
+Now we explore on another thing its DockerFile, what is docker file, its a file we define abotu image waht is adn what it do. 
+Docker image ia alear architecture what is we can see in this docker file how it build layer by leyer.
+
+Lets explore a docker file of nginx, from docker hub.
+Here we see the fitst line of a DockerFile is From: directive what is define what from image we goign to create a new image or app.
+This is the prent image of this nginx Image, this is how all image has its a prant image.
+
+
+Okey we can explore another image like: mysql.
+find it and open its dockerfile.
+see its docker file first line start with FROM directirve and thsi is the prant image for thsi mysql image.
+
+This is how all image create top of another image for its base iamge.
+
+
+13:20
+=====================
+Lets see some of custome exmple fo docker file.
+Looks here alos we have to use a from directorve to define its base image.
+
+So are we gonna chose random bae image ? no.
+We have to chose current base image for our custome image wiath is relatvely same.
+Lise if we need to build a java application then we cholse a jdk image waht specifice version.
+If we do thsit then the image come with ready madn java install ation.
+
+onte other hand if we chase ubutnu iamge for java then we have to install jkd and deploy java app.
+so we have to chose right base iamge for oru custome image base on its type, requirment or its businesslogic waht actually thsi image gonna do.
+
+
+14:10
+==========================
+
+Now see thsi From Scratch: this is then minimal version thsit for vrsion of a docker image.
+Every image build to of thsi image layer by layer.
+
+Let go explore a image file from dockerhub, ok go for myusql image.
+Looks its docekr file it buil top of orcls linux image.
+so its mean we definitely fond a image wtih thsi name, letst find it.
+
+We get it, oh, its hasr amy tag, what was then tag number in mysql docker let me checkit of it was 8-slim.
+so open thsi8- simom image, Loos we found the root of all image what is scratch.
+
+
+
+
+
+All image build on top of another image, thsi those image build on many another image... and finally the image we 
+get what is scratch. 
+thsi iamge is the minum unti of all docker image.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 6) Storage and Volumes
 7) Networking and Security
 8) Simple Example Project
