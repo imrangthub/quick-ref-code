@@ -836,6 +836,159 @@ we have to use using contienr id and we get details information of a contener et
 
 6) Storage and Volumes
 =================================================
+In this tutorial we are talking about docker storage and volume
+
+By default all files created inside a container are stored on a writable container layer.
+
+What is the problem with this by defautl system:
+    The data doesn't persist when that container no longer exists. 
+    Tightly coupled to the host machine.
+    Reduces performance.
+
+
+
+3:00
+==================
+To solve this problem dockr do this two way:
+To managing and persisting data in containers. Two way solved this problem: Volume and Bind-mount.
+ you cna get details in docker official site documentation.
+
+this is the tow main system of dockder staorage.
+
+
+Volume: are inside docker and only can by access by docker-contienr only, not host process.
+
+
+Bind-mount: thsi way a file or directoy manage any weher on host maching and non-dockr process can modify it.
+
+
+So wehn you container data have to secure and no other has requred thsi you cna use voluem.
+Docker also sugest this is a best approaches.
+
+On the other hand if you need to analysis or need access container app generated to process by another other
+host porcess like: application log, report date etc.
+the main resones if you what to do any ferther operation on container generated data or any other host machine process need to access this
+then you have to use bind mounting.
+And you achive it use bin-mounting.
+
+
+
+tmpfs: this way docker keep data in host machine memory, its most secure and faster way.
+
+
+
+9:20mm
+============================
+Let’s starting basic dockr voluem commadn and start practice with voluem first.
+
+
+lest start with nginx, how we can use volume with application server lets see an exmple.
+Oh, i run it but i mees this port mapping, so its run without any host machine port.
+
+
+So i am gonna run it again wit port mapping, lets do it.
+Oke my application is runnign now, lets modify so this my app, like update the defautl nginx pag.
+Ltst do it, so we need exec contienr to go inside it for update its welcome html page.
+Oke now i am inside then container.
+
+Inside vi is not available, so i am gonna use here echo command for now.
+Lsts update this index.html file.
+Updatation done, refresh then browser, and we see our updaton is refalaceted here, and it good.
+
+
+Now lets say my applicaton/ container some how stope wroing or may cresh it and i need to start it again.
+Lets do it.
+manually stope the contienr and run it again.
+Now see this time show nginx default welcome page we lost our updatation what is just do a few minute ago.
+This way contienr keep its data inseide contienr file system, when its delete or crash some how, its data also lost with it.
+Actually this is the defautl behavor of docker contienr.
+
+
+16:00
+============================
+Lets see how to fixed this data loss isuue with docker volume.
+
+Okey, now first create a volume, fist run docker voluem ls to see current volume list, its have to be no volume cos we are not crate yet.
+
+Now create a voluem, using dokcer volume create command.
+do docker volume ls to check it, see here show the volume wht we jsut create.
+
+Oke my docker volume is ready, lets run oru nginx server with this volume.
+For thsi we goign to run the command this way:
+here -v is need to use for volume, this is the voluem name in left side of the colone: and right side is contienr insided directory.
+this way we have to use volume for our nginx server.
+
+Okey if app is runnginx now, lets check the home page form browser.
+In docker desktop show the contienr and volume.
+
+Letst Update ageing the this nginx html page agian.
+for this we have to do docker exec againg.
+we are gonna use updte the index.html page as previouse.
+Using echo we update it, check ti use cat command.
+lets check it from browser.
+
+asume this our app crash, and we need to run it again.
+for thiw we maually stop and delete contener also image.
+so there no iamge, and coneteiner show in docker deshtop dashboard.
+also check by comand line not contiber here.
+
+But we can found a voluem in here, we remove contienr may its crash byuts self but not volume !
+lsts run my applicaton run again with this same voume.
+we gonna pull image againe.
+and we have to get our previous updated index.html file have to show same again form volume.
+
+
+lets run another nginx server without voluem, lsts check what happend..
+See we doen map voluem wthithis contienr ths why we not get our previsou date.
+its run wtih its defautl dta.
+
+
+
+27:30
+==================================
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
