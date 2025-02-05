@@ -7751,6 +7751,319 @@ public class YourEntity {
 }
 
 
+========================================
+##aop
+========================================
+
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import lombok.SneakyThrows;
+import lombok.extern.slf4j.Slf4j;
+import net.banglalink.apihub.productOffer.domain.LogDebugObject;
+import net.banglalink.apihub.productOffer.domain.LogErrorObject;
+import net.banglalink.apihub.productOffer.domain.LogInfoObject;
+import org.apache.commons.lang.StringUtils;
+import org.aspectj.lang.ProceedingJoinPoint;
+import org.aspectj.lang.annotation.AfterThrowing;
+import org.aspectj.lang.annotation.Around;
+import org.aspectj.lang.annotation.Aspect;
+import org.slf4j.Marker;
+import org.slf4j.MarkerFactory;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.stereotype.Component;
+import org.springframework.util.AntPathMatcher;
+import org.springframework.web.context.request.RequestContextHolder;
+import org.springframework.web.context.request.ServletRequestAttributes;
+import org.springframework.web.servlet.HandlerMapping;
+import org.springframework.web.util.ContentCachingRequestWrapper;
+import org.springframework.web.util.ContentCachingResponseWrapper;
+
+import javax.servlet.http.HttpServletRequest;
+import java.io.BufferedReader;
+import java.net.InetAddress;
+import java.net.UnknownHostException;
+import java.util.*;
+import java.util.function.Function;
+import java.util.stream.Collectors;
+
+
+@Aspect
+@Slf4j
+@Component
+public class LogAspect {
+    private static final Marker EXCLUDE_LOG_ASPECT_MARKER = MarkerFactory.getMarker("EXCLUDE_CONSOLE_LOG");
+    private static final Set<String> CLASSNAMES = Set.of("java.lang.String", "java.lang.Long", "java.lang.Integer", "java.lang.Float", "java.lang.Double", "java.lang.Character", "java.lang.CharSequence", "java.lang.Enum");
+    private int truncateAfterWordCount =80;
+    private final ObjectMapper objectMapper = new ObjectMapper();
+
+    public LogAspect(AppPropertiesConfig appPropertiesConfig){
+        this.appPropertiesConfig = appPropertiesConfig;
+    }
+    public AppPropertiesConfig appPropertiesConfig;
+
+    @AfterThrowing(pointcut = "execution(* net.banglalink.apihub.productOffer.service.*.*(..))", throwing = "exception")
+    public void handleException(Exception exception) {
+        log.info(EXCLUDE_LOG_ASPECT_MARKER, "{}", logErrorJsonObjectConverter("ERROR",exception));
+    }
+
+    @Around("execution(* net.banglalink.apihub.productOffer.controller.*.*(..))")
+    public Object writeServiceLog(ProceedingJoinPoint joinPoint) throws Throwable {
+
+        HttpServletRequest request = getRequest();
+        String requestBody = extractRequestBody(joinPoint.getArgs());
+
+        Object result = joinPoint.proceed();
+        if(isDebuggerEndpoint(getRequest().getRequestURI())){
+            log.info(EXCLUDE_LOG_ASPECT_MARKER,"{}", logDebugJsonObjectConverter(requestBody,request,"DEBUG",result, joinPoint));
+        } else if(appPropertiesConfig.getLogLevel().equalsIgnoreCase("debug")){
+            log.info(EXCLUDE_LOG_ASPECT_MARKER,"{}", logDebugJsonObjectConverter(requestBody,request,"DEBUG",result, joinPoint));
+        } else if (appPropertiesConfig.getLogLevel().equalsIgnoreCase("info")) {
+            log.info(EXCLUDE_LOG_ASPECT_MARKER,"{}", logInfoJsonObjectConverter(requestBody,request,"INFO",result, joinPoint));
+        }
+        return result;
+    }
+
+    private String logErrorJsonObjectConverter(String level, Object msg){
+        try {
+            return objectMapper.writeValueAsString(new LogErrorObject(level,msg));
+        }catch (Exception ex){
+            log.error("error: "+ ex);
+            return "null";
+        }
+    }
+
+    public String logInfoJsonObjectConverter(String requestBody, HttpServletRequest request, String loglevel, Object result, ProceedingJoinPoint joinPoint){
+
+        ResponseEntity<?> responseEntity ;
+        if (result instanceof ResponseEntity<?>) {
+            responseEntity = (ResponseEntity<?>) result;
+
+        } else {
+            responseEntity = ResponseEntity.ok(result);
+        }
+
+        Object body = responseEntity.getBody();
+        String bodyString = (body != null) ? body.toString() : null;
+
+        HttpStatus statusCode = responseEntity.getStatusCode();
+        String statusCodeString = statusCode.toString();
+        try {
+            return objectMapper.writeValueAsString(new LogInfoObject(
+                    loglevel,
+                    request.getMethod(), request.getRequestURI(),
+                    request.getQueryString(),
+                    getPathVariable(request),
+                    requestBody,
+                    bodyString,
+                    statusCodeString,
+                    (request).getHeader("X-Request-ID")
+            ));
+
+        } catch (Exception e) {
+            log.error("error: "+e);
+
+            return "null";
+        }
+
+    }
+    public String logDebugJsonObjectConverter( String requestBody, HttpServletRequest request, String loglevel, Object result, ProceedingJoinPoint joinPoint){
+
+        ResponseEntity<?> responseEntity;
+
+        if (result instanceof ResponseEntity<?>) {
+            responseEntity = (ResponseEntity<?>) result;
+
+        } else {
+            responseEntity = ResponseEntity.ok(result);
+        }
+        HttpHeaders headers = responseEntity.getHeaders();
+        String headersString = (headers != null) ? headers.toString() : null;
+        Object body = responseEntity.getBody();
+        String bodyString = (body != null) ? body.toString() : null;
+
+        HttpStatus statusCode = responseEntity.getStatusCode();
+        String statusCodeString = (statusCode != null) ? statusCode.toString() : null;
+
+        try {
+            return objectMapper.writeValueAsString(new LogDebugObject(
+                    loglevel,
+                    joinPoint.getSignature().getDeclaringTypeName(),
+                    Thread.currentThread().getName(),
+                    getIp().toString(),
+                    getHostname(),
+                    request.getMethod() , request.getRequestURI(),
+                    request.getQueryString(),
+                    getPathVariable(request),
+                    requestBody,
+                    getAllHeadersAsJson(request),
+                    headersString,
+                    bodyString,
+                    statusCodeString,
+                    ( request).getHeader("X-Request-ID")
+            ));
+
+        } catch (Exception e) {
+            log.error("error: "+e);
+            return "null";
+        }
+
+    }
+    private HttpServletRequest getRequest(){
+        ServletRequestAttributes attributes = (ServletRequestAttributes) RequestContextHolder.getRequestAttributes();
+        return attributes.getRequest();
+    }
+    public String getPathVariable(HttpServletRequest request){
+        String pathVariable = convertObjectToString( request.getAttribute(HandlerMapping.URI_TEMPLATE_VARIABLES_ATTRIBUTE));
+        return pathVariable.isEmpty() ? null: pathVariable;
+    }
+
+    public static String convertObjectToString(Object obj) {
+        Map<String, Object> map = (LinkedHashMap<String, Object>)obj;
+        return mapToString(map);
+    }
+
+
+    private static String mapToString(Map<String, Object> map) {
+        StringBuilder stringBuilder = new StringBuilder();
+        for (Map.Entry<String, Object> entry : map.entrySet()) {
+            stringBuilder.append(entry.getKey())
+                    .append("=")
+                    .append(entry.getValue())
+                    .append(",");
+        }
+
+        if (stringBuilder.length() > 0) {
+            stringBuilder.setLength(stringBuilder.length() - 3);
+        }
+        return stringBuilder.toString();
+    }
+
+
+    private String extractRequestBody(Object[] args) {
+        for (Object arg : args) {
+            if(arg != null && (!CLASSNAMES.contains(arg.getClass().getName()))){
+                try {
+                    return objectMapper.writeValueAsString(arg);
+                } catch (JsonProcessingException e) {
+                    return "{}";
+                }
+            }
+        }
+        return "null";
+    }
+
+    private boolean isDebuggerEndpoint(String uri){
+        if(Objects.isNull(appPropertiesConfig.getFilteredUri())) return false;
+        List<String> filteredUri = List.of(appPropertiesConfig.getFilteredUri().split("#"));
+        AntPathMatcher pathMatcher = new AntPathMatcher();
+        for (String fUri: filteredUri) {
+            if(pathMatcher.match(fUri,uri)){
+                return true;
+            }
+        }
+        return false;
+    }
+    private String getAllHeadersAsJson(HttpServletRequest request) {
+        Map<String, String> headersMap = new HashMap<>();
+        Enumeration<String> headerNames = request.getHeaderNames();
+        List<String> headers = List.of(appPropertiesConfig.getHeaders().split("#"));
+        if (headerNames != null) {
+            while (headerNames.hasMoreElements()) {
+                String headerName = headerNames.nextElement();
+                if(headers.contains(headerName)){
+                    headersMap.put(headerName, request.getHeader(headerName));
+                }
+            }
+        }
+
+        try {
+            return objectMapper.writeValueAsString(headersMap);
+        } catch (JsonProcessingException e) {
+            return "{}";
+        }
+    }
+
+    private InetAddress getIp() throws UnknownHostException {
+        return InetAddress.getLocalHost();
+    }
+
+    private String getHostname() throws UnknownHostException {
+        return InetAddress.getLocalHost().getHostName();
+    }
+
+    private String getRequestHeaders(ContentCachingRequestWrapper request){
+        return multiLineToSingleLine(
+                headersToString(
+                        Collections.list(request.getHeaderNames()), request::getHeader));
+    }
+    @SneakyThrows
+    private String getRequestBody(ContentCachingRequestWrapper request){
+        StringBuilder body = new StringBuilder();
+        String line;
+        BufferedReader reader = request.getReader();
+        while ((line = reader.readLine()) != null) {
+            body.append(line);
+        }
+        if(body.isEmpty()){
+            body.append(new String(request.getContentAsByteArray()));
+        }
+        return jsonEncodeAndTruncate(body.toString());
+    }
+    @SneakyThrows
+    private String getRequestParams(ContentCachingRequestWrapper request) {
+        return parametersToString(request.getParameterMap());
+    }
+
+    private String getResponseHeaders(ContentCachingResponseWrapper response){
+        return headersToString(response.getHeaderNames(), response::getHeader);
+    }
+    @SneakyThrows
+    private String getResponseBody(ContentCachingResponseWrapper response){
+        return jsonEncodeAndTruncate(new String(response.getContentAsByteArray()));
+    }
+    @SneakyThrows
+    private String getResponseCode(ContentCachingResponseWrapper response) {
+        return String.valueOf(response.getStatus());
+    }
+
+    // Helper Functions
+    private static String joinMapIntoString(Map<String, String> logMap) {
+        return logMap.entrySet().stream()
+                .filter(e -> StringUtils.isNotBlank(e.getValue()))
+                .map(e -> String.join(" ", e.getKey(), e.getValue()))
+                .collect(Collectors.joining(""));
+    }
+
+    @SneakyThrows
+    private String headersToString(Collection<String> headerNames, Function<String, String> headerValueResolver) {
+        return headerNames.stream()
+                .map(header -> String.join("=", header, headerValueResolver.apply(header)))
+                .collect(Collectors.joining("\n"));
+    }
+
+    private String parametersToString(Map<String, String[]> parameterMap) {
+        return parameterMap.entrySet().stream()
+                .map(param -> String.join("=", param.getKey(), Arrays.toString(param.getValue())))
+                .collect(Collectors.joining("\n"));
+    }
+
+    private String multiLineToSingleLine(String multiLine){
+        return multiLine.replaceAll("\r\n", " ");
+    }
+
+    private String jsonEncodeAndTruncate(String payload){
+        payload = payload.replace("\"", "\\\"")
+                .replace("\n", " ")
+                .replace("\r", " ");
+        if(payload.length() > truncateAfterWordCount) {
+            payload = payload.substring(0, truncateAfterWordCount);
+        }
+        return payload;
+    }
+
+}
 
 
 

@@ -35,6 +35,53 @@ extracted_text
 
 
 
+=================================================
+##Django Tutorial
+=================================================
+Django is a Python framework that makes it easier to create web sites using Python.
+Django takes care of the difficult stuff so that you can concentrate on building your web applications.
+Django emphasizes reusability of components, also referred to as DRY (Don't Repeat Yourself), and comes with ready-to-use features like login system, 
+database connection and CRUD operations (Create Read Update Delete).
+
+
+
+How does Django Work?
+  Django follows the MVT design pattern (Model View Template).
+  Model - The data you want to present, usually data from a database.
+  View - A request handler that returns the relevant template and content - based on the request from the user.
+  Template - A text file (like an HTML file) containing the layout of the web page, with logic on how to display the data.
+
+
+When you have installed Django and created your first Django web application, and the browser requests the URL, this is basically what happens:
+  Django receives the URL, checks the urls.py file, and calls the view that matches the URL.
+  The view, located in views.py, checks for relevant models.
+  The models are imported from the models.py file.
+  The view then sends the data to a specified template in the template folder.
+  The template contains HTML and Django tags, and with the data it returns finished HTML content back to the browser.
+  Django can do a lot more than this, but this is basically what you will learn in this tutorial, and are the basic steps in a simple web application made with Django.
+
+
+
+Virtual Environment:
+It is suggested to have a dedicated virtual environment for each Django project, and one way to manage a virtual environment is venv, which is included in Python.
+Note: You must activate the virtual environment every time you open the command prompt to work on your project.
+
+Create Virtual Environment:
+python -m venv myVMEnvWorld
+
+This will set up a virtual environment, and create a folder named "myworld" with subfolders and files, like this:
+myworld
+  Include
+  Lib
+  Scripts
+  pyvenv.cfg
+
+
+Install Django:
+Note: Remember to install Django while you are in the virtual environment!
+
+
+
 
 
 
@@ -1529,3 +1576,1456 @@ filter_arr = arr > 42
 newarr = arr[filter_arr]
 print(filter_arr)
 print(newarr)
+
+
+
+=========================================
+##NumPy Random
+=========================================
+
+
+Generate a random integer from 0 to 100:
+from numpy import random
+x = random.randint(100)
+print(x)
+
+
+Generate Random Array:Generate a 1-D array containing 5 random integers from 0 to 100:
+from numpy import random
+x=random.randint(100, size=(5))
+print(x)
+
+
+
+Random Data Distribution
+===========================================
+What is Data Distribution?
+  Data Distribution is a list of all possible values, and how often each value occurs.
+  Such lists are important when working with statistics and data science.
+  The random module offer methods that returns randomly generated data distributions.
+  A random distribution is a set of random numbers that follow a certain probability density function.
+
+
+
+Example:
+Generate a 1-D array containing 100 values, where each value has to be 3, 5, 7 or 9.
+
+from numpy import random
+x = random.choice([3, 5, 7, 9], p=[0.1, 0.3, 0.6, 0.0], size=(100))
+print(x)
+
+Desc:
+  The probability for the value to be 3 is set to be 0.1
+  The probability for the value to be 5 is set to be 0.3
+  The probability for the value to be 7 is set to be 0.6
+  The probability for the value to be 9 is set to be 0
+
+
+OR
+from numpy import random
+x = random.choice([3, 5, 7, 9], p=[0.5, 0.3, 0.2, 0.0], size=(100))
+print(x)
+
+
+
+Random Permutations of Elements
+================================================
+A permutation refers to an arrangement of elements. e.g. [3, 2, 1] is a permutation of [1, 2, 3] and vice-versa.
+The NumPy Random module provides two methods for this: shuffle() and permutation().
+
+
+
+
+Shuffling Arrays:
+  The shuffle() method makes changes to the original array.
+  Shuffle means changing arrangement of elements in-place. i.e. in the array itself.
+
+from numpy import random
+import numpy as np
+arr = np.array([1, 2, 3, 4, 5])
+random.shuffle(arr)
+print(arr)
+
+
+
+Generating Permutation of Arrays:
+Generate a random permutation of elements of following array:
+The permutation() method returns a re-arranged array (and leaves the original array un-changed).
+
+from numpy import random
+import numpy as np
+arr = np.array([1, 2, 3, 4, 5])
+print(random.permutation(arr))
+
+
+
+=============================================
+##Seaborn
+=============================================
+=>pip install seaborn
+
+
+Visualize Distributions With Seaborn
+Seaborn is a library that uses Matplotlib underneath to plot graphs. It will be used to visualize random distributions.
+Note: We will be using: sns.distplot(arr, hist=False) to visualize random distributions in this tutorial.
+
+=>pip install seaborn
+
+
+
+
+Plotting a Distplot:
+Example
+import matplotlib.pyplot as plt
+import seaborn as sns
+sns.distplot([0, 1, 2, 3, 4, 5])
+plt.show()
+
+
+
+Plotting a Distplot Without the Histogram:
+Example
+import matplotlib.pyplot as plt
+import seaborn as sns
+sns.distplot([0, 1, 2, 3, 4, 5], hist=False)
+plt.show()
+
+
+
+=======================================
+##Normal (Gaussian) Distribution
+=======================================
+
+Normal Distribution:
+  The Normal Distribution is one of the most important distributions.
+  It is also called the Gaussian Distribution after the German mathematician Carl Friedrich Gauss.
+  It fits the probability distribution of many events, eg. IQ Scores, Heartbeat etc.
+  Use the random.normal() method to get a Normal Data Distribution.
+
+It has three parameters:
+  loc - (Mean) where the peak of the bell exists.
+  scale - (Standard Deviation) how flat the graph distribution should be.
+  size - The shape of the returned array.
+
+
+Example:
+Generate a random normal distribution of size 2x3:
+from numpy import random
+x = random.normal(size=(2, 3))
+print(x)
+
+
+
+Visualization of Normal Distribution:
+Example
+from numpy import random
+import matplotlib.pyplot as plt
+import seaborn as sns
+sns.distplot(random.normal(size=1000), hist=False)
+plt.show()
+
+
+
+==============================================
+##Binomial Distribution
+==============================================
+Binomial Distribution is a Discrete Distribution.
+
+It describes the outcome of binary scenarios, e.g. toss of a coin, it will either be head or tails.
+It has three parameters:
+  n - number of trials.
+  p - probability of occurence of each trial (e.g. for toss of a coin 0.5 each).
+  size - The shape of the returned array.
+
+Discrete Distribution:The distribution is defined at separate set of events, e.g. a coin toss's result is discrete as 
+it can be only head or tails whereas height of people is continuous as it can be 170, 170.1, 170.11 and so on.
+
+
+
+Example:
+Given 10 trials for coin toss generate 10 data points:
+
+from numpy import random
+x = random.binomial(n=10, p=0.5, size=10)
+print(x)
+
+
+
+Visualization of Binomial Distribution:
+from numpy import random
+import matplotlib.pyplot as plt
+import seaborn as sns
+sns.distplot(random.binomial(n=10, p=0.5, size=1000), hist=True, kde=False)
+plt.show()
+
+
+Difference Between Normal and Binomial Distribution
+The main difference is that normal distribution is continous whereas binomial is discrete, but if there are enough data points it will be quite similar to normal distribution with certain loc and scale.
+Example:
+from numpy import random
+import matplotlib.pyplot as plt
+import seaborn as sns
+sns.distplot(random.normal(loc=50, scale=5, size=1000), hist=False, label='normal')
+sns.distplot(random.binomial(n=100, p=0.5, size=1000), hist=False, label='binomial')
+plt.show()
+
+
+
+=========================================
+##Poisson Distribution
+=========================================
+Poisson Distribution is a Discrete Distribution.
+
+It estimates how many times an event can happen in a specified time. e.g. If someone eats twice a day what is the probability he will eat thrice?
+It has two parameters:
+lam - rate or known number of occurrences e.g. 2 for above problem.
+size - The shape of the returned array.
+
+Example:
+Generate a random 1x10 distribution for occurrence 2:
+from numpy import random
+x = random.poisson(lam=2, size=10)
+print(x)
+
+
+Visualization of Poisson Distribution:
+from numpy import random
+import matplotlib.pyplot as plt
+import seaborn as sns
+sns.distplot(random.poisson(lam=2, size=1000), kde=False)
+plt.show()
+
+
+
+Difference Between Normal and Poisson Distribution:
+  Normal distribution is continuous whereas poisson is discrete.
+  But we can see that similar to binomial for a large enough poisson distribution it will become similar 
+  to normal distribution with certain std dev and mean.
+
+Example
+from numpy import random
+import matplotlib.pyplot as plt
+import seaborn as sns
+sns.distplot(random.normal(loc=50, scale=7, size=1000), hist=False, label='normal')
+sns.distplot(random.poisson(lam=50, size=1000), hist=False, label='poisson')
+plt.show()
+
+
+
+
+==========================================
+##Uniform Distribution
+==========================================
+Used to describe probability where every event has equal chances of occuring.
+
+E.g. Generation of random numbers.
+
+It has three parameters:
+
+low - lower bound - default 0 .0.
+
+high - upper bound - default 1.0.
+
+size - The shape of the returned array.
+
+Example:
+Create a 2x3 uniform distribution sample:
+from numpy import random
+x = random.uniform(size=(2, 3))
+print(x)
+
+
+
+Visualization of Uniform Distribution:
+Example
+from numpy import random
+import matplotlib.pyplot as plt
+import seaborn as sns
+
+sns.distplot(random.uniform(size=1000), hist=False)
+plt.show()
+
+
+
+=============================================
+##Logistic Distribution
+=============================================
+Logistic Distribution is used to describe growth.
+
+Used extensively in machine learning in logistic regression, neural networks etc.
+
+It has three parameters:
+loc - mean, where the peak is. Default 0.
+scale - standard deviation, the flatness of distribution. Default 1.
+size - The shape of the returned array.
+
+Example
+Draw 2x3 samples from a logistic distribution with mean at 1 and stddev 2.0:
+from numpy import random
+x = random.logistic(loc=1, scale=2, size=(2, 3))
+print(x)
+
+
+
+Visualization of Logistic Distribution
+Example
+from numpy import random
+import matplotlib.pyplot as plt
+import seaborn as sns
+
+sns.distplot(random.logistic(size=1000), hist=False)
+plt.show()
+
+
+
+==========================================
+##Multinomial Distribution
+==========================================
+Multinomial distribution is a generalization of binomial distribution.
+It describes outcomes of multi-nomial scenarios unlike binomial where scenarios must be only one of two. e.g. Blood type of a population, dice roll outcome.
+
+It has three parameters:
+  n - number of possible outcomes (e.g. 6 for dice roll).
+  pvals - list of probabilties of outcomes (e.g. [1/6, 1/6, 1/6, 1/6, 1/6, 1/6] for dice roll).
+  size - The shape of the returned array.
+
+Note: Multinomial samples will NOT produce a single value! They will produce one value for each pval.
+Note: As they are generalization of binomial distribution their visual representation and similarity of normal distribution is same as that of multiple binomial distributions.
+
+Example:
+Draw out a sample for dice roll:
+
+from numpy import random
+x = random.multinomial(n=6, pvals=[1/6, 1/6, 1/6, 1/6, 1/6, 1/6])
+
+print(x)
+
+
+
+
+===========================================
+##Exponential Distribution
+===========================================
+Exponential distribution is used for describing time till next event e.g. failure/success etc.
+
+It has two parameters:
+scale - inverse of rate ( see lam in poisson distribution ) defaults to 1.0.
+size - The shape of the returned array.
+
+
+Example:
+Draw out a sample for exponential distribution with 2.0 scale with 2x3 size:
+
+from numpy import random
+x = random.exponential(scale=2, size=(2, 3))
+print(x)
+
+
+Visualization of Exponential Distribution
+Example
+from numpy import random
+import matplotlib.pyplot as plt
+import seaborn as sns
+sns.distplot(random.exponential(size=1000), hist=False)
+plt.show()
+
+
+
+====================================
+##Chi Square Distribution
+====================================
+Chi Square distribution is used as a basis to verify the hypothesis.
+It has two parameters:
+  df - (degree of freedom).
+  size - The shape of the returned array.
+
+Example
+Draw out a sample for chi squared distribution with degree of freedom 2 with size 2x3:
+from numpy import random
+x = random.chisquare(df=2, size=(2, 3))
+print(x)
+
+
+Visualization of Chi Square Distribution
+Example:
+from numpy import random
+import matplotlib.pyplot as plt
+import seaborn as sns
+
+sns.distplot(random.chisquare(df=1, size=1000), hist=False)
+plt.show()
+
+
+===================================
+##Rayleigh Distribution
+===================================
+Rayleigh distribution is used in signal processing.
+
+It has two parameters:
+
+scale - (standard deviation) decides how flat the distribution will be default 1.0).
+
+size - The shape of the returned array.
+
+Example
+Draw out a sample for rayleigh distribution with scale of 2 with size 2x3:
+
+from numpy import random
+x = random.rayleigh(scale=2, size=(2, 3))
+print(x)
+
+
+
+Visualization of Rayleigh Distribution
+Example
+from numpy import random
+import matplotlib.pyplot as plt
+import seaborn as sns
+
+sns.distplot(random.rayleigh(size=1000), hist=False)
+plt.show()
+
+
+===========================================
+Pareto Distribution
+===========================================
+A distribution following Pareto's law i.e. 80-20 distribution (20% factors cause 80% outcome).
+
+It has two parameter:
+  a - shape parameter.
+  size - The shape of the returned array.
+
+Example
+Draw out a sample for pareto distribution with shape of 2 with size 2x3:
+
+from numpy import random
+x = random.pareto(a=2, size=(2, 3))
+print(x)
+
+
+Visualization of Pareto Distribution
+Example
+from numpy import random
+import matplotlib.pyplot as plt
+import seaborn as sns
+sns.distplot(random.pareto(a=2, size=1000), kde=False)
+plt.show()
+
+
+
+
+======================================
+Zipf Distribution
+======================================
+Zipf distributions are used to sample data based on zipf's law.
+Zipf's Law: In a collection, the nth common term is 1/n times of the most common term. E.g. the 5th most common word in English occurs nearly 1/5 times as often as the most common word.
+
+It has two parameters:
+  a - distribution parameter.
+  size - The shape of the returned array.
+
+
+
+Example
+Draw out a sample for zipf distribution with distribution parameter 2 with size 2x3:
+from numpy import random
+x = random.zipf(a=2, size=(2, 3))
+print(x)
+
+
+
+Visualization of Zipf Distribution
+Sample 1000 points but plotting only ones with value < 10 for more meaningful chart.
+Example
+from numpy import random
+import matplotlib.pyplot as plt
+import seaborn as sns
+x = random.zipf(a=2, size=1000)
+sns.distplot(x[x<10], kde=False)
+plt.show(
+
+
+=========================================
+##ufuncs | NumPy ufuncs
+=========================================
+
+What are ufuncs?
+ufuncs stands for "Universal Functions" and they are NumPy functions that operate on the ndarray object.
+
+Why use ufuncs?
+  ufuncs are used to implement vectorization in NumPy which is way faster than iterating over elements.
+  They also provide broadcasting and additional methods like reduce, accumulate etc. that are very helpful for computation.
+  ufuncs also take additional arguments, like:
+  where boolean array or condition defining where the operations should take place.
+  dtype defining the return type of elements.
+  out output array where the return value should be copied.
+
+What is Vectorization?
+  Converting iterative statements into a vector based operation is called vectorization.
+  It is faster as modern CPUs are optimized for such operations.
+  Add the Elements of Two Lists:
+  list 1: [1, 2, 3, 4]
+  list 2: [4, 5, 6, 7]
+  One way of doing it is to iterate over both of the lists and then sum each elements.
+
+
+Without ufunc, we can use Python's built-in zip() method:
+x = [1, 2, 3, 4]
+y = [4, 5, 6, 7]
+z = []
+for i, j in zip(x, y):
+  z.append(i + j)
+print(z)
+
+
+
+NumPy has a ufunc for this, called add(x, y) that will produce the same result.
+
+Example
+With ufunc, we can use the add() function:
+import numpy as np
+x = [1, 2, 3, 4]
+y = [4, 5, 6, 7]
+z = np.add(x, y)
+
+print(z)
+
+
+
+
+How To Create Your Own ufunc:
+To create your own ufunc, you have to define a function, like you do with normal functions in Python, 
+then you add it to your NumPy ufunc library with the frompyfunc() method.
+
+The frompyfunc() method takes the following arguments:
+function - the name of the function.
+inputs - the number of input arguments (arrays).
+outputs - the number of output arrays.
+
+Example
+Create your own ufunc for addition:
+import numpy as np
+def myadd(x, y):
+  return x+y
+myadd = np.frompyfunc(myadd, 2, 1)
+print(myadd([1, 2, 3, 4], [5, 6, 7, 8]))
+
+
+
+Check if a Function is a ufunc:
+Check the type of a function to check if it is a ufunc or not.
+A ufunc should return <class 'numpy.ufunc'>.
+
+Example
+Check if a function is a ufunc:
+import numpy as np
+print(type(np.add))
+
+
+
+
+Simple Arithmetic:
+You could use arithmetic operators + - * / directly between NumPy arrays, but this section discusses an extension of the same where we have functions that can take any array-like objects e.g. lists, tuples etc. 
+and perform arithmetic conditionally.
+Arithmetic Conditionally: means that we can define conditions where the arithmetic operation should happen.
+All of the discussed arithmetic functions take a where parameter in which we can specify that condition.
+
+Addition
+The add() function sums the content of two arrays, and return the results in a new array.
+
+Example
+Add the values in arr1 to the values in arr2:
+import numpy as np
+arr1 = np.array([10, 11, 12, 13, 14, 15])
+arr2 = np.array([20, 21, 22, 23, 24, 25])
+newarr = np.add(arr1, arr2)
+print(newarr)
+
+
+Subtraction
+The subtract() function subtracts the values from one array with the values from another array, and return the results in a new array.
+
+Example
+Subtract the values in arr2 from the values in arr1:
+import numpy as np
+arr1 = np.array([10, 20, 30, 40, 50, 60])
+arr2 = np.array([20, 21, 22, 23, 24, 25])
+newarr = np.subtract(arr1, arr2)
+print(newarr)
+
+
+
+
+Rounding Decimals:
+There are primarily five ways of rounding off decimals in NumPy:
+  truncation
+  fix
+  rounding
+  floor
+  ceil
+
+Truncation:
+Remove the decimals, and return the float number closest to zero. Use the trunc() and fix() functions.
+
+Example
+Truncate elements of following array:
+import numpy as np
+arr = np.trunc([-3.1666, 3.6667])
+print(arr)
+
+Example
+Same example, using fix():
+import numpy as np
+arr = np.fix([-3.1666, 3.6667])
+print(arr)
+
+
+
+
+Logs:
+  NumPy provides functions to perform log at the base 2, e and 10.
+  We will also explore how we can take log for any base by creating a custom ufunc.
+  All of the log functions will place -inf or inf in the elements if the log can not be computed.
+
+Note: The arange(1, 10) function returns an array with integers starting from 1 (included) to 10 (not included).
+
+
+Log at Base 2:
+Use the log2() function to perform log at the base 2.
+
+Example:
+Find log at base 2 of all elements of following array:
+import numpy as np
+arr = np.arange(1, 10)
+print(np.log2(arr))
+
+
+Log at Base 10:
+Use the log10() function to perform log at the base 10.
+
+Example:
+Find log at base 10 of all elements of following array:
+import numpy as np
+arr = np.arange(1, 10)
+print(np.log10(arr))
+
+
+
+
+Summations:
+What is the difference between summation and addition?
+Addition is done between two arguments whereas summation happens over n elements.
+
+
+Add the values in arr1 to the values in arr2:
+Example:
+import numpy as np
+arr1 = np.array([1, 2, 3])
+arr2 = np.array([1, 2, 3])
+newarr = np.add(arr1, arr2)
+print(newarr)
+
+Returns: [2 4 6]
+
+
+Sum the values in arr1 and the values in arr2:
+import numpy as np
+arr1 = np.array([1, 2, 3])
+arr2 = np.array([1, 2, 3])
+newarr = np.sum([arr1, arr2])
+Returns: 12
+
+
+
+
+
+Products:
+To find the product of the elements in an array, use the prod() function.
+Example
+Find the product of the elements of this array:
+
+import numpy as np
+arr = np.array([1, 2, 3, 4])
+x = np.prod(arr)
+print(x)
+Returns: 24 because 1*2*3*4 = 24
+
+
+Example:
+Find the product of the elements of two arrays:
+import numpy as np
+
+arr1 = np.array([1, 2, 3, 4])
+arr2 = np.array([5, 6, 7, 8])
+x = np.prod([arr1, arr2])
+print(x)
+Returns: 40320 because 1*2*3*4*5*6*7*8 = 40320
+
+
+
+
+Differences:
+A discrete difference means subtracting two successive elements.
+E.g. for [1, 2, 3, 4], the discrete difference would be [2-1, 3-2, 4-3] = [1, 1, 1]
+To find the discrete difference, use the diff() function.
+
+Example
+Compute discrete difference of the following array:
+
+import numpy as np
+arr = np.array([10, 15, 25, 5])
+newarr = np.diff(arr)
+print(newarr)
+
+Returns: [5 10 -20] because 15-10=5, 25-15=10, and 5-25=-20
+We can perform this operation repeatedly by giving parameter n.
+E.g. for [1, 2, 3, 4], the discrete difference with n = 2 would be [2-1, 3-2, 4-3] = [1, 1, 1] , then, since n=2, we will do it once more, with the new result: [1-1, 1-1] = [0, 0]
+
+
+Example
+Compute discrete difference of the following array twice:
+import numpy as np
+arr = np.array([10, 15, 25, 5])
+newarr = np.diff(arr, n=2)
+print(newarr)
+Returns: [5 -30] because: 15-10=5, 25-15=10, and 5-25=-20 AND 10-5=5 and -20-10=-30
+
+
+
+Finding LCM (Lowest Common Multiple):
+The Lowest Common Multiple is the smallest number that is a common multiple of two numbers.
+
+Example
+Find the LCM of the following two numbers:
+import numpy as np
+num1 = 4
+num2 = 6
+x = np.lcm(num1, num2)
+print(x)
+
+Returns: 12 because that is the lowest common multiple of both numbers (4*3=12 and 6*2=12).
+
+
+
+
+Finding GCD (Greatest Common Denominator):
+The GCD (Greatest Common Denominator), also known as HCF (Highest Common Factor) is the biggest number 
+that is a common factor of both of the numbers.
+
+Example
+Find the HCF of the following two numbers:
+import numpy as np
+num1 = 6
+num2 = 9
+x = np.gcd(num1, num2)
+print(x)
+
+Returns: 3 because that is the highest number both numbers can be divided by (6/3=2 and 9/3=3).
+
+
+
+Trigonometric Functions
+NumPy provides the ufuncs sin(), cos() and tan() that take values in radians and produce the corresponding sin, cos and tan values.
+Example:
+Find sine value of PI/2:
+
+import numpy as np
+x = np.sin(np.pi/2)
+print(x)
+
+
+Example:
+Find sine values for all of the values in arr:
+import numpy as np
+arr = np.array([np.pi/2, np.pi/3, np.pi/4, np.pi/5])
+x = np.sin(arr)
+print(x)
+
+
+
+Hyperbolic Functions:
+NumPy provides the ufuncs sinh(), cosh() and tanh() that take values in radians and produce the corresponding sinh, cosh and tanh values..
+
+Example
+Find sinh value of PI/2:
+import numpy as np
+x = np.sinh(np.pi/2)
+print(x)
+
+
+
+What is a Set:
+A set in mathematics is a collection of unique elements.
+Sets are used for operations involving frequent intersection, union and difference operations.
+Create Sets in NumPy
+We can use NumPy's unique() method to find unique elements from any array. E.g. create a set array, but remember that the set arrays should only be 1-D arrays.
+
+Example:
+Convert following array with repeated elements to a set:
+
+import numpy as np
+arr = np.array([1, 1, 1, 2, 3, 4, 5, 5, 6, 7])
+x = np.unique(arr)
+print(x)
+
+
+
+Finding Union:
+To find the unique values of two arrays, use the union1d() method.
+Example
+Find union of the following two set arrays:
+import numpy as np
+arr1 = np.array([1, 2, 3, 4])
+arr2 = np.array([3, 4, 5, 6])
+newarr = np.union1d(arr1, arr2)
+print(newarr
+
+
+
+
+
+
+===================================================
+##Pandas Tutorial
+====================================================
+https://github.com/pandas-dev/pandas
+
+=>pip install pandas
+
+Pandas is a Python library.
+Pandas is used to analyze data.
+
+What is Pandas?
+  Pandas is a Python library used for working with data sets.
+  It has functions for analyzing, cleaning, exploring, and manipulating data.
+  The name "Pandas" has a reference to both "Panel Data", and "Python Data Analysis" and was created by Wes McKinney in 2008.
+
+Why Use Pandas?
+  Pandas allows us to analyze big data and make conclusions based on statistical theories.
+  Pandas can clean messy data sets, and make them readable and relevant.
+  Relevant data is very important in data science.
+
+
+Data Science: is a branch of computer science where we study how to store, use and analyze data for deriving information from it.
+
+What Can Pandas Do?
+  Pandas gives you answers about the data. Like:
+  Is there a correlation between two or more columns?
+  What is average value?
+  Max value?
+  Min value?
+
+Pandas are also able to delete rows that are not relevant, or contains wrong values, like empty or NULL values. 
+This is called cleaning the data.
+
+
+ExampleGet:
+import pandas as pd
+mydataset = {
+  'cars': ["BMW", "Volvo", "Ford"],
+  'passings': [3, 7, 2]
+}
+myvar = pd.DataFrame(mydataset)
+print(myvar)
+
+
+
+
+
+Pandas Series
+===========================
+What is a Series?
+A Pandas Series is like a column in a table.
+It is a one-dimensional array holding data of any type.
+
+Example
+Create a simple Pandas Series from a list:
+import pandas as pd
+a = [1, 7, 2]
+myvar = pd.Series(a)
+print(myvar)
+
+
+Create Labels:
+With the index argument, you can name your own labels.
+
+Example
+Create your own labels:
+import pandas as pd
+a = [1, 7, 2]
+myvar = pd.Series(a, index = ["x", "y", "z"])
+print(myvar)
+
+
+
+
+What is a DataFrame?
+A Pandas DataFrame is a 2 dimensional data structure, like a 2 dimensional array, or a table with rows and columns.
+
+Example
+Create a simple Pandas DataFrame:
+
+import pandas as pd
+data = {
+  "calories": [420, 380, 390],
+  "duration": [50, 40, 45]
+}
+#load data into a DataFrame object:
+df = pd.DataFrame(data)
+print(df) 
+
+
+Result:
+
+     calories  duration
+  0       420        50
+  1       380        40
+  2       390        45
+
+
+
+
+Read CSV Files
+============================
+A simple way to store big data sets is to use CSV files (comma separated files).
+CSV files contains plain text and is a well know format that can be read by everyone including Pandas.
+In our examples we will be using a CSV file called 'data.csv'.
+
+
+Example
+Load the CSV into a DataFrame:
+import pandas as pd
+df = pd.read_csv('data.csv')
+print(df.to_string())
+
+
+Tip: use to_string() to print the entire DataFrame.
+If you have a large DataFrame with many rows, Pandas will only return the first 5 rows, and the last 5 rows:
+
+Example:
+Print the DataFrame without the to_string() method:
+import pandas as pd
+df = pd.read_csv('data.csv')
+print(df) 
+
+
+
+
+Read JSON
+==============================
+Big data sets are often stored, or extracted as JSON.
+
+JSON is plain text, but has the format of an object, and is well known in the world of programming, including Pandas.
+
+In our examples we will be using a JSON file called 'data.json'.
+
+Open data.json.
+
+Example:
+Load the JSON file into a DataFrame:
+import pandas as pd
+df = pd.read_json('data.json')
+print(df.to_string()) 
+
+
+Example:
+Load a Python Dictionary into a DataFrame:
+import pandas as pd
+data = {
+  "Duration":{
+    "0":60,
+    "1":60,
+    "2":60,
+    "3":45,
+    "4":45,
+    "5":60
+  },
+  "Pulse":{
+    "0":110,
+    "1":117,
+    "2":103,
+    "3":109,
+    "4":117,
+    "5":102
+  },
+  "Maxpulse":{
+    "0":130,
+    "1":145,
+    "2":135,
+    "3":175,
+    "4":148,
+    "5":127
+  },
+  "Calories":{
+    "0":409,
+    "1":479,
+    "2":340,
+    "3":282,
+    "4":406,
+    "5":300
+  }
+}
+
+df = pd.DataFrame(data)
+print(df) 
+
+
+
+
+Pandas - Analyzing DataFrames
+=======================================
+Viewing the Data
+  One of the most used method for getting a quick overview of the DataFrame, is the head() method.
+  The head() method returns the headers and a specified number of rows, starting from the top.
+
+Example:
+Get a quick overview by printing the first 10 rows of the DataFrame:
+import pandas as pd
+df = pd.read_csv('data.csv')
+print(df.head(10))
+
+
+Note: if the number of rows is not specified, the head() method will return the top 5 rows.
+
+Example
+Print the first 5 rows of the DataFrame:
+import pandas as pd
+df = pd.read_csv('data.csv')
+print(df.head())
+
+
+Example
+Print the last 5 rows of the DataFrame:
+print(df.tail()) 
+
+
+
+
+Data Cleaning
+===========================================================
+Data cleaning means fixing bad data in your data set.
+Bad data could be:
+  Empty cells
+  Data in wrong format
+  Wrong data
+  Duplicates
+In this tutorial you will learn how to deal with all of them.
+
+Our Data Set
+In the next chapters we will use this data set:
+
+
+-------------------------------------------------------------
+      Duration          Date  Pulse  Maxpulse  Calories
+-------------------------------------------------------------
+  0         60  '2020/12/01'    110       130     409.1
+  1         60  '2020/12/02'    117       145     479.0
+  2         60  '2020/12/03'    103       135     340.0
+  3         45  '2020/12/04'    109       175     282.4
+  4         45  '2020/12/05'    117       148     406.0
+  5         60  '2020/12/06'    102       127     300.0
+  6         60  '2020/12/07'    110       136     374.0
+  7        450  '2020/12/08'    104       134     253.3
+  8         30  '2020/12/09'    109       133     195.1
+  9         60  '2020/12/10'     98       124     269.0
+  10        60  '2020/12/11'    103       147     329.3
+  11        60  '2020/12/12'    100       120     250.7
+  12        60  '2020/12/12'    100       120     250.7
+  13        60  '2020/12/13'    106       128     345.3
+  14        60  '2020/12/14'    104       132     379.3
+  15        60  '2020/12/15'     98       123     275.0
+  16        60  '2020/12/16'     98       120     215.2
+  17        60  '2020/12/17'    100       120     300.0
+  18        45  '2020/12/18'     90       112       NaN
+  19        60  '2020/12/19'    103       123     323.0
+  20        45  '2020/12/20'     97       125     243.0
+  21        60  '2020/12/21'    108       131     364.2
+  22        45           NaN    100       119     282.0
+  23        60  '2020/12/23'    130       101     300.0
+  24        45  '2020/12/24'    105       132     246.0
+  25        60  '2020/12/25'    102       126     334.5
+  26        60    2020/12/26    100       120     250.0
+  27        60  '2020/12/27'     92       118     241.0
+  28        60  '2020/12/28'    103       132       NaN
+  29        60  '2020/12/29'    100       132     280.0
+  30        60  '2020/12/30'    102       129     380.3
+  31        60  '2020/12/31'     92       115     243.0
+
+The data set contains some empty cells ("Date" in row 22, and "Calories" in row 18 and 28).
+The data set contains wrong format ("Date" in row 26).
+The data set contains wrong data ("Duration" in row 7).
+The data set contains duplicates (row 11 and 12).
+
+
+
+
+
+Pandas - Cleaning Empty Cells
+----------------------------------------
+Empty cells can potentially give you a wrong result when you analyze data.
+
+Remove Rows:
+One way to deal with empty cells is to remove rows that contain empty cells.
+This is usually OK, since data sets can be very big, and removing a few rows will not have a big impact on the result.
+
+Example
+Return a new Data Frame with no empty cells:
+import pandas as pd
+df = pd.read_csv('data.csv')
+new_df = df.dropna()
+print(new_df.to_string())
+
+
+
+Pandas - Cleaning Data of Wrong Format
+--------------------------------------------
+Data of Wrong Format
+Cells with data of wrong format can make it difficult, or even impossible, to analyze data.
+To fix it, you have two options: remove the rows, or convert all cells in the columns into the same format.
+
+
+
+ExampleGet: Convert to date:
+import pandas as pd
+df = pd.read_csv('data.csv')
+df['Date'] = pd.to_datetime(df['Date'])
+print(df.to_string())
+
+
+
+Fixing Wrong Data:
+---------------------------
+Wrong Data:
+"Wrong data" does not have to be "empty cells" or "wrong format", it can just be wrong, like if someone registered "199" instead of "1.99".
+Sometimes you can spot wrong data by looking at the data set, because you have an expectation of what it should be.
+If you take a look at our data set, you can see that in row 7, the duration is 450, but for all the other rows the duration is between 30 and 60.
+It doesn't have to be wrong, but taking in consideration that this is the data set of someone's workout sessions, we conclude with the fact that this person did not work out in 450 minutes.
+
+
+Replacing Values:
+One way to fix wrong values is to replace them with something else.
+In our example, it is most likely a typo, and the value should be "45" instead of "450", and we could just insert "45" in row 7:
+Example:
+Set "Duration" = 45 in row 7:
+df.loc[7, 'Duration'] = 45
+For small data sets you might be able to replace the wrong data one by one, but not for big data sets.
+To replace wrong data for larger data sets you can create some rules, e.g. set some boundaries for legal values, and replace any values that are outside of the boundaries.
+
+
+Pandas - Removing Duplicates
+----------------------------------
+By taking a look at our test data set, we can assume that row 11 and 12 are duplicates.
+To discover duplicates, we can use the duplicated() method.
+The duplicated() method returns a Boolean values for each row:
+
+Example
+Returns True for every row that is a duplicate, otherwise False:
+print(df.duplicated())
+
+
+
+Pandas - Data Correlations
+------------------------------------
+
+Note: The corr() method ignores "not numeric" columns.
+Result Explained
+The Result of the corr() method is a table with a lot of numbers that represents how well the relationship is between two columns.
+The number varies from -1 to 1.
+1 means that there is a 1 to 1 relationship (a perfect correlation), and for this data set, each time a value went up in the first column, the other one went up as well.
+0.9 is also a good relationship, and if you increase one value, the other will probably increase as well.
+
+-0.9 would be just as good relationship as 0.9, but if you increase one value, the other will probably go down.
+0.2 means NOT a good relationship, meaning that if one value goes up does not mean that the other will.
+What is a good correlation? It depends on the use, but I think it is safe to say you have to have at least 0.6 (or -0.6) to call it a good correlation.
+
+Perfect Correlation:
+We can see that "Duration" and "Duration" got the number 1.000000, which makes sense, each column always has a perfect relationship with itself.
+
+Good Correlation:
+"Duration" and "Calories" got a 0.922721 correlation, which is a very good correlation, and we can predict that the longer you work out, the more calories you burn, and the other way around: if you burned a lot of calories, you probably had a long work out.
+Bad Correlation:
+"Duration" and "Maxpulse" got a 0.009403 correlation, which is a very bad correlation, meaning that we can not predict the max pulse by just looking at the duration of the work out, and vice versa.
+
+
+
+Plotting
+==================================
+Pandas uses the plot() method to create diagrams.
+We can use Pyplot, a submodule of the Matplotlib library to visualize the diagram on the screen.
+Read more about Matplotlib in our Matplotlib Tutorial.
+
+
+import pandas as pd
+import matplotlib.pyplot as plt
+
+df = pd.read_csv('data.csv')
+df.plot()
+plt.show()
+
+
+
+Scatter Plot:
+Specify that you want a scatter plot with the kind argument:
+kind = 'scatter'
+A scatter plot needs an x- and a y-axis.
+In the example below we will use "Duration" for the x-axis and "Calories" for the y-axis.
+Include the x and y arguments like this:
+x = 'Duration', y = 'Calories'
+Example
+import pandas as pd
+import matplotlib.pyplot as plt
+df = pd.read_csv('data.csv')
+df.plot(kind = 'scatter', x = 'Duration', y = 'Calories')
+plt.show()
+
+
+
+
+=====================================================
+##SciPy Tutorial
+=====================================================
+https://github.com/scipy/scipy
+
+=>pip install scipy
+
+What is SciPy?
+  SciPy is a scientific computation library that uses NumPy underneath.
+  SciPy stands for Scientific Python.
+  It provides more utility functions for optimization, stats and signal processing.
+  Like NumPy, SciPy is open source so we can use it freely.
+  SciPy was created by NumPy's creator Travis Olliphant.
+
+Why Use SciPy?
+  If SciPy uses NumPy underneath, why can we not just use NumPy?
+  SciPy has optimized and added functions that are frequently used in NumPy and Data Science.
+
+Which Language is SciPy Written in?
+  SciPy is predominantly written in Python, but a few segments are written in C.
+
+constants: SciPy offers a set of mathematical constants, one of them is liter which returns 1 liter as cubic meters.
+
+
+
+
+
+Constants in SciPy:
+--------------------------------
+As SciPy is more focused on scientific implementations, it provides many built-in scientific constants.
+These constants can be helpful when you are working with Data Science.
+PI is an example of a scientific constan.
+
+
+Print the constant value of PI:
+from scipy import constants
+print(constants.pi)
+
+
+
+Optimizers in SciPy
+-----------------------------------
+Optimizers are a set of procedures defined in SciPy that either find the minimum value of a function, or the root of an equation.
+
+Optimizing Functions
+Essentially, all of the algorithms in Machine Learning are nothing more than a complex equation that needs to be 
+minimized with the help of given data.
+
+Roots of an Equation:
+NumPy is capable of finding roots for polynomials and linear equations, but it can not find roots for non linear equations, like this one:
+
+x + cos(x)
+For that you can use SciPy's optimize.root function.
+This function takes two required arguments:
+fun - a function representing an equation.
+x0 - an initial guess for the root.
+
+The function returns an object with information regarding the solution.
+The actual solution is given under attribute x of the returned object:
+
+
+Find root of the equation x + cos(x):
+from scipy.optimize import root
+from math import cos
+def eqn(x):
+  return x + cos(x)
+myroot = root(eqn, 0)
+print(myroot.x)
+
+
+
+What is Sparse Data
+--------------------------------------
+Sparse data is data that has mostly unused elements (elements that don't carry any information ).
+It can be an array like this one:
+[1, 0, 2, 0, 0, 3, 0, 0, 0, 0, 0, 0]
+Sparse Data: is a data set where most of the item values are zero.
+Dense Array: is the opposite of a sparse array: most of the values are not zero.
+
+
+
+How to Work With Sparse Data:
+SciPy has a module, scipy.sparse that provides functions to deal with sparse data.
+There are primarily two types of sparse matrices that we use:
+CSC - Compressed Sparse Column. For efficient arithmetic, fast column slicing.
+CSR - Compressed Sparse Row. For fast row slicing, faster matrix vector products
+We will use the CSR matrix in this tutorial.
+
+CSR Matrix
+We can create CSR matrix by passing an arrray into function scipy.sparse.csr_matrix().
+
+Create a CSR matrix from an array:
+import numpy as np
+from scipy.sparse import csr_matrix
+arr = np.array([0, 0, 0, 0, 0, 1, 1, 0, 2])
+print(csr_matrix(arr))
+
+
+
+SciPy Graphs
+-----------------------------
+Working with Graphs
+Graphs are an essential data structure.
+SciPy provides us with the module scipy.sparse.csgraph for working with such data structures.
+
+
+Adjacency Matrix
+Adjacency matrix is a nxn matrix where n is the number of elements in a graph.
+And the values represents the connection between the elements.
+Example:
+For a graph like this, with elements A, B and C, the connections are:
+
+A & B are connected with weight 1.
+
+A & C are connected with weight 2.
+
+C & B is not connected.
+
+The Adjency Matrix would look like this:
+
+
+      A B C
+   A:[0 1 2]  
+   B:[1 0 0]
+   C:[2 0 0]
+
+Below follows some of the most used methods for working with adjacency matrices.
+
+
+
+
+Working with Spatial Data
+----------------------------------------
+Spatial data refers to data that is represented in a geometric space.
+E.g. points on a coordinate system.
+We deal with spatial data problems on many tasks.
+E.g. finding if a point is inside a boundary or not.
+SciPy provides us with the module scipy.spatial, which has functions for working with spatial data.
+
+
+Triangulation
+A Triangulation of a polygon is to divide the polygon into multiple triangles with which we can compute an area of the polygon.
+A Triangulation with points means creating surface composed triangles in which all of the given points are on at least one vertex of any triangle in the surface.
+One method to generate these triangulations through points is the Delaunay() Triangulation.
+
+
+
+
+Working With Matlab Arrays
+--------------------------------------
+We know that NumPy provides us with methods to persist the data in readable formats for Python. But SciPy provides us with interoperability with Matlab as well.
+SciPy provides us with the module scipy.io, which has functions for working with Matlab arrays.
+Exporting Data in Matlab Format
+The savemat() function allows us to export data in Matlab format.
+The method takes the following parameters:
+
+filename - the file name for saving data.
+mdict - a dictionary containing the data.
+do_compression - a boolean value that specifies whether to compress the result or not. Default False.
+
+
+Note: The example above saves a file name "arr.mat" on your computer.
+To open the file, check out the "Import Data from Matlab Format" example below:
+
+
+
+
+What is Interpolation?
+-----------------------------------
+Interpolation is a method for generating points between given points.
+For example: for points 1 and 2, we may interpolate and find points 1.33 and 1.66.
+Interpolation has many usage, in Machine Learning we often deal with missing data in a dataset, interpolation is often used to substitute those values.
+This method of filling values is called imputation.
+Apart from imputation, interpolation is often used where we need to smooth the discrete points in a dataset.
+
+How to Implement it in SciPy?
+SciPy provides us with a module called scipy.interpolate which has many functions to deal with interpolation:
+
+
+What is Statistical Significance Test?
+In statistics, statistical significance means that the result that was produced has a reason behind it, it was not produced randomly, or by chance.
+
+SciPy provides us with a module called scipy.stats, which has functions for performing statistical significance tests.
+Here are some techniques and keywords that are important when performing such tests:
+
+Hypothesis in Statistics
+Hypothesis is an assumption about a parameter in population.
+
+Null Hypothesis
+It assumes that the observation is not statistically significant.
+
+Alternate Hypothesis
+It assumes that the observations are due to some reason.
+It's alternate to Null Hypothesis.
+Example:
+For an assessment of a student we would take:
+"student is worse than average" - as a null hypothesis, and:
+"student is better than average" - as an alternate hypothesis.
+
+One tailed test
+When our hypothesis is testing for one side of the value only, it is called "one tailed test".
+Example:
+For the null hypothesis:
+"the mean is equal to k", we can have alternate hypothesis:
+"the mean is less than k", or:
+"the mean is greater than k"
+
+Two tailed test
+When our hypothesis is testing for both side of the values.
+Example:
+For the null hypothesis:
+"the mean is equal to k", we can have alternate hypothesis:
+"the mean is not equal to k"
+In this case the mean is less than, or greater than k, and both sides are to be checked.
+
+Alpha value
+Alpha value is the level of significance.
+Example:
+How close to extremes the data must be for null hypothesis to be rejected.
+It is usually taken as 0.01, 0.05, or 0.1.
+
+P value
+P value tells how close to extreme the data actually is.
+P value and alpha values are compared to establish the statistical significance.
+If p value <= alpha we reject the null hypothesis and say that the data is statistically significant. otherwise we accept the null hypothesis.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
