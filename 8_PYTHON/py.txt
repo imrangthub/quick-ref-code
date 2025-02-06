@@ -12,7 +12,9 @@
 =>pip uninstall requests
 
 
-
+Check Python Versions
+ls -l /usr/bin/python*
+sudo update-alternatives --install /usr/bin/python python /usr/bin/python3.8 1
 
 
 =================================================
@@ -40,6 +42,30 @@ extracted_text
 =================================================
 https://docs.djangoproject.com/en/5.1/intro/tutorial01/
 
+
+$ django-admin startproject bookCrud djangoWorkshop
+$ python manage.py startapp bookCrud
+
+$ python manage.py runserver
+
+
+mysql-conn
+--------------------------------------
+pip install mysqlclient
+
+python manage.py makemigrations
+python manage.py migrate
+
+
+
+admin
+============================
+
+python manage.py createsuperuser
+
+
+##doc
+===================================================
 Django is a Python framework that makes it easier to create web sites using Python.
 Django takes care of the difficult stuff so that you can concentrate on building your web applications.
 Django emphasizes reusability of components, also referred to as DRY (Don't Repeat Yourself), and comes with ready-to-use features like login system, 
@@ -64,19 +90,22 @@ When you have installed Django and created your first Django web application, an
 
 
 
-Virtual Environment:
-It is suggested to have a dedicated virtual environment for each Django project, and one way to manage a virtual environment is venv, which is included in Python.
-Note: You must activate the virtual environment every time you open the command prompt to work on your project.
+Project vs App in Djengo
+-------------------------
+Project: MyWebsite
+  Apps:
+    blog (handles blog posts)
+    shop (handles product listings and orders)
+    users (handles user authentication and profiles)
+  In this example, MyWebsite is the Django project, and blog, shop, and users are individual apps within the project.
 
-Create Virtual Environment:
-python -m venv myVMEnvWorld
+Conclusion
+  Project: The larger container of your Django setup, which includes configuration, URL routing, and possibly multiple apps.
+  App: A module within the project responsible for a specific feature or functionality, which can be reused across different projects.
 
-This will set up a virtual environment, and create a folder named "myworld" with subfolders and files, like this:
-myworld
-  Include
-  Lib
-  Scripts
-  pyvenv.cfg
+
+
+
 
 
 Install Django:
@@ -84,6 +113,7 @@ Note: Remember to install Django while you are in the virtual environment!
 
 $ python -m django --version
 $ mkdir djangotutorial
+$ django-admin startproject mysite djangotutorial
 
 Let’s look at what startproject created:
 
@@ -98,6 +128,15 @@ djangotutorial/
 
         
 $ python manage.py runserver
+
+
+
+
+Projects vs. apps:
+What’s the difference between a project and an app? An app is a web application that does something – e.g., a blog system, 
+a database of public records or a small poll app. 
+A project is a collection of configuration and apps for a particular website. A project can contain multiple apps. 
+An app can be in multiple projects.
 
 
 
@@ -3024,6 +3063,143 @@ P value
 P value tells how close to extreme the data actually is.
 P value and alpha values are compared to establish the statistical significance.
 If p value <= alpha we reject the null hypothesis and say that the data is statistically significant. otherwise we accept the null hypothesis.
+
+
+
+
+
+===============================================
+##Matplotlib
+===============================================
+Matplotlib is a low level graph plotting library in python that serves as a visualization utility.
+Matplotlib was created by John D. Hunter.
+Matplotlib is open source and we can use it freely.
+
+=>pip install matplotlib
+
+
+Pyplot
+Most of the Matplotlib utilities lies under the pyplot submodule, and are usually imported under the plt alias:
+
+Now the Pyplot package can be referred to as plt.
+
+Example
+Draw a line in a diagram from position (0,0) to position (6,250):
+
+#Three lines to make our compiler able to draw:
+import sys
+import matplotlib
+matplotlib.use('Agg')
+
+import matplotlib.pyplot as plt
+import numpy as np
+
+xpoints = np.array([0, 6])
+ypoints = np.array([0, 250])
+
+plt.plot(xpoints, ypoints)
+plt.show()
+
+#Two  lines to make our compiler able to draw:
+plt.savefig(sys.stdout.buffer)
+sys.stdout.flush()
+
+
+
+Exmaple:
+#Three lines to make our compiler able to draw:
+import sys
+import matplotlib
+matplotlib.use('Agg')
+
+import matplotlib.pyplot as plt
+import numpy as np
+
+ypoints = np.array([3, 8, 1, 10])
+
+plt.plot(ypoints, marker = 'o')
+plt.show()
+
+#Two  lines to make our compiler able to draw:
+plt.savefig(sys.stdout.buffer)
+sys.stdout.flush()
+
+
+
+Exmaple:
+#Three lines to make our compiler able to draw:
+import sys
+import matplotlib
+matplotlib.use('Agg')
+
+import numpy as np
+import matplotlib.pyplot as plt
+
+x = np.array([80, 85, 90, 95, 100, 105, 110, 115, 120, 125])
+y = np.array([240, 250, 260, 270, 280, 290, 300, 310, 320, 330])
+
+plt.title("Sports Watch Data")
+plt.xlabel("Average Pulse")
+plt.ylabel("Calorie Burnage")
+
+plt.plot(x, y)
+
+plt.grid()
+
+plt.show()
+
+#Two  lines to make our compiler able to draw:
+plt.savefig(sys.stdout.buffer)
+sys.stdout.flush()
+
+
+Exmaple:
+#Three lines to make our compiler able to draw:
+import sys
+import matplotlib
+matplotlib.use('Agg')
+
+import matplotlib.pyplot as plt
+import numpy as np
+
+x = np.array(["A", "B", "C", "D"])
+y = np.array([3, 8, 1, 10])
+
+plt.bar(x,y)
+plt.show()
+
+#Two  lines to make our compiler able to draw:
+plt.savefig(sys.stdout.buffer)
+sys.stdout.flush()
+
+
+
+Exmaple:
+#Three lines to make our compiler able to draw:
+import sys
+import matplotlib
+matplotlib.use('Agg')
+
+import matplotlib.pyplot as plt
+import numpy as np
+
+y = np.array([35, 25, 25, 15])
+mylabels = ["Apples", "Bananas", "Cherries", "Dates"]
+
+plt.pie(y, labels = mylabels)
+plt.show() 
+
+#Two  lines to make our compiler able to draw:
+plt.savefig(sys.stdout.buffer)
+sys.stdout.flush()
+
+
+
+
+
+
+
+
 
 
 
