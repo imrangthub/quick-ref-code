@@ -833,8 +833,8 @@ we have to use using contienr id and we get details information of a contener et
 
 
 
-
-6) Storage and Volumes
+=================================================
+##6) Storage and Volumes
 =================================================
 In this tutorial we are talking about docker storage and volume
 
@@ -947,54 +947,128 @@ its run wtih its defautl dta.
 27:30
 ==================================
 
+Lets see now bind mounting, the bind mount command like this.
+
+
+So waht is actually mean this bind mounting: 
+    In this way a file or directory on the host machine is mounted into a container. 
+    Sharing data or files from the host machine to containers.
+
+
+This is the syntax of bind mounting.
+Here if show linux and windowns system bothe command.
+instead of -v we can also use -mount for more explicitly.
+
+--mount type=volume, source=myvolume, target=/usr/share/nginx/html this is the recommend way and other one -v is short way.
+
+
+Let try bind mountting in a action, lets create a cotaoner with bind mount.
+Before thsit let me clearn our previous container.
+
+For thsit first i am gonna update the html pageagiain. and this file path i am gonna to then bind mount.
+and this host machine file/directory well create a vlume to the continer.
+
+
+oke applicaton run done with bind mount file, we going to refresh browser and i have to get our update file here.
+Yes ! we got our expected result.
+
+In this way the key different between volume mounting that we cna update the application file from our host machine
+and this update refelacted on docker contener directly like as a shred file.
+Lets check it out update it again.
+
+yes we got it. the is how it work actually.
+
+
+and Another one mounting is tmpfs, this is rearly uses mechanism this is the command you can explore it
+for now i leave it as it.
+Here is mentation the command for windows and linux systemn both. 
+
+
+
+34:30
+=============================
+We will se docker volume for a most real-worl example, what is with a database mysql volume mounting now.
+
+Now we are run a mysql database with docker volume.
+Let me clear provisou contienr.
+
+First we run a myusql contienr without mounting and check what happedn of data.
+oke i am going run the command, and we going to insent some data in mysql.
+Ok its run now. docker desktop app shows the mysql conteinr.
+
+to insetn some data this mysql database we manually insert some data 
+for ths i amd gonna do docker exec for go to insent container.
+docker document shwo how to i define mysql serverport and dtabase and defaut user credentails.
+
+
+Now i am inside out mysql data base contienr, use the databse, create a table and insent some data in it.
+
+Mysql connamd for creating a table i mentaiton this in this documetn.
+
+oke i am insetn some data on this table and with the select query we alsoe retrive it. 
+
+
+lets datel the contianer like as its crash the database sercer.
+Run it server ageing and check the data same preiviso follow the step.
+do exec ageing, echeck thsi no data, table of prefisou if the contienr crash or delete the container.
+
+
+
+Let do it now with volume and bind boutn with mysql data contienr.
+first i go with voluem, so i have to create a voluem name mysql-data.
+we chan check it with dockr voluem ls command.
+
+Now run the myusql server with thsi volume. and its run done.
+Do insernt crate a table and insetn some data in to it.
+
+use database. 
+show tabel, not table now.
+
+get table create command form my doucment and run it.
+and iset some data command run int it.
+
+after we get data useing select query.
+in thsi case docker voume keep date data from a seprate place from contienr. 
+In doeckr desktop shwo it.
+
+
+do it delete the contienr, and run the contienr agein with mount with the mysql_data volme.
+and we should get our previsou data.
+
+
+let check it our useig docker exec.
+I ma going tie check it as same use databse check table and do a select query.
+and we get it !
+so this is how we can keep contienr data.
+
+Let check and ith bind-mounting way.
+so for this pick a host maching directory and do bind moutn it and run the command..
+We thsi commadn left side we keep host machin path and riht side will contienr targate path.
+
+run tthe commnad with bidn mounting.
+run finish and app is running.
+che this howt machine pathe we should get the mysql directoy in this path, yes we get it here.
+
+same here, do exec, inset dome data insetn it.
+agine delete thsi contienr and run it ageing to check our previosu inserted data.
+
+yes, we get our data ! that great.
+
+This is how we can use docker volume to persiste container data after it delete or destry the contienr 
+and run again with previosu data.
+
+i taking a screehshot and leave it on docuemt for you guys.
 
 
 
 
 
+=================================================
+##7) Networking and Security
+=================================================
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-7) Networking and Security
 8) Simple Example Project
 9) Docker Compose
 10) Container Orchestration
