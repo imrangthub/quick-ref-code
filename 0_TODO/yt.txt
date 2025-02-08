@@ -1066,6 +1066,177 @@ i taking a screehshot and leave it on docuemt for you guys.
 =================================================
 ##7) Networking and Security
 =================================================
+Waht is docker networking and  why need this, actually docker network provide communication between containers.
+Specially multi tier applicaton where one server need to communticaton wtih other service like
+app server mantation communitcaton with database server.
+Also for security perpose.
+
+Lets see a three tier applicaton, here app server talik with formaten and databse sercr throw networking.
+Herw typically fronend app deploy in a public network onthe other hand app server deploy in a secure network
+alose database deploy another network with restrice secureity only may accable for app servr.
+this is look like a three tier applicaton  and Docker network give this mechanism to mantaine differetn tier 
+for differetnt access authorize.
+
+
+Now see some basic netowrk command:
+We alreadhy see some contienr wth is was docker by defaylt netwrok.
+
+Lets see what is default detwork with docker network ls, here shwo then defautl detwork.
+When we run a contienr its by defaytl run with a bridge newroik if we dont specility mentaiton any newrok.
+
+
+to see it lets explore a contienr with docker inspect.
+
+
+9:30:
+=================
+Lets create out first docker network.
+If we dont mentaton any driver for the network then it will creaed with bridge nework.
+
+Waht is actually network derive , lets explore it in details for this image.
+
+
+frst see bridge nework:
+To see the detwork details we have to inspect the netork what we creareed just now.
+When we create a nework its taken an subnet seris ip, we can alsoe mentation a cutome submit.
+and every contienr wtih thsi network and get a uniquer ip from this subnet.
+
+
+hsot driver crate conniecotn with curnet host machine.
+none dosnto make any conecton of its how or any orher netork, here contienr get run isolated way.
+
+
+
+
+14:30
+===================
+lets contienr ip form its inside.
+With help of docker exec command we see the contienr ip.
+ths coniner this ip, and thist contiern get this ip we see by docker exec.
+and this bothe as in a same netwrok so then can communicate each other.
+
+
+Ok, lets create another nwtwork, run some conierh with this new work.
+to run a container aor service with nwtrok we have to pass this network with docker run command.
+oke run done, now we gonna check its nwtork.
+
+
+Lets run another contienr whti this nework waht is called mybackend app.
+So now my backend app and mydatabse app now running with in same netwrok.
+
+
+20:00
+==============
+Lts update this databse and app container to see the wht is what contener.
+Lets do some curl commadn this check the connections.
+As then running diffetne network so the not make communicaton each other.
+
+
+ok lets delete our backend contier, and run it with same newrork as then same network of mysql server.
+this way our backedn conter and mydatabse server can be conninication each other.
+oke our new backend server run done wth same network with dtabse server.
+
+now check this conneciton to reach each other.
+get it ! yes we can now make ntwork.
+this is how actually bridge network to make connunication contienr.
+
+
+Host newrork donsnot use so much.
+
+29:00
+============================
+Lets see the overlay network, is main perpose for working with cluster of servers like docer Swarm.
+In a cluster where mulitple node withkign with in a network for HighAvailable for a signle applicaotn.
+here a single run mutiple copy in different node, here mantain communtioct user overlay newrork.
+thsi is hwo work overlay network.
+
+Bridge network ok for single host machinge and overlay for culater newroking.
+
+
+
+32:30:
+=====================
+Lets see how to create a ntwrok with custome subnet now.
+Previoursly we crate ntwerok wtih out mentation andy subnet wher docker provide subnet ip seri.
+Now we provide our custome subnet ip serise of the network.
+
+
+this is how we define our custome subnet serise with gateway.
+lets create it and inspect the newrok to see then details or thsi network.
+
+
+Now if we run a conter wtih this nework it will get a ip address for our custome submint ip.
+lets run it and check thsi conteinr ip.
+yest we get as expected resutl with our custome submtiu ip in our conteinr.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
