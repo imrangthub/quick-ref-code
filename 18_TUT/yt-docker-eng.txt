@@ -1179,13 +1179,348 @@ yest we get as expected resutl with our custome submtiu ip in our conteinr.
 
 
 
-
-
-
-
 =================================================
 ##8) Simple Example Project
 =================================================
+
+This is well be handon tutorial where we going to roun bunch or project using docker.
+and Here is the project source gitHub link, you cna get the source code from here also ths docuemn.
+What is i use on this tutorial for help.
+You cna make a git colne or may download directly.
+
+
+So let see how we cna dow git clone and directly zip download.
+
+
+1:30
+==============
+In very frisrt we now going to run a php projectr using docker.
+Lets see how we cna do it.
+
+In thsi project drectory there is a only one file index.php to macke it simple.
+Just like a HelloWorld project.
+
+Lets see the docker file how it looks like:
+Here jsut a from tag for get php runtime enviroment, then a copy comand wht is copy file from this location to a docker directory
+and Finay expose a port.
+
+4:10
+=====================
+Now we goitng to build our php project image with the command docker build image.
+Now we run this image with docker run comand, lets Runn the command.
+
+Go to browser and check 8080 port.
+Yes we get it ! we get our expected resutl.
+
+In this case here only a single file and defanntly your project comw with many file, dont same projectss.
+
+
+7:40
+==========================
+We know that a multip tier like Three tier applicaotn run frontend backend and databse differently.
+
+So we going to run same a three tier application, with frontend, badk end and databse.
+and All together will run entier application. 
+
+In this case frontend have to communticaton with backend and backeend havd both with database and fronend also.
+So we need a netwrok to resolve tis issue.
+
+First check the what network we already have.
+
+Befor we goitn to create our application I have need clear a issue with defautl netwrok.
+the issue defautl bridege nework dosnot come with internal dns resolver, until is create a custome one.
+
+Lets check it our in protically to run tow contienr.
+Here we can do make communitcation using ip address but not by contienr name, what is need intenral dns resolver.
+
+
+When we create a custome network it come with docker internal dns resolver.
+and this way we cna use contaienr anem as dns to communticton instead of ip address.
+
+
+Then we call other serive by its name like this instead of IP address.
+
+yes on the document say this that defautl and usier-define network difference.
+
+
+
+
+19:20
+=====================
+So we start with create a user-define netwrok with custome subnet, lets run a create command.
+Run it
+Take a screenshot and add it in the docuemtn.
+Run done, so now for testing perpose I amd going to run againt two nginx contienr we this ntwerok.
+My new conteinr  is ng3 and ng4.
+
+Lets instpect then ntwork to chck the current status.
+so oru ng3 and ng4 contienr runnign with this newtork.
+
+
+so lets echk the is it possible to make communtit contienr to contienr using dns.
+First lets check using ip againg and then dns.
+Now usign dns, and yes grate ! we get it we can able to conenction with dns.
+
+
+So wha we get here, for dns resoluation we have to use user-define network not defautl one.
+
+
+We go to out three tier application, befor the we ging to clean and remove oru current all docker contienr.
+
+
+Lwts echk what oru three tier applicaotn will looks like, here good show one.
+
+
+
+
+26:10
+=====================
+First we goiny to run our database server as a container as:
+This is then comand you cna copy it from thsi docuemtn and run it.
+You cna also chedk the docker hub mysql image ducument ehat is infor need to run this mysql image as a server.
+
+
+mysql service run done !
+Do mysql contienr exec and run mysql command with user credentials.
+
+Chek database, use one, her we use simpledatabase.
+
+then create a table, here is table creation mysql command, and run it.
+So now our mysql database server ready to use !
+
+
+
+
+30:10
+==========================
+Now we goitn to run a python project with this database.
+So check then sourc code of python file.
+
+Nothenr fency hee we create database connection in this connecotn we pass hostname with enviornment.
+
+we just going run a simple select query to keep it simple.
+
+Lets ceck thsi Dockerfile now,
+
+Fistr as ausual a from tage for python.
+crate a directory to get a copy of source and keep it in thsi directory indise of a contienr.
+and Expose the port.
+Finally execut python run commnd.
+
+
+
+36:20
+==================
+Lets build a image ro python applicaton wth docker build command.
+Run doen ! check this image with image ls command age we get it !
+Now the Image is ready.
+
+To run it wiht mysql database the comamn is as:
+here this is contienr naem this is network name, port mapping, and mysql server information here and finally image name.
+Run it, run done lets check it on browser 8080 port.
+
+Yes ! we get it ! we get the data from mysqlserver.
+lets leave a screenshot from here to doucment.
+
+
+40:10
+===========================
+Now we gong work king with a java applicaotn. I am gonna use a java spring boot project.
+
+for run a java applicatoon we have to first compali and build a jar file first, here i am usring maven.
+This is my appliaotn .pom file.
+now i amd run the jar build command.
+yes the build pross is success.
+So the location of har is here showing, and my applicaotn ready to run.
+
+
+Lets now create a dokcerfile for this java applicaton.
+Same we crate befor python image i am doing same here.
+
+See thsi commadn:
+    from a jdk
+    create a directory 
+    copy file and exppsoe the port.
+    then finally run it.
+
+Hwre we see how to maek database credentails. i have to go thsi way for docker contienr perpose.
+
+
+lets run thei build comand. and tis done.
+Check thed image.
+Now run this java applicaton with this ntwrok and mysql server as:
+run it.
+Oh! we get port conflicts with pthon app. lets stop sna delete previour ptyhon app.
+and run tis ageitn, run done, taking a screenshot and add it on document.
+
+
+
+lets eheck the application on browser 8080 port. 
+and yest we get it! data from mysql server.
+
+
+here another this conteinr logges, how we can check contienr logs.
+usti contienr lgos, 
+we can also see live log using -f.
+
+ok now our mysqldatabse and backeend applicaothn is ready now.
+For frontend ther we gojtn to run a Node applicaton.
+
+
+
+53:30
+=====================
+Lets run a nodeja applicaton as a fronend app.
+
+lets echk the appliaton source code.
+Nother faccy here here we provie oru backne url and make a http reqeust and get resposne.
+then we map this respons data wtih a html file.
+
+
+Lets build a image, ok check the dockerfile first.
+
+same as befor: a form tag, copy file, 
+We use diffetne commadn in diffente docker file.
+
+
+Lwts run image build command.
+taking a screenshot and keep it in the document.
+
+In this soruce code the app will run on 3000 port.
+
+
+Now time to run the fronedn applicaton wtih backend server.
+ok run done !
+
+now check it on the browder 3000 port.
+
+we can now flow teh three step for three tier application.
+here data base is mysql, middletier is java app and node app is a fron end.
+
+yes we get oru data in browser wth beautiful way.
+
+
+Now lets add some data on the database manually.
+
+Refresh the frowser and we get new addes data !
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+ 
+
+
+
+
+
+
+
+
+
 
 
 
