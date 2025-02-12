@@ -567,15 +567,14 @@ including how Docker manages containers, images, networks, and volumes.
 
 00:00-to-1:50
 =========================
-Hey guys!
-
-In today's video, we're diving deep into Docker!
+Hey guys! Welcome back to the channel. In today's video, we're diving deep into Docker!
 
 We'll break down Docker’s internal architecture, covering:
     Docker Architecture – How everything fits together
     Docker Components – The key building blocks
     Namespaces – How Docker isolates processes
     Control Groups (cGroups) – How resource limits work
+
 By the end of this section, you’ll have a solid understanding of how Docker works under the hood!
 Let’s get started! 
 
@@ -599,7 +598,7 @@ So, whether it’s the CLI or Dashboard, everything talks to the Docker Engine b
 
 1:50-to-3:00
 ======================
-We can use the Docker Client locally or from any remote CLI to communicate with the Docker Engine—no difference! 
+We can use the Docker Client locally or from any remote CLI to communicate with the Docker Engine, no difference! 
 
 
 
@@ -622,7 +621,7 @@ Docker Hub & Private Registries
 Here’s my Docker Hub account, where I’ve pushed some custom images.
 You can also push and share your own images!
 
-Explore Docker Hub—it has great documentation for each image.
+Explore Docker Hub, it has great documentation for each image.
 For example, the MySQL official image page provides all the details on how to use it! 
 
 
@@ -630,19 +629,56 @@ For example, the MySQL official image page provides all the details on how to us
 
 09:10-to-17:00 
 ===========================
-Now we taling about Namespace and cGroup.
-
-Namespace: this for isolated a contiener and like a process.
-Same software or same image we can run multiple time what is not interact with other, 
-all contienr run its context.
-every process/Conteiner is isolated and run independently, ther process id different.
+Now we’re diving into two fundamental concepts in containerization: Namespaces and cGroups.
+These are key technologies that make containers possible, and understanding them will give you a deeper insight into 
+how containerized applications work. 
+So, let’s get started!
 
 
-cGroup: When we run a container cGroup assign its resource like cpu, memory etc. 
-How much resoruce a contaiber consume what is define by cGrpup.
+What is a Namespace?
+Imagine you have multiple applications running on the same system, but each one needs to think it’s the only application running. 
+That’s where Namespaces come in!
 
-I in a host we buget 50% of resoruce for app a and 50% for B, we can define how much what app able to use
-this how manage by cGrpup.
+A Namespace in Linux is like a virtual wall around a process or a container. 
+It isolates resources, so one process doesn’t interfere with another.
+
+Here’s how it works:
+    When you launch a container, it runs in its own Namespace.
+    It gets a unique process ID (PID) and doesn’t see processes running in other Namespaces.
+    This isolation allows multiple containers to run from the same software image without interfering with each other.
+    Think of it as each container having its own little sandbox, where it operates independently without affecting other 
+    processes on the system.
+
+
+
+What is a cGroup?
+Now that we know how containers stay isolated, let’s talk about cGroups or Control Groups.
+A cGroup is responsible for managing resources like CPU, memory, and disk I/O for a container.
+
+Here’s why it’s important:
+    Without cGroups, one container could use too much CPU or memory, affecting the entire system.
+    With cGroups, you can limit and prioritize resource usage for each container.
+    This ensures fair distribution of system resources and prevents one container from overwhelming the server.
+    Think of cGroups as a traffic controller that decides how much CPU, memory, and other resources each container gets.
+
+
+Real-World Example
+Imagine a host machine where we allocate 50% of resources for Application A and 50% for Application B.
+With cGroups, we can define how much CPU, memory, and other system resources each application is allowed to use.
+
+If we don’t set resource limits, then when Application A experiences high traffic, it may consume most of the available resources.
+As a result, Application B and other applications on the same host might not get enough resources, leading to performance issues.
+
+By using cGroups, we ensure that Application A cannot take more than its allocated quota,
+allowing fair resource distribution and preventing any single application from overwhelming the system.
+
+
+How do Namespaces and cGroups Work Together?
+    Together, Namespaces and cGroups provide:
+    Isolation (via Namespaces)
+    Resource Control (via cGroups)
+This combination allows multiple containers to run efficiently on the same machine while ensuring stability and performance.
+
 
 
 
@@ -650,15 +686,20 @@ this how manage by cGrpup.
 
 17:00 -to - End
 ===========================
-This is overal ide of docker architecure and component how actually docker work.
-You dont need to spend so many time here jsut take a highlevel view of docker internal componsents.
+This is an overall idea of Docker architecture and components—how Docker actually works.
+We won’t spend too much time here, just a high-level view of Docker’s internal components.
 
-When we pass a docker command using cli then docker internal sercer receive thsi command 
-and give instruction to docker engin to run this perticular image ad contiaenr,
-if the container already not presetn insede docker then docekr pull it form regiistry and then run it.
+When we run a Docker command using the CLI, Docker’s internal server receives the command
+and instructs the Docker engine to run the specified image as a container.
+If the container is not already present in Docker, it pulls the image from the registry and then runs it.
 
-Next vide we will see Image and contaiener operation, how build image how to run it as contienr etc.
-how create and modify custome image and upload it to docker hub.
+In the next video, we’ll explore image and container operations—how to build an image,
+run it as a container, create and modify custom images, and upload them to Docker Hub.
+
+
+That’s it for today’s video! If you found this useful, don’t forget to like, subscribe, and hit the notification bell 
+for more tech insights. See you in the next video!
+
 
 
 
@@ -669,180 +710,250 @@ how create and modify custome image and upload it to docker hub.
 
 00-3:00
 =============
-HeyGuys in this tutoruyal we gonna see image and continer operation.
+Hey guys, in this tutorial, we’re going to explore image and container operations.
 
-Image: Image its a exuectable file or package including every this you need to run ap perticular application like nginx.
+Image
+An image is an executable package that includes everything needed to run a specific application, like Nginx.
+We can download pre-built images for Java, MySQL, Redis, etc., or create our own custom images.
 
-We can download our required image like java, mysql and redis or we cna also create our own image.
+An image is essentially a template for containers.
+For example, we can create two Java app containers from a single Java image
+or three Redis app containers from a single Redis image.
+This shows how we can reuse images to create multiple containers as needed.
 
-Actually Image a template of contiener.
-Here you see we crate two java app from a single image and threed redis app form one redis image.
-This is how we can create as much as image as we need.
 
-Lets take look on docker pubhlik registry docker-hub...
-Here a lot of official and custome image, we cna also upload our own image here we will just after a few moment.
+Docker Hub Registry
+Now, let’s take a look at Docker Hub.
+Here, we can find a vast collection of official and custom images.
+We can also upload our own images, which we’ll do in just a moment.
 
-this is how we cna keep oru public image on public registry if we need mantain private registry for a company
-we cna also do it and share to other teamp and run it as app.
+Public images can be stored in a public registry like Docker Hub,
+but if a company needs a private registry, they can set one up and share images with their team to run applications securely.
+
 
 
 3:00--
 ====================
-Now see some of frequently uses docker image command.
-first:
+Now, let’s explore some frequently used Docker image commands.
+Listing Docker Images
 dokcer image ls
-thsi comand show the list of image in you current docker host.
+This command lists all images available on your current Docker host.
 
-reposity: this is thei image reposity.
-Tag: tag actually image version. let me go in docker hub explore a tag form ther.
+Repository: The name of the image repository.
+Tag: This represents the image version. Let’s check Docker Hub to explore tags.
+For example, let’s search for the Ubuntu image.
+We can see different tags listed—each representing a specific release version.
+
 
 Check a image, ubuty.
 see the show ubutn image tag this is actually  thsi is the release version.
 
+If no tag is specified, Docker will pull the latest tag by default:
+However, the latest tag does not always mean the most recent version.
+For example, if we run:docker run ubuntu:latest
 
-Now check one of my custome image wha i build and release with different version as tag.
-In reql-world project thsi is you can mangain app relsaversion as tag
-
-
-Now we see uses of tag, how to we can run a docker image with specific version or tag.
-I am gonn pull a ubuntu image with a specific tag
-If some one dosnot mentation any tag then by defautl it pull the latest version form docker hub
-
-Another note: tag latest dosnot mean thsi will be the most latest version of thsi app/os 
-the latest tag mamy assign on a specific version what is may not the most recent release or version.
+It may run Ubuntu 22.04, even though the latest release might be 23.xx.
+The latest tag is just a label assigned to a specific version, not necessarily the newest release.
+You can check the official Docker Hub image documentation to verify the correct tags.
 
 
-List we run a ubutu image with latest tag but see its run 22.04 but most latesr version is 23.xx
-so tag latest dosnot mean then most recent latest version.
-You can find the version wiath tag with latest on docker hub image documetnation..
+Now, let’s check one of my custom images, which I built and released with different versions as tags.
+In real-world projects, this is how you manage application release versions using tags.
 
-ImageId: its  a auto generate of id , then show create date of ite and then size of image.
+When running docker image ls, we see:
+Image ID: A unique auto-generated identifier for the image.
+Created Date: When the image was built.
+Size: The disk space used by the image.
+
+
 
 
 10:20
 =====================
-Now we see base from from image build and how to build a image.
+Now, let's explore base images, image tags, and how to build an image.
 
-For that we need to know base image, Waht is actually base image, Its a actually prant image of all officeal image and custome image.
-I mean all image creagte from a image call base image.
+1. What is a Base Image?
+A base image is the parent image for all official and custom images.
+Every Docker image is created from another image called a base image.
+
+2. Understanding Dockerfile
+Next, let's explore Dockerfile—a file that defines what an image is and how it works.
+Docker images follow a layered architecture, and the Dockerfile shows how an image is built layer by layer.
+
+3. Exploring a Dockerfile
+Let’s check the Nginx Dockerfile from Docker Hub.
+In the first line, we see the FROM directive: FROM debian:bullseye-slim
+
+This defines the base image used to create the Nginx image.
+Every image has a parent image from which it is derived.
+
+Now, let’s explore another image—MySQL.
+Opening its Dockerfile, we see: FROM debian:bookworm
+
+This means the MySQL image is built on top of Debian (Bookworm) as its base image.
+
+4. How Images Are Built
+All images are created on top of another image, forming a chain of dependencies.
+The FROM directive in a Dockerfile always points to the base image used to build a new image or application.
 
 
-Now we explore on another thing its DockerFile, what is docker file, its a file we define abotu image waht is adn what it do. 
-Docker image ia alear architecture what is we can see in this docker file how it build layer by leyer.
 
-Lets explore a docker file of nginx, from docker hub.
-Here we see the fitst line of a DockerFile is From: directive what is define what from image we goign to create a new image or app.
-This is the prent image of this nginx Image, this is how all image has its a prant image.
-
-
-Okey we can explore another image like: mysql.
-find it and open its dockerfile.
-see its docker file first line start with FROM directirve and thsi is the prant image for thsi mysql image.
-
-This is how all image create top of another image for its base iamge.
 
 
 13:20
 =====================
-Lets see some of custome exmple fo docker file.
-Looks here alos we have to use a from directorve to define its base image.
+Now, let's see some examples of custom Docker images.
 
-So are we gonna chose random bae image ? no.
-We have to chose current base image for our custome image wiath is relatvely same.
-Lise if we need to build a java application then we cholse a jdk image waht specifice version.
-If we do thsit then the image come with ready madn java install ation.
+1. Choosing a Base Image for Custom Images
+Just like official images, custom images also require a base image, which we define using the FROM directive in a Dockerfile.
 
-onte other hand if we chase ubutnu iamge for java then we have to install jkd and deploy java app.
-so we have to chose right base iamge for oru custome image base on its type, requirment or its businesslogic waht actually thsi image gonna do.
+But do we choose a random base image? No!
+We need to select a base image that is relevant to our custom image.
+
+For example:
+If we are building a Java application, we should choose a JDK image with a specific version:
+FROM openjdk:17
+
+This base image already includes Java, so we don’t need to install it manually.
+On the other hand, if we choose a Ubuntu image:
+FROM ubuntu:22.04
+Then, we must manually install JDK and configure our Java application.
+2. Choosing the Right Base Image
+We should always pick a base image that:
+✔ Matches the type of application we are building.
+✔ Meets the system requirements of our app.
+✔ Aligns with business logic and optimizes performance.
+
+Choosing the correct base image helps reduce setup effort, improves efficiency, and keeps our images lightweight.
+
+
 
 
 14:10
 ==========================
 
-Now see thsi From Scratch: this is then minimal version thsit for vrsion of a docker image.
-Every image build to of thsi image layer by layer.
+Now, let’s explore the Scratch image and the FROM scratch tag.
 
-Let go explore a image file from dockerhub, ok go for myusql image.
-Looks its docekr file it buil top of orcls linux image.
-so its mean we definitely fond a image wtih thsi name, letst find it.
+1. What is the Scratch Image?
+The Scratch image is the minimal base image used in Docker.
+It is essentially an empty image—no operating system, no packages—just the bare minimum.
 
-We get it, oh, its hasr amy tag, what was then tag number in mysql docker let me checkit of it was 8-slim.
-so open thsi8- simom image, Loos we found the root of all image what is scratch.
+Every Docker image is built layer by layer, starting from the Scratch image.
+
+2. Exploring MySQL Docker Image
+Let’s explore the MySQL Docker image.
+Looking at its Dockerfile, we see it is built on top of the Oracle Linux image.
+This means the Oracle Linux image is the base image for MySQL.
+
+Now, let's check the MySQL image tag, which is 8-slim.
+When we open this tag, we find that it is still built on the Scratch image at its core.
+
+3. How Images are Built Layer by Layer
+All images are built on top of another image.
+For instance:
+
+The MySQL image starts with Oracle Linux.
+Then, it builds on top of that, adding necessary components.
+Finally, it adds the MySQL application.
+At the very bottom of every image, there is Scratch—the most minimal layer.
+On top of Scratch, we install packages, add files, and run commands to build up the image layer by layer.
+
+This is how Docker images are constructed—step by step, layer by layer.
 
 
 
 
+If you don't want to use ready-made images like the official Nginx image, you can also build your own image layer by layer.
 
-All image build on top of another image, thsi those image build on many another image... and finally the image we 
-get what is scratch. 
-thsi iamge is the minum unti of all docker image.
-and top of this scrath image additional commadn intall package and  finally build second lavel image.
-This is how layer by layer a image develop.
+1. Creating Your Own Nginx Image
+For example, let’s say we want to create an Nginx image using a Linux image as the base.
+The process is similar to setting up a traditional host.
+
+On a physical machine, we install a Linux OS and then manually install packages like Nginx.
+In Docker, we can start with a Linux base image and manually install Nginx, making it ready to use.
+This way, we can customize the image to suit our needs.
+
+2. Scratch Image and Layering
+When you start with the Scratch image (the bare minimum), you can install any server or package you need.
+Each line in the Dockerfile represents a layer of the image.
+
+Each layer is added step-by-step, building up the image, just like you would on a traditional system.
+You can read more about Scratch and layering in its documentation.
 
 
-If you dont use ready made image like officeal image like nginx you can also build your own image 
-as layer by layer.
-Here is am example of createing a ngixn from of linxu image as base.
-The process as our Traditional hsot wher we fits ready maby a linux host and we inatall package like nginx
-same you can take a linux image and install manualli andy server or package like nginx and ready to use it.
 
-
-
-This is actually scratch image, you can more datails in its docuemtaton.
-
-In a docker file all line you see its all each one of call a leyer of this image.
 
 
 23:00-end
 ===============
-Lest see a DockerFile more details.
-A docker file is combanigaton Instruction and argumant.
+Let’s take a closer look at the details of a Dockerfile.
 
-Here you see in my pc screen its the iamge from ubutnu.
-Its take a updte then.
-then its inatall a package of nginx.
-Define its defautl port and finally its run command.
+1. Understanding a Dockerfile
+A Dockerfile is a combination of instructions and arguments that define how an image is built.
 
-From this docker file we goignn to build our image the command is:
-docker build  -t image-name and tag
+Here’s an example of a Dockerfile:
 
- 
-Oke now we see how we cna build a docker image  from a dockerfile in practical
-i need a index.html file so i am gonna create it in this same location.
-
-now check my current image, here show cuttent image list in my curetn host.
-Oke now this time to build our fitrst image: run thei docker build cmmand.
-i paace this screent shot in our document.
-
-Oke our image build donen so check it out usign docker image ls command
-and this shwo our newly created image here.
+It starts with a base image like Ubuntu.
+Then, it updates the package list.
+Next, it installs a package like Nginx.
+It also defines the default port for the container.
+Finally, it includes a run command to start the application.
+2. Building an Image from the Dockerfile
+Once you’ve written the Dockerfile, you can build your image using the following command:
+docker build -t image-name:tag .
+This will create a Docker image with the specified name and tag based on the instructions in the Dockerfile.
 
 
-So now this to run oru new build image as contianer.
-run done, check the container.
-Now w check in our browser.
 
-thst was defautl nginx image, now we gonna run our custome nginx lets see it.
-check in browser, its show out custome nginx defautl page.
+Now let’s see how we can build a Docker image from a Dockerfile in practice.
+1. Preparing the Index File
+First, I need an index.html file, so I’ll create it in the same location as the Dockerfile.
 
-If we want to see more details of a image we cna use image isnpect command.
-Now my image run insude in oru dockr enginx.
+2. Checking Current Images
+Let’s check the current list of images on my Docker host.
+To do this, run the command:
+docker image ls
+3. Building the Image
+Now it’s time to build our first image!
+Run the following docker build command:
+docker build -t image-name:tag .
+I’ll also add a screenshot of this process in our document.
 
-so how we can get this image in my machine as a phical file ?
-we can save this iamge as .tar file ans share it wit other so lest see it.
-for this we hve to use docker save command this way.
-
-So this is out tar file we get ater run dockdr save comamdn.
-
-
-a contienr create from a image using docer run comand wath we alteady see.
-Dockdr run comand do loat of thing, wc can explote this way.
-
-docker pa and dockdr -a shwo docker cuntne contianer.
+4. Verifying the Build
+Once the build is complete, let’s verify it.
+Use the docker image ls command again to check the list of images.
+You should see our newly created image in the list.
 
 
-we cna alsoe a contier details using dokcer inspect.
-we have to use using contienr id and we get details information of a contener etc.
+Now, it's time to run our newly built image as a container.
+1. Running the Container
+Once the image is built, we can run it using the docker run command.
+After running it, let's check the container.
+
+2. Checking in the Browser
+We can open a browser and verify the container is running.
+This was the default Nginx image earlier. Now we’re running our custom Nginx, and you should see the custom default page.
+
+3. Inspecting the Image
+If we want to see more details about the image, we can use the docker inspect command.
+This will give us a deep dive into the image's metadata.
+
+4. Saving the Image
+Now, let’s say we want to share this image as a physical file.
+We can save it as a .tar file using the docker save command:
+docker save -o myimage.tar image-name:tag
+This generates a .tar file that we can share with others.
+
+5. Docker Inspect on Container
+Just like images, we can also inspect containers.
+To inspect a container, we can use docker inspect with the container ID to get detailed information about the container’s configuration and status.
+
+6. Viewing Containers
+To see all running containers, use the docker ps command.
+For all containers (including stopped ones), use:
+docker ps -a
+
+
 
 
 
@@ -850,228 +961,363 @@ we have to use using contienr id and we get details information of a contener et
 =================================================
 ##6) Storage and Volumes
 =================================================
-In this tutorial we are talking about docker storage and volume
+In this tutorial, we will be discussing Docker Storage and Volumes.
 
-By default all files created inside a container are stored on a writable container layer.
+By default, all files created inside a container are stored on a writable container layer.
 
-What is the problem with this by defautl system:
-    The data doesn't persist when that container no longer exists. 
-    Tightly coupled to the host machine.
-    Reduces performance.
+The Problem with the Default System:
+Data Persistence: The data doesn’t persist when the container no longer exists.
+Tightly Coupled to the Host Machine: The container’s data is tightly bound to the host’s file system, making it difficult to 
+manage independently.
+Reduced Performance: Storing data in the container itself can affect performance, especially when containers are 
+constantly created and removed.
+
+Next, we will explore how volumes can solve these problems and make data management more efficient in Docker.
+
 
 
 
 3:00
 ==================
-To solve this problem dockr do this two way:
-To managing and persisting data in containers. Two way solved this problem: Volume and Bind-mount.
- you cna get details in docker official site documentation.
+To solve the data persistence issue, Docker provides two primary ways of managing and persisting data in containers: Volumes and Bind-mounts.
 
-this is the tow main system of dockder staorage.
+You can find more detailed information on these in Docker’s official documentation.
+
+These are the two main storage systems in Docker:
+
+1. Volumes:
+Volumes are stored inside Docker and can only be accessed by Docker containers, not by the host processes.
+Volumes are the recommended approach when you want to keep container data secure and isolated from the host machine.
+Docker suggests using volumes as the best practice for managing container data.
+
+2. Bind-mounts:
+With bind-mounts, a file or directory is managed on the host machine, and non-Docker processes can modify it.
+Bind-mounts are useful when you need to perform analysis or allow other host machine processes to access data 
+generated by the container, such as logs or reports.
+Use bind-mounts when you want to interact with container-generated data outside the container or if other processes on the host
+ need access to it.
+
+3. tmpfs:
+tmpfs allows Docker to store data in the host machine's memory instead of the disk. 
+It’s the fastest and most secure option for temporary data storage.
+tmpfs is ideal when you need high-performance, non-persistent storage that doesn’t require saving data after the container stops.
 
 
-Volume: are inside docker and only can by access by docker-contienr only, not host process.
 
-
-Bind-mount: thsi way a file or directoy manage any weher on host maching and non-dockr process can modify it.
-
-
-So wehn you container data have to secure and no other has requred thsi you cna use voluem.
-Docker also sugest this is a best approaches.
-
-On the other hand if you need to analysis or need access container app generated to process by another other
-host porcess like: application log, report date etc.
-the main resones if you what to do any ferther operation on container generated data or any other host machine process need to access this
-then you have to use bind mounting.
-And you achive it use bin-mounting.
-
-
-
-tmpfs: this way docker keep data in host machine memory, its most secure and faster way.
 
 
 
 9:20mm
 ============================
-Let’s starting basic dockr voluem commadn and start practice with voluem first.
+Now, let's start with the basic Docker volume commands and practice with volumes.
 
+Example: Using Volume with an Application Server (Nginx)
+Let's start with Nginx and see how we can use volumes with an application server.
 
-lest start with nginx, how we can use volume with application server lets see an exmple.
-Oh, i run it but i mees this port mapping, so its run without any host machine port.
+Run the application:
 
+My application is running now. Let’s modify it to update the default Nginx page.
+Update the Default Nginx Page:
 
-So i am gonna run it again wit port mapping, lets do it.
-Oke my application is runnign now, lets modify so this my app, like update the defautl nginx pag.
-Ltst do it, so we need exec contienr to go inside it for update its welcome html page.
-Oke now i am inside then container.
+We need to exec into the container to update its welcome HTML page.
+Use docker exec -it <container_name> /bin/bash to enter the container.
+Inside the container, vi is not available, so I’ll use the echo command to update the page.
+echo "Welcome to My Custom Nginx Page!" > /usr/share/nginx/html/index.html
+Once we update the page, we refresh the browser, and we can see the update reflected on the page.
+What happens when the container crashes or stops?
 
-Inside vi is not available, so i am gonna use here echo command for now.
-Lsts update this index.html file.
-Updatation done, refresh then browser, and we see our updaton is refalaceted here, and it good.
+Manually stop the container and restart it.
 
+Observation:
 
-Now lets say my applicaton/ container some how stope wroing or may cresh it and i need to start it again.
-Lets do it.
-manually stope the contienr and run it again.
-Now see this time show nginx default welcome page we lost our updatation what is just do a few minute ago.
-This way contienr keep its data inseide contienr file system, when its delete or crash some how, its data also lost with it.
-Actually this is the defautl behavor of docker contienr.
+This time, the default Nginx welcome page shows up again, and we lose the update we made just a few minutes ago.
+This happens because the data was stored inside the container's filesystem. When the container stops or crashes, the data inside is lost. This is the default behavior of Docker containers.
+To persist the changes made to the Nginx page, we can use Docker volumes.
+
+We’ll see how Docker volumes work in the next steps.
 
 
 16:00
 ============================
-Lets see how to fixed this data loss isuue with docker volume.
+Now, let's fix the data loss issue by using Docker Volumes:
 
-Okey, now first create a volume, fist run docker voluem ls to see current volume list, its have to be no volume cos we are not crate yet.
+Steps to Fix Data Loss with Docker Volume
+Check for Existing Volumes:
 
-Now create a voluem, using dokcer volume create command.
-do docker volume ls to check it, see here show the volume wht we jsut create.
+First, let’s check the existing volumes by running:
+docker volume ls
+As we haven’t created a volume yet, the list will be empty.
+Create a Volume:
 
-Oke my docker volume is ready, lets run oru nginx server with this volume.
-For thsi we goign to run the command this way:
-here -v is need to use for volume, this is the voluem name in left side of the colone: and right side is contienr insided directory.
-this way we have to use volume for our nginx server.
+Now, let’s create a Docker volume using the following command:
+docker volume create my_volume
+Verify the Volume:
 
-Okey if app is runnginx now, lets check the home page form browser.
-In docker desktop show the contienr and volume.
+Once the volume is created, run docker volume ls again to see the volume we just created:
+docker volume ls
+You should see my_volume in the list of volumes.
+Run Nginx with the Created Volume:
 
-Letst Update ageing the this nginx html page agian.
-for this we have to do docker exec againg.
-we are gonna use updte the index.html page as previouse.
-Using echo we update it, check ti use cat command.
-lets check it from browser.
+Now, let’s run the Nginx container and mount the created volume to it. Use the following command to do this:
+docker run -d -p 80:80 -v my_volume:/usr/share/nginx/html nginx
+Here, -v my_volume:/usr/share/nginx/html tells Docker to mount the my_volume to the /usr/share/nginx/html directory inside the container.
+Check the Home Page:
 
-asume this our app crash, and we need to run it again.
-for thiw we maually stop and delete contener also image.
-so there no iamge, and coneteiner show in docker deshtop dashboard.
-also check by comand line not contiber here.
+Now, you can check the Nginx homepage in your browser. It should display the default Nginx welcome page.
+Update the Nginx HTML Page Again:
 
-But we can found a voluem in here, we remove contienr may its crash byuts self but not volume !
-lsts run my applicaton run again with this same voume.
-we gonna pull image againe.
-and we have to get our previous updated index.html file have to show same again form volume.
+Let’s update the index.html page again, but this time the changes will be persisted even if the container is restarted.
+
+Exec into the container to update the HTML page:
+docker exec -it <container_name> /bin/bash
+Update the index.html file using echo:
+echo "Welcome to My Custom Nginx Page!" > /usr/share/nginx/html/index.html
+Verify the Update:
+
+You can verify the update by using the cat command to see the contents of the index.html file:
+cat /usr/share/nginx/html/index.html
+Once the update is made, refresh your browser, and you should see the updated page as expected.
+Persist Data with Volume:
+
+If the container stops or is restarted, the changes to the index.html page will persist because the data is stored in the Docker volume (my_volume).
+Docker Desktop - View the Volume and Container:
+In Docker Desktop, you can also see the container and the volume being used.
+Now we have successfully solved the data loss issue by using Docker volumes.
 
 
-lets run another nginx server without voluem, lsts check what happend..
-See we doen map voluem wthithis contienr ths why we not get our previsou date.
-its run wtih its defautl dta.
+
+
+
+Let's assume the application crashed, and you stopped and deleted both the container and the image. In Docker Desktop, you can see that there is no container or image listed.
+You can also verify this by running the following command:
+docker ps -a  # to list all containers
+docker images  # to list all images
+Volume Remains Intact:
+
+Even if the container or image is deleted, the volume will still persist. You can check the volume by running:
+docker volume ls
+The volume we created earlier (my_volume) will still be listed.
+Re-run the Application with the Same Volume:
+
+Now, let's pull the Nginx image again and run a new container with the same volume. You can run the following command:
+docker run -d -p 80:80 -v my_volume:/usr/share/nginx/html nginx
+Access the Updated index.html:
+
+Once the container is up and running again, you can go to the browser and check if the previously updated index.html page is displayed (the one we updated before the crash).
+The volume ensures that the data is preserved even after container restarts or deletions.
+Run Nginx Without the Volume to See the Default Data:
+Run Nginx Without Mapping the Volume:
+
+If you run a new Nginx container without mapping the volume, it will show the default Nginx page because it is not using the previous volume that stored the updated index.html file.
+docker run -d -p 80:80 nginx
+Result:
+
+Since we didn’t use the volume (my_volume) this time, the container is using the default Nginx data, and we won't see the updated index.html page.
+Conclusion:
+Docker Volumes ensure that data is persistent even after the container is deleted or crashes. By reattaching the volume to a new container, you can recover the previous state (e.g., the updated index.html).
+Without the volume, Docker containers will use their default data and lose any changes made previously.
+
 
 
 
 27:30
 ==================================
 
-Lets see now bind mounting, the bind mount command like this.
+[Intro]
 
+Hey everyone! Welcome back to the channel!
 
-So waht is actually mean this bind mounting: 
-    In this way a file or directory on the host machine is mounted into a container. 
-    Sharing data or files from the host machine to containers.
+In this video, we're going to dive into Bind Mounting in Docker, and also take a quick look at Tmpfs, another mounting mechanism.
 
+If you’ve been using Docker, you might have heard of mounting volumes, but bind mounting has a key difference. Let’s break it down and explore how it works.
 
-This is the syntax of bind mounting.
-Here if show linux and windowns system bothe command.
-instead of -v we can also use -mount for more explicitly.
+[Section 1: What is Bind Mounting?]
 
---mount type=volume, source=myvolume, target=/usr/share/nginx/html this is the recommend way and other one -v is short way.
+So, what exactly is Bind Mounting?
 
+With Bind Mounting, a file or directory on the host machine is mounted directly into a Docker container.
+This allows you to share files and data between the host machine and the container.
+It’s super useful when you need to update or manage files on your container from your local machine directly.
 
-Let try bind mountting in a action, lets create a cotaoner with bind mount.
-Before thsit let me clearn our previous container.
+[Section 2: Syntax of Bind Mounting]
 
-For thsit first i am gonna update the html pageagiain. and this file path i am gonna to then bind mount.
-and this host machine file/directory well create a vlume to the continer.
+Here’s the syntax for bind mounting:
 
+You can use the -v flag for a quick bind mount or the more explicit --mount option.
+Let’s take a look at both approaches:
 
-oke applicaton run done with bind mount file, we going to refresh browser and i have to get our update file here.
-Yes ! we got our expected result.
+For Linux and Windows systems, the command looks like this:
 
-In this way the key different between volume mounting that we cna update the application file from our host machine
-and this update refelacted on docker contener directly like as a shred file.
-Lets check it out update it again.
+Using -v (short version):
+docker run -d -v /path/on/host:/path/in/container nginx
+Or, the more explicit version using --mount:
+docker run -d --mount type=bind,source=/path/on/host,target=/path/in/container nginx
+The --mount approach is the recommended method because it’s more explicit and easier to understand.
 
-yes we got it. the is how it work actually.
+[Section 3: Trying Bind Mounting in Action]
 
+Let’s see Bind Mounting in action!
 
-and Another one mounting is tmpfs, this is rearly uses mechanism this is the command you can explore it
-for now i leave it as it.
-Here is mentation the command for windows and linux systemn both. 
+We’re going to start by cleaning up our previous container:
+docker rm -f <container_id>
+Next, we’ll update our HTML file on the host machine and use bind mounting to reflect those changes directly into the Docker container.
+
+Here’s how we do it:
+
+Update the index.html file on our host machine.
+Let’s add a simple change, like modifying the welcome text.
+
+Run the Docker container with the bind mount:
+docker run -d -v /path/to/host/index.html:/usr/share/nginx/html/index.html nginx
+What we’ve done here is mount the file from our host machine to the container.
+
+[Section 4: Verifying the Changes]
+
+Now, let’s open our browser and refresh the page.
+
+As you can see, we’ve got the expected update! The change we made to the file on the host machine was reflected directly inside the container.
+
+That’s the magic of bind mounting!
+
+Now, let’s update the index.html file once again on the host machine.
+
+We’ll make a small tweak to the content, save it, and refresh the browser again.
+And boom, we see our new update immediately in the container as well!
+
+[Section 5: Key Difference from Volume Mounting]
+
+So, the key difference between bind mounting and volume mounting is that with bind mounting, we’re directly sharing and modifying a file or directory from the host machine to the container.
+
+This allows for real-time updates from the host, which is perfect when you need to change application files frequently or need external processes to access the files being used by the container.
+
+[Section 6: Tmpfs Mounting]
+
+Now, let’s briefly touch on Tmpfs, another mounting option in Docker.
+
+Tmpfs allows you to store data in memory instead of on disk. It’s a volatile storage solution, meaning that the data won’t persist if the container stops or crashes.
+
+Here’s the basic syntax for Tmpfs mounting:
+docker run -d --mount type=tmpfs,target=/path/in/container nginx
+Tmpfs is generally rarely used and can be handy in specific scenarios where performance is critical, and the data doesn’t need to persist.
+
+[Outro]
+So, that’s an overview of Bind Mounting and Tmpfs in Docker.
+
+Bind mounting lets you share files between the host machine and the container, making it easy to update files in real-time.
+Tmpfs provides temporary storage in memory for situations where you don’t need data to persist.
+Feel free to explore both and let me know if you have any questions in the comments!
+
+If you found this tutorial helpful, don’t forget to like, subscribe, and hit the bell icon for more Docker tips and tricks. Thanks for watching!
+
+See you in the next video!
+
 
 
 
 34:30
 =============================
-We will se docker volume for a most real-worl example, what is with a database mysql volume mounting now.
+ we'll explore Docker Volumes and how they can be used to persist data, specifically using a MySQL database as a real-world example.
 
-Now we are run a mysql database with docker volume.
-Let me clear provisou contienr.
+In this lecture, we'll cover why Docker containers lose data by default and how volumes can help solve this problem by storing data outside of the container's filesystem.
 
-First we run a myusql contienr without mounting and check what happedn of data.
-oke i am going run the command, and we going to insent some data in mysql.
-Ok its run now. docker desktop app shows the mysql conteinr.
+[Section 1: Understanding the Problem - Data Loss in Containers]
 
-to insetn some data this mysql database we manually insert some data 
-for ths i amd gonna do docker exec for go to insent container.
-docker document shwo how to i define mysql serverport and dtabase and defaut user credentails.
+By default, Docker containers are ephemeral, which means that any data inside a container is lost once the container stops or is deleted. This behavior works great for temporary data, but it’s a huge problem when you need to store persistent data, such as a database.
+
+Let’s take a simple MySQL container as an example. If we run a MySQL database inside a container and insert some data, once we stop or remove the container, all the data inside that container is gone. So, if your MySQL container crashes or you delete it for some reason, you lose all the database records.
+
+This is a problem if you want to store important data like customer records, transactions, or any type of persistent database information.
+
+[Section 2: The Solution - Docker Volumes]
+
+The solution to this problem is Docker volumes. A Docker volume is a special kind of storage that is managed by Docker itself, separate from the container’s filesystem. Volumes allow you to persist data even when the container stops, crashes, or is deleted.
+
+Instead of storing data inside the container, Docker volumes are stored on the host system. This means that even if a container is removed, the volume persists, keeping your data safe.
+
+[Section 3: How Docker Volumes Work]
+
+When you use volumes with a container, you mount the volume to a specific path inside the container. For example, in the case of a MySQL container, you would mount a volume to the path where MySQL stores its data (/var/lib/mysql). This way, MySQL’s data is saved in the volume instead of inside the container.
+
+Once a volume is created and linked to a container, you can stop, remove, and recreate the container without worrying about losing your data. The volume remains intact, and the next time the container starts, it will have access to the same data.
+
+[Section 4: Example Scenario - MySQL with Docker Volumes]
+
+Imagine you are running a MySQL container, and you insert some data into the database. Without a volume, this data would be lost if the container is removed. But with a volume, the data is safely stored in the volume and can be reused even after the container is deleted and recreated.
+
+To make this work, you create a Docker volume and mount it to the container’s data storage directory. Now, any changes you make to the database, like adding or modifying records, are stored in the volume, ensuring that the data persists.
+
+When the container is stopped or deleted, you simply run a new container, mount the same volume, and the database will continue with the previous data intact.
+
+[Section 5: The Benefits of Docker Volumes]
+
+The benefits of using Docker volumes include:
+
+Persistence: Data survives even after the container is deleted or crashes.
+Isolation: Volumes are separate from the container’s filesystem, reducing the risk of accidental data loss.
+Portability: You can easily back up or migrate volumes across different environments or machines.
+Data Sharing: Volumes allow multiple containers to share data without worrying about data duplication or file conflicts.
+[Section 6: Comparing Volumes with Other Methods (Bind Mounts, tmpfs)]
+
+There are other ways to manage data in Docker, such as bind mounts and tmpfs. However, volumes are typically the most reliable and efficient way to persist data.
+
+Bind Mounts: These link a specific file or directory from the host system to the container. While they are useful for development or when you need access to host data inside a container, they are not as secure or portable as volumes.
+tmpfs: This is an in-memory filesystem that is mounted inside the container, and data is lost when the container stops. It’s the fastest but not suitable for persistent data.
+Volumes are recommended because they offer persistence, security, and flexibility.
+
+[Outro]
+
+In summary, Docker volumes provide a solution to the problem of data loss when containers are removed or crash. By using volumes, you can ensure that your database and other important data are safe and persistent.
+
+I hope this lecture helped you understand how Docker volumes work and why they are so important. If you found this information useful, be sure to like, subscribe, and click the bell icon for more tutorials.
+
+Thanks for watching, and I’ll see you in the next video!
 
 
-Now i am inside out mysql data base contienr, use the databse, create a table and insent some data in it.
-
-Mysql connamd for creating a table i mentaiton this in this documetn.
-
-oke i am insetn some data on this table and with the select query we alsoe retrive it. 
-
-
-lets datel the contianer like as its crash the database sercer.
-Run it server ageing and check the data same preiviso follow the step.
-do exec ageing, echeck thsi no data, table of prefisou if the contienr crash or delete the container.
 
 
 
-Let do it now with volume and bind boutn with mysql data contienr.
-first i go with voluem, so i have to create a voluem name mysql-data.
-we chan check it with dockr voluem ls command.
-
-Now run the myusql server with thsi volume. and its run done.
-Do insernt crate a table and insetn some data in to it.
-
-use database. 
-show tabel, not table now.
-
-get table create command form my doucment and run it.
-and iset some data command run int it.
-
-after we get data useing select query.
-in thsi case docker voume keep date data from a seprate place from contienr. 
-In doeckr desktop shwo it.
 
 
-do it delete the contienr, and run the contienr agein with mount with the mysql_data volme.
-and we should get our previsou data.
 
+we'll explore how to persist MySQL data using Docker Volumes and Bind Mounts. 
+We'll cover how each method works and how you can keep your data intact even after container deletion.
 
-let check it our useig docker exec.
-I ma going tie check it as same use databse check table and do a select query.
-and we get it !
-so this is how we can keep contienr data.
+[Section 1: Docker Volumes with MySQL]
 
-Let check and ith bind-mounting way.
-so for this pick a host maching directory and do bind moutn it and run the command..
-We thsi commadn left side we keep host machin path and riht side will contienr targate path.
+Create a Volume: First, create a volume called mysql-data to store MySQL data. You can check if it’s created by listing the volumes with a simple command.
 
-run tthe commnad with bidn mounting.
-run finish and app is running.
-che this howt machine pathe we should get the mysql directoy in this path, yes we get it here.
+Run MySQL with Volume: Now, run a MySQL container while mounting the mysql-data volume. Once it’s running, log into the database, create a table, and insert some data.
 
-same here, do exec, inset dome data insetn it.
-agine delete thsi contienr and run it ageing to check our previosu inserted data.
+Verify Data Insertion: Retrieve the data by running a SELECT query to ensure that everything is in place.
 
-yes, we get our data ! that great.
+Volume Persistence: Docker volumes keep the data separate from the container, meaning if the container is deleted or crashes, the data is safe. You can see the volume details in Docker Desktop.
 
-This is how we can use docker volume to persiste container data after it delete or destry the contienr 
-and run again with previosu data.
+Delete and Restart the Container: Now, stop and delete the container. Afterward, restart the container with the same volume attached.
 
-i taking a screehshot and leave it on docuemt for you guys.
+Verify Data After Restart: Use the same methods to check that your data is still intact after restarting the container. This proves that the data has been successfully persisted with Docker volumes.
+
+[Section 2: Bind Mounts with MySQL]
+
+Use Bind Mount: Next, let’s use a Bind Mount. Choose a directory on your host machine and bind mount it to the MySQL container.
+
+Run MySQL with Bind Mount: Run the container with the host directory mounted to the container. This way, the container directly interacts with the files on the host machine.
+
+Insert Data: Just like before, insert data into the MySQL container.
+
+Verify Data: After inserting data, check the host machine’s directory. You should see the MySQL data being written directly to that path.
+
+Delete and Restart the Container: Stop and delete the container again, and then run the container with the same bind mount to verify data persistence.
+
+Check Data After Restart: After restarting the container, check the data to ensure it remains intact. This confirms that the data is properly persisted with bind mounting.
+
+[Conclusion]
+
+Today, we’ve seen how Docker Volumes and Bind Mounts help us persist data in containers. While volumes are typically the preferred method for most cases due to better separation of concerns, bind mounts give you direct control over the host machine’s file system. Both methods ensure your data is safe even when containers are deleted or restarted.
+
+Thank you for watching! Don’t forget to like, subscribe, and click the bell for more tutorials!
+
+This streamlined version should help you focus on the key concepts and steps for your viewers.
+
 
 
 
@@ -1080,108 +1326,154 @@ i taking a screehshot and leave it on docuemt for you guys.
 =================================================
 ##7) Networking and Security
 =================================================
-Waht is docker networking and  why need this, actually docker network provide communication between containers.
-Specially multi tier applicaton where one server need to communticaton wtih other service like
-app server mantation communitcaton with database server.
-Also for security perpose.
+[Intro]
 
-Lets see a three tier applicaton, here app server talik with formaten and databse sercr throw networking.
-Herw typically fronend app deploy in a public network onthe other hand app server deploy in a secure network
-alose database deploy another network with restrice secureity only may accable for app servr.
-this is look like a three tier applicaton  and Docker network give this mechanism to mantaine differetn tier 
-for differetnt access authorize.
+Welcome to today’s tutorial on Docker Networking and Security. We'll dive into the concept of Docker networking, its importance, and how it supports multi-tier applications and security.
+
+[Section 1: What is Docker Networking and Why Is It Important?]
+
+What is Docker Networking? Docker networking allows containers to communicate with each other. This becomes crucial when building complex applications, especially multi-tier applications, where different services need to interact. For example, an app server needs to communicate with a database server or other services.
+
+Why Do We Need Docker Networking? Docker networking helps maintain secure and isolated communication between containers. In real-world applications, where different components of the application (like the frontend, backend, and database) run in different environments, Docker ensures they can securely talk to each other.
+
+Security Considerations: Networking in Docker also plays a major role in security. For example, you might want the database to only be accessible by the app server and not by the public network. Docker networking lets you define these boundaries, keeping your services secure while ensuring they can still communicate effectively.
+
+[Section 2: Three-Tier Application Example]
+
+Three-Tier Application: Let’s consider a three-tier application:
+
+The frontend app is deployed in a public network.
+The app server is deployed in a secure network.
+The database server is placed in another secure network with restricted access, allowing only the app server to communicate with it.
+Docker’s Role in Security and Networking: Docker networking gives you the ability to manage and segregate these different tiers, controlling which services can access each other. This helps ensure that, for example, the database can’t be accessed from the public network, providing an additional layer of security.
+
+[Section 3: Basic Docker Network Commands]
+
+Default Network: Docker provides a default network called the bridge network. When you run a container and don't specify a network, it will automatically connect to this bridge network.
+
+Viewing Networks: You can view Docker’s networks using the docker network ls command. This shows all available networks, including the default ones.
+
+Inspecting Containers: To get more details on how a container is connected to a network, use the docker inspect command. 
+This command will show you detailed information, including the network settings and which network a container is using.
 
 
-Now see some basic netowrk command:
-We alreadhy see some contienr wth is was docker by defaylt netwrok.
+[Conclusion]
 
-Lets see what is default detwork with docker network ls, here shwo then defautl detwork.
-When we run a contienr its by defaytl run with a bridge newroik if we dont specility mentaiton any newrok.
+Docker networking is a fundamental part of building scalable and secure applications. 
+It enables communication between containers while providing mechanisms to isolate and secure different components of an application. 
+Whether you're building a multi-tier app or securing your database, Docker networking helps you manage both.
 
-
-to see it lets explore a contienr with docker inspect.
 
 
 9:30:
 =================
-Lets create out first docker network.
-If we dont mentaton any driver for the network then it will creaed with bridge nework.
+[Intro]
 
-Waht is actually network derive , lets explore it in details for this image.
+Welcome back! In today’s tutorial, we’ll be creating our first Docker network. We’ll also explore different network drivers and how they work with Docker containers.
+
+[Section 1: Creating Your First Docker Network]
+
+Creating a Network: To create a Docker network, you simply use the docker network create command. By default, if you don’t specify a network driver, Docker will create the network using the bridge driver.
+
+What is a Network Driver? A network driver is a way Docker manages the networking configuration for containers. It determines how containers can communicate with each other and the host machine. In this tutorial, we'll start by exploring the bridge network driver.
+
+[Section 2: Exploring the Bridge Network Driver]
+
+Bridge Network Details: The bridge network is Docker’s default network driver. When you create a container without specifying a network, it automatically connects to this bridge network.
+
+Inspecting the Network: After creating the network, we can inspect it using the docker network inspect <network_name> command. This will show the details of the network, such as the subnet, gateway, and the containers connected to it.
+
+Custom Subnet: When you create a network, Docker automatically assigns a subnet for it. However, you can specify a custom subnet if needed. This allows you to define a specific range of IPs that your containers can use, providing better control over your network configuration.
+
+Unique IPs for Containers: Containers connected to the bridge network are assigned a unique IP address from the network's subnet. This ensures that each container can be individually addressed within the network.
+
+[Section 3: Host and None Network Drivers]
+
+Host Driver: The host driver connects the container directly to the host machine’s network. This means the container will share the same network namespace as the host machine, and you can access it using the host's IP address. The container won’t have its own IP; it uses the host machine’s IP.
+
+None Driver: The none driver essentially isolates the container from any network. Containers using this driver have no network connection at all and can’t communicate with other containers or the host machine.
+
+[Conclusion]
+
+That’s it for today’s tutorial! Now you know how to create Docker networks and the different network drivers available. We’ve covered the bridge, host, and none drivers, and how each of them affects container communication.
 
 
-frst see bridge nework:
-To see the detwork details we have to inspect the netork what we creareed just now.
-When we create a nework its taken an subnet seris ip, we can alsoe mentation a cutome submit.
-and every contienr wtih thsi network and get a uniquer ip from this subnet.
 
 
-hsot driver crate conniecotn with curnet host machine.
-none dosnto make any conecton of its how or any orher netork, here contienr get run isolated way.
 
 
 
 
 14:30
 ===================
-lets contienr ip form its inside.
-With help of docker exec command we see the contienr ip.
-ths coniner this ip, and thist contiern get this ip we see by docker exec.
-and this bothe as in a same netwrok so then can communicate each other.
+[Section 1: Viewing Container IPs]
+
+Checking a Container’s IP: To see a container’s IP from the inside, you can use the docker exec command. This allows us to enter the container and check the IP address it has been assigned.
+
+Communicating Between Containers: If both containers are on the same network, they can communicate with each other using their IP addresses.
+
+[Section 2: Creating and Using a New Network]
+
+Creating a New Network: Now, let's create a new network and run containers within this network. When running a container or service with a specific network, we need to specify that network using the docker run command.
+
+Running Containers on the New Network: Let’s run a new container, for example, a backend app container, connected to our newly created network. Now, both the backend app and the database container will be in the same network.
 
 
-Ok, lets create another nwtwork, run some conierh with this new work.
-to run a container aor service with nwtrok we have to pass this network with docker run command.
-oke run done, now we gonna check its nwtork.
 
-
-Lets run another contienr whti this nework waht is called mybackend app.
-So now my backend app and mydatabse app now running with in same netwrok.
 
 
 20:00
 ==============
-Lts update this databse and app container to see the wht is what contener.
-Lets do some curl commadn this check the connections.
-As then running diffetne network so the not make communicaton each other.
+[Section 3: Testing Communication Between Containers]
+
+Testing the Network Connection: Now that both containers are on the same network, we can test the connection between them using curl commands. This ensures that the containers can communicate properly with each other.
+
+Deleting and Recreating Containers: Next, let’s delete the backend container and run it again, but this time, connect it to the same network as the database container. This way, the backend container and the database container will be able to communicate again.
+
+Verifying Communication: After the containers are recreated and connected to the same network, we can use docker exec to check if they can reach each other. The communication should now be successful.
 
 
-ok lets delete our backend contier, and run it with same newrork as then same network of mysql server.
-this way our backedn conter and mydatabse server can be conninication each other.
-oke our new backend server run done wth same network with dtabse server.
-
-now check this conneciton to reach each other.
-get it ! yes we can now make ntwork.
-this is how actually bridge network to make connunication contienr.
-
-
-Host newrork donsnot use so much.
 
 29:00
 ============================
-Lets see the overlay network, is main perpose for working with cluster of servers like docer Swarm.
-In a cluster where mulitple node withkign with in a network for HighAvailable for a signle applicaotn.
-here a single run mutiple copy in different node, here mantain communtioct user overlay newrork.
-thsi is hwo work overlay network.
+[Section 4: Host Network and Overlay Networks]
 
-Bridge network ok for single host machinge and overlay for culater newroking.
+Host Network: The host network is rarely used, but it allows a container to share the network namespace with the host machine. 
+In this mode, the container does not have its own network stack, and it uses the host’s network for communication.
+
+Overlay Network: The overlay network is used for clustering multiple Docker nodes, such as in a Docker Swarm. 
+The overlay network enables communication between containers on different Docker nodes within the cluster. 
+It ensures that containers across multiple machines can communicate as if they were on the same network.
+
 
 
 
 32:30:
 =====================
-Lets see how to create a ntwrok with custome subnet now.
-Previoursly we crate ntwerok wtih out mentation andy subnet wher docker provide subnet ip seri.
-Now we provide our custome subnet ip serise of the network.
+[Section 5: Creating a Custom Network with a Subnet]
+
+Creating a Custom Subnet: In previous steps, we used Docker's default subnet. Now, let's create a network with a custom subnet. This allows us to define our own range of IP addresses and gateway for the network.
+
+Inspecting the Network: After creating the custom network with a specified subnet, we can inspect it to view the network details, such as the assigned subnet, IP range, and gateway.
+
+[Section 6: Running Containers on a Custom Subnet]
+
+Running a Container on the Custom Subnet: When we run a container on the custom subnet, it will be assigned an IP address from the defined subnet.
+
+Verifying the Container IP: Let’s run the container and check its IP using the docker inspect command. The container should receive an IP address from our custom subnet, and we’ll confirm it by inspecting the container’s network settings.
+
+[Conclusion]
+
+That wraps up this tutorial on Docker networks. We’ve learned about bridge, host, and overlay networks, how to create custom networks with subnets, and how containers can communicate with each other. Docker networking is essential for organizing your containers and managing communication between them.
+
+Thanks for watching! If you found this tutorial helpful, please like, comment, and subscribe for more Docker tips and tutorials.
+
+This script explains Docker networks, creating custom subnets, and testing container communication in a 
+clear and structured way for your audience.
 
 
-this is how we define our custome subnet serise with gateway.
-lets create it and inspect the newrok to see then details or thsi network.
 
 
-Now if we run a conter wtih this nework it will get a ip address for our custome submint ip.
-lets run it and check thsi conteinr ip.
-yest we get as expected resutl with our custome submtiu ip in our conteinr.
 
 
 
