@@ -1485,13 +1485,23 @@ clear and structured way for your audience.
 ##8) Simple Example Project
 =================================================
 
-This is well be handon tutorial where we going to roun bunch or project using docker.
-and Here is the project source gitHub link, you cna get the source code from here also ths docuemn.
-What is i use on this tutorial for help.
-You cna make a git colne or may download directly.
+[Intro]
+
+In this hands-on tutorial, we’re going to run a simple project using Docker.
+
+The project source is available on GitHub, and you can access the code either by cloning the repository or downloading it directly as a ZIP file.
+
+[Section 1: Getting the Project Code]
+
+GitHub Link: The source code for this project is available on GitHub. You can find the link in the description below.
+
+Cloning the Repository: First, let's see how you can clone the repository using Git. Open your terminal and run the following command:
+git clone [GitHub Repository URL]
+This will clone the entire project into your local machine, and you can start working with it right away.
+
+Downloading as a ZIP: Alternatively, if you prefer not to use Git, you can download the project as a ZIP file. Just go to the GitHub page, and there will be an option to "Download ZIP" on the repository page.
 
 
-So let see how we cna dow git clone and directly zip download.
 
 
 1:30
@@ -1506,43 +1516,91 @@ Lets see the docker file how it looks like:
 Here jsut a from tag for get php runtime enviroment, then a copy comand wht is copy file from this location to a docker directory
 and Finay expose a port.
 
+
 4:10
 =====================
-Now we goitng to build our php project image with the command docker build image.
-Now we run this image with docker run comand, lets Runn the command.
+[Intro]
 
-Go to browser and check 8080 port.
-Yes we get it ! we get our expected resutl.
+In this tutorial, we’re going to build a Docker image for our PHP project and run it in a container. Afterward, we’ll check it in the browser to ensure everything works as expected.
 
-In this case here only a single file and defanntly your project comw with many file, dont same projectss.
+[Section 1: Build the Docker Image]
+
+Building the Image: Let’s start by building the Docker image for our PHP project. To do this, we use the following command:
+
+docker build -t php-project .
+This command will build the image based on the Dockerfile in the current directory and tag it as php-project.
+
+
+Running the Image: Now that we’ve built the image, let’s run the container using the following command:
+docker run -d -p 8080:80 php-project
+
+This command runs the php-project container in detached mode and maps port 80 in the container to port 8080 on your local machine.
+If everything is set up correctly, you should see your project’s output or the expected result!
+
+[Note]: In this example, we're testing with a single file, but your PHP project may have many files, so ensure your project structure is correctly set up.
+
+
 
 
 7:40
 ==========================
-We know that a multip tier like Three tier applicaotn run frontend backend and databse differently.
+Nowwe’re going to run a three-tier application consisting of a frontend, backend, and database. 
+Each tier will run in a separate container, and we’ll use Docker networking to enable communication between them.
 
-So we going to run same a three tier application, with frontend, badk end and databse.
-and All together will run entier application. 
+[Section 1: Introduction to the Problem]
 
-In this case frontend have to communticaton with backend and backeend havd both with database and fronend also.
-So we need a netwrok to resolve tis issue.
+In a typical three-tier application, the frontend communicates with the backend, and the backend communicates with the database.
 
-First check the what network we already have.
+For this communication to work smoothly, we need to ensure that the containers can reach each other by name, rather than by IP address.
 
-Befor we goitn to create our application I have need clear a issue with defautl netwrok.
-the issue defautl bridege nework dosnot come with internal dns resolver, until is create a custome one.
+Docker’s default bridge network doesn’t include an internal DNS resolver, so containers can communicate using IP addresses, 
+but not by container names. This is where Docker’s custom networks come in.
 
-Lets check it our in protically to run tow contienr.
-Here we can do make communitcation using ip address but not by contienr name, what is need intenral dns resolver.
+[Section 2: Check Existing Networks]
 
+Before we start creating our multi-tier application, let’s check which networks are already available. 
+Run the following command to list all Docker networks:
 
-When we create a custome network it come with docker internal dns resolver.
-and this way we cna use contaienr anem as dns to communticton instead of ip address.
+docker network ls
+You’ll see the default bridge network, but we’ll need to create our own custom network to ensure the containers can communicate 
+with each other by name.
 
+[Section 3: Default Bridge Network Issue]
 
-Then we call other serive by its name like this instead of IP address.
+Let’s test the default bridge network by running two containers. We’ll attempt to make them communicate, but since there’s no internal DNS resolver, they can only communicate using IP addresses, not container names.
 
-yes on the document say this that defautl and usier-define network difference.
+[Section 4: Create a Custom Network]
+
+Now, let’s create a custom network that includes Docker’s internal DNS resolver. This will allow us to use container names for 
+communication.
+
+To create a custom network, use the following command:
+docker network create --driver bridge my_custom_network
+[Section 5: Running the Three-Tier Application]
+
+Now, we’re going to run our three-tier application:
+
+Frontend Container: This container will serve the frontend of our application.
+Backend Container: The backend will communicate with both the frontend and the database.
+Database Container: The database will store data for the application.
+We’ll make sure to connect each container to our custom network, my_custom_network.
+
+Here’s how you run them:
+
+Now, the frontend, backend, and database containers are all connected to the same network and can communicate using container names.
+
+[Section 6: Testing Communication Between Containers]
+
+With the custom network in place, containers can communicate using their names instead of IP addresses. Let’s test this:
+
+Frontend to Backend Communication: The frontend can now access the backend using the container name backend, 
+rather than needing to know its IP address.
+
+Backend to Database Communication: Similarly, the backend can access the database using the container name database.
+
+This is how Docker networking enables communication between containers using DNS resolution by container name, 
+rather than relying on IP addresses.
+
 
 
 
@@ -1570,266 +1628,388 @@ So wha we get here, for dns resoluation we have to use user-define network not d
 We go to out three tier application, befor the we ging to clean and remove oru current all docker contienr.
 
 
-Lwts echk what oru three tier applicaotn will looks like, here good show one.
+lets check what our three tier applicaotn will looks like, here good show one.
 
 
 
 
 26:10
 =====================
-First we goiny to run our database server as a container as:
-This is then comand you cna copy it from thsi docuemtn and run it.
-You cna also chedk the docker hub mysql image ducument ehat is infor need to run this mysql image as a server.
+
+[Intro]
+
+In this tutorial, we’ll walk through how to create a user-defined Docker network with a custom subnet. We’ll then test the communication between containers using DNS resolution, which is enabled by the user-defined network.
+
+[Section 1: Creating a Custom Network]
+
+Let’s start by creating our custom network with a custom subnet. We’ll use a command to create the network, and once it’s created, we’ll move on to testing.
+
+[Section 2: Running Containers on the Custom Network]
+
+Once our network is set up, we’ll run two new Nginx containers, ng3 and ng4, on this network. The idea here is to test how these containers can communicate with each other using DNS, rather than relying on IP addresses.
+
+[Section 3: Inspecting the Network]
+
+Next, we’ll inspect the network to check the current status. This will confirm that our two containers, ng3 and ng4, are running on the same custom network.
+
+[Section 4: Testing Communication Between Containers]
+
+Now, let's check if it's possible for the two containers to communicate with each other by DNS.
+
+First, we’ll test using IP addresses to see if the communication works. After that, we’ll test using DNS resolution.
+
+[Section 5: Testing DNS Resolution]
+
+When we try to communicate using DNS, we’ll see that it works perfectly! The two containers can communicate using their container names, which is only possible with a user-defined network. This is a key advantage over the default network, where containers can't communicate by name without additional configuration.
+
+[Section 6: Three-Tier Application Setup]
+
+With DNS resolution confirmed, we’re now ready to move on to our three-tier application setup. Before proceeding, we’ll clean up and remove all the current Docker containers to ensure a fresh environment.
+
+[Section 7: Previewing the Three-Tier Application]
+
+Let’s take a look at what our three-tier application setup will look like. In this setup, we’ll have the frontend, backend, and database containers, all connected using the custom network we just created. This will allow each tier to communicate seamlessly, using DNS names instead of IP addresses.
 
 
-mysql service run done !
-Do mysql contienr exec and run mysql command with user credentials.
 
-Chek database, use one, her we use simpledatabase.
-
-then create a table, here is table creation mysql command, and run it.
-So now our mysql database server ready to use !
 
 
 
 
 30:10
 ==========================
-Now we goitn to run a python project with this database.
-So check then sourc code of python file.
+Now we we'll walk through how to run a simple Python project inside Docker and connect it to a database. We'll take a look at the source code and Dockerfile setup for this project.
 
-Nothenr fency hee we create database connection in this connecotn we pass hostname with enviornment.
+[Section 1: Checking the Python Source Code]
 
-we just going run a simple select query to keep it simple.
+First, let’s examine the source code of the Python project. The setup here is simple: we are creating a database connection and passing the hostname via an environment variable.
 
-Lets ceck thsi Dockerfile now,
+To keep things simple, we’ll execute a basic SELECT query to verify that the connection to the database works.
 
-Fistr as ausual a from tage for python.
-crate a directory to get a copy of source and keep it in thsi directory indise of a contienr.
-and Expose the port.
-Finally execut python run commnd.
+[Section 2: Reviewing the Dockerfile]
+
+Now, let’s check the Dockerfile. Here's how it's set up:
+
+Python Base Image: As usual, we start with a Python base image.
+Creating Directory for Source Code: We create a directory inside the container to store the source code.
+Copying Source Code: We copy the source code into the container.
+Exposing the Port: The container will expose the required port to allow communication.
+Executing the Python Command: Finally, we use the CMD instruction to run the Python script.
+[Section 3: Building the Docker Image]
+
+Let’s now build the Docker image with the docker build command. Once the image is built, we’ll move on to running it.
+
+[Section 4: Running the Container]
+We’ll run the container using the docker run command and ensure that the Python project connects to the database and executes the query successfully.
+
+
 
 
 
 36:20
 ==================
-Lets build a image ro python applicaton wth docker build command.
-Run doen ! check this image with image ls command age we get it !
-Now the Image is ready.
+[Section 1: Building the Docker Image]
 
-To run it wiht mysql database the comamn is as:
-here this is contienr naem this is network name, port mapping, and mysql server information here and finally image name.
-Run it, run done lets check it on browser 8080 port.
+First, let’s build the Docker image for our Python application. We’ll use the docker build command to create the image.
 
-Yes ! we get it ! we get the data from mysqlserver.
-lets leave a screenshot from here to doucment.
+Once the image is built, we can check it using the docker images command to verify that the image is available.
+
+[Section 2: Running the Container with MySQL Database]
+
+Now that the image is ready, we can run the Python application container along with the MySQL database.
+
+To do this, we’ll use the docker run command. Here’s the breakdown:
+
+Container Name: We specify a name for the container.
+Network Name: The network name to connect the container.
+Port Mapping: We map the container's port 8080 to the host machine's port.
+MySQL Server Information: We include the necessary MySQL configuration details.
+Image Name: Finally, we specify the image name that was just built.
+[Section 3: Verifying the Application]
+
+Once the container is up and running, we can check the application in the browser by navigating to http://localhost:8080.
+
+[Section 4: Screenshot and Final Check]
+
+Yes, we’ve successfully connected the Python application to the MySQL database! The data from the MySQL server is now displayed on the browser.
+
+Let’s capture a screenshot and add it to our documentation.
+
+[Conclusion]
+
+That’s it! We’ve built and run a Python application with MySQL in Docker. The connection is successfully established, and the data is visible in the browser.
+
+
+
+
+
+
+
+
 
 
 40:10
 ===========================
-Now we gong work king with a java applicaotn. I am gonna use a java spring boot project.
+Now we we’ll build and run a Java Spring Boot application inside a Docker container, connecting it to a MySQL database.
 
-for run a java applicatoon we have to first compali and build a jar file first, here i am usring maven.
-This is my appliaotn .pom file.
-now i amd run the jar build command.
-yes the build pross is success.
-So the location of har is here showing, and my applicaotn ready to run.
+[Section 1: Building the Java Application]
+Before running the application, we need to compile and build a JAR file.
+For this, we are using Maven.
+
+First, we check the pom.xml file to ensure all dependencies are configured.
+Now, we run the Maven build command to generate the JAR file.
+The build process completes successfully, and the JAR file is located in the target/ directory.
+[Section 2: Creating the Dockerfile]
+Next, we create a Dockerfile for our Java application.
+
+The steps are similar to what we did for the Python application:
+
+Use a JDK as the base image.
+Create a directory inside the container.
+Copy the JAR file into the container.
+Expose the necessary port.
+Finally, run the JAR file.
+[Section 3: Building and Running the Docker Image]
+Now, let’s build the Docker image for our Java Spring Boot application.
+We run the Docker build command, and once it's done, we verify the image using docker images.
+
+Next, we run the Java application inside a container.
+This container will be part of the same Docker network as the MySQL database.
+
+[Section 4: Resolving Port Conflicts]
+Oh! We encountered a port conflict because our Python application was already using port 8080.
+
+To fix this:
+
+We stop and remove the existing Python container.
+Now, we rerun the Java application container.
+It runs successfully! Let’s take a screenshot and add it to our documentation.
+[Section 5: Checking the Application in the Browser]
+Now, let’s open the browser and check http://localhost:8080.
+Yes! We successfully get the data from the MySQL server.
+
+[Section 6: Viewing Container Logs]
+To debug and monitor the application, we can check container logs:
+
+Use the docker logs command to see past logs.
+Use docker logs -f to view live logs in real time.
+Now, our MySQL database and backend Java application are fully set up inside Docker.
+
+[Section 7: Next Step – Running a Frontend Application]
+The backend is ready! Now, we’ll proceed to running a Node.js frontend application in the next step.
+
+[Conclusion]
+That’s it for this part! We successfully built and ran a Java Spring Boot application inside Docker and connected it to a MySQL database.
 
 
-Lets now create a dokcerfile for this java applicaton.
-Same we crate befor python image i am doing same here.
-
-See thsi commadn:
-    from a jdk
-    create a directory 
-    copy file and exppsoe the port.
-    then finally run it.
-
-Hwre we see how to maek database credentails. i have to go thsi way for docker contienr perpose.
-
-
-lets run thei build comand. and tis done.
-Check thed image.
-Now run this java applicaton with this ntwrok and mysql server as:
-run it.
-Oh! we get port conflicts with pthon app. lets stop sna delete previour ptyhon app.
-and run tis ageitn, run done, taking a screenshot and add it on document.
-
-
-
-lets eheck the application on browser 8080 port. 
-and yest we get it! data from mysql server.
-
-
-here another this conteinr logges, how we can check contienr logs.
-usti contienr lgos, 
-we can also see live log using -f.
-
-ok now our mysqldatabse and backeend applicaothn is ready now.
-For frontend ther we gojtn to run a Node applicaton.
 
 
 
 53:30
 =====================
-Lets run a nodeja applicaton as a fronend app.
+[Intro]
+In this tutorial, we’ll complete our three-tier application by running a Node.js frontend, which communicates with a Java backend, connected to a MySQL database inside Docker.
 
-lets echk the appliaton source code.
-Nother faccy here here we provie oru backne url and make a http reqeust and get resposne.
-then we map this respons data wtih a html file.
+[Section 1: Understanding the Frontend Application]
+First, let’s check the Node.js application source code.
 
+Nothing fancy here!
+The app makes an HTTP request to our backend service and gets the response.
+Then, it maps the data to an HTML file to display it.
+[Section 2: Creating the Dockerfile]
+Now, let’s check the Dockerfile for our Node.js application.
 
-Lets build a image, ok check the dockerfile first.
+The steps are similar to what we did before:
 
-same as befor: a form tag, copy file, 
-We use diffetne commadn in diffente docker file.
+Define a base image for Node.js.
+Copy the source files into the container.
+Expose the port 3000 (since our frontend runs on this port).
+Run the Node.js application.
+[Section 3: Building and Running the Docker Image]
+Now, let’s build the Docker image for our Node.js frontend.
+We run the Docker build command, and once it's done, we take a screenshot and add it to our documentation.
 
+Next, we run the frontend container inside the same Docker network as the backend and database.
 
-Lwts run image build command.
-taking a screenshot and keep it in the document.
+[Section 4: Checking the Application in the Browser]
+Now, let’s open the browser and check http://localhost:3000.
+Yes! We can now see the data from our Java backend, beautifully displayed in the frontend.
 
-In this soruce code the app will run on 3000 port.
+Our three-tier application is fully functional!
 
+Database: MySQL
+Middle Tier (Backend): Java Spring Boot
+Frontend: Node.js
+[Section 5: Adding Data and Refreshing the Frontend]
+Let’s manually add some data to the MySQL database.
 
-Now time to run the fronedn applicaton wtih backend server.
-ok run done !
+Now, we refresh the browser…
+Yes! The newly added data appears in the frontend instantly!
 
-now check it on the browder 3000 port.
-
-we can now flow teh three step for three tier application.
-here data base is mysql, middletier is java app and node app is a fron end.
-
-yes we get oru data in browser wth beautiful way.
-
-
-Now lets add some data on the database manually.
-
-Refresh the frowser and we get new addes data !
-
-
-
-
-
-
-
-
-
-
+[Conclusion]
+We have successfully built and run a three-tier application inside Docker.
 
 
 
 
 
-9) Docker Compose
+
+
+
 ============================================
-Docker composer is tools to run multiple project at a time.
-
-Till now we run osine service using differetn differetn command 
-so that for a three tier applicaton like database backend frontedn we run saperately .
-
-With docker composer we are able to this type system where we need to run multiple application 
-we can run thoses services wtih in one command using docker composer ths is the main benefits of docker composer.
+##9) Docker Compose
+============================================
 
 
-In wendows docker composwer come with docker desktop no need to install saperately but linux may need.
+[Intro]
+🚀 Welcome back to the channel! 🚀
+Today, we’re going to simplify how we run multi-container applications using Docker Compose.
 
-3:00
-==============
-To ensure you machine have docker composer to check it use: docker compose version command.
-Thne you get it.
+If you’ve been manually running database, backend, and frontend services separately, Docker Compose will change the game for you!
 
+[Section 1: What is Docker Compose?]
+Docker Compose is a tool that allows us to define and run multi-container applications using a single YAML file.
 
-Lets go ferther, check how looks a docker composer file, its pretty differnt from dockerfile.
-Lets check it out.
-So, its say as: 
-In the file we first a secton is version, this is then composer version.
-then services, after network and volume section as you needed in you services.
+Before Docker Compose, we had to start each service individually using different docker run commands.
+Now, we can start everything at once with a single command!
 
-Lets see a simple three tier application model wher a front service, back end service and database wit in a netwrok.
-Lets how looks like this docker-compose.yaml file 
+[Benefits of Docker Compose]
+✅ Runs multiple services together
+✅ No need to start containers one by one
+✅ Easy configuration in a single docker-compose.yml file
+✅ Works across different environments (local, staging, production)
 
-
-In thsi file we can mentation dockerfile,  may directly dockr image or may pull form any git repository.
-After that we define a bridge network and volume.
-
-So now we going to run our first dockr composer file.
-I already cratre a file, look here i define a forntend appliaotn,
-I am not insede this directory where is docker-composer.yaml file and project source code.
-
-
-Here a tag called depend on to mentation ependency servie to otuer services like frontend depend on backend
-and backend depend on database serice.
-Here we also mentaitn a voluem for database and netwrok.
+[Section 2: Installing Docker Compose]
+If you're using Windows, Docker Compose comes pre-installed with Docker Desktop.
+If you're on Linux, you may need to install it manually.
+You can check if Docker Compose is installed by running:
+docker-compose --version
+If it’s not installed, follow the official documentation to install it.
+[Section 3: Creating a Docker Compose File]
+Let’s now create a docker-compose.yml file for our three-tier application.
 
 
-Remember our command line have to open inside from serices parant dirctory where the composer file exists.
-So time to run composer, lets run it.
-Then command is docker-compose up
-alsoe we cna run from different location usng -f.
-
-Ok Its runnign....
-Okey we get it our serices running done, we can see a blick or containers here in docker desktop.
 
 
-Now i we see how to stop the apps or down it, for thst we use docker compoe downe.
+To check if Docker Compose is installed, run:
+docker compose version
+
+
+
+[Step 2: Understanding Docker Compose File]
+A docker-compose.yml file is different from a Dockerfile.
+It defines multiple services, their dependencies, networks, and volumes.
+
+The key sections are:
+✅ version – Defines the Docker Compose version
+✅ services – Lists all application components
+✅ networks & volumes – For communication and data persistence
+
+
+This will define:
+1️⃣ A MySQL database
+2️⃣ A Java Spring Boot backend
+3️⃣ A Node.js frontend
+
+[Section 4: Running the Application with Docker Compose]
+Once our docker-compose.yml file is ready, we can start everything with one command:
+docker-compose up -d
+✅ This will start all services together in the background.
+
+To check running containers, use:
+docker ps
+[Section 5: Testing the Application]
+Now, let’s open the browser:
+
+Backend API: http://localhost:8080
+Frontend UI: http://localhost:3000
+And yes! Everything is running smoothly.
+
+[Section 6: Managing Docker Compose]
+To stop all services, run:
+docker-compose down
+To restart services, use:
+docker-compose restart
+[Conclusion]
+Now you know how to run multiple containers easily using Docker Compose!
+No more running each service separately.
+
+
 
 
 16:50
 =============
-Lets make a change in our source code and see how first  we can able to run oru entier system using this composer tools.
-Lets update the service.
+[Step 1: Making Changes to the Source Code]
+Let’s modify our application code and update our service.
+With Docker Compose, we don’t need to rebuild everything manually!
 
-udpate doen, lets run it ageing.
-agaign stop it, one good thing here when we run docker-compose down this command
-first stop the applyplication and then remove thsi contianers.
+[Step 2: Restarting Services]
+After making changes, we simply restart our entire system with a single command.
+This ensures our updates take effect smoothly.
+
+[Step 3: Stopping Services]
+One great feature of Docker Compose is that when we run docker-compose down:
+✅ It stops all running containers
+✅ It removes those containers automatically
+
 
 
 19:40
 ======================
-For testing perpose where no need to build image like qa secton just run the app and check the applicaton.
-in thsi case we can remove the image build section.
+For testing perpose  we’ll see how to run applications in Docker Compose without building images—perfect for testing environments like QA!
 
-so for thst lets create a another docker-compose file and run it.
+[Step 1: Running Without Building]
+For testing purposes, we don’t always need to build images.
+We can skip the build step and just run the app directly!
+To do this, we create a separate docker-compose.yaml file without the build section.
+
+[Step 2: Running & Checking Services]
+Once the file is ready, we run:
+✅ docker-compose up to start the application
+✅ docker-compose ps to check running containers
+✅ docker-compose logs to see application logs
+
+[Step 3: Important Reminder]
+📌 Remember:
+To run docker-compose up, the docker-compose.yaml file must exist in the directory—otherwise, the command won’t work!
+And that’s it! Quick and easy testing without building images!
 
 
-we can see whow many contienr run by this composer we cna see it using docker compose ps, also we cna see logs as well as.
-
-
-Reamember to run docker compose up need a docker-compose.yaml file woth our it thsi command are not work.
 
 
 
 
 
 
-
+========================================
 ##10) Container Orchestration
 ========================================
-In this video we talking about contier orchestration, what is actually  this contaoer orchestration.
+[Intro]
+Welcome back! Today, we’re diving into Container Orchestration—a powerful tool for managing and deploying containerized applications. 🚀
 
-Container orchestration is a big tools for managing and deploying containerized applications. 
-It helps automate the deployment, scaling, and management of containerized applications. 
+[What is Container Orchestration?]
+Container Orchestration automates the deployment, scaling, and management of containers.
+It ensures applications run efficiently without manual intervention!
 
+[Why Use Container Orchestration?]
+Here’s what it automates:
+✅ Provisioning & Deployment – Quickly start new containers
+✅ Configuration & Scheduling – Organize services efficiently
+✅ Resource Allocation – Optimize hardware usage
+✅ Scaling – Adjust based on demand
+✅ Load Balancing & Traffic Routing – Manage traffic efficiently
+✅ Security – Keep containers safe
 
-The orchestration used for: Use container orchestration to automate and manage tasks such as:
-Provisioning and deployment
-Configuration and scheduling 
-Resource allocation
-Scaling or removing containers based on balancing workloads across your infrastructure
-Load balancing and traffic routing 
-Keeping interactions between containers secure.
+[Example: Why Scaling is Important]
+Imagine you have an eCommerce site handling 100 transactions per second (TPS).
+🚀 On a regular day? No problem!
+🔥 Black Friday? Traffic doubles or triples!
+Without orchestration, the site might crash under heavy load.
+With orchestration, it automatically scales up to handle more users—then scales down when traffic normalizes.
 
-
-
-One exmple is show requirment of orchestration is servie scaling, here is a example.
-
-Like you have a applicaton like a echormach site wher maay regualr customer/visitor need 100 tps.
-But on any festival tiam or a black friday when visitor come 2x from regular time.
-in thsi case we need to scale the application capacity to handel thsi extra reqeust.
-this case need auto scaling this the one thisn a orchestration do smartly !
-
-
-
+[Conclusion]
+Container orchestration makes life easier by handling everything automatically!
+Stay tuned for more in-depth tutorials on Kubernetes, Docker Swarm, and more!
 
 
 
