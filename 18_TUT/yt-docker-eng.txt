@@ -2031,154 +2031,235 @@ a small system like pos-software no need orchestration in this case dos not make
 
 7:30
 =======================
-Lets check amazon echomarc how it implementation serice base and how it manage by Orchestration.
+Let's explore how Amazon's e-commerce platform manages its microservices with orchestration.
 
-In amazone Have a lot of microserice like: may the have a product service, payment serivce, Order serivie, payment servicel
-Lke thst lots of serices and hundered copy of instance of this serices.
+Amazon runs numerous microservices, like Product Service, Payment Service, and Order Service, with hundreds of instances.
 
-so this type type bigger sysem mNAGE LIKE cr deployment scale up, scale down it a huge task,
-to make it east autho  here the have to must use like theta Orchestration who can manage it Smartly.
+Managing such a large system—handling deployments, scaling up or down—is a huge challenge.
 
+This is where orchestration comes in, automating and managing everything efficiently.
 
-so then main task is:
-
+Key tasks of orchestration include:
 Provisioning and deployment
-Configuration and scheduling 
+Configuration and scheduling
 Resource allocation
-Scaling or removing containers based on balancing workloads across your infrastructure
-Load balancing and traffic routing 
-Keeping interactions between containers secure
+Scaling containers based on workload
+Load balancing and traffic routing
+Securing container interactions
 
-
+Orchestration makes large-scale microservice management seamless!
 
 13:20
 =====================
-What is a swarm ?
+What is a Swarm?
 
-Docker Swarm is native cluster managing toos and mode for docker and its offers limited feature. 
-A swarm consists of multiple Docker hosts.  A given Docker host can be a manager, a worker, or perform both roles.
+Docker Swarm is Docker’s native clustering tool for managing containerized applications.
+It allows multiple Docker hosts to work together as a single system.
+In a swarm, a host can be a manager, a worker, or both.
 
-
-You no need to install swarm is a tools of docker its self.
+The best part? You don’t need to install anything extra—Swarm is built into Docker itself!
 
 
 
 15:30
 ===================
-Docker has tow type node: master and worker node.
+A Swarm consists of two types of nodes:
 
-Manager node. Maintains cluster management tasks 
+🔹 Manager Node – Handles cluster management tasks like scheduling, scaling, and monitoring.
+🔹 Worker Node – Runs containers and executes tasks assigned by the Manager Node.
 
-Worker node. Runs containers, executes tasks assigned by the Manager Node.
+Managers ensure the system runs smoothly, while workers focus on running applications.
+
+Since Swarm is natively integrated into Docker, no extra installation is needed!
+
 
 
 
 17:00
 ===============
-Let see the swarm componwtn and how it work:
-Swarm Mode: 
-Docker's native orchestration for clustering hosts into a single virtual environment.
+Let’s explore Docker Swarm components and how they work!
 
-Service: 
-A Service defines the desired state of an application in Docker Swarm, specifying parameters such as replicas, network configurations, and more.
+🔹 Swarm Mode – Docker’s built-in orchestration tool that clusters multiple hosts into a single virtual environment.
 
-Task: 
-Smallest unit of work, represents a running container.
+🔹 Service – Defines the desired state of an application, including replicas, network configurations, and more.
 
-Overlay Network:
-Facilitates seamless container communication on different nodes.
+🔹 Task – The smallest unit of work in Swarm, representing a running container.
 
-Load Balancing: 
-Distributes incoming traffic across containers for better performance.
+🔹 Overlay Network – Enables seamless communication between containers across different nodes.
+
+🔹 Load Balancing – Automatically distributes traffic across containers to optimize performance.
+
+With these components, Docker Swarm efficiently manages containerized applications at scale!
+
+
+
 
 
 
 24:25
 =================
 
-Kubernetes:
-Now we going to see another popular Orchestration waht is kubernsts.
-Kubernetes is an open-source container orchestration system for automating software deployment, 
-scaling, and management. Originally designed by Google, the project is now maintained by the
-  CNCF ( Cloud Native Computing Foundation ).
+[Intro]
+
+"Welcome back to the channel, guys! Today, we’re diving into another popular orchestration tool – Kubernetes."
+
+[Section 1: What is Kubernetes?]
+
+"So, what is Kubernetes?
+
+Kubernetes is an open-source container orchestration system that helps automate software deployment, scaling, and management.
+
+Originally designed by Google, it is now maintained by the Cloud Native Computing Foundation (CNCF)."
+
+[Section 2: Why Kubernetes?]
+
+"Kubernetes offers a lot more features compared to Docker Swarm, which is why it's become the world’s go-to orchestration tool."
+
+[Section 3: Kubernetes CLI Tool]
+
+"Kubernetes also works with a command-line interface, using the kubectl tool. This tool supports several different ways to create and manage Kubernetes objects, allowing you to interact with your clusters."
+
+[Section 4: High Availability in Kubernetes]
+
+"In a Kubernetes cluster, one of the best practices is to have multiple master nodes for high availability. This ensures that if one master node goes down, the cluster continues to operate smoothly."
+
+"Each worker node has an agent called the kubelet. The kubelet is responsible for maintaining communication with the master node and ensuring that the containers are running as expected."
+
+[Outro]
+
+"That’s a brief introduction to Kubernetes! We’ll explore more in upcoming videos, so stay tuned. Don’t forget to like, subscribe, and hit the bell icon to stay updated with our latest tutorials!"
 
 
-Its hase more featurs from of docker-swarm this is its why world-wide best uses orchestration.
 
 
-Kubernts alsow work with cli:
-The kubectl command-line tool supports several different ways to create and manage Kubernetes objects. 
 
-
-IN a kubernets cluster the goood partise: redentade multile master node also work node 
-for HighAvailable.
-
-All work node hase a agent call kublet waht is keep communitcaton with master.
 
 
 
 28:40
 ====================
-Pod: a minilam task like contienr is called pod.
-a pod may have multile contienr but good practise is one pod hase only one contier only.
+[Intro]
 
-So with multiple pod togethr maek runnign a cluster.
+"Welcome back to the channel, guys! In today’s tutorial, we’re going to explore Pods in Kubernetes."
+
+[Section 1: What is a Pod?]
+
+"In Kubernetes, a Pod is the smallest and simplest unit. You can think of it as a container running a task, but there’s more to it."
+
+"A Pod can contain multiple containers, but the best practice is to run only one container per Pod. This simplifies management and scaling."
+
+[Section 2: Pods in Action]
+
+"So, when you group multiple Pods together, they form the foundation of your running cluster. Each Pod can run a specific application or service, and together, they make up your entire Kubernetes environment."
+
+[Outro]
+
+"That's a quick overview of Pods in Kubernetes! If you're interested in learning more, stay tuned for upcoming tutorials. Don’t forget to like, subscribe, and click the bell icon for the latest updates!"
+
+
 
 
 
 33:20
 ======================
-we can run a pod as:
-Imperative commands or Declarative object configuration, so what dos it mean lets see.
+[Intro]
+
+"Welcome back, everyone! Today, we’re going to talk about how you can run a Pod in Kubernetes using two different approaches."
+
+[Section 1: Imperative Commands vs. Declarative Object Configuration]
+
+"In Kubernetes, you can run a Pod in two main ways: using imperative commands or declarative object configuration.
+
+So, what do these terms mean? Let’s take a closer look."
+
+[Section 2: Imperative Commands]
+
+"Imperative commands are the 'on-demand' approach. You directly tell Kubernetes what to do using commands like kubectl run or kubectl create. This is more hands-on and immediate."
+
+[Section 3: Declarative Object Configuration]
+
+"On the other hand, declarative object configuration involves defining the desired state of your cluster in YAML files. You then apply this configuration using kubectl apply. Kubernetes will make sure that the cluster matches this state."
 
 
 
 33:50
 ================
 
-lets check the official docjuemtnation.
-Every this show here, we can fine targgated thisng serives/ etc by sercing.
+[Section 4: Official Documentation & Searching Resources]
+
+"To get a deeper understanding, let’s check out the official Kubernetes documentation.
+
+Everything we’ve talked about today can be targeted and searched, whether it’s services, Pods, or configurations. The docs are a great resource for detailed examples and explanations."
+
+[Outro]
+
+"That’s a wrap on how to run Pods in Kubernetes! If you have any questions or want more details, let me know in the comments. Be sure to like, subscribe, and hit the bell for more Kubernetes tutorials!"
+
 
 
 
 35:10
 ===================
-Kubernetes Components: 
+[Intro]
 
-Master Node: 
-Controls the Kubernetes cluster, managing scheduling and orchestration.
+"Welcome back to the channel, everyone! Today, we’re diving into the core components of Kubernetes. Understanding these components is key to mastering Kubernetes and orchestrating containers effectively."
 
-Node: 
-Worker machines that run containers and execute tasks assigned by the Master Node.
+[Section 1: Master Node]
 
-Pod:
-Smallest deployable unit, representing one or more containers that share resources.
+"First up, we have the Master Node. This is the brain of the Kubernetes cluster. It controls everything, managing scheduling and orchestration tasks. It ensures that everything runs smoothly across the cluster."
 
-ReplicaSet:
-Ensures a specified number of replicas (pods) are running at all times.
+[Section 2: Node]
 
-Service:
-Enables network access to a set of pods, providing a stable endpoint.
+"Next, we have Nodes. These are the worker machines that run your containers and execute tasks assigned by the Master Node. Each Node is essentially a worker in the Kubernetes ecosystem."
 
-Ingress and Kube-DNS:
-Manages external access to services within the cluster. Provides DNS-based service discovery in the Kubernetes cluster.
+[Section 3: Pod]
 
-ConfigMap and Secret:
-ConfigMap Stores non-sensitive configuration data for pods and  Secret stores sensitive information, such as passwords or API keys, for pods.
+"Now, let’s talk about Pods. A Pod is the smallest deployable unit in Kubernetes. It can represent one or more containers that share resources like networking and storage. Pods are the fundamental building blocks for running applications in Kubernetes."
+
+[Section 4: ReplicaSet]
+
+"Then, there’s ReplicaSet. This ensures that a specified number of replicas, or Pods, are running at all times. It helps in maintaining high availability by automatically replacing Pods that fail."
+
+[Section 5: Service]
+
+"Now, let’s move on to Service. A Service provides network access to a set of Pods. It abstracts the Pods and offers a stable endpoint, even if the Pods are dynamically scaled or replaced."
+
+[Section 6: Ingress and Kube-DNS]
+
+"Ingress and Kube-DNS are critical for managing external access to services within the cluster. Ingress handles HTTP and HTTPS traffic routing, while Kube-DNS provides DNS-based service discovery inside the cluster."
+
+[Section 7: ConfigMap and Secret]
+
+"Finally, we have ConfigMap and Secret. A ConfigMap stores non-sensitive configuration data for Pods, like environment variables or configuration files. On the other hand, a Secret is used to store sensitive information, such as passwords or API keys, securely for Pods."
+
+[Outro]
+
+"That’s a quick overview of Kubernetes components! These components work together to help you orchestrate containers and scale your applications effectively. If you found this helpful, don’t forget to like, subscribe, and hit the bell for more Kubernetes tutorials!"
 
 
 41:25
 =========================
-Actually this video agenda is introducing Orchestration, we jsut get a bird eye view.
+[Intro]
 
-So what is do next?
-After learned docker propely we have to lern at lest one Contier Orchestration.
-In real-world applicaton when a distributed sysem a big sysmte then you have to 
-use contanrization with Orchestration one like thsit.
+"Alright, folks, that brings us to the end of today’s tutorial! We’ve covered a lot, starting with an introduction to container orchestration, and specifically Kubernetes."
 
+[Section 1: Recap]
 
+"As you’ve seen, we’ve just taken a bird’s eye view of Kubernetes and its components. There’s a lot more to dive into, and we’ll explore it in upcoming videos."
 
+[Section 2: Next Steps]
 
+"So, what’s next? After properly learning Docker, the next step is to learn at least one container orchestration tool, and Kubernetes is one of the most popular ones.
+
+In the real world, when you’re working with distributed systems or large-scale applications, containerization combined with orchestration is the way to go."
+
+[Closing]
+
+"We’ve reached the end of this Kubernetes introduction, but don’t worry! We’ll be back soon with more in-depth technical content right here on the channel."
+
+"Make sure you like, subscribe, and hit that bell icon so you don’t miss our next tutorial!"
+
+"Thanks for watching, and we’ll see you in the next video!"
 
 
 
