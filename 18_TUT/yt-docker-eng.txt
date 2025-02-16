@@ -355,6 +355,7 @@ because we haven't actually started the container.
 Now, let’s run the NGINX container and check its status in the command line.
 To start the container, we use:
 =>docker run -d -p 8080:80 nginx
+
 The -d flag runs the container in detached mode (in the background).
 The -p 8080:80 maps port 8080 on our local machine to port 80 inside the container.
 
@@ -366,6 +367,7 @@ This command displays:
 Container ID – A unique identifier for the container
 Name – An auto-generated name for the container
 Command – The default command used to run the container
+
 Now that the container is running, if we open http://localhost:8080 in a browser, 
 we should see the NGINX default home page.
 
@@ -378,48 +380,56 @@ We’ll go over this in more detail later.
 If we run:
 =>docker ps
 It only shows running containers.
+
 But what if we want to see all containers, including those that have stopped?
 docker ps -a
+
 This command lists both running and stopped containers.
 From here, we can also remove containers if needed.
 We’ll cover container management in detail in the next video.
 
-Stay tuned!"**
 
 
 
 8:40mm
 =================
-Now, let's see how to stop a running container using the command line.
-To stop a container, we need its Container ID or Name.
-First, list running containers:
+Now, To stop a container, we need its Container ID or Name.
+
+For that, I'm gonna do: 
 docker ps
-Copy the Container ID or Name, then stop it with:
+
+Copy the Container ID or Name, then
 docker stop <container_id_or_name>
-For example:
-docker stop my-nginx
+
+
 Now, let’s check if the container is still there:
 docker ps -a
+
 This lists all containers, including stopped ones.
 
-Removing a Container
-To delete a stopped container, use:
+
+To remove a container, I will run:
 docker rm <container_id_or_name>
+
 You don’t need to type the full ID—just a few characters are enough.
 Now, check again:
 docker ps -a
 You’ll see no containers left.
+
 However, the Docker images are still there.
 
 An image is like a class in programming—it's a read-only template.
 A container is like an object, a running instance of an image.
 You can run multiple containers from the same image.
 
+
 Now, let’s run a new container from the NGINX image and give it a custom name:
+
 docker run -d -p 8080:80 --name ng-cont1 nginx
 -d → Runs the container in detached mode (background).
 -p 8080:80 → Maps port 8080 on the host to port 80 in the container.
 --name ng-cont1 → Assigns a custom name instead of a random one.
+
 Check the running container:
 docker ps
 Running Another Container from the Same Image
@@ -429,6 +439,7 @@ docker run -d -p 8081:80 --name ng-cont2 nginx
 
 If you try to use a name that already exists, Docker will show an error.
 If the port is already in use, you must choose a different one.
+
 If you get an error, you can either:
     Delete the previous container:
     docker rm ng-cont1
@@ -443,21 +454,21 @@ Check this using docker ps.
 
 16:40
 =======================
-here is a interesting fact i am going to sared: 
 
-Let’s look at a real-world Problem:
-Imagine you need multiple NGINX instances on your machine:so..
+Here is a interesting fact i am going to sared: 
+
+let's say, you need multiple NGINX instances on your machine:so..
 Without Docker (Traditional Way)
     You would have to manually copy multiple versions of the NGINX software.
     Keep them in different locations to avoid conflicts.
     Update the nginx.conf files separately for each instance.
     Manage them individually, which is complex and time-consuming.
 
-With Docker (The Magic Solution):
-    Using Docker, we skip all that complexity!
-You can run multiple NGINX instances with just one simple command: 
-What we just did.
 
+Using Docker, we skip all that complexity!
+You can run multiple NGINX instances with just one simple command: 
+
+What we just did.
 docker run -d -p 8080:80 --name nginx1 nginx
 docker run -d -p 8081:80 --name nginx2 nginx
     ✔ No need to copy the software multiple times
@@ -465,10 +476,10 @@ docker run -d -p 8081:80 --name nginx2 nginx
     ✔ No dependency issues with the host machine
 ✔ Easy to start, stop, and manage everything with commands
 
+
 This is the true power of Docker!
 
 It allows us to run multiple apps efficiently, without worrying about underlying host dependencies.
-Now, you can deploy and manage multiple services effortlessly—all with just a few Docker commands.
 That’s why Docker is a game changer in software deployment!
 
 
@@ -494,75 +505,71 @@ comfortable with docker.
 
 18:40
 ===========================
-Docker Exec Command: Interact with Running Containers
+Docker Exec Command: 
+
 The docker exec command allows you to enter a running container and execute operations inside it. 
 This is super helpful for tasks like:
 ✔ Installing packages
 ✔ Updating files
 ✔ Modifying configurations (e.g., updating NGINX pages)
 
-How Does It Work?
-    To interact with a container, we use the -it flag, which stands for:
+
+To interact with a container, we use the -it flag, which stands for:
     i: Interactive mode
     t: Terminal, so we get a terminal session inside the container
+
 
 We’re going to change the default NGINX page running on port 8282.
 
 Enter the container using the docker exec command.
 
-We can see the container is running with a minimal Linux distribution, 
-so some packages (like vi or nano) might be missing.
-We’ll use basic commands like cat and echo to interact with the container.
+We know that the container is running with a minimal Linux distribution, 
+so many of the packages like vi or nano might be missing.
 
-Enter the running container using the docker exec -it <container_id> bash command.
-Inside the container, we’ll run the command cat /etc/os-release to check the Linux distribution it’s running.
 
-Next, we will update the default NGINX homepage (located in the default directory) 
-using the echo command (because text editors like vi aren’t available).
+So here I am using: cat and echo to interact with the container.
+
+
+The update is done.
+
 
 Exit the current container running on port 8282, and enter the container running on port 8181.
-
-Check the container ID, and use it to enter the new container with docker exec -it <container_id> bash.
-Update the NGINX page by running echo 'Welcome to My Custom NGINX Page' > /usr/share/nginx/html/index.html 
-to change the homepage content.
-Results:
 Once you’ve updated the page, you can verify it by checking the contents of the index.html 
 file again with the cat command.
-If you refresh your browser, you’ll see the updated NGINX homepage! 🌐
+
+If you refresh your browser, you’ll see the updated NGINX homepage! 
+
+
 
 
 25:50
 ===============
-Now we explore How to Check Container Logs
+Now we explore How to Check Container Logs:
 When a container is running an application, it often produces logs. 
 You can easily view these logs using the docker logs command. 
-This is useful to monitor the application's behavior or debug issues.
 
 Find the Container ID – First, check the container ID by running the command:
 docker ps
-Use the Docker Logs Command – Once you have the container ID, you can view the logs with:
+Use the Docker Logs Command:
 docker logs <container_id>
 
-What’s Next?
-We’ll explore more about viewing and managing container logs in detail in the container section. 
-But for now, just know this basic log-checking command!
-Stay tuned for more advanced log monitoring techniques!
 
 
 26:35
 =====================
 Lest see docker netowrk now:
-
 docker network ls
 This will show you a list of the networks available. 
+
 As we haven’t created any custom networks yet, you’ll see the default ones.
 
 What is a Docker Network?
 Docker networks allow containers to communicate with each other. 
-Containers that are connected to the same network can easily interact with one another, 
-which is essential for multi-container applications.
+for multi-container applications.
 
-We will dive deeper into Docker networks in a dedicated section, so don't worry if it’s not clear yet!
+"We'll cover Docker networks in more detail in a dedicated section, 
+so don't worry if it's not clear yet!"
+
 
 
 28:10
@@ -570,7 +577,9 @@ We will dive deeper into Docker networks in a dedicated section, so don't worry 
 Docker Volumes:
 We can view the existing volumes using the following command:
 docker volume ls
+
 Since we haven't created any volumes yet, this command won’t show any volumes at the moment.
+
 
 dockr login/logout To push images to Docker Hub (Docker's cloud registry), you need to log in first:
 
@@ -592,9 +601,10 @@ including how Docker manages containers, images, networks, and volumes.
 
 
 
-
+@@@
+==============================================
 ##4) Docker in Depth 
-====================================
+==============================================
 
 00:00-to-1:50
 =========================
