@@ -600,8 +600,6 @@ including how Docker manages containers, images, networks, and volumes.
 
 
 
-
-@@@
 ==============================================
 ##4) Docker in Depth 
 ==============================================
@@ -614,32 +612,33 @@ We'll break down Docker’s internal architecture, covering:
     Docker Architecture – How everything fits together
     Docker Components – The key building blocks
     Namespaces – How Docker isolates processes
-    Control Groups (cGroups) – How resource limits work
+    Control Groups (cGroups) – How resource limits work.
 
 By the end of this section, you’ll have a solid understanding of how Docker works under the hood!
 Let’s get started! 
 
 
-First up—Docker Architecture!
-Docker actually works in a client-server model.
-
+Docker Architecture!
+    Docker actually works in a client-server model.
 When we run a Docker command using the CLI, the CLI acts as the client, and the Docker Engine is the server.
+
 Here’s how it works:
 🔹 We enter a command in the CLI (Client)
 🔹 The Docker Engine (Server) receives the command, executes it, and returns a response
 🔹 The response is displayed on the CLI (our black screen)
 
 But that’s not all!
-The Docker Dashboard is also a client.
-It fetches data from the Docker Engine and displays it in a graphical way.
-So, whether it’s the CLI or Dashboard, everything talks to the Docker Engine behind the scenes! 
+    The Docker Dashboard is also a client.
+    It fetches data from the Docker Engine and displays it in a graphical way.
+    So, whether it’s the CLI or Dashboard, everything talks to the Docker Engine behind the scenes! 
 
 
 
 
 1:50-to-3:00
 ======================
-We can use the Docker Client locally or from any remote CLI to communicate with the Docker Engine, no difference! 
+We can use the Docker Client locally or from any remote CLI to communicate 
+with the Docker Engine, no difference! 
 
 
 
@@ -656,11 +655,13 @@ Docker has 5 key components:
 🔹 Docker Registry – A repository for storing and sharing Docker images
 
 Docker Hub & Private Registries
- Docker Hub is a public registry with official images.
- Companies can also set up private registries for internal use.
+    Docker Hub is a public registry with official images.
+    Companies can also set up private registries for internal use.
 
 Here’s my Docker Hub account, where I’ve pushed some custom images.
 You can also push and share your own images!
+
+For that, you need to first create an account on Docker Hub.
 
 Explore Docker Hub, it has great documentation for each image.
 For example, the MySQL official image page provides all the details on how to use it! 
@@ -671,134 +672,149 @@ For example, the MySQL official image page provides all the details on how to us
 09:10-to-17:00 
 ===========================
 Now we’re diving into two fundamental concepts in containerization: Namespaces and cGroups.
-These are key technologies that make containers possible, and understanding them will give you a deeper insight into 
 how containerized applications work. 
 So, let’s get started!
 
 
 What is a Namespace?
-Imagine you have multiple applications running on the same system, but each one needs to think it’s the only application running. 
+    Imagine you have multiple applications running on the same system, 
+    but each one needs to think it’s the only application running. 
+
+You can't run multiple copies of the same application.
+
 That’s where Namespaces come in!
 
 A Namespace in Linux is like a virtual wall around a process or a container. 
 It isolates resources, so one process doesn’t interfere with another.
 
+
 Here’s how it works:
     When you launch a container, it runs in its own Namespace.
     It gets a unique process ID (PID) and doesn’t see processes running in other Namespaces.
-    This isolation allows multiple containers to run from the same software image without interfering with each other.
-    Think of it as each container having its own little sandbox, where it operates independently without affecting other 
-    processes on the system.
+
+    This isolation allows multiple containers to run from the same software image without 
+    interfering with each other.
+    Think of it as each container having its own domain area, 
+    where it operates independently without affecting other processes on the system.
 
 
 
 What is a cGroup?
-Now that we know how containers stay isolated, let’s talk about cGroups or Control Groups.
-A cGroup is responsible for managing resources like CPU, memory, and disk I/O for a container.
+    Now that we know how containers stay isolated, let’s talk about cGroups or Control Groups.
+    A cGroup is responsible for managing resources like CPU, memory, and disk I/O for a container.
+
 
 Here’s why it’s important:
     Without cGroups, one container could use too much CPU or memory, affecting the entire system.
     With cGroups, you can limit and prioritize resource usage for each container.
-    This ensures fair distribution of system resources and prevents one container from overwhelming the server.
-    Think of cGroups as a traffic controller that decides how much CPU, memory, and other resources each container gets.
+
+    Think of cGroups as a controller that decides how much CPU, memory, and other resources 
+    each container gets.
 
 
-Real-World Example
-Imagine a host machine where we allocate 50% of resources for Application A and 50% for Application B.
-With cGroups, we can define how much CPU, memory, and other system resources each application is allowed to use.
+Real-World Example:
+    Imagine a host machine where we allocate 50% of resources for Application A and 50% for Application B.
+    With cGroups, we can define how much CPU, memory, and other system resources each 
+    application is allowed to use.
 
-If we don’t set resource limits, then when Application A experiences high traffic, it may consume most of the available resources.
-As a result, Application B and other applications on the same host might not get enough resources, leading to performance issues.
+If we don’t set resource limits, then when Application A experiences high traffic, 
+it may consume most of the available resources.
+
+As a result, Application B and other applications on the same host might not get enough resources, 
+leading to performance issues.
 
 By using cGroups, we ensure that Application A cannot take more than its allocated quota,
 allowing fair resource distribution and preventing any single application from overwhelming the system.
 
 
-How do Namespaces and cGroups Work Together?
-    Together, Namespaces and cGroups provide:
+Together, Namespaces and cGroups provide:
     Isolation (via Namespaces)
     Resource Control (via cGroups)
-This combination allows multiple containers to run efficiently on the same machine while ensuring stability and performance.
-
-
+This combination allows multiple containers to run efficiently on the same machine while 
+ensuring stability and performance.
 
 
 
 
 17:00 -to - End
 ===========================
-This is an overall idea of Docker architecture and components—how Docker actually works.
+This is an overall idea of Docker architecture and components, how Docker actually works.
 We won’t spend too much time here, just a high-level view of Docker’s internal components.
-
-When we run a Docker command using the CLI, Docker’s internal server receives the command
-and instructs the Docker engine to run the specified image as a container.
-If the container is not already present in Docker, it pulls the image from the registry and then runs it.
 
 In the next video, we’ll explore image and container operations—how to build an image,
 run it as a container, create and modify custom images, and upload them to Docker Hub.
 
-
-That’s it for today’s video! If you found this useful, don’t forget to like, subscribe, and hit the notification bell 
-for more tech insights. See you in the next video!
-
+That’s it for today’s video! If you found this useful, don’t forget to like, 
+subscribe, and hit the notification bell for more tech insights. See you in the next video!
 
 
 
 
 
+
+==========================================
 ##5) Docker Image and Containers
-======================================
+==========================================
+
 
 00-3:00
 =============
-Hey guys, in this tutorial, we’re going to explore image and container operations.
+Hey guys, today we'll be exploring image and container operations in this tutorial.
 
-Image
+Image:
 An image is an executable package that includes everything needed to run a specific application, like Nginx.
 We can download pre-built images for Java, MySQL, Redis, etc., or create our own custom images.
 
 An image is essentially a template for containers.
 For example, we can create two Java app containers from a single Java image
 or three Redis app containers from a single Redis image.
-This shows how we can reuse images to create multiple containers as needed.
 
 
-Docker Hub Registry
+This diagrams shows how we can reuse images to create multiple containers as needed.
+
+
+
 Now, let’s take a look at Docker Hub.
-Here, we can find a vast collection of official and custom images.
-We can also upload our own images, which we’ll do in just a moment.
+    Here, we can find a vast collection of official and custom images.
+    We can also upload our own images, which we’ll do in just a moment.
 
 Public images can be stored in a public registry like Docker Hub,
-but if a company needs a private registry, they can set one up and share images with their team to run applications securely.
+but if a company needs a private registry, they can set one up and share images with their 
+team to run applications securely.
+
+
 
 
 
 3:00--
-====================
+====================================
+
 Now, let’s explore some frequently used Docker image commands.
-Listing Docker Images
-dokcer image ls
+    Listing Docker Images
+    dokcer image ls
 This command lists all images available on your current Docker host.
 
 Repository: The name of the image repository.
 Tag: This represents the image version. Let’s check Docker Hub to explore tags.
+
 For example, let’s search for the Ubuntu image.
-We can see different tags listed—each representing a specific release version.
+    We can see different tags listed—each representing a specific release version.
 
 
-Check a image, ubuty.
-see the show ubutn image tag this is actually  thsi is the release version.
+Look at the Ubuntu image. The tag you see is the release version.
+
 
 If no tag is specified, Docker will pull the latest tag by default:
 However, the latest tag does not always mean the most recent version.
 For example, if we run:docker run ubuntu:latest
+
 
 It may run Ubuntu 22.04, even though the latest release might be 23.xx.
 The latest tag is just a label assigned to a specific version, not necessarily the newest release.
 You can check the official Docker Hub image documentation to verify the correct tags.
 
 
-Now, let’s check one of my custom images, which I built and released with different versions as tags.
+Now, let’s check one of my custom images, which I built an+d released with different versions as tags.
 In real-world projects, this is how you manage application release versions using tags.
 
 When running docker image ls, we see:
@@ -811,19 +827,18 @@ Size: The disk space used by the image.
 
 10:20
 =====================
-Now, let's explore base images, image tags, and how to build an image.
+Now, let's explore base images and how to build an image.
 
-1. What is a Base Image?
-A base image is the parent image for all official and custom images.
-Every Docker image is created from another image called a base image.
+A base image is the parent image for all images.
+    Every Docker image is created from another image called a base image.
 
-2. Understanding Dockerfile
-Next, let's explore Dockerfile—a file that defines what an image is and how it works.
-Docker images follow a layered architecture, and the Dockerfile shows how an image is built layer by layer.
+Next, let's explore Dockerfile, a file that defines what an image is and how it works.
+    Docker images follow a layered architecture, and the Dockerfile shows how an 
+    image is built layer by layer.
 
-3. Exploring a Dockerfile
+
 Let’s check the Nginx Dockerfile from Docker Hub.
-In the first line, we see the FROM directive: FROM debian:bullseye-slim
+    In the first line, we see the FROM directive: FROM debian:bullseye-slim
 
 This defines the base image used to create the Nginx image.
 Every image has a parent image from which it is derived.
@@ -833,7 +848,7 @@ Opening its Dockerfile, we see: FROM debian:bookworm
 
 This means the MySQL image is built on top of Debian (Bookworm) as its base image.
 
-4. How Images Are Built
+
 All images are created on top of another image, forming a chain of dependencies.
 The FROM directive in a Dockerfile always points to the base image used to build a new image or application.
 
@@ -845,62 +860,57 @@ The FROM directive in a Dockerfile always points to the base image used to build
 =====================
 Now, let's see some examples of custom Docker images.
 
-1. Choosing a Base Image for Custom Images
-Just like official images, custom images also require a base image, which we define using the FROM directive in a Dockerfile.
+
+Choosing a Base Image for Custom Images
+    Just like official images, custom images also require a base image, which we define using the 
+    FROM directive in a Dockerfile.
 
 But do we choose a random base image? No!
 We need to select a base image that is relevant to our custom image.
 
 For example:
-If we are building a Java application, we should choose a JDK image with a specific version:
-FROM openjdk:17
-
+    If we are building a Java application, we should choose a JDK image with a specific version:
+    FROM openjdk:17
 This base image already includes Java, so we don’t need to install it manually.
+
 On the other hand, if we choose a Ubuntu image:
 FROM ubuntu:22.04
 Then, we must manually install JDK and configure our Java application.
-2. Choosing the Right Base Image
-We should always pick a base image that:
-✔ Matches the type of application we are building.
-✔ Meets the system requirements of our app.
-✔ Aligns with business logic and optimizes performance.
 
-Choosing the correct base image helps reduce setup effort, improves efficiency, and keeps our images lightweight.
+
+We should always pick a base image that:
+    ✔ Matches the type of application we are building.
+    ✔ Meets the system requirements of our app.
+    ✔ Aligns with business logic and optimizes performance.
 
 
 
 
 14:10
 ==========================
-
 Now, let’s explore the Scratch image and the FROM scratch tag.
 
-1. What is the Scratch Image?
-The Scratch image is the minimal base image used in Docker.
-It is essentially an empty image—no operating system, no packages—just the bare minimum.
 
+The Scratch image is the minimal base image used in Docker.
+    It is essentially an empty image—no operating system, no packages—just the bare minimum.
 Every Docker image is built layer by layer, starting from the Scratch image.
 
-2. Exploring MySQL Docker Image
+
 Let’s explore the MySQL Docker image.
 Looking at its Dockerfile, we see it is built on top of the Oracle Linux image.
 This means the Oracle Linux image is the base image for MySQL.
 
-Now, let's check the MySQL image tag, which is 8-slim.
-When we open this tag, we find that it is still built on the Scratch image at its core.
 
-3. How Images are Built Layer by Layer
+
 All images are built on top of another image.
 For instance:
+    The MySQL image starts with Oracle Linux.
+    Then, it builds on top of that, adding necessary components.
+    Finally, it adds the MySQL application.
+    At the very bottom of every image, there is Scratch—the most minimal layer.
+    On top of Scratch, we install packages, add files, and run commands to build up the image layer by layer.
 
-The MySQL image starts with Oracle Linux.
-Then, it builds on top of that, adding necessary components.
-Finally, it adds the MySQL application.
-At the very bottom of every image, there is Scratch—the most minimal layer.
-On top of Scratch, we install packages, add files, and run commands to build up the image layer by layer.
-
-This is how Docker images are constructed—step by step, layer by layer.
-
+    This is how Docker images are constructed—step by step, layer by layer.
 
 
 
@@ -928,68 +938,71 @@ You can read more about Scratch and layering in its documentation.
 23:00-end
 ===============
 Let’s take a closer look at the details of a Dockerfile.
-
-1. Understanding a Dockerfile
 A Dockerfile is a combination of instructions and arguments that define how an image is built.
 
 Here’s an example of a Dockerfile:
+    It starts with a base image like Ubuntu.
+    Then, it updates the package list.
+    Next, it installs a package like Nginx.
 
-It starts with a base image like Ubuntu.
-Then, it updates the package list.
-Next, it installs a package like Nginx.
 It also defines the default port for the container.
 Finally, it includes a run command to start the application.
-2. Building an Image from the Dockerfile
+
+
+
 Once you’ve written the Dockerfile, you can build your image using the following command:
 docker build -t image-name:tag .
 This will create a Docker image with the specified name and tag based on the instructions in the Dockerfile.
 
 
-
 Now let’s see how we can build a Docker image from a Dockerfile in practice.
-1. Preparing the Index File
+
+
 First, I need an index.html file, so I’ll create it in the same location as the Dockerfile.
 
-2. Checking Current Images
 Let’s check the current list of images on my Docker host.
 To do this, run the command:
 docker image ls
-3. Building the Image
+
+
 Now it’s time to build our first image!
 Run the following docker build command:
 docker build -t image-name:tag .
+
 I’ll also add a screenshot of this process in our document.
 
-4. Verifying the Build
+Verifying the Build
 Once the build is complete, let’s verify it.
 Use the docker image ls command again to check the list of images.
+
 You should see our newly created image in the list.
 
 
 Now, it's time to run our newly built image as a container.
-1. Running the Container
 Once the image is built, we can run it using the docker run command.
 After running it, let's check the container.
 
-2. Checking in the Browser
+
 We can open a browser and verify the container is running.
-This was the default Nginx image earlier. Now we’re running our custom Nginx, and you should see the custom default page.
+This was the default Nginx image earlier. 
+Now we’re running our custom Nginx, and you should see the custom default page.
 
-3. Inspecting the Image
+
 If we want to see more details about the image, we can use the docker inspect command.
-This will give us a deep dive into the image's metadata.
+This will give us more image metadata.
 
-4. Saving the Image
+
 Now, let’s say we want to share this image as a physical file.
 We can save it as a .tar file using the docker save command:
 docker save -o myimage.tar image-name:tag
 This generates a .tar file that we can share with others.
 
-5. Docker Inspect on Container
-Just like images, we can also inspect containers.
-To inspect a container, we can use docker inspect with the container ID to get detailed information about the container’s configuration and status.
 
-6. Viewing Containers
+Just like images, we can also inspect containers.
+To inspect a container, we can use docker inspect with the container ID to get detailed 
+information about the container’s configuration and status.
+
+
 To see all running containers, use the docker ps command.
 For all containers (including stopped ones), use:
 docker ps -a
@@ -1002,69 +1015,71 @@ docker ps -a
 =================================================
 ##6) Storage and Volumes
 =================================================
-In this tutorial, we will be discussing Docker Storage and Volumes.
 
-By default, all files created inside a container are stored on a writable container layer.
+HeyGuys, In this tutorial, we will be discussing Docker Storage and Volumes.
+    By default, all files created inside a container are stored on a writable container layer.
 
 The Problem with the Default System:
 Data Persistence: The data doesn’t persist when the container no longer exists.
-Tightly Coupled to the Host Machine: The container’s data is tightly bound to the host’s file system, making it difficult to 
-manage independently.
-Reduced Performance: Storing data in the container itself can affect performance, especially when containers are 
+Tightly Coupled to the Host Machine: The container’s data is tightly bound to the host’s file system.
+
+Storing data in the container itself can affect performance, especially when containers are 
 constantly created and removed.
-
-Next, we will explore how volumes can solve these problems and make data management more efficient in Docker.
-
 
 
 
 3:00
 ==================
-To solve the data persistence issue, Docker provides two primary ways of managing and persisting data in containers: Volumes and Bind-mounts.
-
+To solve the data persistence issue, Docker provides two primary ways of managing and persisting 
+data in containers: 
+    Volumes and Bind-mounts.
 You can find more detailed information on these in Docker’s official documentation.
 
-These are the two main storage systems in Docker:
 
-1. Volumes:
-Volumes are stored inside Docker and can only be accessed by Docker containers, not by the host processes.
-Volumes are the recommended approach when you want to keep container data secure and isolated from the host machine.
-Docker suggests using volumes as the best practice for managing container data.
+Volumes:
+    Volumes are stored inside Docker and can only be accessed by Docker containers, 
+    not by the host processes.
+    Volumes are the recommended approach when you want to keep container data secure 
+    and isolated from the host machine.
 
-2. Bind-mounts:
-With bind-mounts, a file or directory is managed on the host machine, and non-Docker processes can modify it.
-Bind-mounts are useful when you need to perform analysis or allow other host machine processes to access data 
-generated by the container, such as logs or reports.
-Use bind-mounts when you want to interact with container-generated data outside the container or if other processes on the host
- need access to it.
-
-3. tmpfs:
-tmpfs allows Docker to store data in the host machine's memory instead of the disk. 
-It’s the fastest and most secure option for temporary data storage.
-tmpfs is ideal when you need high-performance, non-persistent storage that doesn’t require saving data after the container stops.
+Bind-mounts:
+    With bind-mounts, a file or directory is managed on the host machine, and non-Docker 
+    processes can modify it.
+    Bind-mounts are useful when you need to perform analysis or allow other host machine processes 
+    to access data generated by the container, such as logs or reports.
+    Use bind-mounts when you want to interact with container-generated data outside the container 
+    or if other processes on the host need access to it.
 
 
+tmpfs:
+    tmpfs allows Docker to store data in the host machine's memory instead of the disk. 
+    It’s the fastest and most secure option for temporary data storage.
+    tmpfs is ideal when you need high-performance, non-persistent storage that doesn’t 
+    require saving data after the container stops.
 
 
 
 
+
+@@@
 9:20mm
 ============================
 Now, let's start with the basic Docker volume commands and practice with volumes.
 
-Example: Using Volume with an Application Server (Nginx)
+
 Let's start with Nginx and see how we can use volumes with an application server.
 
-Run the application:
 
 My application is running now. Let’s modify it to update the default Nginx page.
-Update the Default Nginx Page:
+
 
 We need to exec into the container to update its welcome HTML page.
-Use docker exec -it <container_name> /bin/bash to enter the container.
+Use docker exec
 Inside the container, vi is not available, so I’ll use the echo command to update the page.
+
 echo "Welcome to My Custom Nginx Page!" > /usr/share/nginx/html/index.html
 Once we update the page, we refresh the browser, and we can see the update reflected on the page.
+
 What happens when the container crashes or stops?
 
 Manually stop the container and restart it.
