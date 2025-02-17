@@ -1388,102 +1388,124 @@ Thank you for watching! Don’t forget to like, subscribe, and click the bell fo
 
 
 
-
-@@@
 =================================================
 ##7) Networking and Security
 =================================================
-[Intro]
 
-Welcome to today’s tutorial on Docker Networking and Security. We'll dive into the concept of Docker networking, its importance, and how it supports multi-tier applications and security.
+What is Docker Networking? Docker networking allows containers to communicate with each other.
 
-[Section 1: What is Docker Networking and Why Is It Important?]
+This becomes crucial when building complex applications, especially multi-tier applications, 
+where different services need to interact. 
+    For example, an app server needs to communicate with a database server or other services.
 
-What is Docker Networking? Docker networking allows containers to communicate with each other. This becomes crucial when building complex applications, especially multi-tier applications, where different services need to interact. For example, an app server needs to communicate with a database server or other services.
 
-Why Do We Need Docker Networking? Docker networking helps maintain secure and isolated communication between containers. In real-world applications, where different components of the application (like the frontend, backend, and database) run in different environments, Docker ensures they can securely talk to each other.
+In real-world applications, where different components of the application 
+(like the frontend, backend, and database) run in different environments, 
+Docker ensures they can securely talk to each other.
 
-Security Considerations: Networking in Docker also plays a major role in security. For example, you might want the database to only be accessible by the app server and not by the public network. Docker networking lets you define these boundaries, keeping your services secure while ensuring they can still communicate effectively.
+Security Considerations: Networking in Docker also plays a major role in security. 
+For example, you might want the database to only be accessible by the app server and 
+not by the public network. 
 
-[Section 2: Three-Tier Application Example]
 
-Three-Tier Application: Let’s consider a three-tier application:
+Let’s consider a three-tier application:
 
 The frontend app is deployed in a public network.
 The app server is deployed in a secure network.
-The database server is placed in another secure network with restricted access, allowing only the app server to communicate with it.
-Docker’s Role in Security and Networking: Docker networking gives you the ability to manage and segregate these different tiers, controlling which services can access each other. This helps ensure that, for example, the database can’t be accessed from the public network, providing an additional layer of security.
+The database server is placed in another secure network with restricted access, 
+allowing only the app server to communicate with it.
 
-[Section 3: Basic Docker Network Commands]
+Docker’s Role in Security and Networking: Docker networking gives you the ability 
+to manage and segregate these different tiers, controlling which services can access each other. 
 
-Default Network: Docker provides a default network called the bridge network. When you run a container and don't specify a network, it will automatically connect to this bridge network.
-
-Viewing Networks: You can view Docker’s networks using the docker network ls command. This shows all available networks, including the default ones.
-
-Inspecting Containers: To get more details on how a container is connected to a network, use the docker inspect command. 
-This command will show you detailed information, including the network settings and which network a container is using.
+This helps ensure that, for example, the database can’t be accessed from the public network, 
+providing an additional layer of security.
 
 
-[Conclusion]
 
-Docker networking is a fundamental part of building scalable and secure applications. 
-It enables communication between containers while providing mechanisms to isolate and secure different components of an application. 
-Whether you're building a multi-tier app or securing your database, Docker networking helps you manage both.
+Default Network: 
+Docker provides a default network called the bridge network. 
+When you run a container and don't specify a network, it will automatically connect to this bridge network.
+
+You can view Docker’s networks using the docker network ls command. 
+This shows all available networks, including the default ones.
+
+Inspecting Containers: To get more details on how a container is connected to a network, 
+use the docker inspect command. 
+
+This command will show you detailed information, including the network settings and which 
+network a container is using.
 
 
 
 9:30:
 =================
-[Intro]
-
-Welcome back! In today’s tutorial, we’ll be creating our first Docker network. We’ll also explore different network drivers and how they work with Docker containers.
-
-[Section 1: Creating Your First Docker Network]
-
-Creating a Network: To create a Docker network, you simply use the docker network create command. By default, if you don’t specify a network driver, Docker will create the network using the bridge driver.
-
-What is a Network Driver? A network driver is a way Docker manages the networking configuration for containers. It determines how containers can communicate with each other and the host machine. In this tutorial, we'll start by exploring the bridge network driver.
-
-[Section 2: Exploring the Bridge Network Driver]
-
-Bridge Network Details: The bridge network is Docker’s default network driver. When you create a container without specifying a network, it automatically connects to this bridge network.
-
-Inspecting the Network: After creating the network, we can inspect it using the docker network inspect <network_name> command. This will show the details of the network, such as the subnet, gateway, and the containers connected to it.
-
-Custom Subnet: When you create a network, Docker automatically assigns a subnet for it. However, you can specify a custom subnet if needed. This allows you to define a specific range of IPs that your containers can use, providing better control over your network configuration.
-
-Unique IPs for Containers: Containers connected to the bridge network are assigned a unique IP address from the network's subnet. This ensures that each container can be individually addressed within the network.
-
-[Section 3: Host and None Network Drivers]
-
-Host Driver: The host driver connects the container directly to the host machine’s network. This means the container will share the same network namespace as the host machine, and you can access it using the host's IP address. The container won’t have its own IP; it uses the host machine’s IP.
-
-None Driver: The none driver essentially isolates the container from any network. Containers using this driver have no network connection at all and can’t communicate with other containers or the host machine.
-
-[Conclusion]
-
-That’s it for today’s tutorial! Now you know how to create Docker networks and the different network drivers available. We’ve covered the bridge, host, and none drivers, and how each of them affects container communication.
+Now we’ll be creating our first Docker network. 
+We’ll also explore different network drivers and how they work with Docker containers.
 
 
 
+Creating a Network: 
+To create a Docker network, you simply use the docker network create command. 
+By default, if you don’t specify a network driver, Docker will create the network using the bridge driver.
+
+What is a Network Driver? A network driver is a way Docker manages the networking 
+configuration for containers. 
+It determines how containers can communicate with each other and the host machine. 
+
+
+Bridge Network Details: 
+    The bridge network is Docker’s default network driver. 
+    When you create a container without specifying a network, it automatically connects to this 
+    bridge network.
+
+Inspecting the Network: After creating the network, we can inspect it using the docker network 
+inspect <network_name> command. 
+This will show the details of the network, such as the subnet, gateway, and the containers connected to it.
+
+
+Custom Subnet: 
+    When you create a network, Docker automatically assigns a subnet for it. 
+    However, you can specify a custom subnet if needed. 
+    This allows you to define a specific range of IPs that your containers can use, 
+    providing better control over your network configuration.
+
+
+Unique IPs for Containers: 
+    Containers connected to the bridge network are assigned a unique IP address from the network's subnet. 
+    This ensures that each container can be individually addressed within the network.
 
 
 
+Host Driver: The host driver connects the container directly to the host machine’s network. 
+This means the container will share the same network namespace as the host machine, 
+and you can access it using the host's IP address. 
+The container won’t have its own IP; it uses the host machine’s IP.
+
+None Driver: The none driver essentially isolates the container from any network. 
+Containers using this driver have no network connection at all and can’t communicate with 
+other containers or the host machine.
 
 
 14:30
 ===================
-[Section 1: Viewing Container IPs]
 
-Checking a Container’s IP: To see a container’s IP from the inside, you can use the docker exec command. This allows us to enter the container and check the IP address it has been assigned.
+Checking a Container’s IP: 
+    To see a container’s IP from the inside, you can use the docker exec command. 
+    This allows us to enter the container and check the IP address it has been assigned.
 
-Communicating Between Containers: If both containers are on the same network, they can communicate with each other using their IP addresses.
+Communicating Between Containers: 
+    If both containers are on the same network, they can communicate with each other using their IP addresses.
 
-[Section 2: Creating and Using a New Network]
 
-Creating a New Network: Now, let's create a new network and run containers within this network. When running a container or service with a specific network, we need to specify that network using the docker run command.
+Creating a New Network: 
+    Now, let's create a new network and run containers within this network. 
+    When running a container or service with a specific network, 
+    we need to specify that network using the docker run command.
 
-Running Containers on the New Network: Let’s run a new container, for example, a backend app container, connected to our newly created network. Now, both the backend app and the database container will be in the same network.
+Running Containers on the New Network: Let’s run a new container, 
+for example, a backend app container, connected to our newly created network. 
+Now, both the backend app and the database container will be in the same network.
 
 
 
@@ -1491,24 +1513,33 @@ Running Containers on the New Network: Let’s run a new container, for example,
 
 20:00
 ==============
-[Section 3: Testing Communication Between Containers]
 
-Testing the Network Connection: Now that both containers are on the same network, we can test the connection between them using curl commands. This ensures that the containers can communicate properly with each other.
+Testing the Network Connection: 
+    Now that both containers are on the same network, we can test the connection between them using 
+    curl commands. 
+    This ensures that the containers can communicate properly with each other.
 
-Deleting and Recreating Containers: Next, let’s delete the backend container and run it again, but this time, connect it to the same network as the database container. This way, the backend container and the database container will be able to communicate again.
+let’s delete the backend container and run it again, 
+but this time, connect it to the same network as the database container. 
+This way, the backend container and the database container will be able to communicate again.
 
-Verifying Communication: After the containers are recreated and connected to the same network, we can use docker exec to check if they can reach each other. The communication should now be successful.
+After the containers are recreated and connected to the same network, 
+we can use docker exec to check if they can reach each other. 
+The communication should now be successful.
 
 
 
 29:00
 ============================
-[Section 4: Host Network and Overlay Networks]
 
-Host Network: The host network is rarely used, but it allows a container to share the network namespace with the host machine. 
-In this mode, the container does not have its own network stack, and it uses the host’s network for communication.
+Host Network: The host network is rarely used, but it allows a container to share the network 
+namespace with the host machine. 
+In this mode, the container does not have its own network stack, 
+and it uses the host’s network for communication.
 
-Overlay Network: The overlay network is used for clustering multiple Docker nodes, such as in a Docker Swarm. 
+Overlay Network: The overlay network is used for clustering multiple Docker nodes, 
+such as in a Docker Swarm. 
+
 The overlay network enables communication between containers on different Docker nodes within the cluster. 
 It ensures that containers across multiple machines can communicate as if they were on the same network.
 
@@ -1517,21 +1548,31 @@ It ensures that containers across multiple machines can communicate as if they w
 
 32:30:
 =====================
-[Section 5: Creating a Custom Network with a Subnet]
 
-Creating a Custom Subnet: In previous steps, we used Docker's default subnet. Now, let's create a network with a custom subnet. This allows us to define our own range of IP addresses and gateway for the network.
 
-Inspecting the Network: After creating the custom network with a specified subnet, we can inspect it to view the network details, such as the assigned subnet, IP range, and gateway.
+Creating a Custom Subnet: 
+    In previous steps, we used Docker's default subnet. 
+    Now, let's create a network with a custom subnet. 
+    This allows us to define our own range of IP addresses and gateway for the network.
 
-[Section 6: Running Containers on a Custom Subnet]
+Inspecting the Network: 
+    After creating the custom network with a specified subnet, 
+    we can inspect it to view the network details, such as the assigned subnet, IP range, and gateway.
 
-Running a Container on the Custom Subnet: When we run a container on the custom subnet, it will be assigned an IP address from the defined subnet.
 
-Verifying the Container IP: Let’s run the container and check its IP using the docker inspect command. The container should receive an IP address from our custom subnet, and we’ll confirm it by inspecting the container’s network settings.
+Running a Container on the Custom Subnet: 
+    When we run a container on the custom subnet, it will be assigned an IP address from the defined subnet.
 
-[Conclusion]
+Verifying the Container IP: 
+    Let’s run the container and check its IP using the docker inspect command. 
+    The container should receive an IP address from our custom subnet, and we’ll confirm 
+    it by inspecting the container’s network settings.
 
-That wraps up this tutorial on Docker networks. We’ve learned about bridge, host, and overlay networks, how to create custom networks with subnets, and how containers can communicate with each other. Docker networking is essential for organizing your containers and managing communication between them.
+
+
+That wraps up this tutorial on Docker networks. 
+We’ve learned about bridge, host, and overlay networks, how to create custom networks with subnets, 
+and how containers can communicate with each other. 
 
 Thanks for watching! If you found this tutorial helpful, please like, comment, and subscribe for more Docker tips and tutorials.
 
@@ -1545,28 +1586,36 @@ clear and structured way for your audience.
 
 
 
-
-
-
 =================================================
 ##8) Simple Example Project
 =================================================
 
-[Intro]
+Welcome to this hands-on tutorial!
+Today, we’re going to run several projects using Docker.
 
-In this hands-on tutorial, we’re going to run a simple project using Docker.
+We’ll show you how to run projects in Java, Python, PHP, and Node.js using Docker, step by step. 
+ Let’s jump in!
 
-The project source is available on GitHub, and you can access the code either by cloning the repository or downloading it directly as a ZIP file.
 
-[Section 1: Getting the Project Code]
 
-GitHub Link: The source code for this project is available on GitHub. You can find the link in the description below.
+GitHub Link: 
+The source code for this project is available on GitHub. 
+You can find the link in the description below.
 
-Cloning the Repository: First, let's see how you can clone the repository using Git. Open your terminal and run the following command:
+You can access the code either 
+by cloning the repository or downloading it directly as a ZIP file.
+
+
+
+Cloning the Repository: First, let's see how you can clone the repository using Git. 
+Open your terminal and run the following command:
 git clone [GitHub Repository URL]
+
 This will clone the entire project into your local machine, and you can start working with it right away.
 
-Downloading as a ZIP: Alternatively, if you prefer not to use Git, you can download the project as a ZIP file. Just go to the GitHub page, and there will be an option to "Download ZIP" on the repository page.
+Downloading as a ZIP: Alternatively, if you prefer not to use Git, you can download the 
+project as a ZIP file. 
+Just go to the GitHub page, and there will be an option to "Download ZIP" on the repository page.
 
 
 
@@ -1580,19 +1629,20 @@ In thsi project drectory there is a only one file index.php to macke it simple.
 Just like a HelloWorld project.
 
 Lets see the docker file how it looks like:
-Here jsut a from tag for get php runtime enviroment, then a copy comand wht is copy file from this location to a docker directory
-and Finay expose a port.
+Here jsut a from tag for get php runtime enviroment, then a copy comand wht is 
+copy file from this location to a docker directory and Finay expose a port.
 
 
 4:10
 =====================
-[Intro]
 
-In this tutorial, we’re going to build a Docker image for our PHP project and run it in a container. Afterward, we’ll check it in the browser to ensure everything works as expected.
+In this tutorial, we’re going to build a Docker image for our PHP project and run it in a container. 
+Afterward, we’ll check it in the browser to ensure everything works as expected.
 
-[Section 1: Build the Docker Image]
 
-Building the Image: Let’s start by building the Docker image for our PHP project. To do this, we use the following command:
+
+Building the Image: Let’s start by building the Docker image for our PHP project. 
+    To do this, we use the following command:
 
 docker build -t php-project .
 This command will build the image based on the Dockerfile in the current directory and tag it as php-project.
@@ -1601,10 +1651,13 @@ This command will build the image based on the Dockerfile in the current directo
 Running the Image: Now that we’ve built the image, let’s run the container using the following command:
 docker run -d -p 8080:80 php-project
 
-This command runs the php-project container in detached mode and maps port 80 in the container to port 8080 on your local machine.
+This command runs the php-project container in detached mode and maps port 80 in the container 
+to port 8080 on your local machine.
+
 If everything is set up correctly, you should see your project’s output or the expected result!
 
-[Note]: In this example, we're testing with a single file, but your PHP project may have many files, so ensure your project structure is correctly set up.
+In this example, we're testing with a single file, but your PHP project may have many files, 
+so ensure your project structure is correctly set up.
 
 
 
@@ -1612,62 +1665,58 @@ If everything is set up correctly, you should see your project’s output or the
 7:40
 ==========================
 Nowwe’re going to run a three-tier application consisting of a frontend, backend, and database. 
-Each tier will run in a separate container, and we’ll use Docker networking to enable communication between them.
 
-[Section 1: Introduction to the Problem]
+Each tier will run in a separate container, and we’ll use Docker networking 
+to enable communication between them.
 
-In a typical three-tier application, the frontend communicates with the backend, and the backend communicates with the database.
 
-For this communication to work smoothly, we need to ensure that the containers can reach each other by name, rather than by IP address.
+In a typical three-tier application, the frontend communicates with the backend, and the 
+backend communicates with the database.
 
-Docker’s default bridge network doesn’t include an internal DNS resolver, so containers can communicate using IP addresses, 
+For this communication to work smoothly, we need to ensure that the containers can reach 
+each other by name, rather than by IP address.
+
+Docker’s default bridge network doesn’t include an internal DNS resolver, so containers can 
+communicate using IP addresses, 
 but not by container names. This is where Docker’s custom networks come in.
 
-[Section 2: Check Existing Networks]
+
 
 Before we start creating our multi-tier application, let’s check which networks are already available. 
 Run the following command to list all Docker networks:
-
 docker network ls
-You’ll see the default bridge network, but we’ll need to create our own custom network to ensure the containers can communicate 
-with each other by name.
 
-[Section 3: Default Bridge Network Issue]
 
-Let’s test the default bridge network by running two containers. We’ll attempt to make them communicate, but since there’s no internal DNS resolver, they can only communicate using IP addresses, not container names.
+Let’s test the default bridge network by running two containers. 
+We’ll attempt to make them communicate, but since there’s no internal DNS resolver, 
+they can only communicate using IP addresses, not container names.
 
-[Section 4: Create a Custom Network]
 
-Now, let’s create a custom network that includes Docker’s internal DNS resolver. This will allow us to use container names for 
-communication.
+Now, let’s create a custom network that includes Docker’s internal DNS resolver. 
+This will allow us to use container names for communication.
 
 To create a custom network, use the following command:
 docker network create --driver bridge my_custom_network
-[Section 5: Running the Three-Tier Application]
+
 
 Now, we’re going to run our three-tier application:
+    Frontend Container: This container will serve the frontend of our application.
+    Backend Container: The backend will communicate with both the frontend and the database.
+    Database Container: The database will store data for the application.
 
-Frontend Container: This container will serve the frontend of our application.
-Backend Container: The backend will communicate with both the frontend and the database.
-Database Container: The database will store data for the application.
+
 We’ll make sure to connect each container to our custom network, my_custom_network.
 
-Here’s how you run them:
 
-Now, the frontend, backend, and database containers are all connected to the same network and can communicate using container names.
+With the custom network in place, containers can communicate using their names instead of IP addresses. 
+Let’s test this:
 
-[Section 6: Testing Communication Between Containers]
-
-With the custom network in place, containers can communicate using their names instead of IP addresses. Let’s test this:
-
-Frontend to Backend Communication: The frontend can now access the backend using the container name backend, 
+The frontend can now access the backend using the container name backend, 
 rather than needing to know its IP address.
 
-Backend to Database Communication: Similarly, the backend can access the database using the container name database.
+Similarly, the backend can access the database using the container name database.
 
-This is how Docker networking enables communication between containers using DNS resolution by container name, 
-rather than relying on IP addresses.
-
+This is how Docker networking enables communication between containers using DNS resolution.
 
 
 
@@ -1703,39 +1752,33 @@ lets check what our three tier applicaotn will looks like, here good show one.
 26:10
 =====================
 
-[Intro]
+Let’s start by creating our custom network with a custom subnet. 
+We’ll use a command to create the network, and once it’s created, we’ll move on to testing.
 
-In this tutorial, we’ll walk through how to create a user-defined Docker network with a custom subnet. We’ll then test the communication between containers using DNS resolution, which is enabled by the user-defined network.
+Once our network is set up, we’ll run two new Nginx containers, ng3 and ng4, on this network. 
+The idea here is to test how these containers can communicate with each other using DNS, 
+rather than relying on IP addresses.
 
-[Section 1: Creating a Custom Network]
 
-Let’s start by creating our custom network with a custom subnet. We’ll use a command to create the network, and once it’s created, we’ll move on to testing.
+Next, we’ll inspect the network to check the current status. 
+This will confirm that our two containers, ng3 and ng4, are running on the same custom network.
 
-[Section 2: Running Containers on the Custom Network]
-
-Once our network is set up, we’ll run two new Nginx containers, ng3 and ng4, on this network. The idea here is to test how these containers can communicate with each other using DNS, rather than relying on IP addresses.
-
-[Section 3: Inspecting the Network]
-
-Next, we’ll inspect the network to check the current status. This will confirm that our two containers, ng3 and ng4, are running on the same custom network.
-
-[Section 4: Testing Communication Between Containers]
 
 Now, let's check if it's possible for the two containers to communicate with each other by DNS.
+First, we’ll test using IP addresses to see if the communication works. 
+After that, we’ll test using DNS resolution.
 
-First, we’ll test using IP addresses to see if the communication works. After that, we’ll test using DNS resolution.
 
-[Section 5: Testing DNS Resolution]
 
-When we try to communicate using DNS, we’ll see that it works perfectly! The two containers can communicate using their container names, which is only possible with a user-defined network. This is a key advantage over the default network, where containers can't communicate by name without additional configuration.
+With DNS resolution confirmed, we’re now ready to move on to our three-tier application setup. 
+Before proceeding, we’ll clean up and remove all the current Docker containers to ensure a fresh environment.
 
-[Section 6: Three-Tier Application Setup]
 
-With DNS resolution confirmed, we’re now ready to move on to our three-tier application setup. Before proceeding, we’ll clean up and remove all the current Docker containers to ensure a fresh environment.
+Let’s take a look at what our three-tier application setup will look like. 
+In this setup, we’ll have the frontend, backend, and database containers, 
+all connected using the custom network we just created. 
 
-[Section 7: Previewing the Three-Tier Application]
-
-Let’s take a look at what our three-tier application setup will look like. In this setup, we’ll have the frontend, backend, and database containers, all connected using the custom network we just created. This will allow each tier to communicate seamlessly, using DNS names instead of IP addresses.
+This will allow each tier to communicate seamlessly, using DNS names instead of IP addresses.
 
 
 
@@ -1745,29 +1788,30 @@ Let’s take a look at what our three-tier application setup will look like. In 
 
 30:10
 ==========================
-Now we we'll walk through how to run a simple Python project inside Docker and connect it to a database. We'll take a look at the source code and Dockerfile setup for this project.
+Now we we'll walk through how to run a simple Python project inside Docker and connect it to a database. 
+We'll take a look at the source code and Dockerfile setup for this project.
 
-[Section 1: Checking the Python Source Code]
 
-First, let’s examine the source code of the Python project. The setup here is simple: we are creating a database connection and passing the hostname via an environment variable.
+First, let’s examine the source code of the Python project. 
+The setup here is simple: we are creating a database connection and passing the 
+hostname via an environment variable.
 
-To keep things simple, we’ll execute a basic SELECT query to verify that the connection to the database works.
+To keep things simple, we’ll execute a basic SELECT query to verify that the connection to 
+the database works.
 
-[Section 2: Reviewing the Dockerfile]
 
 Now, let’s check the Dockerfile. Here's how it's set up:
-
 Python Base Image: As usual, we start with a Python base image.
-Creating Directory for Source Code: We create a directory inside the container to store the source code.
-Copying Source Code: We copy the source code into the container.
-Exposing the Port: The container will expose the required port to allow communication.
-Executing the Python Command: Finally, we use the CMD instruction to run the Python script.
-[Section 3: Building the Docker Image]
+    Creating Directory for Source Code: We create a directory inside the container to store the source code.
+    Copying Source Code: We copy the source code into the container.
+    Exposing the Port: The container will expose the required port to allow communication.
+    Executing the Python Command: Finally, we use the CMD instruction to run the Python script.
 
-Let’s now build the Docker image with the docker build command. Once the image is built, we’ll move on to running it.
+Let’s now build the Docker image with the docker build command. 
+Once the image is built, we’ll move on to running it.
 
-[Section 4: Running the Container]
-We’ll run the container using the docker run command and ensure that the Python project connects to the database and executes the query successfully.
+We’ll run the container using the docker run command and ensure that the Python project connects 
+to the database and executes the query successfully.
 
 
 
@@ -1775,41 +1819,26 @@ We’ll run the container using the docker run command and ensure that the Pytho
 
 36:20
 ==================
-[Section 1: Building the Docker Image]
-
-First, let’s build the Docker image for our Python application. We’ll use the docker build command to create the image.
-
-Once the image is built, we can check it using the docker images command to verify that the image is available.
-
-[Section 2: Running the Container with MySQL Database]
-
 Now that the image is ready, we can run the Python application container along with the MySQL database.
 
 To do this, we’ll use the docker run command. Here’s the breakdown:
+    Container Name: We specify a name for the container.
+    Network Name: The network name to connect the container.
+    Port Mapping: We map the container's port 8080 to the host machine's port.
+    MySQL Server Information: We include the necessary MySQL configuration details.
+    Image Name: Finally, we specify the image name that was just built.
 
-Container Name: We specify a name for the container.
-Network Name: The network name to connect the container.
-Port Mapping: We map the container's port 8080 to the host machine's port.
-MySQL Server Information: We include the necessary MySQL configuration details.
-Image Name: Finally, we specify the image name that was just built.
-[Section 3: Verifying the Application]
 
-Once the container is up and running, we can check the application in the browser by navigating to http://localhost:8080.
+Once the container is up and running, we can check the application in the browser 
+by navigating to http://localhost:8080.
 
-[Section 4: Screenshot and Final Check]
 
-Yes, we’ve successfully connected the Python application to the MySQL database! The data from the MySQL server is now displayed on the browser.
+Yes, we’ve successfully connected the Python application to the MySQL database! 
+The data from the MySQL server is now displayed on the browser.
 
 Let’s capture a screenshot and add it to our documentation.
 
-[Conclusion]
-
-That’s it! We’ve built and run a Python application with MySQL in Docker. The connection is successfully established, and the data is visible in the browser.
-
-
-
-
-
+That’s it! We’ve built and run a Python application with MySQL in Docker.
 
 
 
@@ -1817,56 +1846,55 @@ That’s it! We’ve built and run a Python application with MySQL in Docker. Th
 
 40:10
 ===========================
-Now we we’ll build and run a Java Spring Boot application inside a Docker container, connecting it to a MySQL database.
+Now we we’ll build and run a Java Spring Boot application inside a Docker container, 
+connecting it to a MySQL database.
 
-[Section 1: Building the Java Application]
+
 Before running the application, we need to compile and build a JAR file.
 For this, we are using Maven.
 
 First, we check the pom.xml file to ensure all dependencies are configured.
 Now, we run the Maven build command to generate the JAR file.
 The build process completes successfully, and the JAR file is located in the target/ directory.
-[Section 2: Creating the Dockerfile]
-Next, we create a Dockerfile for our Java application.
 
+
+This is the Dockerfile—let’s check it out!
 The steps are similar to what we did for the Python application:
+    Use a JDK as the base image.
+    Create a directory inside the container.
+    Copy the JAR file into the container.
+    Expose the necessary port.
+    Finally, run the JAR file.
 
-Use a JDK as the base image.
-Create a directory inside the container.
-Copy the JAR file into the container.
-Expose the necessary port.
-Finally, run the JAR file.
-[Section 3: Building and Running the Docker Image]
+
 Now, let’s build the Docker image for our Java Spring Boot application.
 We run the Docker build command, and once it's done, we verify the image using docker images.
 
 Next, we run the Java application inside a container.
 This container will be part of the same Docker network as the MySQL database.
 
-[Section 4: Resolving Port Conflicts]
+
 Oh! We encountered a port conflict because our Python application was already using port 8080.
 
 To fix this:
+    We stop and remove the existing Python container.
+    Now, we rerun the Java application container.
+    It runs successfully! Let’s take a screenshot and add it to our documentation.
 
-We stop and remove the existing Python container.
-Now, we rerun the Java application container.
-It runs successfully! Let’s take a screenshot and add it to our documentation.
-[Section 5: Checking the Application in the Browser]
+
 Now, let’s open the browser and check http://localhost:8080.
 Yes! We successfully get the data from the MySQL server.
 
-[Section 6: Viewing Container Logs]
-To debug and monitor the application, we can check container logs:
 
+To debug and monitor the application, we can check container logs:
 Use the docker logs command to see past logs.
 Use docker logs -f to view live logs in real time.
+
 Now, our MySQL database and backend Java application are fully set up inside Docker.
 
-[Section 7: Next Step – Running a Frontend Application]
+
 The backend is ready! Now, we’ll proceed to running a Node.js frontend application in the next step.
 
-[Conclusion]
-That’s it for this part! We successfully built and ran a Java Spring Boot application inside Docker and connected it to a MySQL database.
 
 
 
@@ -1874,49 +1902,53 @@ That’s it for this part! We successfully built and ran a Java Spring Boot appl
 
 53:30
 =====================
-[Intro]
-In this tutorial, we’ll complete our three-tier application by running a Node.js frontend, which communicates with a Java backend, connected to a MySQL database inside Docker.
 
-[Section 1: Understanding the Frontend Application]
+In this tutorial, we’ll complete our three-tier application by running a Node.js frontend, 
+which communicates with a Java backend, connected to a MySQL database inside Docker.
+
+
 First, let’s check the Node.js application source code.
-
 Nothing fancy here!
-The app makes an HTTP request to our backend service and gets the response.
-Then, it maps the data to an HTML file to display it.
-[Section 2: Creating the Dockerfile]
+    The app makes an HTTP request to our backend service and gets the response.
+    Then, it maps the data to an HTML file to display it.
+
+
 Now, let’s check the Dockerfile for our Node.js application.
-
 The steps are similar to what we did before:
-
 Define a base image for Node.js.
-Copy the source files into the container.
-Expose the port 3000 (since our frontend runs on this port).
-Run the Node.js application.
-[Section 3: Building and Running the Docker Image]
+    Copy the source files into the container.
+    Expose the port 3000 (since our frontend runs on this port).
+    Run the Node.js application.
+
+
 Now, let’s build the Docker image for our Node.js frontend.
 We run the Docker build command, and once it's done, we take a screenshot and add it to our documentation.
 
-Next, we run the frontend container inside the same Docker network as the backend and database.
 
-[Section 4: Checking the Application in the Browser]
+Next, we run the frontend container inside the same Docker network as the backend and database.
 Now, let’s open the browser and check http://localhost:3000.
 Yes! We can now see the data from our Java backend, beautifully displayed in the frontend.
 
-Our three-tier application is fully functional!
+
+Our three-tier app is fully set up and working as expected!
+
 
 Database: MySQL
 Middle Tier (Backend): Java Spring Boot
 Frontend: Node.js
-[Section 5: Adding Data and Refreshing the Frontend]
+
+
 Let’s manually add some data to the MySQL database.
+
+The process is almost the same as before!
+
 
 Now, we refresh the browser…
 Yes! The newly added data appears in the frontend instantly!
 
-[Conclusion]
-We have successfully built and run a three-tier application inside Docker.
 
-
+ That’s it! We’ve successfully built and run a three-tier application inside Docker. 
+ Thanks for watching!
 
 
 
@@ -1926,122 +1958,108 @@ We have successfully built and run a three-tier application inside Docker.
 ============================================
 ##9) Docker Compose
 ============================================
-
-
-[Intro]
-🚀 Welcome back to the channel! 🚀
+Welcome back to the channel! 
 Today, we’re going to simplify how we run multi-container applications using Docker Compose.
 
-If you’ve been manually running database, backend, and frontend services separately, Docker Compose will change the game for you!
+Till now we been manually running database, backend, and frontend services separately, 
 
-[Section 1: What is Docker Compose?]
-Docker Compose is a tool that allows us to define and run multi-container applications using a single YAML file.
+Docker Compose will change the game for you!
+
+
+Docker Compose is a tool that allows us to define and run multi-container applications using a single 
+YAML file.
 
 Before Docker Compose, we had to start each service individually using different docker run commands.
 Now, we can start everything at once with a single command!
 
-[Benefits of Docker Compose]
-✅ Runs multiple services together
-✅ No need to start containers one by one
-✅ Easy configuration in a single docker-compose.yml file
-✅ Works across different environments (local, staging, production)
+Benefits of Docker Compose:
+    Runs multiple services together
+    No need to start containers one by one
+    Easy configuration in a single docker-compose.yml file
+    Works across different environments (local, staging, production)
 
-[Section 2: Installing Docker Compose]
+
+
 If you're using Windows, Docker Compose comes pre-installed with Docker Desktop.
 If you're on Linux, you may need to install it manually.
+
 You can check if Docker Compose is installed by running:
 docker-compose --version
 If it’s not installed, follow the official documentation to install it.
-[Section 3: Creating a Docker Compose File]
+
+
+
 Let’s now create a docker-compose.yml file for our three-tier application.
 
-
-
-
-To check if Docker Compose is installed, run:
-docker compose version
-
-
-
-[Step 2: Understanding Docker Compose File]
-A docker-compose.yml file is different from a Dockerfile.
 It defines multiple services, their dependencies, networks, and volumes.
 
 The key sections are:
-✅ version – Defines the Docker Compose version
-✅ services – Lists all application components
-✅ networks & volumes – For communication and data persistence
+    version – Defines the Docker Compose version
+    services – Lists all application components
+    networks & volumes – For communication and data persistence
 
 
 This will define:
-1️⃣ A MySQL database
-2️⃣ A Java Spring Boot backend
-3️⃣ A Node.js frontend
+    A MySQL database
+    A Java Spring Boot backend
+    A Node.js frontend
+
 
 [Section 4: Running the Application with Docker Compose]
 Once our docker-compose.yml file is ready, we can start everything with one command:
 docker-compose up -d
-✅ This will start all services together in the background.
+This will start all services together in the background.
 
 To check running containers, use:
 docker ps
-[Section 5: Testing the Application]
-Now, let’s open the browser:
 
-Backend API: http://localhost:8080
-Frontend UI: http://localhost:3000
+
+Now, let’s open the browser:
+    Backend API: http://localhost:8080
+    Frontend UI: http://localhost:3000
 And yes! Everything is running smoothly.
 
-[Section 6: Managing Docker Compose]
+
 To stop all services, run:
 docker-compose down
 To restart services, use:
 docker-compose restart
-[Conclusion]
+
+
 Now you know how to run multiple containers easily using Docker Compose!
-No more running each service separately.
+
 
 
 
 
 16:50
 =============
-[Step 1: Making Changes to the Source Code]
 Let’s modify our application code and update our service.
 With Docker Compose, we don’t need to rebuild everything manually!
 
-[Step 2: Restarting Services]
 After making changes, we simply restart our entire system with a single command.
 This ensures our updates take effect smoothly.
 
-[Step 3: Stopping Services]
+
 One great feature of Docker Compose is that when we run docker-compose down:
-✅ It stops all running containers
-✅ It removes those containers automatically
+    It stops all running containers
+    It removes those containers automatically
 
 
 
 19:40
 ======================
-For testing perpose  we’ll see how to run applications in Docker Compose without building images—perfect for testing environments like QA!
+For testing perpose  we’ll see how to run applications in Docker Compose without building 
+images—perfect for testing environments like QA!
 
-[Step 1: Running Without Building]
 For testing purposes, we don’t always need to build images.
 We can skip the build step and just run the app directly!
 To do this, we create a separate docker-compose.yaml file without the build section.
 
-[Step 2: Running & Checking Services]
 Once the file is ready, we run:
-✅ docker-compose up to start the application
-✅ docker-compose ps to check running containers
-✅ docker-compose logs to see application logs
-
-[Step 3: Important Reminder]
-📌 Remember:
-To run docker-compose up, the docker-compose.yaml file must exist in the directory—otherwise, the command won’t work!
-And that’s it! Quick and easy testing without building images!
-
-
+    docker-compose up to start the application
+    docker-compose ps to check running containers
+    docker-compose logs to see application logs
 
 
 
@@ -2051,30 +2069,33 @@ And that’s it! Quick and easy testing without building images!
 ========================================
 ##10) Container Orchestration
 ========================================
-[Intro]
-Welcome back! Today, we’re diving into Container Orchestration—a powerful tool for managing and deploying containerized applications. 🚀
 
-[What is Container Orchestration?]
-Container Orchestration automates the deployment, scaling, and management of containers.
-It ensures applications run efficiently without manual intervention!
 
-[Why Use Container Orchestration?]
-Here’s what it automates:
-✅ Provisioning & Deployment – Quickly start new containers
-✅ Configuration & Scheduling – Organize services efficiently
-✅ Resource Allocation – Optimize hardware usage
-✅ Scaling – Adjust based on demand
-✅ Load Balancing & Traffic Routing – Manage traffic efficiently
-✅ Security – Keep containers safe
+Welcome back! Today, we’re diving into Container Orchestration—a powerful tool 
+for managing and deploying containerized applications.
 
-[Example: Why Scaling is Important]
+What is Container Orchestration?
+    Container Orchestration automates the deployment, scaling, and management of containers.
+    It ensures applications run efficiently without manual intervention!
+
+Why Use Container Orchestration?
+    Provisioning & Deployment – Quickly start new containers
+    Configuration & Scheduling – Organize services efficiently
+    Resource Allocation – Optimize hardware usage
+    Scaling – Adjust based on demand
+    Load Balancing & Traffic Routing – Manage traffic efficiently
+    Security – Keep containers safe
+
+
+Why Scaling is Important:
 Imagine you have an eCommerce site handling 100 transactions per second (TPS).
-🚀 On a regular day? No problem!
-🔥 Black Friday? Traffic doubles or triples!
+    On a regular day? No problem!
+    Black Friday? Traffic doubles or triples!
+
 Without orchestration, the site might crash under heavy load.
 With orchestration, it automatically scales up to handle more users—then scales down when traffic normalizes.
 
-[Conclusion]
+
 Container orchestration makes life easier by handling everything automatically!
 Stay tuned for more in-depth tutorials on Kubernetes, Docker Swarm, and more!
 
@@ -2082,6 +2103,7 @@ Stay tuned for more in-depth tutorials on Kubernetes, Docker Swarm, and more!
 
 when increse traffice increse contitaner, more  traffice  more contienr.
 For doing this task automatically call auto scaling what is can be done by container orchestration.
+
 
 Same as wehn traffece descrise ten we have to scale down automaticlly not manually deleteing one by one 
 we have to do it automatically, what is alos done by contienr orchestration.
@@ -2093,28 +2115,31 @@ Not for small typicalsystem.
 
 Like amazon, netfllix, facebook type system need Orchestration.
 
-a small system like pos-software no need orchestration in this case dos not make any good for thisi small software.
+a small system like pos-software no need orchestration in this case dos 
+not make any good for thisi small software.
+
 
 
 7:30
 =======================
 Let's explore how Amazon's e-commerce platform manages its microservices with orchestration.
 
-Amazon runs numerous microservices, like Product Service, Payment Service, and Order Service, with hundreds of instances.
+Amazon runs numerous microservices, like Product Service, Payment Service, and Order Service, 
+with hundreds of instances.
 
 Managing such a large system—handling deployments, scaling up or down—is a huge challenge.
-
 This is where orchestration comes in, automating and managing everything efficiently.
 
 Key tasks of orchestration include:
-Provisioning and deployment
-Configuration and scheduling
-Resource allocation
-Scaling containers based on workload
-Load balancing and traffic routing
-Securing container interactions
+    Provisioning and deployment
+    Configuration and scheduling
+    Resource allocation
+    Scaling containers based on workload
+    Load balancing and traffic routing
+    Securing container interactions
 
 Orchestration makes large-scale microservice management seamless!
+
 
 13:20
 =====================
@@ -2146,9 +2171,11 @@ Since Swarm is natively integrated into Docker, no extra installation is needed!
 ===============
 Let’s explore Docker Swarm components and how they work!
 
-🔹 Swarm Mode – Docker’s built-in orchestration tool that clusters multiple hosts into a single virtual environment.
+🔹 Swarm Mode – Docker’s built-in orchestration tool that clusters multiple hosts 
+    into a single virtual environment.
 
-🔹 Service – Defines the desired state of an application, including replicas, network configurations, and more.
+🔹 Service – Defines the desired state of an application, including replicas, 
+    network configurations, and more.
 
 🔹 Task – The smallest unit of work in Swarm, representing a running container.
 
@@ -2166,165 +2193,153 @@ With these components, Docker Swarm efficiently manages containerized applicatio
 24:25
 =================
 
-[Intro]
-
 "Welcome back to the channel, guys! Today, we’re diving into another popular orchestration tool – Kubernetes."
 
-[Section 1: What is Kubernetes?]
 
 "So, what is Kubernetes?
 
-Kubernetes is an open-source container orchestration system that helps automate software deployment, scaling, and management.
-
+Kubernetes is an open-source container orchestration system that helps automate software deployment, 
+scaling, and management.
 Originally designed by Google, it is now maintained by the Cloud Native Computing Foundation (CNCF)."
 
-[Section 2: Why Kubernetes?]
 
-"Kubernetes offers a lot more features compared to Docker Swarm, which is why it's become the world’s go-to orchestration tool."
-
-[Section 3: Kubernetes CLI Tool]
-
-"Kubernetes also works with a command-line interface, using the kubectl tool. This tool supports several different ways to create and manage Kubernetes objects, allowing you to interact with your clusters."
-
-[Section 4: High Availability in Kubernetes]
-
-"In a Kubernetes cluster, one of the best practices is to have multiple master nodes for high availability. This ensures that if one master node goes down, the cluster continues to operate smoothly."
-
-"Each worker node has an agent called the kubelet. The kubelet is responsible for maintaining communication with the master node and ensuring that the containers are running as expected."
-
-[Outro]
-
-"That’s a brief introduction to Kubernetes! We’ll explore more in upcoming videos, so stay tuned. Don’t forget to like, subscribe, and hit the bell icon to stay updated with our latest tutorials!"
+Why Kubernetes?
+"Kubernetes offers a lot more features compared to Docker Swarm, 
+which is why it's become the world’s go-to orchestration tool."
 
 
+"Kubernetes also works with a command-line interface, using the kubectl tool. 
+This tool supports several different ways to create and manage Kubernetes objects, 
+allowing you to interact with your clusters."
 
 
+"In a Kubernetes cluster, one of the best practices is to have multiple master nodes 
+for high availability. 
+This ensures that if one master node goes down, the cluster continues to operate smoothly."
+
+
+"Each worker node has an agent called the kubelet. 
+The kubelet is responsible for maintaining communication with the master node 
+and ensuring that the containers are running as expected."
+
+
+"That’s a brief introduction to Kubernetes! 
 
 
 
 
 28:40
 ====================
-[Intro]
 
-"Welcome back to the channel, guys! In today’s tutorial, we’re going to explore Pods in Kubernetes."
+What is a Pod?
 
-[Section 1: What is a Pod?]
+"In Kubernetes, a Pod is the smallest and simplest unit. 
+You can think of it as a container running a task, but there’s more to it."
 
-"In Kubernetes, a Pod is the smallest and simplest unit. You can think of it as a container running a task, but there’s more to it."
+"A Pod can contain multiple containers, but the best practice is to run only one container per Pod. 
+This simplifies management and scaling."
 
-"A Pod can contain multiple containers, but the best practice is to run only one container per Pod. This simplifies management and scaling."
 
-[Section 2: Pods in Action]
-
-"So, when you group multiple Pods together, they form the foundation of your running cluster. Each Pod can run a specific application or service, and together, they make up your entire Kubernetes environment."
-
-[Outro]
-
-"That's a quick overview of Pods in Kubernetes! If you're interested in learning more, stay tuned for upcoming tutorials. Don’t forget to like, subscribe, and click the bell icon for the latest updates!"
-
+"So, when you group multiple Pods together, they form the foundation of your running cluster. 
+Each Pod can run a specific application or service, and together, they make up your entire Kubernetes environment."
 
 
 
 
 33:20
 ======================
-[Intro]
 
-"Welcome back, everyone! Today, we’re going to talk about how you can run a Pod in Kubernetes using two different approaches."
+Today, we’re going to talk about how you can run a Pod in Kubernetes using two different approaches."
 
-[Section 1: Imperative Commands vs. Declarative Object Configuration]
 
-"In Kubernetes, you can run a Pod in two main ways: using imperative commands or declarative object configuration.
+"In Kubernetes, you can run a Pod in two main ways: using imperative commands or declarative 
+object configuration.
 
 So, what do these terms mean? Let’s take a closer look."
 
-[Section 2: Imperative Commands]
 
-"Imperative commands are the 'on-demand' approach. You directly tell Kubernetes what to do using commands like kubectl run or kubectl create. This is more hands-on and immediate."
+"Imperative commands are the 'on-demand' approach. 
+You directly tell Kubernetes what to do using commands like kubectl run or kubectl create. This is more hands-on and immediate."
 
-[Section 3: Declarative Object Configuration]
 
-"On the other hand, declarative object configuration involves defining the desired state of your cluster in YAML files. You then apply this configuration using kubectl apply. Kubernetes will make sure that the cluster matches this state."
+"On the other hand, declarative object configuration involves defining the desired state of 
+your cluster in YAML files. You then apply this configuration using kubectl apply. 
+Kubernetes will make sure that the cluster matches this state."
 
 
 
 33:50
 ================
 
-[Section 4: Official Documentation & Searching Resources]
-
 "To get a deeper understanding, let’s check out the official Kubernetes documentation.
 
-Everything we’ve talked about today can be targeted and searched, whether it’s services, Pods, or configurations. The docs are a great resource for detailed examples and explanations."
-
-[Outro]
-
-"That’s a wrap on how to run Pods in Kubernetes! If you have any questions or want more details, let me know in the comments. Be sure to like, subscribe, and hit the bell for more Kubernetes tutorials!"
+Everything we’ve talked about today can be targeted and searched, 
+whether it’s services, Pods, or configurations. 
+The docs are a great resource for detailed examples and explanations."
 
 
 
 
 35:10
 ===================
-[Intro]
-
-"Welcome back to the channel, everyone! Today, we’re diving into the core components of Kubernetes. Understanding these components is key to mastering Kubernetes and orchestrating containers effectively."
+we’re diving into the core components of Kubernetes. 
 
 [Section 1: Master Node]
-
-"First up, we have the Master Node. This is the brain of the Kubernetes cluster. It controls everything, managing scheduling and orchestration tasks. It ensures that everything runs smoothly across the cluster."
+"First up, we have the Master Node. This is the brain of the Kubernetes cluster. 
+It controls everything, managing scheduling and orchestration tasks. 
+It ensures that everything runs smoothly across the cluster."
 
 [Section 2: Node]
-
-"Next, we have Nodes. These are the worker machines that run your containers and execute tasks assigned by the Master Node. Each Node is essentially a worker in the Kubernetes ecosystem."
+"Next, we have Nodes. These are the worker machines that run your containers and execute 
+tasks assigned by the Master Node. Each Node is essentially a worker in the Kubernetes ecosystem."
 
 [Section 3: Pod]
-
-"Now, let’s talk about Pods. A Pod is the smallest deployable unit in Kubernetes. It can represent one or more containers that share resources like networking and storage. Pods are the fundamental building blocks for running applications in Kubernetes."
+"Now, let’s talk about Pods. A Pod is the smallest deployable unit in Kubernetes. 
+It can represent one or more containers that share resources like networking and storage. 
+Pods are the fundamental building blocks for running applications in Kubernetes."
 
 [Section 4: ReplicaSet]
-
-"Then, there’s ReplicaSet. This ensures that a specified number of replicas, or Pods, are running at all times. It helps in maintaining high availability by automatically replacing Pods that fail."
+"Then, there’s ReplicaSet. This ensures that a specified number of replicas, or 
+Pods, are running at all times. It helps in maintaining high availability by 
+automatically replacing Pods that fail."
 
 [Section 5: Service]
-
-"Now, let’s move on to Service. A Service provides network access to a set of Pods. It abstracts the Pods and offers a stable endpoint, even if the Pods are dynamically scaled or replaced."
+"Now, let’s move on to Service. A Service provides network access to a set of Pods. 
+It abstracts the Pods and offers a stable endpoint, even if the Pods are dynamically scaled or replaced."
 
 [Section 6: Ingress and Kube-DNS]
-
-"Ingress and Kube-DNS are critical for managing external access to services within the cluster. Ingress handles HTTP and HTTPS traffic routing, while Kube-DNS provides DNS-based service discovery inside the cluster."
+"Ingress and Kube-DNS are critical for managing external access to services within the cluster. 
+Ingress handles HTTP and HTTPS traffic routing, while Kube-DNS provides DNS-based service discovery 
+inside the cluster."
 
 [Section 7: ConfigMap and Secret]
+"Finally, we have ConfigMap and Secret. 
+A ConfigMap stores non-sensitive configuration data for Pods, like environment variables or configuration 
+files. On the other hand, a Secret is used to store sensitive information, 
+such as passwords or API keys, securely for Pods."
 
-"Finally, we have ConfigMap and Secret. A ConfigMap stores non-sensitive configuration data for Pods, like environment variables or configuration files. On the other hand, a Secret is used to store sensitive information, such as passwords or API keys, securely for Pods."
 
-[Outro]
+"That’s a quick overview of Kubernetes components! 
 
-"That’s a quick overview of Kubernetes components! These components work together to help you orchestrate containers and scale your applications effectively. If you found this helpful, don’t forget to like, subscribe, and hit the bell for more Kubernetes tutorials!"
+
 
 
 41:25
 =========================
-[Intro]
 
-"Alright, folks, that brings us to the end of today’s tutorial! We’ve covered a lot, starting with an introduction to container orchestration, and specifically Kubernetes."
+"Alright, Guys,
+"As you’ve seen, we’ve just taken a bird’s eye view of Kubernetes and its components. 
+There’s a lot more to dive into, and we’ll explore it in upcoming videos."
 
-[Section 1: Recap]
 
-"As you’ve seen, we’ve just taken a bird’s eye view of Kubernetes and its components. There’s a lot more to dive into, and we’ll explore it in upcoming videos."
 
-[Section 2: Next Steps]
+"So, what’s next? After properly learning Docker, the next step is to learn at least one 
+container orchestration tool, and Kubernetes is one of the most popular ones.
 
-"So, what’s next? After properly learning Docker, the next step is to learn at least one container orchestration tool, and Kubernetes is one of the most popular ones.
+In the real world, when you’re working with distributed systems or large-scale applications, 
+containerization combined with orchestration is the way to go."
 
-In the real world, when you’re working with distributed systems or large-scale applications, containerization combined with orchestration is the way to go."
 
-[Closing]
-
-"We’ve reached the end of this Kubernetes introduction, but don’t worry! We’ll be back soon with more in-depth technical content right here on the channel."
-
-"Make sure you like, subscribe, and hit that bell icon so you don’t miss our next tutorial!"
 
 "Thanks for watching, and we’ll see you in the next video!"
 
