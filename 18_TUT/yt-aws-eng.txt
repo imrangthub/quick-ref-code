@@ -456,54 +456,57 @@ I hope this was helpful! Don’t forget to like, comment, and subscribe for more
 =================================================
 Cost And Budgets
 =================================================
- in this tutorial we will talk about Cost And Budgets.
- Aws show all aws related cost in one place/one dashbored called costmanagemen.
- let check it out. open it.
-Here you cand see all serice indivudual cost what is consume how much etc.
+In this tutorial, we will talk about Cost and Budgets in AWS.
+
+AWS provides a dashboard called Cost Management, where you can see all AWS-related costs in one place.
+
+Let's check it out. Open the Cost Management dashboard.
+
+Here, you can see the individual costs for each service, how much is being consumed, and other details.
+
+You can also estimate future costs using the AWS My Estimation menu.
+
+For example, if you need a database server or any other service, you can calculate how much the bill will be based on usage and time.
+
+This helps in planning your AWS budget effectively.
 
 
-You can make a bill demo estimation / price calculation from aws myEstimation manue.
-Like a databae server or any other requrement serve you cna calculation how many bill for how many time for this serives.
+
 
 
 
 2:20
 ==============
-Lets calculate for a ec2 service bill, so serice ec2 select it.
-You have to select region what is make differetn bill for differetn regison for same server.
+Let's calculate the bill for an EC2 service.
 
-we will describe region and tranancet more in details .
+1️⃣ Select EC2 from the services list.
+2️⃣ Choose a region—AWS pricing varies by region for the same server.
 
-Now we have to select instance family as our requirement as our server for reuqrment server.
+We will discuss regions and transactions in more detail later.
 
+Now, select the instance family based on your server requirements.
 
+Payment Options
+AWS offers different payment options, each with different cost-saving benefits.
 
-payment option:
-    in diffeetn payment option aws offer different type saving of you cost.
+Additional Costs
+You can add extra storage volumes, monitoring tools, etc., which increase the service cost.
 
+AWS Budget Notifications
+AWS provides a notification system for budget tracking.
 
+You can set a cost threshold.
+If the cost exceeds the threshold, AWS sends alerts via SMS, email, etc.
+You can take actions like stopping a service or starting another based on notifications.
+Creating a Budget
+You can create a budget for a single service or multiple services.
+AWS Budget helps you track and control your personal or company expenses.
 
-You have more option like add extra valume, monitoraing tools etc what is bring more cost for thisi serivces.
+You can also save budgets and create templates for frequent use.
 
-
-
-Here is a notification system for your bedget in aws, you can set a threshold of cost , if it exceed it then 
-you get the notification as you confi like sms email etc.
-you cna take an action aganist ths event or notification like stop serive or run another etc.
-
-
-
-This is how you cand create buget for a serice any number of service etc.
-So this is how aws budget help you to monitor your or your company cost.
-
-
-
-you can create budget and save it, alsoe you can make template for personal or company uses 
-what is may frequently uses.
+For learning purposes, we can set a $0 or $1 budget to minimize costs and prevent accidental charges.
 
 
-and for in our case, for learning we make a 0 or 1 dolar budget to make our cost minimize 
-and prevent mistakellty generated cost.
 
 
 
@@ -516,27 +519,50 @@ and prevent mistakellty generated cost.
 =================================================
 User, Role and IAM User
 =================================================
+In this tutorial, we will discuss AWS Users, IAM Roles, and IAM Users—their differences, best practices, and how they help manage access in AWS.
 
-In this tutorial we will talking about aws User, Role and IAM User.
+1️⃣ AWS Root User
+The Root User is created when you sign up for an AWS account.
+It has full control over all AWS services and resources.
+Best Practice: Avoid using the root user for daily tasks. Instead, create IAM users with specific permissions.
+2️⃣ AWS IAM Users (Identity and Access Management)
+IAM users have unique credentials (username/password or access keys).
+They can have custom permissions to access only the necessary AWS resources.
+Common Use Cases:
+Developers accessing specific AWS services.
+Admin users managing AWS accounts.
+Applications using access keys for authentication.
+Security Best Practices:
+Enable Multi-Factor Authentication (MFA).
+Assign least privilege permissions—only what is required.
+Rotate access keys regularly to prevent security risks.
+3️⃣ AWS IAM Roles
+IAM roles allow AWS services or users to assume temporary access permissions.
+Unlike IAM users, roles do not require long-term credentials.
+Common Use Cases:
+EC2 instances accessing S3 without storing credentials.
+Lambda functions interacting with databases.
+Federated access for users logging in via external identity providers.
+4️⃣ AWS Federated Users
+These are users who log in using an external identity provider (e.g., Active Directory, Google, Facebook).
+They do not need IAM user accounts but gain access through IAM roles.
+Useful for large enterprises with existing authentication systems.
+5️⃣ AWS Account
+An AWS account represents a unique business or organization within AWS.
+It includes:
+Billing and resource management.
+Security and identity settings.
+Multiple IAM users and roles under one account.
+🔹 Key Takeaways
+✔️ Use the root user only for critical tasks, like billing or security configurations.
+✔️ Create IAM users for team members and assign permissions carefully.
+✔️ Use IAM roles to grant temporary access instead of long-term credentials.
+✔️ Enable MFA and follow security best practices to protect your AWS environment.
 
-so we can take help of aws documentation.
+Managing users, roles, and permissions properly helps secure your AWS infrastructure while ensuring smooth operations.
 
 
-aws basic usesr is:
 
-    Root User: This user created during the registration process. Has full access to all AWS services and resources. 
-    It is recommended not to use the root user for day-to-day activities and to create IAM users instead.
-
-    IAM (Identity and Access Management) Users: IAM users have specific credentials (username and password or access  keys) 
-    and can be assigned individual permissions.
-    IAM users are commonly used for security best practices to avoid using the root user for regular tasks.
-
-    Federated Users: Users who are authenticated by an external identity provider (e.g., Active Directory, Google, Facebook) 
-    and then given access to AWS resources using IAM roles.
-
-
-    AWS Account: An AWS account represents a unique customer or business entity within AWS.
-    Each AWS account has its own resources, billing, and security settings.
 
 
 
@@ -544,25 +570,75 @@ aws basic usesr is:
 3:30
 ====================
 
-More details about IAM Users: 
+We will also learn how to assign permissions and sign in as an IAM user step by step.
 
-IAM users have specific credentials (username and password or access keys) and can be assigned individual permissions.
+1️⃣ What is an IAM User?
+An IAM (Identity and Access Management) user is a secure way to allow individuals or applications to access AWS services without using the root account.
 
+✅ Each IAM user has specific credentials (username/password or access keys).
+✅ Users can have custom permissions to access only the required AWS services.
+✅ Using IAM users ensures better security and access control.
 
-User Permission/Plicies for IAM user:
+📌 Example:
 
-IAM policies are attached to IAM users, groups, or roles to grant or restrict access to AWS resources.
-An IAM user policy consists of statements that describe the allowed or denied actions and the resources on which those actions can be performed.
+A developer may have access to EC2 but not billing.
+A finance team may have access to AWS billing but not EC2 instances.
+2️⃣ IAM Policies – Controlling Access
+IAM policies define what an IAM user, group, or role is allowed or denied to do in AWS.
+A policy consists of statements that specify:
+✔️ Allowed or denied actions (e.g., Start EC2, Read S3 bucket).
+✔️ Resources on which these actions apply (e.g., specific S3 buckets).
+✔️ Conditions for access (e.g., allowed only from a certain IP address).
 
-User Group: Instead of assigning policies to individual users, you can assign policies to groups.
+Types of IAM Policies
+🔹 AWS Managed Policies – Predefined by AWS for common use cases.
+🔹 Customer Managed Policies – Custom policies created by users.
+🔹 Inline Policies – Directly attached to a single IAM user, group, or role.
 
-Now lets create policy and and group and set to a iam user see it on screen step by step.
+📌 Example Policy (Allow access to S3):
 
+3️⃣ IAM Groups – Simplifying User Management
+IAM Groups allow you to assign policies to multiple users at once, instead of assigning permissions individually.
 
-after assign all of this permission and grupp now we go for Sign with IAM user.
+✔️ Helps organize users based on their roles.
+✔️ Users in a group inherit all the group permissions.
+✔️ Makes permission management easier when onboarding new users.
 
+📌 Example Groups:
 
-Sign with IAM user: Now lets sign as iam user in on screen.
+Developers Group – Can access EC2, RDS, S3.
+Admins Group – Full access to AWS resources.
+Read-Only Group – Can only view AWS services but cannot modify them.
+4️⃣ Step-by-Step: Creating an IAM Policy and Group
+Now, let’s create an IAM policy and a user group and assign them to an IAM user.
+📺 Watch the step-by-step process on the screen!
+
+🔹 Step 1: Go to the IAM Management Console.
+🔹 Step 2: Create a new policy with required permissions.
+🔹 Step 3: Create an IAM group and attach the policy.
+🔹 Step 4: Add an IAM user to the group.
+🔹 Step 5: Assign necessary credentials.
+
+5️⃣ Signing in as an IAM User
+Once permissions and groups are assigned, we will sign in as the IAM user and verify access.
+
+📌 IAM User Login Steps:
+1️⃣ Open the AWS IAM Sign-In page.
+2️⃣ Enter the IAM user credentials (username & password).
+3️⃣ Verify that access is restricted based on permissions.
+
+✅ IAM users help maintain secure and controlled access to AWS resources.
+✅ Policies and groups simplify management, making it easy to assign permissions to multiple users.
+
+🔹 Final Thoughts
+✔️ Use IAM Users instead of the root user for daily tasks.
+✔️ Apply least privilege when assigning permissions.
+✔️ Use IAM Groups to manage multiple users efficiently.
+✔️ Regularly review IAM Policies to maintain security.
+
+That’s how AWS IAM Users, Policies, and Groups work!
+🚀 Stay secure and manage access the right way!
+
 
 
 
@@ -573,29 +649,70 @@ Sign with IAM user: Now lets sign as iam user in on screen.
 AWS Architecture, Regions and AZ
 =================================================
 
-In this tutorl we will taling about aws: AWS Architecture, Regions and AZ
+In this tutorial, we will talk about AWS Architecture, Regions, and Availability Zones (AZs).
+Understanding these concepts is essential for building scalable, reliable, and high-performance applications in the cloud.
+
+1️⃣ AWS Architecture – Key Concepts
+AWS is designed to provide high availability, fault tolerance, and scalability through:
+
+✔️ Regions – Independent geographical locations.
+✔️ Availability Zones (AZs) – Data centers within a region.
+
+📌 AWS Documentation:
+Regions & Availability Zones
+
+2️⃣ What is an AWS Region?
+A Region is a geographically isolated area where AWS resources are hosted.
+
+✅ Each region is independent to ensure reliability.
+✅ Helps businesses deploy applications close to their customers for better performance.
+✅ Regions are separated to prevent failures from affecting global AWS services.
+
+📌 Example AWS Regions:
+
+us-east-1 (Virginia, USA)
+eu-west-1 (Ireland)
+ap-southeast-1 (Singapore)
+🔹 Choosing the right region depends on latency, compliance, and cost.
+
+3️⃣ What is an Availability Zone (AZ)?
+An Availability Zone (AZ) is a physically separate data center or a collection of data centers within a region.
+
+✅ Each region has multiple AZs to ensure redundancy.
+✅ AZs are connected via low-latency networks.
+✅ If one AZ fails, AWS automatically shifts workloads to another AZ.
+
+📌 Example:
+A region like us-east-1 has multiple AZs:
+
+us-east-1a
+us-east-1b
+us-east-1c
+🔹 Best Practice: Always deploy applications across multiple AZs for high availability.
+
+4️⃣ Why Are AWS Regions and AZs Important?
+AWS Regions and Availability Zones are critical for:
+
+✔️ Fault Tolerance – Prevents system failures by distributing workloads.
+✔️ Scalability – Allows businesses to expand without downtime.
+✔️ Disaster Recovery – Ensures data is safe even if one AZ goes down.
+✔️ High Performance – Reduces latency by serving users from the nearest region.
+
+5️⃣ Best Practices for Using Regions and AZs
+💡 Choose the right region based on latency, cost, and compliance.
+💡 Deploy across multiple AZs to ensure high availability.
+💡 Use AWS services like Route 53, Auto Scaling, and Load Balancers to manage traffic and improve reliability.
+
+🔹 Final Thoughts
+✔️ AWS Regions provide geographical isolation for resources.
+✔️ Availability Zones ensure high availability and fault tolerance.
+✔️ Using multiple AZs prevents downtime and improves application resilience.
+
+That’s how AWS Regions and Availability Zones help you build scalable and reliable cloud applications! 🚀
 
 
-Key concepts related to AWS architecture include:
-
-Regions 
-Availability zones (AZs)
 
 
-AWS Regions and Availability Zones dock Link: https://docs.aws.amazon.com/whitepapers/latest/get-started-documentdb/aws-regions-and-availability-zones.html
-lets open it.
-
-
-Regions: A region is a geographical area, Each AWS region is independent and isolated from other regions, 
-providing high availability and fault tolerance.
-
-AZ: An Availability Zone is a data center or a collection of data centers within an AWS region.
-
-
-
-Why actually this Regions and AZ for:
-    Regions, and availability zones is crucial for designing and deploying scalable, reliable, 
-    fault tolerance and high-performance applications in the cloud.
 
 
 
