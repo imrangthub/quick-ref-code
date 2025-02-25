@@ -722,87 +722,813 @@ Play with EC2
 =================================================
 
 
+"Hey everyone! Welcome back to the channel.
+In today’s video, we’re talking about EC2—also known as Infrastructure as a Service (IaaS).
+If you're new to AWS or just want to understand EC2 better, you're in the right place!"
+
+"So, what is EC2?
+EC2 instances are basically virtual machines that you can use to host applications, process data, and run various computing tasks.
+The best part? EC2 provides on-demand, scalable computing capacity in the AWS Cloud."
+
+"That means you can scale up or down based on your needs—whether you’re running a small website or a large enterprise application."
+
+"If you want to dive deeper into EC2, AWS has a great documentation page with detailed information.
+Check it out here: https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/concepts.html
+I’ll also drop the link in the description below."
 
 
+
+
+1:30
+=======================
+Run an EC2:
+
+Here’s how you can do it step by step."
+
+"First, go to the EC2 dashboard and click 'Launch Instance'.
+Give your instance a name."
+
+"Next, select an Amazon Machine Image (AMI).
+An AMI is like an operating system for your EC2 instance.
+You can choose from public AMIs provided by AWS or create a custom one."
+
+"Now, select the instance type.
+EC2 offers different instance types optimized for various use cases, such as general-purpose computing, memory-intensive tasks, or storage-optimized applications."
+
+"After that, create or select a key pair.
+This is essential for securely accessing your instance.
+AWS stores the public key, and you need to keep the private key safe."
+
+"Next, configure networking and security settings.
+You can set up security groups and VPC settings to control inbound and outbound traffic.
+We have an entire video covering networking and security, so check that out for a deeper understanding."
+
+"Then, configure storage as needed.
+Here, you can specify the storage type and size for your instance."
+
+"Finally, explore additional options such as domain name joining, OS profiling, purchasing options, shutdown behavior, and user data for bootstrapping scripts."
+
+"Once everything is set, click 'Launch'.
+Your EC2 instance is now up and running!"
+
+
+
+
+
+
+
+12:10
+===============================
+"Let’s talk about EC2 network settings, specifically Security Groups and VPCs."
+
+"A Security Group acts as a virtual firewall for your EC2 instance.
+It controls both inbound and outbound traffic at the instance level."
+
+"Security Groups operate at the instance level, not the subnet level.
+They are stateful, meaning if you allow inbound traffic, the corresponding outbound traffic is automatically allowed."
+
+"You can define rules based on IP addresses, protocols, and port ranges to control traffic.
+By default, all inbound traffic is denied, while all outbound traffic is allowed."
+
+"Every EC2 instance must be associated with at least one Security Group,
+and each Security Group belongs to a specific VPC."
+
+"That’s a quick overview of Security Groups!
+
+
+
+
+
+17:10
+========================
+"You can create a Security Group based on your specific requirements.
+This includes defining rules for port access, allowed protocols, and other security policies."
+
+"We’ll cover security settings in more detail in an upcoming video,
+where we’ll show how to apply rules for different purposes,
+such as port restrictions, protocol restrictions, and more."
+
+
+
+
+21:00
+===================
+"By default, AWS provides a Security Group, but we’re not going to use it.
+Instead, we’ll create a new Security Group."
+
+"To do this:
+
+Give the Security Group a name and an optional description.
+Select a VPC; in this case, we’ll use the default one."
+"Next, we’ll define rules for this Security Group:
+
+First, an inbound rule: Allow HTTP traffic on port 80.
+For the outbound rule, we’ll allow all traffic.
+That’s it! Security Group creation is done."
+"Now, we need to attach this Security Group to our EC2 instance.
+Just refresh the settings, and we’ll see the new Security Group—let’s add it."
+
+"Next, we configure storage for the server.
+The default storage value is enough for now, so we’ll leave it as is."
+
+"For additional configurations, we’ll also leave the default settings."
+
+"Now, let’s add some Bootstrap data.
+Since it depends on our instance’s OS image, we’ll keep it simple."
+
+"The script will:
+
+Update the system
+Install the Nginx package
+Run a basic 'Hello World' server"
+"Finally, let’s launch the instance!"
+
+
+
+
+29:00
+=======================
+"Our EC2 instance is launching, and it will take a few seconds.
+To see details about this instance, we can simply select it."
+
+"Here, we can check important configurations like:
+
+Security Group
+Network settings
+Storage type
+Monitoring details"
+"By default, AWS provides a public IP and DNS for accessing the instance.
+It also has a unique private IP, and both are fully customizable."
+
+"Now, let’s access our brand-new AWS server using the public domain.
+Just copy the public IP or DNS and open it in a browser."
+
+"And there it is! Our expected server is up and running with its home page."
+
+
+
+
+
+
+32:00
+==========================
+"Let’s talk about AWS VPC."
+
+"Virtual Private Cloud (VPC) provides a virtual network in the cloud.
+It allows you to define your own IP address range, create subnets, and configure route tables."
+
+"VPCs define the overall network structure, while Security Groups act as firewalls for the instances within that VPC."
+
+"Now, let’s log in to our running EC2 instance using SSH."
+
+"To do this, we need a key pair (.pem file) and a shell terminal.
+The SSH command looks like this:"
+
+$ ssh -i your-key.pem ubuntu@ec2-public-ip
+"The username depends on the instance’s OS image, and we use the instance’s public IP."
+
+"We can also transfer files from our local PC to the EC2 instance using SCP:"
+
+$ scp -i your-key.pem /path/to/local/file.txt ubuntu@ec2-public-ip:/path/to/ec2/
+"Let’s try logging in!"
+
+"But we get a timeout error—why?
+Because our Security Group doesn’t have an inbound rule allowing SSH on port 22."
+
+"Let’s fix this by updating the Security Group to allow SSH access."
+"Done! Now, let’s try again."
+
+"Yes, we are logged into our AWS EC2 instance!"
+
+"Now, let’s install net-tools, but we see that the package is missing.
+No problem—let’s install it. Done!"
+
+"Next, let’s update our Nginx home page, refresh the browser, and yes! We see the updated page."
+
+"We can also copy any file from our local PC to the EC2 instance using SCP.
+This is useful when we need to transfer application files, like JAR or WAR files."
+
+"Let’s try copying an index.html file to our EC2 instance:"
+
+$ scp -i your-key.pem index.html ubuntu@ec2-public-ip:/var/www/html/
+"The copy is done! Now, let’s refresh our EC2 page, and there it is—our expected result."
+
+
+
+
+
+47:10
+====================
+
+
+"Now, let’s talk about the EC2 pricing model."
+
+"EC2 pricing includes several components:"
+
+Instance Types
+On-Demand Instances
+Reserved Instances
+Spot Instances
+Dedicated Hosts
+Savings Plans
+Data Transfer
+"For more details, check the AWS pricing documentation:
+🔗 AWS EC2 Pricing"
+
+Instance Types:
+"AWS offers different instance types, such as compute-optimized, memory-optimized, and storage-optimized.
+Each type has its own pricing based on hardware specifications and performance."
+
+On-Demand Instances:
+"With on-demand instances, you pay for compute capacity on an hourly or per-second basis.
+This is flexible but can be costly for long-term usage."
+
+Reserved Instances:
+"Reserved instances offer significant discounts compared to on-demand pricing.
+However, they require a commitment of 1 or 3 years."
+
+Spot Instances:
+"Spot instances let you bid for unused EC2 capacity, potentially saving a lot of costs.
+However, AWS can terminate these instances with short notice."
+
+Dedicated Hosts:
+"If you need a physical EC2 server for compliance or licensing reasons, you can use dedicated hosts.
+You pay for the entire host, regardless of how many instances are running on it."
+
+Savings Plans:
+"A flexible pricing model that provides cost savings in exchange for a usage commitment (measured in $/hr) over 1 or 3 years.
+Savings Plans offer lower prices compared to on-demand instances."
+
+Data Transfer:
+"Additional costs apply for data transfers between EC2 instances and the internet, as well as transfers between AWS regions."
+
+
+
+Stay tuned for our next video, where we'll dive into AWS database services!
+Don’t forget to like, subscribe, and hit the notification bell! 🔔🚀
 
 
 
 =================================================
-AWS Storage services
+8) AWS Storage services and Database in AWS 
 =================================================
+
+"Welcome to today’s video!
+In this session, we’ll be diving into AWS Storage Services and Databases and how they can help you build scalable, reliable, and cost-effective storage solutions for your applications."
+
+"AWS offers a wide range of storage options that can be tailored to meet different needs, from simple file storage to complex database management."
+
+Key AWS Storage Services
+Amazon Simple Storage Service (S3)
+"Amazon S3 is an object storage service designed to store and retrieve any amount of data, from anywhere on the web.
+With high scalability, durability, and low latency, it’s ideal for backups, big data storage, and content distribution.
+
+S3 supports multiple storage classes, such as:
+
+Standard: For frequently accessed data.
+Intelligent-Tiering: For data with unpredictable access patterns.
+Glacier: For archiving and long-term data storage.
+Each storage class offers different levels of durability, availability, and cost efficiency, which makes it a great choice for a variety of use cases."
+
+Amazon Elastic Block Store (EBS)
+"Amazon EBS provides block-level storage volumes for use with Amazon EC2 instances.
+EBS allows for persistent storage where data remains available even when an instance is stopped.
+
+EBS is great for:
+
+Databases: For transactional workloads requiring high-performance storage.
+Application storage: For applications requiring low-latency access to data.
+EBS supports different volume types, including:
+
+General Purpose SSD (gp3): For most workloads.
+Provisioned IOPS SSD (io2): For high-performance workloads.
+Magnetic volumes: For low-cost, infrequent access."
+Amazon Elastic File System (EFS)
+"Amazon EFS provides scalable, fully managed file storage for EC2 instances.
+It supports the NFS protocol, which allows EC2 instances to share file storage. This makes it easy for applications to scale across multiple instances without worrying about the complexity of managing file systems.
+
+EFS automatically scales storage as needed, providing cost-effective options for:
+
+Content management systems.
+Big data analytics.
+Web servers that require shared access to files across instances."
+AWS Storage Gateway
+"AWS Storage Gateway bridges the gap between on-premises data and cloud storage.
+It offers hybrid storage solutions for organizations that need to integrate their on-prem applications with AWS cloud storage.
+
+You can use it to:
+
+Store backups in S3 while keeping on-prem data accessible.
+Provide low-latency access to data stored in the cloud.
+Storage Gateway supports multiple configurations, including File Gateway, Tape Gateway, and Volume Gateway, each optimized for specific use cases."
+
+Amazon CloudFront
+"Amazon CloudFront is a Content Delivery Network (CDN) service that accelerates the delivery of content, including S3 data, to end users globally.
+
+Although not a traditional storage service, CloudFront is often used to speed up the delivery of static content such as:
+
+Web pages.
+Images.
+Video files.
+By caching content at edge locations closer to the user, CloudFront reduces latency and speeds up access."
+
+AWS Snow Family
+"The AWS Snow Family is a set of physical devices designed to help organizations move large amounts of data into and out of AWS when high-speed internet transfer isn’t an option.
+
+This includes devices like AWS Snowcone, Snowball, and Snowmobile, each designed for different data sizes and transfer needs.
+For example, Snowball can handle up to 50TB of data, while Snowmobile can move exabytes of data.
+
+The Snow Family is ideal for:
+
+Disaster recovery.
+Data center migrations.
+Handling data at remote locations with no internet access."
+AWS Databases
+"In addition to storage services, AWS also offers a range of managed database services, including:
+
+Amazon RDS (Relational Database Service): A fully managed service for relational databases like MySQL, PostgreSQL, and Oracle.
+Amazon DynamoDB: A NoSQL service designed for high-performance, scalable applications.
+Amazon Redshift: A data warehousing service for analyzing large datasets.
+Amazon Aurora: A MySQL and PostgreSQL-compatible database built for cloud performance.
+These database services make it easy to run mission-critical applications with scalability, high availability, and automatic backups."
+
+💡 In summary, AWS provides a comprehensive suite of storage and database solutions designed to meet the needs of various workloads.
+Whether you need block storage, object storage, file systems, or even physical data migration, AWS has you covered with solutions that offer flexibility, cost efficiency, and scalability.
 
 
 
-=================================================
-Database in AWS 
-=================================================
+
+
+10:30
+====================
+"You can get more details about these storage devices in the official AWS documentation.
+
+AWS Storage Services Documentation: AWS Storage Services
+
+Let's open and explore the document.
+
+A quick note:
+You don’t need to learn about every single AWS storage service in-depth for everyday work.
+In real-world scenarios, you'll likely only need to work with two or three of the most commonly used services.
+
+Whenever you need to dive deeper into a particular storage service, it's best to refer to the official documentation.
+This will help you understand the specific features, configurations, and best practices for the service you're working with.
+
+
+
+
+
+
+12:30
+======================
+Now, let's talk about Amazon Simple Storage Service (S3):
+
+S3 Buckets are public cloud storage containers for objects stored in S3.
+You can think of S3 buckets as file folders where you store your objects. It's a powerful object storage service.
+
+Using S3 Buckets for Static Website Hosting:
+
+You can host a static website directly from an S3 bucket.
+Simply upload your HTML, CSS, and JavaScript files, and S3 will serve them to your users as a fully functional static site.
+
+Permissions required for S3:
+
+Bucket must have public access:
+The bucket must allow public access to enable others to view the content, especially for use cases like static website hosting.
+
+Add a bucket policy for object access:
+You must configure the correct bucket policy to ensure objects are accessible based on the desired level of permissions.
+
+Let’s talk about S3 Public Access:
+
+To enable public access to your S3 bucket and allow others to access the stored objects, we need to adjust the Bucket Policy.
+
+We'll see how to add this in the Bucket Policy in the next steps.
+
+
+
+
+
+
+15:20
+=====================
+Let's create a bucket and go through the process step by step:
+
+Step 1: Log in to AWS Console
+
+First, log in to your AWS Management Console and search for S3 in the search bar.
+Step 2: Create a New Bucket
+
+Select a Region: Choose a region for your bucket. It's recommended to select a region geographically closer to your users or where you expect most of the traffic.
+
+Bucket Name:
+
+Provide a unique name for the bucket.
+Bucket names must be globally unique across AWS, so if someone else has already taken your preferred name, you will get a warning and need to select another one.
+Consider including your project name or a descriptive term in the bucket name to help identify its purpose easily.
+Step 3: Configure Bucket Settings
+
+Public Access:
+
+Decide if you want to share the contents of the bucket publicly.
+If you plan to share the bucket via a URL (for example, for a website), you will need to disable public access, which is turned on by default. Uncheck the box for public access to allow everyone to access the content.
+Be careful with making a bucket public, as this can expose sensitive data unintentionally.
+Bucket Versioning:
+
+Versioning is a way of keeping track of changes to the objects stored in the bucket.
+When enabled, S3 will store every version of an object. If you update a file, the previous version is still accessible.
+For simplicity, we will leave this disabled for now, but enabling it could be helpful if you want to maintain previous versions of objects automatically.
+Encryption:
+
+AWS provides options for encrypting your stored data. By default, the bucket will not have encryption enabled.
+You can leave this setting disabled for now or choose Amazon S3-Managed Keys (SSE-S3) for automatic encryption at rest.
+Step 4: Create the Bucket
+
+Once all the settings are configured, click on Create Bucket.
+You will see a success message once the bucket is created.
+Step 5: Bucket Overview
+
+Your new bucket (in this case, named my-image) will now appear in the S3 dashboard.
+Since it’s a newly created bucket, it will be empty.
+Step 6: Upload an Image File
+
+To upload a file, select the Upload button from your bucket page.
+Choose the file you want to upload (for example, an image file).
+Once selected, click Upload and wait for it to complete.
+Step 7: File Access
+
+After uploading, the file will now be listed under your bucket's contents.
+You can now download the file, share its URL, or access it using the S3 API.
+With these steps, you've successfully created an S3 bucket, uploaded a file, and learned how to manage its accessibility and versioning. This is the foundation of how you can store and serve files in AWS S3.
+
+
+
+
+
+21:40
+==================
+Let's set up a bucket as a static website step by step:
+
+Step 1: Create a New Bucket
+
+Follow the same process to create a bucket as you did previously.
+Bucket Name: Choose a unique name for your bucket.
+Region: Select the desired region where you want the bucket to be created.
+After filling in the required details, click on Create to create the bucket.
+
+Step 2: Make the Bucket Public
+
+To configure the bucket for static website hosting, you need to do the following:
+
+Enable Public Access:
+
+The bucket must be accessible to the public, so ensure that public access is allowed.
+This is typically disabled by default for security reasons, but for static website hosting, you need to enable public access.
+Add Bucket Policy for Object Access:
+
+You need to add a policy to allow public access to the objects within the bucket.
+This can be done by adding a bucket policy that grants the necessary permissions for public read access to the files stored within the bucket.
+Step 3: Upload Static Files
+
+After setting the bucket for public access, upload your static files (HTML, CSS, JS, images, etc.).
+For example, upload your homepage index.html file, along with other necessary files (e.g., styles.css, logo.png).
+Click Upload, select the files from your local system, and finish the upload process.
+Step 4: Set the Index File
+
+After uploading the files, select your index.html file and mark it as the index document for your static website. This file will be the first one displayed when someone accesses your website.
+Step 5: Update the Bucket Policy
+
+To make the bucket publicly accessible, you will need to add a Bucket Policy.
+You can find the example policy in AWS documentation. The policy should allow read access to all objects within the bucket.
+Update the bucket policy using a JSON file. Here’s an example of what the policy might look like:
+
+
+Replace YOUR_BUCKET_NAME with your actual bucket name.
+Save the policy, and the bucket will now be publicly accessible.
+Step 6: Access the Static Website
+
+After applying the policy, your static website should be accessible via a public URL.
+
+AWS S3 provides a public URL for your bucket, which you can find in the Bucket Overview section. The URL will look like this:
+
+
+http://YOUR_BUCKET_NAME.s3-website-REGION.amazonaws.com
+Open the URL in a browser, and you should see your static website live.
+
+Step 7: (Optional) Use a Custom Domain
+
+If you have a custom domain (e.g., www.yourwebsite.com), you can configure Amazon Route 53 or another DNS provider to point to your S3 static website URL.
+This step involves creating a CNAME record in your DNS settings to route traffic from your domain to the S3 URL.
+Congratulations! You’ve successfully deployed a static website on AWS S3 without the need for a server!
+
+
+
+
+
+
+29:40
+===========================
+Now, let's talk about Databases in AWS.
+
+AWS offers a variety of database solutions to meet different needs. One of the most popular offerings is Amazon RDS (Relational Database Service), which supports several database engines:
+
+Amazon RDS Engines: These include popular relational databases like MySQL, PostgreSQL, MariaDB, and Oracle. You can run and manage these engines on AWS easily.
+Amazon Aurora: This is a fully managed, MySQL and PostgreSQL-compatible relational database that is designed to offer high performance and availability with lower costs compared to traditional database engines.
+AWS provides a wide range of database engines, so you can choose the one that fits your needs, whether you're running MySQL, Oracle, or another engine. All the commonly known database engines are available in AWS, giving you flexibility.
+
+Now, if you’ve created any resources that you no longer need, such as an S3 bucket, it’s a good practice to clean them up to avoid unnecessary costs.
+
+Deleting the S3 Buckets
+
+Navigate to S3 Console: Go to your AWS S3 dashboard.
+Select Buckets: You’ll see all your buckets listed there.
+Choose Buckets to Delete: Select the buckets that you no longer need.
+Delete Buckets: For each bucket, you’ll need to confirm the deletion by following the prompts.
+This helps to avoid unnecessary charges for unused resources!
+
+
+
+
+
+
+33:30
+=================================
+Let's dive deeper into working with AWS RDS (Relational Database Service). This service makes it easy to set up, operate, and scale relational databases in the cloud.
+
+Steps to Set Up a MySQL Database on AWS RDS:
+Log into AWS Console and Search for RDS:
+
+Go to the AWS Management Console.
+In the search bar, type RDS and select RDS from the results.
+Create a MySQL Database Instance:
+
+Under the Databases section, click Create database.
+Choose the MySQL engine from the list of database engines available. AWS RDS supports a variety of engines, such as MySQL, PostgreSQL, Oracle, MariaDB, and more.
+Select the Free Tier template (if eligible), which is perfect for small, cost-effective databases.
+Set Database Configuration:
+
+Database Name: Choose a name for your database. If you leave it blank, AWS will assign a default name.
+Master Username: Set the Root Username for the database (e.g., admin or any username you prefer).
+Master Password: Enter a password for the root user. Ensure this password is strong and secure.
+For example:
+
+Master Username: admin
+Master Password: mysecurepassword123
+Select Storage:
+
+The Free Tier offers 20GB of storage. If you don’t need more storage initially, keep it at the default.
+AWS automatically scales the storage as needed, but make sure you’re comfortable with the free-tier limits if you're on a budget.
+Enable Public Access:
+
+If you want to access the database from outside the AWS VPC (Virtual Private Cloud), make sure to enable Public Accessibility. This will assign a public IP to the instance, allowing it to be accessed externally.
+If you're unsure, it's best to leave it disabled to keep it secure.
+VPC & Security Group Setup:
+
+VPC (Virtual Private Cloud): AWS provides default VPCs that you can use. Choose the default one or create a custom VPC if needed.
+Security Group: Select an existing security group or create a new one that allows inbound traffic on port 3306 (the default port for MySQL).
+For security, allow only trusted IPs or other services within the same VPC to access your database.
+Creating and Configuring Security Group for Database Access:
+Security Group Configuration:
+When creating a new Security Group for the database, add inbound rules for port 3306 (MySQL’s default port).
+Add outbound rules to allow the database to communicate with the internet or other services if required.
+Example:
+Inbound Rule:
+Type: MySQL/Aurora
+Protocol: TCP
+Port Range: 3306
+Source: Your IP or range (e.g., 0.0.0.0/0 for global access but this should be avoided for security reasons).
+Associate Security Group:
+After creating the security group, associate it with your RDS instance during the setup process.
+Finalizing the Database Creation:
+Launch Database Instance:
+After configuring the database settings, security group, and VPC, click on the Create database button.
+The database instance will take a few minutes to launch. Once it's up, you can see the database in the RDS Dashboard with the status Available.
+Accessing the Database:
+Connecting to RDS:
+
+Get RDS Endpoint: Once the instance is running, go to the RDS Dashboard, select your database, and find the Endpoint URL (this is the address you’ll use to connect).
+Example: mydbinstance.c6c8iw2ckd28.us-west-2.rds.amazonaws.com
+Database Client:
+
+Use a database client like MySQL Workbench, DBeaver, or HeidiSQL to connect.
+In the client:
+Host: Use the RDS Endpoint.
+Port: 3306 (default for MySQL).
+Username: Use the Master Username you created earlier (e.g., admin).
+Password: Use the Master Password you set.
+Test the connection to make sure everything is working properly.
+Once connected, you can interact with the database like you would with any MySQL instance.
+
+Cleanup:
+Deleting the Database:
+
+After you’ve finished working with the RDS instance and practicing, it’s important to delete the instance to avoid unnecessary costs.
+In the RDS Dashboard, select your database instance and click on Delete.
+AWS will ask if you want to take a snapshot before deletion (optional).
+Click Continue and confirm deletion.
+Remove Security Groups & Other Resources:
+
+Optionally, remove any custom security groups or other resources you no longer need to keep your environment clean.
+Key Tips:
+Cost Management: Always monitor the free-tier usage to ensure you're not exceeding limits, especially with database storage, as RDS can quickly scale.
+Backups: Regularly back up your database using Automated Backups or Manual Snapshots for disaster recovery.
+Security: Use IAM roles and Security Groups to tightly control access to your RDS instance.
+By following these steps, you can easily set up, connect to, and manage a MySQL database in AWS RDS for both development and production environments.
+
+
+
 
 
 
 =================================================
 ELB, ASG
 =================================================
+ in this tutorial we will talking about ELB, ASG
+ 
+ Elastic Load Balancing automatically distributes your incoming traffic across multiple targets, such as EC2 instances, containers, and IP addresses, in one or more Availability Zones. 
+
+It monitors the health of its registered targets, and routes traffic only to the healthy targets. 
 
 
-
-=================================================
-AWS Managed Services
-=================================================
-
-
-
-=================================================
-AWS Serverless
-=================================================
-
-
-
-=================================================
-AWS Queue and Streams
-=================================================
-
-
-
-=================================================
-Route53 and CDN
-=================================================
 
 
 
 
 =================================================
-AWS Networking
+10 | AWS Managed Services | AWS Serverless
 =================================================
 
 
 
-=================================================
-Security and Monitoring
-=================================================
+
 
 
 
 =================================================
-AWS Machine Learning
+11| AWS Queue and Streams | Route53 and CDN
 =================================================
 
 
 
+
 =================================================
-AWS Well-Architected
+12 | AWS Networking
 =================================================
 
 
 
+
+
 =================================================
-Project run on AWS
+14 | Security and Monitoring
 =================================================
+
+In this tutorial we will taling about aws Security and Monitoring.
+
+Amazon Web Services (AWS) provides a comprehensive set of services and features to help users secure their applications and data, 
+as well as monitor their AWS resources. 
+
+
+aws provide free monitoring also some paid serive for more details monitoring.
+
+Details you get from here:
+AWS Doc Link: https://aws.amazon.com/products/security/?nc=sn&loc=2&refid=14a4002d-4936-4343-8211-b5a150ca592
+
+
+
+some as:
+Identity and Access Management (IAM):
+IAM allows you to manage access to AWS services securely. You can create and manage AWS users, groups, and roles, and define policies to grant or deny access to resources.
+
+Web Application Firewall (WAF):
+WAF helps protect web applications from common web exploits by allowing you to control which traffic can access your applications.
+
+Security Groups and Network ACLs:
+These are used to control inbound and outbound traffic at the instance and subnet level, respectively.
+
+AWS CloudTrail:
+CloudTrail records API calls made on your account, providing audit logs for compliance, security analysis, and resource tracking.
+
+AWS Config:
+AWS Config continuously monitors and records configurations of your AWS resources. It provides a history of resource changes and allows you to evaluate configurations against desired settings.
+
+Amazon GuardDuty:
+GuardDuty is a threat detection service that continuously monitors for malicious activity and unauthorized behavior to protect your AWS accounts and workloads.
+
+AWS Secrets Manager:
+Secrets Manager enables you to rotate, manage, and retrieve database credentials, API keys, and other secrets throughout their lifecycle.
+
+Encryption:
+AWS offers various encryption services to protect data in transit and at rest. AWS Key Management Service (KMS) allows you to create and control encryption keys, while services like Amazon S3 and Amazon RDS provide encryption options.
+
+Amazon CloudWatch:
+CloudWatch is a monitoring and observability service that provides data and actionable insights for AWS resources. It can collect and track metrics, collect and monitor log files, and set alarms.
+
+Amazon CloudWatch Events:
+CloudWatch Events allow you to respond to changes in AWS resources. You can create rules that match events and route them to one or more target functions or streams.
+
+AWS Personal Health Dashboard:
+The Personal Health Dashboard provides alerts and remediation guidance when AWS is experiencing events that may impact your applications.
+
+
+
+
+
+
+
+
+
+
+=================================================
+15 | AWS Machine Learning and  Well-Architected
+=================================================
+
+In this tutorial we will taling about AWS Machine Learning and  Well-Architected.
+
+you can get details description from here:
+AWS Dock Link: https://docs.aws.amazon.com/whitepapers/latest/aws-overview/machine-learning.html
+
+
+lets some services:
+Polly: Polly is a text-to-speech service that can convert written text into natural-sounding speech.
+
+
+Translate: Translate is a machine translation service that supports the translation of text between languages.
+
+
+SageMaker:
+SageMaker is a fully managed service that allows you to build, train, and deploy machine learning models at scale.
+
+
+Rekognition:
+Rekognition is a computer vision service that can analyze images and videos for content. It can perform tasks such as facial recognition, object detection, and scene analysis.
+
+
+Amazon Textract:
+Textract is a service that automatically extracts text from scanned documents, images, and PDFs.  and more.
+
+
+
+6:30
+=================
+now we talking about AWS Well-Architected.
+
+The AWS Well-Architected Framework is a set of best practices and guidelines provided by Amazon Web Services (AWS) 
+to help customers build secure, high-performing, resilient, and efficient infrastructure for their applications. 
+
+
+
+we can see details in this document:
+AWS Doc Link: 
+https://aws.amazon.com/architecture/well-architected/?wa-lens-whitepapers.sort-by=item.additionalFields.sortDate&wa-lens-whitepapers.sort-order=desc&wa-guidance-whitepapers.sort-by=item.additionalFields.sortDate&wa-guidance-whitepapers.sort-order=desc
+
+
+
+
+
+
+
+
+
+=================================================
+16 | Project run on AWS
+=================================================
+
+
+
 
 
 
 =================================================
 AWS Certification
 =================================================
+
+In this tutorial we will taling ablut AWS Certification.
+
+
+Aws offer around 14 certification different base on texhnology workgin area and base on exprience or knowledge.
+
+
+docuemnt line here:
+
+AWS Doc Link: https://aws.amazon.com/certification/exams/
+
+
+
+
+5:30
+========================
+
+Now lets see some aws exam more details its syllabus exam topic and question structure.
+
+you can get all details in here:
+ https://aws.amazon.com/certification/?nc2=sb_ce_co
+
+
+simple question example, hours of exam, what should do what should not allow all thing you will get from here.
+
+
+
 
 
 
