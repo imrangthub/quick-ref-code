@@ -1345,9 +1345,137 @@ ELB, ASG
 =================================================
  in this tutorial we will talking about ELB, ASG
  
- Elastic Load Balancing automatically distributes your incoming traffic across multiple targets, such as EC2 instances, containers, and IP addresses, in one or more Availability Zones. 
+ Elastic Load Balancing automatically distributes your incoming traffic across multiple targets, 
+ such as EC2 instances, containers, and IP addresses, in one or more Availability Zones. 
+ This is how it blance the traffice and load.
+
 
 It monitors the health of its registered targets, and routes traffic only to the healthy targets. 
+AwS az base datahouse what is geographically different and we diploy aour same application 
+to multiple az this is how we can manage our application high availability.
+
+the deployment application can be ec2, container, ipaddress etc deployed in different az.
+
+
+5:30
+================
+Now talking about asg.
+AWS Auto Scaling lets you build scaling plans that automate how groups of different resources respond to changes in demand.
+Automatically launch or terminate EC2 instances based on user-defined policies, health status checks, and schedules resources.
+
+
+one of the main gole of asg is resource best utilization and cost mininization and sacle instance base on traffice 
+and this will be automatically.
+We can set asg policy diffeetnt way like: if the instance cpu or memeory uses is exceed then 80% then it will bring more instance.
+
+againe uses below 30% then stope some instance  scale downe when running multiple replica of one instance.
+this is how actually asg work base on difined policy.
+
+
+
+8:30
+================
+Type Of AWS ELB:
+AWS Elastic Load Balancer | AWS Load Balancer Types
+There are multiple types of AWS Elastic Load Balancers (ELB), including Application Load Balancer (ALB),
+Network Load Balancer (NLB), and Classic Load Balancer (CLB). 
+
+
+Application Load Balancers: Application Load Balancers are used to route HTTP/HTTPS (or Layer 7) traffic. 
+Network Load Balancers and Classic Load Balancers are used to route TCP (or Layer 4) traffic.
+
+
+Network Load Balancer: NLB is a layer 4 (TCP/UDP) load balancer that distributes traffic across multiple targets, 
+such as EC2, containers, and IP addresses, within one or more Availability Zones. It can handle millions of requests per second. 
+
+
+Gateway Load Balancer: GLB helps you easily deploy, scale, and manage your third-party virtual appliances. 
+It gives you one gateway for distributing traffic across multiple virtual appliances while scaling them up or down, based on demand. 
+
+
+Classic Load Balancer: You can load balance HTTP/HTTPS applications and use Layer 7-specific features, also You can also use Layer 4 
+load balancing for applications on the TCP protocol using CLB.
+
+AWS recommend Application Load Balancer for Layer 7 traffic and Network Load Balancer for Layer 4 traffic.
+
+
+
+13:20
+==========================
+lets run an ALB and see on handon.
+
+see this image we will make a asg system this image shows architecture.
+
+to do that we need multiple targate or instance os we need first Lunch Multiple EC2.
+lets do it.
+
+we need to security group one for alb what is allow traffice from user to alb and one for instances and this one will be from alb to instance.
+so lets difine security grpup and its in boud and outbound  rule.
+
+then Create a target group for request. 
+    waht is a grpup of same application instance.
+to do that:
+first select instance.
+give a targate grpup name, set instance port number.
+
+
+then set healtch check path difine with port.
+we can set threshold for this.
+
+
+
+
+
+
+Finally crate a Load balancer.
+
+clieck crate Load balanceer.
+
+here show this 4 type load balanceer, remember network loadbalancer not free available on this free tier period.
+Application has and its good anough for lerning perpose.
+
+lets run a ALB.to do thsat 
+
+click crate button, give a name.
+
+set request source what is in our case internate facing then set az here we have same az but producation is food differtn az.
+
+set security group what we created.
+
+and finally crerate.
+our albe booting up its take few time.
+
+
+31:30
+====================
+in this time lets talk about asg.
+
+Amazon EC2 Auto Scaling helps you ensure that you have the correct number of Amazon EC2 instances available to handle the load for your application. You create collections of EC2 instances, called Auto Scaling groups. You can specify the mini/Max number of instances in each Auto Scaling group.
+
+
+For example, the following Auto Scaling group has a minimum size of one instance, a desired capacity of two instances, and a maximum size of four instances.
+
+
+
+this is the docuemnt link:
+AWS ASG doc: https://docs.aws.amazon.com/autoscaling/ec2/userguide/what-is-amazon-ec2-auto-scaling.html
+
+
+33:30
+=====================
+alb provisioning done it now up and runnign, let check it out.
+
+to access it we can use thsi publick dns.
+
+go to browser, open it.
+ok we get access show s server.
+
+lets refresh the borwser what will make multiple request and alb balance it to our server-1 and server-2 instance.
+yes ! its work ! it blance the requst on two services. her by default it user round robin algorithm.
+
+
+Ok we done here. thsi is how actually alb as asg work.
+
 
 
 
@@ -1357,6 +1485,72 @@ It monitors the health of its registered targets, and routes traffic only to the
 =================================================
 10 | AWS Managed Services | AWS Serverless
 =================================================
+we talking today about AWS Managed Services | AWS Serverless.
+
+so first AWS Managed Services:
+
+AWS Managed Services aims to simplify the management of AWS infrastructure by providing a set of automated tools and processes. 
+
+It helps organizations achieve operational excellence by handling routine tasks such as patch management, 
+monitoring, security, and backups. 
+
+
+
+lets say an exaple of database: 
+if we need to run a database what we need to do for that if we do manually:
+    run a vm,install os, install mysql, immplement security abd backup system a lot of task.
+    
+in the from of manage serices this all give all thsi from of me aws.
+we just neeed run a rds and aws do all thing for me.
+
+
+
+So many serive of aws manage serives like:
+Amazon EKS (Elastic Kubernetes Service): A managed Kubernetes service that makes it easier to deploy, manage, and scale containerized applications using Kubernetes.
+
+AWS Fargate(Managed Container Services:): A serverless compute engine for containers that allows you to run containers without managing the underlying infrastructure.
+
+
+AWS Identity and Access Management (IAM): and AWS Key Management Service (KMS): A managed service for creating user/key and controlling the encryption keys used to encrypt data.
+
+also provides:
+File Storage, CDN, Backup Services, Managed IoT Services, Managed Machine Learning Services and more.
+
+
+
+
+6:30
+================
+lets talk about AWS Serverless:
+Instead of provisioning and managing servers AWS Serverless refers to a computing model where you can build and run 
+applications without managing servers. 
+
+In a serverless architecture automatically handles the infrastructure for you. 
+
+
+
+aws provide many serverless servicea like:
+
+AWS Lambda: AWS Lambda is a serverless compute service that lets you run your code without provisioning or managing servers. You upload your code, and Lambda automatically scales and executes.
+
+Amazon API Gateway: This service allows you to create, publish, and manage APIs API at any scale. 
+With API Gateway, you can create RESTful APIs that integrate with Lambda functions, enabling you to build serverless backend services for your applications.
+
+Amazon DynamoDB: A fully managed NoSQL database, DynamoDB can automatically scale based on demand, and you can use it to store and retrieve data for your serverless applications.
+
+
+also:
+Amazon S3, AWS Step Function, AWS Cognito, AWS Secrets Manager, CloudFront, SNS, SQS and more.
+
+
+
+14:40
+===============
+lets run a AWS Lambda and see step by step.
+
+
+
+
 
 
 
@@ -1367,6 +1561,9 @@ It monitors the health of its registered targets, and routes traffic only to the
 =================================================
 11| AWS Queue and Streams | Route53 and CDN
 =================================================
+
+
+
 
 
 
