@@ -1343,140 +1343,222 @@ By following these steps, you can easily set up, connect to, and manage a MySQL 
 =================================================
 ELB, ASG
 =================================================
- in this tutorial we will talking about ELB, ASG
- 
- Elastic Load Balancing automatically distributes your incoming traffic across multiple targets, 
- such as EC2 instances, containers, and IP addresses, in one or more Availability Zones. 
- This is how it blance the traffice and load.
+
+Welcome to this tutorial! Today, we’re talking about Elastic Load Balancing (ELB) and Auto Scaling Groups (ASG) in AWS.
+
+What is Elastic Load Balancing (ELB)?
+ELB automatically distributes incoming traffic across multiple targets, such as:
+
+EC2 instances
+Containers
+IP addresses
+This ensures that no single server is overloaded, keeping your application responsive and available.
+
+How ELB Ensures High Availability
+ELB monitors the health of its registered targets.
+It routes traffic only to healthy targets for better reliability.
+Multi-AZ Deployment for High Availability
+AWS has Availability Zones (AZs)—data centers in different geographical locations.
+To ensure high availability, we deploy the same application across multiple AZs.
+This way, if one AZ goes down, traffic is redirected to another healthy instance.
+
+What Can ELB Distribute Traffic To?
+EC2 Instances
+Containers
+IP addresses in different Availability Zones
+Final Thoughts
+By combining ELB with Auto Scaling Groups, we can ensure:
+✅ Efficient traffic distribution
+✅ Fault tolerance
+✅ Scalability
 
 
-It monitors the health of its registered targets, and routes traffic only to the healthy targets. 
-AwS az base datahouse what is geographically different and we diploy aour same application 
-to multiple az this is how we can manage our application high availability.
 
-the deployment application can be ec2, container, ipaddress etc deployed in different az.
+
 
 
 5:30
 ================
-Now talking about asg.
-AWS Auto Scaling lets you build scaling plans that automate how groups of different resources respond to changes in demand.
-Automatically launch or terminate EC2 instances based on user-defined policies, health status checks, and schedules resources.
+Now, let’s talk about Auto Scaling Groups (ASG) in AWS.
+
+What is AWS Auto Scaling?
+ASG automates scaling based on demand. It can:
+
+Launch new EC2 instances when traffic increases
+Terminate instances when demand drops
+Optimize resource usage to reduce costs
+How ASG Works
+One of the main goals of ASG is efficient resource utilization and cost minimization.
+It automatically adjusts the number of instances based on traffic and predefined policies.
+
+For example:
+
+If CPU or memory usage exceeds 80%, ASG adds more instances to handle the load.
+If usage drops below 30%, ASG removes instances to save costs.
+Scaling Policies in ASG
+We can define scaling rules based on:
+✅ CPU or memory usage
+✅ Custom metrics
+✅ Scheduled scaling
+
+This way, ASG dynamically scales up or down, ensuring performance while keeping costs under control.
+
+That’s the basics of Auto Scaling! 
 
 
-one of the main gole of asg is resource best utilization and cost mininization and sacle instance base on traffice 
-and this will be automatically.
-We can set asg policy diffeetnt way like: if the instance cpu or memeory uses is exceed then 80% then it will bring more instance.
 
-againe uses below 30% then stope some instance  scale downe when running multiple replica of one instance.
-this is how actually asg work base on difined policy.
 
 
 
 8:30
 ================
-Type Of AWS ELB:
-AWS Elastic Load Balancer | AWS Load Balancer Types
-There are multiple types of AWS Elastic Load Balancers (ELB), including Application Load Balancer (ALB),
-Network Load Balancer (NLB), and Classic Load Balancer (CLB). 
+Let’s go over the different types of AWS Elastic Load Balancers (ELB) and when to use them.
+
+Types of AWS ELB
+AWS offers several types of load balancers:
+
+Application Load Balancer (ALB)
+Network Load Balancer (NLB)
+Gateway Load Balancer (GLB)
+Classic Load Balancer (CLB)
+Application Load Balancer (ALB)
+ALB operates at Layer 7 (HTTP/HTTPS) and is designed for routing web traffic.
+It’s great for host-based or path-based routing and supports modern app architectures like microservices.
+
+Network Load Balancer (NLB)
+NLB works at Layer 4 (TCP/UDP) and is built for high-performance traffic handling.
+It can scale to millions of requests per second and is ideal for low-latency applications.
+
+Gateway Load Balancer (GLB)
+GLB is used to deploy and manage third-party virtual appliances.
+It distributes traffic across multiple virtual appliances while scaling them automatically.
+
+Classic Load Balancer (CLB)
+CLB supports both Layer 4 (TCP) and Layer 7 (HTTP/HTTPS) traffic.
+It’s the older generation of ELB and is typically used for legacy applications.
+
+Which One Should You Use?
+For HTTP/HTTPS traffic, use Application Load Balancer (ALB).
+For TCP/UDP traffic, use Network Load Balancer (NLB).
+That’s a quick breakdown of AWS ELB types!
 
 
-Application Load Balancers: Application Load Balancers are used to route HTTP/HTTPS (or Layer 7) traffic. 
-Network Load Balancers and Classic Load Balancers are used to route TCP (or Layer 4) traffic.
-
-
-Network Load Balancer: NLB is a layer 4 (TCP/UDP) load balancer that distributes traffic across multiple targets, 
-such as EC2, containers, and IP addresses, within one or more Availability Zones. It can handle millions of requests per second. 
-
-
-Gateway Load Balancer: GLB helps you easily deploy, scale, and manage your third-party virtual appliances. 
-It gives you one gateway for distributing traffic across multiple virtual appliances while scaling them up or down, based on demand. 
-
-
-Classic Load Balancer: You can load balance HTTP/HTTPS applications and use Layer 7-specific features, also You can also use Layer 4 
-load balancing for applications on the TCP protocol using CLB.
-
-AWS recommend Application Load Balancer for Layer 7 traffic and Network Load Balancer for Layer 4 traffic.
 
 
 
 13:20
 ==========================
-lets run an ALB and see on handon.
+Now, let’s set up an Application Load Balancer (ALB) and see it in action!
 
-see this image we will make a asg system this image shows architecture.
+Step 1: Understanding the Architecture
+Here’s the architecture—we’re setting up an Auto Scaling Group (ASG) with an ALB.
+To do this, we need multiple target instances.
 
-to do that we need multiple targate or instance os we need first Lunch Multiple EC2.
-lets do it.
+Step 2: Launch Multiple EC2 Instances
+We need multiple EC2 instances to act as our targets.
+Let’s launch them now!
 
-we need to security group one for alb what is allow traffice from user to alb and one for instances and this one will be from alb to instance.
-so lets difine security grpup and its in boud and outbound  rule.
+Step 3: Configure Security Groups
+We need two security groups:
 
-then Create a target group for request. 
-    waht is a grpup of same application instance.
-to do that:
-first select instance.
-give a targate grpup name, set instance port number.
+For ALB – allows traffic from users to ALB
+For Instances – allows traffic from ALB to instances
+Let’s define these security groups with inbound and outbound rules.
+
+Step 4: Create a Target Group
+A target group is a set of EC2 instances handling the same application.
+To create it:
+1️⃣ Select instance type
+2️⃣ Give it a target group name
+3️⃣ Set the instance port number
+4️⃣ Define the health check path and port
+5️⃣ Set health check thresholds
+
+Step 5: Create the Load Balancer
+1️⃣ Click Create Load Balancer
+2️⃣ Choose Application Load Balancer (ALB) (since Network Load Balancer isn't free on the AWS Free Tier)
+3️⃣ Set request source → We’ll choose Internet-facing
+4️⃣ Select Availability Zones (AZs)
+5️⃣ Attach the security group we created
+6️⃣ Click Create
+
+Step 6: ALB is Booting Up!
+The ALB setup takes a few minutes.
+Once ready, it will start distributing traffic to our EC2 instances automatically!
 
 
-then set healtch check path difine with port.
-we can set threshold for this.
 
 
-
-
-
-
-Finally crate a Load balancer.
-
-clieck crate Load balanceer.
-
-here show this 4 type load balanceer, remember network loadbalancer not free available on this free tier period.
-Application has and its good anough for lerning perpose.
-
-lets run a ALB.to do thsat 
-
-click crate button, give a name.
-
-set request source what is in our case internate facing then set az here we have same az but producation is food differtn az.
-
-set security group what we created.
-
-and finally crerate.
-our albe booting up its take few time.
 
 
 31:30
 ====================
-in this time lets talk about asg.
+Let’s dive into AWS Auto Scaling Groups (ASG) and understand how they help manage EC2 instances efficiently.
 
-Amazon EC2 Auto Scaling helps you ensure that you have the correct number of Amazon EC2 instances available to handle the load for your application. You create collections of EC2 instances, called Auto Scaling groups. You can specify the mini/Max number of instances in each Auto Scaling group.
+What is Amazon EC2 Auto Scaling?
+AWS Auto Scaling ensures that your application always has the right number of EC2 instances to handle traffic efficiently.
+It automatically scales up when demand increases and scales down to save costs when demand drops.
+
+Key Features of Auto Scaling Groups (ASG)
+✅ Automatic Scaling – Adjusts the number of instances based on real-time traffic.
+✅ High Availability – Distributes instances across multiple Availability Zones (AZs) to prevent failures.
+✅ Cost Optimization – Ensures you pay only for what you use by dynamically adjusting resources.
+✅ Health Monitoring – Replaces unhealthy instances automatically.
+
+How ASG Works
+An Auto Scaling Group (ASG) consists of:
+
+Minimum Instances: The least number of instances that should always be running.
+Desired Capacity: The target number of instances based on normal workload.
+Maximum Instances: The highest number of instances ASG can scale up to during peak load.
+Example Scenario
+Let’s say you configure an ASG with:
+🔹 Min: 1 instance (always running)
+🔹 Desired: 2 instances (normal traffic)
+🔹 Max: 4 instances (handles peak demand)
+
+If traffic increases, ASG automatically launches more instances up to the max limit.
+If traffic drops, ASG terminates excess instances, reducing costs.
+If an instance fails, ASG replaces it automatically to maintain availability.
+Scaling Policies in ASG
+You can configure ASG to scale based on:
+📌 CPU or Memory Usage – Example: If CPU usage exceeds 80%, ASG adds instances.
+📌 Traffic Load – If requests per second increase, ASG scales up.
+📌 Scheduled Scaling – Scale up during business hours and scale down at night.
+
+Get Started with AWS ASG
+Want to set up your own Auto Scaling Group?
+Check out the official AWS documentation:
+📌 AWS ASG Docs: https://docs.aws.amazon.com/autoscaling/ec2/userguide/what-is-amazon-ec2-auto-scaling.html
 
 
-For example, the following Auto Scaling group has a minimum size of one instance, a desired capacity of two instances, and a maximum size of four instances.
-
-
-
-this is the docuemnt link:
-AWS ASG doc: https://docs.aws.amazon.com/autoscaling/ec2/userguide/what-is-amazon-ec2-auto-scaling.html
 
 
 33:30
 =====================
-alb provisioning done it now up and runnign, let check it out.
+Great! Our Application Load Balancer (ALB) provisioning is complete, and it's now up and running.
 
-to access it we can use thsi publick dns.
+Accessing the Load Balancer
+To test it, we need to use the public DNS of our ALB.
+Let’s open a browser and paste the ALB DNS URL.
 
-go to browser, open it.
-ok we get access show s server.
+✅ Success! We have access to the server.
 
-lets refresh the borwser what will make multiple request and alb balance it to our server-1 and server-2 instance.
-yes ! its work ! it blance the requst on two services. her by default it user round robin algorithm.
+Testing Load Balancing
+Now, let’s refresh the browser multiple times.
+Each request is sent to either Server-1 or Server-2, and we can see ALB distributing the traffic.
 
+💡 By default, ALB uses the Round Robin algorithm, meaning requests are evenly sent to all available instances.
 
-Ok we done here. thsi is how actually alb as asg work.
+Wrapping Up
+That’s it! We’ve successfully:
+✔️ Set up Application Load Balancer (ALB)
+✔️ Configured Auto Scaling Groups (ASG)
+✔️ Tested traffic distribution across multiple servers
 
+This is how AWS ALB and ASG work together to ensure scalability, high availability, and cost efficiency.
 
+Thanks for watching! 
 
 
 
@@ -1485,74 +1567,252 @@ Ok we done here. thsi is how actually alb as asg work.
 =================================================
 10 | AWS Managed Services | AWS Serverless
 =================================================
-we talking today about AWS Managed Services | AWS Serverless.
+Welcome to today's video!
+We’re going to explore AWS Managed Services, how they work, and why they are crucial for modern cloud infrastructure.
 
-so first AWS Managed Services:
+What Are AWS Managed Services?
+AWS Managed Services (AMS) is a set of tools and automation that helps businesses manage AWS infrastructure efficiently.
+Instead of handling everything manually, AWS provides a fully managed environment that includes:
 
-AWS Managed Services aims to simplify the management of AWS infrastructure by providing a set of automated tools and processes. 
+✅ Automated Provisioning – Quickly deploy and scale resources
+✅ Patch Management – Automatic security updates & bug fixes
+✅ Performance Monitoring – AWS continuously monitors workloads
+✅ Security & Compliance – Built-in security features to meet industry standards
+✅ Backup & Disaster Recovery – Reliable data protection and recovery
 
-It helps organizations achieve operational excellence by handling routine tasks such as patch management, 
-monitoring, security, and backups. 
+Why Use AWS Managed Services?
+📉 Reduces operational overhead – Less manual work means more focus on business goals
+🔒 Enhances security & compliance – AWS provides encryption, access control, and security monitoring
+📈 Ensures high availability – Automatic scaling, failover mechanisms, and fault tolerance
 
+Example: Managing a Database Manually vs. AWS Managed Services
+Traditional Approach (Manual Setup)
+If you need to set up a MySQL database on AWS manually, you must:
+1️⃣ Launch a VM (EC2 instance)
+2️⃣ Install & configure the operating system
+3️⃣ Install & optimize MySQL
+4️⃣ Set up backups, replication & scaling
+5️⃣ Implement security & patch management
 
+This takes a lot of effort and expertise!
 
-lets say an exaple of database: 
-if we need to run a database what we need to do for that if we do manually:
-    run a vm,install os, install mysql, immplement security abd backup system a lot of task.
-    
-in the from of manage serices this all give all thsi from of me aws.
-we just neeed run a rds and aws do all thing for me.
+AWS Managed Services Approach (RDS Example)
+With Amazon RDS (Relational Database Service):
+✅ AWS automates installation, backups, patching & scaling
+✅ Security, encryption, and monitoring are built-in
+✅ You just select the database engine & instance size, and AWS handles the rest
 
+AWS reduces operational complexity, allowing businesses to focus on innovation rather than infrastructure management.
 
+Popular AWS Managed Services
+📌 Amazon EKS (Elastic Kubernetes Service)
+A fully managed Kubernetes service for deploying, managing, and scaling containerized applications.
 
-So many serive of aws manage serives like:
-Amazon EKS (Elastic Kubernetes Service): A managed Kubernetes service that makes it easier to deploy, manage, and scale containerized applications using Kubernetes.
+📌 AWS Fargate (Managed Container Services)
+A serverless compute engine for containers—no need to manage EC2 instances. Just run and scale containers easily.
 
-AWS Fargate(Managed Container Services:): A serverless compute engine for containers that allows you to run containers without managing the underlying infrastructure.
+📌 AWS IAM (Identity & Access Management) & AWS KMS (Key Management Service)
+IAM manages users and access permissions, while KMS encrypts and secures sensitive data.
 
+📌 Amazon S3 (Simple Storage Service)
+A highly scalable and secure storage solution for backup, archiving, and hosting static content.
 
-AWS Identity and Access Management (IAM): and AWS Key Management Service (KMS): A managed service for creating user/key and controlling the encryption keys used to encrypt data.
+📌 AWS CloudFront (Content Delivery Network - CDN)
+A global CDN service that speeds up content delivery by caching data in multiple AWS edge locations worldwide.
 
-also provides:
-File Storage, CDN, Backup Services, Managed IoT Services, Managed Machine Learning Services and more.
+📌 AWS Backup
+A fully managed backup service for centralizing data protection across AWS services like EC2, EBS, RDS, DynamoDB, and more.
+
+📌 AWS Lambda (Serverless Computing)
+A fully managed, event-driven compute service that runs code in response to triggers, eliminating the need to manage servers.
+
+📌 AWS IoT & Machine Learning Services
+Managed services that handle device connectivity, real-time data processing, and AI-powered analytics.
+
+Benefits of AWS Managed Services
+🚀 Faster Deployment – Launch services within minutes instead of days
+🛡️ Improved Security – Automated security policies, encryption, and compliance enforcement
+📊 Cost Optimization – Pay only for what you use with on-demand scaling
+♻️ Automated Scaling – Scale up or down based on real-time demand
+💡 Focus on Innovation – Spend less time managing infrastructure and more time on business growth
+
+Final Thoughts
+AWS Managed Services eliminates infrastructure management headaches, allowing businesses to run scalable, secure, and cost-effective applications with minimal effort.
 
 
 
 
 6:30
 ================
-lets talk about AWS Serverless:
-Instead of provisioning and managing servers AWS Serverless refers to a computing model where you can build and run 
-applications without managing servers. 
+In this session, we’ll discuss AWS Serverless, how it works, and the benefits of using it.
 
-In a serverless architecture automatically handles the infrastructure for you. 
+What is AWS Serverless?
+AWS Serverless is a cloud computing model where applications run without the need to provision or manage servers.
+Instead of handling infrastructure, AWS automatically manages everything behind the scenes, including:
 
+✅ Compute power – Scales up and down as needed
+✅ Storage & databases – Fully managed, no provisioning required
+✅ Networking & security – AWS handles configurations & compliance
+✅ Event-driven execution – Services run only when triggered, reducing costs
 
+With AWS Serverless, you only pay for what you use, making it an efficient and cost-effective solution.
 
-aws provide many serverless servicea like:
+Key AWS Serverless Services
+1️⃣ AWS Lambda (Serverless Compute)
+AWS Lambda allows you to run code without managing servers.
+📌 Simply upload your function, and AWS automatically handles:
+✅ Scaling – Runs as many instances as needed
+✅ Execution – Responds to events in real-time
+✅ Billing – Only pay for execution time
 
-AWS Lambda: AWS Lambda is a serverless compute service that lets you run your code without provisioning or managing servers. You upload your code, and Lambda automatically scales and executes.
+💡 Example Use Case:
 
-Amazon API Gateway: This service allows you to create, publish, and manage APIs API at any scale. 
-With API Gateway, you can create RESTful APIs that integrate with Lambda functions, enabling you to build serverless backend services for your applications.
+Running backend logic for a web app
+Processing uploaded files in S3
+Triggering real-time notifications
+2️⃣ Amazon API Gateway (Serverless API Management)
+A fully managed service to create, publish, and manage APIs at any scale.
+📌 Integrates seamlessly with AWS Lambda to build serverless applications.
+✅ Supports RESTful & WebSocket APIs
+✅ Provides throttling, security, and monitoring
+✅ Scales automatically to handle high traffic
 
-Amazon DynamoDB: A fully managed NoSQL database, DynamoDB can automatically scale based on demand, and you can use it to store and retrieve data for your serverless applications.
+💡 Example Use Case:
 
+Exposing Lambda functions via REST APIs
+Building serverless microservices
+Managing authentication & request validation
+3️⃣ Amazon DynamoDB (Serverless NoSQL Database)
+A fully managed NoSQL database with built-in scalability.
+📌 Supports automatic scaling based on demand.
+✅ Fast performance – Millisecond response times
+✅ Serverless & Auto-scaling – No need to provision capacity
+✅ Integrated security – Encryption and access control built-in
 
-also:
-Amazon S3, AWS Step Function, AWS Cognito, AWS Secrets Manager, CloudFront, SNS, SQS and more.
+💡 Example Use Case:
+
+Storing user session data
+Handling high-volume e-commerce transactions
+Powering real-time gaming leaderboards
+Other Essential AWS Serverless Services
+📌 Amazon S3 (Simple Storage Service) – Scalable object storage for backups, hosting, and data storage.
+
+📌 AWS Step Functions – Orchestrates workflows between AWS services, automating processes efficiently.
+
+📌 AWS Cognito – Serverless authentication and user identity management for apps.
+
+📌 AWS Secrets Manager – Securely manages and rotates credentials for applications and services.
+
+📌 Amazon CloudFront – A serverless CDN for fast, secure content delivery across the globe.
+
+📌 Amazon SNS (Simple Notification Service) – Serverless messaging & alerts for event-driven applications.
+
+📌 Amazon SQS (Simple Queue Service) – Serverless message queuing for decoupled, scalable applications.
+
+Why Use AWS Serverless?
+🚀 No Server Management – AWS handles everything from infrastructure to security.
+📈 Automatic Scaling – Services scale dynamically based on demand.
+💰 Cost-Efficient – Pay only for execution time and resources used.
+🛠 Event-Driven Execution – Services trigger automatically when needed.
+🔒 Security & Compliance – AWS ensures best-in-class protection.
+
+Final Thoughts
+AWS Serverless simplifies application development, allowing developers to focus on business logic rather than infrastructure.
 
 
 
 14:40
 ===============
-lets run a AWS Lambda and see step by step.
+In this session, we will go through a step-by-step guide to creating and running an AWS Lambda function.
+AWS Lambda allows you to run serverless functions in the cloud without managing servers.
 
+🔹 Step 1: Navigate to AWS Lambda Console
+📌 Open the AWS Management Console
+📌 Search for "Lambda" and click on AWS Lambda
 
+🔹 Step 2: Create a New Lambda Function
+📌 Click on "Create function"
+📌 Select "Author from scratch"
 
+Now, configure the function:
+✅ Function Name – Example: MyFirstLambda
+✅ Runtime – Choose Python 3.9 / Node.js / Java (based on your preference)
+✅ Permissions – Select an existing IAM role or create a new one with AWSLambdaBasicExecutionRole
 
+📌 Click "Create function"
 
+🔹 Step 3: Write and Deploy the Lambda Code
+Once the function is created, scroll down to the Code Source section.
 
+Example 1: Hello World (Python)
+Replace the default code with this simple Lambda function:
+
+import json
+
+def lambda_handler(event, context):
+    return {
+        'statusCode': 200,
+        'body': json.dumps('Hello from AWS Lambda!')
+    }
+📌 Click "Deploy" to save changes.
+
+🔹 Step 4: Test the Lambda Function
+📌 Click "Test"
+📌 Create a new test event with a name like TestEvent
+📌 Use the following JSON event data:
+{
+    "message": "This is a test"
+}
+📌 Click "Create", then click "Test" again.
+
+✅ If successful, you should see:
+Response:
+{
+    "statusCode": 200,
+    "body": "\"Hello from AWS Lambda!\""
+}
+🔹 Step 5: Trigger the Lambda Function Automatically
+AWS Lambda can be triggered by various AWS services. Here are three common triggers:
+
+1️⃣ API Gateway (Creating a Serverless API)
+📌 Go to Amazon API Gateway
+📌 Create a new REST API
+📌 Add a New Resource and select Lambda Function Integration
+📌 Deploy the API and get a public API endpoint
+
+✅ Now, when you make a request to the API, it will trigger the Lambda function!
+
+2️⃣ S3 Trigger (Run Lambda on File Upload)
+📌 Go to Amazon S3
+📌 Create a new bucket or use an existing one
+📌 In Lambda Triggers, select S3, then choose "All object create events"
+
+✅ Every time a file is uploaded, AWS Lambda will execute automatically!
+
+3️⃣ CloudWatch Events (Scheduled Lambda Execution)
+📌 Go to Amazon CloudWatch
+📌 Create a new Rule
+📌 Select Event Source → "Schedule"
+📌 Define a schedule (e.g., run every 5 minutes)
+📌 Attach the Lambda function as the Target
+
+✅ This will automatically run the Lambda function at regular intervals!
+
+🔹 Step 6: Monitoring Lambda Execution
+📌 Go to Amazon CloudWatch Logs
+📌 Find your Lambda function’s log group
+📌 Check execution logs, errors, and performance metrics
+
+🔹 Step 7: Optimize Lambda for Performance
+💡 Best Practices for AWS Lambda:
+✅ Keep function lightweight – Avoid unnecessary dependencies
+✅ Set memory & timeout – Optimize performance & cost
+✅ Use environment variables – Store configuration settings
+✅ Enable concurrency limits – Avoid overloading resources
+
+🔹 Final Thoughts
+That’s it! You’ve successfully created, tested, and automated AWS Lambda.
+🚀 AWS Lambda is a powerful tool for building serverless applications, automating tasks, and integrating AWS services.
 
 
 
@@ -1570,7 +1830,11 @@ lets run a AWS Lambda and see step by step.
 
 =================================================
 12 | AWS Networking
-=================================================
+=================================================   
+
+
+
+
 
 
 
@@ -1580,52 +1844,157 @@ lets run a AWS Lambda and see step by step.
 14 | Security and Monitoring
 =================================================
 
-In this tutorial we will taling about aws Security and Monitoring.
+ Welcome to This AWS Security & Monitoring Guide! 🚀
 
-Amazon Web Services (AWS) provides a comprehensive set of services and features to help users secure their applications and data, 
-as well as monitor their AWS resources. 
+When running applications in the cloud, security and visibility are critical.
+In this tutorial, we'll take a deep dive into AWS Security and Monitoring, exploring the key tools and best practices that help protect your AWS infrastructure, applications, and data from potential threats.
+
+AWS offers a powerful suite of security services designed to control access, detect suspicious activity, enforce compliance, and provide real-time monitoring.
+By leveraging these tools, you can proactively secure your cloud environment while gaining deep insights into resource usage and potential risks.
+
+Let’s get started and unlock the full potential of AWS security!
 
 
-aws provide free monitoring also some paid serive for more details monitoring.
+
 
 Details you get from here:
 AWS Doc Link: https://aws.amazon.com/products/security/?nc=sn&loc=2&refid=14a4002d-4936-4343-8211-b5a150ca592
 
 
 
-some as:
-Identity and Access Management (IAM):
-IAM allows you to manage access to AWS services securely. You can create and manage AWS users, groups, and roles, and define policies to grant or deny access to resources.
+🔹 1. Identity and Access Management (IAM) – Secure Access Control
+📌 IAM (Identity and Access Management) enables secure access control over AWS services and resources.
 
-Web Application Firewall (WAF):
-WAF helps protect web applications from common web exploits by allowing you to control which traffic can access your applications.
+✅ Key Features:
+🔹 Create and manage users, groups, and roles
+🔹 Define IAM policies to grant or restrict access
+🔹 Enable Multi-Factor Authentication (MFA) for extra security
+🔹 Use IAM Roles to provide secure access to AWS services without hardcoded credentials
 
-Security Groups and Network ACLs:
-These are used to control inbound and outbound traffic at the instance and subnet level, respectively.
+💡 Example:
 
-AWS CloudTrail:
-CloudTrail records API calls made on your account, providing audit logs for compliance, security analysis, and resource tracking.
+Create an IAM user with access only to Amazon S3
+Apply a policy to allow s3:ListBucket and s3:GetObject actions
+🔹 2. Web Application Firewall (WAF) – Protect Against Attacks
+📌 AWS WAF helps protect web applications from SQL injection, cross-site scripting (XSS), and DDoS attacks.
 
-AWS Config:
-AWS Config continuously monitors and records configurations of your AWS resources. It provides a history of resource changes and allows you to evaluate configurations against desired settings.
+✅ Key Features:
+🔹 Create custom security rules to filter malicious traffic
+🔹 Protect Amazon CloudFront, API Gateway, and ALB
+🔹 Use AWS Managed Rules for automatic protection
 
-Amazon GuardDuty:
-GuardDuty is a threat detection service that continuously monitors for malicious activity and unauthorized behavior to protect your AWS accounts and workloads.
+💡 Example:
 
-AWS Secrets Manager:
-Secrets Manager enables you to rotate, manage, and retrieve database credentials, API keys, and other secrets throughout their lifecycle.
+Block requests from a specific country
+Allow only traffic with a valid User-Agent header
+🔹 3. Security Groups & Network ACLs – Network Protection
+📌 Security Groups (SGs) and Network ACLs (NACLs) control network traffic at different levels.
 
-Encryption:
-AWS offers various encryption services to protect data in transit and at rest. AWS Key Management Service (KMS) allows you to create and control encryption keys, while services like Amazon S3 and Amazon RDS provide encryption options.
+✅ Security Groups:
+🔹 Act as firewalls at the instance level
+🔹 Define allow rules (no deny rules)
+🔹 Default denies all inbound traffic
 
-Amazon CloudWatch:
-CloudWatch is a monitoring and observability service that provides data and actionable insights for AWS resources. It can collect and track metrics, collect and monitor log files, and set alarms.
+✅ Network ACLs (NACLs):
+🔹 Work at the subnet level
+🔹 Allow both allow and deny rules
+🔹 Ideal for blocking IP ranges
 
-Amazon CloudWatch Events:
-CloudWatch Events allow you to respond to changes in AWS resources. You can create rules that match events and route them to one or more target functions or streams.
+💡 Example:
 
-AWS Personal Health Dashboard:
-The Personal Health Dashboard provides alerts and remediation guidance when AWS is experiencing events that may impact your applications.
+Allow only SSH (port 22) access from a trusted IP address
+🔹 4. AWS CloudTrail – Track API Activity
+📌 AWS CloudTrail records API calls and user actions in your AWS account.
+
+✅ Key Features:
+🔹 Logs API activity across AWS services
+🔹 Helps in security audits and compliance
+🔹 Detects unauthorized API actions
+
+💡 Example:
+
+Monitor who deleted an S3 bucket
+Track IAM policy changes
+🔹 5. AWS Config – Continuous Compliance Monitoring
+📌 AWS Config tracks configuration changes and ensures compliance with security policies.
+
+✅ Key Features:
+🔹 Monitors AWS resource configurations
+🔹 Stores historical configuration changes
+🔹 Alerts when a resource violates compliance rules
+
+💡 Example:
+
+Alert if an S3 bucket becomes public
+Notify if an IAM policy allows full access to EC2
+🔹 6. Amazon GuardDuty – Threat Detection & Anomaly Monitoring
+📌 GuardDuty is an AI-powered security service that detects malicious activities like compromised credentials and unauthorized access.
+
+✅ Key Features:
+🔹 Identifies suspicious login attempts
+🔹 Detects data exfiltration
+🔹 Uses machine learning to detect anomalies
+
+💡 Example:
+
+Alert if an IAM user logs in from an unusual location
+Detect unauthorized access to S3 buckets
+🔹 7. AWS Secrets Manager – Secure Credential Storage
+📌 AWS Secrets Manager securely stores and rotates database credentials, API keys, and sensitive information.
+
+✅ Key Features:
+🔹 Automatic credential rotation
+🔹 Secure access using IAM policies
+🔹 Encrypts secrets using AWS KMS
+
+💡 Example:
+
+Store and automatically rotate RDS database passwords
+🔹 8. Encryption – Data Protection in AWS
+📌 AWS provides encryption services to secure data at rest and in transit.
+
+✅ Key Services:
+🔹 AWS KMS (Key Management Service) – Manages encryption keys
+🔹 Amazon S3 Encryption – Protects stored data
+🔹 Amazon RDS Encryption – Encrypts database storage
+
+💡 Example:
+
+Encrypt S3 objects using SSE-KMS
+🔹 9. Amazon CloudWatch – Monitor AWS Resources & Applications
+📌 Amazon CloudWatch collects and analyzes metrics, logs, and events.
+
+✅ Key Features:
+🔹 Monitor EC2, RDS, Lambda, and more
+🔹 Create alarms for high CPU, memory usage
+🔹 Automate responses using CloudWatch Events
+
+💡 Example:
+
+Set an alarm if EC2 CPU usage exceeds 80%
+🔹 10. Amazon CloudWatch Events – Automated Responses
+📌 CloudWatch Events triggers automated responses when AWS resources change state.
+
+✅ Key Features:
+🔹 Real-time monitoring of AWS events
+🔹 Can trigger Lambda functions, SNS, or Step Functions
+
+💡 Example:
+
+Trigger an SNS notification if an EC2 instance stops
+🔹 11. AWS Personal Health Dashboard – Proactive Issue Alerts
+📌 AWS Personal Health Dashboard provides alerts and guidance for AWS service disruptions.
+
+✅ Key Features:
+🔹 Personalized AWS service health alerts
+🔹 Impact analysis for AWS service issues
+
+💡 Example:
+
+Get notified if AWS RDS faces performance issues
+🔹 12. Free vs. Paid AWS Security & Monitoring Services
+AWS offers both free and premium security and monitoring services.
+
 
 
 
@@ -1639,43 +2008,38 @@ The Personal Health Dashboard provides alerts and remediation guidance when AWS 
 =================================================
 15 | AWS Machine Learning and  Well-Architected
 =================================================
-
-In this tutorial we will taling about AWS Machine Learning and  Well-Architected.
-
-you can get details description from here:
-AWS Dock Link: https://docs.aws.amazon.com/whitepapers/latest/aws-overview/machine-learning.html
+ Welcome to This AWS Machine Learning & Well-Architected Guide! 🤖💡
 
 
-lets some services:
-Polly: Polly is a text-to-speech service that can convert written text into natural-sounding speech.
+In this tutorial, we’re talking about AWS Machine Learning (ML) services and the AWS Well-Architected Framework, which helps you build reliable, secure, and efficient cloud applications.
 
+AWS makes machine learning easier and more accessible with a range of managed services. Instead of worrying about complex infrastructure, you can focus on building and deploying intelligent applications quickly.
 
-Translate: Translate is a machine translation service that supports the translation of text between languages.
+📌 AWS Machine Learning Services
+✅ Amazon Polly – Converts text into realistic speech. Great for creating voice assistants, audiobooks, and accessibility features.
 
+✅ Amazon Translate – Provides automatic language translation. Perfect for multilingual websites, chatbots, and global communication.
 
-SageMaker:
-SageMaker is a fully managed service that allows you to build, train, and deploy machine learning models at scale.
+✅ Amazon SageMaker – A fully managed ML service that helps you build, train, and deploy machine learning models without handling servers.
 
+✅ Amazon Rekognition – Analyzes images and videos to detect faces, objects, and scenes. Used in security, media, and content moderation.
 
-Rekognition:
-Rekognition is a computer vision service that can analyze images and videos for content. It can perform tasks such as facial recognition, object detection, and scene analysis.
+✅ Amazon Textract – Automatically extracts text and data from scanned documents and PDFs, making it easy to digitize paperwork.
 
+These services help businesses automate tasks, improve efficiency, and make data-driven decisions without needing deep ML expertise.
 
-Amazon Textract:
-Textract is a service that automatically extracts text from scanned documents, images, and PDFs.  and more.
 
 
 
 6:30
 =================
-now we talking about AWS Well-Architected.
+Now, let’s talk about the AWS Well-Architected Framework, a set of best practices designed to help you build secure, high-performing, resilient, and efficient cloud applications.
 
-The AWS Well-Architected Framework is a set of best practices and guidelines provided by Amazon Web Services (AWS) 
-to help customers build secure, high-performing, resilient, and efficient infrastructure for their applications. 
+This framework is essential for businesses looking to optimize their AWS workloads while ensuring security, cost-effectiveness, and operational excellence.
+
+AWS provides guidelines, tools, and architectural recommendations to help you design and maintain a scalable cloud infrastructure that meets your business needs.
 
 
-
-we can see details in this document:
 AWS Doc Link: 
 https://aws.amazon.com/architecture/well-architected/?wa-lens-whitepapers.sort-by=item.additionalFields.sortDate&wa-lens-whitepapers.sort-order=desc&wa-guidance-whitepapers.sort-by=item.additionalFields.sortDate&wa-guidance-whitepapers.sort-order=desc
 
@@ -1696,35 +2060,80 @@ https://aws.amazon.com/architecture/well-architected/?wa-lens-whitepapers.sort-b
 
 
 
+
+
+
 =================================================
 AWS Certification
 =================================================
 
-In this tutorial we will taling ablut AWS Certification.
+In this tutorial, we’ll explore AWS Certification, a globally recognized credential that validates your expertise in cloud computing, architecture, security, and development. AWS certifications help professionals demonstrate their technical skills, industry knowledge, and hands-on experience with AWS services.
+
+🔹 Why Get AWS Certified?
+✅ Career Growth – Enhance your resume and stand out in the cloud job market.
+✅ Industry Recognition – AWS is the leading cloud provider, and certified professionals are highly valued.
+✅ Hands-on Knowledge – Gain deep expertise in AWS technologies with real-world applications.
+✅ Higher Salaries – AWS-certified professionals often earn higher salaries compared to non-certified peers.
+
+🔹 AWS Certification Paths
+AWS offers 14 different certifications, categorized based on technology focus and experience level:
+
+🟢 Foundational Level (Beginner – No prior cloud experience required)
+AWS Certified Cloud Practitioner – Covers AWS basics, cloud concepts, billing, and security.
+🔵 Associate Level (1+ year of experience recommended)
+AWS Certified Solutions Architect – Associate – Focuses on designing scalable and cost-effective AWS solutions.
+AWS Certified Developer – Associate – Covers application development and AWS SDK usage.
+AWS Certified SysOps Administrator – Associate – Focuses on deployment, management, and operations.
+🟠 Professional Level (2+ years of experience recommended)
+AWS Certified Solutions Architect – Professional – Advanced architectural best practices.
+AWS Certified DevOps Engineer – Professional – Covers CI/CD, automation, and infrastructure as code.
+🔴 Specialty Certifications (Advanced expertise in specific AWS services)
+AWS Certified Security – Specialty – Security best practices, compliance, and encryption.
+AWS Certified Advanced Networking – Specialty – Focus on networking, hybrid cloud, and connectivity.
+AWS Certified Database – Specialty – Database migration, management, and optimization.
+AWS Certified Data Analytics – Specialty – Data processing, visualization, and AWS analytics tools.
+AWS Certified Machine Learning – Specialty – AI/ML solutions using AWS.
+AWS Certified SAP on AWS – Specialty – Running SAP workloads on AWS.
+📌 Learn More & Explore Exams:
+📖 AWS Certification Exams
+
+AWS certifications are a great way to validate your skills, advance your career, and gain credibility in the cloud industry. 🚀 Which certification are you aiming for? Let’s get started!
 
 
-Aws offer around 14 certification different base on texhnology workgin area and base on exprience or knowledge.
-
-
-docuemnt line here:
-
-AWS Doc Link: https://aws.amazon.com/certification/exams/
 
 
 
 
 5:30
 ========================
+Now, let's dive deeper into AWS certification exams, including syllabus, exam topics, question formats, and important guidelines.
 
-Now lets see some aws exam more details its syllabus exam topic and question structure.
+🔗 Official AWS Certification Exam Guide:
+👉 AWS Certification Details
 
-you can get all details in here:
- https://aws.amazon.com/certification/?nc2=sb_ce_co
+🔹 What to Expect in AWS Certification Exams?
+✅ Exam Duration: Varies by certification (typically 90–180 minutes).
+✅ Question Format: Multiple-choice and multiple-response questions.
+✅ Difficulty Level: Increases from Foundational to Specialty & Professional exams.
+✅ Passing Score: Each exam has a different passing percentage, not publicly disclosed.
 
+🔹 Common Topics Covered
+AWS Core Services – Compute, storage, networking, security, and databases.
+Best Practices – AWS Well-Architected Framework, cost optimization, scalability.
+Security & Compliance – IAM, encryption, monitoring, incident response.
+Networking & Connectivity – VPC, Direct Connect, VPNs, routing policies.
+Automation & DevOps – CI/CD, infrastructure as code, deployment strategies.
+🔹 Exam Rules & Guidelines
+✅ Allowed: Scratch paper, online exam setup (for remote exams).
+❌ Not Allowed: External reference materials, electronic devices, unauthorized breaks.
 
-simple question example, hours of exam, what should do what should not allow all thing you will get from here.
+🔹 Sample Questions
+AWS provides practice exams and sample questions to help you prepare. These include real-world scenarios that test your problem-solving skills.
 
+📌 Get Full Details & Exam Resources:
+🔗 AWS Certification Portal
 
+AWS certifications are a great way to validate your expertise and grow in the cloud industry. 🚀 Ready to take your AWS certification journey to the next level? Let’s get started! 🎯
 
 
 
