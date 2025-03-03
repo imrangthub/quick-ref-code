@@ -160,6 +160,18 @@ Max conn
 Set Max conn
 
 
+
+
+SELECT 
+    COUNT(*) AS total_connections,
+    SUM(CASE WHEN command = 'Sleep' THEN 1 ELSE 0 END) AS idle_connections,
+    SUM(CASE WHEN command != 'Sleep' THEN 1 ELSE 0 END) AS active_connections
+FROM INFORMATION_SCHEMA.PROCESSLIST 
+WHERE USER = 'root';
+
+get all active/idel connection by user.
+
+
 #ORDER BY 
 -------------------------------------------------
 SELECT * FROM student
