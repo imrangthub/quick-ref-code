@@ -1897,3 +1897,229 @@ If external updates bypass Hibernate, the cache won't know, and old data might b
 
 
 
+Type of Database Key:
+=====================================
+--------------------------------------------------------------------------------------------------------------------------------
+| Key Type          | Definition                                                                                               |
+--------------------------------------------------------------------------------------------------------------------------------
+| Primary Key       | Uniquely identifies a record, only one per table, no NULLs.                                               |
+--------------------------------------------------------------------------------------------------------------------------------
+| Candidate Key     | Minimal set of attributes that can uniquely identify records.                                            |
+--------------------------------------------------------------------------------------------------------------------------------
+| Super Key         | Any set of attributes that uniquely identifies a record (may include extra attributes).                 |
+--------------------------------------------------------------------------------------------------------------------------------
+| Alternate Key     | A candidate key that is not chosen as the primary key.                                                  |
+--------------------------------------------------------------------------------------------------------------------------------
+| Foreign Key       | A key that references a primary key in another table.                                                    |
+--------------------------------------------------------------------------------------------------------------------------------
+| Composite Key     | A key that consists of multiple columns.                                                                |
+--------------------------------------------------------------------------------------------------------------------------------
+| Unique Key        | Ensures unique values but can contain NULLs.                                                              |
+--------------------------------------------------------------------------------------------------------------------------------
+| Non-Key Attribute | A column that is not part of any key.                                                                    |
+--------------------------------------------------------------------------------------------------------------------------------
+
+
+1. Primary Key (PK)
+  A primary key is a column (or a set of columns) that uniquely identifies each record in a table.
+  It cannot have NULL values.
+  A table can have only one primary key.
+
+
+
+2. Candidate Key
+A candidate key is a minimal set of columns that can uniquely identify a record.
+A table can have multiple candidate keys.
+One of these candidate keys is chosen as the primary key.
+
+Example:
+------------------------------------------------------
+| EmployeeID | Email              | Phone            |
+------------------------------------------------------
+| 101        | john@example.com   | 1234567890       |
+------------------------------------------------------
+| 102        | alice@example.com  | 9876543210       |
+------------------------------------------------------
+EmployeeID, Email, and Phone can uniquely identify a record.
+So, these are Candidate Keys.
+If we choose EmployeeID as the Primary Key, Email and Phone remain Alternate Keys.
+
+
+
+3.Foreign Key (FK)
+A foreign key is a column that references the primary key of another table.
+It establishes relationships between tables.
+It can contain duplicate values and NULL values (if allowed).
+
+
+4.Composite Key
+A composite key is a primary key made up of two or more columns.
+Used when a single column is not sufficient to uniquely identify a record.
+Example:
+CREATE TABLE OrderDetails (
+    OrderID INT,
+    ProductID INT,
+    Quantity INT,
+    PRIMARY KEY (OrderID, ProductID)
+);
+Here, both OrderID and ProductID together form the Primary Key.
+
+
+5.Unique Key
+A unique key ensures that all values in the column are distinct.
+Unlike a primary key, it can contain NULL values.
+
+
+
+6. Non-Key Attribute
+A non-key attribute is a column that is not part of any candidate key.
+It does not uniquely identify records.
+
+
+
+
+##Database normalization 
+=================================================
+📌 1NF: No multiple values in a single column.
+📌 2NF: Data is split into separate tables to remove partial dependencies.
+📌 3NF: Each column depends only on the primary key, avoiding unnecessary repetition.
+
+
+Imagine a Student Database:
+=============================================================
+We have a table that stores student information, including courses:
+
+-------------------------------------------------------------
+| StudentID | Name  | Courses        | Instructor           |
+-------------------------------------------------------------
+| 1         | John  | Math, Science  | Mr. Smith, Dr. Brown |
+-------------------------------------------------------------
+| 2         | Alice | Science        | Dr. Brown            |
+-------------------------------------------------------------
+
+
+
+1️⃣ First Normal Form (1NF)
+----------------------------------
+Problem: The "Courses" and "Instructor" columns contain multiple values.
+Solution: Each column should have only one value per row.
+✅ Now, if an instructor changes, we update only one row in the "Instructors" table.
+
+Updated Table (1NF):
+------------------------------------------------------
+| StudentID | Name  | Course  | Instructor           |
+------------------------------------------------------
+| 1         | John  | Math    | Mr. Smith            |
+------------------------------------------------------
+| 1         | John  | Science | Dr. Brown            |
+------------------------------------------------------
+| 2         | Alice | Science | Dr. Brown            |
+------------------------------------------------------
+✅ Now, each column contains atomic (indivisible) values.
+
+
+
+2️⃣ Second Normal Form (2NF)
+----------------------------------
+Problem: The "Instructor" column depends on the "Course," not directly on "StudentID."
+Solution: Split data into separate tables so that non-key attributes fully depend on the primary key.
+
+Updated Tables (2NF):
+
+Students Table:
+---------------------
+| StudentID | Name  |
+---------------------
+| 1         | John  |
+---------------------
+| 2         | Alice |
+---------------------
+
+
+Courses Table:
+---------------------------
+| Course  | Instructor    |
+---------------------------
+| Math    | Mr. Smith     |
+---------------------------
+| Science | Dr. Brown     |
+---------------------------
+
+
+Student-Course Mapping Table:
+---------------------------
+| StudentID | Course      |
+---------------------------
+| 1         | Math        |
+---------------------------
+| 1         | Science     |
+---------------------------
+| 2         | Science     |
+---------------------------
+
+
+3️⃣ Third Normal Form (3NF)
+Problem: If an instructor changes, we need to update multiple rows in the "Courses" table.
+Solution: Separate instructors into their own table so that each attribute depends only on the primary key.
+
+Updated Tables (3NF):
+
+Students Table:
+---------------------
+| StudentID | Name  |
+---------------------
+| 1         | John  |
+---------------------
+| 2         | Alice |
+---------------------
+
+Courses Table:
+---------------------------
+| Course  | InstructorID  |
+---------------------------
+| Math    | 101           |
+---------------------------
+| Science | 102           |
+---------------------------
+
+Instructors Table:
+----------------------------
+| InstructorID | Name      |
+----------------------------
+| 101          | Mr. Smith |
+----------------------------
+| 102          | Dr. Brown |
+----------------------------
+
+Student-Course Mapping Table:
+---------------------------
+| StudentID | Course      |
+---------------------------
+| 1         | Math        |
+---------------------------
+| 1         | Science     |
+---------------------------
+| 2         | Science     |
+---------------------------
+
+✅ Now, if an instructor changes, we update only one row in the "Instructors" table.
+
+
+
+
+Boyce-Codd Normal Form (BCNF) 
+While Third Normal Form (3NF) is generally sufficient for organizing relational databases, it may not completely eliminate redundancy. 
+Redundancy can still occur if there’s a dependency X→X where X is not a candidate key. 
+This issue is addressed by a stronger normal form known as Boyce-Codd Normal Form (BCNF).
+
+
+4th and 5th Normal Form in DBMS:
+Two of the highest levels of database normalization are the fourth normal form (4NF) and the fifth normal form (5NF). 
+Multivalued dependencies are handled by 4NF, whereas join dependencies are handled by 5NF.
+
+
+
+
+
+
+
