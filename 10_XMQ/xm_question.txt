@@ -67,6 +67,40 @@
 8) Why Redis so Faster
 
 
+Asynchronous programming is a technique that allows a system to perform multiple tasks c
+oncurrently without waiting for one task to finish before starting another. 
+asynchronous operations allow a program to continue executing other tasks while waiting for a long-running operation 
+(like I/O, network calls, or database queries) to complete.
+
+Asynchronous in Java/Spring:
+    ✔ @Async → Best for simple background tasks.
+    ✔ CompletableFuture → Use when you need to return results asynchronously.
+    ✔ ThreadPoolTaskExecutor → Use for efficient thread management.
+    ✔ WebFlux (Mono/Flux) → Use for non-blocking reactive APIs.
+    ✔ Kafka / RabbitMQ → Use for event-driven async processing. Distributed async processing
+
+
+How Does Multithreading Work in Java?
+    Multithreading is the ability of a CPU to execute multiple threads concurrently.
+    Java provides built-in support for multithreading using the Thread class and Runnable interface.
+    Java creates threads within the same process (unlike multiple processes, which have separate memory).
+    Each thread runs independently but shares resources such as memory and CPU.
+    Java's JVM manages thread execution using a thread scheduler, which assigns CPU time based on priority.
+
+How to Achieve Multithreading in Java:
+    ✔ Thread Class → Extend for simple threads.
+    ✔ Runnable Interface → Implement for flexible thread usage.
+    ✔ ExecutorService → Use for efficient thread pool management.
+    ✔ Callable & Future → Use when threads need to return values.
+    ✔ ForkJoinPool → Use for parallel processing.
+
+
+
+JDK 7 focused on minor enhancements, while JDK 8 introduced major improvements like Lambdas, Streams, 
+Functional Interfaces, and a new Date-Time API. 
+
+Redis is fast because it operates in-memory, uses efficient data structures, 
+and optimizes request handling with a non-blocking event loop. 
 
 
 #adcty
@@ -78,6 +112,45 @@
 5) How spring boot autoconfig work.
 6) MyslQuery: a cutomer,order,orderitem table, now fine then cusname, order id and total amount of item.
 
+
+Key Components of Microservices Architecture:
+    API Gateway – Handles client requests, routing, authentication, and load balancing.
+    Service Discovery – Helps services find and communicate with each other dynamically.
+    Configuration Management – Centralized configuration storage (e.g., Spring Cloud Config, Consul).
+    Load Balancer – Distributes traffic across multiple service instances (e.g., Nginx, Ribbon).
+    Service Communication – Uses REST, gRPC, GraphQL, or Messaging (Kafka, RabbitMQ) for inter-service communication.
+    Database per Service – Each microservice has its own dedicated database (SQL/NoSQL) for data isolation.
+    Logging & Monitoring – Tools like ELK (Elasticsearch, Logstash, Kibana), Prometheus, Grafana for observability.
+    Security – Uses JWT, OAuth2, API keys for authentication & authorization.
+    Containerization & Orchestration – Uses Docker, Kubernetes for scalability & deployment.
+    Event-Driven Architecture – Uses Kafka, RabbitMQ for asynchronous communication & event sourcing.
+
+How Stream API is Faster? 
+    Internal Iteration – Optimized iteration handled by JVM, unlike for loops (external iteration).
+    Lazy Evaluation – Operations are executed only when needed, reducing unnecessary computations.
+    Parallel Processing – parallelStream() uses multi-threading to process large datasets faster.
+    Optimized Pipeline Execution – Chains operations without creating intermediate collections, saving memory.
+
+
+Why Internal Iteration is Faster? 
+    Optimized Execution: JVM can optimize iteration logic at runtime.
+    Parallel Processing: parallelStream() can process elements using multiple threads.
+        parallelStream() splits the list into multiple parts and processes them concurrently.
+        Each task runs in a different thread, improving performance on large datasets.
+
+    Lazy Evaluation: Operations execute only when needed, avoiding unnecessary processing.
+    Optimized Pipeline Execution – Chains operations without creating intermediate collections, saving memory.
+External Iteration (for-loops) is manual and less optimized.
+Internal Iteration (Stream API) lets JVM handle iteration, enabling faster & parallel execution. 🚀
+
+
+
+How Spring Boot Auto-Configuration Works? 
+    Spring Boot Auto-Configuration automatically configures beans based on classpath dependencies and application properties.
+    Registers Beans Automatically
+    Example: If H2 or MySQL driver is found, Spring Boot configures a DataSource automatically.
+    Spring Boot Checks Dependencies
+    If you add a dependency (e.g., spring-boot-starter-web), Spring Boot detects it.
 
 
 #Brain Station 23  | Software Engineer, JAVA
@@ -103,8 +176,9 @@
 2) Runtime polymorphism
 3) Java String = new String(getName()) in a Loop ?
 4) Java String = getName() in a Loop ?
-String concatenation in a loop can lead to high memory usage because strings in Java are immutable. Each concatenation creates a new String object.
-Use StringBuilder or StringBuffer for concatenation in loops.
+    String concatenation in a loop can lead to high memory usage because strings in Java are immutable. 
+    Each concatenation creates a new String object.
+    Use StringBuilder or StringBuffer for concatenation in loops.
 5) obj1 == obj2 how will retrun true for different object.
 6) Spring Been Scope
 7) What is Singleton been and Other been in Spring ?
