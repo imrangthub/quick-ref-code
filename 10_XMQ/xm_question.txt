@@ -155,7 +155,6 @@ How Spring Boot Auto-Configuration Works?
 
 #Brain Station 23  | Software Engineer, JAVA
 =========================================================
-
 1) What is Spring and Spring Boot?
 2) What different between Rest Api and Normal API?
 3) How work OAuth2 with Spring Security?
@@ -169,6 +168,117 @@ How Spring Boot Auto-Configuration Works?
 
 
 
+API (Application Programming Interface):
+    This is a set of rules that allows software applications to communicate with each other. 
+    It defines how applications can request and exchange data.
+
+REST Principles:
+Identification of resources: Each resource is uniquely identified by a URI (Uniform Resource Identifier).   
+Typically uses lightweight data formats like JSON.   
+Uses standard HTTP methods (GET, POST, PUT, DELETE).  
+Stateless:
+    The server doesn't store any client session information between requests.   
+Cacheable:
+    Responses can be cached, improving performance by reducing the need for repeated server requests.   
+Client-Server:
+    The client and server are separate entities. This separation allows them to evolve independently.   
+Layered System:
+    The architecture can consist of multiple layers, such as proxies or load balancers, without affecting the client.
+
+
+Relation SOAP and Http:
+    SOAP's Role:
+        SOAP defines the structure and format of messages, typically using XML. It specifies how those messages should be exchanged.   
+        It's concerned with the "what" of the message.
+    HTTP's Role:
+        HTTP is a protocol for transferring data over the web. It defines how data is transmitted between clients and servers.   
+        It's concerned with the "how" of the message is transported.
+SOAP provides the message format, and HTTP provides the transport mechanism. 
+
+
+SOAP API:
+    Base: Yes, ultimately, it relies on TCP for the underlying network transport.
+    Protocol: Uses the SOAP protocol for message structure and exchange.
+    Security: Can use WS-Security for enhanced security features.
+    Data Presentation: Primarily uses XML for data representation.
+    Transport: Commonly (but not exclusively) uses HTTP as the application-level protocol for transmitting SOAP messages over the network. 
+    It can use other protocols also.
+
+REST API:
+    Base: Yes, ultimately, it relies on TCP for the underlying network transport.
+    Architectural Style: Adheres to the REST architectural style, emphasizing resources and standard HTTP methods.
+    Data Presentation: Commonly uses JSON for data representation, but can also use other formats like XML.
+    Transport: Uses HTTP as the application-level protocol for communication.
+
+Key Refinements:
+    SOAP and HTTP: It's crucial to remember that SOAP is not bound to HTTP. 
+    While HTTP is the most common transport, SOAP can operate over other protocols.
+    REST and Data format: While JSON is very common with REST, REST is not limited to only Json.
+    TCP as the base: Both rest and soap rely on TCP.
+
+It is more accurate to say that SOAP has more built in security protocols, where as REST relies on 
+the proper implementation of security practices.
+
+
+Relationships Summarized:
+    TCP is the underlying transport layer that enables communication.   
+    HTTP builds upon TCP, providing a standardized way to exchange messages on the web.   
+    REST APIs utilize HTTP to facilitate communication between clients and servers.   
+    SOAP services can use HTTP (or other protocols like TCP) to transport SOAP messages.   
+    REST servers host REST APIs, and SOAP servers host SOAP services.
+
+
+
+OAuth2 with JWT Flow in Spring Security:
+1️⃣ User Provides Credentials
+    The user logs in to the Authorization Server (e.g., Keycloak, Okta).
+    If credentials are valid, the server generates a JWT token.
+
+2️⃣ Authorization Server Issues JWT
+    The JWT token is signed (using a private key) and sent to the user.
+    This JWT contains claims like sub (subject), exp (expiration), roles, etc.
+
+3️⃣ User Sends Request to Resource Server
+    The user includes the JWT in the Authorization header:
+    The request is sent to the Resource Server (Spring Boot API).
+
+4️⃣ Resource Server Validates JWT
+    The Resource Server verifies the JWT using the public key of the Authorization Server.
+    If valid, it extracts the claims (like user roles) and grants access.
+
+5️⃣ Response Sent
+    If the JWT is valid, the requested resource is returned.
+    If invalid/expired, the request is denied (401 Unauthorized or 403 Forbidden).
+
+
+
+Abstraction Rule:
+    If an abstract method remains unimplemented, the first concrete subclass must implement it.
+    If Mammal does not implement makeSound(), then Dog must.
+    Otherwise, the compiler will throw an error.
+
+
+Java Static DataIssu:
+    High Memory Consumption (Heap Usage):
+        Static fields are stored in the heap memory (inside the class metadata section).
+        If the data is large, it remains in memory as long as the application is running, leading to:
+        Increased RAM usage.
+        OutOfMemoryError if the heap is full.
+
+
+    Class Loading Delays
+        Static properties are initialized when the class is loaded.
+        If the data is too large, class loading takes more time, delaying application startup.
+
+    Thread Safety Issues
+        If multiple threads modify the static data, race conditions and inconsistent data may occur.
+        Solution: Use synchronized blocks or Concurrent Collections.
+
+    Memory Leaks
+        If the static data holds references to other objects, those objects cannot be garbage collected, leading to a memory leak.
+
+
+
 #BRAC IT Services Limited | Sr. Software Engineer, JAVA,
 =========================================================
 
@@ -176,15 +286,60 @@ How Spring Boot Auto-Configuration Works?
 2) Runtime polymorphism
 3) Java String = new String(getName()) in a Loop ?
 4) Java String = getName() in a Loop ?
-    String concatenation in a loop can lead to high memory usage because strings in Java are immutable. 
-    Each concatenation creates a new String object.
-    Use StringBuilder or StringBuffer for concatenation in loops.
 5) obj1 == obj2 how will retrun true for different object.
 6) Spring Been Scope
 7) What is Singleton been and Other been in Spring ?
 8) Which been are not Singleton in Spring.
 9) What is Servlet, how work it, is Servlet Singleton or not ?
 10) Is every http request generate a single thared for per request ?
+
+
+When to Use a Private Class?
+🔸 When a class is only needed inside another class (e.g., helper/utility logic).
+🔸 When you want to encapsulate sensitive logic that should not be accessible externally.
+A private class can only exist inside another class (it cannot be a top-level class).
+    There are two types of private inner classes:
+        Private (Non-Static ) Inner Class:
+
+
+
+Runtime Polymorphism in Java:
+🔹 Runtime polymorphism (also called dynamic method dispatch) is a concept where method overriding allows a
+   subclass to provide a specific implementation of a method that is already defined in its superclass.
+🔹 The method to be executed is determined at runtime based on the object type, not the reference type.
+
+Method Overloading (same method name with different parameters) is compile-time polymorphism, NOT runtime polymorphism.
+
+Static Methods Do NOT Support Runtime Polymorphism, its call Method Hiding.
+    The method is resolved at compile time based on the reference type (Animal), not the object type (new Dog()).
+    Even though myAnimal refers to a Dog object, it still calls Animal.makeSound(), not Dog.makeSound().
+
+
+String concatenation in a loop can lead to high memory usage because strings in Java are immutable. 
+Each concatenation creates a new String object.
+Use StringBuilder or StringBuffer for concatenation in loops.
+
+
+
+How Tomcat Handles Requests (Default Behavior)
+    1️⃣ A client sends an HTTP request to Tomcat.
+    2️⃣ Tomcat assigns a thread from its pool (e.g., http-nio-8080-exec-1).
+    3️⃣ The thread processes the request (e.g., runs a Spring MVC controller).
+    4️⃣ After sending the response, the thread is returned to the pool for reuse.
+
+
+Default Behavior in Spring Boot:
+    Spring MVC	Tomcat (Blocking, Thread-per-Request)
+    Spring WebFlux	Netty (Non-blocking, Event-Driven)
+
+Using WebFlux with Netty (Default):
+    If you use Spring Boot with WebFlux, Netty is used automatically:
+    <dependency>
+        <groupId>org.springframework.boot</groupId>
+        <artifactId>spring-boot-starter-webflux</artifactId>
+    </dependency>
+✔ No need to specify Netty explicitly.
+✔ Spring Boot excludes Tomcat and enables Netty automatically.
 
 
 
@@ -198,6 +353,7 @@ How Spring Boot Auto-Configuration Works?
 6) Hibernate caching.
 7) How to provide security to a REST Api?
 8) How to provide security to angular app ?
+
 
 
 #Seirion Software Engineer | Ahsanullah University 
@@ -232,11 +388,7 @@ Problem solving
 Java basics
 SQL basics
 JavaScript basics
-
-expire on 25 Dec 2024 11:59 PM +06 (Asia - Dhaka). 90 mins from the time you start.
-
-
-
+90 mins from the time you start.
 
 Basic programming, analytical, testing and debugging questions 
 1. Find the duplicates elements among arrays. 
@@ -245,14 +397,10 @@ String right alignment ,
 Map Vector Tree related problems.You are asked to write the code for 
 right-aligning a text in a text-box.
 
-
-
 1. Reverse string ( input=abc, output=cba) 
 3. Check duplicate elements... etc Testing Question: 
 1. They will give a picture of a software and tell you to find the testing features 
 2. Finding errors from code
-
-
 
  (1) Write a function that will receive a string as an input and will return the string in reverse order. 
  (2) Write a function that will print the following series of numbers using only one loop: "1,2,3,4,5,6,7,8,9,10,9,8,7,6,5,4,3,2,1" 
@@ -261,27 +409,26 @@ right-aligning a text in a text-box.
 4. print multiples of 3 from 200 to 1 etc coding test : give a window size .
 
  
-1. there is some basic questions from math like simple probability finding, finding age of father from son's age, angle finding, perimeter, circle related problem. very easy questions. it may have 1-2 mcq. 2. Then there is coding questions. first questions will be - what are the basic concepts of OOP and write a code to implement them. after this there will be some coding problem- like string reverse etc. 
+1. there is some basic questions from math like simple probability finding, 
+finding age of father from son's age, angle finding, perimeter, 
+circle related problem. very easy questions. it may have 1-2 mcq. 
+2. Then there is coding questions. first questions will be - what are the basic concepts of OOP and write a code to implement them. 
+after this there will be some coding problem- like string reverse etc. 
 
 sql queries:
 	find the max, 2nd max salary, swap two columns of two table etc. 
-	
-	practice some query. it may have 1-2 mcq. 4. then there will be questions from QA. like difference among white,black, gray box testing. 
-	then there will be picture find out diff in those pictures, then there will be some scenario - you have to write how will you test it or how you will you improve it. 
+	practice some query. it may have 1-2 mcq. 4. then there will be questions from QA. like difference 
+    among white,black, gray box testing. 
+	then there will be picture find out diff in those pictures, then there will be some scenario - 
+    you have to write how will you test it or how you will you improve it. 
 	very easy questions. write as your wish. last questions will be what is your most memorable achievement,
- 
- 
  Write code of 1st 100 Prime number series, Fibonnaci series. Testing related questions.
  
  
-
-
-
 =================================================================
 ##javaScript
 =================================================================
 https://builtin.com/software-engineering-perspectives/javascript-interview-questions
-
 
 
 <html>
@@ -313,33 +460,18 @@ h2 {
 <button id="btn1">ClickMe</button>
 
 
-
 <script>
+    console.log("app ready=============");
+    const btn1 = document.getElementById("btn1");
+    const p2 = document.getElementById("p2id");
 
-console.log("app ready=============");
-
-const btn1 = document.getElementById("btn1");
-const p2 = document.getElementById("p2id");
-
-
-btn1.addEventListener("click", function(){
-      var text = document.getElementById("inpid").value;
-      console.log(text);
-      document.getElementById("p2id").innerText=text;
-      
-      document.getElementById("p3id").innerHTML='<h1>'+text+'</h1>';
-});
-
-
-
+    btn1.addEventListener("click", function(){
+        var text = document.getElementById("inpid").value;
+        console.log(text);
+        document.getElementById("p2id").innerText=text;
+        document.getElementById("p3id").innerHTML='<h1>'+text+'</h1>';
+    });
 </script>
-</body>
-</html>
-
-
-
-
-
 
 Loop:
 ------------
@@ -353,8 +485,6 @@ for( let i=1; i<=19; i++){
     rsVal+=incCal;
     console.log(rsVal);
 }
-
-
 ----------
 
 let myArr = [2,3,3,4,5,5,6,7,7]
@@ -382,7 +512,6 @@ console.log(duplicates);
     
 
 
-
 =================================================================
 Mysql
 ==================================================================
@@ -391,6 +520,12 @@ select floor(avg(price)) from book
 select truncate(avg(price),3) from book
 select round(avg(price),2) from book
 
+
+truncate() then cuts off the decimal portion after 3 decimal places without rounding.
+floor() always rounds down, even if the decimal part is closer to the next whole number.
+It always results in a whole number (an integer).
+round() then rounds the average to 2 decimal places, using standard rounding rules.
+
 StringOps:
 select reverse(name) from book
 select lpad(name,100,"*") from book
@@ -398,17 +533,11 @@ select repeat(name,10) from book
 select LOCATE("g",name) from book
 select distinct type from book
 
-
-
-
-
 1) price is maximum:
 select max(price) as maxData from book;
 
 select * from book
 where price=(select max(price) from book)
-
-
 
 2)Find the Second Maximum Salary	
 select max(price) as maxData from book
@@ -440,28 +569,18 @@ group by depid
 select type, count(id), max(price) from book
 group by type
 
-
-
 SELECT type, GROUP_CONCAT(name SEPARATOR ', ') as names, COUNT(*) as count 
 FROM book 
 GROUP BY type;
 
-
-
-
 addColumn:
 ALTER TABLE std_tbl ADD COLUMN depid INT;
 alter table std_tbl add column dep int default 1;
-
 alter table std_tbl drop column depid2;
-
-
 
 Update:
 update std_tbl set dep=2 where id in (1,2,3)
 update std_tbl set dep=2 where id between 1 and 10 
-
-
 
 select * from std_tbl 
 where gender like 'M%'
@@ -474,99 +593,14 @@ SET
  depid=@temp
  where id =1
  
-
-
 UPDATE employees
 SET salary = salary * 1.10
 WHERE department = 'Sales';
 
 
-
-##sql - SQL basics
-=================================================================
-ROUND(): Rounds to the nearest value, based on the fractional part.
-TRUNCATE(): Removes the fractional part, without rounding.
-FLOOR(): Always rounds down to the nearest integer less than or equal to the number.
-
-
-
-SELECT LOWER(name) AS lowercase_name 
-FROM book;
-
-
-SELECT LENGTH(name) AS name_length 
-FROM book;
-
-
-SELECT REVERSE(name) AS reversed_name 
-FROM book;
-
-
-
-sedondLeargetvalue:
-------------------------
-select max(id) as secondLg from book
-where id<(select max(id) from book)
-
-select * from book
-order by id desc
-limit 1 offset 1;
-
-Leargest
-select max(id) as secondLg from book
-
-select * from book
-order by id desc
-limit 1;
-
-
-
-
-
-
 	
-select COUNTRY.Continent, floor(avg(CITY.Population))
-from city
-join country on
-CITY.CountryCode = COUNTRY.Code 
-group by COUNTRY.Continent
-
-
-
-select round(LONG_W, 4) from  station
-where lat_n=
-(select min(lat_n) from station where  lat_n>38.7780)
-
-
-
-
-select round((long_w), 4) from station
-where 
-    lat_n=
-    (select max(lat_n) from station where lat_n<137.2345)
-    
-    
-    
-
-select TRUNCATE(max(lat_n),4) as GreatestLatitude
-from station
-where lat_n<137.2345
-
-
-
-select round(sum(lat_n),4) from station
-where lat_n>38.7880 and lat_n<137.2345
-
-
-
-
-select floor(avg(population)) from city;
-
-
 
 SELECT * FROM Customers WHERE CustomerID IN (SELECT CustomerID FROM Orders);
-
-
 
 (SELECT CITY, LENGTH(CITY) AS CITY_LENGTH
  FROM STATION
@@ -584,34 +618,6 @@ UNION ALL
 
 
 
-select distinct city from station
-where 
-lower(left(city,1)) not in ('a', 'e', 'i', 'o', 'u')
-
-
-
-
-SELECT NAME
-FROM STUDENTS
-WHERE MARKS > [Marks]
-ORDER BY RIGHT(NAME, 3), ID ASC;
-
-
-
-select sum(population) from city
-where 
-district='California'
-
-
-
-
-BACKUP DATABASE testDB
-TO DISK = 'D:\backups\testDB.bak';
-
-
-
-
-
 Give some examples of common SQL commands of each type.
 	DDL: CREATE, ALTER TABLE, DROP, TRUNCATE, and ADD COLUMN
 	DML: UPDATE, DELETE, and INSERT
@@ -620,25 +626,11 @@ Give some examples of common SQL commands of each type.
 	DQL: – SELECT
 	 
 
-
-SELECT CONCAT(name, ' - ', department) AS employee_info
-FROM employees;
-
-
-
-
 13. What is the order of appearance of the common statements in the SELECT query?
 SELECT – FROM – JOIN – ON – WHERE – GROUP BY – HAVING – ORDER BY – LIMIT
 
 14. In which order the interpreter executes the common statements in the SELECT query?
 FROM – JOIN – ON – WHERE – GROUP BY – HAVING – SELECT – ORDER BY – LIMIT
-
-
-
-
-SELECT * FROM table_name
-WHERE MOD(ID_column, 2) = 0;
-
 
 
 
