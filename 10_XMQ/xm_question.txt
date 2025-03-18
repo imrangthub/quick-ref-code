@@ -655,8 +655,7 @@ Ans:
 
 2) Access Modifiers, Constructor, Object creation
 Ans:
-Access Modifiers
-Control the visibility of classes, fields, and methods:
+Access Modifiers: Control the visibility of classes, fields, and methods:
 Public: Accessible from anywhere.
 Private: Accessible only within the same class.
 Protected: Accessible within the same package and by subclasses.
@@ -667,7 +666,6 @@ Protected: Accessible within the same package and by subclasses.
         Parent.java class has a protected method: protected void displayMessage();
         Now a chile cllas in differenet package not able to accessa this displayMessage(); createing new object of Parent class
         But able to access with in Child class if Clild class extedn Prant class as:
-
          // Child class in package2
             package package2;
             import package1.Parent;
@@ -683,11 +681,14 @@ Protected: Accessible within the same package and by subclasses.
         // parent.displayMessage(); // Compilation error: displayMessage() is not accessible directly.
 Default (no modifier): Accessible within the same package.
 
-    Constructor
-        A special method used to initialize objects.
-        It has the same name as the class.
-        It has no return type.
-        Can be overloaded.
+Constructor:
+    A constructor is a special method in Java that is used to initialize objects when they are created.
+    It has the same name as the class.
+    It has no return type.
+    Can be overloaded.
+Called automatically when an object is created using new.
+Every Java class has a default constructor only if you don't define any constructor yourself.
+If you explicitly declare a constructor, Java does not create the default one.
 
 
 3) Java Record
@@ -713,16 +714,26 @@ Ans:
                 System.out.println(person); // Output: Person[name=Alice, age=30]
             }
         }
-
-
-    Limitations
-        Cannot extend other classes (records are implicitly final).
-        Cannot have mutable fields.
-        Designed only for data-carrying classes, not behavior-rich objects.
+Limitations of Records:
+    Cannot extend other classes (records are implicitly final).
+    Cannot have mutable fields.
+    Designed only for data-carrying classes, not behavior-rich objects.
 
 Enum vs Records:
-Use Records for immutable data structures with a focus on simplicity and reduced boilerplate.
-Use Enums for defining a fixed set of constants with optional, shared, or custom behavior.
+    Use Records for immutable data structures with a focus on simplicity and reduced boilerplate.
+    Use Enums for defining a fixed set of constants with optional, shared, or custom behavior.
+    Records Can have custom methods, but mainly used for data storage
+    Enum for Constant values (e.g., days of the week, statuses)
+    Records for Immutable data objects (e.g., DTOs, key-value pairs)
+
+When to Use What?
+    Use enum → When defining constant values (e.g., DAYS_OF_WEEK, USER_ROLE).
+    Use record → When you need immutable data objects with minimal boilerplate.
+
+What Does "Immutable Data Object" Mean?
+    An immutable data object is an object whose state (fields) cannot be changed after creation.
+    Once you set its values (via constructor), you cannot modify them.
+
 
 
 
@@ -745,8 +756,12 @@ Inheritance
 In Java, overloading can be broadly categorized into three types, each serving a specific purpose:
     1. Method Overloading
     2. Constructor Overloading
-    3. Operator Overloading (Limited to Built-in Operators)
-
+    3. Operator Overloading (Limited to Built-in Operators),Java does limited operator overloading, mainly with built-in types!
+        +	Numbers, Strings	5 + 10 = 15, "Hello" + "World" = "HelloWorld"
+        +=	Numbers, Strings	x += 5, "Java" += " Rocks!"
+        ==	Primitives (value), Objects (reference)	5 == 5 (true), new String("Hi") == new String("Hi") (false)
+        Other operators (like -, *, /, %, etc.) are NOT overloaded and only work with their specific data types.
+        Java does not allow custom operator overloading like C++ does!
 
 5) JavaString, StringBuilder, StringBuffer, TextBlock
 String:
@@ -791,7 +806,6 @@ Ans:
     StringLiterals:
         Strings created using double quotes ("") are stored in the String Pool,  is located in the heap memory.
         If a literal already exists in the pool, the same reference is returned.
-        Memory efficient.
         Example:
             String s1 = "Hello"; // Stored in String Pool
             String s2 = "Hello"; // Same reference as s1
@@ -907,7 +921,6 @@ Ans:
     Pass by reference
         The memory address of the variable is shared with the function argument. 
         This means that any changes made to the argument within the function will also affect the original variable.
-
 "In Java, everything is passed by value"
 
 Java is always pass by value, but for objects, the "value" passed is the reference to the same object. 
@@ -969,11 +982,52 @@ Example: Re-assigning Reference:
 
 12) Java Date & Time:
 Ans:
-    LocalDate, LocalTime, LocalDateTime (Java 8+)
+    Java 8 introduced a new java.time package for handling date & time efficiently with LocalDate, LocalTime, LocalDateTime,
+    ZonedDateTime (Date, Time & Timezone),Duration, Period and more.
     For working with date, time, and both.
     Format and parse with DateTimeFormatter.
     Instant for timestamps, Duration for time differences.
     Date and Calendar for older date handling(Legacy Classes)
+
+
+java.time package:
+------------------------------------------------------------
+| Class              | Purpose             | Example Output               |
+------------------------------------------------------------
+| LocalDate         | Date only           | 2025-03-18                   |
+------------------------------------------------------------
+| LocalTime         | Time only           | 14:30:10                     |
+------------------------------------------------------------
+| LocalDateTime     | Date & Time         | 2025-03-18T14:30:10          |
+------------------------------------------------------------
+| ZonedDateTime     | Date, Time & Timezone | 2025-03-18T14:30:10+06:00[Asia/Dhaka] |
+------------------------------------------------------------
+| Instant          | UTC Timestamp       | 2025-03-18T08:30:10Z         |
+------------------------------------------------------------
+| Duration         | Time Difference     | 2 hours                       |
+------------------------------------------------------------
+| Period           | Date Difference     | 25 years, 2 months            |
+------------------------------------------------------------
+| DateTimeFormatter | Formatting         | 2025/03/18 14:30:10           |
+------------------------------------------------------------
+
+Period (Date Difference)
+✅ Used for measuring days, months, years between dates
+
+Duration (Time Difference)
+✅ Used for measuring time differences (e.g., between two timestamps).
+
+DateTimeFormatter (Formatting & Parsing)
+✅ Converts LocalDateTime to String and vice versa.
+
+
+
+Multiple Inheritance ( Not Supported in Java for Classes)
+A class inherits from multiple parent classes.
+
+Multilevel Inheritance (Supported in Java)
+A class is inherited in a chain (hierarchical manner).
+
 
 
 
@@ -993,7 +1047,6 @@ Ans:
         It can have fields, constructors, and method implementations, unlike interfaces.
         A subclass of an abstract class must implement all the abstract methods unless it is also abstract.
         Abstract classes are typically used to represent "shared" functionality for a group of related classes.
-
     Enum
         An enum in Java is a special class that represents a group of constants (unchangeable variables).
         Enums are more powerful than simple constants because they can have fields, methods, and constructors.
@@ -1003,10 +1056,23 @@ Ans:
 Interface:
     Used to define a contract (behavior) that multiple classes can implement.
     Focuses on "what to do" rather than "how to do it."
+
+If you want to force multiple classes to have the same method signatures, use interfaces.
+Example: Different payment gateways (PayPal, Stripe) must implement processPayment().
+Java does not support multiple inheritance with classes, but a class can implement multiple interfaces.
+
 Abstract Class:
     Serves as a base class for other classes.
     Can define common functionality while leaving some methods abstract for subclasses to implemen
-
+You Need Partial Implementation (Some Methods Implemented)
+If a class has common behavior for all subclasses but also needs some abstract methods, use an abstract class.
+If you want to provide some common behavior while allowing subclasses to define certain methods.
+Example: All animals sleep, but their sound (makeSound()) differs.
+You Want to Use a Constructor
+Unlike interfaces, abstract classes can have constructors.
+You Want to Use Access Modifiers (private, protected, etc.)
+    Methods in interfaces are public by default.
+    Abstract classes allow private, protected, or public methods.
 
 
 
