@@ -1086,7 +1086,7 @@ Ans:
     When you override equals(), you must also override hashCode() to maintain consistency.
 
 hashCode:
-To maek unique key inseide HashMap object as key need override hash-code of thwi object.
+To maek unique key inseide HashMap object as key need override hash-code of the object.
 Overriding hashCode (along with equals) is critical for situations where you need to use custom objects as keys in 
 hash-based collections (like HashMap, HashSet, and Hashtable). 
 
@@ -1148,6 +1148,10 @@ LinkedList and different operations on collection.
 
 Ans:
 Java Collection Framework:
+The Java Collection Framework (JCF) is a set of classes and interfaces in Java that provide a standard way to store, 
+manipulate, and retrieve data efficiently. 
+It includes various List, Set, Queue, and Map implementations.
+
     The Java Collection Framework provides a set of interfaces and classes to handle groups of objects. 
     It is part of the java.util package and includes 
     three main types  interfaces, with concrete classes to handle groups of objects: List, Set, and Map.
@@ -1157,7 +1161,12 @@ ArrayList, LinkedList, HashSet, HashMap, and Hashtable are classes that implemen
 
         1. List
         What: Ordered, allows duplicates.
-        Example: ArrayList, LinkedList.
+        Example-class: 
+        ArrayList → Fast random access, but slow insert/delete in the middle.
+        LinkedList → Fast insert/delete, but slow random access.
+        Vector → Synchronized version of ArrayList.
+        Stack → Last-In-First-Out (LIFO) structure.
+
         List<String> list = new ArrayList<>();
         list.add("A");
         list.add("B");
@@ -1166,7 +1175,10 @@ Elements maintain insertion order.
 
         2. Set
         What: Unordered, no duplicates.
-        Example: HashSet.
+        Example: 
+            HashSet → Uses hashing, fast lookup (O(1) time on average).
+            LinkedHashSet → Maintains insertion order.
+            TreeSet → Maintains sorted order (uses Red-Black Tree).
         Set<String> set = new HashSet<>();
         set.add("A");
         set.add("B");
@@ -1176,7 +1188,11 @@ Use a TreeSet instead if you need sorted elements (natural order or custom Compa
 
         3. Map
         What: Key-value pairs, unique keys.
-        Example: HashMap.
+        Example: 
+        HashMap → Unordered, fast lookup (O(1) time complexity).
+        LinkedHashMap → Maintains insertion order.
+        TreeMap → Maintains sorted order (uses Red-Black Tree).
+
         Map<String, Integer> map = new HashMap<>();
         map.put("A", 1);
         map.put("B", 2);
@@ -1186,6 +1202,35 @@ Keys are unordered.
 For sorting, use TreeMap (sorted by keys in natural order or custom Comparator) or LinkedHashMap (preserves insertion order).
 
 
+
+Collection vs. Collections:
+Collection	Interface that represents a group of objects (List, Set, Queue).
+Collections	Utility class that provides helper methods like sort(), reverse(), etc.
+Example using Collections.sort():
+
+
+
+ArrayList → Fast Random Access, But Slow Insert/Delete in the Middle
+How It Works
+ArrayList is backed by a dynamic array (internally, an array of objects).
+Random access is fast (O(1)) because elements are stored in contiguous memory locations, allowing direct access via index (list.get(i)).
+Insertion/Deletion is slow (O(n)) when modifying elements in the middle because it requires shifting elements.
+
+LinkedList → Fast Insert/Delete, But Slow Random Access
+How It Works
+LinkedList is a doubly linked list, where each node contains:
+A data element.
+A pointer to the next node.
+A pointer to the previous node (for quick backward traversal).
+
+
+
+Does ArrayList Reduce Its Internal Size Automatically?
+No, the ArrayList does not shrink automatically when elements are removed.
+Internally, ArrayList maintains an underlying array that remains the same size until explicitly resized.
+Yes, this is memory inefficient because:
+ How to Reduce Memory Usage?
+You can manually trim the capacity of the ArrayList using trimToSize():
 
 
 
@@ -1209,12 +1254,14 @@ Internal Implementation of ArrayList
         it happens infrequently because the growth is exponential (doubling each time).
 
 When remove element of array call trimToSize  cos:
-alling trimToSize() ensures that the internal array's capacity matches the list's actual size, minimizing memory usage.
+clling trimToSize() ensures that the internal array's capacity matches the list's actual size, minimizing memory usage.
 
 
 
 18) How HashMap works internally and how to minimize hash collision?
-Ans:
+Ans:HashMap stores key-value pairs using an array of buckets (or "bins") and handles collisions 
+(multiple keys mapping to the same bucket) using linked lists and, in Java 8 and later, potentially red-black trees. 
+
 Summary of How HashMap Works:
     Uses an array of buckets to store key-value pairs.
     Keys are hashed to determine the bucket index.
@@ -1242,6 +1289,25 @@ Sorting a Set
 Comparing Java Custom Objects:
     To sort custom objects, you need to define how two objects are compared. 
     You can achieve this through Comparable or Comparator interfaces.
+
+
+Java is used to sort elements in a list. It relies on either:
+The natural ordering of the elements (if the elements implement the Comparable interface).
+A custom ordering provided by a Comparator.
+
+
+Comparable & Comparator Interfaces in Java
+------------------------------------------------
+Comparable<T> (Natural Ordering)
+    Used for default sorting order.
+    Defines sorting logic inside the class using compareTo().
+    A class implementing Comparable can have only one sorting logic.
+
+
+Comparator<T> (Custom Ordering)
+Used for multiple sorting options.
+Sorting logic is defined outside the class using compare().
+A class can have multiple comparators for different sorting rules.
 
 
 a) Comparable Interface:
@@ -1310,9 +1376,6 @@ This is why String objects work efficiently as keys in hash-based collections li
 ensuring proper hash-based behavior.
 
 
-Java is used to sort elements in a list. It relies on either:
-The natural ordering of the elements (if the elements implement the Comparable interface).
-A custom ordering provided by a Comparator.
 
 Sorting a List of Numbers:
     When sorting a list of numbers, the natural ordering is used (ascending order). 
@@ -1377,6 +1440,9 @@ Examples include Predicate, Function, Consumer, etc.
             // Output: 2, 4
         }
     }
+
+
+
 Built-in Functional Interfaces:
     Java provides several built-in functional interfaces that are commonly used:
 
@@ -1451,6 +1517,28 @@ Where to Use Functional Programming?
     Operations: filter, map, reduce, sorted, distinct, etc.
     Immutability: Avoid modifying existing objects.
 
+
+✅ Lambda Expressions → Shorter, cleaner code for functional interfaces.
+✅ Functional Interfaces → Allow passing behavior as arguments.
+✅ Stream API provides efficient collection processing using functional interfaces like Predicate, Function, Consumer
+
+✅ Lambda expressions work only with Functional Interfaces because they require a single abstract method (SAM) to implement.
+✅ If an interface has multiple abstract methods, Java won’t allow using a Lambda Expression.
+A Functional Interface is an interface that has exactly one abstract method but can have multiple default or static methods.
+
+example:
+    public class Main {
+        public static void main(String[] args) {
+            List<String> names = Arrays.asList("Alice", "Bob", "Charlie", "David");
+
+            // Functional Interface: Predicate (Used in filter)
+            Predicate<String> startsWithA = name -> name.startsWith("A");
+
+            names.stream()
+                .filter(startsWithA) // Uses Predicate Functional Interface
+                .forEach(System.out::println); // Uses Consumer Functional Interface
+        }
+    }
 
 
 21) Stream API - terminal operations, non terminal operations, Pure Function, Higher Order Funciton, 
@@ -1527,6 +1615,10 @@ Difference Between Function and Closure:
 - Functions are declared using the func keyword, while closures don't require it.
 - Functions always have a name, whereas closures don't necessarily need one.
 - Functions don't use the in keyword, while closures use it to separate the return type and statements inside.
+
+
+Java supports closure-like behavior using Lambda Expressions and Anonymous Classes, 
+but it does not fully support closures like JavaScript or Python. and has some Limitations.
 
 
 
@@ -1836,7 +1928,7 @@ Runnable vs Thread, Thread Lifecycle, Thread Signaling, Thread Join, Volatile ke
         Blocked/Waiting: Paused, waiting for resources/signals.
         Terminated: Execution completed.
 
-
+Virtual Threads are lightweight, user-mode threads introduced in Java 19 (preview) and finalized in Java 21 as part of Project Loom.
 Java Virtual Threads (Project Loom):
     Traditional Threads:
         Java's standard Thread is mapped to an operating system thread.
