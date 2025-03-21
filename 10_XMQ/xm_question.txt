@@ -2476,6 +2476,7 @@ Annotation Processors are tools that can read annotations and generate additiona
 
 Types of Annotations:
     Built-in Annotations: Examples include @Override, @Deprecated, @SuppressWarnings.
+    
     Custom Annotations: You can define your own annotations to add metadata specific to your project.
         @interface MyCustomAnnotation {
             String value() default "defaultValue";
@@ -2572,9 +2573,13 @@ Use NIO for high-performance, multi-threaded applications.
 
 
 
-
+==================================================
 ##Framework & Web	| sec2
 ==================================================
+
+Spring Boot is geared towards a microservices environment. 
+It’s a “convention over configuration” environment that’s designed for creating stand-alone, production-grade applications.  
+
 
 1) What is spring bean ?
 Ans:
@@ -2643,7 +2648,7 @@ public class MyBean {
 }
 
 Java-based Configuration:
-Use @Configuration and @Bean annotations in a configuration class.
+Use @Configuration, and @Bean annotations in a configuration class.
 @Configuration
 public class AppConfig {
     @Bean
@@ -2911,9 +2916,10 @@ Overriding @Primary with @Qualifier:
     handling incoming requests and routing them to appropriate controllers.
 
     ServletFilters: Used to process requests and responses (e.g., logging, authentication) before or after they reach a servlet.
-    Servlet Listeners: Listen for specific events in the servlet container, such as context or session creation/destruction, to perform necessary actions.
+    Servlet Listeners: Listen for specific events in the servlet container, such as context or session creation/destruction, 
+    to perform necessary actions.
 
-HttpRequest processing:
+HttpRequest processing-flow:
 ---------------------------------------------
     Request Reception:
     A user sends an HTTP request to the web server (e.g., GET /home).
@@ -2974,9 +2980,9 @@ Basic Concepts:
     Permissions: A permission represents the actual rights a user has to access certain resources or perform specific actions.
         Example: READ_PRIVILEGE, WRITE_PRIVILEGE.
 
-You can use annotations like @PreAuthorize or @Secured to protect methods based on roles or permissions.
-@PreAuthorize is more flexible and allows you to use SpEL (Spring Expression Language) for more complex authorization rules.
-@Secured is simpler and restricts method access to users with the specified role.
+    You can use annotations like @PreAuthorize or @Secured to protect methods based on roles or permissions.
+    @PreAuthorize is more flexible and allows you to use SpEL (Spring Expression Language) for more complex authorization rules.
+    @Secured is simpler and restricts method access to users with the specified role.
 
 Roles are broad categories that group permissions.
 Permissions are granular rights that control access to specific resources.
@@ -3226,6 +3232,31 @@ JUnit Jupiter is the foundation of JUnit 5 and is designed to be more extensible
 
 
 
+Spring vs. Spring Boot
+A comprehensive framework for Java EE development. 
+It provides a lot of powerful features like dependency injection (DI), AOP, and transaction management, 
+but it requires manual configuration for things like setting up a web server, database connections, and security.
+
+Spring Boot, on the other hand,  a specialized extension of Spring that simplifies Spring application development.
+It comes with auto-configuration, embedded servers (like Tomcat), and a lot of defaults configuration 
+what is let you start coding right away without worrying about a lot of setup.
+Eliminates boilerplate code and XML configuration, enabling faster development.
+
+Key Differences:
+If you're building a microservice or a REST API, applications needing rapid development and deployment then 
+Spring Boot is usually the better choice because it reduces  boilerplate code and speeds up development.
+
+For large enterprise applications that need fine-tuned configurations, you might still prefer plain Spring.
+
+My Experience
+In my experience, Spring Boot has been a game changer for developing microservices and REST APIs. 
+The auto-configuration, embedded servers, and starter dependencies save a lot of time. 
+But if you need custom configurations, especially in large monolithic applications, plain Spring can still be a good option.
+
+
+
+
+
 
 
 
@@ -3288,12 +3319,12 @@ Tomcat as a Lightweight Application Server:
     Although Tomcat is primarily a servlet container, it can act as an application server by providing some 
     basic application-level features:
 
-Java EE Component Support (Partial):
-    Supports key components like:
-    Servlets
-    JSPs
-    WebSocket APIs
-    Does not support full Java EE features like EJBs, JCA (Java Connector Architecture), or JPA out of the box.
+    Java EE Component Support (Partial):
+        Supports key components like:
+        Servlets
+        JSPs
+        WebSocket APIs
+        Does not support full Java EE features like EJBs, JCA (Java Connector Architecture), or JPA out of the box.
 
 
 Summary:
@@ -3302,6 +3333,90 @@ Summary:
     Tomcat sends the processed response back to the client.
     By combining Tomcat and Spring, you're effectively using Tomcat as a servlet container while 
     relying on Spring to act as the "application server" for advanced logic and application features.
+
+
+
+Complete request: Flow in Diagram
+
+Client (Browser/Postman)  
+       │  
+       ▼  
+[Optional] Web Server (Nginx/Apache)  
+       │  
+       ▼  
+Embedded Servlet Container (Tomcat)  
+       │  
+       ▼  
+Spring DispatcherServlet  
+       │  
+       ▼  
+Handler Mapping → Resolved Controller  
+       │  
+       ▼  
+Controller → Calls Service (Business Logic)  
+       │  
+       ▼  
+[Optional] Service Calls Repository (Database)  
+       │  
+       ▼  
+Database (H2, MySQL, PostgreSQL)  
+       │  
+       ▼  
+Response sent back through the same path  
+
+
+Spring Boot has an embedded servlet container (Tomcat, Jetty, or Undertow) that acts as both a web server and a lightweight application server.
+It directly processes HTTP requests and serves responses.
+
+You only need a full application server (e.g., JBoss, WebLogic) if:
+    You are using Java EE features like EJB, JMS, JTA, and EAR packaging.
+    Your organization enforces deploying WAR files inside an existing Java EE server.
+For Spring Boot applications, this is unnecessary because:
+    Spring Boot does not rely on full Java EE stacks.
+
+
+What Happens When You Build a WAR File and Deploy It in an External Tomcat Server?
+The request flow (Tomcat → DispatcherServlet → Controller → Response) is the same in both setups.
+✔ The only difference is whether Tomcat is embedded in the JAR (self-contained) or running externally (shared server for multiple apps).
+the request flow remains the same in both embedded Tomcat (Spring Boot JAR) and external Tomcat (WAR deployment), 
+but with some minor differences in where the request is processed.
+
+
+How Does External Tomcat Manage Multiple Applications on the Same Port?
+    When using an external Tomcat, all applications run on the same port (e.g., 8080), 
+    but Tomcat distinguishes between them using context paths.
+    Each deployed WAR file is assigned a unique context path, allowing multiple applications to coexist on a single port.
+
+Context Path Mechanism in Extranal Tomcat:
+    Each application in Tomcat has a context path based on its WAR file name.
+    If you deploy:
+        app1.war → Access at http://host-ip:8080/app1/
+        app2.war → Access at http://host-ip:8080/app2/
+    Tomcat routes requests to the correct application based on the context path.
+
+So, Where is Servlet Used?
+    Servlets still exist and work in Spring Boot.
+        ✔ DispatcherServlet is a special Servlet that acts as the front controller in Spring.
+        ✔ Tomcat processes requests using the Servlet API before Spring takes over.
+
+Relationship Between Servlet and DispatcherServlet in Spring Boot:
+🔹 Servlet API in Tomcat
+    Tomcat is a Servlet container, meaning it can execute Java Servlets.
+    When a request comes in, Tomcat creates an instance of a Servlet and calls its service() method.
+🔹 DispatcherServlet in Spring Boot
+    DispatcherServlet is a specialized Servlet provided by Spring.
+    It acts as the front controller in the Spring MVC framework.
+    It extends HttpServlet and is registered as a Servlet in Tomcat
+    DispatcherServlet Takes Over
+        DispatcherServlet is a Servlet itself (extends HttpServlet).
+        It processes the request using the Spring MVC flow.
+        DispatcherServlet itself is a Servlet (it extends HttpServlet).
+        It runs inside Tomcat like any other Servlet.
+
+DispatcherServlet does not replace raw Servlets (HttpServlet) but wraps and extends their functionality.
+In a Spring Boot application running inside Tomcat, DispatcherServlet acts as the main entry point for handling HTTP requests, 
+but it still runs on top of Tomcat’s standard Servlet mechanism.
+Tomcat still relies on Servlets to handle requests, but Spring hides that complexity for you.
 
 
 
@@ -3556,7 +3671,8 @@ In server.xml, define an Executor to manage threads across multiple connectors:
           minSpareThreads="25"/>
 
 3. Enabling HTTP Response Compression
-HTTP Response Compression reduces the size of the response sent from Tomcat to clients, improving performance, especially for text-based content.
+HTTP Response Compression reduces the size of the response sent from Tomcat to clients, 
+improving performance, especially for text-based content.
 To enable compression, modify the HTTP Connector in server.xml:
 <Connector port="8080" protocol="HTTP/1.1" 
            compression="on" 
@@ -3637,7 +3753,8 @@ stream {
 L7 Load Balancing (Layer 7 - Application Layer): 
 Used for: HTTP(S) traffic (web applications, APIs, etc.).
 Works at: The Application Layer (Layer 7) of the OSI model.
-How it works: Nginx performs load balancing by inspecting the content of HTTP requests (e.g., URL path, headers, cookies) and can make decisions based on this data.
+How it works: Nginx performs load balancing by inspecting the content of HTTP requests (e.g., URL path, headers, cookies) 
+and can make decisions based on this data.
 For example, Nginx can route HTTP traffic to different backend servers depending on the URL path or use advanced features like SSL termination, cookie-based session persistence, etc.
 
 
@@ -4196,6 +4313,8 @@ URL vs URI
     All URLs are URIs, but not all URIs are URLs.
 
 URL Encoding:
+URL Encoding is a process of converting characters into a format that is safe to transmit in a URL.
+It replaces special characters with % followed by a hexadecimal value.
     Purpose: Encodes characters in a URL to ensure they are transmitted safely over the internet.
     Use Cases:
     Encoding query parameters: https://example.com/search?q=hello%20world.
@@ -4950,6 +5069,12 @@ N+1 Problem in ORM:
     Occurs when multiple database queries are executed unnecessarily, especially when loading related entities.
     Solution: Use JOIN FETCH or Eager loading to optimize.
 
+The N+1 problem occurs when an ORM (like Hibernate, JPA) makes one query for the main entity (1 query) and then 
+N additional queries for related entities (N queries), leading to (N+1) queries instead of 1 optimized query.
+
+How to fixed this issue and Best Practice: Use JOIN FETCH for immediate fixes, @BatchSize for batching, 
+and @EntityGraph for flexible fetching!
+
 
 20) Writing Native Query in Spring Data Jpa
 Ans:
@@ -5353,6 +5478,8 @@ Contains essential system binary executables (e.g., ls, cp).
 Etc Directory (/etc):
 Contains system configuration files.
 
+ /opt directory in Linux is used for optional, third-party, or manually installed software that is not part of the default system packages.
+
 Var Directory (/var):
 Stores variable files, such as logs and databases.
 
@@ -5539,7 +5666,8 @@ A distributed system consists of multiple interconnected components that communi
 Communication between these components is vital for the system's functionality. 
 There are several types of communication patterns in distributed systems:
     Request-Reply: A component sends a request to another, which processes it and replies with a response.
-    Publish-Subscribe: Components (publishers) send messages to a topic or channel, and interested subscribers receive those messages asynchronously.
+    Publish-Subscribe: Components (publishers) send messages to a topic or channel, and interested subscribers 
+                       receive those messages asynchronously.
     Message Queues: A producer sends messages to a queue, and a consumer reads and processes them at its own pace.
     Broadcast: A message is sent to all components in the network, and all of them process the message.
     Peer-to-Peer: Each component in the system can act as both a client and a server, allowing direct communication between peers.
