@@ -1806,6 +1806,38 @@ In nginx.conf file under http{} Block:
 
 
 
+proxy pass with match url
+-------------------------------------
+server {
+    listen 8080;
+    # Match any request starting with /customer-information/vas/rbt/rrbt/, any thing after this part of url will ignore.
+    location ^~ /customer-information/vas/rbt/rrbt/ {
+        default_type application/json;
+        return 200 '{"msg":"I am ok"}';
+    }
+
+    location /customer-information/ {
+        proxy_pass http://192.168.254.122:7272;
+        proxy_http_version 1.1;
+        proxy_set_header Host $host:$server_port;
+        proxy_set_header X-Forwarded-Host $server_name;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Request-ID $request_id;
+        proxy_set_header Upgrade $http_upgrade;
+        proxy_set_header Connection "upgrade";
+    }
+}
+
+
+For Exact match (=) for the RBT API:
+  location = /customer-information/vas/rbt/rrbt/subscription-status {
+      return 200 '{"status": "success", "message": "Hardcoded response from Nginx"}';
+      add_header Content-Type application/json;
+  }
+
+
+
 
 
 Windows CMD
