@@ -193,6 +193,28 @@ SELECT @@hostname, @@port;
 proxy identify
 
 
+host check | connection check
+----------------------------------
+SELECT @@hostname, @@port;
+
+
+SELECT 
+    COUNT(*) AS total_connections,
+    SUM(CASE WHEN command = 'Sleep' THEN 1 ELSE 0 END) AS idle_connections,
+    SUM(CASE WHEN command != 'Sleep' THEN 1 ELSE 0 END) AS active_connections
+FROM INFORMATION_SCHEMA.PROCESSLIST 
+WHERE USER = 'apihub';
+
+
+SELECT id, user, host, time, state 
+FROM information_schema.processlist 
+WHERE command = 'Sleep';
+
+
+SET SQL_SAFE_UPDATES = 0;
+delete  FROM apihub.otp_service
+where otp_msisdn = '01916894486';
+SET SQL_SAFE_UPDATES = 1;
 
 =================================================
 #              DOCKER                                          
