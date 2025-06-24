@@ -1850,13 +1850,24 @@ identify its leadership term. This epoch helps other brokers recognize the curre
 
 
 ✅ What Happens When 1 Node Fails in a 3-Node ZooKeeper Cluster
-  Quorum Maintained: ZooKeeper requires a majority of nodes (more than half) to be operational. In a 3-node cluster, this means at least 2 nodes must be up. With one node down, the remaining two still form a majority, so the ensemble remains functional.​
+  Quorum Maintained: ZooKeeper requires a majority of nodes (more than half) to be operational. 
+  In a 3-node cluster, this means at least 2 nodes must be up. With one node down, the remaining two still form a majority, so the ensemble remains functional.​
 
   No Service Disruption: Clients can continue to perform both read and write operations without any interruption.​
 
   Automatic Leader Re-election: If the failed node was the leader, the remaining nodes will automatically elect a new leader to maintain cluster coordination.​
 
   No Manual Intervention Needed: The system handles the failure gracefully without requiring any manual recovery steps.
+
+
+
+
+
+Key Points to Remember:
+  ZooKeeper	Requires quorum (majority) = 2 out of 3 nodes
+  Kafka Controller	Elected by ZooKeeper and runs on one broker
+  Partition Leader	Chosen by Controller from ISR (in-sync replica) list
+  Kafka Cluster	Can survive if ZooKeeper quorum is available and Controller is alive
 
 
 
@@ -1871,7 +1882,8 @@ Importance of ZooKeeper Quorum:
 
   Kafka Controller Election: The Kafka controller, responsible for managing partition leadership and metadata, is elected through coordination with ZooKeeper.​
 
-  Partition Leader Election: ZooKeeper helps in electing partition leaders, ensuring that each partition has a leader broker for handling read and write operations.​
+  Partition Leader Election: ZooKeeper helps in electing partition leaders, ensuring that each partition has a leader broker for handling 
+  read and write operations.​
 
 
 
@@ -1918,16 +1930,16 @@ Topics:
   A topic is similar to a folder in a filesystem, and the events are the files in that folder. 
   Events are save in durably stored in Kafka, they can be read as many times and by as many consumers as you want. 
 
-Here's an example event:
-  Event key: "Alice"
-  Event value: "Made a payment of $200 to Bob"
-  Event timestamp: "Jun. 25, 2020 at 2:06 p.m."
+  Here's an example event:
+    Event key: "Alice"
+    Event value: "Made a payment of $200 to Bob"
+    Event timestamp: "Jun. 25, 2020 at 2:06 p.m."
 
-Topics in Kafka are always multi-producer and multi-subscriber: a topic can have zero, one, or many producers that write events to it, 
-as well as zero, one, or many consumers that subscribe to these events
-unlike traditional messaging systems, events are not deleted after consumption. 
-Instead, you define for how long Kafka should retain your events through a per-topic configuration setting, 
-after which old events will be discarded. 
+  Topics in Kafka are always multi-producer and multi-subscriber: a topic can have zero, one, or many producers that write events to it, 
+  as well as zero, one, or many consumers that subscribe to these events
+  unlike traditional messaging systems, events are not deleted after consumption. 
+  Instead, you define for how long Kafka should retain your events through a per-topic configuration setting, 
+  after which old events will be discarded. 
 
 
 
