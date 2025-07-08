@@ -455,10 +455,13 @@ You’ll see that the container with the ID you just removed is no longer listed
 
 11:30
 =====================
-However, the Docker images are still there.
+However, The Docker images are still there.
 
-An image is like a class in programming—it's a read-only template.
-A container is like an object, a running instance of an image.
+Think of an image like a blueprint — it's a read-only template.
+A container is like a copy of that blueprint — it's a running instance of an image.
+
+If you're a programmer:
+An image is like a class, and a container is like an object.
 
 
 
@@ -466,8 +469,9 @@ You can run multiple containers from the same image.
 
 Now, let’s run a new container from the NGINX image and give it a custom name:
 docker run -d -p 8181:80 --name ng-cont1 nginx
--d → Runs the container in detached mode (background).
--p 8181:80 → Maps port 8181 on the host to port 80 in the container.
+
+-d              → Runs the container in detached mode (background).
+-p 8181:80      → Maps port 8181 on the host to port 80 in the container.
 --name ng-cont1 → Assigns a custom name instead of a random one.
 
 
@@ -475,31 +479,28 @@ Check the running container for DeskTop and using command line
 =>docker ps
 
 
-
-Again:
 Running Another Container from the Same Image
-Now, let’s start another container using the same image:
+Now, let’s run one more container using the same image:
+
+Let me try using a wrong image name that doesn't exist.
+Docker won't be able to run the command properly because there's no such image locally or online.
+That's why it will fail.
+
+Also:
+If the port is already in use, you need to choose a different one.
+If you try to use a container name that already exists, Docker will show an error.
 
 
-Let me try with a wrong image name what is not exist, and yes docker will not able to run the command properly
-because the nmae we use here no image existing in local or online with this image name.
-so this why its will faild.
-
-
-
-If the port is already in use, you must choose a different one.
-If you try to use a name that already exists, Docker will show an error.
-
-If you get an error, you can either:
+If you get an error, you can do one of two things:
     Delete the previous container:
     docker rm ng-cont1
-    OR Use a different container name, like:
-docker run -d -p 8082:80 --name ng-cont3 nginx
+
+    Or use a different name, like:
+    docker run -d -p 8082:80 --name ng-cont3 nginx
 
 Now, both ng-cont2 and ng-cont3 are running.
-Check this using docker ps.
-
-
+Check this using:
+docker ps
 
 
 
@@ -507,7 +508,7 @@ Check this using docker ps.
 16:40
 =======================
 
-Here is a interesting fact i am going to sared: 
+Here’s an interesting fact I’m going to share:
 
 let's say, you need multiple NGINX instances on your machine:so..
 Without Docker (Traditional Way)
@@ -537,6 +538,7 @@ That’s why Docker is a game changer in software deployment!
 
 
 
+
 17:50
 =====================
 Docker containers run in an isolated environment, meaning:
@@ -550,13 +552,11 @@ As long as the host machine has Docker Engine running, multiple containers
 
 
 
-In this video, we won’t dive deep into Docker's internal architecture just yet, but don’t worry!
-We’ll explore how Docker manages containers in more detail in the Docker In-Depth Section.
+In this video, we won’t go deep into Docker’s internal architecture — not yet!
+Don’t worry, we’ll cover that later in the Docker In-Depth section.
 
-
-Right now, we’ll keep our focus on the basic Docker commands to get you 
-comfortable with docker.
-
+For now, let’s focus on the basic Docker commands
+to help you get comfortable using Docker.
 
 
 
@@ -565,40 +565,42 @@ comfortable with docker.
 ===========================
 Docker Exec Command: 
 
-The docker exec command allows you to enter a running container and execute operations inside it. 
-This is super helpful for tasks like:
-✔ Installing packages
-✔ Updating files
-✔ Modifying configurations (e.g., updating NGINX pages)
-
-
+The docker exec command lets you go inside a running container and run commands there.
+    It’s super helpful for things like:
+    ✔ Installing packages
+    ✔ Updating files
+    ✔ Changing configs (like editing NGINX pages)
 
 
 
 To interact with a container, we use the -it flag, which stands for:
     i: Interactive mode
-    t: Terminal, so we get a terminal session inside the container
+    t: Terminal, so we get a terminal session inside the container.
 
 
-,
-Now
-We’re going to change the default NGINX page, let me check our running continer status.
-We have three continer running with 3 different port.
+
+Now,
+We’re going to change the default NGINX page.
+First, let’s check the status of our running containers.
+We have three containers running, each on a different port.
 
 
-Now lets chnge the ng-cont3 Nginx server default page,
-Enter the container using the docker exec command.
+Now, let’s change the default page of the ng-cont3 NGINX server.
 
-=>docker exec -it contID the a argument
-we cna use sh or bash for argument to run,
-We will describe about this command and argument and how work it in details leter viewo.
+First, enter the container using the docker exec command:
 
+docker exec -it contId bash
+You can use sh or bash as the argument to open a shell inside the container.
+ 
+Don’t worry — we’ll explain this command, its arguments, and how it works in detail in a later video.
 
 Now we are inside the contienr
-lets some basic thing.
 
-as we use nginx image to run all those contienr ner so all container internal same, let me check another one.
-I am doing ageing, docker exec command and inside it.
+
+Since we used the same NGINX image for all those containers, their inside is the same.
+Let me check another one.
+I’m using the docker exec command again to go inside a different container.
+
 
 We know that the container is running with a minimal Linux distribution, 
 so many of the packages like vi or nano might be missing.
@@ -609,7 +611,7 @@ Let me update thei defautl nginx page.
 Check it aggain.
 The update is done.
 
-If you refresh your browser, you’ll see the updated NGINX homepage! 
+If you refresh your browser, you’ll see the updated NGINX default welcome pag! 
 
 
 
@@ -617,13 +619,14 @@ If you refresh your browser, you’ll see the updated NGINX homepage!
 25:50
 ===============
 Now we explore How to Check Container Logs:
-When a container is running an application, it often produces logs. 
+When a container runs an application, it often produces logs. 
 You can easily view these logs using the docker logs command. 
 
 Find the Container ID – First, check the container ID by running the command:
 docker ps
 Use the Docker Logs Command:
 docker logs <container_id>
+
 
 
 
@@ -639,11 +642,13 @@ Docker networks allow containers to communicate with each other.
 for multi-container applications.
 
 "We'll cover Docker networks in more detail in a dedicated section, 
-so don't worry if it's not clear yet!"
+so don't worry for now.
 
 
-We can see more datails about a contienr include netwrok using 
+We can see more datails about a contienr include netwrok using: docker inspect  command
 =>docker inspect contId
+
+
 
 
 
@@ -659,7 +664,8 @@ Since we haven't created any volumes yet, this command won’t show any volumes 
 
 dockr login/logout To push images to Docker Hub (Docker's cloud registry), you need to log in first:
 
-Prune Unused Images:
+
+=>docker Prune
 You can remove unused images using the following command to clean up your system:
 
 
@@ -675,8 +681,13 @@ To upload an image to Docker Hub, you use the docker push command. Make sure you
 
 
 
-In the next video, we'll explore Docker's internal architecture in greater detail, 
-including how Docker manages containers, images, networks, and volumes.
+In the next video, we’ll explore Docker’s internal architecture in detail,
+including how it manages containers, images, networks, volumes, and more.
+
+
+
+
+
 
 
 
