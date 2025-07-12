@@ -396,9 +396,6 @@ Command – The default command used to run the container
 Now, let’s run the NGINX container and check its status in the command line.
 To start the container, we use:
 =>docker run -d -p 8080:80 nginx
-The -d flag runs the container in detached mode (in the background).
-The -p  maps port 8080 on our host machine to port 80 inside the container.
-
 
 Now let’s check again using docker ps.
 Yes, we can see the Nginx container we just ran.
@@ -410,7 +407,7 @@ Now, let's give a custom name to the container:
 By default, Docker assigns random names to containers.
 If you want to set a custom name, you can use the --name option:
 =>docker run -d -p 8080:80 --name my-ng1 nginx
--d is for detached mode, -p is for port mapping, and I give it the name my-ng1
+-d is for detached mode, -p is for port mapping, and I give it the name my-ng1    (I name it 'msx')
 
 
 
@@ -436,6 +433,7 @@ This will give the list of all containers.
 =================
 Now let’s see how to stop a container.
 To stop a container, you need the targeted Container ID or name
+
 First, run:
 docker ps
 This will show the list of running containers.
@@ -444,7 +442,7 @@ Next, copy the Container ID or Name, then run:
 docker stop <container_id_or_name>
 
 
-Now, let’s check it again using docker ps, and you will  the container is goon.
+Now, let’s check it again using docker ps, and you will see that the container is gone.
 
 
 docker ps -a
@@ -458,7 +456,7 @@ You don’t need to type the full Container ID, just a few characters are enough
 
 Now, check again with:
 docker ps -a
-You'll see that the container with the ID you just removed is no longer here.
+You'll see that the container we just removed is no longer here.
 
 
 
@@ -469,11 +467,16 @@ You'll see that the container with the ID you just removed is no longer here.
 =====================
 However, The Docker images are still there.
 
+
+In Docker, containers and images are completely different — they are very different things  and separate entities.
+
+
 Think of an image like a blueprint — it's a read-only template.
 A container is like a copy of that blueprint — it's a running instance of an image.
 
-If you're a programmer:
-An image is like a class, and a container is like an object of the class.
+
+If you're a programmer, think of it like this: 
+an image is like a class, and a container is like an object created from that class.
 
 
 You can run multiple containers from the same image.
@@ -482,9 +485,7 @@ You can run multiple containers from the same image.
 Now, let’s run a new container from the NGINX image and give it a custom name:
 docker run -d -p 8181:80 --name ng-cont1 nginx
 
--d              → Runs the container in detached mode (background).
--p 8181:80      → Maps port 8181 on the host to port 80 in the container.
---name ng-cont1 → I give it the name ng-cont1
+ I give it the name ng-cont1
 
 
 
@@ -499,6 +500,8 @@ Now, let’s run one more container using the same image:
 Let me check another thing. What happend if we use a wrong image name...
 
 Let me try using a wrong image name that doesn't exist.
+
+
 Docker won't be able to run the command properly because there's no such image locally or online.
 That's why it will fail.
 
@@ -507,12 +510,16 @@ If the port is already in use, you need to choose a different one.
 If you try to use a container name that already exists, Docker will show an error.
 
 
-If you get an error, you can do one of two things:
+If you get this kind of error, you can either:
     Delete the previous container:
     docker rm ng-cont1
 
-    Or use a different name, like:
+    Or 
+    
+    Choose a different name, like:
     docker run -d -p 8082:80 --name ng-cont3 nginx
+
+
 
 Now, both ng-cont2 and ng-cont3 are running.
 Check this using:
@@ -623,6 +630,7 @@ so many of the packages like vi or nano might be missing.
 
 So here I am using: cat and echo to interact with the container.
 
+
 Let me find and update the defautl nginx page.
 Check it aggain.
 The update is done.
@@ -635,7 +643,7 @@ If you refresh your browser, you’ll see the updated NGINX default welcome pag!
 25:50
 ===============
 Now we explore How to Check Container Logs:
-When a container runs an application, it often produces logs. Right ?
+When a container runs an application, it usually generates logs. Right ?
 You can easily view these logs using the docker logs command. 
 
 For that, we need the container ID. To get it, we run docker ps
@@ -646,7 +654,7 @@ Now
 Use the Docker Logs Command:
 docker logs <container_id>
 
-Yes, we get the container logs. This command shows the container logs here.
+Yes, we get the logs. This command shows the container logs here.
 
 
 
