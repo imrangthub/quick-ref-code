@@ -764,10 +764,14 @@ But that’s not all!
 
 
 
+
+
 1:50-to-3:00
 ======================
 We can use the Docker Client locally or from any remote CLI to communicate 
 with the Docker Engine, no difference! 
+
+
 
 
 
@@ -777,23 +781,49 @@ with the Docker Engine, no difference!
 Docker Components:
 Docker has 5 key components:
 
+
+
 🔹 Docker Daemon – Creates containers, manages volumes, and handles execution
+
+-----
+
 🔹 Docker Client – Sends commands to the Docker Engine (server)
+----
+
 🔹 Docker Image – A read-only blueprint for creating containers
+----
+
+
 🔹 Container – A running instance of a Docker image (we’ll dive deeper in later videos)
+----
+
+
 🔹 Docker Registry – A repository for storing and sharing Docker images
+---
+
+
 
 Docker Hub & Private Registries
     Docker Hub is a public registry with official images.
     Companies can also set up private registries for internal use.
 
+
+
 Here’s my Docker Hub account, where I’ve pushed some custom images.
 You can also push and share your own images!
-
 For that, you need to first create an account on Docker Hub.
 
-Explore Docker Hub, it has great documentation for each image.
+you can push you image to public registry or may private registry like a company keep there shource code in private git registry.
+
+
+this is all about docker component docker entier operation done by this component. 
+
+
+you can Explore Docker Hub, it has great documentation for each image.
 For example, the MySQL official image page provides all the details on how to use it! 
+
+
+
 
 
 
@@ -816,15 +846,23 @@ That’s where Namespaces come in!
 A Namespace in Linux is like a virtual wall around a process or a container. 
 It isolates resources, so one process doesn’t interfere with another.
 
-
+ 
 Here’s how it works:
     When you launch a container, it runs in its own Namespace.
     It gets a unique process ID (PID) and doesn’t see processes running in other Namespaces.
 
+
     This isolation allows multiple containers to run from the same software image without 
     interfering with each other.
+
     Think of it as each container having its own domain area, 
     where it operates independently without affecting other processes on the system.
+
+every contienr run there own world own context.
+
+
+
+
 
 
 
@@ -842,18 +880,25 @@ Here’s why it’s important:
 
 
 Real-World Example:
-    Imagine a host machine where we allocate 50% of resources for Application A and 50% for Application B.
+    Imagine a host machine where we allocate 50% of resources for Application X and 50% for Application X.
     With cGroups, we can define how much CPU, memory, and other system resources each 
     application is allowed to use.
 
-If we don’t set resource limits, then when Application A experiences high traffic, 
+If we don’t set resource limits, then when Application X experiences high traffic, 
 it may consume most of the available resources.
 
-As a result, Application B and other applications on the same host might not get enough resources, 
+As a result, Application X and other applications on the same host might not get enough resources, 
 leading to performance issues.
 
-By using cGroups, we ensure that Application A cannot take more than its allocated quota,
+By using cGroups, we ensure that Application X cannot take more than its allocated quota,
 allowing fair resource distribution and preventing any single application from overwhelming the system.
+
+
+
+Example:
+if we st cGroup process then it work,dont take more resource what we jsut set. with exple a and b.
+
+
 
 
 Together, Namespaces and cGroups provide:
@@ -865,16 +910,24 @@ ensuring stability and performance.
 
 
 
+
+
 17:00 -to - End
 ===========================
 This is an overall idea of Docker architecture and components, how Docker actually works.
 We won’t spend too much time here, just a high-level view of Docker’s internal components.
 
+
 In the next video, we’ll explore image and container operations—how to build an image,
 run it as a container, create and modify custom images, and upload them to Docker Hub.
 
+
 That’s it for today’s video! If you found this useful, don’t forget to like, 
 subscribe, and hit the notification bell for more tech insights. See you in the next video!
+
+
+
+
 
 
 
