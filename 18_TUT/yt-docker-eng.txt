@@ -749,7 +749,7 @@ We’ll be covering:
 
     Control Groups the cGroups:
     Learn how Docker uses cGroups to allocate and limit system resources like CPU, memory, and I/O.
-    This way we can ensures containers don’t overuse resources or impact other processes on the host.
+    This way we can ensures containers don’t overuse resources and impact other processes on the host.
 
 
 By the end of this section, you’ll have a solid understanding of how Docker works under the hood!
@@ -773,7 +773,7 @@ Yes:
     The DockerDesktop Dashboard is also a client.
     It fetches data from the Docker Engine and displays it in a graphical way.
 
-So, whether it’s the CLI or DockerDesktop, everything talks to the Docker Engine behind the scenes! 
+So, whether it’s the client CLI or DockerDesktop, everything talks to the Docker Engine behind the scenes! 
 
 
 
@@ -782,9 +782,11 @@ So, whether it’s the CLI or DockerDesktop, everything talks to the Docker Engi
 
 1:50-to-3:00
 ======================
-We can run Docker commands from your own computer or even from another computer remotely, either way, it works just the same!
+We can run Docker commands from your own computer or even from another computer remotely, 
+either way, it works just the same!
 
-The Docker Client simply sends commands to the Docker Engine, which does all the heavy lifting like building images or running containers.
+
+Docker Client simply sends commands to the Docker Engine, which does all the heavy lifting like building images or running containers.
 
 As long as the Docker Engine is running and accessible, the client can connect and control it.
 
@@ -807,48 +809,46 @@ Docker Daemon:
     It runs behind the scenes, doing the heavy lifting task like starting containers and keeping your apps alive.
 
 Docker Client:
-    The Docker Client is the interface you use to run commands like: docker run.
-    It sends those commands to the Docker Daemon, whether it’s on your own computer or a remote server.
+    Docker Client is the interface you use to run commands like: docker ps.
+    It sends those commands to the Docker Daemon directly to process it.
 
 
 Docker Image:
     A Docker Image is like a blueprint we already know that, It’s tells Docker how to build a container.
-    It includes everything your app needs — code, runtime, libraries, and settings.
+    It includes everything your app needs to run: code, runtime, libraries, and settings.
 
 
 Container:
-A Container is the actual running version of a Docker image.
-It’s isolated, lightweight, and includes only what your app needs to work.
-(We’ll dive deeper into Image and Containers in a later video!)
+    A Container is the actual running version of a Docker image.
+    It’s isolated, lightweight, and includes only what your app needs to work.
+    (We’ll dive deeper into Image and Containers in a later video!)
 
 Docker Registry:
-Docker Hub is a public registry where anyone can upload and download Docker images.
-It includes official images for popular software like NGINX, MySQL, and Ubuntu, which are verified and safe to use.
+    Docker Hub is a public registry where anyone can upload and download Docker images.
+    It includes official images for popular software like NGINX, MySQL, and Ubuntu, which are verified and safe to use.
 
-Any Companies can also set up private registries to store their own images securely.
-These are useful when you want to share images only within your team or organization.
+    Any Companies can also set up private registries to store their own images securely.
+    These are useful when you want to share images only within your team or organization.
 
 
 
 
 Here’s my Docker Hub account, where I’ve pushed some custom images.
-You can also push and share your own images!
-For that, you need to first create an account on Docker Hub.
+    You can also push and share your own images!
+    For that, you need to first create an account on Docker Hub.
 
 You can push your Docker image to a public registry like Docker Hub, where anyone can access it.
-Or, you can push it to a private registry, just like companies store their source code in a private Git repository.
-
-This way, you can control who has access to your images — public for open sharing, or private for internal use.
+Or, you can keep it to a private registry, just like companies store their source code in a private Git repository.
 
 
-
+So,
 These are the main Docker components, and together they handle everything Docker does behind the scenes.
 From building images to running containers — every Docker operation depends on these building blocks.
 
 
 
 You can Explore Docker Hub, it has great documentation for each image.
-For example, the MySQL official image page provides all the details on how to use it! 
+For example, the MySQL official image page provides all the details about this image you need to know.
 
 
 
@@ -859,39 +859,33 @@ For example, the MySQL official image page provides all the details on how to us
 09:10-to-17:00 
 ===========================
 Now we’re diving into two fundamental concepts in containerization: Namespaces and cGroups.
-how containerized applications work. 
+
 
 So, let’s get started!
 
 
 What is a Namespace?
-Imagine you’re running many applications on the same computer.
-Each app should feel like it’s the only one running — with its own files, network, and users.
-
-But normally, all apps share the same system resources.
-You can’t run multiple copies of the same app without them clashing.
+Normally, if you try to run two of the same web servers (like Nginx) on a host-machine using port 80,
+one of them will fail to start, because only one app can use this 80 port at a time.
+Running two web servers on the same port is like two people trying to sit on one chair — it doesn't work.
 
 That’s where Namespaces come in!
 
-A Namespace in Linux is like creating a separate world for each process or container.
+Namespace separates system resources so that apps don’t interfere with each other.
+
+A Namespace is like creating a separate world for each container. its feel like a separate mini-computer.
+every container like a mini-computer.
+
 It hides system resources (like process IDs, network, mounts) from other processes.
 So, even if multiple containers are running the same app, they stay completely isolated from each other.
 
-This is one of the key technologies that makes Docker containers possible!
-
+This is one of the key technologies that makes Docker containerization possible!
 
 
  
 Here’s how it works:
     When you launch a container, it runs in its own Namespace.
     It gets a unique process ID (PID) and doesn’t see processes running in other Namespaces.
-
-
-    This isolation allows multiple containers to run from the same software image without 
-    interfering with each other.
-
-Think of it like this: each container lives in its own little world, with its own files, network, and settings.
-It operates in its own space (or context), completely separate from other containers or processes on the system.
 
 This means containers can run side by side without interfering with each other — just like each one has its own private domain.
 
@@ -900,40 +894,35 @@ This means containers can run side by side without interfering with each other �
 
 
 
+Now that we know how containers stay isolated, let’s talk about Control Groups in other words cGroups.
+
 What is a cGroup?
-    Now that we know how containers stay isolated, 
-    let’s talk about cGroups or Control Groups.
     A cGroup is responsible for managing resources like CPU, memory, and disk I/O for a container.
 
 
 Here’s why it’s important:
-Without cGroups, a container could use too much CPU or memory, which might slow down or crash the whole system.
-With cGroups, you can control how much resources each container is allowed to use.
+    Without cGroups, a container could use too much CPU or memory, which might slow down or crash the whole system.
+    With cGroups, you can control how much resources each container is allowed to use.
 
-Think of cGroups as a resource manager or traffic controller.
-It decides how much CPU, memory, disk, or network each container can use,
-so everything runs smoothly and fairly — even when many containers are running.
+Think of cGroups as a resource manager.
+It decides how much CPU, memory, disk, or network each container can use, so everything runs smoothly.
 
 
-Real-World Example:
-    Imagine a host machine where we allocate 50% of resources for Application X and 50% for Application Y.
-    With cGroups, we can define how much CPU, memory, and other system resources each 
-    application is allowed to use.
+Imagine you have two Application — Application X and Application Y — running on the same machine.
+With cGroups, you can control how much CPU, memory, and other resources each Application can use.
 
-If we don’t set resource limits, then when Application X experiences high traffic, 
-it may consume most of the available resources.
+If you don’t set limits, Application X might use too much when it gets busy.
+This can slow down Application Y and other Application on the system.
 
-As a result, Application Y and other applications on the same host might not get enough resources, 
-leading to performance issues.
+Using cGroups, you make sure Application X only gets what it’s allowed used.
+That way, no Application  get  slow-down  or make performance issue, everything will runs smoothly.
 
-By using cGroups, we make sure that Application X only uses the resources it’s allowed — no more than its limit.
 
-This helps keep things fair, so no single app can slow down or overload the system.
-It allows all containers or apps to run smoothly side by side, each within their own quota.
+
 
 
 Example:
-Let’s say we have two applications running in containers:
+Let’s say we have two applications running in a host-machine:
     App A is a small background service.
     App B is a heavy video processing tool.
 
@@ -952,8 +941,7 @@ This keeps the system stable and fair — both apps run within their allowed res
 Together, Namespaces and cGroups provide:
     Isolation (via Namespaces)
     Resource Control (via cGroups)
-This combination allows multiple containers to run efficiently on the same machine while 
-ensuring stability and performance.
+This combination allows multiple containers to run efficiently on the same machine.
 
 
 
@@ -962,15 +950,17 @@ ensuring stability and performance.
 
 17:00 -to - End
 ===========================
-This is an overall idea of Docker architecture and components, how Docker actually works.
-We won’t go into too much detail right now — this is just a high-level overview to help you understand the big picture of Docker’s internal parts.
 
 
-In the next video, we’ll explore image and container operations—how to build an image,
-run it as a container, create and modify custom images, and upload them to Docker Hub.
-
-
+This is an overall idea of Docker architecture and components, how Docker actually works. the big picture of Docker’s internal parts.
 That’s it for today’s video! 
+
+
+In the next video, we’ll explore image and container section, 
+How to build an image, run it as a container, create and modify custom images, and upload them to Docker Hub.
+and more...
+
+
 Hopefully, you enjoyed this video. If you did, don’t forget to give it a like and subscribe the channel.
 We got much more content for you.
 
