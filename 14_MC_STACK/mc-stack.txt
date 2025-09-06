@@ -2229,57 +2229,6 @@ Generating a Public Key from the Private Key
 ================================================
 
 
-How to create a ipd server:
-  Resource server → just validates Google-issued tokens with JWKS.
-  Client app → must be registered in Google Console.
-  User → logs in with Google and consents.
-
-
-🔑 OAuth2-Flow:
-  Client knows which IdP to use (because resource server docs specify it).
-    Example: Google Drive API docs say: “Request tokens from accounts.google.com with drive.readonly scope”.
-  Client redirects user to IdP authorization endpoint → user logs in & consents.
-  IdP issues token → signed JWT with aud=resource-server, scope=....
-  Client calls resource server with token.
-  Resource server validates token:
-  Check iss (issuer is trusted).
-  Check aud (audience = itself).
-  Validate signature with IdP’s public key.
-  Check scope.
-  If all good → request allowed.
-
-
-
-🔑 3. Client Needs a Token (What URL to Use?)
-  When a client app needs to access data from a particular resource server, it must know:
-  Which IdP issues valid tokens for that resource.
-  The token endpoint URL of that IdP.
-  The scopes required by that resource.
-
-
-
-🔑 1. Resource Server + Authorization Server Relationship
-    A resource server (API) does not issue tokens itself.
-    It trusts one (or more) authorization servers (IdPs) to issue tokens.
-
-  This trust is established by:
-    Public keys (JWKS URL) → so the resource server can verify JWT signatures.
-    Configuration (issuer/audience) → so it only accepts tokens from known IdPs.
-
-  👉 Example:
-    Google Drive (resource server) trusts accounts.google.com (authorization server).
-    Microsoft Graph (resource server) trusts login.microsoftonline.com (Azure AD).
-    Your custom API could trust https://auth.mycompany.com or even both Google & Azure AD.
-
-
-
-🔹 ✅ Summary
-  Roles = identity level (who the user is: admin, manager, end-user).
-  Scopes = API permissions requested (customer.read, product.purchase, etc.).
-Resource Server checks both:
-  Does the token have the scope required for this API?
-  Does the user’s role allow this action?
-
 
 
 
@@ -2539,6 +2488,60 @@ How Spring Authorization Server Handles PKCE:
 
 
 
+
+
+ipd and client relation
+================================================
+How to create a ipd server:
+  Resource server → just validates Google-issued tokens with JWKS.
+  Client app → must be registered in Google Console.
+  User → logs in with Google and consents.
+
+
+🔑 OAuth2-Flow:
+  Client knows which IdP to use (because resource server docs specify it).
+    Example: Google Drive API docs say: “Request tokens from accounts.google.com with drive.readonly scope”.
+  Client redirects user to IdP authorization endpoint → user logs in & consents.
+  IdP issues token → signed JWT with aud=resource-server, scope=....
+  Client calls resource server with token.
+  Resource server validates token:
+  Check iss (issuer is trusted).
+  Check aud (audience = itself).
+  Validate signature with IdP’s public key.
+  Check scope.
+  If all good → request allowed.
+
+
+
+🔑 3. Client Needs a Token (What URL to Use?)
+  When a client app needs to access data from a particular resource server, it must know:
+  Which IdP issues valid tokens for that resource.
+  The token endpoint URL of that IdP.
+  The scopes required by that resource.
+
+
+
+🔑 1. Resource Server + Authorization Server Relationship
+    A resource server (API) does not issue tokens itself.
+    It trusts one (or more) authorization servers (IdPs) to issue tokens.
+
+  This trust is established by:
+    Public keys (JWKS URL) → so the resource server can verify JWT signatures.
+    Configuration (issuer/audience) → so it only accepts tokens from known IdPs.
+
+  👉 Example:
+    Google Drive (resource server) trusts accounts.google.com (authorization server).
+    Microsoft Graph (resource server) trusts login.microsoftonline.com (Azure AD).
+    Your custom API could trust https://auth.mycompany.com or even both Google & Azure AD.
+
+
+
+🔹 ✅ Summary
+  Roles = identity level (who the user is: admin, manager, end-user).
+  Scopes = API permissions requested (customer.read, product.purchase, etc.).
+Resource Server checks both:
+  Does the token have the scope required for this API?
+  Does the user’s role allow this action?
 
 
 
@@ -2850,6 +2853,48 @@ GoForLogin:
 https://<your-keycloak-domain>/realms/<realm-name>/account
 
 
+
+
+
+
+
+
+Azure AD vs On-premises AD + Federation
+============================================================
+1. Cloud-based user (Azure AD native)
+
+- The user account lives directly in Azure AD.
+- Username & password are stored in Microsoft’s cloud directory.
+- When user signs in:
+  * Teams/Outlook redirects to Azure AD login page.
+  * User enters username@company.com + password.
+  * Azure AD directly checks the password against its cloud directory (with hashing, no plain-text).
+  * If MFA is enabled, Azure AD enforces it here.
+  * Azure AD issues tokens (id_token, access_token, refresh_token).
+
+➡️ No on-premises dependency here. Everything is verified in the cloud.
+
+
+
+
+
+
+2. Federated user (On-premises AD + Federation / SSO)
+
+- The user identity is managed in on-premises Active Directory (AD).
+- Azure AD is only a front door — it redirects the authentication to on-premises federation service (e.g., ADFS or other SAML/OIDC provider).
+
+Step-by-step flow:
+  * User enters username@company.com on the Azure AD login page.
+  * Azure AD checks the domain (@company.com) → sees it’s a federated domain.
+  * Azure AD does not validate the password → instead redirects the user to the company’s ADFS endpoint (e.g., https://adfs.company.com/adfs/ls/).
+  * ADFS talks to Active Directory Domain Controllers to validate credentials:
+      - Could be password-based
+      - Or Integrated Windows Authentication (SSO if user is inside corporate network)
+      - Or with MFA if enforced by ADFS.
+  * Once ADFS verifies the user, it issues a SAML/OIDC token back to Azure AD.
+  * Azure AD trusts ADFS (via certificate) and exchanges that token for Azure AD’s own OAuth2/JWT tokens (id_token, access_token).
+  * Teams/Outlook now uses these tokens to call Microsoft Graph or other APIs.
 
 
 
