@@ -2010,9 +2010,40 @@ It does not uniquely identify records.
 
 ##Database normalization 
 =================================================
-📌 1NF: No multiple values in a single column.
-📌 2NF: Data is split into separate tables to remove partial dependencies.
-📌 3NF: Each column depends only on the primary key, avoiding unnecessary repetition.
+1NF (First Normal Form)
+  Each column contains only atomic (single) values.
+  Each row is unique (no duplicate rows).
+
+2NF (Second Normal Form)
+  Must already be in 1NF.
+  No partial dependency: a non-key column cannot depend on just part of a composite primary key.
+
+3NF (Third Normal Form)
+  Must already be in 2NF.
+  No transitive dependency: every non-key column depends directly on the primary key, not on another non-key column.
+
+4NF: No multiple independent lists
+  Rule:
+  A table should not have two or more independent multi-valued facts about an entity.
+  Must already be in 3NF.
+
+  Example (Not 4NF):
+  StudentID	Hobby	Language
+  101	Chess	English
+  101	Music	French
+
+  Problem:
+  Student has multiple hobbies and multiple languages, independent of each other.
+  4NF Solution: Split into two tables:
+
+
+5NF: Split complex relationships, join to get data
+  Table should be broken down so that data can only be reconstructed by joining tables.
+
+6NF: Split over time (temporal data)
+  Deal with temporal data (data changes over time) or very complex scenarios.
+  Usually used in data warehouses or specialized databases.
+
 
 
 Imagine a Student Database:
