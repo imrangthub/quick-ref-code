@@ -998,51 +998,58 @@ Hey guys, today we'll be exploring image and container operations in this tutori
 
 Image:
 So, what exactly is an image?
-Think of it like a ready-to-use package that includes everything an app needs to run — for example, Nginx.
+Think of it like a ready-to-use package that includes everything an app needs to run — for example, a Java Application or MySql Servdr.
 
-Now, the cool thing is, we can download pre-built images for things like Java, MySQL, or Redis.
-Or, if we want more control, we can even build our own custom image.
 
-You can imagine an image as a template for containers.
-From one Java image, we can spin up two or more Java app containers.
-Or from one Redis image, we can create multiple Redis containers — all running separately!
+an image as a template for containers.
+It’s like a blueprint,  when you run it, Docker creates a container based on that image.
 
-And here’s a simple diagram that shows how we can reuse a single image to create as many containers as we want.
+
+Here, we’re running two Java application from a single Java image, and three Redis Instance from a single Redis image.
+ all running separately!
+
+And simple diagram  shows that how we can reuse a single image to create as many containers as we want.
 
 
 
 Now, where can we find an image for our application? What is the image source, or how can we create one?
 We can either build our own image using a Dockerfile or download a ready-made image from Docker Hub.
 
-Alright, let’s explore Docker Hub!
-Here, we can find tons of images — some official, some made by other developers.
-And guess what? We can also upload our own images here too!
 
-Public images are stored on Docker Hub, but if a company wants to keep things private, they can set up their own private registry and share images safely within the team.
+
+Alright, let’s explore Docker Hub!
+    Here, We can find a list of images, both official and those created by individual developers.
+    And guess what? We can also upload our own images here too!
+
+
+
+Public images are stored on Docker Hub, but if a company wants to keep things private, 
+they can set up their own private registry and share images safely within the team.
 
 
 
 
 Now, let’s explore some of the most common Docker image commands.
 
-First, listing Docker images — just type:
+First:
 docker image ls
 This command shows all the images available on your Docker host.
+
 You can also see them directly in Docker Desktop.
 
-Here’s what the columns mean:
-
 Repository – that’s the name of the image.
-
 Tag – this shows the version of the image.
 
 Let’s check out Docker Hub to explore this in action.
-For example, if we search for the Ubuntu image,
-we’ll see lots of different tags — each one representing a specific release version.
+    For example, if we search for the Ubuntu image,
+    we’ll see lots of different tags — each one representing a specific release version.
+
+
 
 Alright, let’s talk a bit more about tags.
 So, here I have one of my custom images — it comes with three different release versions, and each version is defined by a tag.
 It works the same way for other images too.
+
 
 Now, let’s download an image using its tag version.
 To do that, we just run:
@@ -1056,15 +1063,15 @@ And that’s it — our image is ready to use!
 
 By default, if we don’t mention any tag, Docker automatically downloads the image with the :latest tag.
 
-But here’s something important to remember — the :latest tag doesn’t always mean it’s the newest version of the image.
+But here’s something important to remember, the :latest tag doesn’t always mean it’s the newest version of the image.
 Sometimes, it’s just the most stable or popular release.
-So, there might actually be newer versions available even if they’re not tagged as latest.
+So, there might be newer versions out there, even if they’re not marked as latest.
 
 
 Let’s see what that really means.
-Here, we can see the Ubuntu image — it comes with many release versions as tags.
-Notice that the :latest tag points to version 22.04,
-but there’s actually a newer version, 23.10, available.
+    Here, we can see the Ubuntu image — it comes with many release versions as tags.
+    Notice that the :latest tag points to version 22.04,
+    but there’s actually a newer version, 23.10, available.
 
 Interesting, right?
 So always remember — the :latest tag doesn’t always mean the newest release of the image!
@@ -1083,51 +1090,32 @@ When running docker image ls, we see:
 
 Now, let's explore base images and how to build an image.
 
+Every Docker image is created from another image called a base image.
 A base image is the parent image for all images.
-    Every Docker image is created from another image called a base image.
-
-Next, let's explore Dockerfile, a file that defines what an image is and how it works.
-    Docker images follow a layered architecture, and the Dockerfile shows how an 
-    image is built layer by layer.
 
 
+
+Next, let's explore Dockerfile;
 
 
 
 Let’s check the Nginx Dockerfile from Docker Hub.
-    In the first line, we see the FROM directive: FROM debian:bullseye-slim
-
-This defines the base image used to create the Nginx image.
+    In the first line, we see the FROM directive, This defines the base image used to create the Nginx image.
 Every image has a parent image from which it is derived.
 
-Now, let’s explore another image—MySQL.
-Opening its Dockerfile, we see: FROM debian:bookworm
-
-This means the MySQL image is built on top of Debian (Bookworm) as its base image.
-
-
 All images are created on top of another image, forming a chain of dependencies.
-The FROM directive in a Dockerfile always points to the base image used to build a new image or application.
 
 
 
+Choosing a Base Image for CustomImages:
 
-
-Choosing a Base Image for Custom Images
-    Just like official images, custom images also require a base image, which we define using the 
-    FROM directive in a Dockerfile.
-
-But do we choose a random base image? No!
+Do we choose a random base image? No!
 We need to select a base image that is relevant to our custom image.
 
 For example:
-    If we are building a Java application, we should choose a JDK image with a specific version:
+    If we are going to build a Java application, we should choose a JDK image with a specific version:
     FROM openjdk:17
 This base image already includes Java, so we don’t need to install it manually.
-
-On the other hand, if we choose a Ubuntu image:
-FROM ubuntu:22.04
-Then, we must manually install JDK and configure our Java application.
 
 
 We should always pick a base image that:
@@ -1141,15 +1129,15 @@ We should always pick a base image that:
 
 Now, let’s explore the Scratch image and the FROM scratch tag.
 
+    The Scratch image is the bare minimum and most basic image in Docker.
+    It’s completely empty — no operating system, no tools, nothing at all.
+    Every Docker image starts from this Scratch image and builds layer by layer on top of it.
 
-The Scratch image is the minimal base image used in Docker.
-    It is essentially an empty image—no operating system, no packages—just the bare minimum.
-Every Docker image is built layer by layer, starting from the Scratch image.
 
 
 Let’s explore the MySQL Docker image.
-Looking at its Dockerfile, we see it is built on top of the Oracle Linux image.
-This means the Oracle Linux image is the base image for MySQL.
+    Looking at its Dockerfile, we see it is built on top of the Oracle Linux image.
+    This means the Oracle Linux image is the base image for MySQL.
 
 
 
@@ -1158,36 +1146,24 @@ For instance:
     The MySQL image starts with Oracle Linux.
     Then, it builds on top of that, adding necessary components.
     Finally, it adds the MySQL application.
-    At the very bottom of every image, there is Scratch—the most minimal layer.
-    On top of Scratch, we install packages, add files, and run commands to build up the image layer by layer.
 
-    This is how Docker images are constructed—step by step, layer by layer.
+This is how Docker images are constructed—step by step, layer by layer.
 
 
 
 If you don't want to use ready-made images like the official Nginx image, you can also build your own image layer by layer.
 
-1. Creating Your Own Nginx Image
+
+
 For example, let’s say we want to create an Nginx image using a Linux image as the base.
 The process is similar to setting up a traditional host.
 
-On a physical machine, we install a Linux OS and then manually install packages like Nginx.
-In Docker, we can start with a Linux base image and manually install Nginx, making it ready to use.
-This way, we can customize the image to suit our needs.
-
-2. Scratch Image and Layering
-When you start with the Scratch image (the bare minimum), you can install any server or package you need.
-Each line in the Dockerfile represents a layer of the image.
-
-Each layer is added step-by-step, building up the image, just like you would on a traditional system.
-You can read more about Scratch and layering in its documentation.
 
 
 
 
 
-23:00-end
-===============
+
 Let’s take a closer look at the details of a Dockerfile.
 A Dockerfile is a combination of instructions and arguments that define how an image is built.
 
@@ -1203,16 +1179,15 @@ Finally, it includes a run command to start the application.
 
 Once you’ve written the Dockerfile, you can build your image using the following command:
 docker build -t image-name:tag .
-This will create a Docker image with the specified name and tag based on the instructions in the Dockerfile.
+This will create a Docker image based on the instructions in the Dockerfile.
 
 
 
 
-
+As you can see, the commands are shown in the dockerFile.
 
 
 Now, let’s see how to create a Docker image from a Dockerfile in action.
-
 
 
 
@@ -1234,14 +1209,14 @@ In future episodes, we’ll see how to create Docker images for real-world proje
 
 
 
-This is the Dockerfile along with its commands that we used to build our image just now.
-Now, it’s your turn to practice — try creating your own image using this same approach.
+This is the Dockerfile and the commands we just used to build our image.
+Now it’s your turn — try making your own image using the same steps.
 
 
 
 
 You can create your own image using any package, such as JDK.
-In this example, I used Nginx, but instead of Nginx, you can install Java to build an image for your specific purpose or application.
+In this example, I used Nginx, but instead of Nginx, you can install any package to build an image for your specific purpose or application.
 This way, you can customize your Dockerfile based on what your project needs.
 
 
@@ -1254,11 +1229,11 @@ You can build and run your own Python application in the same way.
 
 
 
-Now that you’ve created and tested your image, you may want to share it with other team members, such as the QA or production team.
+Now that you’ve created your image, you may want to share it with other team members, such as the QA or production team.
 To do this, you can push the image to an image repository. For restricted access, use a private repository.
 
-Alternatively, you can create a .tar file from the image using Docker commands, share it, and then load it on another system using the corresponding Docker command.
-
+Alternatively, you can create a .tar file from the image using Docker commands, 
+share it with other teams, and once they load it into their system, the image will be ready to use.
 
 
 
@@ -1277,7 +1252,7 @@ The run command has many options that you can explore, such as -d, -p, and other
 
 
 I have mentioned some examples here that you can explore.
-You should play around with these options a bit more to get comfortable.
+You should play around with these options to get comfortable.
 
 
 To see the details of a container, we can use the docker inspect command.
