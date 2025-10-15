@@ -998,22 +998,24 @@ Hey guys, today we'll be exploring image and container operations in this tutori
 
 Image:
 So, what exactly is an image?
-Think of it like a ready-to-use package that includes everything an app needs to run — for example, a Java Application or MySql Servdr.
+ Image is ready-to-use package that includes everything an app needs to run, for example, a Java Application or MySql Servdr.
 
 
-an image as a template for containers.
+Think of image as a template for containers.
 It’s like a blueprint,  when you run it, Docker creates a container based on that image.
 
 
+As you can see in the document:
 Here, we’re running two Java application from a single Java image, and three Redis Instance from a single Redis image.
  all running separately!
 
-And simple diagram  shows that how we can reuse a single image to create as many containers as we want.
+And The diagram shows that how we can reuse a single image to create as many containers as we want.
 
 
 
 Now, where can we find an image for our application? What is the image source, or how can we create one?
-We can either build our own image using a Dockerfile or download a ready-made image from Docker Hub.
+Well,
+    We can either build our own image using a Dockerfile or download a ready-made image from Docker Hub.
 
 
 
@@ -1022,7 +1024,7 @@ Alright, let’s explore Docker Hub!
     And guess what? We can also upload our own images here too!
 
 
-
+Docker Hub is a public repository !
 Public images are stored on Docker Hub, but if a company wants to keep things private, 
 they can set up their own private registry and share images safely within the team.
 
@@ -1033,12 +1035,15 @@ Now, let’s explore some of the most common Docker image commands.
 
 First:
 docker image ls
-This command shows all the images available on your Docker host.
+This command shows all the available images on your Docker host.
 
 You can also see them directly in Docker Desktop.
 
 Repository – that’s the name of the image.
 Tag – this shows the version of the image.
+
+
+
 
 Let’s check out Docker Hub to explore this in action.
     For example, if we search for the Ubuntu image,
@@ -1048,7 +1053,6 @@ Let’s check out Docker Hub to explore this in action.
 
 Alright, let’s talk a bit more about tags.
 So, here I have one of my custom images — it comes with three different release versions, and each version is defined by a tag.
-It works the same way for other images too.
 
 
 Now, let’s download an image using its tag version.
@@ -1058,7 +1062,7 @@ docker image pull
 Once the pull is complete, we can check it by running:
 docker image ls
 
-And that’s it — our image is ready to use!
+And that’s the image, it's ready to use!
 
 
 By default, if we don’t mention any tag, Docker automatically downloads the image with the :latest tag.
@@ -1095,19 +1099,17 @@ A base image is the parent image for all images.
 
 
 
-Next, let's explore Dockerfile;
-
 
 
 Let’s check the Nginx Dockerfile from Docker Hub.
-    In the first line, we see the FROM directive, This defines the base image used to create the Nginx image.
-Every image has a parent image from which it is derived.
+    In the first line, we see the FROM directive, This defines the base image used to create this Nginx image.
 
+Every image has a parent image from which it is derived.
 All images are created on top of another image, forming a chain of dependencies.
 
 
 
-Choosing a Base Image for CustomImages:
+Lets talk how to Choosing a Base Image for our CustomImages:
 
 Do we choose a random base image? No!
 We need to select a base image that is relevant to our custom image.
@@ -1121,8 +1123,6 @@ This base image already includes Java, so we don’t need to install it manually
 We should always pick a base image that:
     ✔ Matches the type of application we are building.
     ✔ Meets the system requirements of our app.
-    ✔ Aligns with business logic and optimizes performance.
-
 
 
 
@@ -1183,8 +1183,10 @@ This will create a Docker image based on the instructions in the Dockerfile.
 
 
 
-
 As you can see, the commands are shown in the dockerFile.
+
+
+
 
 
 Now, let’s see how to create a Docker image from a Dockerfile in action.
@@ -1217,6 +1219,7 @@ Now it’s your turn — try making your own image using the same steps.
 
 You can create your own image using any package, such as JDK.
 In this example, I used Nginx, but instead of Nginx, you can install any package to build an image for your specific purpose or application.
+
 This way, you can customize your Dockerfile based on what your project needs.
 
 
@@ -1237,11 +1240,14 @@ share it with other teams, and once they load it into their system, the image wi
 
 
 
+
+Let's try doing this.
+
+
+
 As you can see, the commands are shown in the document.
 
 
-
-Let's try doing this.
 
 
 
