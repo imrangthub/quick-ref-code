@@ -84,66 +84,89 @@ tmpfs:
 
 9:20mm
 ============================
-Now, let's start with the basic Docker volume commands and practice with volumes.
+Now, let's explore some of the basic Docker volume commands and get some hands-on practice! 
 
 
-Let's start with Nginx and see how we can use volumes with an application server.
+Let's start with Nginx and see how how volumes work with a real application .
 
 
-My application is running now. Let’s modify it to update the default Nginx page.
 
 
-We need to exec into the container to update its welcome HTML page.
-Use docker exec
-Inside the container, vi is not available, so I’ll use the echo command to update the page.
+Great — our application is up and running!  
+Now, let’s update the default Nginx page.
 
-echo "Welcome to My Custom Nginx Page!" > /usr/share/nginx/html/index.html
-Once we update the page, we refresh the browser, and we can see the update reflected on the page.
+To do that, we need to go inside the container.
+I’m going to exec into the container so we can update its welcome HTML page.
+
+We’ll use docker exec for this.
+
+Since vi isn’t available inside the container, I’ll use the echo command to make the changes directly.
 
 
-What happens when the container crashes ?
-For thist Manually stop the container and remove it.
+
+echo "Update from host machine" > /usr/share/nginx/html/index.html
+Once the page is updated, we can refresh the browser and see our changes instantly reflected.
+
+
+
+Now, what happens if the container crashes?
+If we have to run it again, all our updates will be lost.
+
+To see this in action, let’s manually stop the container and remove it.
+
 
 
 Observation:
-This time, the default Nginx welcome page shows up again, and we lose the update we made 
-just a few minutes ago.
-This happens because the data was stored inside the container's filesystem. 
-When the container stops or crashes, the data inside is lost. 
-This is the default behavior of Docker containers.
-To persist the changes made to the Nginx page, we can use Docker volumes.
+    This time, the default Nginx welcome page shows up again, and we lose the update we made 
+    just a few minutes ago.
+
+    This happens because the data was stored inside the container’s filesystem.
+
+    When the container stops or crashes, the data inside is lost. 
+    This is the default behavior of Docker containers.
 
 
-16:00
-============================
+
+
 Now, let's fix the data loss issue by using Docker Volumes:
 
-Steps to Fix Data Loss with Docker Volume
+
+
+
 First, let’s check the existing volumes by running:
 docker volume ls
-As we haven’t created a volume yet, the list will be empty.
+Since we haven’t created any volumes yet, the list will be empty..
 
-Now, let’s create a Docker volume using the following command:
-docker volume create my_volume
+
+Now, let’s create a new Docker volume with this command:
+docker volume create my_ng_service_data
+
 
 Verify the Volume:
-Once the volume is created, run docker volume ls again to see the volume we just created:
 docker volume ls
-You should see my_volume in the list of volumes.
+You should see my_ng_service_data in the list.
+
+
 
 
 Now, let’s run the Nginx container and mount the created volume to it. 
 Use the following command to do this:
-docker run -d -p 80:80 -v my_volume:/usr/share/nginx/html nginx
+docker run -d -p 80:80 -v my_ng_service_data:/usr/share/nginx/html nginx
 
-Here, -v my_volume:/usr/share/nginx/html tells Docker to mount the my_volume 
+Here, -v my_ng_service_data:/usr/share/nginx/html tells Docker to mount the my_ng_service_data 
 to the /usr/share/nginx/html directory inside the container.
 
 
-Now, you can check the Nginx homepage in your browser. It should display the default Nginx welcome page.
+
+
+Now, you can check the Nginx homepage in your browser. 
+It  display the default Nginx welcome page.
+
+
 
 Let’s update the index.html page again, but this time the changes will be persisted 
 even if the container is restarted.
+
 
 So, 
 docker exec -it <container_name> /bin/bash
@@ -151,85 +174,96 @@ Update the index.html file using echo:
 echo "Welcome to My Custom Nginx Page!" > /usr/share/nginx/html/index.html
 
 
-You can verify the update by using the cat command to see the contents of the index.html file:
+To verify the update i am gonna do cat  to see the index.html file:
 cat /usr/share/nginx/html/index.html
 
-Once the update is made, refresh your browser, and you should see the updated page as expected.
-
-
-Now If the container stops or is restarted, the changes to the index.html page will 
-persist because the data is stored in the Docker volume (my_volume).
-
-In Docker Desktop, you can also see the container and the volume being used.
-Now we have successfully solved the data loss issue by using Docker volumes.
+Once the update is made, refresh your browser, and we should see the updated page as expected.
 
 
 
 
 
-Let's assume the application crashed, and you stopped and deleted both the container and the image. 
-In Docker Desktop, you can see that there is no container or image listed.
 
-You can also verify this by running the following command:
-docker ps -a  # to list all containers
-docker images  # to list all images
+Now, if the container stops or is restarted, the changes we made to the index.html page will persist, 
+because the data is stored in the Docker volume.
 
-
-Even if the container or image is deleted, the volume will still persist. 
-You can check the volume by running:
-docker volume ls
-The volume we created earlier (my_volume) will still be listed.
+In Docker Desktop, you can even see the container and the volume that’s being used.
 
 
-Now, let's pull the Nginx image again and run a new container with the same volume. 
-You can run the following command:
+
+
+
+Let’s imagine the application crashed, 
+In this case I am going to manually stopped and deleted both the container and image to simulate this scenario.
+
+In Docker Desktop, you’ll notice that no container or image is listed anymore.
+
+You can also verify this from the terminal by running:
+    docker ps -a   # lists all containers
+    docker images  # lists all images
+
+
+
+
+Now, let’s pull the Nginx image again and run a new container using the same volume.
+
+We can do this with the same command as before:
 docker run -d -p 80:80 -v my_volume:/usr/share/nginx/html nginx
 
-
-Once the container is up and running again, you can go to the browser and 
-check if the previously updated index.html page is displayed (the one we updated before the crash).
-The volume ensures that the data is preserved even after container restarts or deletions.
+Once the container is up and running, open your browser and check — you should see the previously updated index.html page, 
+the one we modified before the crash.
 
 
-If you run a new Nginx container without mapping the volume,
- it will show the default Nginx page because it is not using the previous volume that 
- stored the updated index.html file.
-docker run -d -p 80:80 nginx
-
-Since we didn’t use the volume (my_volume) this time, the container is using the default Nginx data, 
-and we won't see the updated index.html page.
-
-Docker Volumes ensure that data is persistent even after the container is deleted or crashes. 
+This is how the Docker volume preserves our data, even after container restarts or deletions.
 
 
 
 
-27:30
-==================================
+If you run a new Nginx container without mapping the volume, it will show the default Nginx page, 
+because it’s not using the volume that stored our updated index.html file.
 
-Hey everyone! Welcome back to the channel!
+
+Let's run one:
+    docker run -d -p 80:80 nginx
+
+Since we didn’t use the volume this time, the container only shows the default Nginx page, not our custom update.
+
+
+This is why Docker volumes are so important,
+they ensure that your data persists, even if the container is deleted or crashes.
+
+
+
+
+
+
 Now Bind Mounting !
 So, what exactly is Bind Mounting?
 
 With Bind Mounting, a file or directory on the host machine is mounted directly into a Docker container.
 This allows you to share files and data between the host machine and the container.
+
 It’s super useful when you need to update or manage files on your container from your local machine directly.
 
 
 Here’s the syntax for bind mounting:
 You can use the -v flag for a quick bind mount or the more explicit --mount option.
 
-For Linux and Windows systems, the command looks like this:
-Using -v (short version):
-docker run -d -v /path/on/host:/path/in/container nginx
-Or, the more explicit version using --mount:
-docker run -d --mount type=bind,source=/path/on/host,target=/path/in/container nginx
+
+Using -v Or, the more explicit version using --mount:
+docker run -d --mount type=bind,        source=/path/on/host,       target=/path/in/container nginx
 The --mount approach is the recommended method because it’s more explicit and easier to understand.
 
 
+
+
 Let’s see Bind Mounting in action!
-We’re going to start by cleaning up our previous container:
-docker rm -f <container_id>
+
+Let’s start by cleaning up our previous container.
+We’ll delete the container and its volume, but keep the image, so we don’t have to download it again.
+
+
+
 Next, we’ll update our HTML file on the host machine and use bind mounting to reflect those 
 changes directly into the Docker container.
 
@@ -237,9 +271,14 @@ changes directly into the Docker container.
 Update the index.html file on our host machine.
 Let’s add a simple change, like modifying the welcome text.
 
+
+
 Run the Docker container with the bind mount:
 docker run -d -v /path/to/host/index.html:/usr/share/nginx/html/index.html nginx
+
 What we’ve done here is mount the file from our host machine to the container.
+
+
 
 
 
@@ -247,7 +286,10 @@ Now, let’s open our browser and refresh the page.
 As you can see, we’ve got the expected update! The change we made to the file on the 
 host machine was reflected directly inside the container.
 
+
 That’s the magic of bind mounting!
+
+
 
 Now, let’s update the index.html file once again on the host machine.
 We’ll make a small tweak to the content, save it, and refresh the browser again.
@@ -255,23 +297,41 @@ And boom, we see our new update immediately in the container as well!
 
 
 
+
 So, the key difference between bind mounting and volume mounting is that with bind mounting, 
 we’re directly sharing and modifying a file or directory from the host machine to the container.
 
 
-Now, let’s briefly touch on Tmpfs, another mounting option in Docker.
 
-Tmpfs allows you to store data in memory instead of on disk. 
-It’s a volatile storage solution, meaning that the data won’t persist if the container stops or crashes.
 
-Here’s the basic syntax for Tmpfs mounting:
+Now, let’s briefly talk about Tmpfs, another way to mount data in Docker.
+
+Tmpfs lets you store data in memory instead of on disk.
+Since it’s volatile, the data won’t persist if the container stops or crashes.
+
+
+The basic syntax looks like this:
 docker run -d --mount type=tmpfs,target=/path/in/container nginx
-Tmpfs is generally rarely used and can be handy in specific scenarios where performance is critical, 
-and the data doesn’t need to persist.
 
-[Outro]
-So, that’s an overview of Bind Mounting and Tmpfs in Docker.
-See you in the next video!
+
+Tmpfs isn’t used much, but it’s useful when you need fast performance and 
+don’t care about keeping the data after the container stops.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
