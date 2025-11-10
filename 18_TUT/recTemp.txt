@@ -11,177 +11,189 @@
 34:30
 =============================
 
-Lets check another exmple of bind-mounting  
-specifically using a MySQL database as a real-world example.
-
-Let’s take a simple MySQL container as an example. 
-
-Lets clear proviours container.
-
-Lets say a scanerio when one or mulitple applicants insert and retirive data from a mysql server
-and you run this mysql using docker contienr.
 
 
-Now with defautl container behavior as:
-
-Once we stop or remove the container, all the data inside that container is gone. 
-So, if your MySQL container crashes or you delete it for some reason, you lose all the database records.
-
-This is a big problem if you want to store important data like customer records, 
-transactions, or any type of persistent database information.
-
-
-Lets try doing this, first create a mysql contiber with mounting.
-We gonna some data insert to it and manually delete it to examing the seanerio.
-
-
-DockerDesktop show container is running..
-Lets insert some data manually to mysql
-to do that i have to insert container and then mysql server.
-
-
-so lets do this, i am gonna do exec.
-
-Inportant point it as when i run the contienr i include some env variable with command.
-to Pass user name amd database name on onthe fly.
-
-How i know that this way have to push mysql info to server.
-gues what.. we all get form docker hub documentation.
+Now, let’s look at another example of bind mounting,
+this time, we’ll use a MySQL database to see how it works in a real-world scenario.
 
 
 
-Now lets access mysql server now usign this user credentials.
-and I am in !
- 
-
-Lets run some mysql command, lets check db first.
-we should see simpledb what we pass ron runtime.
-
-Lets check table, no table as we not create one till now.
-
-Now crate a table called book.
-Lets Insert some data in to it.
-
-
-lset cehck by running select query.
-
-
-Okey now our mysql server is ready, lets say some application 
-insert some in book table as i do it manually.
-
-
-
-Now lets semulate container crash and data loss.
-Lets manullay delete the continer.
-
-Now not contienr.
-
-Lets run it again, i am going to user same commane.
-
-
-
-Lets checn our contienr on same process is any previous data is have our contienr or not.
-
-
-You see not data or table here !
-Because when we user defautl bahavior or container thne data is goon with contienr when it remove.
+Let’s start by creating a simple MySQL container.
+To keep things clean lets remove older contienr.
 
 
 
 
 
-Now we go mysql server with volumena and Bind-mounting both.
-lets try bind mounting first.
-You will find the comment in my document.
+Let’s imagine a scenario where one or more applications are inserting and retrieving 
+data from a MySQL server — and this MySQL server is running inside a Docker container.
+
+Now, by default, when you stop or remove a container, all the data inside it is lost.
+So, if your MySQL container crashes or you delete it, all your database records are gone.
+
+That’s a big problem if you’re storing important data like customer information, 
+transactions, or anything you need to keep permanently.”
 
 
-lets create volume first, we call it mysql-data.
+
+Let’s try this out. 
+First, we’ll create a MySQL container without any mounting.
+Then we’ll insert some data into it, and after that, we’ll delete the container  
+and run it again to see what happens in this scenario.
 
 
-Now i am going to run mysql contienr with thsi volume, then command as.
-here i ma user -e insted of -env, -e is short form both are correct.
+
+Docker Desktop shows that our container is running.
+Now, let’s manually insert some data into MySQL.
+To do that, we first need to enter the container, and then access the MySQL server inside it.
 
 
-Here what i just done, here i mount the volume with mysql main directory 
-what is use mysql server to keep confir and data.
+
+So let's do this, I am gonna do exec.
 
 
-our contienr run done.
+Here is One important thing to Note,
+when I ran the container, I added some environment variables in the command.
 
-lets go insett into contienr and same as create table and insert some data as before.
+These are used to pass the scama name and  database credentials on the fly.
 
+Now you might wonder, how do we know what to use ?
+Well, guess what — all of that information comes straight from the Docker Hub documentation.
 
-No table right table, first create table.
-to keep it simple i just two field in book table.
-and Insert some data.
-
-
-lets run a select query to check data.
-
-
-So right now we run our contianer with vaoluem mounting with a volume 
-what is show here.
-
-This is the command i use to run it.
-and we insett some data in our mysql server, 
-so now the data persist in the volume not on contianer its self.
+Alright, let’s access the MySQL server now using those credentials
+… and we’re in !
 
 
-Now ageing, lets delte the contienr and run it aginr to chek the data.
-
-Lets use the same command, thsi time we should get our prevourly inseted data.
 
 
-lets check, to do that lets exec it againg.
-access mysql...
-chek database., Its show the database.
-check table, In this we should data, and your see!
-we get our provieurs inserteed data as expected.
+
+
+
+“Let’s run some MySQL commands. First, let’s check the databases — we should see simpledb, the one we created at runtime.
+
+Next, let’s check the tables. There aren’t any yet, since we haven’t created one.
+
+Now, let’s create a table called book and insert some data into it.
+
+Let’s verify by running a select query — perfect!
+
+Alright, our MySQL server is ready. Imagine some application is now inserting data into the book table, just like we did manually.
+
+
+
+
+
+Now, let’s simulate a container crash and see what happens to the data.
+We’ll manually delete the container.
+
+As you can see, there’s no container now.
+
+Let’s run it again using the same command.
+
+Now, let’s check the database and tables to see if any of our previous data is still there.
+
+And as you can see — nothing! No data, no tables.
+That’s because, with the default container behavior, all the data is lost when the container is removed.
+
+
+
+
+
+
+Now, let’s try running MySQL with both volume and bind-mounting.
+We’ll start with volume mounting first — you can find the commands in my document.
+
+First, let’s create a volume called mysql-data.
+
+Next, I’m going to run the MySQL container using this volume.
+Notice I’m using -e instead of --env — it’s just a shorter version, both work the same.
+
+Here, I’ve mounted the volume to MySQL’s main directory, which is used by the server to store configuration and data.
+
+The container is up and running.
+
+Now, let’s go inside the container and, like before, create a table and insert some data.
+
+
+
+
+
+There’s no table yet, so let’s create one.
+To keep it simple, I’m adding just two fields in the book table and inserting some data.
+
+Let’s run a select query to check the data — perfect!
+
+So now, our container is running with volume mounting.
+Here’s the command I used to run it.
+
+We’ve inserted some data into the MySQL server, and now the data is stored in the volume, not inside the container itself.
+That means even if the container is removed, the data will stay safe in the volume
+
+
+
+
+Let’s try this again. We’ll delete and remove the container, then run it again to check the data.
+
+We’ll use the same command, and this time, we should see the data we inserted before.
+
+To check, let’s exec into the container, access MySQL, and look at the database — there it is!
+Now check the table, and you’ll see the data is still there.
+
+As expected, all our previously inserted data is safe.
+This is how volume mounting keeps your data even if the container is removed.
+
 Now this way your data is save.
 
 
 
 
-Same way will owrk Bind Mount: 
+Bind mounts work the same way as volumes.
 
-Why not we try this, lets run it!
+So, why not try it? Let’s run it!
+For this, we need to provide a path on the host machine, followed by a colon and the container path.
 
-to do that we have to provide a pat of host macheine pat and on right side or : will be contienr path.
+Let’s copy the command and run it — here, I’m using a directory on my host machine to store the data.
 
-Lets copy the command and run it..
-Here user host location, contienr pate etc 
-and lets run it.
-
-Its running
-Int tis time no volume we use we user host machine dorectory to keep data.
-you see here is it the directorhy in my host machein.
+The container is running.
+This time, we’re not using a volume; instead, we’re directly using a folder on the host machine to keep the data.
+And here you can see the directory on my host machine.
 
 
 
-Lets do same producre to insert data in to it.
-exec the contienra
-access mysql server.
-
-Insertt some data.
-
-Lets run all command at a time..
 
 
-In this time mysql data wrint in the directory on in any volume.
+
+Now, let’s do the same procedure to insert data.
+We’ll exec into the container, access the MySQL server, and insert some data.
+
+Let’s run all the commands at once.
+
+This time, the MySQL data is saved in the directory on the host machine.
+
+Next, let’s delete and remove the container, then run it again using the same command.
+
+The container is running, and since we’re using a bind mount with the same host location, we should get our previously inserted data back.
+
+Let’s check…
+
+We get our data as expected !
 
 
-Lets delete and remove the conteinr agirn and run it ageint.
 
-lets run it useirng same command.
-
-Its running, thsi time we user bidn ount with same host locaton.
-so we should get our privioru inserted data here.
-
-lets check it...
 
 
     
+And that’s it for today’s video guyes !
 
-[Conclusion]
-Thank you for watching! Don’t forget to like, subscribe, and click the bell for more tutorials!
+We’ve seen how MySQL behaves in a Docker container by default — where data is lost if the container is removed.
 
+Then we explored volume and bind mounting, which keeps your data safe even if the container is deleted.
+
+So, whether you use volumes or bind mounts, your  data stays safe, unlike the default container behavior.
+
+
+
+
+
+Thanks for watching! 
+Go ahead and give it a try yourself — it’s fun!
