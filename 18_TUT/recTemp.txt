@@ -1,199 +1,371 @@
 
 =================================================
-##6) Storage and Volumes
+##7) Networking and Security
 =================================================
 
 
 
+Why actually this docker network for, why need this....
 
+because now real world project architects gating complex day by day, 
+especially multi-tier applications and microservice architects
 
 
-34:30
-=============================
+where different services need to interact. 
+    For example, an app server needs to communicate with a database server or other services.
 
 
 
-Now, let’s look at another example of bind mounting,
-this time, we’ll use a MySQL database to see how it works in a real-world scenario.
+Thing about now a multi-tier applications:
+In real-world applications, where different components of the application 
+(like the frontend, backend, and database) run in different environments, 
 
+Docker ensures they can securely talk to each other.
 
 
-Let’s start by creating a simple MySQL container.
-To keep things clean lets remove older contienr.
 
+Also Security Considerations: 
+Networking in Docker also plays a major role in security. 
 
+For example, you might want the database to only be accessible by the app server and 
+not by the public network. 
 
 
 
-Let’s imagine a scenario where one or more applications are inserting and retrieving 
-data from a MySQL server — and this MySQL server is running inside a Docker container.
 
-Now, by default, when you stop or remove a container, all the data inside it is lost.
-So, if your MySQL container crashes or you delete it, all your database records are gone.
 
-That’s a big problem if you’re storing important data like customer information, 
-transactions, or anything you need to keep permanently.”
 
 
+Let’s consider a three-tier application:
 
-Let’s try this out. 
-First, we’ll create a MySQL container without any mounting.
-Then we’ll insert some data into it, and after that, we’ll delete the container  
-and run it again to see what happens in this scenario.
+The frontend app is deployed in a public network.
+The app server is deployed in a secure network.
+The database server is placed in another secure network with restricted access, 
+allowing only the app server to communicate with it.
 
 
 
-Docker Desktop shows that our container is running.
-Now, let’s manually insert some data into MySQL.
-To do that, we first need to enter the container, and then access the MySQL server inside it.
+Docker  network installation work just like same as a general host.
+it user a virtual eitner nete.
 
 
 
-So let's do this, I am gonna do exec.
 
+Every container run with in a netwrok and has it a IP addr.
 
-Here is One important thing to Note,
-when I ran the container, I added some environment variables in the command.
+Till now we are not use dockr network but we run continer right ?
 
-These are used to pass the scama name and  database credentials on the fly.
 
-Now you might wonder, how do we know what to use ?
-Well, guess what — all of that information comes straight from the Docker Hub documentation.
 
-Alright, let’s access the MySQL server now using those credentials
-… and we’re in !
+so how it work ..?
 
+Default Network: 
+Docker provides a default network called the bridge network. 
+When you run a container and don't specify a network, it will automatically connect to this bridge network.
 
 
 
 
+You can view Docker’s networks using the:
+docker network ls command. 
+This shows all available networks, including the default ones.
 
 
-“Let’s run some MySQL commands. First, let’s check the databases — we should see simpledb, the one we created at runtime.
 
-Next, let’s check the tables. There aren’t any yet, since we haven’t created one.
+To get more details on how a container is connected to a network, 
+use the docker inspect command. 
 
-Now, let’s create a table called book and insert some data into it.
 
-Let’s verify by running a select query — perfect!
+This command will show you detailed information, including the network settings and which 
+network a container is using.
 
-Alright, our MySQL server is ready. Imagine some application is now inserting data into the book table, just like we did manually.
 
 
 
 
 
-Now, let’s simulate a container crash and see what happens to the data.
-We’ll manually delete the container.
 
-As you can see, there’s no container now.
 
-Let’s run it again using the same command.
 
-Now, let’s check the database and tables to see if any of our previous data is still there.
+9:30:
+=================
+Now we’ll be creating our first Docker network. 
 
-And as you can see — nothing! No data, no tables.
-That’s because, with the default container behavior, all the data is lost when the container is removed.
+Lets Creating a Network: 
+To create a Docker network, you simply use the docker network create command. 
 
 
+By default, if you don’t specify a network driver, 
+Docker will create the network using the bridge driver.
 
 
 
 
-Now, let’s try running MySQL with both volume and bind-mounting.
-We’ll start with volume mounting first — you can find the commands in my document.
+What is a Network Driver? 
+It determines how containers can communicate with each other and the host machine. 
 
-First, let’s create a volume called mysql-data.
 
-Next, I’m going to run the MySQL container using this volume.
-Notice I’m using -e instead of --env — it’s just a shorter version, both work the same.
+Lets explore our created netowrk.
+Its come with a dirrernet subnet.
 
-Here, I’ve mounted the volume to MySQL’s main directory, which is used by the server to store configuration and data.
 
-The container is up and running.
 
-Now, let’s go inside the container and, like before, create a table and insert some data.
+Inspecting the Network: After creating the network, we can inspect it using the docker network 
+inspect <network_name> command. 
+This will show the details of the network, such as the subnet, gateway, and the containers connected to it.
 
 
 
+Custom Subnet: 
+    When you create a network, Docker automatically assigns a subnet for it. 
+    However, you can specify a custom subnet if needed. 
+    This allows you to define a specific range of IPs that your containers can use, 
+    providing better control over your network configuration.
 
 
-There’s no table yet, so let’s create one.
-To keep it simple, I’m adding just two fields in the book table and inserting some data.
+Containers connected to the bridge network are assigned a unique IP address from the network's subnet. 
+This ensures that each container can be individually addressed within the network.
 
-Let’s run a select query to check the data — perfect!
 
-So now, our container is running with volume mounting.
-Here’s the command I used to run it.
 
-We’ve inserted some data into the MySQL server, and now the data is stored in the volume, not inside the container itself.
-That means even if the container is removed, the data will stay safe in the volume
 
 
+Host Driver: 
+The host driver connects the container directly to the host machine’s network. 
+This means the container will share the same network namespace as the host machine, 
+and you can access it using the host's IP address. 
+The container won’t have its own IP; it uses the host machine’s IP.
 
 
-Let’s try this again. We’ll delete and remove the container, then run it again to check the data.
 
-We’ll use the same command, and this time, we should see the data we inserted before.
 
-To check, let’s exec into the container, access MySQL, and look at the database — there it is!
-Now check the table, and you’ll see the data is still there.
+None Driver: 
+The none driver essentially isolates the container from any network. 
+Containers using this driver have no network connection at all and can’t communicate with 
+other containers or the host machine.
 
-As expected, all our previously inserted data is safe.
-This is how volume mounting keeps your data even if the container is removed.
 
-Now this way your data is save.
 
 
 
 
-Bind mounts work the same way as volumes.
 
-So, why not try it? Let’s run it!
-For this, we need to provide a path on the host machine, followed by a colon and the container path.
+14:30
+===================
 
-Let’s copy the command and run it — here, I’m using a directory on my host machine to store the data.
+Lets see our current container ip and thre network !
 
-The container is running.
-This time, we’re not using a volume; instead, we’re directly using a folder on the host machine to keep the data.
-And here you can see the directory on my host machine.
+Lets go inside thei contienr using exec.
 
+Your see its it IP !
 
 
 
+Lets check another one !
+the same way go inside the contienr 
+and chedck it ip.
 
 
-Now, let’s do the same procedure to insert data.
-We’ll exec into the container, access the MySQL server, and insert some data.
 
-Let’s run all the commands at once.
 
-This time, the MySQL data is saved in the directory on the host machine.
+As the use same subnet then should maek coumunitcation.
+Lets check it.
+letc url a curl commane.
 
-Next, let’s delete and remove the container, then run it again using the same command.
 
-The container is running, and since we’re using a bind mount with the same host location, we should get our previously inserted data back.
 
-Let’s check…
 
-We get our data as expected !
 
+Lets create curstome new network.
 
 
+Lets check it usign inspect command.
+Your see it come with new subnet serise.
 
 
-    
-And that’s it for today’s video guyes !
 
-We’ve seen how MySQL behaves in a Docker container by default — where data is lost if the container is removed.
 
-Then we explored volume and bind mounting, which keeps your data safe even if the container is deleted.
 
-So, whether you use volumes or bind mounts, your  data stays safe, unlike the default container behavior.
 
 
 
+Now lets try communtixton of using this new netowrk.
 
+To do that i am gnna run tow serveice usign this service.
 
-Thanks for watching! 
-Go ahead and give it a try yourself — it’s fun!
+
+Lets say we have and db server and a application service.
+
+Lets run a app serfive using same netowrk.
+
+
+Lets run anoter contienr call my-backend.
+Its run done.
+
+
+so we have now two continer one db server and one for applicaiton server.
+
+your see when i run db servei i it run with my cursome network.
+
+but my application run with defautl network as 
+we are not mentation any netwokr when we run it.
+
+
+Now tow contaienr run with dirretrne netowrk.
+Lets check are they able to make connrdction or not?
+
+
+lets do a curl request 
+I have to ip adress.
+Right now i amd insise in db so i can maek curl.
+
+now lets try thsi from app server to connect to
+db servrr.
+
+
+I amd inside db server:
+Lets echek it Ip first.
+
+Now lets try a curl to my application to make cunnection.
+
+we should not get any response because the on tow different network.
+and you no response.
+
+
+
+Lets fixed it, 
+Lets run our backend service with the same network
+with database server what is uses.
+
+
+you can inspect dataisl of the my_net using inspect
+It will shwo how amy contienr connecti with it.
+
+
+
+
+Lts run our second contianr.
+
+
+Lets checkf netwrk ageint.
+You see its show now boutu contner ip.
+
+
+
+Now letc check tow service communitcation !
+Now then should able to make connection.
+
+
+lets go inside contienr 
+lets run a curl.
+
+
+now you see we get ther response from our db contienr.
+
+
+
+This is how brize network work.
+
+when multiple contaienr run on same net then can communticaotn.
+
+
+
+
+
+
+
+29:00
+============================
+
+
+
+Host Network: 
+How it work ? it make direct conenction with host machine.
+Your can be access using host ip.
+
+Host network not use so much,Your can find its details in docker doc.
+
+
+
+lets talk about Overlay Network: 
+
+The overlay network is used for clustering multiple Docker nodes, 
+such as in a Docker Swarm. 
+
+The overlay network enables communication between containers on different Docker nodes within the cluster. 
+It ensures that containers across multiple machines can communicate as if they were on the same network.
+
+
+
+
+
+
+
+Lets talk about now user difent netork.
+Lets crate a Custom Subnet our cont9enr netowrk.
+
+
+In previous steps, we used Docker's default subnet. 
+Now, let's create a network with a custom subnet. 
+This allows us to define our own range of IP addresses and gateway for the network.
+
+
+
+Lets check current network we have.
+lets check one 
+We dont mentation any subnet on thsi network.
+
+
+now let crate one with custome subnet.
+
+
+on the commen:
+I menation the sunbet and a gatewowrk ip form thsi subnet.
+LETS set a name for it.
+
+
+
+lets ehck 
+lets see detaisl using inspect
+
+
+we can inspect it to view the network details, such as the assigned subnet, IP range, and gateway.
+
+
+Now if run a conteir usign this netork 
+the contienr will get a ip from this subnet.
+
+
+
+Lets run one .
+
+When we run a container on the custom subnet, it will be assigned an IP address from the defined subnet.
+we give it name mynet2 I gooona mame the contienr mydb3.
+
+
+
+
+Let’s run the container and check its IP using the docker inspect command. 
+The container should receive an IP address from our custom subnet, 
+and we’ll confirm it by inspecting the container’s network settings.
+
+
+
+
+
+That wraps up this tutorial on Docker networks. 
+We’ve learned about bridge, host, and overlay networks, how to create custom networks with subnets, 
+and how containers can communicate with each other. 
+
+Thanks for watching! If you found this tutorial helpful, please like, comment, and subscribe for more Docker tips and tutorials.
+
+This script explains Docker networks, creating custom subnets, and testing container communication in a 
+clear and structured way for your audience.
+
+
+
+
+
+
+
+
