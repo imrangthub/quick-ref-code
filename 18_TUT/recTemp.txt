@@ -13,15 +13,14 @@ system architecture is getting more complex every day
 especially with multi-tier applications and microservices.
 
 
-
-Where need 
+You know..
 Different services constantly need to talk to each other.
 
 For example, your application server might need to communicate with a database server, 
 an authentication service, or other internal components.
 
-Docker networks make this communication clean, secure, 
-just like they would in a real project network requirement.
+
+Docker networks make this communication clean, secure.
 
 
 
@@ -40,8 +39,11 @@ smoothly and securely.
 Docker networking isn’t just about connecting containers; 
 it’s also about controlling who can access what.
 
+
+
 For example, you may want your database to be reachable only by the app server, 
 not by the public network.
+
 
 This is where Docker networks play a major 
 role in keeping your architecture both functional and secure.
@@ -54,13 +56,20 @@ role in keeping your architecture both functional and secure.
 
 Let’s take a simple three-tier application as an example.
 
+
+
+
 The frontend is deployed in a public network, where users can access it directly.
+
+
 
 The application server sits in a secure network, away from public exposure.
 
 
+
 And the database server lives in an even more restricted network, 
 where only the app server is allowed to communicate with it.
+
 
 
 This layered structure keeps everything organized, 
@@ -73,15 +82,17 @@ controlled, and secure—just like in a real production environment.
 
 
 Docker networking works like normal networking on a host machine.
-Docker creates a virtual Ethernet network, and every container gets its own IP address.
+Docker creates a virtual Ethernet network, 
+and every container gets its own IP address.
 
 
 
 
 You might wonder...
 we never created a network, but our containers still worked.
-That’s because Docker automatically uses a default network called the bridge network.
+How....?
 
+That’s because Docker automatically uses a default network called the bridge network.
 
 
 If you don’t specify a network, your container joins this bridge network by default.
@@ -95,7 +106,8 @@ This lists every network available, including the default ones.
 
 
 
-If you want to see how a specific container is connected to a network, use docker inspect.
+
+docker inspect.
 
 It gives you detailed info,
 like the container’s network settings and which network it’s using.
@@ -113,7 +125,10 @@ Now let’s create our first Docker network.
 
 
 To create one, just use the docker network create command.
-If you don’t specify a driver, Docker will automatically use the bridge driver by default.
+
+If you don’t specify a driver, 
+Docker will automatically use the bridge driver by default.
+
 
 
 Simple and easy
@@ -125,24 +140,29 @@ your custom network is ready.
 
 Now
 What is a network driver?
+
 It’s simply the component that decides how containers 
 communicate with each other and with the host machine.
 
 
 
+By default, there are three network drivers available here.
 
 
-Host bridge:
+
+
+Bridge:
 Now let’s explore the bridge network.
-Every Docker network comes with its own subnet.
 
 
-You can inspect it using:
-docker network inspect <network_name>
+The Docker bridge network driver creates an internal, 
+private network on the host where containers can communicate with each other.
 
 
-This shows details like the subnet,
-gateway, and any containers connected to that network.
+
+It’s the default driver for standalone containers 
+and allows port mapping so outside clients can access 
+services running inside containers.
 
 
 
@@ -162,6 +182,8 @@ making each one individually reachable within the network.
 Host driver:
 With this driver, the container is directly connected to the host’s network.
 It shares the host’s IP, so it doesn’t get its own.
+
+
 
 For example, if your host machine’s IP is 192.168.1.10 
 and you run a web server in a container, 
@@ -192,14 +214,13 @@ for computation or testing, without exposing it to any network.
 14:30
 ===================
 
-Now lets explore more about bridge network.
-Now let’s check the IP of our running container and the network it’s connected to.
-
+Now let’s explore the bridge network a bit more.
+First, we’ll check the IP address of our running container and see 
+which network it’s connected to.
 
 
 We can go inside the container using:
 docker exec -it <container_name> bash
-
 
 
 
@@ -213,19 +234,6 @@ confirm which network it’s using.
 
 Let’s check another container the same way.
 Go inside using docker exec -it <container_name> bash and check its IP.
-
-
-
-Since both containers are on the same subnet, 
-they should be able to communicate with each other.
-
-
-
-Let’s test it using a curl command to see if one container can reach the other.
-
-
-
-This is a simple way to see Docker networking in action!.
 
 
 
@@ -255,7 +263,6 @@ and structure of our containers more precisely.
 
 
 
-
 Now let’s test communication using our new custom network.
 
 
@@ -268,7 +275,11 @@ Let’s say we have a database server and an application backned-service.
 
 
 
- we’ll run the app backend-service without network.
+
+First, we’ll run the backend-service container without attaching it to any network, 
+and see what happens in that situation.
+
+
 
 
 
@@ -279,8 +290,8 @@ and one for the application server.
 
 
 
-
 You’ll notice that the DB server is running on our custom network, 
+
 
 while the application server is still on the default network, 
 because we didn’t specify a network when running it.
@@ -295,6 +306,8 @@ Let’s check if they can communicate.
 
 
 
+
+
 We’ll try using a curl request.
 I have the IP addresses—right now I’m inside the DB server, 
 so I can attempt to connect.
@@ -306,6 +319,10 @@ First, let’s check the DB server’s IP.
 Now, let’s try to curl the application server from the DB server.
 
 
+
+
+
+
 As expected, we don’t get any response, .
 because the containers are on different networks and cannot communicate 
 with each other.
@@ -314,9 +331,8 @@ with each other.
 
 
 
-This shows why it’s important to have containers on the same network 
-if you want them to talk.
-
+This clearly shows why containers need to be on the same network 
+if you want them to communicate.
 
 
 
@@ -329,6 +345,8 @@ We’ll run our backend service on the same network as the database server.
 
 
 
+
+
 You can inspect the network using:
 docker network inspect my_net
 This will show how many containers are connected to it.
@@ -337,7 +355,8 @@ This will show how many containers are connected to it.
 
 
 Let’s run our second container on this network.
-Now, if we check the network again, you’ll see  the IP addresses of both containers.
+Now, if we check the network again, 
+you’ll see  the IP addresses of both containers.
 
 
 
@@ -348,14 +367,13 @@ We’ll go inside one container and run a curl command.
 
 
 Now you’ll see we get a response from the DB container, 
-
 which means they can successfully communicate.
 
 
 
-
-
 This is exactly how the bridge network works:
+
+
 When multiple containers are on the same network, 
 they can easily talk to each other.
 
@@ -382,13 +400,14 @@ It’s not used very often, but you can find more details in the Docker document
 
 
 
-Overlay Network:
+Now let’s talk about the Overlay network.
 The overlay network is designed for clustering multiple Docker nodes, 
 like in a Docker Swarm.
 
 
-It allows containers on different machines to communicate 
-as if they were on the same network, 
+It lets containers on different machines talk to each other as if 
+they were on the same network.
+
 making multi-node communication simple and seamless.
 
 
@@ -397,6 +416,9 @@ making multi-node communication simple and seamless.
 
 
 
+
+
+Custom subnet:
 
 Now let’s create a network with a custom subnet.
 
@@ -408,18 +430,18 @@ which lets us define our own range of IP addresses and gateway.
 
 
 First, let’s check the current networks we have.
-Here’s one we created earlier—we didn’t specify any subnet for this network, 
+
+
+Here’s one we created earlier and 
+we didn’t specify any subnet for this network, 
 so Docker automatically assigned one.
 
 
 
 
-
-
-Let’s create one...
-In the command, we’ll specify the subnet and 
-a gateway IP from that subnet, and give the network a name.
-
+Let’s create a custom network.
+In the command, we’ll set the subnet, choose a gateway IP from that subnet, 
+and give our network a name.
 
 
 
@@ -445,8 +467,11 @@ We’ll name the network mynet2 and the container mydb3.
 
 
 After running the container, we can check its IP with docker inspect.
-You’ll see that the container receives an IP from our custom subnet, 
-confirming everything is set up correctly.
+
+
+
+You’ll notice that the container gets an IP from our custom subnet,
+which shows that everything is set up correctly.
 
 
 
@@ -455,17 +480,21 @@ confirming everything is set up correctly.
 
 
 
+That’s it for todays video guys !
+
+We’ve covered bridge, host, and overlay networks,
+and seen how containers communicate with each other.
+
+We also learned how to create custom networks with your own subnets.
+
+
+So thats it....
+Thanks for watching! If you found this helpful, like, comment, 
+and subscribe for more Docker tips and tutorials.
 
 
 
-That’s it for this Docker networks tutorial!
-
-We covered bridge, host, and overlay networks, 
-how to create custom networks with your own subnets, and how containers communicate with each other.
-
-Thanks for watching! If you found this helpful, like, comment, and subscribe for more Docker tips and tutorials.
-
-See you in the next one!
+See you in the next episode !
 
 
 
