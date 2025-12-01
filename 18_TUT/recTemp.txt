@@ -1,525 +1,505 @@
 
 =================================================
-##7) Networking and Security
+##8) Simple Example Project
 =================================================
 
 
+Hey everyone! Welcome back!
 
+Today, we’re going to run several projects using Docker.
 
-Why do we actually need Docker networks?
+We’ll show you how to run projects using different programming languages 
+like Java, Python, PHP, and Node.js with Docker, 
+and I’ll break it down into a super easy, step-by-step guide.
 
-Well, in real-world projects, 
-system architecture is getting more complex every day especially with multi-tier 
-applications and microservices.
+This is going to be an interesting episode in our tutorial series.
 
+Let’s jump into it !
 
-You know..
-Different services constantly need to talk to each other.
 
-For example, your application server might need to communicate with a database server, 
-authentication service, or other internal components.
 
 
+GitHub Link: 
+The source code for this project is available on GitHub. 
 
+You can find the link in the description below.
 
 
-Think about a typical multi-tier application.
 
-In real-world systems,  frontend, backend, 
-and database—often run in separate environments. 
+You can access the code either 
+by cloning the repository or downloading it directly as a ZIP file.
 
 
-so 
-we really need a clear communication line here, right ?
 
-Docker networks make this communication clean, secure.
 
+First, 
+let's see how you can clone the repository using Git. 
 
-Docker makes sure all these components can communicate with each other 
-smoothly and securely.
+Open your terminal and run the following command:
+git clone [GitHub Repository URL]
 
+This will clone the entire project into your local machine, 
+and you can start working with it right away.
 
 
 
-Docker networking isn’t just about connecting containers; 
-it’s also about controlling who can access what.
+Alternatively,  you can download the project as a ZIP file. 
 
+Just go to the GitHub page, and there will be an option to "Download ZIP" 
+on the repository page.
 
 
-For example, you may want your database to be reachable only by the app server, 
-not by the public network.
 
 
-This is where Docker networks play a major 
-role in keeping your architecture both functional and secure.
 
 
 
 
 
+1:30
+==============
 
+First, we’re going to run a PHP project using Docker.
 
-Let’s take a simple three-tier application as an example.
+Lets see how we cna do it.
 
 
 
+This project is super simple – just one file, index.php, like a Hello World.
 
-The frontend is deployed in a public network, where users can access it directly.
 
+Lets see the docker file how it looks like:
 
 
-The application server sits in a secure network, away from public exposure.
+    FROM – sets up the PHP environment
+    COPY – moves our file into the container
+    EXPOSE – opens the port to access the project
 
+Simple, right? Let’s run it!
 
 
-And the database server lives in an even more restricted network, 
-where only the app server is allowed to communicate with it.
 
 
 
-This layered structure keeps everything organized, 
-controlled, and secure—just like in a real production environment.
+4:10
+=====================
 
+Let’s open the terminal here,
+you should see two files: Dockerfile and index.php
 
 
+Let’s build Docker image for our PHP project. 
 
+To do that, we use the following command:
 
-Docker networking works like normal networking on a host machine.
-Docker creates a virtual Ethernet network, 
-and every container gets its own IP address.
+docker build -t php-project .
 
+This command will build the image based on the Dockerfile 
+in the current directory, named php-project.
 
 
 
-You might wonder...
-we never created a network, but our containers still worked.
-How....?
+Now that we’ve built the image, 
+let’s run the container using the following command:
 
-That’s because Docker automatically uses a default network called the bridge network.
+docker run -d -p 8080:80 php-project
 
 
-If you don’t specify a network, your container joins this bridge network by default.
 
+This command runs the php-project in detached mode 
+and maps port 80 in the container to 8080 on your machine.
 
 
 
-You can check all Docker networks using the docker network ls command.
 
-This lists every network available, including the default ones.
+If everything is set up correctly, your project will be running.
+Open your browser and go to port 8080 to see it in action!
 
 
 
+We’re using just a single file here, 
+but for bigger PHP projects with many files, 
+make sure your project structure is organized and all files are 
+copied to the right directories.
 
-docker inspect.
 
-It gives you detailed info,
-like the container’s network settings and which network it’s using.
 
 
 
 
 
 
+7:40
+==========================
 
 
-9:30:
-=================
-Now let’s create our first Docker network.
 
+In the real world, most projects use a multi-tier setup with 
+frontend, backend, and a database.
 
-to do that we gonna run docker network create command
+Now, we’re going to run a three-tier application with all three parts: 
+frontend, backend, and database.
 
 
 
+Each tier will run in a separate container, and we’ll use Docker networking 
+to enable communication between them.
 
-If you don’t specify a driver, 
-Docker will automatically use the default driver. 
 
 
+In a typical three-tier application, 
+the frontend communicates with the backend, and the 
+backend communicates with the database.
 
-Do you know what that is? It’s the bridge driver.
 
+For our containers to talk to each other easily, 
+they need to connect by name instead of IP address.
 
-because bridge driver is the Docker’s default network.
 
+Docker’s default bridge network doesn’t include an internal DNS resolver, 
+so containers can communicate using IP addresses, 
+but not by container names. 
 
+To fix this, we use Docker’s custom networks, 
+which make dns-based communication easy.
 
 
 
 
-Now
-What is a network driver?
 
-It’s the component that decides how containers 
-communicate with each other and with the host machine.
 
 
+Before we start creating our multi-tier application, 
+let’s check which networks are already available. 
 
 
-By default, there are three network drivers available here.
 
+Run the following command to list all Docker networks:
+docker network ls
 
 
 
-Bridge:
-Now let’s explore the bridge network.
 
+Let’s test the default bridge network by running two containers. 
 
-The Docker bridge network driver creates an internal, 
-private network on the host where containers can communicate with each other.
+We’ll attempt to make them communicate, but since 
+there’s no internal DNS resolver, 
+they can only communicate using IP addresses, not container names.
 
 
 
-It’s the default driver for standalone containers 
-and allows port mapping so outside clients can access 
-services running inside containers.
 
 
 
-Docker automatically assigns a subnet when you create a network, 
-but you can also define your own custom subnet.
 
 
-Every container connected to a network gets a unique IP address from that subnet, 
-making each one individually reachable within the network.
 
+Now, let’s create a custom network that includes Docker’s internal DNS resolver. 
+This will allow us to use container names for communication.
 
 
 
 
+To create a custom network, use the following command:
+docker network create --driver bridge my_custom_network
 
 
-Host driver:
-With this driver, the container is directly connected to the host’s network.
-It shares the host’s IP, so it doesn’t get its own.
 
 
 
-For example, if your host machine’s IP is 192.168.1.10 
-and you run a web server in a container, 
-you can access it using the host’s IP directly—no extra networking needed.
+Once our network is set up, we’ll run two new Nginx containers, 
+ng3 and ng4, on this network. 
 
 
-This is handy when you want the container application 
-Behave like it’s running directly on your machine.
+The idea here is to test how these containers can communicate with each other 
+using DNS, rather than relying on IP addresses.
 
 
-Like when you need a MySQL server on your host machine for development work.
 
+Next, we’ll inspect the network to check the current status. 
+This will confirm that our two containers, 
+ng3 and ng4, are running on the same custom network.
 
 
 
 
+Now, let's check if it's possible for the two containers 
+to communicate with each other by DNS.
 
-None driver:
-On the other hand, the none driver completely isolates the container.
+First, we’ll test using IP addresses to see if the communication works. 
+After that, we’ll test using DNS resolution.
 
-It has no network access, so it can’t communicate with other containers or the host.
-This is useful if you just want to run a container 
-for computation or testing, without exposing it to any network.
 
 
 
 
+Let’s take a look at what our three-tier application setup will look like. 
 
 
 
+In this setup, we’ll have the frontend, backend, and database containers, 
+all connected using the custom network we just created. 
 
 
 
-14:30
-===================
+This will allow each tier to communicate seamlessly, 
+using DNS names instead of IP addresses.
 
-Now let’s explore the bridge network a bit more.
-First, we’ll check the IP address of our running container and see 
-which network it’s connected to.
 
 
-We can go inside the container using:
-docker exec -it <container_name> bash
 
+Let’s start by running our database server.
 
+We’ll use this command (you can check Docker docs for details 
+on the environment options).
+We’re going to use our custom network and also attach a volume 
+to keep our data safe – you already know about Docker volumes.
 
-Once inside, you’ll be able to see its IP address and 
-confirm which network it’s using.
+Alright, let’s run it!
 
 
+Okay, our database server is running!
+Let’s check the tables and add some data.
 
+We’ll create a table and then run a few INSERT commands to add some records.
 
 
 
-Let’s check another container the same way.
-Go inside using docker exec -it <container_name> bash and check its IP.
 
 
+30:10
+==========================
+Now, let’s see how to run a simple Python project in Docker 
+and connect it to a database.
 
+We’ll check out the source code and Dockerfile for this project.
 
 
+First, looking at the python sorece code, 
+Tt’s simple: 
+we create a database connection and pass the hostname 
+using an environment variable.
 
 
 
+Now, let’s check the Dockerfile. 
 
-Now let’s create a custom Docker network.
 
-After creating it, we can check it using:
-docker network inspect <network_name>
 
+As usual, we start with a Python base image.
+then create a folder inside the container called app to hold our code.
 
+Next, we install the MySQL library and copy the source code into the container.
 
-You’ll see that it comes with a new subnet range, 
-different from the default networks.
+Finally, we use the CMD instruction to run the Python script.
 
-This allows us to control the IP addresses 
-and structure of our containers more precisely.
 
 
 
+Let’s now build the Docker image with the docker build command. 
 
+Once the image is built, we’ll move on to running it.
 
 
 
 
-Now let’s test communication using our new custom network.
+Now, we’ll run the container using docker run.
 
+We’ll make sure the Python project connects to the database and 
+runs the query successfully.
 
 
+We use the container name as DNS to connect to the MySQL server, 
+and provide the database credentials and name.
 
-We’ll run two services on this network.
-Let’s say we have a database server and an application backned-service.
+Let’s run it…
+And there you go! Our application is running successfully and 
+reading data from the database.
 
 
 
+Let’s capture a screenshot and add it to our documentation.
 
-First, we’ll run the backend-service container without attaching it to custom network, 
-and see what happens in that situation.
+That’s it! We’ve built and run a Python application with MySQL in Docker.
 
 
 
 
 
-So right now, we have two containers—one for the database server 
-and one for the application server.
 
 
+40:10
+===========================
 
+Now we we’ll build and run a Java Spring Boot application 
+inside a Docker container,  connecting it to a MySQL database.
 
 
-You’ll notice that the DB server is running on our custom network, 
+Lets check the docker file first.
 
 
-while the application server is still on the default network, 
-because we didn’t specify a network when running it.
+Before running the Java application, we need to compile and build a JAR file.
 
 
 
+We’ll use Maven for this.
+Let’s see how to go from source code to a JAR file. 
+I’ll import the project into Eclipse IDE to make building the JAR easier.
 
 
 
-Now, these two containers are on different networks. 
-Let’s check if they can communicate.
+This is a bit different from other languages,
+in Java, you always need to build a JAR before running the application.
 
 
 
 
+This is a Spring Boot project, and here’s the pom.xml 
+where you can see all the dependencies.
 
-We’ll try using a curl request.
-I have the IP addresses—right now I’m inside the DB server, 
-so I can attempt to connect.
+Here’s the source code.
+Now, let’s build the required JAR file.
 
 
 
 
-First, let’s check the DB server’s IP.
-Now, let’s try to curl the application server from the DB server.
+This is the Dockerfile—let’s check it out!
 
+The steps are similar to what we did for the Python application:
 
+Use a JDK as the base image.
+Create a directory inside the container.
+Copy the JAR file into the container.
+Expose the necessary port.
+Finally, run the JAR file.
 
 
 
 
-As expected, we don’t get any response, .
-because the containers are on different networks and cannot communicate 
-with each other.
 
 
+Now, let’s build the Docker image for our Java Spring Boot app 
+using the Docker build command.
 
 
-This clearly shows why containers need to be on the same network 
-if you want them to talk to each other.
 
 
+Next, we’ll run the Java app inside a container on the same 
+Docker network as our MySQL database.
 
 
+Oops! We got a port conflict because our Python app is already using port 8080.
 
 
 
-Now let’s fix the issue.
-We’ll run our backend service on the same network as the database server.
 
 
+To fix this:
+    We stop and remove the existing Python container.
+    Now, we rerun the Java application container.
 
 
+It runs successfully! Let’s take a screenshot and add it to our documentation.
 
-You can inspect the network using:
-docker network inspect my_net
-This will show how many containers are connected to it.
 
 
+Now, 
+let’s open the browser and check http://localhost:8080.
 
+Yes! We successfully get the data from the MySQL server.
 
-Let’s run our second container on this network.
 
 
-Now, if we check the network again, 
-you’ll see  the IP addresses of both containers.
 
+To debug and monitor the application, we can check container logs:
+Use the docker logs command to see past logs.
 
 
+Use docker logs -f to view live logs in real time.
 
-Next, let’s test communication between the two services.
-We’ll go inside one container and run a curl command.
+Now, our MySQL database and backend Java application 
+are fully set up inside Docker.
 
 
 
-Now you’ll see we get a response from the DB container, 
-which means they can successfully communicate.
+The backend is ready! 
+Now, we’ll proceed to running a Node.js frontend application in the next step.
 
 
 
-This is exactly how the bridge network works:
 
 
-When multiple containers are on the same network, 
-they can easily talk to each other.
 
+53:30
+=====================
 
+In this tutorial, 
+we’ll complete our three-tier application by running a Node.js frontend,
 
+which communicates with a Java backend, 
+connected to a MySQL database inside Docker.
 
 
 
 
+First, 
+let’s check the Node.js application source code.
 
+Nothing fancy here!
+    The app makes an HTTP request to our backend service and gets the response.
+    Then, it maps the data to an HTML file to display it.
 
 
 
-29:00
-============================
 
+Now, let’s check the Dockerfile for our Node.js application.
 
-Host Network:
-The host network connects the container directly to the host machine’s network, 
-so you can access it using the host’s IP.
 
-It’s not used very often, but you can find more details in the Docker documentation.
+The steps are similar to what we did before:
+Define a base image for Node.js.
 
+    Copy the source files into the container.
+    Expose the port 3000 (since our frontend runs on this port).
+    Run the Node.js application.
 
-You can give it a try—I am gonna leave it up to you.
 
+Now, let’s build the Docker image for our Node.js frontend.
 
 
+We run the Docker build command, 
+and once it's done, we take a screenshot and add it to our documentation.
 
-Overlay network:
-Now let’s talk about the Overlay network.
-The overlay network is designed for clustering multiple Docker nodes, 
-like in a Docker Swarm.
 
 
-It lets containers on different machines talk to each other as if 
-they were on the same network.
 
-making multi-node communication simple and seamless.
+Next, we run the frontend container inside the 
+same Docker network as the backend and database.
 
+Now, let’s open the browser and check http://localhost:3000.
 
 
+Yes! We can now see the data from our Java backend, 
+beautifully displayed in the frontend.
 
 
+Our three-tier app is fully set up and working as expected!
 
 
+Database: MySQL
+Middle Tier (Backend): Java Spring Boot
+Frontend: Node.js
 
 
-Custom subnet:
+Let’s manually add some data to the MySQL database.
 
-Now let’s create a network with a custom subnet.
+The process is almost the same as before!
 
 
-In the previous steps, we used Docker’s default subnet.
-Now, we’ll create a network with a custom subnet, 
-which lets us define our own range of IP addresses and gateway.
+Now, we refresh the browser…
+Yes! The newly added data appears in the frontend instantly!
 
 
-
-First, let’s check the current networks we have.
-
-
-This one we created earlier and 
-we didn’t specify any subnet for this network, 
-so Docker automatically assigned one.
-
-
-
-
-Let’s create a custom network.
-In the command, we’ll set the subnet, choose a gateway IP from that subnet, 
-and give our network a name.
-
-
-
-
-Once it’s created, we can check the details using:
-docker network inspect <network_name>
-This shows the assigned subnet, IP range, and gateway.
-
-
-
-
-
-Now, if we run a container using this network, 
-it will get an IP from our custom subnet.
-
-
-
-
-Let’s try it.
-We’ll name the network mynet2 and the container mydb3.
-
-
-
-
-After running the container, we can check its IP with docker inspect.
-
-
-
-You’ll notice that the container gets an IP from our custom subnet,
-which shows that everything is set up correctly.
-
-
-
-
-
-
-
-
-
-That’s it for todays video guys !
-
-We’ve covered bridge, host, and overlay networks,
-and seen how containers communicate with each other.
-
-We also learned how to create custom networks with your own subnets.
-
-
-So thats it....
-Thanks for watching! If you found this helpful, like, comment, 
-and subscribe for more Docker tips and tutorials.
-
-
-
-See you in the next episode !
-
-
-
-
-
-
+ That’s it! We’ve successfully built and run a three-tier application inside Docker. 
+ Thanks for watching!
 
 
