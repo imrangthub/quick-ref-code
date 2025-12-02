@@ -8,11 +8,17 @@ Hey everyone! Welcome back!
 
 Today, we’re going to run several projects using Docker.
 
+
+
 We’ll show you how to run projects using different programming languages 
-like Java, Python, PHP, and Node.js with Docker, 
+like Java, Python, PHP, and Node.js.
+
+
 and I’ll break it down into a super easy, step-by-step guide.
 
-This is going to be an interesting episode in our tutorial series.
+
+
+This episode going to be an interesting one.
 
 Let’s jump into it !
 
@@ -34,6 +40,9 @@ by cloning the repository or downloading it directly as a ZIP file.
 
 First, 
 let's see how you can clone the repository using Git. 
+
+
+
 
 Open your terminal and run the following command:
 git clone [GitHub Repository URL]
@@ -61,7 +70,7 @@ on the repository page.
 
 First, we’re going to run a PHP project using Docker.
 
-Lets see how we cna do it.
+Lets see how we can do it.
 
 
 
@@ -74,6 +83,9 @@ Lets see the docker file how it looks like:
     FROM – sets up the PHP environment
     COPY – moves our file into the container
     EXPOSE – opens the port to access the project
+
+
+
 
 Simple, right? Let’s run it!
 
@@ -88,31 +100,46 @@ Let’s open the terminal here,
 you should see two files: Dockerfile and index.php
 
 
+
+
 Let’s build Docker image for our PHP project. 
 
 To do that, we use the following command:
 
 docker build -t php-project .
 
+
+
+
 This command will build the image based on the Dockerfile 
 in the current directory, named php-project.
 
 
 
+
+
+
+
 Now that we’ve built the image, 
+
+
 let’s run the container using the following command:
 
 docker run -d -p 8080:80 php-project
 
 
 
-This command runs the php-project in detached mode 
+This command runs the php-project in detached mode.
+
 and maps port 80 in the container to 8080 on your machine.
 
 
 
 
 If everything is set up correctly, your project will be running.
+
+
+
 Open your browser and go to port 8080 to see it in action!
 
 
@@ -129,6 +156,9 @@ copied to the right directories.
 
 
 
+
+
+
 7:40
 ==========================
 
@@ -137,13 +167,17 @@ copied to the right directories.
 In the real world, most projects use a multi-tier setup with 
 frontend, backend, and a database.
 
-Now, we’re going to run a three-tier application with all three parts: 
+
+
+
+
+Now, we’re going to run a multi-tier application with the common three parts: 
 frontend, backend, and database.
 
 
 
-Each tier will run in a separate container, and we’ll use Docker networking 
-to enable communication between them.
+Each tier will run in a separate container, 
+and we’ll use Docker networking to enable communication between them.
 
 
 
@@ -152,13 +186,16 @@ the frontend communicates with the backend, and the
 backend communicates with the database.
 
 
-For our containers to talk to each other easily, 
-they need to connect by name instead of IP address.
+
+Here docker provide a dns for internal communication !
 
 
 Docker’s default bridge network doesn’t include an internal DNS resolver, 
 so containers can communicate using IP addresses, 
 but not by container names. 
+
+
+
 
 To fix this, we use Docker’s custom networks, 
 which make dns-based communication easy.
@@ -181,6 +218,8 @@ docker network ls
 
 
 Let’s test the default bridge network by running two containers. 
+
+
 
 We’ll attempt to make them communicate, but since 
 there’s no internal DNS resolver, 
@@ -211,8 +250,14 @@ Once our network is set up, we’ll run two new Nginx containers,
 ng3 and ng4, on this network. 
 
 
+
+
+
 The idea here is to test how these containers can communicate with each other 
 using DNS, rather than relying on IP addresses.
+
+
+
 
 
 
@@ -223,11 +268,17 @@ ng3 and ng4, are running on the same custom network.
 
 
 
+
+
 Now, let's check if it's possible for the two containers 
 to communicate with each other by DNS.
 
+
+
 First, we’ll test using IP addresses to see if the communication works. 
+
 After that, we’ll test using DNS resolution.
+
 
 
 
@@ -237,8 +288,11 @@ Let’s take a look at what our three-tier application setup will look like.
 
 
 
+
+
 In this setup, we’ll have the frontend, backend, and database containers, 
 all connected using the custom network we just created. 
+
 
 
 
@@ -248,18 +302,28 @@ using DNS names instead of IP addresses.
 
 
 
+
 Let’s start by running our database server.
 
 We’ll use this command (you can check Docker docs for details 
 on the environment options).
+
+
+
+
 We’re going to use our custom network and also attach a volume 
 to keep our data safe – you already know about Docker volumes.
+
+
 
 Alright, let’s run it!
 
 
 Okay, our database server is running!
 Let’s check the tables and add some data.
+
+
+
 
 We’ll create a table and then run a few INSERT commands to add some records.
 
@@ -272,13 +336,24 @@ We’ll create a table and then run a few INSERT commands to add some records.
 Now, let’s see how to run a simple Python project in Docker 
 and connect it to a database.
 
+
+
+
+
 We’ll check out the source code and Dockerfile for this project.
 
 
+
+
 First, looking at the python sorece code, 
+
+
 Tt’s simple: 
 we create a database connection and pass the hostname 
+
 using an environment variable.
+
+
 
 
 
@@ -286,17 +361,28 @@ Now, let’s check the Dockerfile.
 
 
 
+
 As usual, we start with a Python base image.
+
+
+
 then create a folder inside the container called app to hold our code.
 
-Next, we install the MySQL library and copy the source code into the container.
+
+
+Next, we install the required library and copy the source code into the container.
+
+
 
 Finally, we use the CMD instruction to run the Python script.
 
 
 
 
+
 Let’s now build the Docker image with the docker build command. 
+
+
 
 Once the image is built, we’ll move on to running it.
 
@@ -305,22 +391,34 @@ Once the image is built, we’ll move on to running it.
 
 Now, we’ll run the container using docker run.
 
+
+
 We’ll make sure the Python project connects to the database and 
 runs the query successfully.
+
+
+
 
 
 We use the container name as DNS to connect to the MySQL server, 
 and provide the database credentials and name.
 
+
+
+
 Let’s run it…
-And there you go! Our application is running successfully and 
-reading data from the database.
+And there you go! 
+Our application is running successfully and reading data from the database.
 
 
 
 Let’s capture a screenshot and add it to our documentation.
 
-That’s it! We’ve built and run a Python application with MySQL in Docker.
+
+
+
+That’s it! 
+We’ve built and run a Python application with MySQL in Docker.
 
 
 
@@ -331,25 +429,40 @@ That’s it! We’ve built and run a Python application with MySQL in Docker.
 40:10
 ===========================
 
-Now we we’ll build and run a Java Spring Boot application 
-inside a Docker container,  connecting it to a MySQL database.
+
+
+
+Now 
+We we’ll build and run a Java  application !
+
+
+
 
 
 Lets check the docker file first.
+
 
 
 Before running the Java application, we need to compile and build a JAR file.
 
 
 
+
 We’ll use Maven for this.
-Let’s see how to go from source code to a JAR file. 
+
+
+Let’s see how to go from java source code to a JAR file. 
+
+
+To do that ...
 I’ll import the project into Eclipse IDE to make building the JAR easier.
 
 
 
-This is a bit different from other languages,
-in Java, you always need to build a JAR before running the application.
+
+
+Java is a bit different from other programming languages,
+You always need to build a JAR before running the application.
 
 
 
@@ -357,20 +470,33 @@ in Java, you always need to build a JAR before running the application.
 This is a Spring Boot project, and here’s the pom.xml 
 where you can see all the dependencies.
 
+
+
 Here’s the source code.
 Now, let’s build the required JAR file.
 
 
 
 
+
 This is the Dockerfile—let’s check it out!
+
+
+
+
 
 The steps are similar to what we did for the Python application:
 
+
+
 Use a JDK as the base image.
+
 Create a directory inside the container.
+
 Copy the JAR file into the container.
+
 Expose the necessary port.
+
 Finally, run the JAR file.
 
 
@@ -388,6 +514,8 @@ Next, we’ll run the Java app inside a container on the same
 Docker network as our MySQL database.
 
 
+
+
 Oops! We got a port conflict because our Python app is already using port 8080.
 
 
@@ -399,6 +527,8 @@ To fix this:
     Now, we rerun the Java application container.
 
 
+
+
 It runs successfully! Let’s take a screenshot and add it to our documentation.
 
 
@@ -406,19 +536,28 @@ It runs successfully! Let’s take a screenshot and add it to our documentation.
 Now, 
 let’s open the browser and check http://localhost:8080.
 
+
+
 Yes! We successfully get the data from the MySQL server.
 
 
 
 
+
 To debug and monitor the application, we can check container logs:
+
 Use the docker logs command to see past logs.
 
 
 Use docker logs -f to view live logs in real time.
 
+
+
+
 Now, our MySQL database and backend Java application 
 are fully set up inside Docker.
+
+
 
 
 
@@ -433,21 +572,19 @@ Now, we’ll proceed to running a Node.js frontend application in the next step.
 53:30
 =====================
 
-In this tutorial, 
-we’ll complete our three-tier application by running a Node.js frontend,
-
-which communicates with a Java backend, 
-connected to a MySQL database inside Docker.
-
 
 
 
 First, 
 let’s check the Node.js application source code.
 
+
+
 Nothing fancy here!
-    The app makes an HTTP request to our backend service and gets the response.
-    Then, it maps the data to an HTML file to display it.
+
+The app makes an HTTP request to our backend service and gets the response.
+Then, it maps the data to an HTML file to display it.
+
 
 
 
@@ -455,19 +592,27 @@ Nothing fancy here!
 Now, let’s check the Dockerfile for our Node.js application.
 
 
+
+
 The steps are similar to what we did before:
+
 Define a base image for Node.js.
 
-    Copy the source files into the container.
-    Expose the port 3000 (since our frontend runs on this port).
-    Run the Node.js application.
+
+Copy the source files into the container.
+Expose the port 3000 
+Run the Node.js application.
+
+
 
 
 Now, let’s build the Docker image for our Node.js frontend.
 
 
 We run the Docker build command, 
+
 and once it's done, we take a screenshot and add it to our documentation.
+
 
 
 
@@ -475,14 +620,21 @@ and once it's done, we take a screenshot and add it to our documentation.
 Next, we run the frontend container inside the 
 same Docker network as the backend and database.
 
+
+
 Now, let’s open the browser and check http://localhost:3000.
 
 
-Yes! We can now see the data from our Java backend, 
-beautifully displayed in the frontend.
+Great! The frontend is now successfully fetching 
+and displaying data from our Java backend. 
 
 
+
+Everything looks perfect !
 Our three-tier app is fully set up and working as expected!
+
+
+
 
 
 Database: MySQL
@@ -490,16 +642,22 @@ Middle Tier (Backend): Java Spring Boot
 Frontend: Node.js
 
 
-Let’s manually add some data to the MySQL database.
 
-The process is almost the same as before!
+Let’s insert some data into the MySQL database manually.
+
+The steps are very similar to what we did previously.
 
 
-Now, we refresh the browser…
-Yes! The newly added data appears in the frontend instantly!
+After refreshing the browser… voilà! 
+The new data shows up in the frontend immediately.
+
+
+
+
 
 
  That’s it! We’ve successfully built and run a three-tier application inside Docker. 
+
  Thanks for watching!
 
 
