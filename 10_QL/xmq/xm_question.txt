@@ -1,7 +1,15 @@
 
 
 
-#object-data
+#Gdu 
+==================================================
+Java Multiple inheritance (Diamond Problem) vs Multilevel Inheritance? what is support ? How C++ solve DiamoneProblem ?
+Normal Forms in DBMS-Whatis 3rd Normal form?
+Types of API/Application Testing
+
+
+
+#Object-data 
 ==================================================
 1) Spring boot vs spring Framework
 2) Currect Project Structure: componetn / technology / 
@@ -4827,6 +4835,7 @@ Database & ORM
 Ans:
 Normalization: Organize data to reduce redundancy and ensure data integrity by applying normal 
 forms (up to 3NF, or higher if needed).
+
 Indexing: Use indexes to speed up query performance, especially on columns used in WHERE clauses, JOINs, and ORDER BY.
     Read vs. Write Trade-offs:
         Read-heavy workloads benefit from more indexes to speed up query performance.
@@ -4893,16 +4902,32 @@ Database normalization organizes data to reduce redundancy and improve integrity
     First Normal Form (1NF)
         The simplest level of normalization, which ensures that each table has a primary key and each column has atomic values. 
         A single cell cannot contain multiple values like "Red, Blue." Split them into separate rows.
-    Second Normal Form (2NF)
-        Must be in 1NF.
-        Eliminates partial dependencies by ensuring that non-key attributes depend only on the primary key. 
-        What this means, in essence, is that there should be a direct relationship between each column and the primary key, 
-        and not between other columns.
+    Second Normal Form (2NF):
+        Must be in 1NF, Applies when you have composite primary key.
+    Rule:
+        Must be in 1NF
+        No partial dependency
+        Non-key columns must depend on FULL primary key
+
+        Example Table:
+        StudentID	Subject	StudentName.
+            Primary Key = (StudentID, Subject)
+        Problem:
+        StudentName depends only on StudentID
+        Not on Subject
+
     Third Normal Form (3NF): 
         Remove transitive dependency (non-key columns should not depend on other non-key columns).
         3NF builds on 2NF by requiring that all non-key attributes are independent of each other. 
         This means that each column should be directly related to the primary key, and not to any other columns in the same table.
         If column A depends on column B, and B depends on the primary key, move A to another table.
+        Example:
+            StudentID | DeptID | DeptName |
+            Problem:
+            DeptName depends on DeptID
+            DeptID depends on StudentID
+
+
     Boyce-Codd Normal Form (BCNF)
         This is a more strict version of 3NF that addresses additional anomalies. 
         At this normalization level, every determinant is a candidate key.
@@ -5566,18 +5591,59 @@ Agile Model:
     Divides the project into small, manageable parts (sprints).
     Emphasizes collaboration, customer feedback, and adapting to change.
 
-7) Software Testing - Unit Testing vs Integration Testing, Code Review Process
-    Unit Testing:
-    Tests individual components or functions in isolation.
-    Ensures the correctness of small, specific parts of the code.
 
-    Integration Testing:
-    Tests how different modules or systems work together.
-    Ensures that combined components function correctly.
+7) Type Software Testing and Code Review Process
+    Application and API testing can be broken down into several categories that verify functionality, reliability, performance, and security. 
 
-    Code Review Process:
-    A practice where developers review each other's code for errors, improvements, and adherence to standards.
-    Helps catch issues early, improve code quality, and ensure consistency.
+Functional Testing: This category ensures the application or API works as intended according to specified business requirements. 
+    Unit Testing: Tests individual components, methods, or functions in isolation to confirm they return the correct output for a given input.
+    Functional Testing: Validates that the API's features and operations perform correctly based on the requirements, focusing on the business logic layer.
+    Integration Testing: Verifies that different modules, APIs, or services interact correctly with each other and external systems like databases.
+    End-to-End (E2E) Testing: Replicates an entire user workflow, potentially involving multiple API calls and components, to ensure the complete system functions as expected in a real-world scenario.
+    Smoke Testing: A set of quick, basic tests run after a build or deployment to ensure core functionalities are working and that more extensive testing can proceed.
+    Regression Testing: Involves re-running existing tests after code changes (bug fixes, new features) to ensure that the updates haven't broken any previously working functionality. 
+    Sanity Testing – Ensures specific functionality works after minor changes.
+    Beta Testing – Real users test a pre-release version.
+
+Non-Functional Testing: These tests evaluate the quality attributes of the application or API beyond its core functions. 
+    Performance Testing: Measures how the API performs under various workloads to assess speed, stability, and scalability.
+        Load Testing: Simulates expected traffic volumes to verify the API can handle typical usage without performance degradation.
+        Stress Testing: Pushes the API beyond its normal operating capacity to identify breaking points and observe behavior under extreme conditions.
+        Soak Testing (Endurance Testing): Subjects the API to a steady load over a long period to detect memory leaks or performance degradation over time.
+    Security Testing: Identifies vulnerabilities to external threats and ensures proper access control mechanisms are in place.
+        Authentication and Authorization Testing: Confirms that only users with valid credentials and appropriate permission levels can access protected resources.
+        Fuzz Testing: Injects random or unexpected data to the API's inputs to discover vulnerabilities, potential crashes, or improper error handling.
+        Penetration Testing: Simulates a real-world attack to evaluate the system's defenses and uncover security weaknesses.
+    Reliability Testing: Ensures the API consistently performs its functions under normal and unexpected conditions.
+    Compatibility Testing: Verifies that the API functions correctly across different platforms, operating systems, and environments. 
+
+
+Other Relevant Testing Types:
+    Error Handling Testing: Ensures the API returns appropriate HTTP status codes and informative messages for invalid requests or system failures.
+    Documentation Testing: Validates that the API's documentation (endpoints, parameters, error codes) accurately reflects its actual behavior, which is vital for developer experience.
+    Contract Testing: Ensures that the API's structure and data format adhere to the defined contract or schema, often used to manage agreements between API producers and consumers. 
+
+
+Based on Test Approach:
+    Manual Testing – Testers execute test cases manually without automation.
+    Automation Testing – Test scripts are written to automatically execute test cases.
+        Tools: Selenium, JUnit, TestNG, Cypress, etc.
+
+Based on Test Timing:
+    Static Testing – Code is tested without execution (e.g., reviews, walkthroughs).
+    Dynamic Testing – Code is executed and the behavior is verified.
+
+
+
+
+Code Review Process:
+    Code review is the systematic examination of source code by peers to identify bugs, improve code quality, and ensure best practices are followed.
+
+A. Purpose of Code Review
+    Improve code quality and maintainability.
+    Detect bugs early.
+    Share knowledge across the team.
+    Ensure adherence to coding standards.
 
 
 
