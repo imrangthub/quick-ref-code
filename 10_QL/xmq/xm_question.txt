@@ -4966,11 +4966,11 @@ Database normalization organizes data to reduce redundancy and improve integrity
         Non-key columns must depend on FULL primary key
 
         Example Table:
-        StudentID	Subject	StudentName.
-            Primary Key = (StudentID, Subject)
+        StudentID	SubjectID	StudentName.
+            Primary Key = (StudentID, SubjectlID)
         Problem:
         StudentName depends only on StudentID
-        Not on Subject
+        Not on SubjectID
 
     Third Normal Form (3NF): 
         Remove transitive dependency (non-key columns should not depend on other non-key columns).
@@ -5019,6 +5019,29 @@ ACID ensures database transactions are processed reliably:
         Database Indexing:
         Speeds up data retrieval by creating a structured reference to table data.
         Types: B-tree, Hash, and Full-text indexes.
+
+🗑️ DELETE
+    Removes rows (data only)
+    Can use WHERE
+    Can rollback (if transaction)
+⚡ TRUNCATE
+    Removes all rows
+    Faster than DELETE
+    No WHERE
+    Resets auto-increment
+    Limited/no rollback
+💥 DROP
+    Removes entire table (data + structure)
+    Cannot rollback (usually)
+    Table is gone completely
+
+MySQL, the database engine itself (InnoDB) maintains the AUTO_INCREMENT value.Managed per table.
+ALTER TABLE table_name AUTO_INCREMENT = 1;
+
+
+
+remove() = delete a row (entity) from DB using JPA/Hibernate
+Deletes an entity (row) from the database.
 
 
 
@@ -5118,6 +5141,54 @@ ORM Relationship Best Practices:
     Fetch Strategy: Choose between Lazy or Eager loading based on use case (e.g., avoid Eager loading in large datasets).
     Avoid N+1 Problem: Use JOIN FETCH to optimize queries in One to Many and Many to Many.
     Cascade Operations: Use cascade types (PERSIST, MERGE, REMOVE) judiciously to propagate changes to related entities.
+
+
+N+1 Problem:
+solve JOIN FETCH.
+
+Without JOIN FETCH
+    Query: SELECT o FROM Order o → 1 query for orders
+    Then, for each order, when you call o.getItems() → N queries (one per order)
+    Total queries = 1 + N → N+1 problem
+
+List<Order> orders = entityManager.createQuery("SELECT o FROM Order o", Order.class)
+                                  .getResultList();
+
+for(Order o : orders) {
+    System.out.println(o.getItems().size()); // triggers N queries
+}
+
+    Example (3 orders):
+    Query 1: SELECT * FROM orders;       → 3 rows
+    Query 2: SELECT * FROM order_items WHERE order_id=1;
+    Query 3: SELECT * FROM order_items WHERE order_id=2;
+    Query 4: SELECT * FROM order_items WHERE order_id=3;
+
+
+
+✅ Fix with JOIN FETCH
+List<Order> orders = entityManager.createQuery(
+        "SELECT o FROM Order o JOIN FETCH o.items", Order.class)
+        .getResultList();
+
+for(Order o : orders) {
+    System.out.println(o.getItems().size()); // all loaded in 1 query
+}
+
+With JOIN FETCH
+    Query: SELECT o FROM Order o JOIN FETCH o.items → 1 query
+    Loads all orders and their items in one go
+    No extra queries when you access o.getItems()
+
+    Example result (1 query):
+
+    Query: SELECT o.*, i.* FROM orders o
+        LEFT JOIN order_items i ON o.id = i.order_id;
+    Hibernate maps the items to each order automatically.
+
+JOIN FETCH = load parent + children in one DB hit; without it = N+1 queries.
+
+
 
 
 8) JPA Cascading Type, JPA Fetching Strategy 
