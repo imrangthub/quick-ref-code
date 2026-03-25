@@ -3461,6 +3461,63 @@ application server (e.g., WildFly, WebSphere).
 
 
 
+Apache Tomcat:
+--------------------------
+Primarily: Servlet Container (✔️ correct)
+Also acts as: Web Server (✔️ limited)
+Not a full: Application Server (❌)
+
+1. Servlet Container (Main Identity)
+    Tomcat is designed to run Java web applications using:
+    Servlets
+    JSP (JavaServer Pages)
+
+    👉 So, its main role = Servlet Container
+
+2. Web Server (Basic Capability)
+    Tomcat can:
+    Handle HTTP requests
+    Serve static content (HTML, CSS, images)
+
+    👉 That means it works like a web server, but:
+    Not as powerful as full web servers like Apache HTTP Server or Nginx
+
+3. Application Server (Not Fully)
+    A full application server (like:
+    JBoss
+    WebLogic
+    WebSphere)
+
+    supports:
+    EJB (Enterprise JavaBeans)
+    JMS (Messaging)
+    Advanced transaction management
+    👉 Tomcat does NOT support these fully, so:
+
+
+🧠 Easy Way to Remember
+Tomcat = Web Server + Servlet Container (Lightweight)
+Not full Java EE Application Server
+
+
+
+
+Spring MVC runs on Servlet API
+
+Spring web apps (Spring MVC / REST API):
+
+Are built on Servlets
+Need a Servlet Container only
+
+👉 Tomcat provides exactly that:
+
+Handles HTTP request
+Calls Spring DispatcherServlet
+Returns response
+
+✅ That’s enough to run your backend
+
+
 
 All-in-one:
     Apache Tomcat (acts as both servlet container and lightweight application server).
@@ -3886,86 +3943,65 @@ Both servers provide essential logging for monitoring and troubleshooting.
 
 12) Configuring L4, L7 LoadBalancer with Nginx
 
-Used for: TCP and UDP traffic (like MySQL, database connections, etc.).
-Works at: The Transport Layer (Layer 4) of the OSI model.
-How it works: Nginx performs load balancing based on IP address and port without inspecting the content of 
-the data being transmitted.
-    For example, with MySQL, Nginx can distribute requests from clients to multiple backend MySQL servers 
-    based solely on the connection's IP address and port (default 3306 for MySQL).
-    Since Nginx does not inspect the packet contents, it does not require knowledge of the application-layer 
-    protocol (like HTTP).
+For L4 load balancing:
+    Used for: TCP and UDP traffic (like MySQL, database connections, etc.).
+    Works at: The Transport Layer (Layer 4) of the OSI model.
+    How it works: Nginx performs load balancing based on IP address and port without inspecting the content of 
+    the data being transmitted.
+        For example, with MySQL, Nginx can distribute requests from clients to multiple backend MySQL servers 
+        based solely on the connection's IP address and port (default 3306 for MySQL).
+        Since Nginx does not inspect the packet contents, it does not require knowledge of the application-layer 
+        protocol (like HTTP).
 
 
+    Basic TCP Load Balancing: For L4 load balancing, configure Nginx to proxy TCP traffic to backend servers.
+    stream {
+        upstream tcp_backend {
+            server backend1.example.com:8080;
+            server backend2.example.com:8080;
+        }
 
-Basic TCP Load Balancing: For L4 load balancing, configure Nginx to proxy TCP traffic to backend servers.
-stream {
-    upstream tcp_backend {
-        server backend1.example.com:8080;
-        server backend2.example.com:8080;
+        server {
+            listen 12345;  # Incoming port for TCP traffic
+            proxy_pass tcp_backend;  # Forward to upstream TCP servers
+        }
     }
-
-    server {
-        listen 12345;  # Incoming port for TCP traffic
-        proxy_pass tcp_backend;  # Forward to upstream TCP servers
-    }
-}
 
 
 
 L7 Load Balancing (Layer 7 - Application Layer): 
-Used for: HTTP(S) traffic (web applications, APIs, etc.).
-Works at: The Application Layer (Layer 7) of the OSI model.
-How it works: Nginx performs load balancing by inspecting the content of HTTP requests (e.g., URL path, headers, cookies) 
-and can make decisions based on this data.
-For example, Nginx can route HTTP traffic to different backend servers depending on the URL path or use advanced features like SSL termination, cookie-based session persistence, etc.
+    Used for: HTTP(S) traffic (web applications, APIs, etc.).
+    Works at: The Application Layer (Layer 7) of the OSI model.
+    How it works: Nginx performs load balancing by inspecting the content of HTTP requests (e.g., URL path, headers, cookies) 
+    and can make decisions based on this data.
+    For example, Nginx can route HTTP traffic to different backend servers depending on the URL path or use advanced features like SSL termination, cookie-based session persistence, etc.
 
 
 
-Basic HTTP Load Balancing: For L7 load balancing, configure Nginx to proxy HTTP requests to backend web servers.
-http {
-    upstream http_backend {
-        server backend1.example.com;
-        server backend2.example.com;
-    }
+    Basic HTTP Load Balancing: For L7 load balancing, configure Nginx to proxy HTTP requests to backend web servers.
+    http {
+        upstream http_backend {
+            server backend1.example.com;
+            server backend2.example.com;
+        }
 
-    server {
-        listen 80;  # HTTP port
-        server_name example.com;
+        server {
+            listen 80;  # HTTP port
+            server_name example.com;
 
-        location / {
-            proxy_pass http://http_backend;  # Forward HTTP requests to upstream backend servers
-            proxy_set_header Host $host;
-            proxy_set_header X-Real-IP $remote_addr;
-            proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+            location / {
+                proxy_pass http://http_backend;  # Forward HTTP requests to upstream backend servers
+                proxy_set_header Host $host;
+                proxy_set_header X-Real-IP $remote_addr;
+                proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+            }
         }
     }
-}
 
 Key Differences:
     L4 Load Balancing is used for non-HTTP protocols (like MySQL, SSH, etc.) and makes decisions based on IP and port.
     L7 Load Balancing is used for HTTP/HTTPS traffic and makes decisions based on the application layer 
     (like URLs, headers, cookies).
-
-
-Key Features of stream in Nginx:
-In Nginx, the stream block is used to handle TCP and UDP traffic, which operates at Layer 4 (L4) of the OSI model. 
-This block enables Nginx to act as a reverse proxy for non-HTTP protocols, 
-allowing it to distribute traffic to backend servers for services that use TCP or UDP, such as databases, 
-mail servers, or custom applications.
-
-Basic Example of stream Block (TCP Load Balancing):
-    stream {
-        upstream tcp_backend {
-            server backend1.example.com:3306;
-            server backend2.example.com:3306;
-        }
-
-        server {
-            listen 3306;  # Listen on TCP port 3306 (MySQL)
-            proxy_pass tcp_backend;  # Forward requests to upstream backend servers
-        }
-    }
-
 
 
 
@@ -4141,7 +4177,7 @@ Types:
 
 
 
-4
+##4
 ===============================================================
 ##Web, HTTP and Other Communication Protocols	
 ===============================================================
@@ -4201,6 +4237,7 @@ Ans
     2xx: Success
         200 OK: Request succeeded.
         201 Created: Resource created successfully.
+        202 a request has been accepted for processing, but the processing has not been completed.
         204 No Content: Request succeeded, no content to return.
     3xx: Redirection
         301 Moved Permanently: Resource moved to a new URL.
@@ -4720,8 +4757,9 @@ Basic Javascript, DOM Manipulation, and Event Handling, Form Validation
 
 
 ##5
+===============================================================
 Basic Networking	
-=============================================================
+===============================================================
 1) Understanding Network Layer, TCP/IP Stack
 TCP/IP Stack:
     The TCP/IP Stack is the foundational model for network communication. It consists of four layers:
@@ -4842,9 +4880,13 @@ Docker uses network drivers to manage container-to-container and container-to-ho
 
 
 
+
+
+
 ##6
+===============================================================
 Database & ORM	
-========================================================
+===============================================================
 1)DB Design and Best Practices
 Ans:
 Normalization: Organize data to reduce redundancy and ensure data integrity by applying normal 
@@ -5381,8 +5423,9 @@ Ans:
 
 
 ##7	
+===============================================================
 Version Control	What is git ?
-=============================================
+===============================================================
 What is Git?
 A distributed version control system for tracking changes in code.
 GitLab,GitHub: A web-based DevOps platform with Git repository hosting.
@@ -5468,8 +5511,9 @@ Types of Git Reset:
 
 
 ##8
+===============================================================
 Software Engineering	
-=======================================================================
+===============================================================
 1) SOLID Principle, DRY, YAGNI, KISS
 SOLID:
 A set of five design principles for creating maintainable and scalable software:
@@ -5664,8 +5708,9 @@ A. Purpose of Code Review
 
 
 ##9
+===============================================================
 Basic Linux	Understanding Linux OS
-============================================================
+===============================================================
 1) Understanding Command Line
 SH (Shell):
     A shell is a command-line interface that allows users to interact with the operating system by typing commands.
@@ -5879,8 +5924,9 @@ Example with iptables:
 
 
 ##10
+===============================================================
 Distributed System	Communication
-==============================================================================
+===============================================================
 1) Different Types of Communication Pattern
 A distributed system consists of multiple interconnected components that communicate over a network to achieve a common goal. 
 Communication between these components is vital for the system's functionality. 
