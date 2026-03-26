@@ -3,7 +3,8 @@
 
 #Gdu 
 ==================================================
-Java Multiple inheritance (Diamond Problem) vs Multilevel Inheritance? what is support ? How C++ solve DiamoneProblem ?
+Java Multiple inheritance (Diamond Problem) vs Multilevel Inheritance? what is support ? 
+How C++ solve DiamoneProblem ?
 Normal Forms in DBMS-Whatis 3rd Normal form?
 Types of API/Application Testing
 
@@ -665,6 +666,8 @@ FROM – JOIN – ON – WHERE – GROUP BY – HAVING – SELECT – ORDER BY �
 =================================================
 @@##ead | staff-level or senior Java roles
 =================================================     
+
+
 1. ☕ What really happens when you type new in Java?
 Why it’s asked:
 To assess your understanding of memory management, object creation, and the JVM under the hood.
@@ -783,6 +786,181 @@ Sealed classes restrict inheritance using permits keyword.
 Improves exhaustiveness checks in switch expressions.
 Great for modeling state machines, domain models, or exhaustive enums.
 
+
+
+
+
+
+
+
+##OAuth2 vs OAuth2.1:
+=================================================================
++---------------------------------------------------+-------------------------------------------------------------------------------------+
+| Feature                                           | OAuth 2.0 (Original)                                      | OAuth 2.1 (Current Best Practice)                     |
++---------------------------------------------------+-------------------------------------------------------------------------------------+
+| PKCE                                              | Optional (mostly for mobile/SPAs).                        | Mandatory for all clients using Authorization Code.   |
++---------------------------------------------------+-------------------------------------------------------------------------------------+
+| Implicit Flow                                     | Allowed (but discouraged).                                | Removed. (Security risk: tokens in URLs).             |
++---------------------------------------------------+-------------------------------------------------------------------------------------+
+| Password Grant                                    | Allowed (Resource Owner Password).                        | Removed. (Security risk: sharing credentials).        |
++---------------------------------------------------+-------------------------------------------------------------------------------------+
+| Redirect URIs                                     | Flexible/Partial matching allowed.                        | Exact string matching required.                       |
++---------------------------------------------------+-------------------------------------------------------------------------------------+
+| Refresh Tokens                                    | No strict requirement.                                    | Must be Sender-Constrained or use Rotation.           |
++---------------------------------------------------+-------------------------------------------------------------------------------------+
+
+
++---------------------------------------------------------------------------------------------+
+|               [OAuth2 vs OAuth2.1                                                           |
++---------------------------------------------------------------------------------------------+
+| 1. OAuth2 (RFC 6749)                                                                        |
++---------------------------------------------------------------------------------------------+
+| • Authorization framework (not authentication)                                              |
+| • Uses access_token (and optional refresh_token)                                            |
++---------------------------------------------------------------------------------------------+
+| Main Flows:                                                                                 |
++---------------------------------------------------------------------------------------------+
+| 1. Authorization Code                                                                       |
+|    Client → /authorize → User login → code                                                  |
+|    Client → /token (code + client_secret) → access_token                                    |
++---------------------------------------------------------------------------------------------+
+| 2. Implicit (⚠ deprecated now)                                                              |
+|    Client → /authorize → access_token directly (in URL)                                     |
++---------------------------------------------------------------------------------------------+
+| 3. Resource Owner Password (⚠ deprecated)                                                   |
+|    User → Client (username/password) → /token → access_token                                |
++---------------------------------------------------------------------------------------------+
+| 4. Client Credentials                                                                       |
+|    Client → /token (client_id + secret) → access_token                                      |
++---------------------------------------------------------------------------------------------+
+| 5. Refresh Token                                                                            |
+|    Client → /token (refresh_token) → new access_token                                       |
++---------------------------------------------------------------------------------------------+
+| Issues in OAuth2:                                                                           |
++---------------------------------------------------------------------------------------------+
+| • Implicit flow (token in browser → unsafe)                                                 |
+| • No PKCE by default                                                                        |
+| • Weak security guidance                                                                    |
++---------------------------------------------------------------------------------------------+
+| 2. OAuth2.1 (Modern / Best Practice)                                                        |
++---------------------------------------------------------------------------------------------+
+| • Not final RFC (but widely adopted best practice)                                          |
+| • Combines OAuth2 + security improvements                                                   |
++---------------------------------------------------------------------------------------------+
+| Changes:                                                                                    |
++---------------------------------------------------------------------------------------------+
+| ✔ Removes:                                                                                  |
+|    • Implicit Flow ❌                                                                       |
+|    • Password Flow ❌                                                                       |
++---------------------------------------------------------------------------------------------+
+| ✔ Requires:                                                                                 |
+|    • PKCE (Proof Key for Code Exchange) for all clients                                     |
+|    • Secure redirect URIs                                                                   |
+|    • Strong token handling                                                                  |
++---------------------------------------------------------------------------------------------+
+| Main Flow (Recommended):                                                                    |
+| Authorization Code + PKCE:                                                                  |
++---------------------------------------------------------------------------------------------+
+| 1. Client → /authorize (code_challenge)                                                     |
+| 2. User logs in                                                                             |
+| 3. Server → returns code                                                                    |
+| 4. Client → /token (code + code_verifier)                                                   |
+| 5. Server → returns access_token (+ refresh_token)                                          |
++---------------------------------------------------------------------------------------------+
+| 3) OAuth2 vs OAuth2.1 (Quick Diff)                                                          |
++---------------------------------------------------------------------------------------------+
+| OAuth2:                                                                                     |
+| • Multiple flows (some insecure)                                                            |
+| • PKCE optional                                                                             |
+| • Implicit & Password allowed                                                               |
++---------------------------------------------------------------------------------------------+
+| OAuth2.1:                                                                                   |
+| • Only secure flows                                                                         |
+| • PKCE mandatory                                                                            |
+| • Implicit & Password removed                                                               |
++---------------------------------------------------------------------------------------------+
+| 4. Simple Flow Example (OAuth2.1)                                                           |
++---------------------------------------------------------------------------------------------+
+| [Frontend]                                                                                  |
+| → Redirect user to /authorize (with PKCE)                                                   |
+| [Auth Server]                                                                               |
+| → User login → returns code                                                                 |
+| [Backend]                                                                                   |
+| → Exchange code + verifier → get access_token                                               |
+| → Use token to call APIs                                                                    |
++---------------------------------------------------------------------------------------------+
+| 5. Summary                                                                                  |
++---------------------------------------------------------------------------------------------+
+| OAuth2 = Flexible but less secure (old flows exist)                                         |
+| OAuth2.1 = Simplified + secure (only best practices)                                        |
+| Use: Authorization Code + PKCE ✔                                                            |
+| Avoid: Implicit & Password ❌                                                               |
++---------------------------------------------------------------------------------------------+
+
+
+
+OAut2.1 flow:
++---------------------------------------------------------------------------------------------+
+|                  The Flows (The "Short & Easy" Version)                                     |
++---------------------------------------------------------------------------------------------+
+| OAuth 2.1 simplifies things by funneling almost everyone into the Authorization Code Flow.  |
++---------------------------------------------------------------------------------------------+
+| 1. Authorization Code Flow (with PKCE)                                                      |
+|    The gold standard for almost every app (Web, Mobile, SPA).                               |
++---------------------------------------------------------------------------------------------+
+|    1. Code Challenge: The app creates a secret "Code Verifier" and hashes it into a         |
+|       "Code Challenge."                                                                     |
+|    2. Authorize: User goes to the Auth Server. The app sends the Code Challenge.            |
+|    3. Code Exchange: After login, the server gives the app a temporary Authorization Code.  |
+|    4. Token Exchange: The app sends the Code + the original Code Verifier.                  |
+|    5. Validation: The server verifies the hash. If it matches, it issues the Access Token.  |
++---------------------------------------------------------------------------------------------+
+| 2. Client Credentials Flow                                                                  |
+|    For Machine-to-Machine (M2M) communication (no user involved).                           |
++---------------------------------------------------------------------------------------------+
+|    1. Request: Service A sends its client_id and client_secret directly to the Token        |
+|       Endpoint.                                                                             |
+|    2. Response: Server validates the secret and returns an Access Token.                    |
+|    3. Usage: Service A uses the token to call Service B’s API.                              |
++---------------------------------------------------------------------------------------------+
+| 3. Device Authorization Flow                                                                |
+|    For devices with limited input (Smart TVs, CLI tools).                                   |
++---------------------------------------------------------------------------------------------+
+|    1. Request: Device asks the server for a "User Code" (e.g., ABCD-1234).                  |
+|    2. User Action: User goes to a URL on their phone/laptop and enters the code.            |
+|    3. Polling: The device polls the server in the background.                               |
+|    4. Success: Once the user approves, the server gives the device an Access Token.         |
++---------------------------------------------------------------------------------------------+
+| Key Security Upgrades in 2.1                                                                |
++---------------------------------------------------------------------------------------------+
+| • No More "Implicit Flow": In 2.0, tokens were often passed in the URL fragment, making     |
+|   them easy to leak via browser history or Referer headers. 2.1 kills this entirely.        |
+|                                                                                             |
+| • PKCE Everywhere: Originally made for mobile apps to prevent "Authorization Code           |
+|   Interception," 2.1 mandates it for web apps too, protecting against "Authorization Code  |
+|   Injection."                                                                               |
+|                                                                                             |
+| • Strict Redirects: You can no longer use wildcards in your redirect URLs                   |
+|   (e.g., *.myapp.com). You must register the exact URL to prevent attackers from stealing   |
+|   codes via open redirects.                                                                 |
++---------------------------------------------------------------------------------------------+
+
+
+
+
+
+How to maintain Security in Angular ?
+-------------------------------------------
+Authentication & Authorization
+    Use token-based authentication:
+    Prefer JWT (JSON Web Tokens) for SPAs.
+    Store tokens securely; avoid localStorage for sensitive data if possible. Use HTTP-only cookies.
+
+Implement role-based access control (RBAC):
+    Angular: Use Route Guards (CanActivate, CanLoad) to restrict routes.
+    React: Use higher-order components (HOCs) or custom hooks to wrap protected routes.
+    OAuth 2.0 / OpenID Connect:
+    Offload authentication to a secure provider (e.g., Azure AD, Auth0, Google).
 
 
 
@@ -1182,6 +1360,61 @@ A class inherits from multiple parent classes.
 
 Multilevel Inheritance (Supported in Java)
 A class is inherited in a chain (hierarchical manner).
+
+
+Desc:
+Multilevel Inheritance (Java ✅ Supported)
+Chain of inheritance:
+A → B → C
+Example: Child inherits from Parent, Parent inherits from Grandparent
+✔ Java supports this (with classes)
+
+
+Multiple Inheritance / Diamond Problem (Java ❌ Not Supported with classes)
+
+Structure:
+
+    A
+   / \
+  B   C
+   \ /
+    D
+
+Problem: If both B and C override a method from A, 
+then D gets confused → which method to use?
+❌ Java does NOT support multiple inheritance with classes (to avoid this ambiguity)
+
+
+Does Java support Multiple Inheritance at all?
+✔ Yes, using interfaces:
+
+Java resolves conflict by forcing override in child:
+
+interface A { default void show() {} }
+interface B { default void show() {} }
+
+class C implements A, B {
+    public void show() {
+        A.super.show(); // must specify
+    }
+}
+
+
+C++ Supported multiple:
+How C++ solves Diamond Problem (✅ Supported)
+C++ allows multiple inheritance but uses virtual inheritance to fix duplication.
+
+
+class A {
+public:
+    int x;
+};
+
+class B : virtual public A {};
+class C : virtual public A {};
+
+class D : public B, public C {};
+
 
 
 
@@ -3415,6 +3648,53 @@ But if you need custom configurations, especially in large monolithic applicatio
 
 
 
+[Spring Boot Key Features - Short]
+
+1. Auto-Configuration
+
+* Auto setup based on dependencies
+* Example: Add JPA → DB + Hibernate auto-configured
+
+Example:
+// Add dependency
+spring-boot-starter-data-jpa
+
+➡ Spring Boot auto-configures:
+    DataSource
+    Hibernate
+    Transaction Manager
+    (No manual config needed)
+
+
+2. Embedded Server
+* Built-in server (no deploy needed)
+* Example: Run jar → starts on port 8080
+
+3. Starter Dependencies
+* Ready-made dependency bundles
+* Example: spring-boot-starter-web → MVC + Tomcat + JSON
+
+Example (Maven):
+
+<dependency>
+  <groupId>org.springframework.boot</groupId>
+  <artifactId>spring-boot-starter-web</artifactId>
+</dependency>
+
+➡ Includes:
+Spring MVC
+Jackson (JSON)
+Embedded Tomcat
+(No need to add each manually)
+
+
+
+4. Default Configuration
+* Predefined settings
+* Example: Default port 8080 (change via application.properties)
+
+
+
 
 
 
@@ -5292,6 +5572,9 @@ Multitenancy:
 
 
 14) JPA - Locking: Optimistic and Pessimistic Lock
+
+Locking prevents two users from updating the same data at the same time, which would cause "Lost Updates."
+
 Optimistic Locking:
     Assumes no conflicts. It uses a version field to check if the entity has been changed by another transaction.
     Example:
@@ -5319,6 +5602,147 @@ Use Optimistic Locking where conflicts are rare, and the application can handle 
 Use Pessimistic Locking for critical operations where conflicts are expected and must be avoided.
 
 
+Example in Spring Data JPA:
+    @Lock(LockModeType.PESSIMISTIC_WRITE)
+    @QueryHints({@QueryHint(name = "javax.persistence.lock.timeout", value = "5000")})
+    Optional<Product> findById(Long id);
+
+
+
+
+Optimistic vs Pessimistic Locking:
+========================================================
+ Optimistic Locking (Automatic) :
++---------------------------------------------------------------------------------------------+
+|    Best for most web apps. High performance, no DB deadlocks.                               |
++---------------------------------------------------------------------------------------------+
+| Requirement:                                                                            |
+| • Add a version column (INT) to your DB table.                                              |
++---------------------------------------------------------------------------------------------+
+| The Code:                                                                                   |
+| @Entity                                                                                     |
+| public class Product {                                                                      |
+|     @Id                                                                                     |
+|     private Long id;                                                                        |
+|     private String name;                                                                    |
+|                                                                                             |
+|     @Version                          // Hibernate manages this automatically               |
+|     private Integer version;                                                                |
+| }                                                                                           |
++---------------------------------------------------------------------------------------------+
+| The Logic:                                                                                  |
+| 1. User A and B both fetch version: 1.                                                      |
+| 2. User A saves first → DB updates to version: 2.                                           |
+| 3. User B tries to save version: 1 → DB says "No" because it's already 2.                   |
+| 4. Result: Hibernate throws OptimisticLockException.                                        |
++---------------------------------------------------------------------------------------------+
+
+
+
+Pessimistic Locking (Manual):
++---------------------------------------------------------------------------------------------+
+|    Best for high-concurrency "Money/Inventory" operations.                                  |
++---------------------------------------------------------------------------------------------+
+| Requirement:                                                                                |
+| • No extra columns needed.                                                                  |
++---------------------------------------------------------------------------------------------+
+| The Code (Repository):                                                                      |
+| @Lock(LockModeType.PESSIMISTIC_WRITE)                                                       |
+| Optional<Product> findWithLockById(Long id);                                                |
++---------------------------------------------------------------------------------------------+
+| The Logic:                                                                                  |
+| 1. User A calls findWithLockById.                                                           |
+| 2. The Database locks the row (SQL: SELECT ... FOR UPDATE).                                 |
+| 3. User B tries to read/write the same row → User B must wait until User A commits.         |
+| 4. Result: No conflict, but slower because users queue up.                                  |
++---------------------------------------------------------------------------------------------+
+| Quick Comparison                                                                            |
++---------------------------------------------------------------------------------------------+
+| Type                | How it triggers          | When it fails     | Best For                          |
++---------------------------------------------------------------------------------------------+
+| Optimistic          | @Version annotation      | At Commit time    | 90% of apps (CMS, Profiles)       |
+| Pessimistic         | @Lock on query           | At Select time    | Banking, Stock, Tickets           |
++---------------------------------------------------------------------------------------------+
+
+
+
++---------------------------------------------------------------------------------------------+
+|                    Pessimistic Locking Modes in Hibernate / JPA                             |
++---------------------------------------------------------------------------------------------+
+| 1. PESSIMISTIC_WRITE (The Standard Lock)                                                    |
+|    This is the most common one. It creates an exclusive lock.                               |
++---------------------------------------------------------------------------------------------+
+| • SQL: SELECT ... FOR UPDATE                                                                |
+|                                                                                             |
+| • What it does: Nobody else can update or delete this row. In many databases                |
+|   (like Oracle/PostgreSQL), other users cannot even use FOR UPDATE on this row              |
+|   until you are done.                                                                       |
+|                                                                                             |
+| • Use case: You are about to change the data (e.g., deducting money from a balance).        |
++---------------------------------------------------------------------------------------------+
+| 2. PESSIMISTIC_READ (The Shared Lock)                                                       |
+|    This is a shared lock.                                                                   |
++---------------------------------------------------------------------------------------------+
+| • SQL: SELECT ... FOR SHARE (or LOCK IN SHARE MODE)                                         |
+|                                                                                             |
+| • What it does: It prevents other users from updating or deleting the row, but it allows    |
+|   other users to also "Read Lock" the same row.                                             |
+|                                                                                             |
+| • Use case: You want to ensure the data doesn't change while you are looking at it,         |
+|   but you don't necessarily need to update it yourself.                                     |
++---------------------------------------------------------------------------------------------+
+| 3. PESSIMISTIC_FORCE_INCREMENT                                                              |
+|    This is a hybrid of Pessimistic and Optimistic locking.                                  |
++---------------------------------------------------------------------------------------------+
+| • SQL: SELECT ... FOR UPDATE + an automatic version bump.                                   |
+|                                                                                             |
+| • What it does: It locks the row physically and it forces the @Version column to increase  |
+|   even if you didn't change any data in the entity.                                         |
+|                                                                                             |
+| • Use case: Used when you change a "Child" entity but want the "Parent" entity's version    |
+|   to increase to show a change happened in the relationship.                                |
++---------------------------------------------------------------------------------------------+
+
+
+
+Jap Query Hints:
++---------------------------------------------------------------------------------------------+
+| 1. No Wait (NOWAIT)                                                                         |
+|    If the row is already locked by another transaction, your code throws an exception       |
+|    immediately instead of hanging.                                                          |
++---------------------------------------------------------------------------------------------+
+| Java Code:                                                                                  |
+| @Lock(LockModeType.PESSIMISTIC_WRITE)                                                       |
+| @QueryHints(@QueryHint(name = "javax.persistence.lock.timeout", value = "0")) // 0 = No Wait |
+| Optional<Product> findById(Long id);                                                        |
++---------------------------------------------------------------------------------------------+
+| • Use Case: A "Flash Sale" where you'd rather tell the user "System busy, try again"        |
+|   than have them wait for a 30-second timeout.                                              |
++---------------------------------------------------------------------------------------------+
+| 2. Skip Locked (SKIP LOCKED)                                                                |
+|    This is the "Secret Sauce" for high-performance background jobs. It simply ignores       |
+|    any rows that are currently being processed by another worker.                           |
++---------------------------------------------------------------------------------------------+
+| Java Code:                                                                                  |
+| @Lock(LockModeType.PESSIMISTIC_WRITE)                                                       |
+| @QueryHints(@QueryHint(name = "jakarta.persistence.lock.timeout", value = "-2"))            |
+| // -2 is the standard code for SKIP LOCKED                                                  |
+| @Query("select t from Task t where t.status = 'PENDING'")                                   |
+| List<Task> findNextAvailableTasks(Pageable pageable);                                       |
++---------------------------------------------------------------------------------------------+
+| • Use Case: You have 10 worker threads sending emails. SKIP LOCKED ensures Thread A         |
+|   doesn't try to send the same email Thread B is already working on.                        |
++---------------------------------------------------------------------------------------------+
+| 3. Time Out (WAIT X)                                                                        |
+|    Your application will wait for a specific number of milliseconds before giving up        |
+|    and throwing an error.                                                                   |
++---------------------------------------------------------------------------------------------+
+| Java Code:                                                                                  |
+| @Lock(LockModeType.PESSIMISTIC_WRITE)                                                       |
+| @QueryHints(@QueryHint(name = "javax.persistence.lock.timeout", value = "5000"))            |
+| // 5000ms = 5 seconds                                                                       |
+| Optional<Product> findById(Long id);                                                        |
++---------------------------------------------------------------------------------------------+
 
 
 
