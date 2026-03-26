@@ -89,8 +89,8 @@ Senior JAVA Engineer-required skill
 8) Why Redis so Faster
 
 
-Asynchronous programming is a technique that allows a system to perform multiple tasks c
-oncurrently without waiting for one task to finish before starting another. 
+Asynchronous programming is a technique that allows a system to perform multiple tasks 
+concurrently without waiting for one task to finish before starting another. 
 asynchronous operations allow a program to continue executing other tasks while waiting for a long-running operation 
 (like I/O, network calls, or database queries) to complete.
 
@@ -115,6 +115,14 @@ How to Achieve Multithreading in Java:
     ✔ ExecutorService → Use for efficient thread pool management.
     ✔ Callable & Future → Use when threads need to return values.
     ✔ ForkJoinPool → Use for parallel processing.
+
+    Multithreading: Parallel Streams (The Functional Way)
+        List<Long> ticketIds = Arrays.asList(1L, 2L, 3L, 4L, 5L);
+
+        ticketIds.parallelStream().forEach(id -> {
+            // Java automatically splits this list across your CPU cores
+            log.info("Processing ticket " + id + " on thread " + Thread.currentThread().getName());
+        });
 
 
 
@@ -168,11 +176,49 @@ Internal Iteration (Stream API) lets JVM handle iteration, enabling faster & par
 
 
 How Spring Boot Auto-Configuration Works? 
-    Spring Boot Auto-Configuration automatically configures beans based on classpath dependencies and application properties.
+    Spring Boot Auto-Configuration automatically configures beans based on classpath dependencies 
+    and application properties.
     Registers Beans Automatically
     Example: If H2 or MySQL driver is found, Spring Boot configures a DataSource automatically.
     Spring Boot Checks Dependencies
     If you add a dependency (e.g., spring-boot-starter-web), Spring Boot detects it.
+
+
+as:
+1. Automatic Bean Registration
+Spring Boot scans classpath dependencies and registers beans automatically if they are needed.
+Example:
+// Add H2 database dependency in pom.xml or build.gradle
+spring-boot-starter-data-jpa
+com.h2database:h2
+Spring Boot automatically creates a DataSource bean for H2:
+@Bean
+public DataSource dataSource() {
+    return new EmbeddedDatabaseBuilder()
+           .setType(EmbeddedDatabaseType.H2)
+           .build();
+}
+You don’t need to manually define the DataSource in @Configuration.
+
+
+3. Dependency Detection
+Spring Boot checks which starter dependencies are included:
+spring-boot-starter-web → configures Tomcat, DispatcherServlet, Jackson for JSON automatically.
+spring-boot-starter-data-jpa → configures EntityManagerFactory, TransactionManager, DataSource.
+This is done by scanning spring.factories files in the dependencies (or META-INF/spring/org.springframework.boot.autoconfigure.AutoConfiguration.imports in Spring Boot 2.7+).
+
+
+4. Properties-Based Customization
+Auto-configuration reads application.properties or application.yml to customize beans.
+Example: Configure H2 datasource:
+spring.datasource.url=jdbc:h2:mem:testdb
+spring.datasource.username=sa
+spring.datasource.password=
+spring.datasource.driver-class-name=org.h2.Driver
+Spring Boot overrides defaults using these properties, keeping configuration flexible.
+
+
+
 
 
 #Brain Station 23  | Software Engineer, JAVA
@@ -180,7 +226,7 @@ How Spring Boot Auto-Configuration Works?
 1) What is Spring and Spring Boot?
 2) What different between Rest Api and Normal API?
 3) How work OAuth2 with Spring Security?
-4) What is different Server generated token and Other same info token ?
+4) What is different Server generated token and Other same info token in jwt ?
 5) Java Abstract class extemd another abstract class for limit abstraction.
 6) Java Interface, Same argument for differnet class in a Method.
 7) Oracle Table Indexcing is good if it done for every column in a table?
@@ -322,6 +368,13 @@ When to Use a Private Class?
 A private class can only exist inside another class (it cannot be a top-level class).
     There are two types of private inner classes:
         Private (Non-Static ) Inner Class:
+
+Key Rules:
+Top-level classes cannot be private → compiler error.
+Inner classes can be private → only outer class can access them.
+Private static nested class → good for helper classes that don’t need outer instance.
+Anonymous inner class → implicitly hidden, often private in scope.
+
 
 
 
@@ -663,6 +716,13 @@ FROM – JOIN – ON – WHERE – GROUP BY – HAVING – SELECT – ORDER BY �
 
 
 
+
+
+
+
+
+
+
 =================================================
 @@##ead | staff-level or senior Java roles
 =================================================     
@@ -961,6 +1021,28 @@ Implement role-based access control (RBAC):
     React: Use higher-order components (HOCs) or custom hooks to wrap protected routes.
     OAuth 2.0 / OpenID Connect:
     Offload authentication to a secure provider (e.g., Azure AD, Auth0, Google).
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -5743,6 +5825,59 @@ Jap Query Hints:
 | // 5000ms = 5 seconds                                                                       |
 | Optional<Product> findById(Long id);                                                        |
 +---------------------------------------------------------------------------------------------+
+
+
+In Row sql:
+-------------------------------------------------------------
+The "Magic" Combo Explained:
+When you combine them, the database follows this logic for every row it hits:
+
+FOR UPDATE: "I want to lock this row so I can change it safely. If it's free, put my name on it in the Lock Table."
+
+SKIP LOCKED: "If someone else’s name is already on this row, don't wait for them. Just pretend this row doesn't exist and move to the next one."
+
+
+SELECT * FROM book LIMIT 5 FOR UPDATE;
+-- Add SKIP LOCKED if you don't want to wait for other users
+SELECT * FROM book LIMIT 5 FOR UPDATE SKIP LOCKED;
+
+
+
+JPA Repository Code:
+---------------------------------------
+In Spring Data JPA, you don't write the SQL manually. 
+You use the @Lock annotation and a Pageable object to handle the LIMIT.
+
+public interface BookRepository extends JpaRepository<Book, Long> {
+    @Lock(LockModeType.PESSIMISTIC_WRITE) // This adds "FOR UPDATE"
+    @QueryHints(@QueryHint(name = "jakarta.persistence.lock.timeout", value = "-2")) // This adds "SKIP LOCKED"
+    @Query("SELECT b FROM Book b")
+    List<Book> findTop5Books(Pageable pageable);
+}
+
+
+How to call it from your Service:
+@Transactional
+public void processBooks() {
+    // PageRequest.of(0, 5) creates the "LIMIT 5"
+    List<Book> books = bookRepository.findTop5Books(PageRequest.of(0, 5));
+    
+    // These 5 books are now LOCKED in the DB until this method ends.
+}
+
+
+
+
++---------------------------------------------------------------------------------------------+
+|                    Locking Hints – Quick Reference Table                                    |
++---------------------------------------------------------------------------------------------+
+| Keyword              | What it tells the Database                     | Why use it?                                      |
++---------------------------------------------------------------------------------------------+
+| FOR UPDATE           | "Reserved for me."                             | Prevents data corruption / double processing.    |
+| SKIP LOCKED          | "Ignore the busy ones."                        | Prevents threads from hanging or crashing.       |
+| Both Together        | "Give me the next 5 free rows."                | High-speed, parallel background processing.      |
++---------------------------------------------------------------------------------------------+
+
 
 
 
