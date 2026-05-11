@@ -336,6 +336,7 @@ Protected: Accessible within the same package and by subclasses.
     The protected access modifier allows access to members within the same package and 
     by subclasses (even if they are in different packages).
     Restrictions: Non-subclass classes outside the package1 cannot directly access protected members.
+
     Examlple:
         Parent.java class has a protected method: protected void displayMessage();
         Now a chile cllas in differenet package not able to accessa this displayMessage(); createing new object of Parent class
@@ -353,6 +354,7 @@ Protected: Accessible within the same package and by subclasses.
     But not as:
         // Parent parent = new Parent();
         // parent.displayMessage(); // Compilation error: displayMessage() is not accessible directly.
+
 Default (no modifier): Accessible within the same package.
 
 Constructor:
@@ -494,11 +496,6 @@ Ans:
         System.out.println(s1 == s2); // Output: false (different references)
 
 The JVM sees the literal "Hello". It checks the String Pool. If "Hello" isn't there, it creates it.
-
-Summary of your scenario:
-    String Pool: Contains one "Hello" object.
-    Heap (outside pool): Contains two distinct String objects.
-    Total Objects: 3 String objects were involved.
 
 
 
@@ -888,9 +885,18 @@ The Java Collection Framework (JCF) is a set of classes and interfaces in Java t
 manipulate, and retrieve data efficiently. 
 It includes various List, Set, Queue, and Map implementations.
 
-    The Java Collection Framework provides a set of interfaces and classes to handle groups of objects. 
-    It is part of the java.util package and includes 
-    three main types  interfaces, with concrete classes to handle groups of objects: List, Set, and Map.
+
+Main Root Interfaces
+    List
+    Set
+    Queue
+
+Map (Separate hierarchy)
+Used for key-value pairs:
+    HashMap
+    TreeMap
+
+
 
 List, Set, and Map are interfaces.
 ArrayList, LinkedList, HashSet, HashMap, and Hashtable are classes that implement these interfaces.
@@ -1356,6 +1362,42 @@ Difference Between Function and Closure:
 Java supports closure-like behavior using Lambda Expressions and Anonymous Classes, 
 but it does not fully support closures like JavaScript or Python. and has some Limitations.
 
+
+
+What is Stream API?
+    Stream API was introduced in Java 8.
+    It allows you to process collections (List, Set, Map, Array, etc.) in a declarative way (what to do, not how to do it).
+
+Key Features:
+    It does not modify the original collection.
+    It is lazy (doesn't process data until necessary).
+    Supports functional programming style using Lambda.
+    Can process data sequentially or in parallel.
+
+Types of Operations in Stream:
+    A. Intermediate Operations (Lazy)
+        These return a new Stream. They are not executed immediately.
+        filter()
+        Filter 
+        elements.filter(x -> x > 5)map()Transform elements.map(x -> x*2)flatMap()Flatten nested structures.flatMap()
+
+    B. Terminal Operations (Eager)
+        These trigger the actual processing and return a result (not a Stream).
+        OperationPurposeReturnscollect()Collect into List/Set/MapCollectionforEach()Perform action on each elementvoid
+
+
+Parallel Stream? (parallelStream())
+    Parallel Stream splits the data into multiple parts and processes them simultaneously using multiple threads (multi-core processing).
+
+List<Integer> result = numbers.parallelStream()
+    .filter(n -> n % 2 == 0)
+    .map(n -> n * n)
+    .collect(Collectors.toList());
+
+How Parallel Processing Works Internally:
+    Stream is divided into multiple chunks (using ForkJoinPool).
+    Each chunk is processed by a different thread.
+    Results from all threads are combined at the end.
 
 
 
@@ -1966,7 +2008,7 @@ Common Types of Thread Pools:
 Ans:
 Fork/Join Framework
 Purpose: Breaks a large task into smaller subtasks (fork), processes them in parallel, and combines the results (join).
-
+    
 Key Classes:
     ForkJoinPool: Manages worker threads.
     RecursiveTask: For tasks that return results.
