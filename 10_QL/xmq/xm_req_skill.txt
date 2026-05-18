@@ -2500,7 +2500,7 @@ Key Stereotype Annotations:
     @Service: A specialized @Component for service layer beans, typically holding business logic.
     @Repository: A specialized @Component for DAO (Data Access Object) classes, often used for database interaction.
                  also makes the class eligible for exception translation, meaning Spring will 
-    automatically convert database-related exceptions (like SQLException) into Spring's DataAccessException.
+                 automatically convert database-related exceptions (like SQLException) into Spring's DataAccessException.
     @Controller: A specialized @Component for Spring MVC controllers that handle HTTP requests.
     @RestController: A combination of @Controller and @ResponseBody, used for REST APIs where the response is 
     typically in JSON or XML format.
@@ -2585,7 +2585,7 @@ Generaic Metod:
 8) Use of @Primary, @Qualifier, @Order, @Lazy, and @Lookup
     @Primary: Use it when you want one bean to be the default choice when there are multiple beans of the same type.
     @Qualifier: Use it to specify exactly which bean to inject when there are multiple candidates of the same type.
-    @Order: Use it to define the order in which beans are processed or injected.
+    @Order: Use it to define the order in which beans are processed or injected.  (Multipl service/component create, when we make list of it it mantain the order !)
     @Lazy: Use it to delay the initialization of a bean until it is actually needed.
     @Lookup: Use it to inject a new instance of a prototype bean into a singleton bean.
 
@@ -2878,6 +2878,21 @@ Use Case: Used when the method must always run inside an existing transaction.
 
 
 
+KEY DIFFERENCE (VERY IMPORTANT):
+| ----------------- | ------------------- | ---------------------------- | ---------------------- |
+| Feature           | Isolation           | Pessimistic Lock             | Optimistic Lock        |
+| ----------------- | ------------------- | ---------------------------- | ---------------------- |
+| Level             | DB transaction rule | Row/table locking            | Version check          |
+| Who controls      | Database engine     | DB + developer               | Application (JPA)      |
+| Blocking          | Sometimes (depends) | YES (locks row)              | NO                     |
+| Performance       | Medium              | Slow (locking)               | Fast                   |
+| Conflict handling | Prevents anomalies  | Prevents conflict by waiting | Detects conflict after |
+| ----------------- | ------------------- | ---------------------------- | ---------------------- |
+
+
+
+
+
 14) Structuring Spring Project
 
 my-spring-project/
@@ -2899,7 +2914,7 @@ my-spring-project/
 ├── pom.xml (or build.gradle)
 └── src/test/ (unit tests)
 
-
+0
 
 15) How to enable actuator endpoints
 1. Add Spring Boot Actuator Dependency
