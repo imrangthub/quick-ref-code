@@ -3324,6 +3324,54 @@ Tomcat still relies on Servlets to handle requests, but Spring hides that comple
 
 
 
+Spring Boot:
+------------------------------------
+Starts embedded Tomcat.
+Creates a DispatcherServlet bean.
+Registers that servlet with Tomcat on the URL pattern /.
+
+Conceptually it does something like:
+
+ServletRegistration.Dynamic registration =
+    servletContext.addServlet(
+        "dispatcherServlet",
+        new DispatcherServlet(applicationContext));
+
+registration.addMapping("/");
+
+So Tomcat knows:
+
+URL /*
+  ↓
+DispatcherServlet
+
+
+
+
+
+
+Browser
+   ↓
+Tomcat
+   ↓
+DispatcherServlet (a Servlet)
+   ↓
+HandlerMapping
+   ↓
+Controller Method
+   ↓
+Service
+   ↓
+Controller Result
+   ↓
+MessageConverter (Jackson)
+   ↓
+HttpServletResponse
+   ↓
+Browser
+
+
+
 
 2) Thread per request vs Event loop. What are the advantages and disadvantages of them.
 Ans
@@ -3880,6 +3928,8 @@ SSL (up to version 3.0) is considered insecure and replaced by TLS.
 
 How They Work Together
 HTTP + TLS = HTTPS: Provides secure web browsing.
+TLS is a security protocol layer that sits between HTTP and TCP and provides encryption, authentication, and data integrity.
+
 During an HTTPS session:
 A TLS/SSL handshake establishes a secure channel.
 HTTP messages are encrypted and transmitted over this channel.
@@ -3903,6 +3953,8 @@ resulting in the same outcome.
 
 Examples of idempotent methods: GET, HEAD, PUT, DELETE, OPTIONS, TRACE 
 Non-idempotent method: POST - sending a POST request multiple times can create multiple resources on the server 
+
+PATCH (sometimes), non-idempotent cases (depending on design).
 
 
 
@@ -4082,6 +4134,23 @@ MySQL Protocol: A custom protocol designed specifically for interacting with MyS
 Oracle Protocol (SQL*Net): Oracle has its own protocol called SQL*Net (also known as Oracle Net Services) 
     for communication between Oracle databases and clients. SQL*Net is more feature-rich and complex compared 
     to MySQL's protocol, as it supports advanced features like advanced security and connection pooling.
+
+
+Spring Boot ↔ TCP ↔ MySQL Server
+Spring Boot ↔ HTTP ↔ MySQL ❌
+
+
+Spring Boot (JDBC / Hibernate)
+        ↓
+MySQL Driver (Connector/J)
+        ↓
+TCP Socket
+        ↓
+MySQL Server (port 3306)
+
+Spring Boot communicates with MySQL using JDBC over TCP using the MySQL binary protocol, not HTTP.
+
+
 
 
 
