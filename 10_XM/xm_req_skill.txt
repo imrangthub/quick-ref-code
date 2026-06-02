@@ -4985,8 +4985,34 @@ Ans:
     @Embedded:
     Defines an embedded object, typically used with @Embeddable class to include its fields in the parent entity.
 
+    @Embeddable and @Embedded
+        These two work as a team. They are used to value-map a reusable group of fields (like an address or GPS coordinates) 
+        into a single database table, rather than creating a separate table with a relationship.
+        @Embeddable: Placed on a class to state that its instances can be stored as part of an owning entity.
+        @Embedded: Placed on the field inside the owning entity to inject those fields.
+    
+            @Embeddable
+            public class Address {
+                private String street;
+                private String city;
+                private String zipCode;
+            }
+
+            @Entity
+            public class User {
+                @Id
+                private Long id;
+                private String name;
+                
+                @Embedded // Fields from Address will be columns in the User table
+                private Address address;
+            }
+
+
+
+
     @EmbeddedId:
-    Defines a composite primary key as an embedded object, typically a class with @Embeddable.
+    Used to define a composite primary key (a primary key made of multiple columns) using an embeddable class.
 
     @Transient:
     Marks a field to be ignored by JPA (not persisted in the database).
@@ -4998,7 +5024,17 @@ Ans:
     Specifies the default fetch strategy (LAZY or EAGER) and whether the field is required to be persisted.
 
     @Cacheable:
-    Marks an entity as eligible for caching to improve performance by storing query results in the cache.
+    Enables or disables Second-Level (L2) Caching for an entity. When enabled, 
+    JPA will cache the entity data across different sessions/transactions, drastically reducing database hits for frequently read, rarely changed data.
+
+        @Entity
+        @Cacheable(true) // Activates L2 cache for this specific entity
+        public class Country {
+            @Id
+            private String code; // e.g., "US", "CA"
+            private String name;
+        }
+
 
 
 11) Spring Data JPA - @Query, @Modify,Specifications, Query Creation from Method Names
@@ -5020,7 +5056,7 @@ Specifications:
 Provides a way to create dynamic queries using the Specification interface, allowing complex queries with conditions.
 
 
-12) uery Creation from Method Names:
+12) Query Creation from Method Names:
 Spring Data JPA can automatically generate queries based on method names.
 Example:
     List<Employee> findByLastName(String lastName);
@@ -5270,6 +5306,10 @@ public void processBooks() {
 | Both Together        | "Give me the next 5 free rows."                | High-speed, parallel background processing.      |
 +---------------------------------------------------------------------------------------------+
 
+You can use both together → FOR UPDATE SKIP LOCKED (Best for queue-like processing)
+You cannot use SKIP LOCKED without FOR UPDATE
+SKIP LOCKED only works with FOR UPDATE or FOR SHARE
+
 
 
 
@@ -5318,6 +5358,26 @@ N additional queries for related entities (N queries), leading to (N+1) queries 
 How to fixed this issue and Best Practice: Use JOIN FETCH for immediate fixes, @BatchSize for batching, 
 and @EntityGraph for flexible fetching!
 
+JOIN FETCH (Triggers exactly 1 query)
+JOIN FETCH forces Hibernate to eagerly load the associated collection in the exact same query using a SQL JOIN.
+// Service Layer
+List<MediaChannel> channels = entityManager
+    .createQuery("SELECT m FROM MediaChannel m JOIN FETCH m.configs", MediaChannel.class)
+    .getResultList(); 
+
+for (MediaChannel channel : channels) {
+    // No extra queries! The data is already loaded in memory.
+    System.out.println(channel.getConfigs().size()); 
+}
+
+
+-- Exactly 1 Query executed
+SELECT m.id, m.channel_name, c.id, c.key, c.value, c.channel_id 
+FROM smet.media_channels m 
+INNER JOIN smet.channel_configs c ON m.id = c.channel_id;
+
+
+
 
 20) Writing Native Query in Spring Data Jpa
 Ans:
@@ -5356,8 +5416,8 @@ Serializable:
     Description: The highest level of isolation, ensuring complete consistency by serializing transactions as if they were executed one after another.
     Phenomena Allowed: None (no Dirty Reads, Non-Repeatable Reads, or Phantom Reads).
     How It Works:
-    Locks the entire range of data accessed to prevent updates, inserts, or deletes by others.
-    Use Case: Applications requiring absolute consistency, such as financial systems.
+        Locks the entire range of data accessed to prevent updates, inserts, or deletes by others.
+        Use Case: Applications requiring absolute consistency, such as financial systems.
 
 
 
@@ -5395,6 +5455,13 @@ There are two types:
     }
     Class-based Projections: Using DTO classes to map the result.
 Both techniques help improve performance by fetching only necessary data.
+
+
+In Spring Boot, data mapping can be done using manual mapping, JPQL constructor-based DTOs, interface projections, 
+and mapping libraries like MapStruct. For simple read-only data, projections are best; for complex or scalable systems, 
+MapStruct or DTO mapping is preferred.
+
+
 
 
 
@@ -5556,7 +5623,7 @@ A set of five design principles for creating maintainable and scalable software:
     Definition: Software entities (classes, modules, functions) should be open for extension but closed for modification.
     Focus: Add new functionality without altering existing code.
     Example:
-    Use interfaces or abstract classes to allow new behaviors without changing existing ones.
+        Use interfaces or abstract classes to allow new behaviors without changing existing ones.
 
     3. Liskov Substitution Principle (LSP)
     Definition: Objects of a superclass should be replaceable with objects of its subclasses without altering the correctness of the program.
@@ -5614,6 +5681,9 @@ Coupling:
 Cohesion:
     Refers to how closely related the responsibilities of a single module or class are.
     High cohesion is preferred, meaning a class should have related functions that belong together.
+
+Coupling = connection between classes
+Cohesion = focus inside a class
 
 
 4) Composition vs Association, IS-A vs HAS-A relationship
@@ -5997,15 +6067,16 @@ Ans:
     typically through redundancy and failover mechanisms.
 
     Resiliency: The ability of a system to recover from failures or disruptions, maintaining functionality and minimizing downtime.
+    System’s ability to recover quickly from failures and keep working.
 
     Common Failure: A failure that affects multiple components of a system simultaneously, 
     often due to shared dependencies or architecture flaws.
 
-    Upstream Resiliency: The ability to handle failures or slowdowns from upstream services 
-    (e.g., databases or external APIs) without impacting the system's performance.
+    Upstream Resiliency: How a service handles problems coming from services it depends on (calls going out).
+    👉 Example: Your service calls payment service → payment service is down.
 
-    Downstream Resiliency: Ensuring that downstream services 
-    (e.g., dependent microservices) can continue operating despite failures or issues in the system.
+    Downstream Resiliency: How a service handles being called by other services under stress or failure conditions.
+    👉 Example: Many users hit your API → you must not crash.
 
 
 5) Event Driven Architecture, Microservice Architecture:
