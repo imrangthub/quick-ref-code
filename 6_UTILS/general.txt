@@ -1,0 +1,32 @@
+#################################################
+#                 Utils                         #
+#################################################
+
+
+
+=================================================
+## USB
+=================================================
+
+fIXED usbdrive issue:
+
+
+1. Verify the USB
+lsblk -o NAME,SIZE,TYPE,FSTYPE,MOUNTPOINTS,MODEL
+
+2. Unmount the USB
+sudo umount /dev/sda1
+
+
+3. Install exFAT support
+sudo apt update
+sudo apt install exfatprogs
+
+4. Create a new partition
+⚠️ This deletes everything on /dev/sda.
+sudo parted /dev/sda --script mklabel gpt
+sudo parted /dev/sda --script mkpart primary 0% 100%
+
+
+5. Verify
+lsblk -f /dev/sda
