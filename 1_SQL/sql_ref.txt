@@ -2184,3 +2184,148 @@ Multivalued dependencies are handled by 4NF, whereas join dependencies are handl
 
 
 
+
+===============================================
+##copy data from one db to another db
+================================================
+cat copy_mysql_tables.sh
+
+#!/bin/bash
+
+# ============================
+# SOURCE DATABASE
+# ============================
+SRC_HOST="192.16.8.11"
+SRC_PORT="3306"
+SRC_USER="myuser"
+SRC_DB="mydb"
+
+# ============================
+# LOCAL DATABASE
+# ============================
+DST_HOST="localhost"
+DST_PORT="3306"
+DST_USER="root"
+DST_DB="mydb"
+
+# ============================
+# Temporary directory
+# ============================
+TMP_DIR="/tmp/mysql_table_dump"
+
+mkdir -p "$TMP_DIR"
+
+echo "=========================================="
+echo "MySQL Table-by-Table Copy"
+echo "=========================================="
+
+# Ask passwords
+read -s -p "Source MySQL password: " SRC_PASS
+echo
+read -s -p "Local MySQL password: " DST_PASS
+echo
+
+# Get table list
+echo ""
+echo "Getting table list from source..."
+
+TABLES=$(mysql \
+    -h "$SRC_HOST" \
+    -P "$SRC_PORT" \
+    -u "$SRC_USER" \
+    -p"$SRC_PASS" \
+    -N \
+    -B \
+    -e "SELECT TABLE_NAME
+        FROM information_schema.TABLES
+        WHERE TABLE_SCHEMA='$SRC_DB'
+        AND TABLE_TYPE='BASE TABLE'
+        ORDER BY TABLE_NAME;")
+
+if [ $? -ne 0 ]; then
+    echo "ERROR: Cannot connect to source database."
+    exit 1
+fi
+
+TABLE_COUNT=$(echo "$TABLES" | wc -l)
+
+echo "Found $TABLE_COUNT tables."
+echo ""
+
+# Create destination database
+mysql \
+    -h "$DST_HOST" \
+    -P "$DST_PORT" \
+    -u "$DST_USER" \
+    -p"$DST_PASS" \
+    -e "CREATE DATABASE IF NOT EXISTS \`$DST_DB\`;"
+
+SUCCESS=0
+FAILED=0
+
+# ==========================================
+# COPY TABLE ONE BY ONE
+# ==========================================
+
+for TABLE in $TABLES
+do
+
+    echo ""
+    echo "=========================================="
+    echo "Copying: $TABLE"
+    echo "=========================================="
+
+    DUMP_FILE="$TMP_DIR/${TABLE}.sql"
+
+    echo "  [1/3] Dumping structure + data..."
+
+    mysqldump \
+        -h "$SRC_HOST" \
+        -P "$SRC_PORT" \
+        -u "$SRC_USER" \
+        -p"$SRC_PASS" \
+        --single-transaction \
+        --no-tablespaces \
+        --set-gtid-purged=OFF \
+        --skip-triggers \
+        "$SRC_DB" "$TABLE" > "$DUMP_FILE"
+
+    if [ $? -ne 0 ]; then
+        echo "  FAILED: Could not dump $TABLE"
+        FAILED=$((FAILED+1))
+        continue
+    fi
+
+    echo "  [2/3] Importing into local DB..."
+
+    mysql \
+        -h "$DST_HOST" \
+        -P "$DST_PORT" \
+        -u "$DST_USER" \
+        -p"$DST_PASS" \
+        "$DST_DB" < "$DUMP_FILE"
+
+    if [ $? -ne 0 ]; then
+        echo "  FAILED: Could not import $TABLE"
+        FAILED=$((FAILED+1))
+        continue
+    fi
+
+    echo "  [3/3] SUCCESS: $TABLE"
+
+    SUCCESS=$((SUCCESS+1))
+
+    rm -f "$DUMP_FILE"
+
+done
+
+echo ""
+echo "=========================================="
+echo "COPY FINISHED"
+echo "=========================================="
+echo "Successful : $SUCCESS"
+echo "Failed     : $FAILED"
+echo "Total      : $TABLE_COUNT"
+echo "=========================================="
+
+
